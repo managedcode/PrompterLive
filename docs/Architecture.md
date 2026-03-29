@@ -49,6 +49,14 @@ flowchart TD
     Ui --> WebApis
 ```
 
+## Media Permission Model
+
+- Browser-first WASM is the only active runtime today, so media access comes from browser origin permissions.
+- Keep local development on the stable launch-settings origin. Do not rotate ports randomly because camera and microphone permissions are origin-bound.
+- There is no server backend in the runtime path. `getUserMedia()` and device enumeration must stay client-side.
+
+If a native embedded browser host returns later, media access must not rely on system permission alone. Follow the dedicated macOS note in [MacEmbeddedWebViewPermissions.md](./MacEmbeddedWebViewPermissions.md).
+
 ## Project Responsibilities
 
 ### `src/PrompterLive.App`
@@ -135,3 +143,4 @@ flowchart LR
 - The runtime must remain backend-free.
 - Visual fidelity should prefer copying the exact design classes and structure over inventing replacements.
 - Browser tests require Playwright Chromium to be installed locally.
+- If macOS embedding returns later, use a persistent `WKWebView` data store, a stable trusted origin, and explicit `requestMediaCapturePermissionFor` handling so camera and microphone prompts are not repeated on every launch.

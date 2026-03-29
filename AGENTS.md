@@ -28,13 +28,15 @@ There is no backend in the runtime shape. The app must boot directly in the brow
 ## Commands
 
 - `dotnet build PrompterLive.slnx`
-- `dotnet run --project src/PrompterLive.App/PrompterLive.App.csproj --urls http://127.0.0.1:5187`
+- `cd /Users/ksemenenko/Developer/PrompterLive/src/PrompterLive.App && dotnet run`
 - `dotnet test tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj`
 - `dotnet test tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj`
 - `dotnet test tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj`
 - `dotnet test PrompterLive.slnx`
 - `dotnet format PrompterLive.slnx`
 - `node tests/PrompterLive.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
+
+Do not override the app URL with `--urls` or random ports. Media permissions are origin-bound, so local development must stay on the stable launch-settings origin.
 
 ## Testing Policy
 
@@ -46,6 +48,7 @@ There is no backend in the runtime shape. The app must boot directly in the brow
 ## Architecture Map
 
 - Read [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterLive/docs/Architecture.md) before non-trivial changes.
+- If a native embedded browser host is ever reintroduced, also read [docs/MacEmbeddedWebViewPermissions.md](/Users/ksemenenko/Developer/PrompterLive/docs/MacEmbeddedWebViewPermissions.md) before touching macOS or BlazorWebView camera/microphone access.
 - Read the nearest local `AGENTS.md` before editing inside that project.
 
 ## Local AGENTS

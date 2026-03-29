@@ -6,7 +6,8 @@
 
 ## Rules
 
-- Launch the real app with `dotnet run` on `src/PrompterLive.App`.
+- `dotnet test` must be enough to run this suite. Do not require env vars, custom ports, or manual app startup.
+- The fixture self-hosts the built WASM assets on a stable local origin for Playwright.
 - Verify routed flows in a real browser.
 - Click real controls instead of only checking static HTML.
 - Keep selectors stable when possible via `data-testid`.
