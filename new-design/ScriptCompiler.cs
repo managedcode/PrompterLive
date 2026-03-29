@@ -1,10 +1,14 @@
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
-using PrompterLive.Core.Models.CompiledScript;
-using PrompterLive.Core.Models.HeadCues;
-using PrompterLive.Core.Models.Tps;
+using System.Threading.Tasks;
+using Teleprompter.Models.CompiledScript;
+using Teleprompter.Models.HeadCues;
+using Teleprompter.Models.Tps;
 
-namespace PrompterLive.Core.Services;
+namespace Teleprompter.Services;
 
 public class ScriptCompiler
 {
@@ -23,6 +27,8 @@ public class ScriptCompiler
     private static readonly Regex BoldMarkdownRegex = new(@"\*\*([^*]+)\*\*", RegexOptions.Compiled);
     private static readonly Regex ItalicMarkdownRegex = new(@"\*(?!\*)([^*]+)\*(?!\*)", RegexOptions.Compiled);
     private static readonly Regex TokenSplitRegex = new(@"(\[[^\[\]]+\]|</?[^>]+>|\{[^{}]+\}|//|/)", RegexOptions.Compiled);
+    private static readonly Regex NumericWpmRegex = new(@"^(?:speed:|wpm:)?(\d+)(?:wpm)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public static readonly Dictionary<string, string> AvailableColors = new(StringComparer.OrdinalIgnoreCase)
     {
         { "red", "#FF5252" },
@@ -95,8 +101,7 @@ public class ScriptCompiler
 
         var baseState = CreateBaseState(targetWpm, emotion);
 
-        var blocks = segment.Blocks ?? [];
-        var hasBlocks = blocks.Count > 0;
+        var hasBlocks = segment.Blocks?.Any() == true;
 
         if (hasBlocks)
         {
@@ -117,7 +122,7 @@ public class ScriptCompiler
                 }
             }
 
-            foreach (var block in blocks)
+            foreach (var block in segment.Blocks)
             {
                 compiledSegment.Blocks.Add(CompileBlock(block, baseState));
             }
@@ -216,7 +221,7 @@ public class ScriptCompiler
         return compiledPhrase;
     }
 
-    private static List<CompiledWord> CompileContent(string? rawText, FormattingState baseState)
+    private List<CompiledWord> CompileContent(string? rawText, FormattingState baseState)
     {
         var results = new List<CompiledWord>();
         if (string.IsNullOrWhiteSpace(rawText))
@@ -297,7 +302,7 @@ public class ScriptCompiler
         }
     }
 
-    private static bool TryHandleTagToken(string token, Stack<ScopeFrame> scopeStack, List<CompiledWord> words)
+    private bool TryHandleTagToken(string token, Stack<ScopeFrame> scopeStack, List<CompiledWord> words)
     {
         if (!IsTagToken(token))
         {
@@ -432,7 +437,7 @@ public class ScriptCompiler
         return true;
     }
 
-    private static void HandleCurlyTagToken(string token, Stack<ScopeFrame> scopeStack)
+    private void HandleCurlyTagToken(string token, Stack<ScopeFrame> scopeStack)
     {
         var inner = token.Substring(1, token.Length - 2).Trim();
         if (string.Equals(inner, "/", StringComparison.Ordinal))
@@ -455,7 +460,7 @@ public class ScriptCompiler
         ApplyCurlyTag(name, argument, scopeStack);
     }
 
-    private static void ApplyCurlyTag(string name, string? argument, Stack<ScopeFrame> scopeStack)
+    private void ApplyCurlyTag(string name, string? argument, Stack<ScopeFrame> scopeStack)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -640,7 +645,7 @@ public class ScriptCompiler
         return 1000;
     }
 
-    private static void AddWord(List<CompiledWord> words, string token, FormattingState state)
+    private void AddWord(List<CompiledWord> words, string token, FormattingState state)
     {
         var clean = token.Trim();
         if (string.IsNullOrEmpty(clean))
@@ -686,7 +691,7 @@ public class ScriptCompiler
         });
     }
 
-    private static string NormalizeContent(string text)
+    private string NormalizeContent(string text)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -743,45 +748,29 @@ public class ScriptCompiler
         return EmotionStyles["neutral"];
     }
 
-    private static string CleanSegmentName(string name)
+    private string CleanSegmentName(string name)
     {
         name = Regex.Replace(name, @"\|\d+WPM.*$", string.Empty, RegexOptions.IgnoreCase);
         return name.Trim();
     }
 
-    private static string CleanBlockName(string name)
+    private string CleanBlockName(string name)
     {
         name = Regex.Replace(name, @"\|\d+WPM.*$", string.Empty, RegexOptions.IgnoreCase);
         return name.Trim();
     }
 
-    private static int CalculateORP(string word)
+    private int CalculateORP(string word)
     {
         var length = word.Length;
-        if (length <= 2)
-        {
-            return 0;
-        }
-
-        if (length <= 5)
-        {
-            return 1;
-        }
-
-        if (length <= 9)
-        {
-            return 2;
-        }
-
-        if (length <= 13)
-        {
-            return 3;
-        }
-
+        if (length <= 2) return 0;
+        if (length <= 5) return 1;
+        if (length <= 9) return 2;
+        if (length <= 13) return 3;
         return 4;
     }
 
-    private static TimeSpan CalculateDisplayDuration(string word, int wpm)
+    private TimeSpan CalculateDisplayDuration(string word, int wpm)
     {
         var clamped = ClampWpm(wpm);
         var baseMs = 60000.0 / clamped;
@@ -791,10 +780,16 @@ public class ScriptCompiler
 
     private sealed record EmotionColorSet(string Background, string Text, string Accent);
 
-    private sealed class ScopeFrame(string tag, ScriptCompiler.FormattingState state)
+    private sealed class ScopeFrame
     {
-        public string Tag { get; } = tag.ToLowerInvariant();
-        public FormattingState State { get; } = state;
+        public ScopeFrame(string tag, FormattingState state)
+        {
+            Tag = tag.ToLowerInvariant();
+            State = state;
+        }
+
+        public string Tag { get; }
+        public FormattingState State { get; }
     }
 
     private sealed class FormattingState

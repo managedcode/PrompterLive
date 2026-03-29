@@ -97,6 +97,48 @@ flowchart LR
     Page --> Session
 ```
 
+## Diagnostics Contracts
+
+```mermaid
+flowchart LR
+    WasmHost["PrompterLive.App<br/>ILogger configuration"]
+    Layout["MainLayout + DiagnosticsBanner"]
+    Boundary["LoggingErrorBoundary"]
+    Diagnostics["UiDiagnosticsService"]
+    Pages["Library / Editor / Learn / Teleprompter / Settings"]
+    Browser["BrowserSettingsStore"]
+    Session["ScriptSessionService"]
+
+    WasmHost --> Diagnostics
+    Pages --> Diagnostics
+    Browser --> WasmHost
+    Session --> WasmHost
+    Diagnostics --> Layout
+    Boundary --> Diagnostics
+```
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Page as "Routed page"
+    participant Diagnostics as "UiDiagnosticsService"
+    participant Logger as "ILogger"
+    participant Boundary as "LoggingErrorBoundary"
+
+    User->>Page: Trigger load/save/device action
+    Page->>Diagnostics: RunAsync(operation, message, action)
+    Diagnostics->>Logger: Information start/success
+    alt Recoverable failure
+        Diagnostics->>Logger: Error with exception
+        Diagnostics-->>Page: Current recoverable entry
+        Page-->>User: Banner with dismiss action
+    else Unhandled render failure
+        Boundary->>Logger: Critical exception
+        Boundary->>Diagnostics: ReportFatal(...)
+        Boundary-->>User: Fatal fallback with retry/library actions
+    end
+```
+
 ## Media Permission Model
 
 - Browser-first WASM is the only active runtime today, so media access comes from browser origin permissions.
@@ -119,6 +161,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - exact design shell and imported `new-design` assets
 - browser interop and app DI wiring
 - dynamic library folder components and folder/document browser storage adapters
+- UI diagnostics banner and global error boundary
 
 Rules:
 

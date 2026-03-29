@@ -1,9 +1,10 @@
+using System.IO;
 using System.Text.RegularExpressions;
+using Teleprompter.Localization;
+using Teleprompter.Models.Documents;
+using Teleprompter.Models.Tps;
 
-using PrompterLive.Core.Models.Documents;
-using PrompterLive.Core.Models.Tps;
-
-namespace PrompterLive.Core.Services;
+namespace Teleprompter.Services;
 
 /// <summary>
 /// Parser for TPS (TelePrompterScript) markdown format
@@ -13,22 +14,28 @@ public partial class TpsParser
     // Regex patterns for TPS format parsing
     [GeneratedRegex(@"^---\s*$", RegexOptions.Multiline)]
     private static partial Regex FrontMatterDelimiter();
-
+    
     [GeneratedRegex(@"^##\s*\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]", RegexOptions.Multiline)]
     private static partial Regex SegmentHeader();
-
+    
     [GeneratedRegex(@"^##\s+(.+)$", RegexOptions.Multiline)]
     private static partial Regex SimpleSegmentHeader();
-
+    
     [GeneratedRegex(@"^###\s*\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\]]*))?\]", RegexOptions.Multiline)]
     private static partial Regex BlockHeader();
-
+    
     [GeneratedRegex(@"\[pause:(\d+(?:ms|s))\]")]
     private static partial Regex PauseMarker();
-
+    
+    [GeneratedRegex(@"\[emphasis\](.*?)\[/emphasis\]")]
+    private static partial Regex EmphasisMarker();
+    
+    [GeneratedRegex(@"\[(\d+)wpm\](.*?)\[/\d+wpm\]", RegexOptions.IgnoreCase)]
+    private static partial Regex WpmMarker();
+    
     [GeneratedRegex(@"\[edit_point(?::(\w+))?\]")]
     private static partial Regex EditPointMarker();
-
+    
     // NOTE: Curly brace syntax {style,color}...{/} is DEPRECATED and no longer supported
     // All formatting must use bracket syntax: [tag]...[/tag]
 
@@ -96,10 +103,7 @@ public partial class TpsParser
     /// </summary>
     private static string ProcessEscapeSequences(string text)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return text;
-        }
+        if (string.IsNullOrEmpty(text)) return text;
 
         return text
             .Replace(@"\\", EscapedBackslash.ToString())  // Must be first
@@ -115,10 +119,7 @@ public partial class TpsParser
     /// </summary>
     private static string RestoreEscapedCharacters(string text)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return text;
-        }
+        if (string.IsNullOrEmpty(text)) return text;
 
         return text
             .Replace(EscapedBracketOpen, '[')
@@ -189,7 +190,7 @@ public partial class TpsParser
         var segmentPositions = segmentMatches.Cast<Match>().Select(m => m.Index).ToList();
         segmentPositions.Add(content.Length);
 
-        for (var i = 0; i < segmentMatches.Count; i++)
+        for (int i = 0; i < segmentMatches.Count; i++)
         {
             var match = segmentMatches[i];
             var segmentEnd = segmentPositions[i + 1];
@@ -250,7 +251,7 @@ public partial class TpsParser
             var blockPositions = blockMatches.Cast<Match>().Select(m => m.Index).ToList();
             blockPositions.Add(segmentContent.Length);
 
-            for (var j = 0; j < blockMatches.Count; j++)
+            for (int j = 0; j < blockMatches.Count; j++)
             {
                 var blockMatch = blockMatches[j];
                 var blockEnd = blockPositions[j + 1];
@@ -274,12 +275,10 @@ public partial class TpsParser
         return Task.FromResult(document);
     }
 
-    private static TimeSpan? ParseDuration(string durationString)
+    private TimeSpan? ParseDuration(string durationString)
     {
         if (string.IsNullOrWhiteSpace(durationString))
-        {
             return null;
-        }
 
         // Parse formats like "0:00-1:30" or "1:30"
         var parts = durationString.Split('-');
@@ -303,7 +302,7 @@ public partial class TpsParser
         return null;
     }
 
-    private static bool TryParseTime(string timeString, out TimeSpan time)
+    private bool TryParseTime(string timeString, out TimeSpan time)
     {
         time = TimeSpan.Zero;
         var parts = timeString.Trim().Split(':');
@@ -355,15 +354,68 @@ public partial class TpsParser
             Segments = segments.ToArray()
         };
     }
+    
+    /// <summary>
+    /// Clean TPS content to remove all formatting
+    /// </summary>
+    private string CleanTpsContent(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return string.Empty;
+
+        var text = content;
+
+        // Remove segment headers: ## [SegmentName|WPM|Emotion]
+        text = Regex.Replace(text, @"^##\s*\[[^\]]+\].*$", "", RegexOptions.Multiline);
+
+        // Remove block headers: ### [BlockName|WPM]
+        text = Regex.Replace(text, @"^###\s*\[[^\]]+\].*$", "", RegexOptions.Multiline);
+
+        // Clean all words
+        var lines = text.Split('\n');
+        var cleanedLines = new List<string>();
+
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                cleanedLines.Add("");
+                continue;
+            }
+
+            // Process each word to remove formatting
+            var words = line.Split(' ');
+            var cleanWords = new List<string>();
+
+            foreach (var word in words)
+            {
+                var cleanWord = CleanWord(word);
+                if (!string.IsNullOrEmpty(cleanWord))
+                {
+                    cleanWords.Add(cleanWord);
+                }
+            }
+
+            if (cleanWords.Any())
+            {
+                cleanedLines.Add(string.Join(" ", cleanWords));
+            }
+        }
+
+        // Remove excessive blank lines
+        var result = string.Join("\n", cleanedLines);
+        result = Regex.Replace(result, @"\n{3,}", "\n\n");
+
+        return result.Trim();
+    }
 
     /// <summary>
     /// Extract front matter and content from TPS
     /// </summary>
-    private static (Dictionary<string, string> frontMatter, string content) ExtractFrontMatter(string tpsContent)
+    private (Dictionary<string, string> frontMatter, string content) ExtractFrontMatter(string tpsContent)
     {
         var frontMatter = new Dictionary<string, string>();
         var content = tpsContent;
-
+        
         var frontMatterMatch = FrontMatterDelimiter().Matches(tpsContent);
         if (frontMatterMatch.Count >= 2)
         {
@@ -371,7 +423,7 @@ public partial class TpsParser
             var end = frontMatterMatch[1].Index;
             var frontMatterText = tpsContent[start..end].Trim();
             content = tpsContent[(frontMatterMatch[1].Index + frontMatterMatch[1].Length)..].Trim();
-
+            
             // Parse YAML-like front matter
             var lines = frontMatterText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
@@ -385,20 +437,20 @@ public partial class TpsParser
                 }
             }
         }
-
+        
         return (frontMatter, content);
     }
-
+    
     /// <summary>
     /// Parse segments from content
     /// </summary>
     private List<ScriptSegment> ParseSegments(string content, Dictionary<string, string> frontMatter)
     {
         var segments = new List<ScriptSegment>();
-
+        
         // Try complex format first
         var segmentMatches = SegmentHeader().Matches(content);
-
+        
         // If no complex segments, try simple format
         if (segmentMatches.Count == 0)
         {
@@ -408,7 +460,7 @@ public partial class TpsParser
                 return ParseSimpleSegments(content, segmentMatches);
             }
         }
-
+        
         if (segmentMatches.Count == 0)
         {
             // No segments defined, create a single default segment
@@ -416,8 +468,8 @@ public partial class TpsParser
             segments.Add(CreateDefaultSegment(content, words));
             return segments;
         }
-
-        for (var i = 0; i < segmentMatches.Count; i++)
+        
+        for (int i = 0; i < segmentMatches.Count; i++)
         {
             var match = segmentMatches[i];
             var segmentName = match.Groups[1].Value;
@@ -440,7 +492,7 @@ public partial class TpsParser
             // Time is now calculated automatically, not parsed from format
             var startTime = "0:00";
             var endTime = "0:00";
-
+            
             // Get colors for this emotion
             var colors = GetEmotionColors(emotion);
 
@@ -460,38 +512,38 @@ public partial class TpsParser
                 Content = segmentContent,
                 Blocks = blocks.ToArray()
             };
-
+            
             segments.Add(segment);
         }
-
+        
         return segments;
     }
-
+    
     /// <summary>
     /// Parse simple segments with emotion emojis and inline tags
     /// </summary>
-    private static List<ScriptSegment> ParseSimpleSegments(string content, MatchCollection segmentMatches)
+    private List<ScriptSegment> ParseSimpleSegments(string content, MatchCollection segmentMatches)
     {
         var segments = new List<ScriptSegment>();
-        var totalWordCount = 0;
-
-        for (var i = 0; i < segmentMatches.Count; i++)
+        int totalWordCount = 0;
+        
+        for (int i = 0; i < segmentMatches.Count; i++)
         {
             var match = segmentMatches[i];
             var segmentTitle = match.Groups[1].Value.Trim();
-
+            
             // Extract segment content
             var startPos = match.Index + match.Length;
-            var endPos = i + 1 < segmentMatches.Count
-                ? segmentMatches[i + 1].Index
+            var endPos = i + 1 < segmentMatches.Count 
+                ? segmentMatches[i + 1].Index 
                 : content.Length;
-
+            
             var segmentContent = content[startPos..endPos].Trim();
-
+            
             // Parse emotion from emoji at start of content
             var emotion = "neutral";
             var speed = 250;
-
+            
             // Check for emoji and emotion at start
             var emojiPattern = @"^([😊😟🎯💪⚡🚨😌😢😠😨💼🕊️🌧️])\s*(\w+)?";
             var emojiMatch = Regex.Match(segmentContent, emojiPattern);
@@ -502,7 +554,7 @@ public partial class TpsParser
                 // Remove emoji from content
                 segmentContent = segmentContent.Substring(emojiMatch.Length).Trim();
             }
-
+            
             // Check for speed tags in content
             var speedPattern = @"\[(\d+)WPM\]";
             var speedMatch = Regex.Match(segmentContent, speedPattern, RegexOptions.IgnoreCase);
@@ -510,13 +562,13 @@ public partial class TpsParser
             {
                 speed = wpm;
             }
-
+            
             // Parse into blocks with inline formatting
             var blocks = ParseInlineBlocks(segmentContent, emotion, speed);
-
+            
             // Count words
             var wordCount = CountWords(segmentContent);
-
+            
             // Get colors for this emotion
             var colors = GetEmotionColors(emotion);
 
@@ -533,18 +585,18 @@ public partial class TpsParser
                 Content = segmentContent,
                 Blocks = blocks.ToArray()
             };
-
+            
             segments.Add(segment);
             totalWordCount += wordCount;
         }
-
+        
         return segments;
     }
-
+    
     /// <summary>
     /// Map emoji to emotion name
     /// </summary>
-    private static string MapEmojiToEmotion(string emoji)
+    private string MapEmojiToEmotion(string emoji)
     {
         return emoji switch
         {
@@ -564,30 +616,27 @@ public partial class TpsParser
             _ => "neutral"
         };
     }
-
+    
     /// <summary>
     /// Parse blocks with inline formatting tags
     /// </summary>
-    private static List<ScriptBlock> ParseInlineBlocks(string content, string defaultEmotion, int defaultSpeed)
+    private List<ScriptBlock> ParseInlineBlocks(string content, string defaultEmotion, int defaultSpeed)
     {
         var blocks = new List<ScriptBlock>();
-
+        
         // Split by paragraphs or major formatting changes
         var lines = content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
-        var blockStartIndex = 0;
-
+        int blockStartIndex = 0;
+        
         foreach (var line in lines)
         {
             var blockContent = line.Trim();
-            if (string.IsNullOrEmpty(blockContent))
-            {
-                continue;
-            }
-
+            if (string.IsNullOrEmpty(blockContent)) continue;
+            
             // Check for inline emotion changes
             var emotion = defaultEmotion;
             var speed = defaultSpeed;
-
+            
             // Check for color tags that might indicate emotion
             if (blockContent.Contains("[red]") || blockContent.Contains("[yellow]"))
             {
@@ -601,16 +650,16 @@ public partial class TpsParser
             {
                 emotion = "positive";
             }
-
+            
             // Check for speed changes
             var speedMatch = Regex.Match(blockContent, @"\[(\d+)WPM\]", RegexOptions.IgnoreCase);
             if (speedMatch.Success && int.TryParse(speedMatch.Groups[1].Value, out var blockSpeed))
             {
                 speed = blockSpeed;
             }
-
+            
             var wordCount = CountWords(blockContent);
-
+            
             var block = new ScriptBlock
             {
                 Name = AppText.Format("Parser.Block.Indexed", blocks.Count + 1),
@@ -621,11 +670,11 @@ public partial class TpsParser
                 Content = blockContent,
                 Phrases = ParsePhrases(blockContent).ToArray()
             };
-
+            
             blocks.Add(block);
             blockStartIndex += wordCount;
         }
-
+        
         // If no blocks created, make one default block
         if (blocks.Count == 0)
         {
@@ -640,18 +689,18 @@ public partial class TpsParser
                 Phrases = ParsePhrases(content).ToArray()
             });
         }
-
+        
         return blocks;
     }
-
+    
     /// <summary>
     /// Parse blocks within a segment
     /// </summary>
-    private static List<ScriptBlock> ParseBlocks(string segmentContent)
+    private List<ScriptBlock> ParseBlocks(string segmentContent)
     {
         var blocks = new List<ScriptBlock>();
         var blockMatches = BlockHeader().Matches(segmentContent);
-
+        
         if (blockMatches.Count == 0)
         {
             // No blocks defined, create a single default block
@@ -665,23 +714,23 @@ public partial class TpsParser
             });
             return blocks;
         }
-
-        for (var i = 0; i < blockMatches.Count; i++)
+        
+        for (int i = 0; i < blockMatches.Count; i++)
         {
             var match = blockMatches[i];
             var blockName = match.Groups[1].Value;
             var wpmSpec = match.Groups[2].Value;
             var emotion = match.Groups[3].Value;
-
+            
             // Extract block content
             var startPos = match.Index + match.Length;
-            var endPos = i + 1 < blockMatches.Count
-                ? blockMatches[i + 1].Index
+            var endPos = i + 1 < blockMatches.Count 
+                ? blockMatches[i + 1].Index 
                 : segmentContent.Length;
-
+            
             var blockContent = segmentContent[startPos..endPos].Trim();
             var phrases = ParsePhrases(blockContent);
-
+            
             var block = new ScriptBlock
             {
                 Name = blockName,
@@ -692,35 +741,32 @@ public partial class TpsParser
                 Content = blockContent,
                 Phrases = phrases.ToArray()
             };
-
+            
             blocks.Add(block);
         }
-
+        
         return blocks;
     }
-
+    
     /// <summary>
     /// Parse phrases within a block
     /// </summary>
-    private static List<ScriptPhrase> ParsePhrases(string blockContent)
+    private List<ScriptPhrase> ParsePhrases(string blockContent)
     {
         var phrases = new List<ScriptPhrase>();
-
+        
         // Split by sentence boundaries for now (could be more sophisticated)
         var sentences = blockContent.Split(new[] { '.', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
-
-        var startIndex = 0;
+        
+        int startIndex = 0;
         foreach (var sentence in sentences)
         {
             var cleanSentence = sentence.Trim();
-            if (string.IsNullOrEmpty(cleanSentence))
-            {
-                continue;
-            }
-
+            if (string.IsNullOrEmpty(cleanSentence)) continue;
+            
             var words = TokenizeContent(cleanSentence);
             var parsedWords = ParseWords(cleanSentence);
-
+            
             var phrase = new ScriptPhrase
             {
                 Text = cleanSentence,
@@ -728,25 +774,25 @@ public partial class TpsParser
                 EndIndex = startIndex + words.Length - 1,
                 Words = parsedWords.ToArray()
             };
-
+            
             phrases.Add(phrase);
             startIndex += words.Length;
         }
-
+        
         return phrases;
     }
-
+    
     /// <summary>
     /// Parse individual words with their properties
     /// </summary>
-    private static List<ScriptWord> ParseWords(string text)
+    private List<ScriptWord> ParseWords(string text)
     {
         var words = new List<ScriptWord>();
-
+        
         // First, let's extract and preserve color information
         var processedText = text;
         var wordColors = new Dictionary<string, string>();
-
+        
         // Extract paired emotion tags and convert to colors
         processedText = Regex.Replace(processedText,
             $@"\[({EmotionAlt})\]([^\[]*?)\[\/(?:{EmotionAlt})\]",
@@ -756,10 +802,7 @@ public partial class TpsParser
                 var content = match.Groups[2].Value;
                 var color = EmotionTextColors.GetValueOrDefault(emotion, "#808080");
                 foreach (var word in content.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                {
                     wordColors[word] = color;
-                }
-
                 return content;
             }, RegexOptions.IgnoreCase);
 
@@ -771,10 +814,7 @@ public partial class TpsParser
                 var color = match.Groups[1].Value;
                 var content = match.Groups[2].Value;
                 foreach (var word in content.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                {
                     wordColors[word] = color;
-                }
-
                 return content;
             }, RegexOptions.IgnoreCase);
 
@@ -809,10 +849,10 @@ public partial class TpsParser
         // 9. Final cleanup: Remove any remaining [something] tags
         // This is a catch-all for any other formatting tags
         processedText = Regex.Replace(processedText, @"\[[^\]]*\]", "", RegexOptions.IgnoreCase);
-
+        
         // Now tokenize the cleaned text
         var tokens = TokenizeContent(processedText);
-
+        
         foreach (var token in tokens)
         {
             // Handle pause markers
@@ -826,10 +866,10 @@ public partial class TpsParser
                 });
                 continue;
             }
-
+            
             // Clean any remaining formatting from the word
             var cleanWord = CleanWord(token);
-
+            
             if (!string.IsNullOrWhiteSpace(cleanWord))
             {
                 var scriptWord = new ScriptWord
@@ -837,19 +877,19 @@ public partial class TpsParser
                     Text = cleanWord,
                     OrpIndex = CalculateORP(cleanWord),
                     EmphasisLevel = DetermineEmphasisLevel(token),
-                    Color = wordColors.TryGetValue(cleanWord, out var value) ? value : null,
+                    Color = wordColors.ContainsKey(cleanWord) ? wordColors[cleanWord] : null,
                     PauseAfter = ExtractPause(token),
                     IsEditPoint = IsEditPoint(token),
                     EditPointPriority = ExtractEditPointPriority(token)
                 };
-
+                
                 words.Add(scriptWord);
             }
         }
-
+        
         return words;
     }
-
+    
     /// <summary>
     /// Calculate Optimal Recognition Point for a word
     /// </summary>
@@ -865,23 +905,20 @@ public partial class TpsParser
             _ => 4      // Longer words
         };
     }
-
+    
     /// <summary>
     /// Parse WPM specification (e.g., "140WPM")
     /// </summary>
     private static int? ParseWpmSpec(string wpmSpec)
     {
-        if (string.IsNullOrEmpty(wpmSpec))
-        {
-            return null;
-        }
-
+        if (string.IsNullOrEmpty(wpmSpec)) return null;
+        
         var numbers = Regex.Matches(wpmSpec, @"\d+");
         if (numbers.Count > 0 && int.TryParse(numbers[0].Value, out var wpm))
         {
             return wpm;
         }
-
+        
         return null;
     }
 
@@ -890,11 +927,7 @@ public partial class TpsParser
     /// </summary>
     private static (int? min, int? max) ParseWpmRangeSpec(string wpmSpec)
     {
-        if (string.IsNullOrEmpty(wpmSpec))
-        {
-            return (null, null);
-        }
-
+        if (string.IsNullOrEmpty(wpmSpec)) return (null, null);
         var numbers = Regex.Matches(wpmSpec, @"\d+");
         if (numbers.Count >= 2)
         {
@@ -914,10 +947,7 @@ public partial class TpsParser
     /// </summary>
     private static string NormalizeEmotionName(string emotion)
     {
-        if (string.IsNullOrWhiteSpace(emotion))
-        {
-            return "neutral";
-        }
+        if (string.IsNullOrWhiteSpace(emotion)) return "neutral";
         // Remove emoji and trim
         var e = Regex.Replace(emotion, @"^[\p{So}\p{C}]+\s*", string.Empty).Trim();
         e = e.ToLowerInvariant();
@@ -933,36 +963,150 @@ public partial class TpsParser
             _ => e
         };
     }
-
+    
+    /// <summary>
+    /// Parse time specification (e.g., "0:00-1:30")
+    /// </summary>
+    private static (string? startTime, string? endTime) ParseTimeSpec(string timeSpec)
+    {
+        if (string.IsNullOrEmpty(timeSpec)) return (null, null);
+        
+        var parts = timeSpec.Split('-');
+        if (parts.Length == 2)
+        {
+            return (parts[0].Trim(), parts[1].Trim());
+        }
+        
+        return (null, null);
+    }
+    
+    /// <summary>
+    /// Map emotion names to emoji
+    /// </summary>
+    private static string MapEmotionToEmoji(string emotion)
+    {
+        return emotion?.ToLower() switch
+        {
+            // Positive emotions
+            "warm" => "😊",
+            "happy" => "😄",
+            "excited" => "🚀",
+            "joyful" => "😁",
+            "cheerful" => "😃",
+            "optimistic" => "🌟",
+            "confident" => "😎",
+            "proud" => "🏆",
+            "grateful" => "🙏",
+            "loving" => "❤️",
+            
+            // Motivational emotions
+            "motivational" => "💪",
+            "inspiring" => "✨",
+            "determined" => "🔥",
+            "ambitious" => "🎯",
+            "energetic" => "⚡",
+            "passionate" => "❤️‍🔥",
+            "driven" => "🚀",
+            "powerful" => "💥",
+            
+            // Focused/Professional emotions
+            "focused" => "🎯",
+            "serious" => "😐",
+            "professional" => "💼",
+            "analytical" => "🔍",
+            "thoughtful" => "🤔",
+            "careful" => "⚠️",
+            "precise" => "🎯",
+            "methodical" => "📋",
+            
+            // Concerned/Problem emotions
+            "concerned" => "😟",
+            "worried" => "😰",
+            "anxious" => "😥",
+            "troubled" => "😣",
+            "alarmed" => "😨",
+            "distressed" => "😖",
+            "frustrated" => "😤",
+            "overwhelmed" => "🤯",
+            
+            // Urgent/Alert emotions
+            "urgent" => "🚨",
+            "critical" => "⚠️",
+            "emergency" => "🆘",
+            "warning" => "⚡",
+            "alert" => "🔔",
+            "immediate" => "🔴",
+            
+            // Empathetic/Caring emotions
+            "empathetic" => "🤝",
+            "caring" => "💙",
+            "supportive" => "🫂",
+            "understanding" => "🤗",
+            "compassionate" => "💚",
+            "gentle" => "🕊️",
+            "kind" => "😌",
+            
+            // Surprised/Amazed emotions
+            "surprised" => "😲",
+            "amazed" => "🤩",
+            "astonished" => "😱",
+            "impressed" => "👏",
+            "wow" => "🤯",
+            "incredible" => "🙌",
+            
+            // Questioning/Curious emotions
+            "curious" => "🤔",
+            "questioning" => "❓",
+            "wondering" => "💭",
+            "exploring" => "🔍",
+            "investigating" => "🕵️",
+            
+            // Neutral/Calm emotions
+            "neutral" => "😐",
+            "calm" => "😌",
+            "peaceful" => "☮️",
+            "balanced" => "⚖️",
+            "steady" => "📊",
+            "stable" => "🏛️",
+            
+            // Success/Achievement emotions
+            "successful" => "🎉",
+            "victorious" => "🏆",
+            "accomplished" => "✅",
+            "triumphant" => "🎊",
+            "winning" => "🥇",
+            
+            // Creative/Innovative emotions
+            "creative" => "🎨",
+            "innovative" => "💡",
+            "imaginative" => "🌈",
+            "artistic" => "🖼️",
+            "inventive" => "🔬",
+            
+            // Default fallback
+            _ => "😊"
+        };
+    }
+    
     /// <summary>
     /// Helper methods for word processing
     /// </summary>
     private static string[] TokenizeContent(string content)
     {
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            return Array.Empty<string>();
-        }
-
-        return content.Split(new[] { ' ', '\t', '\n', '\r' },
+        if (string.IsNullOrWhiteSpace(content)) return Array.Empty<string>();
+        
+        return content.Split(new[] { ' ', '\t', '\n', '\r' }, 
                            StringSplitOptions.RemoveEmptyEntries)
                      .Where(word => !string.IsNullOrWhiteSpace(word))
                      .ToArray();
     }
-
+    
     private static int CountWords(string content) => TokenizeContent(content).Length;
-
+    
     private static string CleanWord(string word)
     {
-        if (string.IsNullOrWhiteSpace(word))
-        {
-            return string.Empty;
-        }
-
-        if (word == "/" || word == "//")
-        {
-            return string.Empty;
-        }
+        if (string.IsNullOrWhiteSpace(word)) return string.Empty;
+        if (word == "/" || word == "//") return string.Empty;
 
         var t = word;
 
@@ -1009,22 +1153,30 @@ public partial class TpsParser
 
         return t.Trim();
     }
-
+    
     private static int DetermineEmphasisLevel(string token)
     {
-        if (token.Contains("**"))
-        {
-            return 2; // Strong emphasis (markdown)
-        }
-
-        if (token.Contains('*') || token.Contains("[emphasis]"))
-        {
-            return 1; // Normal emphasis
-        }
-
+        if (token.Contains("**")) return 2; // Strong emphasis (markdown)
+        if (token.Contains("*") || token.Contains("[emphasis]")) return 1; // Normal emphasis
         return 0; // No emphasis
     }
-
+    
+    private static string? ExtractColor(string token)
+    {
+        var match = Regex.Match(token, @"\[(\w+)\]");
+        if (match.Success)
+        {
+            var color = match.Groups[1].Value;
+            if (IsValidColor(color)) return color;
+        }
+        return null;
+    }
+    
+    private static bool IsValidColor(string color)
+    {
+        return InlineColors.Contains(color, StringComparer.OrdinalIgnoreCase);
+    }
+    
     private static int? ExtractPause(string token)
     {
         var match = PauseMarker().Match(token);
@@ -1034,26 +1186,22 @@ public partial class TpsParser
             if (pauseValue.EndsWith("ms"))
             {
                 if (int.TryParse(pauseValue[..^2], out var ms))
-                {
                     return ms;
-                }
             }
             else if (pauseValue.EndsWith("s"))
             {
                 if (int.TryParse(pauseValue[..^1], out var seconds))
-                {
                     return seconds * 1000; // Convert to milliseconds
-                }
             }
         }
         return null;
     }
-
+    
     private static bool IsEditPoint(string token)
     {
         return EditPointMarker().IsMatch(token);
     }
-
+    
     private static string? ExtractEditPointPriority(string token)
     {
         var match = EditPointMarker().Match(token);
@@ -1063,7 +1211,7 @@ public partial class TpsParser
         }
         return null;
     }
-
+    
     private static ScriptData CreateEmptyScript()
     {
         return new ScriptData
@@ -1075,7 +1223,7 @@ public partial class TpsParser
             Segments = Array.Empty<ScriptSegment>()
         };
     }
-
+    
     private static ScriptSegment CreateDefaultSegment(string content, string[] words)
     {
         // Use blue colors for default/neutral emotion
@@ -1095,7 +1243,7 @@ public partial class TpsParser
     /// <summary>
     /// Get color scheme for an emotion
     /// </summary>
-    private static (string Background, string Text, string Accent) GetEmotionColors(string emotion)
+    private (string Background, string Text, string Accent) GetEmotionColors(string emotion)
     {
         return emotion.ToLower() switch
         {

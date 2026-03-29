@@ -6,6 +6,7 @@ using PrompterLive.Core.Services;
 using PrompterLive.Core.Services.Preview;
 using PrompterLive.Shared.Components.Library;
 using PrompterLive.Shared.Services;
+using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Services.Library;
 
 namespace PrompterLive.Shared.Pages;
@@ -14,9 +15,24 @@ public partial class LibraryPage : ComponentBase
 {
     private const string LibrarySettingsKey = "prompterlive.library";
     private const string SyncLibraryBreadcrumbMethod = "PrompterLiveDesign.setLibraryBreadcrumb";
+    private const string LoadLibraryOperation = "Library load";
+    private const string LoadLibraryMessage = "Unable to load the library right now.";
+    private const string CreateScriptOperation = "Library create script";
+    private const string CreateScriptMessage = "Unable to create a new script.";
+    private const string OpenScriptOperation = "Library open script";
+    private const string OpenScriptMessage = "Unable to open this script.";
+    private const string DuplicateScriptOperation = "Library duplicate script";
+    private const string DuplicateScriptMessage = "Unable to duplicate this script.";
+    private const string MoveScriptOperation = "Library move script";
+    private const string MoveScriptMessage = "Unable to move this script.";
+    private const string DeleteScriptOperation = "Library delete script";
+    private const string DeleteScriptMessage = "Unable to delete this script.";
+    private const string CreateFolderOperation = "Library create folder";
+    private const string CreateFolderMessage = "Unable to create this folder.";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private BrowserSettingsStore SettingsStore { get; set; } = null!;
+    [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private ILibraryFolderRepository LibraryFolderRepository { get; set; } = null!;
@@ -52,8 +68,14 @@ public partial class LibraryPage : ComponentBase
         if (_loadLibrary)
         {
             _loadLibrary = false;
-            await LoadLibraryAsync();
-            StateHasChanged();
+            await RunLibraryOperationAsync(
+                LoadLibraryOperation,
+                LoadLibraryMessage,
+                async () =>
+                {
+                    await LoadLibraryAsync();
+                    StateHasChanged();
+                });
             return;
         }
 
@@ -93,22 +115,34 @@ public partial class LibraryPage : ComponentBase
 
     private async Task CreateScriptAsync()
     {
-        await Bootstrapper.EnsureReadyAsync();
-        await SessionService.NewAsync();
-        Navigation.NavigateTo("/editor");
+        await RunLibraryOperationAsync(
+            CreateScriptOperation,
+            CreateScriptMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                await SessionService.NewAsync();
+                Navigation.NavigateTo("/editor");
+            });
     }
 
     private async Task OpenScriptAsync(string id)
     {
-        await Bootstrapper.EnsureReadyAsync();
-        var document = await ScriptRepository.GetAsync(id);
-        if (document is null)
-        {
-            return;
-        }
+        await RunLibraryOperationAsync(
+            OpenScriptOperation,
+            OpenScriptMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                var document = await ScriptRepository.GetAsync(id);
+                if (document is null)
+                {
+                    return;
+                }
 
-        await SessionService.OpenAsync(document);
-        Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(id)}");
+                await SessionService.OpenAsync(document);
+                Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(id)}");
+            });
     }
 
     private Task LearnScriptAsync(string id)
@@ -125,40 +159,58 @@ public partial class LibraryPage : ComponentBase
 
     private async Task DuplicateScriptAsync(string id)
     {
-        await Bootstrapper.EnsureReadyAsync();
-        var document = await ScriptRepository.GetAsync(id);
-        if (document is null)
-        {
-            return;
-        }
+        await RunLibraryOperationAsync(
+            DuplicateScriptOperation,
+            DuplicateScriptMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                var document = await ScriptRepository.GetAsync(id);
+                if (document is null)
+                {
+                    return;
+                }
 
-        await ScriptRepository.SaveAsync(
-            title: $"{document.Title} Copy",
-            text: document.Text,
-            documentName: null,
-            existingId: null,
-            folderId: document.FolderId);
-        await LoadLibraryAsync();
+                await ScriptRepository.SaveAsync(
+                    title: $"{document.Title} Copy",
+                    text: document.Text,
+                    documentName: null,
+                    existingId: null,
+                    folderId: document.FolderId);
+                await LoadLibraryAsync();
+            });
     }
 
     private async Task MoveScriptAsync(LibraryMoveRequest request)
     {
-        await Bootstrapper.EnsureReadyAsync();
-        await ScriptRepository.MoveToFolderAsync(request.ScriptId, request.FolderId);
-        await LoadLibraryAsync();
+        await RunLibraryOperationAsync(
+            MoveScriptOperation,
+            MoveScriptMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                await ScriptRepository.MoveToFolderAsync(request.ScriptId, request.FolderId);
+                await LoadLibraryAsync();
+            });
     }
 
     private async Task DeleteScriptAsync(string id)
     {
-        await Bootstrapper.EnsureReadyAsync();
-        await ScriptRepository.DeleteAsync(id);
+        await RunLibraryOperationAsync(
+            DeleteScriptOperation,
+            DeleteScriptMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                await ScriptRepository.DeleteAsync(id);
 
-        if (string.Equals(SessionService.State.ScriptId, id, StringComparison.Ordinal))
-        {
-            await SessionService.NewAsync();
-        }
+                if (string.Equals(SessionService.State.ScriptId, id, StringComparison.Ordinal))
+                {
+                    await SessionService.NewAsync();
+                }
 
-        await LoadLibraryAsync();
+                await LoadLibraryAsync();
+            });
     }
 
     private async Task SelectFolder(string folderId)
@@ -202,21 +254,27 @@ public partial class LibraryPage : ComponentBase
             return;
         }
 
-        await Bootstrapper.EnsureReadyAsync();
-        var parentId = NormalizeDraftParentId(_folderDraftParentId);
-        var folder = await LibraryFolderRepository.CreateAsync(folderName, parentId);
-        if (parentId is not null)
-        {
-            _expandedFolderIds.Add(parentId);
-        }
+        await RunLibraryOperationAsync(
+            CreateFolderOperation,
+            CreateFolderMessage,
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                var parentId = NormalizeDraftParentId(_folderDraftParentId);
+                var folder = await LibraryFolderRepository.CreateAsync(folderName, parentId);
+                if (parentId is not null)
+                {
+                    _expandedFolderIds.Add(parentId);
+                }
 
-        _expandedFolderIds.Add(folder.Id);
-        _isCreatingFolder = false;
-        _folderDraftName = string.Empty;
-        _folderDraftParentId = ResolveDraftParentId();
-        _selectedFolderId = folder.Id;
-        await LoadLibraryAsync();
-        await PersistViewStateAsync();
+                _expandedFolderIds.Add(folder.Id);
+                _isCreatingFolder = false;
+                _folderDraftName = string.Empty;
+                _folderDraftParentId = ResolveDraftParentId();
+                _selectedFolderId = folder.Id;
+                await LoadLibraryAsync();
+                await PersistViewStateAsync();
+            });
     }
 
     private async Task SetSortMode(LibrarySortMode sortMode)
@@ -338,6 +396,9 @@ public partial class LibraryPage : ComponentBase
 
         return SettingsStore.SaveAsync(LibrarySettingsKey, state);
     }
+
+    private Task RunLibraryOperationAsync(string operation, string message, Func<Task> action) =>
+        Diagnostics.RunAsync(operation, message, action);
 
     private static string? NormalizeDraftParentId(string? folderId) =>
         string.IsNullOrWhiteSpace(folderId) || string.Equals(folderId, LibrarySelectionKeys.All, StringComparison.Ordinal)

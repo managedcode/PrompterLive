@@ -9,6 +9,11 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+builder.Logging.AddFilter("PrompterLive", LogLevel.Information);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Components.WebAssembly.Rendering.WebAssemblyRenderer", LogLevel.Warning);
+
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddPrompterLiveShared();
 

@@ -3,10 +3,12 @@
 @using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Streaming
 @using PrompterLive.Core.Models.Workspace
+@using PrompterLive.Shared.Services.Diagnostics
 
 @inject AppBootstrapper Bootstrapper
 @inject BrowserSettingsStore SettingsStore
 @inject StudioSettingsStore StudioSettingsStore
+@inject UiDiagnosticsService Diagnostics
 @inject IMediaPermissionService MediaPermissionService
 @inject IMediaDeviceService MediaDeviceService
 @inject IMediaSceneService MediaSceneService
@@ -639,6 +641,14 @@
     private StudioSettings _studioSettings = StudioSettings.Default;
     private string? _primaryMicrophoneId;
     private readonly IReadOnlyList<AudioRouteTarget> _routeTargets = Enum.GetValues<AudioRouteTarget>();
+    private const string LoadSettingsOperation = "Settings load";
+    private const string LoadSettingsMessage = "Unable to load settings right now.";
+    private const string RefreshMediaOperation = "Settings media refresh";
+    private const string RefreshMediaMessage = "Unable to refresh camera and microphone access.";
+    private const string PersistSceneOperation = "Settings save scene";
+    private const string PersistSceneMessage = "Unable to save scene changes.";
+    private const string PersistStudioOperation = "Settings save studio";
+    private const string PersistStudioMessage = "Unable to save studio settings.";
 
     private IReadOnlyList<SceneCameraSource> _sceneCameras => MediaSceneService.State.Cameras;
     private string SelectedCameraId => ResolveSelectedCamera()?.DeviceId ?? string.Empty;
@@ -658,8 +668,14 @@
         }
 
         _loadState = false;
-        await LoadAsync();
-        StateHasChanged();
+        await Diagnostics.RunAsync(
+            LoadSettingsOperation,
+            LoadSettingsMessage,
+            async () =>
+            {
+                await LoadAsync();
+                StateHasChanged();
+            });
     }
 
     private async Task LoadAsync()
@@ -716,8 +732,14 @@
 
     private async Task RequestMediaAccessAsync()
     {
-        _permissions = await MediaPermissionService.RequestAsync();
-        await LoadAsync();
+        await Diagnostics.RunAsync(
+            RefreshMediaOperation,
+            RefreshMediaMessage,
+            async () =>
+            {
+                _permissions = await MediaPermissionService.RequestAsync();
+                await LoadAsync();
+            });
     }
 
     private async Task NormalizeStudioSettingsAsync()
@@ -985,10 +1007,17 @@
     private async Task PersistSceneAsync()
     {
         _primaryMicrophoneId = MediaSceneService.State.PrimaryMicrophoneId;
-        await SettingsStore.SaveAsync("prompterlive.scene", MediaSceneService.State);
+        await Diagnostics.RunAsync(
+            PersistSceneOperation,
+            PersistSceneMessage,
+            () => SettingsStore.SaveAsync("prompterlive.scene", MediaSceneService.State));
     }
 
-    private Task PersistStudioSettingsAsync() => StudioSettingsStore.SaveAsync(_studioSettings);
+    private Task PersistStudioSettingsAsync() =>
+        Diagnostics.RunAsync(
+            PersistStudioOperation,
+            PersistStudioMessage,
+            () => StudioSettingsStore.SaveAsync(_studioSettings));
 
     private MediaDeviceInfo? ResolveSelectedCamera() =>
         _cameraDevices.FirstOrDefault(device => string.Equals(device.DeviceId, ResolveSelectedCameraCandidate()?.DeviceId, StringComparison.Ordinal))

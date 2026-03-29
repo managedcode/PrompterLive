@@ -1,0 +1,106 @@
+/* ============================================
+   DESIGN TOKENS — Teleprompter Design System
+   Single source of truth for all colors, spacing, typography
+   ============================================ */
+
+:root {
+    /* ---- Base Palette ---- */
+    --bg-deep: #080A14;
+    --bg-1: #080E12;
+    --bg-2: #0C1418;
+    --bg-3: #111A1F;
+    --bg-4: #162028;
+    --bg-5: #1C2830;
+
+    /* ---- Accent Gold (196,160,96) ---- */
+    --gold: #C4A060;
+    --gold-text: #E8D5B0;
+    --gold-light: #F5E6D0;
+    --gold-mid: #C4A882;
+    --gold-gradient: linear-gradient(135deg, #F5E6D0, #C4A882);
+
+    /* Gold opacity scale */
+    --gold-03: rgba(196,160,96,.03);
+    --gold-04: rgba(196,160,96,.04);
+    --gold-05: rgba(196,160,96,.05);
+    --gold-06: rgba(196,160,96,.06);
+    --gold-07: rgba(196,160,96,.07);
+    --gold-08: rgba(196,160,96,.08);
+    --gold-09: rgba(196,160,96,.09);
+    --gold-10: rgba(196,160,96,.10);
+    --gold-12: rgba(196,160,96,.12);
+    --gold-14: rgba(196,160,96,.14);
+    --gold-15: rgba(196,160,96,.15);
+    --gold-16: rgba(196,160,96,.16);
+    --gold-20: rgba(196,160,96,.20);
+    --gold-25: rgba(196,160,96,.25);
+    --gold-30: rgba(196,160,96,.30);
+    --gold-35: rgba(196,160,96,.35);
+    --gold-45: rgba(196,160,96,.45);
+
+    /* ---- Glass Panel System ---- */
+    --glass-bg: rgba(6,8,16,.45);
+    --glass-bg-light: rgba(6,8,16,.35);
+    --glass-blur: blur(24px) saturate(1.2);
+    --glass-border: 1px solid var(--gold-08);
+    --glass-border-light: 1px solid var(--gold-06);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,.3);
+    --glass-inset: inset 0 1px 0 var(--gold-06);
+
+    /* ---- Text Hierarchy ---- */
+    --text-1: #E8D5B0;
+    --text-2: #B0A08A;
+    --text-3: #8A7E6E;
+    --text-4: #6A6050;
+
+    /* ---- Borders ---- */
+    --border-subtle: var(--gold-05);
+    --border-default: var(--gold-08);
+    --border-strong: var(--gold-12);
+    --border-hover: var(--gold-16);
+    --border-active: var(--gold-25);
+
+    /* ---- TPS Emotion Colors ---- */
+    --emo-warm: #F59E0B;
+    --emo-concerned: #EF4444;
+    --emo-focused: #10B981;
+    --emo-motivational: #A855F7;
+    --emo-neutral: #74C0FC;
+    --emo-urgent: #FF3B3B;
+    --emo-happy: #FFE066;
+    --emo-excited: #F472B6;
+    --emo-sad: #818CF8;
+    --emo-calm: #38D9A9;
+    --emo-energetic: #FB923C;
+    --emo-professional: #60A5FA;
+
+    /* ---- TPS Inline Colors (high contrast on dark) ---- */
+    --tps-red: #FF8A8A;
+    --tps-green: #6FE89A;
+    --tps-blue: #8ECFFF;
+    --tps-yellow: #FFE87A;
+    --tps-orange: #FFB86A;
+    --tps-purple: #D88AFF;
+    --tps-cyan: #7DE8F0;
+    --tps-magenta: #FF96C5;
+    --tps-pink: #FFB3D1;
+    --tps-teal: #5EECC2;
+    --tps-gray: #B8C0C8;
+
+    /* ---- ORP / Reading ---- */
+    --orp-red: #FF5252;
+
+    /* ---- Radii ---- */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    /* ---- Typography ---- */
+    --font-sans: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* ---- Sidebar ---- */
+    --sidebar-width: 260px;
+}

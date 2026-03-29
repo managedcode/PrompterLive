@@ -1,5 +1,6 @@
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
@@ -13,17 +14,27 @@ using PrompterLive.Core.Services.Rsvp;
 using PrompterLive.Core.Services.Streaming;
 using PrompterLive.Core.Services.Workspace;
 using PrompterLive.Shared.Services;
+using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Services.Editor;
 
 namespace PrompterLive.Shared.Tests;
 
 internal static class TestHarnessFactory
 {
-    public static AppHarness Create(BunitContext context, IReadOnlyList<MediaDeviceInfo>? devices = null)
+    public static AppHarness Create(
+        BunitContext context,
+        IReadOnlyList<MediaDeviceInfo>? devices = null,
+        Action<ILoggingBuilder>? configureLogging = null)
     {
         var jsRuntime = new TestJsRuntime();
         var repository = new InMemoryScriptRepository();
         var folderRepository = new InMemoryLibraryFolderRepository();
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.ClearProviders();
+            builder.SetMinimumLevel(LogLevel.Trace);
+            configureLogging?.Invoke(builder);
+        });
         var parser = new TpsParser();
         var compiler = new ScriptCompiler();
         var frontMatter = new TpsFrontMatterDocumentService();
@@ -31,12 +42,28 @@ internal static class TestHarnessFactory
         var structureEditor = new TpsStructureEditor();
         var localAssistant = new EditorLocalAssistant();
         var previewService = new ScriptPreviewService(parser, compiler);
-        var session = new ScriptSessionService(repository, parser, compiler, previewService);
+        var session = new ScriptSessionService(
+            repository,
+            parser,
+            compiler,
+            previewService,
+            loggerFactory.CreateLogger<ScriptSessionService>());
         var sceneService = new MediaSceneService();
         var permissionService = new FakeMediaPermissionService();
         var deviceService = new FakeMediaDeviceService(devices ?? DefaultDevices);
+        var settingsStore = new BrowserSettingsStore(
+            jsRuntime,
+            loggerFactory.CreateLogger<BrowserSettingsStore>());
+        var bootstrapper = new AppBootstrapper(
+            session,
+            folderRepository,
+            sceneService,
+            settingsStore,
+            loggerFactory.CreateLogger<AppBootstrapper>());
 
         context.Services.AddSingleton<IJSRuntime>(jsRuntime);
+        context.Services.AddSingleton<ILoggerFactory>(loggerFactory);
+        context.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
         context.Services.AddSingleton<ILibraryFolderRepository>(folderRepository);
         context.Services.AddSingleton<IScriptRepository>(repository);
         context.Services.AddSingleton<IScriptSessionService>(session);
@@ -56,15 +83,24 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<RsvpTextProcessor>();
         context.Services.AddSingleton<RsvpEmotionAnalyzer>();
         context.Services.AddSingleton<RsvpPlaybackEngine>();
-        context.Services.AddSingleton<BrowserSettingsStore>();
+        context.Services.AddSingleton(settingsStore);
         context.Services.AddSingleton<StudioSettingsStore>();
         context.Services.AddSingleton<CameraPreviewInterop>();
-        context.Services.AddSingleton<AppBootstrapper>();
+        context.Services.AddSingleton(bootstrapper);
+        context.Services.AddSingleton<UiDiagnosticsService>();
         context.Services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, RtmpStreamingOutputProvider>();
 
-        return new AppHarness(jsRuntime, repository, folderRepository, session, sceneService, permissionService, deviceService);
+        return new AppHarness(
+            jsRuntime,
+            repository,
+            folderRepository,
+            session,
+            sceneService,
+            permissionService,
+            deviceService,
+            loggerFactory);
     }
 
     private static IReadOnlyList<MediaDeviceInfo> DefaultDevices =>
@@ -81,7 +117,8 @@ internal sealed record AppHarness(
     ScriptSessionService Session,
     MediaSceneService SceneService,
     FakeMediaPermissionService PermissionService,
-    FakeMediaDeviceService DeviceService);
+    FakeMediaDeviceService DeviceService,
+    ILoggerFactory LoggerFactory);
 
 internal sealed class TestJsRuntime : IJSRuntime
 {

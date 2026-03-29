@@ -5,9 +5,11 @@
 @using PrompterLive.Core.Models.Tps
 @using PrompterLive.Core.Models.Workspace
 @using PrompterLive.Core.Services.Samples
+@using PrompterLive.Shared.Services.Diagnostics
 
 @inject AppBootstrapper Bootstrapper
 @inject ScriptCompiler Compiler
+@inject UiDiagnosticsService Diagnostics
 @inject IJSRuntime JS
 @inject IMediaDeviceService MediaDeviceService
 @inject IMediaSceneService MediaSceneService
@@ -174,6 +176,8 @@
     private StudioSettings _studioSettings = StudioSettings.Default;
     private IReadOnlyList<ReaderCameraLayerViewModel> _cameraLayers = [ReaderCameraLayerViewModel.Placeholder];
     private IReadOnlyList<ReaderCardViewModel> _cards = [ReaderCardViewModel.Empty];
+    private const string LoadReaderOperation = "Teleprompter load";
+    private const string LoadReaderMessage = "Unable to prepare teleprompter playback.";
 
     protected override Task OnParametersSetAsync()
     {
@@ -186,11 +190,17 @@
         if (_loadState)
         {
             _loadState = false;
-            await Bootstrapper.EnsureReadyAsync();
-            await EnsureSessionLoadedAsync();
-            await PopulateReaderStateAsync();
-            await PopulateCameraStateAsync();
-            StateHasChanged();
+            await Diagnostics.RunAsync(
+                LoadReaderOperation,
+                LoadReaderMessage,
+                async () =>
+                {
+                    await Bootstrapper.EnsureReadyAsync();
+                    await EnsureSessionLoadedAsync();
+                    await PopulateReaderStateAsync();
+                    await PopulateCameraStateAsync();
+                    StateHasChanged();
+                });
             return;
         }
 

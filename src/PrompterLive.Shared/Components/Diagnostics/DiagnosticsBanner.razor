@@ -1,0 +1,36 @@
+@implements IDisposable
+@inject PrompterLive.Shared.Services.Diagnostics.UiDiagnosticsService Diagnostics
+
+@if (Diagnostics.Current is { IsFatal: false } diagnostic)
+{
+    <section class="diag-banner" data-testid="diagnostics-banner">
+        <div class="diag-banner-copy">
+            <span class="diag-banner-title">@diagnostic.Title</span>
+            <p class="diag-banner-message">@diagnostic.Message</p>
+            <span class="diag-banner-detail">@diagnostic.Detail</span>
+        </div>
+        <button class="diag-banner-dismiss"
+                type="button"
+                @onclick="HandleDismiss"
+                data-testid="diagnostics-dismiss">
+            Dismiss
+        </button>
+    </section>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Diagnostics.Changed += HandleDiagnosticsChanged;
+    }
+
+    private void HandleDismiss() => Diagnostics.Clear();
+
+    private void HandleDiagnosticsChanged(object? sender, EventArgs args) =>
+        InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Diagnostics.Changed -= HandleDiagnosticsChanged;
+    }
+}

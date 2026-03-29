@@ -1,6 +1,7 @@
 @page "/learn"
 @using PrompterLive.Core.Services.Rsvp
 @using PrompterLive.Core.Services.Samples
+@using PrompterLive.Shared.Services.Diagnostics
 
 <div id="screen-rsvp"
      class="screen active"
@@ -72,6 +73,7 @@
 
 @code {
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
+    [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private RsvpTextProcessor TextProcessor { get; set; } = null!;
@@ -90,6 +92,8 @@
     private bool _loadState = true;
     private bool _syncWords;
     private IReadOnlyList<RsvpTimelineEntry> _timeline = [];
+    private const string LoadLearnOperation = "Learn load";
+    private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
 
     protected override Task OnParametersSetAsync()
     {
@@ -102,10 +106,16 @@
         if (_loadState)
         {
             _loadState = false;
-            await Bootstrapper.EnsureReadyAsync();
-            await EnsureSessionLoadedAsync();
-            PopulateLearnState();
-            StateHasChanged();
+            await Diagnostics.RunAsync(
+                LoadLearnOperation,
+                LoadLearnMessage,
+                async () =>
+                {
+                    await Bootstrapper.EnsureReadyAsync();
+                    await EnsureSessionLoadedAsync();
+                    PopulateLearnState();
+                    StateHasChanged();
+                });
             return;
         }
 

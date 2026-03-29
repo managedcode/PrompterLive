@@ -7,6 +7,7 @@ using PrompterLive.Core.Services.Preview;
 using PrompterLive.Core.Services.Rsvp;
 using PrompterLive.Core.Services.Streaming;
 using PrompterLive.Core.Services.Workspace;
+using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Services.Editor;
 
 namespace PrompterLive.Shared.Services;
@@ -40,6 +41,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<StudioSettingsStore>();
         services.AddScoped<CameraPreviewInterop>();
         services.AddScoped<AppBootstrapper>();
+        services.AddScoped<UiDiagnosticsService>();
 
         services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
         services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();

@@ -6,12 +6,20 @@ using PrompterLive.Core.Services.Editor;
 using PrompterLive.Core.Services.Samples;
 using PrompterLive.Shared.Components.Editor;
 using PrompterLive.Shared.Services;
+using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Services.Editor;
 
 namespace PrompterLive.Shared.Pages;
 
 public partial class EditorPage
 {
+    private const string LoadEditorOperation = "Editor load";
+    private const string LoadEditorMessage = "Unable to load the editor right now.";
+    private const string PersistDraftOperation = "Editor save draft";
+    private const string PersistDraftMessage = "Unable to save the current draft.";
+    private const string EditorSyntaxOperation = "Editor syntax";
+    private const string EditorSyntaxMessage = "The TPS draft has a syntax issue. Fix it and keep writing.";
+
     private readonly EditorDocumentHistory _history = new();
     private readonly TpsFrontMatterDocumentService _frontMatterService = new();
     private bool _loadState = true;
@@ -31,6 +39,7 @@ public partial class EditorPage
     private string _version = "1.0";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
+    [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private EditorOutlineBuilder OutlineBuilder { get; set; } = null!;
     [Inject] private EditorLocalAssistant LocalAssistant { get; set; } = null!;
@@ -53,10 +62,16 @@ public partial class EditorPage
         if (_loadState)
         {
             _loadState = false;
-            await Bootstrapper.EnsureReadyAsync();
-            await EnsureSessionLoadedAsync();
-            PopulateEditorState(resetHistory: true);
-            StateHasChanged();
+            await Diagnostics.RunAsync(
+                LoadEditorOperation,
+                LoadEditorMessage,
+                async () =>
+                {
+                    await Bootstrapper.EnsureReadyAsync();
+                    await EnsureSessionLoadedAsync();
+                    PopulateEditorState(resetHistory: true);
+                    StateHasChanged();
+                });
         }
     }
 
@@ -221,6 +236,15 @@ public partial class EditorPage
         _xfastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.XfastOffset, DefaultXfastOffset);
         _segments = OutlineBuilder.Build(state.ScriptData, document.Body, 0);
         _errorMessage = state.ErrorMessage;
+        if (string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            Diagnostics.ClearRecoverable(EditorSyntaxOperation);
+        }
+        else
+        {
+            Diagnostics.ReportRecoverable(EditorSyntaxOperation, EditorSyntaxMessage, _errorMessage);
+        }
+
         if (resetHistory || !_history.IsInitialized)
         {
             _history.Reset(_sourceText, _selection.Range);
@@ -236,20 +260,27 @@ public partial class EditorPage
         _sourceText = text ?? string.Empty;
         var persistedText = BuildPersistedDocument(_sourceText);
         var title = _screenTitle;
-        await SessionService.UpdateDraftAsync(
-            title,
-            persistedText,
-            SessionService.State.DocumentName,
-            SessionService.State.ScriptId);
+        await Diagnostics.RunAsync(
+            PersistDraftOperation,
+            PersistDraftMessage,
+            async () =>
+            {
+                await SessionService.UpdateDraftAsync(
+                    title,
+                    persistedText,
+                    SessionService.State.DocumentName,
+                    SessionService.State.ScriptId);
 
-        var savedDocument = await SessionService.SaveAsync();
-        if (string.IsNullOrWhiteSpace(ScriptId))
-        {
-            ScriptId = savedDocument.Id;
-            Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(savedDocument.Id)}", replace: true);
-        }
+                var savedDocument = await SessionService.SaveAsync();
+                if (string.IsNullOrWhiteSpace(ScriptId))
+                {
+                    ScriptId = savedDocument.Id;
+                    Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(savedDocument.Id)}", replace: true);
+                }
 
-        PopulateEditorState();
+                PopulateEditorState();
+            },
+            clearRecoverableOnSuccess: string.IsNullOrWhiteSpace(SessionService.State.ErrorMessage));
     }
 
     private async Task PersistMetadataAsync()

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.CompiledScript;
 using PrompterLive.Core.Models.Documents;
@@ -11,12 +13,14 @@ public sealed class ScriptSessionService(
     IScriptRepository repository,
     TpsParser parser,
     ScriptCompiler compiler,
-    IScriptPreviewService previewService) : IScriptSessionService
+    IScriptPreviewService previewService,
+    ILogger<ScriptSessionService>? logger = null) : IScriptSessionService
 {
     private readonly IScriptRepository _repository = repository;
     private readonly TpsParser _parser = parser;
     private readonly ScriptCompiler _compiler = compiler;
     private readonly IScriptPreviewService _previewService = previewService;
+    private readonly ILogger<ScriptSessionService> _logger = logger ?? NullLogger<ScriptSessionService>.Instance;
 
     public ScriptWorkspaceState State { get; private set; } = ScriptWorkspaceState.Empty with
     {
@@ -27,6 +31,7 @@ public sealed class ScriptSessionService(
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Initializing script session repository and starter document.");
         await _repository.InitializeAsync(SampleScriptCatalog.CreateSeedDocuments(), cancellationToken);
         await NewAsync(cancellationToken);
     }
@@ -44,11 +49,13 @@ public sealed class ScriptSessionService(
     public Task LoadSampleAsync(string sampleId, CancellationToken cancellationToken = default)
     {
         var sample = SampleScriptCatalog.GetById(sampleId);
+        _logger.LogInformation("Loading sample script {SampleId}.", sampleId);
         return OpenAsync(sample, cancellationToken);
     }
 
     public Task OpenAsync(StoredScriptDocument document, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Opening script {ScriptId} ({Title}).", document.Id, document.Title);
         return UpdateDraftAsync(
             title: document.Title,
             text: document.Text,
@@ -67,6 +74,7 @@ public sealed class ScriptSessionService(
         title = string.IsNullOrWhiteSpace(title) ? "Untitled Script" : title.Trim();
         text ??= string.Empty;
         documentName = string.IsNullOrWhiteSpace(documentName) ? Slugify(title) : documentName;
+        _logger.LogDebug("Updating draft for {Title}.", title);
 
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -114,9 +122,12 @@ public sealed class ScriptSessionService(
                 EstimatedDuration = CalculateDuration(compiledScript),
                 ErrorMessage = null
             };
+
+            _logger.LogDebug("Draft updated successfully for {Title}.", title);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
+            _logger.LogError(exception, "Failed to update draft for {Title}.", title);
             State = State with
             {
                 ScriptId = scriptId ?? string.Empty,
@@ -137,6 +148,7 @@ public sealed class ScriptSessionService(
 
     public async Task<StoredScriptDocument> SaveAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Saving script {ScriptId} ({Title}).", State.ScriptId, State.Title);
         var document = await _repository.SaveAsync(
             State.Title,
             State.Text,
@@ -145,6 +157,7 @@ public sealed class ScriptSessionService(
             cancellationToken: cancellationToken);
 
         await OpenAsync(document, cancellationToken);
+        _logger.LogInformation("Saved script {ScriptId}.", document.Id);
         return document;
     }
 

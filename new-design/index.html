@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleprompter</title>
+    <link rel="stylesheet" href="tokens.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ==================== GLOBAL HEADER ==================== -->
+    <header class="app-header">
+        <div class="app-header-left" onclick="navigateTo('library')" style="cursor:pointer">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 6h16M4 12h12M4 18h14" stroke="url(#glogo)" stroke-width="2.5" stroke-linecap="round"/>
+                    <defs><linearGradient id="glogo" x1="4" y1="6" x2="20" y2="18"><stop stop-color="#F5E6D0"/><stop offset="1" stop-color="#C4A882"/></linearGradient></defs>
+                </svg>
+            </div>
+            <span class="app-logo-text">Prompter.live</span>
+        </div>
+        <div class="app-header-center" id="app-header-center">
+            <!-- Filled dynamically per screen -->
+        </div>
+        <div class="app-header-right" id="app-header-right">
+            <!-- Filled dynamically per screen -->
+        </div>
+    </header>
+
+    <!-- ==================== LIBRARY ==================== -->
+    <div id="screen-library" class="screen active">
+        <div class="lib-sidebar">
+            <nav class="lib-nav">
+                <a class="nav-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    All Scripts
+                    <span class="nav-count">12</span>
+                </a>
+                <a class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                    Recent
+                </a>
+                <a class="nav-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    Favorites
+                </a>
+            </nav>
+
+            <div class="lib-folders-section">
+                <div class="lib-folders-header">
+                    <span>Folders</span>
+                    <button class="folder-add-btn" title="New folder">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                </div>
+                <nav class="lib-folder-tree">
+                    <a class="folder-item folder-open">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Presentations</span>
+                        <span class="nav-count">4</span>
+                    </a>
+                    <div class="folder-children">
+                        <a class="folder-item folder-child">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            <span>Product</span>
+                            <span class="nav-count">2</span>
+                        </a>
+                        <a class="folder-item folder-child">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            <span>Investors</span>
+                            <span class="nav-count">2</span>
+                        </a>
+                    </div>
+                    <a class="folder-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Podcasts</span>
+                        <span class="nav-count">3</span>
+                    </a>
+                    <a class="folder-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>News Reports</span>
+                        <span class="nav-count">2</span>
+                    </a>
+                    <a class="folder-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>TED Talks</span>
+                        <span class="nav-count">1</span>
+                    </a>
+                    <a class="folder-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Internal</span>
+                        <span class="nav-count">2</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="lib-nav-spacer"></div>
+            <nav class="lib-nav lib-nav-bottom">
+                <a class="nav-item" onclick="navigateTo('settings')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Settings
+                </a>
+            </nav>
+        </div>
+
+        <main class="lib-main">
+
+            <div class="lib-scroll">
+            <!-- Sort toolbar -->
+            <div class="lib-sort-bar">
+                <span class="sort-label">Sort by</span>
+                <button class="sort-btn active">Name</button>
+                <button class="sort-btn">Date</button>
+                <button class="sort-btn">Duration</button>
+                <button class="sort-btn">WPM</button>
+            </div>
+
+            <!-- Data cards grid -->
+            <div class="dcards-grid">
+                <!-- Card with emotion "cover art" -->
+                <article class="dcard" style="--emo:#E97F00" onclick="navigateTo('editor')">
+                    <div class="dcard-menu-wrap">
+                        <button class="dcard-menu-btn" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                        </button>
+                        <div class="dcard-dropdown">
+                            <button onclick="event.stopPropagation(); navigateTo('editor')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicate</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Move to...</button>
+                            <div class="dcard-dropdown-sep"></div>
+                            <button class="dcard-dropdown-danger" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
+                        </div>
+                    </div>
+                    <div class="dcard-inner">
+                        <div class="dcard-cover dcover-warm">
+                            <div class="dcover-orb dcover-orb1"></div>
+                            <div class="dcover-orb dcover-orb2"></div>
+                            <h3 class="dcard-title">Product Launch</h3>
+                            <div class="dcover-meta"><span class="dcover-emo">Warm</span><span>Actor</span><span>10:00</span></div>
+                        </div>
+                        <div class="dcard-data">
+                            <div class="ddata-row"><span>140 WPM</span><span>1,420 words</span><span>4 segments</span></div>
+                            <div class="ddata-foot"><span>Jane Doe</span><span>Mar 25</span></div>
+                        </div>
+                        <div class="dcard-actions">
+                            <button class="dcard-act" onclick="event.stopPropagation(); navigateTo('rsvp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learn</button>
+                            <button class="dcard-act dcard-act-go" onclick="event.stopPropagation(); navigateTo('teleprompter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Read</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dcard" style="--emo:#B91C1C" onclick="navigateTo('editor')">
+                    <div class="dcard-menu-wrap">
+                        <button class="dcard-menu-btn" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+                        <div class="dcard-dropdown">
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicate</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Move to...</button>
+                            <div class="dcard-dropdown-sep"></div>
+                            <button class="dcard-dropdown-danger" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
+                        </div>
+                    </div>
+                    <div class="dcard-inner">
+                        <div class="dcard-cover dcover-urgent">
+                            <div class="dcover-orb dcover-orb1"></div>
+                            <div class="dcover-orb dcover-orb2"></div>
+                            <h3 class="dcard-title">Security Incident</h3>
+                            <div class="dcover-meta"><span class="dcover-emo">Urgent</span><span>Actor</span><span>5:30</span></div>
+                        </div>
+                        <div class="dcard-data">
+                            <div class="ddata-row"><span>155 WPM</span><span>852 words</span><span>3 segments</span></div>
+                            <div class="ddata-foot"><span>Alex Chen</span><span>Mar 24</span></div>
+                        </div>
+                        <div class="dcard-actions">
+                            <button class="dcard-act" onclick="event.stopPropagation(); navigateTo('rsvp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learn</button>
+                            <button class="dcard-act dcard-act-go" onclick="event.stopPropagation(); navigateTo('teleprompter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Read</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dcard" style="--emo:#7C3AED" onclick="navigateTo('editor')">
+                    <div class="dcard-menu-wrap">
+                        <button class="dcard-menu-btn" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+                        <div class="dcard-dropdown">
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicate</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Move to...</button>
+                            <div class="dcard-dropdown-sep"></div>
+                            <button class="dcard-dropdown-danger" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
+                        </div>
+                    </div>
+                    <div class="dcard-inner">
+                        <div class="dcard-cover dcover-motivational">
+                            <div class="dcover-orb dcover-orb1"></div>
+                            <div class="dcover-orb dcover-orb2"></div>
+                            <h3 class="dcard-title">TED: Leadership</h3>
+                            <div class="dcover-meta"><span class="dcover-emo">Motivational</span><span>Actor</span><span>18:00</span></div>
+                        </div>
+                        <div class="dcard-data">
+                            <div class="ddata-row"><span>160 WPM</span><span>2,880 words</span><span>6 segments</span></div>
+                            <div class="ddata-foot"><span>Maria Lopez</span><span>Mar 20</span></div>
+                        </div>
+                        <div class="dcard-actions">
+                            <button class="dcard-act" onclick="event.stopPropagation(); navigateTo('rsvp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learn</button>
+                            <button class="dcard-act dcard-act-go" onclick="event.stopPropagation(); navigateTo('teleprompter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Read</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dcard" style="--emo:#0D9488" onclick="navigateTo('editor')">
+                    <div class="dcard-menu-wrap">
+                        <button class="dcard-menu-btn" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+                        <div class="dcard-dropdown">
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicate</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Move to...</button>
+                            <div class="dcard-dropdown-sep"></div>
+                            <button class="dcard-dropdown-danger" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
+                        </div>
+                    </div>
+                    <div class="dcard-inner">
+                        <div class="dcard-cover dcover-calm">
+                            <div class="dcover-orb dcover-orb1"></div>
+                            <div class="dcover-orb dcover-orb2"></div>
+                            <h3 class="dcard-title">Green Architecture</h3>
+                            <div class="dcover-meta"><span class="dcover-emo">Calm</span><span>Actor</span><span>8:00</span></div>
+                        </div>
+                        <div class="dcard-data">
+                            <div class="ddata-row"><span>130 WPM</span><span>1,040 words</span><span>5 segments</span></div>
+                            <div class="ddata-foot"><span>Sam Wilson</span><span>Mar 18</span></div>
+                        </div>
+                        <div class="dcard-actions">
+                            <button class="dcard-act" onclick="event.stopPropagation(); navigateTo('rsvp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learn</button>
+                            <button class="dcard-act dcard-act-go" onclick="event.stopPropagation(); navigateTo('teleprompter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Read</button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="dcard" style="--emo:#2563EB" onclick="navigateTo('editor')">
+                    <div class="dcard-menu-wrap">
+                        <button class="dcard-menu-btn" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+                        <div class="dcard-dropdown">
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Rename</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicate</button>
+                            <button onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Move to...</button>
+                            <div class="dcard-dropdown-sep"></div>
+                            <button class="dcard-dropdown-danger" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
+                        </div>
+                    </div>
+                    <div class="dcard-inner">
+                        <div class="dcard-cover dcover-neutral">
+                            <div class="dcover-orb dcover-orb1"></div>
+                            <div class="dcover-orb dcover-orb2"></div>
+                            <h3 class="dcard-title">Quantum Computing</h3>
+                            <div class="dcover-meta"><span class="dcover-emo">Neutral</span><span style="color:var(--accent)">RSVP</span><span>25:00</span></div>
+                        </div>
+                        <div class="dcard-data">
+                            <div class="ddata-row"><span>300 WPM</span><span>7,500 words</span><span>8 segments</span></div>
+                            <div class="ddata-foot"><span>You</span><span>Mar 15</span></div>
+                        </div>
+                        <div class="dcard-actions">
+                            <button class="dcard-act" onclick="event.stopPropagation(); navigateTo('rsvp')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Learn</button>
+                            <button class="dcard-act dcard-act-go" onclick="event.stopPropagation(); navigateTo('teleprompter')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Read</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- New Script — surreal glass card -->
+                <article class="dcard dcard-create" onclick="navigateTo('editor')">
+                    <div class="dcard-create-inner">
+                        <div class="dcreate-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </div>
+                        <span class="dcreate-label">New Script</span>
+                    </div>
+                </article>
+
+                <!-- New Folder -->
+                <article class="dcard dcard-create dcard-create-folder" onclick="event.stopPropagation()">
+                    <div class="dcard-create-inner">
+                        <div class="dcreate-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                        </div>
+                        <span class="dcreate-label">New Folder</span>
+                    </div>
+                </article>
+            </div>
+            </div><!-- /lib-scroll -->
+        </main>
+    </div>
+
+    <!-- ==================== EDITOR ==================== -->
+    <div id="screen-editor" class="screen">
+        <div class="ed-layout">
+            <!-- Sidebar — structure only -->
+            <div class="ed-sidebar">
+                <div class="ed-structure">
+                    <div class="ed-section-label">STRUCTURE</div>
+                    <div class="ed-tree">
+                        <div class="ed-tree-seg active" style="--sc:#F59E0B" data-nav="seg-0" onclick="edNavTo(this)">
+                            <div class="ed-tree-dot"></div>
+                            <span>Intro</span>
+                            <small>Warm</small>
+                        </div>
+                        <div class="ed-tree-children">
+                            <div class="ed-tree-block" data-nav="blk-0-0" onclick="edNavTo(this)"><span>Opening Block</span><code>140</code></div>
+                            <div class="ed-tree-block" data-nav="blk-0-1" onclick="edNavTo(this)"><span>Purpose Block</span><code>150</code></div>
+                        </div>
+
+                        <div class="ed-tree-seg" style="--sc:#EF4444" data-nav="seg-1" onclick="edNavTo(this)">
+                            <div class="ed-tree-dot"></div>
+                            <span>Problem</span>
+                            <small>Concerned</small>
+                        </div>
+                        <div class="ed-tree-children">
+                            <div class="ed-tree-block" data-nav="blk-1-0" onclick="edNavTo(this)"><span>Statistics</span><code>150</code></div>
+                            <div class="ed-tree-block" data-nav="blk-1-1" onclick="edNavTo(this)"><span>Impact</span><code>140</code></div>
+                        </div>
+
+                        <div class="ed-tree-seg" style="--sc:#10B981" data-nav="seg-2" onclick="edNavTo(this)">
+                            <div class="ed-tree-dot"></div>
+                            <span>Solution</span>
+                            <small>Focused</small>
+                        </div>
+                        <div class="ed-tree-children">
+                            <div class="ed-tree-block" data-nav="blk-2-0" onclick="edNavTo(this)"><span>Introduction</span><code>150</code></div>
+                            <div class="ed-tree-block" data-nav="blk-2-1" onclick="edNavTo(this)"><span>Benefits</span><code>160</code></div>
+                        </div>
+
+                        <div class="ed-tree-seg" style="--sc:#A855F7" data-nav="seg-3" onclick="edNavTo(this)">
+                            <div class="ed-tree-dot"></div>
+                            <span>Call to Action</span>
+                            <small>Motivational</small>
+                        </div>
+                        <div class="ed-tree-children">
+                            <div class="ed-tree-block" data-nav="blk-3-0" onclick="edNavTo(this)"><span>Inspiration</span><code>130</code></div>
+                            <div class="ed-tree-block" data-nav="blk-3-1" onclick="edNavTo(this)"><span>Closing</span><code>140</code></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Editor area -->
+            <div class="ed-main">
+                <!-- Structured Toolbar (Word/Ribbon style) -->
+                <div class="ed-toolbar">
+                    <!-- History -->
+                    <div class="tb-section">
+                        <div class="tb-label">History</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-tip" data-tip="Undo last action (Ctrl+Z)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+                            <button class="tb-btn tb-tip" data-tip="Redo last undone action (Ctrl+Y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg></button>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Text Format -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Format</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-tip" data-tip="Bold — strong emphasis level 2. Markdown: **text**"><b>B</b></button>
+                            <button class="tb-btn tb-tip" data-tip="Italic — emphasis level 1. Markdown: *text*"><i>I</i></button>
+                            <button class="tb-btn tb-tip" data-tip="Emphasis — standard emphasis level 1. TPS: [emphasis]text[/emphasis]">Em</button>
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="More formatting options">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Format dropdown -->
+                        <div class="tb-dropdown">
+                            <div class="tb-drop-label">Formatting</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item"><b style="color:var(--text-1)">B</b> Bold <small>**text**</small></button>
+                                <button class="tb-emo-item"><i style="color:var(--text-1)">I</i> Italic <small>*text*</small></button>
+                                <button class="tb-emo-item"><span style="color:var(--gold-text);font-weight:600">Em</span> Emphasis <small>[emphasis]</small></button>
+                                <button class="tb-emo-item"><span style="background:rgba(255,232,122,.18);padding:1px 4px;border-radius:3px;color:#FFE87A">H</span> Highlight <small>[highlight]</small></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Color -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Color</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="Text color — wrap selected text with a color tag. 12 semantic colors optimized for dark teleprompter backgrounds">
+                                <span class="cdot" style="background:#FF8A8A"></span>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Color dropdown -->
+                        <div class="tb-dropdown">
+                            <div class="tb-drop-label">TPS Colors</div>
+                            <div class="tb-color-grid">
+                                <button class="tb-cswatch tb-tip" style="background:#FF8A8A" data-tip="Red — warnings, emphasis. [red]text[/red]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#6FE89A" data-tip="Green — positive, success. [green]text[/green]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#8ECFFF" data-tip="Blue — calm, informational. [blue]text[/blue]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#FFE87A" data-tip="Yellow — caution, highlight. [yellow]text[/yellow]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#FFB86A" data-tip="Orange — attention. [orange]text[/orange]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#D88AFF" data-tip="Purple — creative, special. [purple]text[/purple]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#7DE8F0" data-tip="Cyan — cool, tech. [cyan]text[/cyan]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#FF96C5" data-tip="Magenta — accent. [magenta]text[/magenta]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#FFB3D1" data-tip="Pink — soft emphasis. [pink]text[/pink]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#5EECC2" data-tip="Teal — professional. [teal]text[/teal]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:#B8C0C8" data-tip="Gray — subdued, secondary text. [gray]text[/gray]"></button>
+                                <button class="tb-cswatch tb-tip" style="background:transparent;border:1px dashed var(--gold-20)" data-tip="Remove color — strip color tags from selected text"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Emotion -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Emotion</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text">
+                                <span class="cdot" style="background:#FFB840"></span>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Emotion dropdown -->
+                        <div class="tb-dropdown">
+                            <div class="tb-drop-label">TPS Emotions</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="Friendly, welcoming tone. Inline: [warm]text[/warm]"><span class="cdot" style="background:#FFB840"></span> Warm <small>😊</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Worried, empathetic. Inline: [concerned]text[/concerned]"><span class="cdot" style="background:#FF7A7A"></span> Concerned <small>😟</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Concentrated, precise. Inline: [focused]text[/focused]"><span class="cdot" style="background:#4AE0A0"></span> Focused <small>🎯</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Inspiring, encouraging. Inline: [motivational]text[/motivational]"><span class="cdot" style="background:#C88AFF"></span> Motivational <small>💪</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Default balanced tone. Inline: [neutral]text[/neutral]"><span class="cdot" style="background:#8ECFFF"></span> Neutral <small>😐</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Critical, immediate attention. Inline: [urgent]text[/urgent]"><span class="cdot" style="background:#FF6060"></span> Urgent <small>🚨</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Joyful, positive. Inline: [happy]text[/happy]"><span class="cdot" style="background:#FFE87A"></span> Happy <small>😄</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Enthusiastic, energetic. Inline: [excited]text[/excited]"><span class="cdot" style="background:#FF8AC8"></span> Excited <small>🚀</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Melancholy, somber. Inline: [sad]text[/sad]"><span class="cdot" style="background:#A0A8FF"></span> Sad <small>😢</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Peaceful, relaxed. Inline: [calm]text[/calm]"><span class="cdot" style="background:#5EECC2"></span> Calm <small>😌</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="High energy, dynamic. Inline: [energetic]text[/energetic]"><span class="cdot" style="background:#FFA050"></span> Energetic <small>⚡</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Business-like, formal. Inline: [professional]text[/professional]"><span class="cdot" style="background:#80B8FF"></span> Professional <small>💼</small></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Pauses -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Pause</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-tip" data-tip="Short pause — inserts / marker (300ms silence)">/</button>
+                            <button class="tb-btn tb-tip" data-tip="Medium pause — inserts // marker (600ms silence)">//</button>
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="More pause options">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Pause dropdown -->
+                        <div class="tb-dropdown">
+                            <div class="tb-drop-label">Pause Types</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="Short 300ms pause between clauses. Inserted as / in text"><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">/</span> Short pause <small>300ms</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Medium 600ms pause between sentences. Inserted as // in text"><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">//</span> Medium pause <small>600ms</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="1 second timed pause. [pause:1s]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg> 1 second <small>[pause:1s]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="2 second timed pause. [pause:2s]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg> 2 seconds <small>[pause:2s]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="3 second timed pause. [pause:3s]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg> 3 seconds <small>[pause:3s]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Custom timed pause in milliseconds. [pause:500ms]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg> Custom (ms) <small>[pause:Nms]</small></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Speed -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Speed</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-speed tb-tip" data-tip="Extra slow — base WPM × 0.6. Use for critical warnings, very careful delivery. [xslow]text[/xslow]" style="color:#FF8A8A">×.6</button>
+                            <button class="tb-btn tb-speed tb-tip" data-tip="Slow — base WPM × 0.8. Use for important points, emphasis. [slow]text[/slow]" style="color:#FFB86A">×.8</button>
+                            <button class="tb-btn tb-speed tb-tip" data-tip="Normal speed — resets to base WPM × 1.0. [normal]text[/normal]">×1</button>
+                            <button class="tb-btn tb-speed tb-tip" data-tip="Fast — base WPM × 1.25. Use for quick mentions, asides. [fast]text[/fast]" style="color:#8ECFFF">×1.25</button>
+                            <button class="tb-btn tb-speed tb-tip" data-tip="Extra fast — base WPM × 1.5. Use for rapid transitions, low-importance text. [xfast]text[/xfast]" style="color:#80B8FF">×1.5</button>
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="Custom WPM and more speed options">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Speed dropdown -->
+                        <div class="tb-dropdown" style="min-width:240px">
+                            <div class="tb-drop-label">Speed Presets</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="Very careful delivery. Critical warnings. base × 0.6 = 84 WPM at base 140"><span style="color:#FF8A8A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.6</span> Extra Slow <small>[xslow]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Important points, emphasis. base × 0.8 = 112 WPM at base 140"><span style="color:#FFB86A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.8</span> Slow <small>[slow]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Reset to base speed. base × 1.0 = 140 WPM at base 140"><span style="color:var(--text-2);font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.0</span> Normal <small>[normal]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Quick mentions, asides. base × 1.25 = 175 WPM at base 140"><span style="color:#8ECFFF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.25</span> Fast <small>[fast]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Rapid transitions, low-importance text. base × 1.5 = 210 WPM at base 140"><span style="color:#80B8FF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.5</span> Extra Fast <small>[xfast]</small></button>
+                            </div>
+                            <div class="tb-drop-sep"></div>
+                            <div class="tb-drop-label">Custom Speed</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="Set an absolute WPM value for a text span. [180WPM]text[/180WPM]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg> Custom WPM <small>[NWPM]</small></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- Insert -->
+                    <div class="tb-section tb-dropdown-wrap">
+                        <div class="tb-label">Insert</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-tip" data-tip="Edit Point — marks a natural place to stop or resume an editing session. [edit_point] or [edit_point:high]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></button>
+                            <button class="tb-btn tb-tip" data-tip="Pronunciation guide — add IPA or simple pronunciation. [phonetic:IPA]word[/phonetic]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></button>
+                            <button class="tb-btn tb-tip" data-tip="Segment — major script section with name, WPM, and emotion. ## [Name|WPM|Emotion]">§</button>
+                            <button class="tb-btn tb-has-dropdown tb-tip" data-tip="More insert options">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9"/></svg>
+                            </button>
+                        </div>
+                        <!-- Insert dropdown -->
+                        <div class="tb-dropdown" style="min-width:260px">
+                            <div class="tb-drop-label">Structure</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="Segment — major section of the script (Intro, Problem, Solution). ## [Name|WPM|Emotion|Timing]"><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">§</span> Segment <small>## [Name]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Block — topic group within a segment. ### [Name|WPM|Emotion]"><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">¶</span> Block <small>### [Name]</small></button>
+                            </div>
+                            <div class="tb-drop-sep"></div>
+                            <div class="tb-drop-label">Edit Points</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="High priority edit point — critical, must review. [edit_point:high]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> High priority <small>[edit_point:high]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Medium priority edit point — important but not critical. [edit_point:medium]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB86A" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Medium priority <small>[edit_point:medium]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Standard edit point — marks a natural break. [edit_point]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Standard <small>[edit_point]</small></button>
+                            </div>
+                            <div class="tb-drop-sep"></div>
+                            <div class="tb-drop-label">Pronunciation</div>
+                            <div class="tb-emo-list">
+                                <button class="tb-emo-item tb-tip" data-tip="IPA phonetic notation for precise pronunciation. [phonetic:IPA]word[/phonetic]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2" style="flex-shrink:0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Phonetic (IPA) <small>[phonetic:...]</small></button>
+                                <button class="tb-emo-item tb-tip" data-tip="Simple pronunciation guide for easy reading. [pronunciation:guide]word[/pronunciation]"><span style="color:#D88AFF;font-weight:600;width:14px;text-align:center;flex-shrink:0;font-size:13px">Aa</span> Pronunciation <small>[pronunciation:...]</small></button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="tb-div"></span>
+                    <!-- AI -->
+                    <div class="tb-section">
+                        <div class="tb-label">AI</div>
+                        <div class="tb-row">
+                            <button class="tb-btn tb-ai tb-tip" data-tip="AI Assistant — rewrite, expand, simplify, or auto-format your script with AI">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z"/></svg>
+                                AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ed-content">
+                    <!-- Segment: Intro — Warm -->
+                    <div class="ed-seg" data-e="warm">
+                        <h2 class="ed-seg-h"><span class="h-mark">## </span><span class="h-br">[</span><span class="h-name">Intro</span><span class="h-sep">|</span><span class="h-wpm">140WPM</span><span class="h-sep">|</span><span class="h-emo">Warm</span><span class="h-br">]</span></h2>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Opening Block</span><span class="h-sep">|</span><span class="h-wpm">140WPM</span><span class="h-br">]</span></h3>
+                            <p class="ed-p" style="position:relative">
+                                Good morning everyone, <span class="mk-pause">/</span> and <span class="mk-tag">[emphasis]</span><span class="mk-em">welcome</span><span class="mk-tag">[/emphasis]</span> to what I believe <span class="mk-pause">/</span><br>
+                                will be a <span class="mk-tag">[green]</span><span class="mk-color-green ed-text-selected" style="position:relative"><span class="ed-float-bar">
+                                    <button class="efb-btn" title="Bold"><b>B</b></button>
+                                    <button class="efb-btn" title="Italic"><i>I</i></button>
+                                    <button class="efb-btn" title="Emphasis [emphasis]">Em</button>
+                                    <button class="efb-btn" title="Highlight [highlight]"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFE066" stroke-width="2"><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M8 14V8a4 4 0 0 1 8 0v6"/></svg></button>
+                                    <span class="efb-sep"></span>
+                                    <button class="efb-btn" title="Text Color"><span class="cdot" style="background:#FF8A8A"></span></button>
+                                    <button class="efb-btn" title="Emotion"><span class="cdot" style="background:#FFB840"></span></button>
+                                    <span class="efb-sep"></span>
+                                    <button class="efb-btn" title="Slow [slow]">.8×</button>
+                                    <button class="efb-btn" title="Fast [fast]">1.25×</button>
+                                    <button class="efb-btn" title="Pause [pause]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+                                    <span class="efb-sep"></span>
+                                    <button class="efb-btn efb-ai" title="AI — rewrite, expand, simplify">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z"/></svg>
+                                        AI
+                                    </button>
+                                </span>transformative moment</span><span class="mk-tag">[/green]</span> for our company. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-special">[pause:2s]</span>
+                            </p>
+                        </div>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Purpose Block</span><span class="h-sep">|</span><span class="h-wpm">150WPM</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                <span class="mk-tag">[emphasis]</span><span class="mk-em">Today</span><span class="mk-tag">[/emphasis]</span>, <span class="mk-pause">/</span> we're not just launching a product &mdash; <span class="mk-pause">/</span><br>
+                                we're introducing a <span class="mk-tag">[highlight]</span><span class="mk-hl">solution</span><span class="mk-tag">[/highlight]</span> that will <span class="mk-tag">[emphasis]</span><span class="mk-em">revolutionize</span><span class="mk-tag">[/emphasis]</span> <span class="mk-pause">/</span><br>
+                                how our customers interact with technology. <span class="mk-pause">//</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Segment: Problem — Concerned -->
+                    <div class="ed-seg" data-e="concerned">
+                        <h2 class="ed-seg-h"><span class="h-mark">## </span><span class="h-br">[</span><span class="h-name">Problem</span><span class="h-sep">|</span><span class="h-wpm">150WPM</span><span class="h-sep">|</span><span class="h-emo">Concerned</span><span class="h-br">]</span></h2>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Statistics Block</span><span class="h-sep">|</span><span class="h-wpm">150WPM</span><span class="h-sep">|</span><span class="h-emo">Neutral</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                But first, <span class="mk-pause">/</span> let's address the <span class="mk-tag">[xslow]</span><span class="mk-tag">[red]</span><span class="mk-color-red mk-xslow">elephant in the room</span><span class="mk-tag">[/red]</span><span class="mk-tag">[/xslow]</span>. <span class="mk-pause">/</span><br>
+                                Our industry has been <span class="mk-tag">[emphasis]</span><span class="mk-em">struggling</span><span class="mk-tag">[/emphasis]</span> with a fundamental problem. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-edit">[edit_point:high]</span><br><br>
+                                According to recent studies, <span class="mk-pause">/</span><br>
+                                <span class="mk-tag">[slow]</span><span class="mk-tag">[emphasis]</span><span class="mk-em mk-slow">73% of users abandon</span><span class="mk-tag">[/emphasis]</span> applications within the first three interactions<span class="mk-tag">[/slow]</span> <span class="mk-pause">/</span><br>
+                                due to <span class="mk-tag">[highlight]</span><span class="mk-hl">complexity and poor user experience</span><span class="mk-tag">[/highlight]</span>. <span class="mk-pause">//</span>
+                            </p>
+                        </div>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Impact Block</span><span class="h-sep">|</span><span class="h-wpm">140WPM</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                This affects <span class="mk-tag">[emphasis]</span><span class="mk-em">millions</span><span class="mk-tag">[/emphasis]</span> of people worldwide, <span class="mk-pause">/</span><br>
+                                costing businesses <span class="mk-tag">[red]</span><span class="mk-color-red">billions in revenue</span><span class="mk-tag">[/red]</span> annually. <span class="mk-pause">//</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Segment: Solution — Focused -->
+                    <div class="ed-seg" data-e="focused">
+                        <h2 class="ed-seg-h"><span class="h-mark">## </span><span class="h-br">[</span><span class="h-name">Solution</span><span class="h-sep">|</span><span class="h-wpm">160WPM</span><span class="h-sep">|</span><span class="h-emo">Focused</span><span class="h-br">]</span></h2>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Introduction Block</span><span class="h-sep">|</span><span class="h-wpm">150WPM</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                That's where our <span class="mk-tag">[blue]</span><span class="mk-tag">[emphasis]</span><span class="mk-em mk-color-blue">new platform</span><span class="mk-tag">[/emphasis]</span><span class="mk-tag">[/blue]</span> comes in. <span class="mk-pause">/</span><br>
+                                We've developed a <span class="mk-tag">[green]</span><span class="mk-color-green">local-first teleprompter workflow</span><span class="mk-tag">[/green]</span> that <span class="mk-pause">/</span><br>
+                                <span class="mk-tag">[highlight]</span><span class="mk-hl">simplifies complex processes</span><span class="mk-tag">[/highlight]</span> and <span class="mk-tag">[emphasis]</span><span class="mk-em">enhances user experience</span><span class="mk-tag">[/emphasis]</span>. <span class="mk-pause">//</span>
+                            </p>
+                        </div>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Benefits Block</span><span class="h-sep">|</span><span class="h-wpm">160WPM</span><span class="h-sep">|</span><span class="h-emo">Excited</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                With our solution, <span class="mk-pause">/</span> you can expect a <span class="mk-tag">[green]</span><span class="mk-tag">[emphasis]</span><span class="mk-em mk-color-green">50% reduction</span><span class="mk-tag">[/emphasis]</span><span class="mk-tag">[/green]</span> in user abandonment <span class="mk-pause">/</span><br>
+                                and a <span class="mk-tag">[green]</span><span class="mk-tag">[emphasis]</span><span class="mk-em mk-color-green">30% increase</span><span class="mk-tag">[/emphasis]</span><span class="mk-tag">[/green]</span> in engagement. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-special">[pause:1s]</span><br><br>
+                                <span class="mk-tag">[xfast]</span><span class="mk-xfast">Full details are available in the handout.</span><span class="mk-tag">[/xfast]</span> <span class="mk-pause">/</span><br>
+                                <span class="mk-tag">[highlight]</span><span class="mk-hl">Thank you</span><span class="mk-tag">[/highlight]</span> for your time. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-edit">[edit_point:medium]</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Segment: Motivation — Motivational (showcases pronunciation + emotion inline) -->
+                    <div class="ed-seg" data-e="motivational">
+                        <h2 class="ed-seg-h"><span class="h-mark">## </span><span class="h-br">[</span><span class="h-name">Call to Action</span><span class="h-sep">|</span><span class="h-wpm">140WPM</span><span class="h-sep">|</span><span class="h-emo">Motivational</span><span class="h-sep">|</span><span class="h-wpm">8:00-10:00</span><span class="h-br">]</span></h2>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Inspiration Block</span><span class="h-sep">|</span><span class="h-wpm">130WPM</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                <span class="mk-tag">[warm]</span><span class="mk-emo-warm">Let me share something personal.</span><span class="mk-tag">[/warm]</span> <span class="mk-pause">//</span><br><br>
+                                When we started this journey, <span class="mk-pause">/</span> our <span class="mk-tag">[phonetic:ˈviʒən]</span><span class="mk-phonetic">ˈviʒən</span> <span class="mk-phonetic-word">vision</span><span class="mk-tag">[/phonetic]</span> was simple: <span class="mk-pause">/</span><br>
+                                make technology <span class="mk-tag">[emphasis]</span><span class="mk-em">disappear</span><span class="mk-tag">[/emphasis]</span> <span class="mk-pause">/</span> so people can <span class="mk-tag">[purple]</span><span class="mk-color-purple">focus on what matters</span><span class="mk-tag">[/purple]</span>. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-tag">[slow]</span><span class="mk-slow">I want each of you to <span class="mk-tag">[emphasis]</span><span class="mk-em">imagine</span><span class="mk-tag">[/emphasis]</span> a world</span><span class="mk-tag">[/slow]</span> <span class="mk-pause">/</span><br>
+                                where <span class="mk-tag">[cyan]</span><span class="mk-color-cyan">every interaction is intuitive</span><span class="mk-tag">[/cyan]</span>, <span class="mk-pause">/</span><br>
+                                every workflow is <span class="mk-tag">[teal]</span><span class="mk-color-teal">seamless</span><span class="mk-tag">[/teal]</span>, <span class="mk-pause">/</span><br>
+                                and every user feels <span class="mk-tag">[orange]</span><span class="mk-color-orange">empowered</span><span class="mk-tag">[/orange]</span>. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-special">[pause:3s]</span>
+                            </p>
+                        </div>
+
+                        <div class="ed-blk">
+                            <h3 class="ed-blk-h"><span class="h-mark">### </span><span class="h-br">[</span><span class="h-name">Closing Block</span><span class="h-sep">|</span><span class="h-wpm">140WPM</span><span class="h-sep">|</span><span class="h-emo">Energetic</span><span class="h-br">]</span></h3>
+                            <p class="ed-p">
+                                <span class="mk-tag">[urgent]</span><span class="mk-emo-urgent">The time to act is now.</span><span class="mk-tag">[/urgent]</span> <span class="mk-pause">//</span><br><br>
+                                <span class="mk-tag">[180WPM]</span><span class="mk-wpm-badge">180WPM</span> Join us in building the future of <span class="mk-tag">[pronunciation:TELE-promp-ter]</span><span class="mk-phonetic">TELE-promp-ter</span> <span class="mk-phonetic-word">teleprompter</span><span class="mk-tag">[/pronunciation]</span> technology.<span class="mk-tag">[/180WPM]</span> <span class="mk-pause">/</span><br><br>
+                                <span class="mk-tag">[fast]</span><span class="mk-fast">Visit our booth in the exhibition hall for live demos.</span><span class="mk-tag">[/fast]</span> <span class="mk-pause">/</span><br><br>
+                                <span class="mk-tag">[motivational]</span><span class="mk-emo-motivational">Together, we will change how the world communicates.</span><span class="mk-tag">[/motivational]</span> <span class="mk-pause">//</span><br><br>
+                                <span class="mk-tag">[yellow]</span><span class="mk-color-yellow">**Thank you**</span><span class="mk-tag">[/yellow]</span> — <span class="mk-pause">/</span>
+                                <span class="mk-tag">[magenta]</span><span class="mk-color-magenta">you are the future</span><span class="mk-tag">[/magenta]</span>. <span class="mk-pause">//</span><br><br>
+                                <span class="mk-edit">[edit_point:high]</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ed-statusbar">
+                    <span>Ln 48, Col 12</span>
+                    <span>Actor</span>
+                    <span>140 WPM</span>
+                    <span>4 Segments</span>
+                    <span>~480 Words</span>
+                    <span>~3:26</span>
+                    <span>TPS v1.0</span>
+                </div>
+            </div>
+
+            <!-- Right sidebar — Metadata (editable) -->
+            <div class="ed-right">
+                <div class="ed-section-label">METADATA</div>
+                <div class="ed-meta-field">
+                    <label>Profile</label>
+                    <select class="ed-meta-select">
+                        <option selected>Actor</option>
+                        <option>RSVP</option>
+                    </select>
+                </div>
+                <div class="ed-meta-field">
+                    <label>Base WPM</label>
+                    <input type="number" class="ed-meta-input" value="140" min="80" max="600" />
+                </div>
+                <div class="ed-meta-field">
+                    <label>Duration</label>
+                    <input type="text" class="ed-meta-input" value="10:00" placeholder="MM:SS" />
+                </div>
+                <div class="ed-meta-field">
+                    <label>Author</label>
+                    <input type="text" class="ed-meta-input" value="Jane Doe" />
+                </div>
+                <div class="ed-meta-field">
+                    <label>Created</label>
+                    <input type="date" class="ed-meta-input" value="2024-01-01" />
+                </div>
+                <div class="ed-meta-field">
+                    <label>Version</label>
+                    <input type="text" class="ed-meta-input" value="1.0" />
+                </div>
+
+                <div class="ed-section-label" style="margin-top:18px">SPEED OFFSETS</div>
+                <div class="ed-meta-field">
+                    <label>xslow</label>
+                    <div class="ed-meta-row">
+                        <input type="number" class="ed-meta-input ed-meta-num" value="-40" />
+                        <span class="ed-meta-unit" style="color:#FF8A8A">%</span>
+                    </div>
+                </div>
+                <div class="ed-meta-field">
+                    <label>slow</label>
+                    <div class="ed-meta-row">
+                        <input type="number" class="ed-meta-input ed-meta-num" value="-20" />
+                        <span class="ed-meta-unit" style="color:#FFB86A">%</span>
+                    </div>
+                </div>
+                <div class="ed-meta-field">
+                    <label>fast</label>
+                    <div class="ed-meta-row">
+                        <input type="number" class="ed-meta-input ed-meta-num" value="25" />
+                        <span class="ed-meta-unit" style="color:#8ECFFF">%</span>
+                    </div>
+                </div>
+                <div class="ed-meta-field">
+                    <label>xfast</label>
+                    <div class="ed-meta-row">
+                        <input type="number" class="ed-meta-input ed-meta-num" value="50" />
+                        <span class="ed-meta-unit" style="color:#80B8FF">%</span>
+                    </div>
+                </div>
+
+                <div class="ed-section-label" style="margin-top:18px">STATS</div>
+                <div class="ed-stat"><span>Words</span><b>~480</b></div>
+                <div class="ed-stat"><span>Est. Time</span><b>3:26</b></div>
+                <div class="ed-stat"><span>Segments</span><b>4</b></div>
+                <div class="ed-stat"><span>Blocks</span><b>8</b></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== RSVP (Learn) ==================== -->
+    <div id="screen-rsvp" class="screen">
+        <div class="rsvp">
+
+            <!-- Progress -->
+            <div class="rsvp-progress"><div class="rsvp-progress-fill" style="width:23%"></div></div>
+
+            <!-- Horizontal word display -->
+            <div class="rsvp-display">
+                <!-- Crosshair above ORP -->
+                <div class="rsvp-crosshair">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                        <line x1="8" y1="0" x2="8" y2="16" stroke="rgba(255,82,82,.3)" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <line x1="0" y1="8" x2="16" y2="8" stroke="rgba(255,82,82,.3)" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <circle cx="8" cy="8" r="2" fill="rgba(255,82,82,.5)"/>
+                    </svg>
+                </div>
+
+                <!-- 3 words LEFT | FOCUS WORD | 3 words RIGHT -->
+                <div class="rsvp-h-row">
+                    <div class="rsvp-ctx-left" id="rsvp-ctx-l">
+                        <span>what</span>
+                        <span>I</span>
+                        <span>believe</span>
+                    </div>
+
+                    <div class="rsvp-focus" id="rsvp-word">
+                        <span>t</span><span>r</span><span class="orp">a</span><span>n</span><span>s</span><span>f</span><span>o</span><span>r</span><span>m</span><span>a</span><span>t</span><span>i</span><span>v</span><span>e</span>
+                    </div>
+
+                    <div class="rsvp-ctx-right" id="rsvp-ctx-r">
+                        <span>moment</span>
+                        <span>for</span>
+                        <span>our</span>
+                    </div>
+                </div>
+
+                <!-- ORP vertical line -->
+                <div class="rsvp-orp-line"></div>
+
+                <!-- Phrase preview -->
+                <div class="rsvp-phrase">
+                    <span class="rsvp-phrase-label">Next</span>
+                    <p>Today, we're not just launching a product &mdash; we're introducing a solution...</p>
+                </div>
+
+                <!-- Pause bar -->
+                <div class="rsvp-pause-track">
+                    <div class="rsvp-pause-fill"></div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="rsvp-bottom">
+                <div class="rsvp-speed">
+                    <button class="rsvp-btn" onclick="changeRsvpSpeed(-10)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                    <div class="rsvp-speed-num"><span id="rsvp-speed">300</span><small>WPM</small></div>
+                    <button class="rsvp-btn" onclick="changeRsvpSpeed(10)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                </div>
+                <div class="rsvp-play-row">
+                    <button class="rsvp-btn" onclick="stepRsvpWord(-5)" title="Back 5 words"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+                    <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(-1)" title="Back 1 word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg></button>
+                    <button class="rsvp-play" id="rsvp-play-btn" onclick="toggleRsvp()">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    </button>
+                    <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(1)" title="Forward 1 word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18"/></svg></button>
+                    <button class="rsvp-btn" onclick="stepRsvpWord(5)" title="Forward 5 words"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg></button>
+                </div>
+                <div class="rsvp-pos">Word 24 / 342 &middot; ~0:42 left</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== READER (RSVP Teleprompter) ==================== -->
+    <div id="screen-teleprompter" class="screen">
+        <div class="rd">
+            <!-- Animated emotion gradient background -->
+            <div class="rd-gradient warm" id="rd-gradient"></div>
+
+            <!-- Camera layer (behind text, no icon when off) -->
+            <div class="rd-camera" id="rd-camera"></div>
+            <div class="rd-camera-tint" id="rd-camera-tint"></div>
+
+            <!-- UI overlay -->
+            <div class="rd-ui">
+                <!-- Back button only — immersive reading -->
+                <button class="rd-back" onclick="navigateTo('editor')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+                </button>
+
+                <!-- Countdown overlay -->
+                <div class="rd-countdown" id="rd-countdown">3</div>
+
+                <!-- Right-edge sliders: focal point + text width -->
+                <div class="rd-sliders">
+                    <div class="rd-slider-group">
+                        <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="8" x2="3" y2="16"/><line x1="21" y1="8" x2="21" y2="16"/></svg>
+                        <input type="range" class="rd-vslider" id="rd-focal-slider" min="15" max="55" value="30" oninput="changeFocalPoint(this.value)">
+                        <span class="rd-slider-val" id="rd-focal-val">30%</span>
+                    </div>
+                    <div class="rd-slider-group">
+                        <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="8,9 5,12 8,15"/><polyline points="16,9 19,12 16,15"/></svg>
+                        <input type="range" class="rd-vslider" id="rd-width-slider" min="400" max="1100" value="750" oninput="changeTextWidth(this.value)">
+                        <span class="rd-slider-val" id="rd-width-val">750</span>
+                    </div>
+                </div>
+
+                <!-- Main display: cluster with center-pinned word -->
+                <div class="rd-stage">
+                    <div class="rd-center-guide"></div>
+                    <!-- Adjustment guide lines (visible only while dragging sliders) -->
+                    <div class="rd-guide-h" id="rd-guide-h"></div>
+                    <div class="rd-guide-v rd-guide-v-l" id="rd-guide-v-l"></div>
+                    <div class="rd-guide-v rd-guide-v-r" id="rd-guide-v-r"></div>
+
+                    <div class="rd-cluster-wrap" id="rd-cluster-wrap">
+                        <!-- Card 1: Intro / Warm -->
+                        <div class="rd-card rd-card-active" data-card="0">
+                            <div class="rd-cluster rd-cluster-active">
+                                <div class="rd-cluster-emotion">
+                                    <span class="rd-emo-dot" style="background:#F59E0B"></span>
+                                    <span class="rd-emo-name">Warm</span>
+                                    <span class="rd-emo-wpm">140 <small>WPM</small></span>
+                                </div>
+                                <p class="rd-cluster-text">
+                                    <span class="rd-g"><span class="rd-w">Good</span> <span class="rd-w">morning</span> <span class="rd-w">everyone,</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">and</span> <span class="rd-w tps-emphasis">welcome</span></span> <span class="rd-g"><span class="rd-w">to</span> <span class="rd-w">what</span> <span class="rd-w">I</span> <span class="rd-w">believe</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">will</span> <span class="rd-w">be</span> <span class="rd-w">a</span> <span class="rd-w tps-green">transformative</span> <span class="rd-w tps-green">moment</span></span>
+                                    <span class="rd-g"><span class="rd-w">for</span> <span class="rd-w">our</span> <span class="rd-w">company.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                    <span class="rd-g"><span class="rd-w tps-emphasis">Today,</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">we're</span> <span class="rd-w">not</span> <span class="rd-w">just</span> <span class="rd-w">launching</span></span> <span class="rd-g"><span class="rd-w">a</span> <span class="rd-w">product</span> <span class="rd-w">&mdash;</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">we're</span> <span class="rd-w">introducing</span> <span class="rd-w">a</span> <span class="rd-w tps-highlight">solution</span></span>
+                                    <span class="rd-g"><span class="rd-w">that</span> <span class="rd-w">will</span> <span class="rd-w tps-emphasis">revolutionize</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">how</span> <span class="rd-w">our</span> <span class="rd-w">customers</span> <span class="rd-w">interact</span></span>
+                                    <span class="rd-g"><span class="rd-w">with</span> <span class="rd-w">technology.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Problem / Concerned -->
+                        <div class="rd-card rd-card-next" data-card="1">
+                            <div class="rd-cluster rd-cluster-active">
+                                <div class="rd-cluster-emotion">
+                                    <span class="rd-emo-dot" style="background:#EF4444"></span>
+                                    <span class="rd-emo-name">Concerned</span>
+                                    <span class="rd-emo-wpm">150 <small>WPM</small></span>
+                                </div>
+                                <p class="rd-cluster-text">
+                                    <span class="rd-g"><span class="rd-w">But</span> <span class="rd-w">first,</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">let's</span> <span class="rd-w">address</span> <span class="rd-w">the</span></span> <span class="rd-g"><span class="rd-w tps-xslow tps-red">elephant</span> <span class="rd-w tps-xslow tps-red">in</span> <span class="rd-w tps-xslow tps-red">the</span> <span class="rd-w tps-xslow tps-red">room.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                    <span class="rd-g"><span class="rd-w">Our</span> <span class="rd-w">industry</span> <span class="rd-w">has</span> <span class="rd-w">been</span> <span class="rd-w tps-emphasis">struggling</span></span>
+                                    <span class="rd-g"><span class="rd-w">with</span> <span class="rd-w">a</span> <span class="rd-w">fundamental</span> <span class="rd-w">problem.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                    <span class="rd-g"><span class="rd-w">According</span> <span class="rd-w">to</span> <span class="rd-w">recent</span> <span class="rd-w">studies,</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w tps-slow tps-emphasis tps-red">73%</span> <span class="rd-w tps-slow tps-emphasis">of</span> <span class="rd-w tps-slow tps-emphasis">users</span> <span class="rd-w tps-slow tps-emphasis">abandon</span></span> <span class="rd-g"><span class="rd-w tps-slow">applications</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">within</span> <span class="rd-w">the</span> <span class="rd-w">first</span></span> <span class="rd-g"><span class="rd-w">three</span> <span class="rd-w">interactions</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">due</span> <span class="rd-w">to</span> <span class="rd-w tps-highlight">complexity</span></span>
+                                    <span class="rd-g"><span class="rd-w">and</span> <span class="rd-w tps-highlight">poor</span> <span class="rd-w tps-highlight">user</span> <span class="rd-w tps-highlight">experience.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Solution / Focused -->
+                        <div class="rd-card rd-card-next" data-card="2">
+                            <div class="rd-cluster rd-cluster-active">
+                                <div class="rd-cluster-emotion">
+                                    <span class="rd-emo-dot" style="background:#10B981"></span>
+                                    <span class="rd-emo-name">Focused</span>
+                                    <span class="rd-emo-wpm">160 <small>WPM</small></span>
+                                </div>
+                                <p class="rd-cluster-text">
+                                    <span class="rd-g"><span class="rd-w">That's</span> <span class="rd-w">where</span> <span class="rd-w">our</span></span> <span class="rd-g"><span class="rd-w tps-blue tps-emphasis">new</span> <span class="rd-w tps-blue tps-emphasis">platform</span> <span class="rd-w">comes</span> <span class="rd-w">in.</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">With</span> <span class="rd-w">our</span> <span class="rd-w">solution,</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">you</span> <span class="rd-w">can</span> <span class="rd-w">expect</span></span> <span class="rd-g"><span class="rd-w">a</span> <span class="rd-w tps-green tps-emphasis">50%</span> <span class="rd-w tps-green tps-emphasis">reduction</span></span>
+                                    <span class="rd-g"><span class="rd-w">in</span> <span class="rd-w">user</span> <span class="rd-w">abandonment</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w">and</span> <span class="rd-w">a</span> <span class="rd-w tps-green tps-emphasis">30%</span> <span class="rd-w tps-green tps-emphasis">increase</span></span> <span class="rd-g"><span class="rd-w">in</span> <span class="rd-w">engagement.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                    <span class="rd-g"><span class="rd-w tps-xfast">Full</span> <span class="rd-w tps-xfast">details</span> <span class="rd-w tps-xfast">are</span> <span class="rd-w tps-xfast">available</span></span> <span class="rd-g"><span class="rd-w tps-xfast">in</span> <span class="rd-w tps-xfast">the</span> <span class="rd-w tps-xfast">handout.</span></span><span class="rd-pause" data-ms="300"></span>
+                                    <span class="rd-g"><span class="rd-w tps-highlight">Thank</span> <span class="rd-w tps-highlight">you</span> <span class="rd-w">for</span> <span class="rd-w">your</span> <span class="rd-w">time.</span></span><span class="rd-pause rd-pause-med" data-ms="600"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rd-pause-indicator" id="rd-pause-bar">
+                        <div class="rd-pause-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Minimal edge progress -->
+                <div class="rd-edge-progress">
+                    <div class="rd-edge-fill" id="rd-progress-fill" style="width:23%"></div>
+                    <div class="rd-edge-segs">
+                        <div style="width:33%;--sc:rgba(245,158,11,.35)"></div>
+                        <div style="width:40%;--sc:rgba(239,68,68,.35)"></div>
+                        <div style="width:27%;--sc:rgba(16,185,129,.35)"></div>
+                    </div>
+                </div>
+                <div class="rd-edge-info">
+                    <span class="rd-edge-section">Intro</span>
+                    <span class="rd-time">0:00 / 2:27</span>
+                </div>
+
+                <!-- Control bar -->
+                <div class="rd-controls">
+                    <!-- Font size -->
+                    <div class="rd-ctrl-group">
+                        <button class="rd-ctrl-btn" onclick="changeFontSize(-4)" title="Smaller text">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <span class="rd-ctrl-label" id="rd-font-label">36</span>
+                        <button class="rd-ctrl-btn" onclick="changeFontSize(4)" title="Larger text">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Playback -->
+                    <div class="rd-ctrl-group rd-ctrl-main">
+                        <button class="rd-ctrl-btn" onclick="jumpCard(-1)" title="Previous block">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4"/><line x1="5" y1="4" x2="5" y2="20"/></svg>
+                        </button>
+                        <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(-1)" title="Back one word">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+                        </button>
+                        <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" onclick="toggleTp()" title="Play / Pause">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        </button>
+                        <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(1)" title="Forward one word">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18"/></svg>
+                        </button>
+                        <button class="rd-ctrl-btn" onclick="jumpCard(1)" title="Next block">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20"/><line x1="19" y1="4" x2="19" y2="20"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Block indicator + camera -->
+                    <div class="rd-ctrl-group">
+                        <span class="rd-ctrl-label rd-block-indicator" id="rd-block-indicator">1 / 3</span>
+                        <button class="rd-ctrl-btn" id="rd-cam-btn" onclick="toggleReaderCamera()" title="Camera">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SETTINGS ==================== -->
+    <div id="screen-settings" class="screen">
+        <div class="set-layout">
+            <!-- Sidebar -->
+            <div class="set-sidebar">
+                <div class="set-back-row">
+                    <h2 class="set-title">Settings</h2>
+                </div>
+                <nav class="set-nav">
+                    <a class="set-nav-item active" onclick="showSetSection('cloud')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        Cloud Sync
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('files')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        File Storage
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('cameras')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        Cameras
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('mics')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        Microphones
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('streaming')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><line x1="2" y1="20" x2="2.01" y2="20"/></svg>
+                        Streaming
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('ai')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z"/></svg>
+                        AI Provider
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('appearance')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        Appearance
+                    </a>
+                    <a class="set-nav-item" onclick="showSetSection('about')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        About
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Content -->
+            <div class="set-main">
+                <!-- Cloud Storage -->
+                <section class="set-section set-panel" id="set-cloud">
+                    <h3 class="set-section-title">Cloud Storage</h3>
+                    <p class="set-section-desc">Connect cloud accounts to sync your scripts across devices.</p>
+
+                    <div class="set-accounts">
+                        <!-- OneDrive -->
+                        <div class="set-account">
+                            <div class="set-account-icon set-icon-onedrive">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 6c-1.8 0-3.4.8-4.5 2.1C7.3 7.4 6.2 7 5 7 2.2 7 0 9.2 0 12s2.2 5 5 5h14c2.8 0 5-2.2 5-5 0-2.5-1.8-4.5-4.2-4.9C18.7 5.2 16.8 4 14.5 4c-.7 0-1.4.1-2 .3V6z"/></svg>
+                            </div>
+                            <div class="set-account-info">
+                                <span class="set-account-name">OneDrive</span>
+                                <span class="set-account-status set-connected">Connected &middot; user@outlook.com</span>
+                            </div>
+                            <button class="set-btn-outline">Disconnect</button>
+                        </div>
+
+                        <!-- Google Drive -->
+                        <div class="set-account">
+                            <div class="set-account-icon set-icon-gdrive">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.71 3.5L1.15 15l3.43 5.96h6.86L18 15 11.44 3.5H7.71zm.86 1.73L13 13.5H4.59l4-8.27z"/><path d="M22.85 15L16.29 3.5h-3.43L19.43 15l-3.43 5.96h6.86L22.85 15z" opacity=".6"/></svg>
+                            </div>
+                            <div class="set-account-info">
+                                <span class="set-account-name">Google Drive</span>
+                                <span class="set-account-status set-disconnected">Not connected</span>
+                            </div>
+                            <button class="set-btn-golden">Connect</button>
+                        </div>
+
+                        <!-- Dropbox -->
+                        <div class="set-account">
+                            <div class="set-account-icon set-icon-dropbox">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L6 6.5 12 11l-6 4.5L12 20l6-4.5L12 11l6-4.5L12 2z"/></svg>
+                            </div>
+                            <div class="set-account-info">
+                                <span class="set-account-name">Dropbox</span>
+                                <span class="set-account-status set-disconnected">Not connected</span>
+                            </div>
+                            <button class="set-btn-golden">Connect</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- File Storage -->
+                <section class="set-section set-panel" id="set-files" style="display:none">
+                    <h3 class="set-section-title">File Storage</h3>
+                    <p class="set-section-desc">Where scripts, recordings, and exports are saved locally.</p>
+
+                    <div class="set-devices">
+                        <div class="set-field">
+                            <label>Scripts Location</label>
+                            <div class="set-path-field">
+                                <input type="text" class="set-input" value="/Users/you/Documents/Prompter/Scripts" readonly />
+                                <button class="set-btn-outline">Browse</button>
+                            </div>
+                        </div>
+                        <div class="set-field">
+                            <label>Recordings Location</label>
+                            <div class="set-path-field">
+                                <input type="text" class="set-input" value="/Users/you/Documents/Prompter/Recordings" readonly />
+                                <button class="set-btn-outline">Browse</button>
+                            </div>
+                        </div>
+                        <div class="set-field">
+                            <label>Export Format</label>
+                            <select class="set-select">
+                                <option>TPS (Native)</option>
+                                <option>Markdown</option>
+                                <option>Plain Text</option>
+                                <option>PDF</option>
+                            </select>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Auto-save every 30 seconds</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Keep backup copies</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Cameras -->
+                <section class="set-section set-panel" id="set-cameras" style="display:none">
+                    <h3 class="set-section-title">Cameras</h3>
+                    <p class="set-section-desc">Configure cameras for teleprompter overlay and recording.</p>
+
+                    <div class="set-devices">
+                        <div class="set-field">
+                            <label>Default Camera</label>
+                            <select class="set-select">
+                                <option>Logitech C920 HD Pro</option>
+                                <option>FaceTime HD Camera</option>
+                                <option>OBS Virtual Camera</option>
+                            </select>
+                        </div>
+                        <div class="set-field">
+                            <label>Resolution</label>
+                            <select class="set-select">
+                                <option>1920 x 1080 (Full HD)</option>
+                                <option>1280 x 720 (HD)</option>
+                                <option>3840 x 2160 (4K)</option>
+                                <option>640 x 480 (SD)</option>
+                            </select>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Mirror Camera (Flip Horizontal)</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Auto-start Camera on Read</label>
+                            <div class="set-toggle"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Microphones -->
+                <section class="set-section set-panel" id="set-mics" style="display:none">
+                    <h3 class="set-section-title">Microphones</h3>
+                    <p class="set-section-desc">Audio input for recording and streaming.</p>
+
+                    <div class="set-devices">
+                        <div class="set-field">
+                            <label>Default Microphone</label>
+                            <select class="set-select">
+                                <option>Blue Yeti USB</option>
+                                <option>MacBook Pro Microphone</option>
+                                <option>AirPods Pro</option>
+                            </select>
+                        </div>
+                        <div class="set-field">
+                            <label>Input Level</label>
+                            <div class="set-level-bar">
+                                <div class="set-level-fill" style="width:65%"></div>
+                                <div class="set-level-thumb" style="left:65%"></div>
+                            </div>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Noise Suppression</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Echo Cancellation</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Streaming -->
+                <section class="set-section set-panel" id="set-streaming" style="display:none">
+                    <h3 class="set-section-title">Streaming</h3>
+                    <p class="set-section-desc">Configure output for live streaming and recording.</p>
+
+                    <div class="set-devices">
+                        <div class="set-field">
+                            <label>Output Mode</label>
+                            <select class="set-select">
+                                <option>Virtual Camera (OBS/Zoom)</option>
+                                <option>NDI Output</option>
+                                <option>Direct RTMP</option>
+                                <option>Local Recording</option>
+                            </select>
+                        </div>
+                        <div class="set-field">
+                            <label>Output Resolution</label>
+                            <select class="set-select">
+                                <option>1920 x 1080 @ 30fps</option>
+                                <option>1920 x 1080 @ 60fps</option>
+                                <option>1280 x 720 @ 30fps</option>
+                                <option>3840 x 2160 @ 30fps</option>
+                            </select>
+                        </div>
+                        <div class="set-field">
+                            <label>Bitrate (kbps)</label>
+                            <input type="number" class="set-input" value="6000" />
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Show Text Overlay on Stream</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                        <div class="set-field set-field-toggle">
+                            <label>Include Camera in Output</label>
+                            <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        </div>
+                        <div class="set-field">
+                            <label>RTMP URL</label>
+                            <input type="text" class="set-input" placeholder="rtmp://live.example.com/stream" />
+                        </div>
+                        <div class="set-field">
+                            <label>Stream Key</label>
+                            <input type="password" class="set-input" value="sk-xxxxxxxxxxxx" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Provider -->
+                <section class="set-section set-panel" id="set-ai" style="display:none">
+                    <h3 class="set-section-title">AI Provider</h3>
+                    <p class="set-section-desc">Connect an AI provider to enable rewriting, expanding, and formatting scripts with AI assistance.</p>
+
+                    <div class="set-subsection">
+                        <h4 class="set-sub-title">Provider</h4>
+                        <div class="set-ai-providers">
+                            <label class="set-ai-provider active">
+                                <input type="radio" name="ai-provider" checked />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(196,160,96,.12); color:#E8D5B0;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">Claude API</span>
+                                        <span class="set-ai-desc">Anthropic</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="set-ai-provider">
+                                <input type="radio" name="ai-provider" />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(16,163,127,.12); color:#34D399;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">OpenAI</span>
+                                        <span class="set-ai-desc">GPT-4o, o1</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="set-ai-provider">
+                                <input type="radio" name="ai-provider" />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(99,102,241,.12); color:#818CF8;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">Local / Ollama</span>
+                                        <span class="set-ai-desc">Self-hosted models</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="set-ai-provider">
+                                <input type="radio" name="ai-provider" />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(236,72,153,.12); color:#F472B6;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">Claude Code</span>
+                                        <span class="set-ai-desc">CLI agent</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="set-ai-provider">
+                                <input type="radio" name="ai-provider" />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(59,130,246,.12); color:#60A5FA;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">Copilot</span>
+                                        <span class="set-ai-desc">GitHub / Microsoft</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="set-ai-provider">
+                                <input type="radio" name="ai-provider" />
+                                <div class="set-ai-provider-inner">
+                                    <div class="set-ai-logo" style="background:rgba(234,179,8,.12); color:#FBBF24;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+                                    </div>
+                                    <div>
+                                        <span class="set-ai-name">Codex</span>
+                                        <span class="set-ai-desc">OpenAI Codex</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="set-subsection">
+                        <h4 class="set-sub-title">Configuration</h4>
+                        <div class="set-devices">
+                            <div class="set-field">
+                                <label>API Key</label>
+                                <input type="password" class="set-input" placeholder="sk-ant-..." value="" />
+                            </div>
+                            <div class="set-field">
+                                <label>Model</label>
+                                <select class="set-select">
+                                    <option>claude-sonnet-4-6</option>
+                                    <option>claude-opus-4-6</option>
+                                    <option>claude-haiku-4-5</option>
+                                </select>
+                            </div>
+                            <div class="set-field">
+                                <label>Base URL (optional)</label>
+                                <input type="text" class="set-input" placeholder="https://api.anthropic.com" />
+                            </div>
+                        </div>
+                        <button class="set-btn-golden" style="margin-top:16px">Test Connection</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

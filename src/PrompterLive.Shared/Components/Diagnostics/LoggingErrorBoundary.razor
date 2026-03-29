@@ -1,0 +1,21 @@
+@inherits LoggingErrorBoundaryBase
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <section class="diag-fatal-shell" data-testid="diagnostics-fatal">
+        <div class="diag-fatal-card">
+            <span class="diag-fatal-eyebrow">Diagnostics</span>
+            <h1>@CurrentDiagnostic?.Title</h1>
+            <p>@CurrentDiagnostic?.Message</p>
+            <div class="diag-fatal-detail">@CurrentDiagnostic?.Detail</div>
+            <div class="diag-fatal-actions">
+                <button class="diag-fatal-btn" type="button" @onclick="HandleRecover" data-testid="diagnostics-retry">Retry</button>
+                <button class="diag-fatal-btn diag-fatal-btn-primary" type="button" @onclick="HandleReturnHome" data-testid="diagnostics-home">Library</button>
+            </div>
+        </div>
+    </section>
+}
