@@ -1,11 +1,15 @@
 @page "/teleprompter"
+@using PrompterLive.Core.Abstractions
 @using PrompterLive.Core.Models.CompiledScript
+@using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Tps
 @using PrompterLive.Core.Services.Samples
 
 @inject AppBootstrapper Bootstrapper
 @inject ScriptCompiler Compiler
 @inject IJSRuntime JS
+@inject IMediaDeviceService MediaDeviceService
+@inject IMediaSceneService MediaSceneService
 @inject IScriptRepository ScriptRepository
 @inject IScriptSessionService SessionService
 
@@ -16,7 +20,16 @@
      data-screen-subtitle="@_screenSubtitle">
     <div class="rd">
         <div class="rd-gradient @_gradientClass" id="rd-gradient"></div>
-        <div class="rd-camera" id="rd-camera"></div>
+        <video class="rd-camera"
+               id="rd-camera"
+               autoplay
+               muted
+               playsinline
+               data-camera-device-id="@_cameraDeviceId"
+               data-camera-autostart="@_cameraAutoStart.ToString().ToLowerInvariant()"
+               data-camera-mirror="@_cameraMirror.ToString().ToLowerInvariant()"
+               data-camera-flip="@_cameraFlip.ToString().ToLowerInvariant()"
+               style="@_cameraStyle"></video>
         <div class="rd-camera-tint" id="rd-camera-tint"></div>
 
         <div class="rd-ui">
@@ -68,7 +81,9 @@
                                             <span class="rd-g">
                                                 @foreach (var word in group.Words)
                                                 {
-                                                    <span class="rd-w @word.CssClass">@word.Text</span>
+                                                    <span class="rd-w @word.CssClass"
+                                                          data-ms="@word.DurationMs"
+                                                          data-pause-ms="@word.PauseAfterMs">@word.Text</span>
                                                     <text> </text>
                                                 }
                                             </span>
@@ -100,7 +115,9 @@
             </div>
             <div class="rd-edge-info">
                 <span class="rd-edge-section">@_edgeSectionLabel</span>
-                <span class="rd-time" data-total-seconds="@_totalSeconds">0:00 / @_durationLabel</span>
+                <span class="rd-time"
+                      data-total-seconds="@_totalSeconds"
+                      data-total-ms="@_totalDurationMilliseconds">0:00 / @_durationLabel</span>
             </div>
 
             <div class="rd-controls">
@@ -146,7 +163,13 @@
     private string _edgeSectionLabel = "Opening Block";
     private string _durationLabel = "0:00";
     private int _totalSeconds = 1;
+    private int _totalDurationMilliseconds = 1000;
     private bool _syncReader;
+    private string _cameraDeviceId = string.Empty;
+    private bool _cameraAutoStart;
+    private bool _cameraMirror = true;
+    private bool _cameraFlip;
+    private string _cameraStyle = string.Empty;
     private IReadOnlyList<ReaderCardViewModel> _cards = [ReaderCardViewModel.Empty];
 
     protected override Task OnParametersSetAsync()
@@ -163,6 +186,7 @@
             await Bootstrapper.EnsureReadyAsync();
             await EnsureSessionLoadedAsync();
             await PopulateReaderStateAsync();
+            await PopulateCameraStateAsync();
             StateHasChanged();
             return;
         }
@@ -207,9 +231,35 @@
             ? $"{firstCard.DisplayName} · {firstCard.EmotionLabel}"
             : $"{firstCard.SectionName} · {firstCard.DisplayName}";
 
-        _totalSeconds = Math.Max(1, _cards.Sum(card => card.DurationSeconds));
+        _totalDurationMilliseconds = Math.Max(1000, _cards.Sum(card => card.DurationMilliseconds));
+        _totalSeconds = Math.Max(1, (int)Math.Ceiling(_totalDurationMilliseconds / 1000d));
         _durationLabel = FormatDuration(_totalSeconds);
         _syncReader = true;
+    }
+
+    private async Task PopulateCameraStateAsync()
+    {
+        var sceneCamera = MediaSceneService.State.Cameras.FirstOrDefault(camera => camera.Transform.Visible);
+
+        if (sceneCamera is null)
+        {
+            var devices = await MediaDeviceService.GetDevicesAsync();
+            var defaultCamera = devices.FirstOrDefault(device => device.Kind == MediaDeviceKind.Camera)
+                ?? devices.FirstOrDefault(device => device.Kind == MediaDeviceKind.Camera);
+
+            _cameraDeviceId = defaultCamera?.DeviceId ?? string.Empty;
+            _cameraMirror = true;
+            _cameraFlip = false;
+        }
+        else
+        {
+            _cameraDeviceId = sceneCamera.DeviceId;
+            _cameraMirror = sceneCamera.Transform.MirrorHorizontal;
+            _cameraFlip = sceneCamera.Transform.MirrorVertical;
+        }
+
+        _cameraAutoStart = SessionService.State.ReaderSettings.ShowCameraScene && !string.IsNullOrWhiteSpace(_cameraDeviceId);
+        _cameraStyle = BuildCameraStyle(_cameraMirror, _cameraFlip);
     }
 
     private async Task<List<ReaderCardViewModel>> BuildReaderCardsAsync()
@@ -261,6 +311,7 @@
                     AccentColor: segmentAccent,
                     TargetWpm: targetWpm,
                     WordCount: wordCount,
+                    DurationMilliseconds: Math.Max(1000, (int)Math.Ceiling(words.Sum(word => word.DisplayDuration.TotalMilliseconds))),
                     DurationSeconds: Math.Max(1, (int)Math.Ceiling(words.Sum(word => word.DisplayDuration.TotalSeconds))),
                     Chunks: BuildReaderChunks(words)));
             }
@@ -282,6 +333,7 @@
                 seed.AccentColor,
                 seed.TargetWpm,
                 seed.WordCount,
+                seed.DurationMilliseconds,
                 seed.DurationSeconds,
                 $"{Math.Max(8d, seed.WordCount * 100d / totalWords):0.##}%",
                 ToAlphaColor(seed.AccentColor, 0.35),
@@ -337,8 +389,14 @@
         {
             if (word.Metadata?.IsPause == true)
             {
-                FlushGroup(chunks, currentGroup);
                 var pauseDuration = Math.Max(250, word.Metadata.PauseDuration ?? 500);
+                if (currentGroup.Count > 0)
+                {
+                    var lastWord = currentGroup[^1];
+                    currentGroup[^1] = lastWord with { PauseAfterMs = pauseDuration };
+                }
+
+                FlushGroup(chunks, currentGroup);
                 chunks.Add(new ReaderPauseViewModel(
                     pauseDuration,
                     pauseDuration >= 600 ? "rd-pause rd-pause-med" : "rd-pause"));
@@ -352,7 +410,8 @@
 
             currentGroup.Add(new ReaderWordViewModel(
                 word.CleanText,
-                BuildReaderWordClass(word.Metadata)));
+                BuildReaderWordClass(word.Metadata),
+                Math.Max(120, (int)Math.Round(word.DisplayDuration.TotalMilliseconds))));
         }
 
         FlushGroup(chunks, currentGroup);
@@ -543,6 +602,24 @@
         return $"rgba({red}, {green}, {blue}, {opacity.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
     }
 
+    private static string BuildCameraStyle(bool mirror, bool flip)
+    {
+        var transforms = new List<string>();
+        if (mirror)
+        {
+            transforms.Add("scaleX(-1)");
+        }
+
+        if (flip)
+        {
+            transforms.Add("scaleY(-1)");
+        }
+
+        return transforms.Count == 0
+            ? string.Empty
+            : $"transform:{string.Join(' ', transforms)};";
+    }
+
     private sealed record ReaderCardSeed(
         string SectionName,
         string DisplayName,
@@ -552,6 +629,7 @@
         string AccentColor,
         int TargetWpm,
         int WordCount,
+        int DurationMilliseconds,
         int DurationSeconds,
         IReadOnlyList<ReaderChunkViewModel> Chunks);
 
@@ -564,6 +642,7 @@
         string AccentColor,
         int TargetWpm,
         int WordCount,
+        int DurationMilliseconds,
         int DurationSeconds,
         string WidthPercentString,
         string EdgeColor,
@@ -579,10 +658,11 @@
             "#E97F00",
             140,
             1,
+            1000,
             1,
             "100%",
             "rgba(233, 127, 0, 0.35)",
-            [new ReaderGroupViewModel([new ReaderWordViewModel("Ready", "tps-warm")])],
+            [new ReaderGroupViewModel([new ReaderWordViewModel("Ready", "tps-warm", 600)])],
             "teleprompter-card-fallback");
     }
 
@@ -592,5 +672,5 @@
 
     private sealed record ReaderPauseViewModel(int DurationMs, string CssClass) : ReaderChunkViewModel;
 
-    private sealed record ReaderWordViewModel(string Text, string CssClass);
+    private sealed record ReaderWordViewModel(string Text, string CssClass, int DurationMs, int PauseAfterMs = 0);
 }

@@ -1,4 +1,15 @@
 @page "/settings"
+@using PrompterLive.Core.Abstractions
+@using PrompterLive.Core.Models.Media
+@using PrompterLive.Core.Models.Streaming
+
+@inject AppBootstrapper Bootstrapper
+@inject BrowserSettingsStore SettingsStore
+@inject IMediaPermissionService MediaPermissionService
+@inject IMediaDeviceService MediaDeviceService
+@inject IMediaSceneService MediaSceneService
+@inject IScriptSessionService SessionService
+@inject IEnumerable<IStreamingOutputProvider> StreamingProviders
 
 <div id="screen-settings" class="screen active" data-testid="settings-page">
     <div class="set-layout">
@@ -126,31 +137,82 @@
                 <h3 class="set-section-title">Cameras</h3>
                 <p class="set-section-desc">Configure cameras for teleprompter overlay and recording.</p>
 
-                <div class="set-devices">
-                    <div class="set-field">
-                        <label>Default Camera</label>
-                        <select class="set-select">
-                            <option>Logitech C920 HD Pro</option>
-                            <option>FaceTime HD Camera</option>
-                            <option>OBS Virtual Camera</option>
-                        </select>
+                <div class="set-status-banner">
+                    <div>
+                        <strong>@(_permissions.CameraGranted ? "Camera access is ready" : "Camera access is required")</strong>
+                        <span>Teleprompter background video and multi-camera scene selection run directly in the browser.</span>
                     </div>
-                    <div class="set-field">
-                        <label>Resolution</label>
-                        <select class="set-select">
-                            <option>1920 x 1080 (Full HD)</option>
-                            <option>1280 x 720 (HD)</option>
-                            <option>3840 x 2160 (4K)</option>
-                            <option>640 x 480 (SD)</option>
-                        </select>
+                    <button class="set-btn-golden" @onclick="RequestMediaAccessAsync" data-testid="settings-request-media">
+                        @(_permissions.CameraGranted && _permissions.MicrophoneGranted ? "Refresh Devices" : "Enable Camera + Mic")
+                    </button>
+                </div>
+
+                <div class="set-subsection">
+                    <h4 class="set-sub-title">Scene Cameras</h4>
+                    @if (_sceneCameras.Count == 0)
+                    {
+                        <div class="set-empty-card" data-testid="settings-no-cameras">
+                            Add at least one camera to drive the teleprompter background and stream scene.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="set-device-list">
+                            @foreach (var source in _sceneCameras)
+                            {
+                                var inOutput = source.Transform.IncludeInOutput;
+                                <article class="set-scene-card" data-testid="settings-scene-camera-@source.SourceId">
+                                    <div class="set-scene-head">
+                                        <div>
+                                            <span class="set-account-name">@source.Label</span>
+                                            <span class="set-account-status set-connected">@source.DeviceId</span>
+                                        </div>
+                                        <button class="set-btn-outline" @onclick="() => RemoveSceneCameraAsync(source.SourceId)">Remove</button>
+                                    </div>
+                                    <div class="set-chip-row">
+                                        <button class="set-chip-btn @(source.Transform.MirrorHorizontal ? "active" : null)" @onclick="() => ToggleSceneMirrorAsync(source.SourceId)">Mirror</button>
+                                        <button class="set-chip-btn @(source.Transform.MirrorVertical ? "active" : null)" @onclick="() => ToggleSceneFlipAsync(source.SourceId)">Flip Vertical</button>
+                                        <button class="set-chip-btn @(inOutput ? "active" : null)" @onclick="() => ToggleSceneOutputAsync(source.SourceId)">Include In Output</button>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="set-subsection">
+                    <h4 class="set-sub-title">Available Cameras</h4>
+                    <div class="set-device-list">
+                        @if (_cameraDevices.Count == 0)
+                        {
+                            <div class="set-empty-card">No camera devices are currently visible to the browser.</div>
+                        }
+                        else
+                        {
+                            @foreach (var camera in _cameraDevices)
+                            {
+                                var alreadyAdded = _sceneCameras.Any(source => string.Equals(source.DeviceId, camera.DeviceId, StringComparison.Ordinal));
+                                <article class="set-device-card" data-testid="settings-camera-device-@camera.DeviceId">
+                                    <div>
+                                        <span class="set-account-name">@camera.Label</span>
+                                        <span class="set-account-status @(camera.IsDefault ? "set-connected" : "set-disconnected")">@(camera.IsDefault ? "Browser default camera" : "Available camera")</span>
+                                    </div>
+                                    <button class="@(alreadyAdded ? "set-btn-outline" : "set-btn-golden")"
+                                            @onclick="() => ToggleCameraSelectionAsync(camera)">
+                                        @(alreadyAdded ? "Remove From Scene" : "Add To Scene")
+                                    </button>
+                                </article>
+                            }
+                        }
                     </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Mirror Camera (Flip Horizontal)</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
-                    </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Auto-start Camera on Read</label>
-                        <div class="set-toggle"><div class="set-toggle-thumb"></div></div>
+                </div>
+
+                <div class="set-field set-field-toggle">
+                    <label>Auto-start camera on read</label>
+                    <div class="set-toggle @(SessionService.State.ReaderSettings.ShowCameraScene ? "on" : null)"
+                         @onclick="ToggleReaderCameraSceneAsync"
+                         data-testid="settings-reader-camera-toggle">
+                        <div class="set-toggle-thumb"></div>
                     </div>
                 </div>
             </section>
@@ -159,36 +221,107 @@
                 <h3 class="set-section-title">Microphones</h3>
                 <p class="set-section-desc">Audio input for recording and streaming.</p>
 
-                <div class="set-devices">
+                <div class="set-subsection">
+                    <h4 class="set-sub-title">Primary Microphone</h4>
                     <div class="set-field">
                         <label>Default Microphone</label>
-                        <select class="set-select">
-                            <option>Blue Yeti USB</option>
-                            <option>MacBook Pro Microphone</option>
-                            <option>AirPods Pro</option>
+                        <select class="set-select" @onchange="OnPrimaryMicrophoneChanged" data-testid="settings-primary-mic">
+                            <option value="">No microphone selected</option>
+                            @foreach (var microphone in _microphoneDevices)
+                            {
+                                <option value="@microphone.DeviceId" selected="@string.Equals(_primaryMicrophoneId, microphone.DeviceId, StringComparison.Ordinal)">@microphone.Label</option>
+                            }
                         </select>
                     </div>
-                    <div class="set-field">
-                        <label>Input Level</label>
-                        <div class="set-level-bar">
-                            <div class="set-level-fill" style="width:65%"></div>
-                            <div class="set-level-thumb" style="left:65%"></div>
+                </div>
+
+                <div class="set-subsection">
+                    <h4 class="set-sub-title">Audio Sync + Routing</h4>
+                    @if (_microphoneDevices.Count == 0)
+                    {
+                        <div class="set-empty-card" data-testid="settings-no-mics">
+                            No microphones are currently visible to the browser.
                         </div>
-                    </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Noise Suppression</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
-                    </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Echo Cancellation</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="set-device-list">
+                            @foreach (var microphone in _microphoneDevices)
+                            {
+                                var inputState = GetAudioInput(microphone);
+                                <article class="set-scene-card" data-testid="settings-mic-device-@microphone.DeviceId">
+                                    <div class="set-scene-head">
+                                        <div>
+                                            <span class="set-account-name">@microphone.Label</span>
+                                            <span class="set-account-status @(string.Equals(_primaryMicrophoneId, microphone.DeviceId, StringComparison.Ordinal) ? "set-connected" : "set-disconnected")">
+                                                @(string.Equals(_primaryMicrophoneId, microphone.DeviceId, StringComparison.Ordinal) ? "Primary input" : "Secondary input")
+                                            </span>
+                                        </div>
+                                        <button class="set-btn-outline" @onclick="() => ToggleMicMuteAsync(microphone)">
+                                            @(inputState.IsMuted ? "Unmute" : "Mute")
+                                        </button>
+                                    </div>
+
+                                    <div class="set-inline-grid">
+                                        <div class="set-field">
+                                            <label>Delay</label>
+                                            <input type="range"
+                                                   class="set-range"
+                                                   min="0"
+                                                   max="1200"
+                                                   step="20"
+                                                   value="@inputState.DelayMs"
+                                                   @oninput="args => UpdateAudioDelayAsync(microphone, args)"
+                                                   data-testid="settings-mic-delay-@microphone.DeviceId" />
+                                            <span class="set-inline-value">@inputState.DelayMs ms</span>
+                                        </div>
+                                        <div class="set-field">
+                                            <label>Gain</label>
+                                            <input type="range"
+                                                   class="set-range"
+                                                   min="0"
+                                                   max="200"
+                                                   step="5"
+                                                   value="@Math.Round(inputState.Gain * 100)"
+                                                   @oninput="args => UpdateAudioGainAsync(microphone, args)" />
+                                            <span class="set-inline-value">@($"{Math.Round(inputState.Gain * 100)}%")</span>
+                                        </div>
+                                        <div class="set-field">
+                                            <label>Route</label>
+                                            <select class="set-select" @onchange="args => UpdateAudioRouteAsync(microphone, args)">
+                                                @foreach (var option in _routeTargets)
+                                                {
+                                                    <option value="@option" selected="@(inputState.RouteTarget == option)">@FormatRouteTarget(option)</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    }
                 </div>
             </section>
 
             <section class="set-section set-panel" id="set-streaming" style="display:none">
                 <h3 class="set-section-title">Streaming</h3>
                 <p class="set-section-desc">Configure output for live streaming and recording.</p>
+
+                <div class="set-subsection">
+                    <h4 class="set-sub-title">Provider Targets</h4>
+                    <div class="set-device-list">
+                        @foreach (var descriptor in _streamingDescriptors)
+                        {
+                            <article class="set-device-card" data-testid="settings-stream-provider-@descriptor.ProviderId">
+                                <div>
+                                    <span class="set-account-name">@descriptor.DisplayName</span>
+                                    <span class="set-account-status @(descriptor.IsReady ? "set-connected" : "set-disconnected")">@descriptor.Summary</span>
+                                </div>
+                                <span class="set-provider-kind">@descriptor.ProviderKind</span>
+                            </article>
+                        }
+                    </div>
+                </div>
 
                 <div class="set-devices">
                     <div class="set-field">
@@ -397,3 +530,234 @@
         </div>
     </div>
 </div>
+
+@code {
+    private bool _loadState = true;
+    private MediaPermissionsState _permissions = new(false, false);
+    private IReadOnlyList<MediaDeviceInfo> _devices = [];
+    private IReadOnlyList<MediaDeviceInfo> _cameraDevices = [];
+    private IReadOnlyList<MediaDeviceInfo> _microphoneDevices = [];
+    private IReadOnlyList<StreamingPublishDescriptor> _streamingDescriptors = [];
+    private string? _primaryMicrophoneId;
+    private readonly IReadOnlyList<AudioRouteTarget> _routeTargets = Enum.GetValues<AudioRouteTarget>();
+
+    private IReadOnlyList<SceneCameraSource> _sceneCameras => MediaSceneService.State.Cameras;
+
+    protected override Task OnParametersSetAsync()
+    {
+        _loadState = true;
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_loadState)
+        {
+            return;
+        }
+
+        _loadState = false;
+        await LoadAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadAsync()
+    {
+        await Bootstrapper.EnsureReadyAsync();
+        _permissions = await MediaPermissionService.QueryAsync();
+
+        try
+        {
+            _devices = await MediaDeviceService.GetDevicesAsync();
+        }
+        catch
+        {
+            _devices = [];
+        }
+
+        _cameraDevices = _devices.Where(device => device.Kind == MediaDeviceKind.Camera).ToList();
+        _microphoneDevices = _devices.Where(device => device.Kind == MediaDeviceKind.Microphone).ToList();
+        _primaryMicrophoneId = MediaSceneService.State.PrimaryMicrophoneId;
+        _streamingDescriptors = StreamingProviders
+            .Select(provider => provider.Describe(StreamingProfile.CreateDefault(provider.Kind)))
+            .ToList();
+
+        await SeedSceneDefaultsAsync();
+    }
+
+    private async Task SeedSceneDefaultsAsync()
+    {
+        var changed = false;
+
+        if (_sceneCameras.Count == 0 && _cameraDevices.Count > 0)
+        {
+            var defaultCamera = _cameraDevices.FirstOrDefault(device => device.IsDefault) ?? _cameraDevices.First();
+            MediaSceneService.AddCamera(defaultCamera.DeviceId, defaultCamera.Label);
+            changed = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneId) && _microphoneDevices.Count > 0)
+        {
+            var defaultMicrophone = _microphoneDevices.FirstOrDefault(device => device.IsDefault) ?? _microphoneDevices.First();
+            MediaSceneService.SetPrimaryMicrophone(defaultMicrophone.DeviceId, defaultMicrophone.Label);
+            MediaSceneService.UpsertAudioInput(new AudioInputState(defaultMicrophone.DeviceId, defaultMicrophone.Label));
+            _primaryMicrophoneId = defaultMicrophone.DeviceId;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            await PersistSceneAsync();
+        }
+    }
+
+    private async Task RequestMediaAccessAsync()
+    {
+        _permissions = await MediaPermissionService.RequestAsync();
+        await LoadAsync();
+    }
+
+    private async Task ToggleCameraSelectionAsync(MediaDeviceInfo camera)
+    {
+        var existing = _sceneCameras.FirstOrDefault(source => string.Equals(source.DeviceId, camera.DeviceId, StringComparison.Ordinal));
+        if (existing is null)
+        {
+            MediaSceneService.AddCamera(camera.DeviceId, camera.Label);
+        }
+        else
+        {
+            MediaSceneService.RemoveCamera(existing.SourceId);
+        }
+
+        await PersistSceneAsync();
+    }
+
+    private async Task RemoveSceneCameraAsync(string sourceId)
+    {
+        MediaSceneService.RemoveCamera(sourceId);
+        await PersistSceneAsync();
+    }
+
+    private async Task ToggleSceneMirrorAsync(string sourceId)
+    {
+        var source = _sceneCameras.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.Ordinal));
+        if (source is null)
+        {
+            return;
+        }
+
+        MediaSceneService.UpdateTransform(sourceId, source.Transform with { MirrorHorizontal = !source.Transform.MirrorHorizontal });
+        await PersistSceneAsync();
+    }
+
+    private async Task ToggleSceneFlipAsync(string sourceId)
+    {
+        var source = _sceneCameras.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.Ordinal));
+        if (source is null)
+        {
+            return;
+        }
+
+        MediaSceneService.UpdateTransform(sourceId, source.Transform with { MirrorVertical = !source.Transform.MirrorVertical });
+        await PersistSceneAsync();
+    }
+
+    private async Task ToggleSceneOutputAsync(string sourceId)
+    {
+        var source = _sceneCameras.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.Ordinal));
+        if (source is null)
+        {
+            return;
+        }
+
+        MediaSceneService.SetIncludeInOutput(sourceId, !source.Transform.IncludeInOutput);
+        await PersistSceneAsync();
+    }
+
+    private async Task ToggleReaderCameraSceneAsync()
+    {
+        var current = SessionService.State.ReaderSettings;
+        var next = current with { ShowCameraScene = !current.ShowCameraScene };
+        await SessionService.UpdateReaderSettingsAsync(next);
+        await SettingsStore.SaveAsync("prompterlive.reader", next);
+    }
+
+    private async Task OnPrimaryMicrophoneChanged(ChangeEventArgs args)
+    {
+        var deviceId = args.Value?.ToString();
+        var microphone = _microphoneDevices.FirstOrDefault(device => string.Equals(device.DeviceId, deviceId, StringComparison.Ordinal));
+        _primaryMicrophoneId = microphone?.DeviceId;
+        MediaSceneService.SetPrimaryMicrophone(microphone?.DeviceId, microphone?.Label);
+
+        if (microphone is not null)
+        {
+            MediaSceneService.UpsertAudioInput(GetAudioInput(microphone));
+        }
+
+        await PersistSceneAsync();
+    }
+
+    private async Task ToggleMicMuteAsync(MediaDeviceInfo microphone)
+    {
+        var current = GetAudioInput(microphone);
+        MediaSceneService.UpsertAudioInput(current with { IsMuted = !current.IsMuted });
+        await PersistSceneAsync();
+    }
+
+    private async Task UpdateAudioDelayAsync(MediaDeviceInfo microphone, ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var delay))
+        {
+            return;
+        }
+
+        var current = GetAudioInput(microphone);
+        MediaSceneService.UpsertAudioInput(current with { DelayMs = delay });
+        await PersistSceneAsync();
+    }
+
+    private async Task UpdateAudioGainAsync(MediaDeviceInfo microphone, ChangeEventArgs args)
+    {
+        if (!double.TryParse(args.Value?.ToString(), out var gainPercent))
+        {
+            return;
+        }
+
+        var current = GetAudioInput(microphone);
+        MediaSceneService.UpsertAudioInput(current with { Gain = gainPercent / 100d });
+        await PersistSceneAsync();
+    }
+
+    private async Task UpdateAudioRouteAsync(MediaDeviceInfo microphone, ChangeEventArgs args)
+    {
+        if (!Enum.TryParse<AudioRouteTarget>(args.Value?.ToString(), out var routeTarget))
+        {
+            return;
+        }
+
+        var current = GetAudioInput(microphone);
+        MediaSceneService.UpsertAudioInput(current with { RouteTarget = routeTarget });
+        await PersistSceneAsync();
+    }
+
+    private AudioInputState GetAudioInput(MediaDeviceInfo microphone)
+    {
+        return MediaSceneService.State.AudioBus.Inputs
+            .FirstOrDefault(input => string.Equals(input.DeviceId, microphone.DeviceId, StringComparison.Ordinal))
+            ?? new AudioInputState(microphone.DeviceId, microphone.Label);
+    }
+
+    private async Task PersistSceneAsync()
+    {
+        _primaryMicrophoneId = MediaSceneService.State.PrimaryMicrophoneId;
+        await SettingsStore.SaveAsync("prompterlive.scene", MediaSceneService.State);
+    }
+
+    private static string FormatRouteTarget(AudioRouteTarget routeTarget) =>
+        routeTarget switch
+        {
+            AudioRouteTarget.Monitor => "Monitor only",
+            AudioRouteTarget.Stream => "Stream only",
+            _ => "Monitor + Stream"
+        };
+}

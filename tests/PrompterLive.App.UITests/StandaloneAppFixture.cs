@@ -21,7 +21,14 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        if (!await IsServerAvailableAsync())
+        var serverState = await GetServerStateAsync();
+        if (serverState == ServerState.Invalid)
+        {
+            await StopListeningProcessAsync();
+            serverState = ServerState.NotRunning;
+        }
+
+        if (serverState != ServerState.Valid)
         {
             _process = StartAppProcess();
             await WaitForServerAsync();
@@ -96,7 +103,7 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
         var deadline = DateTimeOffset.UtcNow.AddSeconds(60);
         while (DateTimeOffset.UtcNow < deadline)
         {
-            if (await IsServerAvailableAsync())
+            if (await GetServerStateAsync() == ServerState.Valid)
             {
                 return;
             }
@@ -107,7 +114,7 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
         throw new TimeoutException($"PrompterLive.App did not start listening on {BaseAddressValue} within the timeout.");
     }
 
-    private static async Task<bool> IsServerAvailableAsync()
+    private static async Task<ServerState> GetServerStateAsync()
     {
         using var client = new HttpClient
         {
@@ -119,15 +126,105 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
             using var response = await client.GetAsync(BaseAddressValue);
             if (response.StatusCode is not HttpStatusCode.OK)
             {
-                return false;
+                return ServerState.NotRunning;
             }
 
             var body = await response.Content.ReadAsStringAsync();
-            return body.Contains("Prompter.live", StringComparison.Ordinal);
+            if (!body.Contains("Prompter.live", StringComparison.Ordinal))
+            {
+                return ServerState.Invalid;
+            }
+
+            var assetName = GetExpectedFrameworkAssetName();
+            if (string.IsNullOrWhiteSpace(assetName))
+            {
+                return ServerState.Valid;
+            }
+
+            using var assetResponse = await client.GetAsync($"{BaseAddressValue}/_framework/{assetName}");
+            return assetResponse.StatusCode is HttpStatusCode.OK
+                ? ServerState.Valid
+                : ServerState.Invalid;
         }
         catch
         {
-            return false;
+            return ServerState.NotRunning;
         }
+    }
+
+    private static string? GetExpectedFrameworkAssetName()
+    {
+        var frameworkDirectory = Path.Combine(
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../src/PrompterLive.App")),
+            "bin",
+            "Debug",
+            "net10.0",
+            "wwwroot",
+            "_framework");
+
+        if (!Directory.Exists(frameworkDirectory))
+        {
+            return null;
+        }
+
+        return Directory
+            .EnumerateFiles(frameworkDirectory, "PrompterLive.App*.wasm", SearchOption.TopDirectoryOnly)
+            .OrderByDescending(File.GetLastWriteTimeUtc)
+            .Select(Path.GetFileName)
+            .FirstOrDefault();
+    }
+
+    private static async Task StopListeningProcessAsync()
+    {
+        var listenerPids = await GetListeningPidsAsync();
+        foreach (var pid in listenerPids.Distinct())
+        {
+            try
+            {
+                using var process = Process.GetProcessById(pid);
+                process.Kill(entireProcessTree: true);
+                await process.WaitForExitAsync();
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private static async Task<IReadOnlyList<int>> GetListeningPidsAsync()
+    {
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "lsof",
+                Arguments = "-t -iTCP:5040 -sTCP:LISTEN",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+
+        if (!process.Start())
+        {
+            return Array.Empty<int>();
+        }
+
+        var output = await process.StandardOutput.ReadToEndAsync();
+        await process.WaitForExitAsync();
+
+        return output
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(value => int.TryParse(value, out var pid) ? pid : 0)
+            .Where(pid => pid > 0)
+            .ToArray();
+    }
+
+    private enum ServerState
+    {
+        NotRunning,
+        Valid,
+        Invalid
     }
 }

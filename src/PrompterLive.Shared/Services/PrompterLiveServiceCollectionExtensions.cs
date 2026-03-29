@@ -19,6 +19,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<RsvpOrpCalculator>();
         services.AddScoped<RsvpEmotionAnalyzer>();
         services.AddScoped<RsvpTextProcessor>();
+        services.AddScoped<RsvpPlaybackEngine>();
         services.AddScoped<IScriptPreviewService, ScriptPreviewService>();
 
         services.AddScoped<IScriptRepository, BrowserScriptRepository>();

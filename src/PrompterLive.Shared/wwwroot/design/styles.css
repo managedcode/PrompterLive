@@ -2687,14 +2687,18 @@ button {
     position: absolute;
     inset: 0;
     z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(78, 94, 163, 0.2), transparent 42%),
+        linear-gradient(135deg, rgba(12, 18, 30, 0.88), rgba(20, 33, 62, 0.78));
+    transition: opacity 220ms ease;
 }
 .rd-camera-off { color: var(--t4); }
 .rd-camera.active .rd-camera-off { display: none; }
 .rd-camera.active {
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    opacity: 0.9;
 }
 
 .rd-camera-tint {
@@ -3735,6 +3739,97 @@ body::before {
     flex-shrink: 0;
 }
 .set-input::placeholder { color: var(--t4); }
+
+.set-status-banner,
+.set-device-card,
+.set-scene-card,
+.set-empty-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    background: rgba(10,14,20,.5);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.set-status-banner {
+    margin-bottom: 24px;
+}
+
+.set-status-banner strong {
+    display: block;
+    color: var(--t1);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.set-status-banner span,
+.set-provider-kind,
+.set-inline-value {
+    color: var(--t3);
+    font-size: 12px;
+}
+
+.set-device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.set-empty-card {
+    justify-content: flex-start;
+    color: var(--t3);
+}
+
+.set-scene-card,
+.set-device-card {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.set-scene-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.set-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.set-chip-btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--gold-12);
+    background: var(--gold-04);
+    color: var(--t3);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.set-chip-btn.active {
+    background: var(--gold-10);
+    color: #F5E6D0;
+    border-color: var(--gold-25);
+}
+
+.set-inline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.set-range {
+    width: 100%;
+    accent-color: #E8D5B0;
+}
 
 /* Toggle switch */
 .set-toggle {

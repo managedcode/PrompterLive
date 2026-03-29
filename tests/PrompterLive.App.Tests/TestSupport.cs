@@ -40,6 +40,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<RsvpOrpCalculator>();
         context.Services.AddSingleton<RsvpTextProcessor>();
         context.Services.AddSingleton<RsvpEmotionAnalyzer>();
+        context.Services.AddSingleton<RsvpPlaybackEngine>();
         context.Services.AddSingleton<BrowserSettingsStore>();
         context.Services.AddSingleton<CameraPreviewInterop>();
         context.Services.AddSingleton<AppBootstrapper>();

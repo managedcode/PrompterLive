@@ -1,4 +1,5 @@
 @page "/learn"
+@using PrompterLive.Core.Services.Rsvp
 @using PrompterLive.Core.Services.Samples
 
 <div id="screen-rsvp"
@@ -74,6 +75,7 @@
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private RsvpTextProcessor TextProcessor { get; set; } = null!;
+    [Inject] private RsvpPlaybackEngine PlaybackEngine { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
 
     [SupplyParameterFromQuery(Name = "id")]
@@ -87,6 +89,7 @@
     private int _speed = 300;
     private bool _loadState = true;
     private bool _syncWords;
+    private IReadOnlyList<RsvpTimelineEntry> _timeline = [];
 
     protected override Task OnParametersSetAsync()
     {
@@ -110,12 +113,21 @@
         {
             _syncWords = false;
             await JS.InvokeVoidAsync(
-                "PrompterLiveDesign.setRsvpWords",
-                _rsvpWords,
+                "PrompterLiveDesign.setRsvpTimeline",
+                _timeline.Select(entry => new
+                {
+                    word = entry.Word,
+                    durationMs = entry.DurationMs,
+                    pauseAfterMs = entry.PauseAfterMs,
+                    baseWpm = entry.BaseWpm,
+                    nextPhrase = entry.NextPhrase,
+                    emotion = entry.Emotion
+                }).ToArray(),
                 new
                 {
                     speed = _speed,
-                    index = Math.Min(12, Math.Max(_rsvpWords.Length - 1, 0))
+                    index = 0,
+                    autoPlay = SessionService.State.LearnSettings.AutoPlay
                 });
         }
     }
@@ -132,14 +144,18 @@
             words = ["Ready"];
         }
 
-        _rsvpWords = words;
         _screenTitle = SessionService.State.Title;
         _screenSubtitle = processed.Segments.FirstOrDefault()?.Title ?? "Intro / Opening Block";
         _speed = SessionService.State.LearnSettings.WordsPerMinute > 0
             ? SessionService.State.LearnSettings.WordsPerMinute
             : processed.Segments.FirstOrDefault()?.Speed ?? 300;
-        _nextPhrase = string.Join(' ', _rsvpWords.Skip(1).Take(9));
-        _progressLabel = BuildProgressLabel(0, _rsvpWords.Length, _speed);
+        PlaybackEngine.WordsPerMinute = _speed;
+        PlaybackEngine.LoadTimeline(processed);
+
+        _timeline = BuildTimeline(processed);
+        _rsvpWords = _timeline.Select(entry => entry.Word).ToArray();
+        _nextPhrase = _timeline.FirstOrDefault()?.NextPhrase ?? "End of script.";
+        _progressLabel = BuildProgressLabel(_timeline, 0, _speed);
         _syncWords = true;
     }
 
@@ -163,12 +179,97 @@
         }
     }
 
-    private static string BuildProgressLabel(int currentIndex, int totalWords, int wordsPerMinute)
+    private IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed)
     {
-        var safeTotalWords = Math.Max(1, totalWords);
-        var safeWpm = Math.Max(100, wordsPerMinute);
-        var remainingWords = Math.Max(0, safeTotalWords - (currentIndex + 1));
-        var remainingSeconds = (int)Math.Ceiling((remainingWords / (double)safeWpm) * 60);
-        return $"Word {Math.Min(currentIndex + 1, safeTotalWords)} / {safeTotalWords} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
+        var entries = new List<RsvpTimelineEntry>();
+
+        for (var wordIndex = 0; wordIndex < processed.AllWords.Count; wordIndex++)
+        {
+            var word = processed.AllWords[wordIndex];
+            if (string.IsNullOrWhiteSpace(word))
+            {
+                continue;
+            }
+
+            entries.Add(new RsvpTimelineEntry(
+                Word: word,
+                DurationMs: Math.Max(120, (int)Math.Round(PlaybackEngine.GetWordDisplayTime(wordIndex, word).TotalMilliseconds)),
+                PauseAfterMs: PlaybackEngine.GetPauseAfterMilliseconds(wordIndex) ?? 0,
+                BaseWpm: ResolveBaseWpm(processed, wordIndex, _speed),
+                NextPhrase: ResolveNextPhrase(processed, wordIndex),
+                Emotion: ResolveEmotion(processed, wordIndex)));
+        }
+
+        return entries.Count == 0
+            ? [new RsvpTimelineEntry("Ready", 240, 0, Math.Max(100, _speed), "End of script.", "neutral")]
+            : entries;
     }
+
+    private static string ResolveNextPhrase(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
+    {
+        var nextPhrase = processed.PhraseGroups.FirstOrDefault(group => group.StartWordIndex > currentWordIndex);
+        if (nextPhrase is null || nextPhrase.Words.Count == 0)
+        {
+            return "End of script.";
+        }
+
+        return string.Join(' ', nextPhrase.Words.Take(10));
+    }
+
+    private static string ResolveEmotion(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
+    {
+        if (processed.WordEmotionOverrides.TryGetValue(currentWordIndex, out var emotion) &&
+            !string.IsNullOrWhiteSpace(emotion))
+        {
+            return emotion;
+        }
+
+        if (processed.WordToSegmentMap.TryGetValue(currentWordIndex, out var segmentIndex) &&
+            segmentIndex >= 0 &&
+            segmentIndex < processed.Segments.Count)
+        {
+            return processed.Segments[segmentIndex].Emotion;
+        }
+
+        return "neutral";
+    }
+
+    private static int ResolveBaseWpm(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex, int fallback)
+    {
+        if (processed.WordSpeedOverrides.TryGetValue(currentWordIndex, out var wordSpeed) && wordSpeed > 0)
+        {
+            return wordSpeed;
+        }
+
+        if (processed.WordToSegmentMap.TryGetValue(currentWordIndex, out var segmentIndex) &&
+            segmentIndex >= 0 &&
+            segmentIndex < processed.Segments.Count)
+        {
+            return processed.Segments[segmentIndex].Speed;
+        }
+
+        return fallback;
+    }
+
+    private static string BuildProgressLabel(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex, int wordsPerMinute)
+    {
+        var safeTimeline = timeline.Count == 0
+            ? [new RsvpTimelineEntry("Ready", 240, 0, Math.Max(100, wordsPerMinute), "End of script.", "neutral")]
+            : timeline;
+
+        var remainingMilliseconds = safeTimeline
+            .Skip(Math.Max(0, currentIndex + 1))
+            .Sum(entry => entry.DurationMs + entry.PauseAfterMs);
+
+        var remainingSeconds = (int)Math.Ceiling(remainingMilliseconds / 1000d);
+        return $"Word {Math.Min(currentIndex + 1, safeTimeline.Count)} / {safeTimeline.Count} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
+    }
+
+    private sealed record RsvpTimelineEntry(
+        string Word,
+        int DurationMs,
+        int PauseAfterMs,
+        int BaseWpm,
+        string NextPhrase,
+        string Emotion);
 }

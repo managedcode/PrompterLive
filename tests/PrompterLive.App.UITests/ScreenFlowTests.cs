@@ -87,6 +87,7 @@ public sealed class ScreenFlowTests
             await page.GotoAsync("/learn?id=rsvp-tech-demo");
             await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
             await Expect(page.Locator("#app-header-center")).ToContainTextAsync("RSVP Technology Demo", new() { Timeout = 15000 });
+            await Expect(page.Locator("#rsvp-next-phrase")).Not.ToHaveTextAsync(string.Empty);
             await page.GetByTestId("learn-speed-up").ClickAsync();
             await Expect(page.Locator("#rsvp-speed")).ToHaveTextAsync("310");
             await page.GetByTitle("Back 1 word").ClickAsync();
@@ -112,6 +113,7 @@ public sealed class ScreenFlowTests
             await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
             await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
             await Expect(page.Locator(".rd-edge-section")).ToContainTextAsync("Opening Block");
+            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-autostart", new Regex("true|false"));
 
             await page.GetByTestId("teleprompter-font-up").ClickAsync();
             await Expect(page.Locator("#rd-font-label")).ToHaveTextAsync("40");
@@ -124,6 +126,9 @@ public sealed class ScreenFlowTests
 
             await page.GetByTestId("teleprompter-play-toggle").ClickAsync();
             await Expect(page.Locator("#tp-play-btn")).ToBeVisibleAsync();
+            await page.WaitForTimeoutAsync(2500);
+            await Expect(page.Locator(".rd-time")).Not.ToHaveTextAsync(new Regex(@"^0:00 /"));
+            await Expect(page.Locator("#rd-progress-fill")).Not.ToHaveAttributeAsync("style", new Regex(@"width:\s*0%"));
             await page.GetByTitle("Previous block").ClickAsync();
             await page.GetByTitle("Next block").ClickAsync();
             await page.GetByTitle("Back one word").ClickAsync();
@@ -139,6 +144,18 @@ public sealed class ScreenFlowTests
 
             await page.GetByTestId("settings-nav-cameras").ClickAsync();
             await Expect(page.Locator("#set-cameras")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-request-media")).ToBeVisibleAsync();
+            var readerCameraToggle = page.GetByTestId("settings-reader-camera-toggle");
+            var cameraToggleWasOn = ((await readerCameraToggle.GetAttributeAsync("class")) ?? string.Empty).Contains("on", StringComparison.Ordinal);
+            await readerCameraToggle.ClickAsync();
+            if (cameraToggleWasOn)
+            {
+                await Expect(readerCameraToggle).Not.ToHaveClassAsync(new Regex(@"\bon\b"));
+            }
+            else
+            {
+                await Expect(readerCameraToggle).ToHaveClassAsync(new Regex(@"\bon\b"));
+            }
 
             await page.GetByTestId("settings-nav-mics").ClickAsync();
             await Expect(page.Locator("#set-mics")).ToBeVisibleAsync();
@@ -158,6 +175,11 @@ public sealed class ScreenFlowTests
 
             await page.GetByTestId("settings-nav-about").ClickAsync();
             await Expect(page.GetByTestId("settings-about-panel")).ToBeVisibleAsync();
+
+            await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
+            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync(
+                "data-camera-autostart",
+                cameraToggleWasOn ? new Regex("false") : new Regex("true"));
         }
         finally
         {

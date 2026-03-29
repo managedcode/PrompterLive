@@ -129,7 +129,9 @@ function updateAppHeader(screenId) {
 // ============================================
 
 let rsvpSpeed = 300;
-let rsvpPlaying = true;
+let rsvpPlaying = false;
+let rsvpTimeline = [];
+let rsvpTimer = null;
 
 function changeRsvpSpeed(delta) {
     rsvpSpeed = Math.max(100, Math.min(600, rsvpSpeed + delta));
@@ -137,15 +139,26 @@ function changeRsvpSpeed(delta) {
     if (el) el.textContent = rsvpSpeed;
     const badge = document.getElementById('rsvp-wpm-badge');
     if (badge) badge.textContent = rsvpSpeed + ' WPM';
+
+    updateRsvpProgress();
+    if (rsvpPlaying) {
+        scheduleRsvpAdvance();
+    }
 }
 
 function toggleRsvp() {
     rsvpPlaying = !rsvpPlaying;
     const btn = document.getElementById('rsvp-play-btn');
+    if (!btn) {
+        return;
+    }
+
     if (rsvpPlaying) {
         btn.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+        scheduleRsvpAdvance();
     } else {
         btn.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>';
+        clearTimeout(rsvpTimer);
     }
 }
 
@@ -157,7 +170,22 @@ let rsvpWords = [
     'how', 'our', 'customers', 'interact', 'with', 'technology.'
 ];
 
-let rsvpIndex = 12;
+let rsvpIndex = 0;
+
+function getRsvpEntries() {
+    if (Array.isArray(rsvpTimeline) && rsvpTimeline.length > 0) {
+        return rsvpTimeline;
+    }
+
+    return rsvpWords.map(word => ({
+        word,
+        durationMs: Math.round(60000 / Math.max(rsvpSpeed, 1)),
+        pauseAfterMs: 0,
+        baseWpm: rsvpSpeed,
+        nextPhrase: '',
+        emotion: 'neutral'
+    }));
+}
 
 function getORP(word) {
     const len = word.replace(/[^a-zA-Z]/g, '').length;
@@ -168,11 +196,15 @@ function getORP(word) {
 }
 
 function renderRsvpWord() {
-    if (!rsvpWords.length) {
+    const entries = getRsvpEntries();
+    if (!entries.length) {
         return;
     }
 
-    const word = rsvpWords[rsvpIndex];
+    const safeIndex = Math.max(0, Math.min(rsvpIndex, entries.length - 1));
+    rsvpIndex = safeIndex;
+    const entry = entries[safeIndex];
+    const word = entry.word;
     const orp = getORP(word);
     const container = document.getElementById('rsvp-word');
     if (!container) return;
@@ -198,48 +230,109 @@ function renderRsvpWord() {
     // Left context (5 words)
     const leftEl = document.getElementById('rsvp-ctx-l');
     if (leftEl) {
-        const leftWords = rsvpWords.slice(Math.max(0, rsvpIndex - 5), rsvpIndex);
+        const leftWords = entries.slice(Math.max(0, safeIndex - 3), safeIndex).map(item => item.word);
         leftEl.innerHTML = leftWords.map(w => `<span>${w}</span>`).join('');
     }
 
     // Right context (5 words)
     const rightEl = document.getElementById('rsvp-ctx-r');
     if (rightEl) {
-        const rightWords = rsvpWords.slice(rsvpIndex + 1, rsvpIndex + 6);
+        const rightWords = entries.slice(safeIndex + 1, safeIndex + 4).map(item => item.word);
         rightEl.innerHTML = rightWords.map(w => `<span>${w}</span>`).join('');
     }
 
     const fill = document.querySelector('.rsvp-progress-fill');
-    if (fill) fill.style.width = ((rsvpIndex + 1) / rsvpWords.length * 100) + '%';
+    if (fill) fill.style.width = ((safeIndex + 1) / entries.length * 100) + '%';
 
     const phrase = document.getElementById('rsvp-next-phrase');
     if (phrase) {
-        phrase.textContent = rsvpWords
-            .slice(rsvpIndex + 1, Math.min(rsvpIndex + 10, rsvpWords.length))
+        phrase.textContent = entry.nextPhrase || entries
+            .slice(safeIndex + 1, Math.min(safeIndex + 10, entries.length))
+            .map(item => item.word)
             .join(' ') || 'End of script.';
     }
 
+    updateRsvpProgress();
+    animateRsvpPause(entry);
+}
+
+function getScaledRsvpDuration(entry, key) {
+    const sourceValue = Number(entry?.[key]);
+    const baseValue = Number(entry?.baseWpm) || rsvpSpeed;
+    const scaled = (Number.isFinite(sourceValue) ? sourceValue : Math.round(60000 / Math.max(baseValue, 1)))
+        * (baseValue / Math.max(rsvpSpeed, 1));
+    return Math.max(key === 'pauseAfterMs' ? 0 : 120, Math.round(scaled));
+}
+
+function updateRsvpProgress() {
+    const entries = getRsvpEntries();
     const progress = document.getElementById('rsvp-progress-label');
     if (progress) {
-        const remainingWords = Math.max(0, rsvpWords.length - (rsvpIndex + 1));
-        const remainingMinutes = remainingWords / Math.max(rsvpSpeed, 1);
-        const remainingSeconds = Math.ceil(remainingMinutes * 60);
-        progress.textContent = `Word ${rsvpIndex + 1} / ${rsvpWords.length} · ~${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')} left`;
+        const remainingMilliseconds = entries
+            .slice(Math.max(0, rsvpIndex + 1))
+            .reduce((sum, entry) => sum + getScaledRsvpDuration(entry, 'durationMs') + getScaledRsvpDuration(entry, 'pauseAfterMs'), 0);
+        const remainingSeconds = Math.ceil(remainingMilliseconds / 1000);
+        progress.textContent = `Word ${Math.min(rsvpIndex + 1, entries.length)} / ${entries.length} · ~${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')} left`;
     }
+}
+
+function animateRsvpPause(entry) {
+    const pauseFill = document.querySelector('.rsvp-pause-fill');
+    if (!pauseFill) {
+        return;
+    }
+
+    const pauseMs = getScaledRsvpDuration(entry, 'pauseAfterMs');
+    pauseFill.style.transition = 'none';
+    pauseFill.style.width = '0%';
+    void pauseFill.offsetWidth;
+
+    if (pauseMs <= 0) {
+        return;
+    }
+
+    pauseFill.style.transition = `width ${pauseMs}ms linear`;
+    pauseFill.style.width = '100%';
+}
+
+function scheduleRsvpAdvance() {
+    clearTimeout(rsvpTimer);
+
+    if (!rsvpPlaying) {
+        return;
+    }
+
+    const entries = getRsvpEntries();
+    if (!entries.length) {
+        return;
+    }
+
+    const current = entries[rsvpIndex] || entries[0];
+    const delay = getScaledRsvpDuration(current, 'durationMs') + getScaledRsvpDuration(current, 'pauseAfterMs');
+    rsvpTimer = setTimeout(() => {
+        if (!rsvpPlaying) {
+            return;
+        }
+
+        rsvpIndex = (rsvpIndex + 1) % entries.length;
+        renderRsvpWord();
+        scheduleRsvpAdvance();
+    }, Math.max(150, delay));
 }
 
 // Step RSVP by N words (negative = back)
 function stepRsvpWord(n) {
-    rsvpIndex = (rsvpIndex + n + rsvpWords.length) % rsvpWords.length;
-    renderRsvpWord();
-}
-
-setInterval(() => {
-    if (rsvpPlaying && document.getElementById('screen-rsvp')?.classList.contains('active')) {
-        rsvpIndex = (rsvpIndex + 1) % rsvpWords.length;
-        renderRsvpWord();
+    const entries = getRsvpEntries();
+    if (!entries.length) {
+        return;
     }
-}, 800);
+
+    rsvpIndex = (rsvpIndex + n + entries.length) % entries.length;
+    renderRsvpWord();
+    if (rsvpPlaying) {
+        scheduleRsvpAdvance();
+    }
+}
 
 // ============================================
 // READER — card-by-card with word highlighting
@@ -250,6 +343,22 @@ let tpPlaying = false; // Start paused — user presses play
 let readerWordIndex = -1;
 let readerCardIndex = 0;
 let countdownActive = false;
+
+function getReaderWordDuration(word) {
+    const duration = Number.parseInt(word?.dataset?.ms || '600', 10);
+    return Number.isFinite(duration) && duration > 0 ? duration : 600;
+}
+
+function getReaderWordPause(word) {
+    const pause = Number.parseInt(word?.dataset?.pauseMs || '0', 10);
+    return Number.isFinite(pause) && pause > 0 ? pause : 0;
+}
+
+function getReaderTotalMilliseconds() {
+    const timeEl = document.querySelector('.rd-time');
+    const parsed = Number.parseInt(timeEl?.dataset?.totalMs || '147000', 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 147000;
+}
 
 function changeTpSpeed(delta) {
     tpSpeed = Math.max(80, Math.min(220, tpSpeed + delta));
@@ -324,6 +433,7 @@ function highlightFirstWord() {
     words[0].classList.add('rd-now');
     const g = words[0].closest('.rd-g');
     if (g) g.classList.add('rd-g-active');
+    updateReaderProgress();
 }
 
 function startPlaying() {
@@ -370,9 +480,47 @@ function formatSeconds(totalSeconds) {
 }
 
 function getReaderTotalSeconds() {
+    return Math.max(1, Math.ceil(getReaderTotalMilliseconds() / 1000));
+}
+
+function getReaderElapsedMilliseconds() {
+    const cards = getReaderCards();
+    let elapsed = 0;
+
+    cards.forEach((card, cardIndex) => {
+        const words = Array.from(card.querySelectorAll('.rd-w'));
+        if (cardIndex < readerCardIndex) {
+            words.forEach(word => {
+                elapsed += getReaderWordDuration(word) + getReaderWordPause(word);
+            });
+            return;
+        }
+
+        if (cardIndex !== readerCardIndex || readerWordIndex <= 0) {
+            return;
+        }
+
+        words.slice(0, readerWordIndex).forEach(word => {
+            elapsed += getReaderWordDuration(word) + getReaderWordPause(word);
+        });
+    });
+
+    return elapsed;
+}
+
+function updateReaderProgress() {
+    const totalMilliseconds = getReaderTotalMilliseconds();
+    const elapsedMilliseconds = Math.min(totalMilliseconds, getReaderElapsedMilliseconds());
+    const progress = totalMilliseconds > 0 ? (elapsedMilliseconds / totalMilliseconds) * 100 : 0;
+    const fill = document.getElementById('rd-progress-fill');
+    if (fill) {
+        fill.style.width = progress + '%';
+    }
+
     const timeEl = document.querySelector('.rd-time');
-    const parsed = Number.parseInt(timeEl?.dataset?.totalSeconds || '147', 10);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 147;
+    if (timeEl) {
+        timeEl.textContent = `${formatSeconds(Math.floor(elapsedMilliseconds / 1000))} / ${formatSeconds(Math.ceil(totalMilliseconds / 1000))}`;
+    }
 }
 
 // Center the active word's line at screen center
@@ -484,6 +632,13 @@ function advanceReaderWord() {
         // Wait for slide transition, then resume
         setTimeout(() => {
             readerWordIndex = 0;
+            const firstWord = cards[readerCardIndex]?.querySelector('.rd-w');
+            const firstGroup = firstWord?.closest('.rd-g');
+            cards[readerCardIndex]?.querySelectorAll('.rd-g').forEach(g => g.classList.remove('rd-g-active'));
+            if (firstGroup) {
+                firstGroup.classList.add('rd-g-active');
+            }
+            updateReaderProgress();
             if (!wasPaused) tpPlaying = true;
         }, 850);
         return;
@@ -513,24 +668,7 @@ function advanceReaderWord() {
 
     // Center the active line on screen (smooth scroll)
     centerActiveLine(true);
-
-    // Progress (global across all cards)
-    let totalWords = 0, totalRead = 0;
-    cards.forEach((c, ci) => {
-        const cw = c.querySelectorAll('.rd-w').length;
-        totalWords += cw;
-        if (ci < readerCardIndex) totalRead += cw;
-        else if (ci === readerCardIndex) totalRead += readerWordIndex;
-    });
-    const progress = totalWords ? (totalRead / totalWords * 100) : 0;
-    const fill = document.getElementById('rd-progress-fill');
-    if (fill) fill.style.width = progress + '%';
-    const timeEl = document.querySelector('.rd-time');
-    if (timeEl) {
-        const totalSeconds = getReaderTotalSeconds();
-        const elapsedSeconds = Math.round((progress / 100) * totalSeconds);
-        timeEl.textContent = `${formatSeconds(elapsedSeconds)} / ${formatSeconds(totalSeconds)}`;
-    }
+    updateReaderProgress();
 }
 
 // Font size control
@@ -625,6 +763,7 @@ function stepWord(direction) {
                 if (pg) pg.classList.add('rd-g-active');
             }
             centerActiveLine(true);
+            updateReaderProgress();
         }
     }
 }
@@ -685,6 +824,7 @@ function jumpCard(direction) {
     readerCardIndex = newIndex;
     readerWordIndex = 0;
     showCard(readerCardIndex);
+    updateReaderProgress();
 
     // Wait for slide transition, then resume
     setTimeout(() => {
@@ -739,22 +879,73 @@ function resetReader() {
 let readerTimer = null;
 function scheduleNextWord() {
     clearTimeout(readerTimer);
+    if (!tpPlaying) {
+        return;
+    }
+
+    const currentWord = document.querySelector('.rd-card-active .rd-w.rd-now');
+    const delay = currentWord
+        ? getReaderWordDuration(currentWord) + getReaderWordPause(currentWord)
+        : 600;
+
     readerTimer = setTimeout(() => {
         if (tpPlaying && document.getElementById('screen-teleprompter')?.classList.contains('active')) {
             advanceReaderWord();
         }
         if (tpPlaying) scheduleNextWord();
-    }, 600);
+    }, Math.max(120, delay));
 }
 
 // Camera toggle
-function toggleReaderCamera() {
+async function setReaderCameraActive(nextActive) {
     const cam = document.getElementById('rd-camera');
     const tint = document.getElementById('rd-camera-tint');
     const btn = document.getElementById('rd-cam-btn');
-    cam.classList.toggle('active');
-    tint.classList.toggle('active');
-    btn.classList.toggle('active');
+    if (!cam || !tint || !btn) {
+        return;
+    }
+
+    const cameraDeviceId = cam.dataset.cameraDeviceId || '';
+
+    if (nextActive && cameraDeviceId) {
+        try {
+            await window.PrompterLive.media.attachCamera('rd-camera', cameraDeviceId, true);
+        } catch {
+            // Leave the visual state in place even if the browser blocks access.
+        }
+    } else if (!nextActive) {
+        try {
+            await window.PrompterLive.media.detachCamera('rd-camera');
+        } catch {
+        }
+    }
+
+    cam.classList.toggle('active', nextActive);
+    tint.classList.toggle('active', nextActive);
+    btn.classList.toggle('active', nextActive);
+}
+
+async function toggleReaderCamera() {
+    const cam = document.getElementById('rd-camera');
+    if (!cam) {
+        return;
+    }
+
+    await setReaderCameraActive(!cam.classList.contains('active'));
+}
+
+async function initializeReaderCamera() {
+    const cam = document.getElementById('rd-camera');
+    if (!cam) {
+        return;
+    }
+
+    const shouldAutoStart = cam.dataset.cameraAutostart === 'true';
+    if (shouldAutoStart) {
+        await setReaderCameraActive(true);
+    } else {
+        await setReaderCameraActive(false);
+    }
 }
 
 // Focus mode toggle
@@ -991,6 +1182,52 @@ window.PrompterLiveDesign = {
 
         if (resolvedScreenId === 'teleprompter') {
             resetReader();
+            void initializeReaderCamera();
+        }
+    },
+    setRsvpTimeline(entries, options) {
+        const nextEntries = Array.isArray(entries)
+            ? entries
+                .filter(entry => entry && typeof entry.word === 'string' && entry.word.trim().length > 0)
+                .map(entry => ({
+                    word: entry.word,
+                    durationMs: Number.isFinite(entry.durationMs) ? entry.durationMs : Math.round(60000 / Math.max(rsvpSpeed, 1)),
+                    pauseAfterMs: Number.isFinite(entry.pauseAfterMs) ? entry.pauseAfterMs : 0,
+                    baseWpm: Number.isFinite(entry.baseWpm) ? entry.baseWpm : rsvpSpeed,
+                    nextPhrase: typeof entry.nextPhrase === 'string' ? entry.nextPhrase : '',
+                    emotion: typeof entry.emotion === 'string' ? entry.emotion : 'neutral'
+                }))
+            : [];
+
+        if (!nextEntries.length) {
+            return;
+        }
+
+        clearTimeout(rsvpTimer);
+        rsvpTimeline = nextEntries;
+        rsvpWords = nextEntries.map(entry => entry.word);
+        rsvpIndex = Math.max(0, Math.min(options?.index ?? 0, rsvpTimeline.length - 1));
+
+        if (typeof options?.speed === 'number' && Number.isFinite(options.speed)) {
+            rsvpSpeed = Math.max(100, Math.min(600, Math.round(options.speed)));
+            const speedLabel = document.getElementById('rsvp-speed');
+            if (speedLabel) {
+                speedLabel.textContent = String(rsvpSpeed);
+            }
+        }
+
+        rsvpPlaying = options?.autoPlay === true;
+        const btn = document.getElementById('rsvp-play-btn');
+        if (btn) {
+            btn.innerHTML = rsvpPlaying
+                ? '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+                : '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>';
+        }
+
+        updateAppHeader('rsvp');
+        renderRsvpWord();
+        if (rsvpPlaying) {
+            scheduleRsvpAdvance();
         }
     },
     setRsvpWords(words, options) {
@@ -1002,18 +1239,13 @@ window.PrompterLiveDesign = {
             return;
         }
 
-        rsvpWords = nextWords;
-        rsvpIndex = Math.max(0, Math.min(options?.index ?? 0, rsvpWords.length - 1));
-
-        if (typeof options?.speed === 'number' && Number.isFinite(options.speed)) {
-            rsvpSpeed = Math.max(100, Math.min(600, Math.round(options.speed)));
-            const speedLabel = document.getElementById('rsvp-speed');
-            if (speedLabel) {
-                speedLabel.textContent = String(rsvpSpeed);
-            }
-        }
-
-        updateAppHeader('rsvp');
-        renderRsvpWord();
+        this.setRsvpTimeline(nextWords.map(word => ({
+            word,
+            durationMs: Math.round(60000 / Math.max((options?.speed || rsvpSpeed), 1)),
+            pauseAfterMs: 0,
+            baseWpm: options?.speed || rsvpSpeed,
+            nextPhrase: '',
+            emotion: 'neutral'
+        })), options);
     }
 };
