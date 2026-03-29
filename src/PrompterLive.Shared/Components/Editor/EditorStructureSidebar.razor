@@ -32,25 +32,12 @@
             }
         </div>
     </div>
-
-    <EditorStructureInspector ActiveSegment="@ActiveSegment"
-                              ActiveSegmentChanged="OnActiveSegmentChanged"
-                              ActiveBlock="@ActiveBlock"
-                              ActiveBlockChanged="OnActiveBlockChanged" />
 </div>
 
 @code {
     [Parameter] public int? ActiveBlockIndex { get; set; }
 
-    [Parameter] public EditorStructureHeaderEditorViewModel ActiveBlock { get; set; } = EditorStructureHeaderEditorViewModel.Empty("Block", false);
-
     [Parameter] public int ActiveSegmentIndex { get; set; }
-
-    [Parameter] public EditorStructureHeaderEditorViewModel ActiveSegment { get; set; } = EditorStructureHeaderEditorViewModel.Empty("Segment", true);
-
-    [Parameter] public EventCallback<EditorStructureHeaderEditorViewModel> OnActiveBlockChanged { get; set; }
-
-    [Parameter] public EventCallback<EditorStructureHeaderEditorViewModel> OnActiveSegmentChanged { get; set; }
 
     [Parameter] public EventCallback<EditorNavigationTarget> OnNavigate { get; set; }
 

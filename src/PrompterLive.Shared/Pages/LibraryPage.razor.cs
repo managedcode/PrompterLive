@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Library;
@@ -29,10 +30,15 @@ public partial class LibraryPage : ComponentBase
     private const string DeleteScriptMessage = "Unable to delete this script.";
     private const string CreateFolderOperation = "Library create folder";
     private const string CreateFolderMessage = "Unable to create this folder.";
+    private const string SelectFolderLogTemplate = "Selecting library folder {FolderId}.";
+    private const string StartCreateFolderLogTemplate = "Opening library folder overlay with parent {ParentId}.";
+    private const string CancelCreateFolderLogMessage = "Cancelling library folder overlay.";
+    private const string FolderCreatedLogTemplate = "Created library folder {FolderId} under {ParentId}.";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private BrowserSettingsStore SettingsStore { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
+    [Inject] private ILogger<LibraryPage> Logger { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private ILibraryFolderRepository LibraryFolderRepository { get; set; } = null!;
@@ -215,6 +221,7 @@ public partial class LibraryPage : ComponentBase
 
     private async Task SelectFolder(string folderId)
     {
+        Logger.LogInformation(SelectFolderLogTemplate, folderId);
         _selectedFolderId = folderId;
         RebuildLibraryView();
         await PersistViewStateAsync();
@@ -222,13 +229,16 @@ public partial class LibraryPage : ComponentBase
 
     private void StartCreateFolder()
     {
+        var draftParentId = ResolveDraftParentId();
+        Logger.LogInformation(StartCreateFolderLogTemplate, draftParentId);
         _isCreatingFolder = true;
         _folderDraftName = string.Empty;
-        _folderDraftParentId = ResolveDraftParentId();
+        _folderDraftParentId = draftParentId;
     }
 
     private void CancelCreateFolder()
     {
+        Logger.LogInformation(CancelCreateFolderLogMessage);
         _isCreatingFolder = false;
         _folderDraftName = string.Empty;
         _folderDraftParentId = ResolveDraftParentId();
@@ -272,6 +282,7 @@ public partial class LibraryPage : ComponentBase
                 _folderDraftName = string.Empty;
                 _folderDraftParentId = ResolveDraftParentId();
                 _selectedFolderId = folder.Id;
+                Logger.LogInformation(FolderCreatedLogTemplate, folder.Id, parentId ?? LibrarySelectionKeys.Root);
                 await LoadLibraryAsync();
                 await PersistViewStateAsync();
             });

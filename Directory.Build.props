@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <PrompterLiveTargetFramework>net10.0</PrompterLiveTargetFramework>
+    <PrompterLiveVersionPrefix>0.1.0</PrompterLiveVersionPrefix>
+    <PrompterLiveAssemblyVersion>0.1.0.0</PrompterLiveAssemblyVersion>
+    <PrompterLiveFileVersion>0.1.0.0</PrompterLiveFileVersion>
+
+    <TargetFramework Condition="'$(TargetFramework)' == ''">$(PrompterLiveTargetFramework)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">false</TreatWarningsAsErrors>
+
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">$(PrompterLiveVersionPrefix)</VersionPrefix>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(PrompterLiveAssemblyVersion)</AssemblyVersion>
+    <FileVersion Condition="'$(FileVersion)' == ''">$(PrompterLiveFileVersion)</FileVersion>
+    <InformationalVersion Condition="'$(InformationalVersion)' == ''">$(Version)</InformationalVersion>
+  </PropertyGroup>
+</Project>

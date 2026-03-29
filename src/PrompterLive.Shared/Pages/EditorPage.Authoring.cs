@@ -25,34 +25,6 @@ public partial class EditorPage
 
     private Task OnXslowOffsetChangedAsync(int value) => UpdateSpeedOffsetAsync(value, SpeedOffsetKind.Xslow);
 
-    private Task OnActiveBlockChangedAsync(EditorStructureHeaderEditorViewModel value) =>
-        PersistStructureHeaderAsync(value, _activeSegmentEditor, isSegment: false);
-
-    private Task OnActiveSegmentChangedAsync(EditorStructureHeaderEditorViewModel value) =>
-        PersistStructureHeaderAsync(value, _activeBlockEditor, isSegment: true);
-
-    private async Task PersistStructureHeaderAsync(
-        EditorStructureHeaderEditorViewModel changedValue,
-        EditorStructureHeaderEditorViewModel _,
-        bool isSegment)
-    {
-        var snapshot = BuildSnapshot(changedValue, isSegment);
-        if (snapshot is null)
-        {
-            return;
-        }
-
-        var mutation = StructureEditor.Update(_sourceText, snapshot);
-        _selection = _selection with { Range = mutation.Selection };
-        _history.TryRecord(mutation.Text, mutation.Selection);
-        await PersistDraftAsync(mutation.Text);
-
-        if (_sourcePanel is not null)
-        {
-            await _sourcePanel.FocusRangeAsync(mutation.Selection.Start, mutation.Selection.End);
-        }
-    }
-
     private void RefreshStructureAuthoringState()
     {
         _activeSegmentEditor = BuildStructureEditor(_segments.ElementAtOrDefault(_activeSegmentIndex), true);
@@ -114,25 +86,6 @@ public partial class EditorPage
             EditorEmotionCatalog.GetLabel(snapshot.EmotionKey),
             snapshot.Timing,
             snapshot.SupportsTiming);
-
-    private static TpsStructureHeaderSnapshot? BuildSnapshot(
-        EditorStructureHeaderEditorViewModel value,
-        bool isSegment)
-    {
-        if (value.StartIndex < 0)
-        {
-            return null;
-        }
-
-        return new TpsStructureHeaderSnapshot(
-            isSegment ? TpsStructureHeaderKind.Segment : TpsStructureHeaderKind.Block,
-            value.StartIndex,
-            value.StartIndex,
-            value.Name,
-            value.TargetWpm,
-            EditorEmotionCatalog.GetKey(value.EmotionLabel),
-            isSegment ? value.Timing : string.Empty);
-    }
 
     private async Task UpdateSpeedOffsetAsync(int value, SpeedOffsetKind kind)
     {

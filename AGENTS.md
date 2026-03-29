@@ -189,6 +189,9 @@ Repo-specific design rules:
 - Keep the solution in `PrompterLive.slnx`.
 - Keep all production projects under `src/`.
 - Keep all test projects under `tests/`.
+- Keep shared build settings in `Directory.Build.props`.
+- Keep shared package versions in `Directory.Packages.props`.
+- Keep the pinned SDK version in `global.json`.
 - Treat `new-design/index.html`, `new-design/tokens.css`, `new-design/components.css`, `new-design/styles.css`, and `new-design/app.js` as the exact design reference.
 - Do not re-invent the UI when the answer should be “port the markup and classes from `new-design`”.
 - Do not introduce a server host for the app runtime.

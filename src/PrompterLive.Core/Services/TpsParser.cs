@@ -392,7 +392,7 @@ public partial class TpsParser
     /// <summary>
     /// Parse segments from content
     /// </summary>
-    private List<ScriptSegment> ParseSegments(string content, Dictionary<string, string> frontMatter)
+    private static List<ScriptSegment> ParseSegments(string content, Dictionary<string, string> frontMatter)
     {
         var segments = new List<ScriptSegment>();
 

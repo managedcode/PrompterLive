@@ -42,9 +42,9 @@
 
 @if (_isCreatingFolder)
 {
-    <LibraryFolderCreateModal FolderOptions="_folderOptions"
-                              FolderDraftName="_folderDraftName"
-                              FolderDraftParentId="_folderDraftParentId"
+    <LibraryFolderCreateModal FolderOptions="@_folderOptions"
+                              FolderDraftName="@_folderDraftName"
+                              FolderDraftParentId="@_folderDraftParentId"
                               OnCancelCreateFolder="CancelCreateFolder"
                               OnSubmitCreateFolder="SubmitCreateFolderAsync"
                               OnFolderDraftNameChanged="UpdateFolderDraftName"

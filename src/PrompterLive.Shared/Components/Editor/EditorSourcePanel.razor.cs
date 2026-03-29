@@ -49,18 +49,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
         }
 
         await SafeSyncScrollAsync();
-
-        if (Selection.Range != _domSelection.Range)
-        {
-            try
-            {
-                _domSelection = await Interop.SetSelectionAsync(_textareaRef, Selection.Range.Start, Selection.Range.End);
-            }
-            catch
-            {
-                _domSelection = Selection;
-            }
-        }
     }
 
     public async Task FocusRangeAsync(int start, int end)
@@ -120,8 +108,8 @@ public partial class EditorSourcePanel : IAsyncDisposable
     private async Task OnSourceInputAsync(ChangeEventArgs args)
     {
         CloseToolbarPanels();
-        await OnTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
         await RefreshSelectionAsync();
+        await OnTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
     }
 
     private async Task RefreshSelectionAsync()

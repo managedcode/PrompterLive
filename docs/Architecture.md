@@ -33,6 +33,12 @@ flowchart LR
     Tests --> Core
 ```
 
+## Build Governance
+
+- `Directory.Packages.props` is the canonical source for NuGet package versions.
+- `Directory.Build.props` is the canonical source for shared target framework, analyzer policy, and assembly/app version settings.
+- `global.json` pins the expected .NET SDK for local and CI builds.
+
 ## Runtime Boundaries
 
 ```mermaid
@@ -77,7 +83,7 @@ flowchart LR
 flowchart LR
     SourcePanel["EditorSourcePanel<br/>body-only source textarea + highlight overlay"]
     ToolbarCatalog["EditorToolbarCatalog<br/>descriptor-driven toolbar + floating bar"]
-    StructureSidebar["EditorStructureSidebar<br/>tree + structure inspector"]
+    StructureSidebar["EditorStructureSidebar<br/>tree navigation only"]
     MetadataRail["EditorMetadataRail<br/>front matter + speed offsets"]
     LocalAi["EditorLocalAssistant<br/>local rewrite helpers"]
     Page["EditorPage"]
@@ -162,6 +168,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - browser interop and app DI wiring
 - dynamic library folder components and folder/document browser storage adapters
 - UI diagnostics banner and global error boundary
+- debounced editor autosave and body-only TPS source authoring
 
 Rules:
 
@@ -242,4 +249,5 @@ flowchart LR
 - The runtime must remain backend-free.
 - Visual fidelity should prefer copying the exact design classes and structure over inventing replacements.
 - Browser tests require Playwright Chromium to be installed locally.
+- Editor metadata belongs in the right metadata rail and must not be rendered as visible front matter in the source editor.
 - If macOS embedding returns later, use a persistent `WKWebView` data store, a stable trusted origin, and explicit `requestMediaCapturePermissionFor` handling so camera and microphone prompts are not repeated on every launch.

@@ -128,7 +128,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Learn" })).ToBeVisibleAsync();
             await page.GetByRole(AriaRole.Button, new() { Name = "Learn" }).ClickAsync();
-            await page.WaitForURLAsync("**/learn");
+            await page.WaitForURLAsync("**/learn*");
             await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
 
             await page.GotoAsync("/learn?id=rsvp-tech-demo");
@@ -160,6 +160,8 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
             await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
             await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
             await Expect(page.Locator(".rd-edge-section")).ToContainTextAsync("Opening Block");
+            await Expect(page.Locator(".rd-card-active .rd-cluster-text")).ToContainTextAsync("Good morning everyone");
+            await Expect(page.Locator(".rd-card-active .rd-cluster-text")).Not.ToContainTextAsync("Goodmorningeveryone");
             await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-autostart", new Regex("true|false"));
 
             await page.GetByTestId("teleprompter-font-up").ClickAsync();

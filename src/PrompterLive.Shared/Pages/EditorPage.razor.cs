@@ -19,9 +19,11 @@ public partial class EditorPage
     private const string PersistDraftMessage = "Unable to save the current draft.";
     private const string EditorSyntaxOperation = "Editor syntax";
     private const string EditorSyntaxMessage = "The TPS draft has a syntax issue. Fix it and keep writing.";
+    private const int AutosaveDelayMilliseconds = 450;
 
     private readonly EditorDocumentHistory _history = new();
     private readonly TpsFrontMatterDocumentService _frontMatterService = new();
+    private CancellationTokenSource? _autosaveCancellationSource;
     private bool _loadState = true;
     private int? _activeBlockIndex;
     private int _activeSegmentIndex;
@@ -208,7 +210,8 @@ public partial class EditorPage
     {
         _sourceText = text ?? string.Empty;
         _history.TryRecord(_sourceText, _selection.Range);
-        await PersistDraftAsync(_sourceText);
+        await UpdateDraftStateAsync(_sourceText, persistDocument: false);
+        QueueAutosave();
     }
 
     private async Task OnVersionChangedAsync(string value)
@@ -257,6 +260,12 @@ public partial class EditorPage
 
     private async Task PersistDraftAsync(string text)
     {
+        CancelAutosave();
+        await UpdateDraftStateAsync(text, persistDocument: true);
+    }
+
+    private async Task UpdateDraftStateAsync(string text, bool persistDocument)
+    {
         _sourceText = text ?? string.Empty;
         var persistedText = BuildPersistedDocument(_sourceText);
         var title = _screenTitle;
@@ -271,16 +280,51 @@ public partial class EditorPage
                     SessionService.State.DocumentName,
                     SessionService.State.ScriptId);
 
-                var savedDocument = await SessionService.SaveAsync();
-                if (string.IsNullOrWhiteSpace(ScriptId))
+                if (persistDocument)
                 {
-                    ScriptId = savedDocument.Id;
-                    Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(savedDocument.Id)}", replace: true);
+                    var savedDocument = await SessionService.SaveAsync();
+                    if (string.IsNullOrWhiteSpace(ScriptId))
+                    {
+                        ScriptId = savedDocument.Id;
+                        Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(savedDocument.Id)}", replace: true);
+                    }
                 }
 
                 PopulateEditorState();
             },
             clearRecoverableOnSuccess: string.IsNullOrWhiteSpace(SessionService.State.ErrorMessage));
+    }
+
+    private void QueueAutosave()
+    {
+        CancelAutosave();
+        _autosaveCancellationSource = new CancellationTokenSource();
+        var autosaveToken = _autosaveCancellationSource.Token;
+        _ = RunAutosaveAsync(autosaveToken);
+    }
+
+    private async Task RunAutosaveAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(AutosaveDelayMilliseconds, cancellationToken);
+            await InvokeAsync(() => PersistDraftAsync(_sourceText));
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void CancelAutosave()
+    {
+        if (_autosaveCancellationSource is null)
+        {
+            return;
+        }
+
+        _autosaveCancellationSource.Cancel();
+        _autosaveCancellationSource.Dispose();
+        _autosaveCancellationSource = null;
     }
 
     private async Task PersistMetadataAsync()

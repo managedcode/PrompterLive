@@ -942,10 +942,10 @@ button {
     align-items: center;
     justify-content: center;
     padding: 32px;
-    background:
-        radial-gradient(ellipse at top, rgba(94,234,212,.06), transparent 48%),
-        linear-gradient(180deg, rgba(4,8,16,.52), rgba(4,8,16,.78));
-    backdrop-filter: blur(22px);
+    background-color: rgba(4, 8, 16, 0.12);
+    background-image: radial-gradient(ellipse at top, rgba(94,234,212,.1), transparent 48%);
+    backdrop-filter: blur(24px) saturate(118%);
+    -webkit-backdrop-filter: blur(24px) saturate(118%);
 }
 
 .lib-modal-card {

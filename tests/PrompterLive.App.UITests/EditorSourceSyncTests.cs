@@ -8,7 +8,7 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
-    public async Task EditorScreen_DirectSourceHeaderEditsRefreshStructureInspector()
+    public async Task EditorScreen_DirectSourceHeaderEditsRefreshStructureTree()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -34,13 +34,10 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await Expect(page.GetByTestId("editor-active-segment-name")).ToHaveValueAsync("Launch Angle");
-            await Expect(page.GetByTestId("editor-active-segment-wpm")).ToHaveValueAsync("305");
-            await Expect(page.GetByTestId("editor-active-segment-emotion")).ToHaveValueAsync("Focused");
-            await Expect(page.GetByTestId("editor-active-segment-timing")).ToHaveValueAsync("1:00-2:00");
-            await Expect(page.GetByTestId("editor-active-block-name")).ToHaveValueAsync("Signal Block");
-            await Expect(page.GetByTestId("editor-active-block-wpm")).ToHaveValueAsync("305");
-            await Expect(page.GetByTestId("editor-active-block-emotion")).ToHaveValueAsync("Professional");
+            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Launch Angle");
+            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Focused");
+            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Signal Block");
+            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("305WPM");
             await Expect(page.GetByTestId("editor-source-highlight"))
                 .ToContainTextAsync("## [Launch Angle|305WPM|focused|1:00-2:00]");
         }

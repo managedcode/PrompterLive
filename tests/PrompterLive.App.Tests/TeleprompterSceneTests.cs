@@ -54,4 +54,20 @@ public sealed class TeleprompterSceneTests : BunitContext
             Assert.Contains("data-camera-role=\"overlay\"", cut.Markup);
         });
     }
+
+    [Fact]
+    public void TeleprompterPage_RendersReadableWordSpacingInsideReaderCards()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var activeText = cut.Find(".rd-card-active .rd-cluster-text").TextContent;
+
+            Assert.Contains("Good morning everyone", activeText, StringComparison.Ordinal);
+            Assert.Contains("what I believe", activeText, StringComparison.Ordinal);
+            Assert.DoesNotContain("Goodmorningeveryone", activeText, StringComparison.Ordinal);
+        });
+    }
 }

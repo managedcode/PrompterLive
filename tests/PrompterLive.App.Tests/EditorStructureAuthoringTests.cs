@@ -16,7 +16,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_ChangingActiveStructureRewritesTpsHeaders()
+    public void EditorPage_ChangingSourceHeadersRefreshesStructureTreeWithoutLegacyInspector()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo("http://localhost/editor?id=quantum-computing");
@@ -25,24 +25,27 @@ public sealed class EditorStructureAuthoringTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("Quantum Computing", cut.Markup);
-            Assert.Equal("Introduction", cut.Find("[data-testid='editor-active-segment-name']").GetAttribute("value"));
+            Assert.Contains("Introduction", cut.Markup);
+            Assert.DoesNotContain("ACTIVE SEGMENT", cut.Markup, StringComparison.Ordinal);
+            Assert.DoesNotContain("ACTIVE BLOCK", cut.Markup, StringComparison.Ordinal);
         });
 
-        cut.Find("[data-testid='editor-active-segment-name']").Change("Introduction");
-        cut.Find("[data-testid='editor-active-segment-wpm']").Change("280");
-        cut.Find("[data-testid='editor-active-segment-emotion']").Change("Neutral");
-        cut.Find("[data-testid='editor-active-segment-timing']").Change("0:00-0:00");
-        cut.Find("[data-testid='editor-active-block-name']").Change("Overview Block");
-        cut.Find("[data-testid='editor-active-block-wpm']").Change("280");
-        cut.Find("[data-testid='editor-active-block-emotion']").Change("Neutral");
+        var source = cut.Find("[data-testid='editor-source-input']");
+        var updatedSource = (source.GetAttribute("value") ?? string.Empty)
+            .Replace("## [Introduction|280WPM|neutral|0:00-1:10]", "## [Launch Angle|305WPM|focused|1:00-2:00]", StringComparison.Ordinal)
+            .Replace("### [Overview Block|280WPM|neutral]", "### [Signal Block|305WPM|professional]", StringComparison.Ordinal);
+
+        source.Input(updatedSource);
 
         cut.WaitForAssertion(() =>
         {
-            var source = cut.Find("[data-testid='editor-source-input']").GetAttribute("value");
-            Assert.Contains("## [Introduction|280WPM|neutral|0:00-0:00]", source);
-            Assert.Contains("### [Overview Block|280WPM|neutral]", source);
-            Assert.Contains("Overview Block", cut.Markup);
-            Assert.Contains("280WPM", cut.Markup);
+            var currentSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value");
+            Assert.Contains("## [Launch Angle|305WPM|focused|1:00-2:00]", currentSource);
+            Assert.Contains("### [Signal Block|305WPM|professional]", currentSource);
+            Assert.Contains("data-nav=\"seg-0\"", cut.Markup, StringComparison.Ordinal);
+            Assert.Contains("Launch Angle", cut.Markup, StringComparison.Ordinal);
+            Assert.Contains("Signal Block", cut.Markup, StringComparison.Ordinal);
+            Assert.DoesNotContain("ACTIVE SEGMENT", cut.Markup, StringComparison.Ordinal);
         });
     }
 

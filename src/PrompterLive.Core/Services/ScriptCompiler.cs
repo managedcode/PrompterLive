@@ -73,7 +73,7 @@ public class ScriptCompiler
         return Task.FromResult(compiledScript);
     }
 
-    private CompiledSegment CompileSegment(TpsSegment segment)
+    private static CompiledSegment CompileSegment(TpsSegment segment)
     {
         var emotion = NormalizeEmotion(segment.Emotion);
         var targetWpm = ClampWpm(segment.TargetWPM ?? DefaultWpm);
@@ -138,7 +138,7 @@ public class ScriptCompiler
         return compiledSegment;
     }
 
-    private CompiledBlock CompileBlock(TpsBlock block, FormattingState parentState)
+    private static CompiledBlock CompileBlock(TpsBlock block, FormattingState parentState)
     {
         var emotion = NormalizeEmotion(block.Emotion) ?? parentState.Emotion;
         var blockWpm = ClampWpm(block.TargetWPM ?? parentState.BaseWpm);
@@ -181,7 +181,7 @@ public class ScriptCompiler
         return compiledBlock;
     }
 
-    private CompiledPhrase CompilePhrase(TpsPhrase phrase, FormattingState parentState)
+    private static CompiledPhrase CompilePhrase(TpsPhrase phrase, FormattingState parentState)
     {
         var phraseState = parentState.Clone();
 

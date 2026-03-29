@@ -9,6 +9,8 @@ const routeMap = {
     teleprompter: '/teleprompter',
     settings: '/settings'
 };
+const scriptScopedScreens = new Set(['editor', 'rsvp', 'teleprompter']);
+let blazorNavigator = null;
 
 function getScreenElement(screenId) {
     const elementId = screenId === 'rsvp'
@@ -46,10 +48,28 @@ function getCurrentScreenId() {
     }
 }
 
-function navigateTo(screenId) {
-    const targetRoute = routeMap[screenId] || routeMap.library;
-    if (window.location.pathname !== targetRoute) {
-        window.location.assign(targetRoute);
+function buildRoute(screenId) {
+    const targetPath = routeMap[screenId] || routeMap.library;
+    const targetUrl = new URL(targetPath, window.location.origin);
+    const currentUrl = new URL(window.location.href);
+    const currentScriptId = currentUrl.searchParams.get('id');
+
+    if (scriptScopedScreens.has(screenId) && currentScriptId) {
+        targetUrl.searchParams.set('id', currentScriptId);
+    }
+
+    return `${targetUrl.pathname}${targetUrl.search}`;
+}
+
+async function navigateTo(screenId) {
+    const targetRoute = buildRoute(screenId);
+    const currentRoute = `${window.location.pathname}${window.location.search}`;
+    if (currentRoute !== targetRoute) {
+        if (blazorNavigator) {
+            await blazorNavigator.invokeMethodAsync('NavigateClient', targetRoute);
+        } else {
+            window.location.assign(targetRoute);
+        }
         return;
     }
 
@@ -227,11 +247,12 @@ function renderRsvpWord() {
         html += `<span${i === orp ? ' class="orp"' : ''}>${word[i]}</span>`;
     }
     container.innerHTML = html;
+    container.style.transform = '';
 
     // Position the word so the ORP letter aligns with the center vertical line
     const orpEl = container.querySelector('.orp');
     if (orpEl) {
-        const containerRect = container.parentElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
         const orpRect = orpEl.getBoundingClientRect();
         const containerCenter = containerRect.left + containerRect.width / 2;
         const orpCenter = orpRect.left + orpRect.width / 2;
@@ -889,6 +910,8 @@ function resetReader() {
 // Auto-advance reader — timeout chain guarantees each word gets full duration.
 // setInterval would fire on a fixed clock, cutting words short on resume.
 let readerTimer = null;
+let readerCameraRequestedState = null;
+let readerCameraOperationId = 0;
 function scheduleNextWord() {
     clearTimeout(readerTimer);
     if (!tpPlaying) {
@@ -921,16 +944,15 @@ async function setReaderCameraActive(nextActive) {
         return;
     }
 
+    readerCameraRequestedState = !!nextActive;
+    const operationId = ++readerCameraOperationId;
     const attachableCameras = cameras.filter(camera => (camera.dataset.cameraDeviceId || '').length > 0);
-    if (!attachableCameras.length) {
-        cameras.forEach(camera => camera.classList.remove('active'));
-        tint.classList.remove('active');
-        btn.classList.remove('active');
-        return;
-    }
+    const targetCameras = attachableCameras.length > 0
+        ? attachableCameras
+        : cameras.slice(0, 1);
 
     if (nextActive) {
-        await Promise.all(attachableCameras.map(async camera => {
+        await Promise.all(targetCameras.map(async camera => {
             try {
                 await window.PrompterLive.media.attachCamera(camera.id, camera.dataset.cameraDeviceId || '', true);
             } catch {
@@ -944,6 +966,10 @@ async function setReaderCameraActive(nextActive) {
             } catch {
             }
         }));
+    }
+
+    if (operationId !== readerCameraOperationId) {
+        return;
     }
 
     cameras.forEach(camera => camera.classList.toggle('active', nextActive));
@@ -968,11 +994,8 @@ async function initializeReaderCamera() {
     }
 
     const shouldAutoStart = cameras.some(camera => camera.dataset.cameraAutostart === 'true');
-    if (shouldAutoStart) {
-        await setReaderCameraActive(true);
-    } else {
-        await setReaderCameraActive(false);
-    }
+    const requestedState = readerCameraRequestedState ?? shouldAutoStart;
+    await setReaderCameraActive(requestedState);
 }
 
 // Focus mode toggle
@@ -1204,6 +1227,9 @@ function edNavTo(el) {
 // ============================================
 
 window.PrompterLiveDesign = {
+    attachNavigator(dotNetRef) {
+        blazorNavigator = dotNetRef || null;
+    },
     initialize(screenId) {
         const resolvedScreenId = screenId || getCurrentScreenId();
         updateAppHeader(resolvedScreenId);

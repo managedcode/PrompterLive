@@ -24,20 +24,17 @@
      data-screen-subtitle="@_screenSubtitle">
     <div class="rd">
         <div class="rd-gradient @_gradientClass" id="rd-gradient"></div>
-        @foreach (var layer in _cameraLayers)
-        {
-            <video class="@layer.CssClass"
-                   id="@layer.ElementId"
-                   autoplay
-                   muted
-                   playsinline
-                   data-camera-device-id="@layer.DeviceId"
-                   data-camera-autostart="@layer.AutoStart.ToString().ToLowerInvariant()"
-                   data-camera-role="@layer.Role"
-                   data-camera-order="@layer.Order"
-                   data-testid="@layer.TestId"
-                   style="@layer.Style"></video>
-        }
+        <video class="@_cameraLayer.CssClass"
+               id="@_cameraLayer.ElementId"
+               autoplay
+               muted
+               playsinline
+               data-camera-device-id="@_cameraLayer.DeviceId"
+               data-camera-autostart="@_cameraLayer.AutoStart.ToString().ToLowerInvariant()"
+               data-camera-role="@_cameraLayer.Role"
+               data-camera-order="@_cameraLayer.Order"
+               data-testid="@_cameraLayer.TestId"
+               style="@_cameraLayer.Style"></video>
         <div class="rd-camera-tint" id="rd-camera-tint"></div>
 
         <div class="rd-ui">
@@ -82,23 +79,36 @@
                                     <span class="rd-emo-wpm">@entry.card.TargetWpm <small>WPM</small></span>
                                 </div>
                                 <p class="rd-cluster-text">
-                                    @foreach (var chunk in entry.card.Chunks)
+                                    @for (var chunkIndex = 0; chunkIndex < entry.card.Chunks.Count; chunkIndex++)
                                     {
+                                        var chunk = entry.card.Chunks[chunkIndex];
+                                        var nextChunk = chunkIndex < entry.card.Chunks.Count - 1
+                                            ? entry.card.Chunks[chunkIndex + 1]
+                                            : null;
                                         if (chunk is ReaderGroupViewModel group)
                                         {
                                             <span class="rd-g">
-                                                @foreach (var word in group.Words)
+                                                @for (var wordIndex = 0; wordIndex < group.Words.Count; wordIndex++)
                                                 {
+                                                    var word = group.Words[wordIndex];
                                                     <span class="rd-w @word.CssClass"
                                                           data-ms="@word.DurationMs"
                                                           data-pause-ms="@word.PauseAfterMs">@word.Text</span>
-                                                    <text> </text>
+                                                    @if (wordIndex < group.Words.Count - 1)
+                                                    {
+                                                        @(" ")
+                                                    }
                                                 }
                                             </span>
                                         }
                                         else if (chunk is ReaderPauseViewModel pause)
                                         {
                                             <span class="@pause.CssClass" data-ms="@pause.DurationMs"></span>
+                                        }
+
+                                        if (nextChunk is ReaderGroupViewModel)
+                                        {
+                                            @(" ")
                                         }
                                     }
                                 </p>
@@ -174,10 +184,11 @@
     private int _totalDurationMilliseconds = 1000;
     private bool _syncReader;
     private StudioSettings _studioSettings = StudioSettings.Default;
-    private IReadOnlyList<ReaderCameraLayerViewModel> _cameraLayers = [ReaderCameraLayerViewModel.Placeholder];
+    private ReaderCameraLayerViewModel _cameraLayer = ReaderCameraLayerViewModel.Placeholder;
     private IReadOnlyList<ReaderCardViewModel> _cards = [ReaderCardViewModel.Empty];
     private const string LoadReaderOperation = "Teleprompter load";
     private const string LoadReaderMessage = "Unable to prepare teleprompter playback.";
+    private const int MaxReaderGroupWordCount = 5;
 
     protected override Task OnParametersSetAsync()
     {
@@ -272,42 +283,27 @@
                 ?? primarySceneCamera;
         }
 
-        var layers = new List<ReaderCameraLayerViewModel>();
         var shouldUseConfiguredPrimary = configuredCamera is not null &&
             visibleSceneCameras.All(camera => !string.Equals(camera.DeviceId, configuredCamera.DeviceId, StringComparison.Ordinal));
 
         if (shouldUseConfiguredPrimary)
         {
             var transform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
-            var configuredCameraDeviceId = configuredCamera!.DeviceId;
-            layers.Add(new ReaderCameraLayerViewModel(
+            _cameraLayer = new ReaderCameraLayerViewModel(
                 ElementId: "rd-camera",
-                DeviceId: configuredCameraDeviceId,
+                DeviceId: configuredCamera!.DeviceId,
                 AutoStart: autoStart,
                 Role: "primary",
                 Order: 0,
                 CssClass: "rd-camera rd-camera-base",
                 Style: BuildPrimaryCameraStyle(transform),
-                TestId: "teleprompter-camera-layer-primary"));
-
-            var overlayIndex = 0;
-            foreach (var overlay in visibleSceneCameras)
-            {
-                layers.Add(new ReaderCameraLayerViewModel(
-                    ElementId: $"rd-camera-overlay-{overlayIndex + 1}",
-                    DeviceId: overlay.DeviceId,
-                    AutoStart: autoStart,
-                    Role: "overlay",
-                    Order: overlayIndex + 1,
-                    CssClass: "rd-camera rd-camera-overlay",
-                    Style: BuildOverlayCameraStyle(overlay.Transform),
-                    TestId: $"teleprompter-camera-layer-overlay-{overlayIndex + 1}"));
-                overlayIndex++;
-            }
+                TestId: "teleprompter-camera-layer-primary");
+            return;
         }
-        else if (primarySceneCamera is not null)
+
+        if (primarySceneCamera is not null)
         {
-            layers.Add(new ReaderCameraLayerViewModel(
+            _cameraLayer = new ReaderCameraLayerViewModel(
                 ElementId: "rd-camera",
                 DeviceId: primarySceneCamera.DeviceId,
                 AutoStart: autoStart,
@@ -315,42 +311,24 @@
                 Order: 0,
                 CssClass: "rd-camera rd-camera-base",
                 Style: BuildPrimaryCameraStyle(primarySceneCamera.Transform),
-                TestId: "teleprompter-camera-layer-primary"));
-
-            var overlayIndex = 0;
-            foreach (var overlay in visibleSceneCameras.Where(camera => !string.Equals(camera.SourceId, primarySceneCamera.SourceId, StringComparison.Ordinal)))
-            {
-                layers.Add(new ReaderCameraLayerViewModel(
-                    ElementId: $"rd-camera-overlay-{overlayIndex + 1}",
-                    DeviceId: overlay.DeviceId,
-                    AutoStart: autoStart,
-                    Role: "overlay",
-                    Order: overlayIndex + 1,
-                    CssClass: "rd-camera rd-camera-overlay",
-                    Style: BuildOverlayCameraStyle(overlay.Transform),
-                    TestId: $"teleprompter-camera-layer-overlay-{overlayIndex + 1}"));
-                overlayIndex++;
-            }
-        }
-        else
-        {
-            var defaultCamera = availableCameras.FirstOrDefault(device => string.Equals(device.DeviceId, preferredCameraId, StringComparison.Ordinal))
-                ?? availableCameras.FirstOrDefault(device => device.IsDefault)
-                ?? availableCameras.FirstOrDefault();
-
-            var transform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
-            layers.Add(new ReaderCameraLayerViewModel(
-                ElementId: "rd-camera",
-                DeviceId: defaultCamera?.DeviceId ?? string.Empty,
-                AutoStart: autoStart && !string.IsNullOrWhiteSpace(defaultCamera?.DeviceId),
-                Role: "primary",
-                Order: 0,
-                CssClass: "rd-camera rd-camera-base",
-                Style: BuildPrimaryCameraStyle(transform),
-                TestId: "teleprompter-camera-layer-primary"));
+                TestId: "teleprompter-camera-layer-primary");
+            return;
         }
 
-        _cameraLayers = layers.Count > 0 ? layers : [ReaderCameraLayerViewModel.Placeholder];
+        var defaultCamera = availableCameras.FirstOrDefault(device => string.Equals(device.DeviceId, preferredCameraId, StringComparison.Ordinal))
+            ?? availableCameras.FirstOrDefault(device => device.IsDefault)
+            ?? availableCameras.FirstOrDefault();
+        var defaultTransform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
+
+        _cameraLayer = new ReaderCameraLayerViewModel(
+            ElementId: "rd-camera",
+            DeviceId: defaultCamera?.DeviceId ?? string.Empty,
+            AutoStart: autoStart && !string.IsNullOrWhiteSpace(defaultCamera?.DeviceId),
+            Role: "primary",
+            Order: 0,
+            CssClass: "rd-camera rd-camera-base",
+            Style: BuildPrimaryCameraStyle(defaultTransform),
+            TestId: "teleprompter-camera-layer-primary");
     }
 
     private async Task<List<ReaderCardViewModel>> BuildReaderCardsAsync()
@@ -503,10 +481,30 @@
                 word.CleanText,
                 BuildReaderWordClass(word.Metadata),
                 Math.Max(120, (int)Math.Round(word.DisplayDuration.TotalMilliseconds))));
+
+            if (ShouldEndReaderGroup(word.CleanText, currentGroup.Count))
+            {
+                FlushGroup(chunks, currentGroup);
+            }
         }
 
         FlushGroup(chunks, currentGroup);
         return chunks;
+    }
+
+    private static bool ShouldEndReaderGroup(string cleanText, int wordCount)
+    {
+        if (wordCount >= MaxReaderGroupWordCount)
+        {
+            return true;
+        }
+
+        if (HasSentenceEndingPunctuation(cleanText))
+        {
+            return true;
+        }
+
+        return HasClausePunctuation(cleanText) && wordCount >= 3;
     }
 
     private static void FlushGroup(List<ReaderChunkViewModel> chunks, List<ReaderWordViewModel> currentGroup)
@@ -725,6 +723,12 @@
 
         return string.Join(';', styleParts) + ';';
     }
+
+    private static bool HasSentenceEndingPunctuation(string text) =>
+        text.IndexOfAny(['.', '!', '?']) >= 0;
+
+    private static bool HasClausePunctuation(string text) =>
+        text.IndexOfAny([',', ';', ':', '—', '–']) >= 0;
 
     private static string BuildCameraTransform(MediaSourceTransform transform, bool includeTranslate)
     {

@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Microsoft.Playwright;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -131,43 +130,23 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
     }
 
     [Fact]
-    public async Task EditorScreen_StructureInspectorEditsRewriteHeaders()
+    public async Task EditorScreen_DoesNotRenderLegacyStructureInspectorPanel()
     {
         var page = await _fixture.NewPageAsync();
 
         try
         {
             await page.GotoAsync("/editor?id=quantum-computing");
-
-            await Expect(page.GetByTestId("editor-active-segment-name")).ToBeVisibleAsync();
-            await SetInputValueAsync(page, "editor-active-segment-name", "Introduction");
-            await SetInputValueAsync(page, "editor-active-segment-wpm", "280");
-            await page.GetByTestId("editor-active-segment-emotion").SelectOptionAsync(new[] { "Neutral" });
-            await SetInputValueAsync(page, "editor-active-segment-timing", "0:00-0:00");
-            await SetInputValueAsync(page, "editor-active-block-name", "Overview Block");
-            await SetInputValueAsync(page, "editor-active-block-wpm", "280");
-            await page.GetByTestId("editor-active-block-emotion").SelectOptionAsync(new[] { "Neutral" });
-
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"## \[Introduction\|280WPM\|neutral\|0:00-0:00\]"));
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"### \[Overview Block\|280WPM\|neutral\]"));
+            await Expect(page.GetByText("ACTIVE SEGMENT")).ToHaveCountAsync(0);
+            await Expect(page.GetByText("ACTIVE BLOCK")).ToHaveCountAsync(0);
+            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Introduction");
+            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Overview Block");
         }
         finally
         {
             await page.Context.CloseAsync();
         }
     }
-
-    private static Task SetInputValueAsync(IPage page, string testId, string value) =>
-        page.GetByTestId(testId).EvaluateAsync(
-            """
-            (element, nextValue) => {
-                element.value = nextValue;
-                element.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-            """,
-            value);
 
     [Fact]
     public async Task EditorScreen_HidesFrontMatterFromVisibleEditorBody()

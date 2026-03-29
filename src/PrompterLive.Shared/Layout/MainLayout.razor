@@ -1,6 +1,9 @@
+@using Microsoft.JSInterop
+@using Microsoft.Extensions.Logging
 @implements IDisposable
 @inherits LayoutComponentBase
 @inject AppBootstrapper Bootstrapper
+@inject ILogger<MainLayout> Logger
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 
@@ -28,6 +31,12 @@
 @Body
 
 @code {
+    private const string AttachNavigatorLogMessage = "Attached SPA navigator bridge.";
+    private const string ClientNavigationLogTemplate = "Client navigation requested for {Route}.";
+    private const string RouteChangedLogTemplate = "Route changed to {Location}.";
+
+    private DotNetObjectReference<MainLayout>? _navigationBridge;
+
     protected override void OnInitialized()
     {
         Navigation.LocationChanged += HandleLocationChanged;
@@ -38,13 +47,29 @@
         if (firstRender)
         {
             await Bootstrapper.EnsureReadyAsync();
+            _navigationBridge = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("PrompterLiveDesign.attachNavigator", _navigationBridge);
+            Logger.LogInformation(AttachNavigatorLogMessage);
         }
 
         await JS.InvokeVoidAsync("PrompterLiveDesign.initialize", ResolveScreenId(Navigation.Uri));
     }
 
+    [JSInvokable]
+    public void NavigateClient(string route)
+    {
+        if (string.IsNullOrWhiteSpace(route))
+        {
+            return;
+        }
+
+        Logger.LogInformation(ClientNavigationLogTemplate, route);
+        Navigation.NavigateTo(route);
+    }
+
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
+        Logger.LogInformation(RouteChangedLogTemplate, e.Location);
         StateHasChanged();
     }
 
@@ -67,5 +92,6 @@
     public void Dispose()
     {
         Navigation.LocationChanged -= HandleLocationChanged;
+        _navigationBridge?.Dispose();
     }
 }
