@@ -1,3 +1,4 @@
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -12,15 +13,16 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/learn?id=quantum-computing");
-            await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.Locator("#rsvp-word .orp")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Learn.Word).Locator(".orp")).ToBeVisibleAsync();
 
             var initialDelta = await MeasureOrpDeltaAsync(page);
             Assert.InRange(initialDelta, 0, 6);
 
-            await page.GetByTestId("learn-play-toggle").ClickAsync();
-            await page.WaitForTimeoutAsync(900);
+            await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackDelayMs);
 
             var playbackDelta = await MeasureOrpDeltaAsync(page);
             Assert.InRange(playbackDelta, 0, 6);
@@ -35,8 +37,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<double>(
             """
             () => {
-                const line = document.querySelector('.rsvp-orp-line');
-                const orp = document.querySelector('#rsvp-word .orp');
+                const line = document.querySelector('[data-testid="learn-orp-line"]');
+                const orp = document.querySelector('[data-testid="learn-word"] .orp');
                 if (!line || !orp) {
                     return 999;
                 }

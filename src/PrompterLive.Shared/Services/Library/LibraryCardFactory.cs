@@ -4,6 +4,8 @@ using PrompterLive.Core.Services;
 using PrompterLive.Core.Services.Preview;
 using PrompterLive.Shared.Components.Library;
 
+using PrompterLive.Shared.Contracts;
+
 namespace PrompterLive.Shared.Services.Library;
 
 internal static class LibraryCardFactory
@@ -77,7 +79,7 @@ internal static class LibraryCardFactory
             DurationLabel: $"{(int)Math.Max(duration.TotalMinutes, 0)}:{duration.Seconds:00}",
             FolderId: summary.FolderId,
             DisplayOrder: displayOrder,
-            TestId: $"library-card-{summary.Id}");
+            TestId: UiTestIds.Library.Card(summary.Id));
     }
 
     private static int ResolveAverageWpm(

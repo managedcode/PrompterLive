@@ -1,3 +1,4 @@
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -14,16 +15,16 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=quantum-computing");
-            await Expect(page.GetByTestId("editor-source-input"))
-                .ToBeVisibleAsync(new() { Timeout = 10_000 });
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
-                element => {
+                (element, values) => {
                     const nextValue = element.value
-                        .replace(/^## \[[^\n]+\]/m, "## [Launch Angle|305WPM|focused|1:00-2:00]")
-                        .replace(/^### \[[^\n]+\]/m, "### [Signal Block|305WPM|professional]");
+                        .replace(/^## \[[^\n]+\]/m, values.segmentHeader)
+                        .replace(/^### \[[^\n]+\]/m, values.blockHeader);
 
                     element.focus();
                     element.value = nextValue;
@@ -32,14 +33,19 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
                     element.dispatchEvent(new Event("select", { bubbles: true }));
                     element.dispatchEvent(new Event("keyup", { bubbles: true }));
                 }
-                """);
+                """,
+                new
+                {
+                    segmentHeader = BrowserTestConstants.Editor.SegmentRewrite,
+                    blockHeader = BrowserTestConstants.Editor.BlockRewrite
+                });
 
-            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Launch Angle");
-            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Focused");
-            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Signal Block");
-            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("305WPM");
-            await Expect(page.GetByTestId("editor-source-highlight"))
-                .ToContainTextAsync("## [Launch Angle|305WPM|focused|1:00-2:00]");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync("Launch Angle");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync("Focused");
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(0, 0))).ToContainTextAsync("Signal Block");
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(0, 0))).ToContainTextAsync("305WPM");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight))
+                .ToContainTextAsync(BrowserTestConstants.Editor.SegmentRewrite);
         }
         finally
         {

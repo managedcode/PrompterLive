@@ -3,7 +3,7 @@
 
 @if (Diagnostics.Current is { IsFatal: false } diagnostic)
 {
-    <section class="diag-banner" data-testid="diagnostics-banner">
+    <section class="diag-banner" data-testid="@UiTestIds.Diagnostics.Banner">
         <div class="diag-banner-copy">
             <span class="diag-banner-title">@diagnostic.Title</span>
             <p class="diag-banner-message">@diagnostic.Message</p>
@@ -12,7 +12,7 @@
         <button class="diag-banner-dismiss"
                 type="button"
                 @onclick="HandleDismiss"
-                data-testid="diagnostics-dismiss">
+                data-testid="@UiTestIds.Diagnostics.Dismiss">
             Dismiss
         </button>
     </section>

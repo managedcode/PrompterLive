@@ -1,4 +1,5 @@
 using Bunit;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -20,30 +21,42 @@ public sealed class EditorMetadataInteractionTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='editor-profile']").Change("RSVP");
-        cut.Find("[data-testid='editor-base-wpm']").Change("210");
-        cut.Find("[data-testid='editor-author']").Change("Test Speaker");
-        cut.Find("[data-testid='editor-created']").Change("2026-03-26");
-        cut.Find("[data-testid='editor-version']").Change("2.0");
+        cut.FindByTestId(UiTestIds.Editor.Profile).Change(EditorMetadataTestSource.ProfileRsvp);
+        cut.FindByTestId(UiTestIds.Editor.BaseWpm).Change(EditorMetadataTestSource.BaseWpm210);
+        cut.FindByTestId(UiTestIds.Editor.Author).Change(AppTestData.Editor.TestSpeaker);
+        cut.FindByTestId(UiTestIds.Editor.Created).Change(AppTestData.Editor.CreatedDate);
+        cut.FindByTestId(UiTestIds.Editor.Version).Change(AppTestData.Editor.Version);
 
         cut.WaitForAssertion(() =>
         {
             var metadata = _harness.Session.State.CompiledScript?.Metadata;
-            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
+            var visibleSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty;
             var persistedText = _harness.Session.State.Text;
 
             Assert.NotNull(metadata);
-            Assert.Equal("RSVP", metadata!["profile"]);
-            Assert.Equal("210", metadata["base_wpm"]);
-            Assert.Equal("Test Speaker", metadata["author"]);
-            Assert.Equal("2026-03-26", metadata["created"]);
-            Assert.Equal("2.0", metadata["version"]);
-            Assert.Contains("210 WPM", cut.Markup);
-            Assert.Contains("TPS v2.0", cut.Markup);
-            Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("version:", visibleSource, StringComparison.Ordinal);
-            Assert.Contains("author: \"Test Speaker\"", persistedText, StringComparison.Ordinal);
-            Assert.Contains("version: \"2.0\"", persistedText, StringComparison.Ordinal);
+            Assert.Equal(EditorMetadataTestSource.ProfileRsvp, metadata!["profile"]);
+            Assert.Equal(EditorMetadataTestSource.BaseWpm210, metadata["base_wpm"]);
+            Assert.Equal(AppTestData.Editor.TestSpeaker, metadata["author"]);
+            Assert.Equal(AppTestData.Editor.CreatedDate, metadata["created"]);
+            Assert.Equal(AppTestData.Editor.Version, metadata["version"]);
+            Assert.Contains(EditorMetadataTestSource.WpmSummary, cut.Markup);
+            Assert.Contains(EditorMetadataTestSource.VersionSummary, cut.Markup);
+            Assert.DoesNotContain(EditorMetadataTestSource.AuthorField, visibleSource, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorMetadataTestSource.VersionField, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(EditorMetadataTestSource.AuthorPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorMetadataTestSource.VersionPersistenceLine, persistedText, StringComparison.Ordinal);
         });
+    }
+
+    private static class EditorMetadataTestSource
+    {
+        public const string AuthorField = "author:";
+        public const string AuthorPersistenceLine = "author: \"Test Speaker\"";
+        public const string BaseWpm210 = "210";
+        public const string ProfileRsvp = "RSVP";
+        public const string VersionField = "version:";
+        public const string VersionPersistenceLine = "version: \"2.0\"";
+        public const string VersionSummary = "TPS v2.0";
+        public const string WpmSummary = "210 WPM";
     }
 }

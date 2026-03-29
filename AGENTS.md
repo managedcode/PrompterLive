@@ -48,6 +48,16 @@ Browser test execution rules:
 
 Do not override the app URL with `--urls` or random ports. Media permissions are origin-bound, so local development must stay on the stable launch-settings origin.
 
+Selector and constant rules:
+
+- UI contracts MUST expose stable `data-testid` hooks for any flow covered by automated tests.
+- Browser and component tests MUST prefer `data-testid` selectors over text, role-name, CSS-class, or DOM-shape selectors.
+- If a stable `data-testid` exists, raw `GetByText`, `GetByRole(... Name = ...)`, `.Locator(".class")`, and `[data-testid='literal']` selectors are forbidden.
+- Routes, route patterns, test ids, DOM ids, storage keys, keyboard shortcuts, seeded values, wait durations, and other repeated test inputs MUST come from named constants.
+- URLs in tests MUST come from shared route helpers or constants, never inline literals.
+- Magic numbers in tests are forbidden. Put timeouts, delays, counts, percentages, and seeded numeric inputs behind named constants.
+- Prefer production-owned UI contract constants in `PrompterLive.Shared.Contracts` over duplicating selector strings in test projects.
+
 ### Project AGENTS Policy
 
 - Multi-project solutions MUST keep one root `AGENTS.md` plus one local `AGENTS.md` in each project or module root.
@@ -198,6 +208,7 @@ Repo-specific design rules:
 - Do not re-invent the UI when the answer should be “port the markup and classes from `new-design`”.
 - Do not introduce a server host for the app runtime.
 - Preserve stable `data-testid` selectors on core flows because the Playwright suite depends on them.
+- Keep UI routes in shared route constants and keep `data-testid` names in shared UI contract constants.
 
 ### Critical
 

@@ -5,7 +5,7 @@
 
 <div id="screen-rsvp"
      class="screen active"
-     data-testid="learn-page"
+     data-testid="@UiTestIds.Learn.Page"
      data-screen-title="@_screenTitle"
      data-screen-subtitle="@_screenSubtitle"
      data-screen-wpm="@($"{_speed} WPM")">
@@ -22,28 +22,28 @@
             </div>
 
             <div class="rsvp-h-row">
-                <div class="rsvp-ctx-left" id="rsvp-ctx-l">
+                <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft">
                     <span>what</span>
                     <span>I</span>
                     <span>believe</span>
                 </div>
 
-                <div class="rsvp-focus" id="rsvp-word">
+                <div class="rsvp-focus" id="@UiDomIds.Learn.Word" data-testid="@UiTestIds.Learn.Word">
                     <span>t</span><span>r</span><span class="orp">a</span><span>n</span><span>s</span><span>f</span><span>o</span><span>r</span><span>m</span><span>a</span><span>t</span><span>i</span><span>v</span><span>e</span>
                 </div>
 
-                <div class="rsvp-ctx-right" id="rsvp-ctx-r">
+                <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight">
                     <span>moment</span>
                     <span>for</span>
                     <span>our</span>
                 </div>
             </div>
 
-            <div class="rsvp-orp-line"></div>
+            <div class="rsvp-orp-line" data-testid="@UiTestIds.Learn.OrpLine"></div>
 
             <div class="rsvp-phrase">
                 <span class="rsvp-phrase-label">Next</span>
-                <p id="rsvp-next-phrase">@_nextPhrase</p>
+                <p id="@UiDomIds.Learn.NextPhrase" data-testid="@UiTestIds.Learn.NextPhrase">@_nextPhrase</p>
             </div>
 
             <div class="rsvp-pause-track">
@@ -53,18 +53,18 @@
 
         <div class="rsvp-bottom">
             <div class="rsvp-speed">
-                <button class="rsvp-btn" onclick="changeRsvpSpeed(-10)" data-testid="learn-speed-down"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-                <div class="rsvp-speed-num"><span id="rsvp-speed">@_speed</span><small>WPM</small></div>
-                <button class="rsvp-btn" onclick="changeRsvpSpeed(10)" data-testid="learn-speed-up"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                <button class="rsvp-btn" onclick="changeRsvpSpeed(-10)" data-testid="@UiTestIds.Learn.SpeedDown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed">@_speed</span><small>WPM</small></div>
+                <button class="rsvp-btn" onclick="changeRsvpSpeed(10)" data-testid="@UiTestIds.Learn.SpeedUp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             </div>
             <div class="rsvp-play-row">
-                <button class="rsvp-btn" onclick="stepRsvpWord(-5)" title="Back 5 words"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
-                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(-1)" title="Back 1 word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                <button class="rsvp-play" id="rsvp-play-btn" onclick="toggleRsvp()" data-testid="learn-play-toggle">
+                <button class="rsvp-btn" onclick="stepRsvpWord(-5)" title="Back 5 words" data-testid="@UiTestIds.Learn.StepBackwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
+                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(-1)" title="Back 1 word" data-testid="@UiTestIds.Learn.StepBackward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                <button class="rsvp-play" id="rsvp-play-btn" onclick="toggleRsvp()" data-testid="@UiTestIds.Learn.PlayToggle">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
                 </button>
-                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(1)" title="Forward 1 word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                <button class="rsvp-btn" onclick="stepRsvpWord(5)" title="Forward 5 words"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
+                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(1)" title="Forward 1 word" data-testid="@UiTestIds.Learn.StepForward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                <button class="rsvp-btn" onclick="stepRsvpWord(5)" title="Forward 5 words" data-testid="@UiTestIds.Learn.StepForwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
             </div>
             <div class="rsvp-pos" id="rsvp-progress-label">@_progressLabel</div>
         </div>

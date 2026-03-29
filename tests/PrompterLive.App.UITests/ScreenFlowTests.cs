@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Microsoft.Playwright;
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -16,39 +16,40 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/library");
-            await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
-            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("library-card-rsvp-tech-demo").Locator(".dcover-meta")).ToContainTextAsync("Actor");
-            await page.GetByTestId("library-search").FillAsync("Quantum");
-            await Expect(page.GetByText("Quantum Computing")).ToBeVisibleAsync();
-            await Expect(page.GetByText("Product Launch")).ToBeHiddenAsync();
-            await page.GetByTestId("library-search").FillAsync(string.Empty);
-            await page.GetByRole(AriaRole.Button, new() { Name = "Date" }).ClickAsync();
-            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Date" })).ToHaveClassAsync(new Regex("active"));
-            var tedTalksFolder = page.Locator(".folder-item").Filter(new() { HasText = "TED Talks" });
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard).Locator(".dcover-meta"))
+                .ToContainTextAsync(BrowserTestConstants.Library.ModeLabel);
+            await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(BrowserTestConstants.Library.SearchQuery);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.QuantumCard)).ToContainTextAsync(BrowserTestConstants.Scripts.QuantumTitle);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToBeHiddenAsync();
+            await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(string.Empty);
+            await page.GetByTestId(UiTestIds.Library.SortDate).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.SortDate)).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            var tedTalksFolder = page.GetByTestId(BrowserTestConstants.Elements.TedTalksFolder);
             await tedTalksFolder.ClickAsync();
-            await Expect(tedTalksFolder).ToHaveClassAsync(new Regex("active"));
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("TED Talks");
+            await Expect(tedTalksFolder).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
+                .ToHaveTextAsync(BrowserTestConstants.Folders.TedTalksName);
 
-            var menuWrap = page.Locator(".dcard-menu-wrap").First;
-            await menuWrap.Locator(".dcard-menu-btn").ClickAsync();
-            await Expect(menuWrap).ToHaveClassAsync(new Regex("open"));
-            await menuWrap.GetByRole(AriaRole.Button, new() { Name = "Duplicate" }).ClickAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
+            await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)).ClickAsync();
+            await page.GetByTestId(UiTestIds.Library.CardDuplicate(BrowserTestConstants.Scripts.LeadershipId)).ClickAsync();
 
-            await page.GetByTestId("library-open-settings").ClickAsync();
-            await page.WaitForURLAsync("**/settings");
-            await Expect(page.GetByTestId("settings-page")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.OpenSettings).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Settings));
+            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
 
-            await page.GotoAsync("/library");
-            await page.GetByRole(AriaRole.Button, new() { Name = "New Script" }).ClickAsync();
-            await page.WaitForURLAsync("**/editor");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await page.GetByTestId(UiTestIds.Header.LibraryNewScript).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Editor));
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
 
-            await page.GotoAsync("/library");
-            await page.GetByTestId("library-create-script").ClickAsync();
-            await page.WaitForURLAsync("**/editor");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await page.GetByTestId(UiTestIds.Library.CreateScript).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Editor));
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
         }
         finally
         {
@@ -63,38 +64,38 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/library");
-            await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
-            await page.GetByTestId("library-folder-create-tile").ClickAsync();
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("library-new-folder-card")).ToBeVisibleAsync();
-            await page.GetByTestId("library-new-folder-cancel").ClickAsync();
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeHiddenAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.FolderCreateTile).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderCard)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.NewFolderCancel).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
 
-            await page.GetByTestId("library-folder-create-start").ClickAsync();
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeVisibleAsync();
-            await page.GetByTestId("library-new-folder-name").FillAsync("Roadshows");
-            await page.GetByTestId("library-new-folder-parent").SelectOptionAsync(new[] { "presentations" });
-            await page.GetByTestId("library-new-folder-submit").ClickAsync();
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeHiddenAsync();
-            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+            await page.GetByTestId(UiTestIds.Library.FolderCreateStart).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.NewFolderName).FillAsync(BrowserTestConstants.Folders.RoadshowsName);
+            await page.GetByTestId(UiTestIds.Library.NewFolderParent).SelectOptionAsync(new[] { BrowserTestConstants.Folders.PresentationsId });
+            await page.GetByTestId(UiTestIds.Library.NewFolderSubmit).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
-            await page.GetByTestId("library-folder-all").ClickAsync();
-            await page.GetByTestId("library-card-menu-rsvp-tech-demo").ClickAsync();
-            await page.GetByTestId("library-move-rsvp-tech-demo-roadshows").ClickAsync();
-            await page.GetByTestId("library-folder-roadshows").ClickAsync();
+            await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
+            await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)).ClickAsync();
+            await page.GetByTestId(UiTestIds.Library.Move(BrowserTestConstants.Scripts.DemoId, BrowserTestConstants.Folders.RoadshowsId)).ClickAsync();
+            await page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder).ClickAsync();
 
-            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
-            await Expect(page.GetByText("Security Incident")).ToBeHiddenAsync();
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
             await page.ReloadAsync();
 
-            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
-            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
-            await Expect(page.GetByText("Security Incident")).ToBeHiddenAsync();
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
         }
         finally
         {
@@ -109,40 +110,41 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("editor-source-highlight")).ToContainTextAsync("## [Intro|140WPM|warm]");
-            await Expect(page.GetByTestId("editor-source-highlight")).ToContainTextAsync("Opening Block");
-            await Expect(page.GetByTestId("editor-source-highlight")).ToContainTextAsync("Purpose Block");
-            await page.Locator(".tb-dropdown-wrap").Nth(0).HoverAsync();
-            await Expect(page.Locator(".tb-dropdown").Nth(0)).ToBeVisibleAsync();
-            await page.Locator(".tb-dropdown-wrap").Nth(1).HoverAsync();
-            await Expect(page.Locator(".tb-dropdown").Nth(1)).ToBeVisibleAsync();
-            await page.GetByTestId("editor-bold").ClickAsync();
-            await page.GetByTestId("editor-ai").ClickAsync();
-            await page.Locator("[data-nav='blk-2-1']").ClickAsync();
-            await Expect(page.Locator("[data-nav='blk-2-1']")).ToHaveClassAsync(new Regex("active"));
-            await Expect(page.Locator("[data-nav='seg-2']")).ToHaveClassAsync(new Regex("active"));
-            await Expect(page.GetByTestId("editor-source-highlight")).ToContainTextAsync("Benefits Block");
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync(BrowserTestConstants.Editor.BodyHeading);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Opening Block");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Purpose Block");
+            await page.GetByTestId(UiTestIds.Editor.FormatTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuFormat)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuColor)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.Bold).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1)).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1))).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(2))).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Benefits Block");
 
-            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Learn" })).ToBeVisibleAsync();
-            await page.GetByRole(AriaRole.Button, new() { Name = "Learn" }).ClickAsync();
-            await page.WaitForURLAsync("**/learn*");
-            await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorLearn)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorLearn).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.LearnDemo));
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            await page.GotoAsync("/learn?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.Locator("#app-header-center")).ToContainTextAsync("Product Launch", new() { Timeout = 15000 });
-            await Expect(page.Locator("#rsvp-next-phrase")).Not.ToHaveTextAsync(string.Empty);
-            await page.GetByTestId("learn-speed-up").ClickAsync();
-            await Expect(page.Locator("#rsvp-speed")).ToHaveTextAsync("310");
-            await page.GetByTitle("Back 1 word").ClickAsync();
-            await page.GetByTitle("Forward 1 word").ClickAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Header.Center))
+                .ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle, new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase)).Not.ToHaveTextAsync(string.Empty);
+            await page.GetByTestId(UiTestIds.Learn.SpeedUp).ClickAsync();
+            await Expect(page.Locator($"#{UiDomIds.Learn.Speed}")).ToHaveTextAsync("310");
+            await page.GetByTestId(UiTestIds.Learn.StepBackward).ClickAsync();
+            await page.GetByTestId(UiTestIds.Learn.StepForward).ClickAsync();
 
-            await page.GetByTestId("learn-play-toggle").ClickAsync();
-            await Expect(page.GetByTestId("learn-play-toggle")).ToBeVisibleAsync();
-            await Expect(page.Locator("#rsvp-next-phrase")).Not.ToHaveTextAsync(string.Empty);
+            await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Learn.PlayToggle)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase)).Not.ToHaveTextAsync(string.Empty);
         }
         finally
         {
@@ -157,121 +159,123 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.Locator(".rd-edge-section")).ToContainTextAsync("Opening Block");
-            await Expect(page.Locator(".rd-card-active .rd-cluster-text")).ToContainTextAsync("Good morning everyone");
-            await Expect(page.Locator(".rd-card-active .rd-cluster-text")).Not.ToContainTextAsync("Goodmorningeveryone");
-            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-autostart", new Regex("true|false"));
-            await Expect(page.Locator("#rd-camera-overlay-1")).ToHaveCountAsync(0);
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.EdgeSection)).ToContainTextAsync("Opening Block");
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardText(0))).ToContainTextAsync("Good morning everyone");
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardText(0))).Not.ToContainTextAsync("Goodmorningeveryone");
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-autostart", BrowserTestConstants.Regexes.CameraAutoStart);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.CameraOverlay(1)}")).ToHaveCountAsync(0);
 
-            await page.GetByTestId("teleprompter-font-up").ClickAsync();
-            await Expect(page.Locator("#rd-font-label")).ToHaveTextAsync("40");
+            await page.GetByTestId(UiTestIds.Teleprompter.FontUp).ClickAsync();
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync("40");
 
-            await page.GetByTestId("teleprompter-camera-toggle").ClickAsync();
-            await Expect(page.GetByTestId("teleprompter-camera-toggle")).ToHaveClassAsync(new Regex("active"));
+            await page.GetByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
 
-            await page.GetByTestId("teleprompter-width-slider").EvaluateAsync("element => { element.value = '900'; element.dispatchEvent(new Event('input', { bubbles: true })); }");
-            await Expect(page.Locator("#rd-width-val")).ToHaveTextAsync("900");
+            await page.GetByTestId(UiTestIds.Teleprompter.WidthSlider).EvaluateAsync("element => { element.value = '900'; element.dispatchEvent(new Event('input', { bubbles: true })); }");
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync("900");
 
-            await page.GetByTestId("teleprompter-play-toggle").ClickAsync();
-            await Expect(page.Locator("#tp-play-btn")).ToBeVisibleAsync();
-            await page.WaitForTimeoutAsync(2500);
-            await Expect(page.Locator(".rd-time")).Not.ToHaveTextAsync(new Regex(@"^0:00 /"));
-            await Expect(page.Locator("#rd-progress-fill")).Not.ToHaveAttributeAsync("style", new Regex(@"width:\s*0%"));
-            await page.GetByTitle("Previous block").ClickAsync();
-            await page.GetByTitle("Next block").ClickAsync();
-            await page.GetByTitle("Back one word").ClickAsync();
-            await page.GetByTitle("Forward one word").ClickAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.PlayToggle).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.PlayToggle)).ToBeVisibleAsync();
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderPlaybackDelayMs);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Time}")).Not.ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderTimeNotZero);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.ProgressFill}")).Not.ToHaveAttributeAsync("style", BrowserTestConstants.Regexes.NonZeroWidth);
+            await page.GetByTestId(UiTestIds.Teleprompter.PreviousBlock).ClickAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.PreviousWord).ClickAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
 
-            await page.GotoAsync("/settings");
-            await page.GetByTestId("settings-nav-cloud").ClickAsync();
-            await Expect(page.Locator("#set-cloud")).ToBeVisibleAsync();
-            await page.GetByTestId("settings-nav-files").ClickAsync();
-            await Expect(page.Locator("#set-files")).ToBeVisibleAsync();
-            await page.Locator("#set-files .set-toggle").First.ClickAsync();
-            await Expect(page.Locator("#set-files .set-toggle").First).Not.ToHaveClassAsync(new Regex("\\bon\\b"));
+            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await page.GetByTestId(UiTestIds.Settings.NavCloud).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CloudPanel)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.NavFiles).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.FilesPanel)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.FileAutoSave).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave)).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
 
-            await page.GetByTestId("settings-nav-cameras").ClickAsync();
-            await Expect(page.Locator("#set-cameras")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-request-media")).ToBeVisibleAsync();
-            await page.GetByTestId("settings-request-media").ClickAsync();
-            await Expect(page.GetByTestId("settings-default-camera")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-camera-resolution")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-camera-mirror-toggle")).ToBeVisibleAsync();
-            await Expect(page.Locator("[data-testid^='settings-camera-device-']").First).ToBeVisibleAsync();
-            await Expect(page.Locator("[data-testid^='settings-scene-camera-']").First).ToBeVisibleAsync();
-            await page.GetByTestId("settings-camera-resolution").SelectOptionAsync(new[] { "Hd720" });
-            await Expect(page.GetByTestId("settings-camera-resolution")).ToHaveValueAsync("Hd720");
-            var mirrorToggle = page.GetByTestId("settings-camera-mirror-toggle");
+            await page.GetByTestId(UiTestIds.Settings.NavCameras).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CamerasPanel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.RequestMedia)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.RequestMedia).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.DefaultCamera)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CameraResolution)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CameraMirrorToggle)).ToBeVisibleAsync();
+            await Expect(page.Locator($"[data-testid^='{UiTestIds.Settings.CameraDevice(string.Empty)}']").First).ToBeVisibleAsync();
+            await Expect(page.Locator($"[data-testid^='{UiTestIds.Settings.SceneCamera(string.Empty)}']").First).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.CameraResolution).SelectOptionAsync(new[] { BrowserTestConstants.Streaming.ResolutionHd720 });
+            await Expect(page.GetByTestId(UiTestIds.Settings.CameraResolution)).ToHaveValueAsync(BrowserTestConstants.Streaming.ResolutionHd720);
+            var mirrorToggle = page.GetByTestId(UiTestIds.Settings.CameraMirrorToggle);
             var mirrorWasOn = ((await mirrorToggle.GetAttributeAsync("class")) ?? string.Empty).Contains("on", StringComparison.Ordinal);
             await mirrorToggle.ClickAsync();
             if (mirrorWasOn)
             {
-                await Expect(mirrorToggle).Not.ToHaveClassAsync(new Regex(@"\bon\b"));
+                await Expect(mirrorToggle).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             }
             else
             {
-                await Expect(mirrorToggle).ToHaveClassAsync(new Regex(@"\bon\b"));
+                await Expect(mirrorToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             }
-            await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Mirror" }).ClickAsync();
-            await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Flip Vertical" }).ClickAsync();
-            var readerCameraToggle = page.GetByTestId("settings-reader-camera-toggle");
+            await page.Locator($"[data-testid^='{UiTestIds.Settings.SceneCamera(string.Empty)}']").First
+                .Locator($"[data-testid^='{UiTestIds.Settings.SceneMirror(string.Empty)}']").ClickAsync();
+            await page.Locator($"[data-testid^='{UiTestIds.Settings.SceneCamera(string.Empty)}']").First
+                .Locator($"[data-testid^='{UiTestIds.Settings.SceneFlip(string.Empty)}']").ClickAsync();
+            var readerCameraToggle = page.GetByTestId(UiTestIds.Settings.ReaderCameraToggle);
             var cameraToggleWasOn = ((await readerCameraToggle.GetAttributeAsync("class")) ?? string.Empty).Contains("on", StringComparison.Ordinal);
             await readerCameraToggle.ClickAsync();
             if (cameraToggleWasOn)
             {
-                await Expect(readerCameraToggle).Not.ToHaveClassAsync(new Regex(@"\bon\b"));
+                await Expect(readerCameraToggle).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             }
             else
             {
-                await Expect(readerCameraToggle).ToHaveClassAsync(new Regex(@"\bon\b"));
+                await Expect(readerCameraToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             }
 
-            await page.GetByTestId("settings-nav-mics").ClickAsync();
-            await Expect(page.Locator("#set-mics")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-primary-mic")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-mic-level")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-noise-suppression")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-echo-cancellation")).ToBeVisibleAsync();
-            await page.GetByTestId("settings-mic-level").EvaluateAsync("element => { element.value = '82'; element.dispatchEvent(new Event('input', { bubbles: true })); }");
-            await Expect(page.GetByTestId("settings-mic-level-value")).ToHaveTextAsync("82%");
-            await page.GetByTestId("settings-noise-suppression").ClickAsync();
+            await page.GetByTestId(UiTestIds.Settings.NavMics).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicsPanel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.PrimaryMic)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicLevel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.NoiseSuppression)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.EchoCancellation)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.MicLevel).EvaluateAsync("element => { element.value = '82'; element.dispatchEvent(new Event('input', { bubbles: true })); }");
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicLevelValue)).ToHaveTextAsync("82%");
+            await page.GetByTestId(UiTestIds.Settings.NoiseSuppression).ClickAsync();
 
-            await page.GetByTestId("settings-nav-streaming").ClickAsync();
-            await Expect(page.Locator("#set-streaming")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-output-mode")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-output-resolution")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("settings-bitrate")).ToBeVisibleAsync();
-            await page.GetByTestId("settings-output-mode").SelectOptionAsync(new[] { "DirectRtmp" });
-            await page.GetByTestId("settings-bitrate").FillAsync("7200");
-            await page.GetByTestId("settings-rtmp-url").FillAsync("rtmp://live.example.com/stream");
-            await page.GetByTestId("settings-stream-key").FillAsync("sk-live-key");
-            await Expect(page.GetByTestId("settings-output-mode")).ToHaveValueAsync("DirectRtmp");
-            await Expect(page.GetByTestId("settings-bitrate")).ToHaveValueAsync("7200");
-            await Expect(page.GetByTestId("settings-rtmp-url")).ToHaveValueAsync("rtmp://live.example.com/stream");
+            await page.GetByTestId(UiTestIds.Settings.NavStreaming).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.StreamingPanel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.OutputMode)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.OutputResolution)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.Bitrate)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.OutputMode).SelectOptionAsync(new[] { BrowserTestConstants.Streaming.OutputModeDirectRtmp });
+            await page.GetByTestId(UiTestIds.Settings.Bitrate).FillAsync(BrowserTestConstants.Streaming.BitrateKbps);
+            await page.GetByTestId(UiTestIds.Settings.RtmpUrl).FillAsync(BrowserTestConstants.Streaming.RtmpUrl);
+            await page.GetByTestId(UiTestIds.Settings.StreamKey).FillAsync(BrowserTestConstants.Streaming.StreamKey);
+            await Expect(page.GetByTestId(UiTestIds.Settings.OutputMode)).ToHaveValueAsync(BrowserTestConstants.Streaming.OutputModeDirectRtmp);
+            await Expect(page.GetByTestId(UiTestIds.Settings.Bitrate)).ToHaveValueAsync(BrowserTestConstants.Streaming.BitrateKbps);
+            await Expect(page.GetByTestId(UiTestIds.Settings.RtmpUrl)).ToHaveValueAsync(BrowserTestConstants.Streaming.RtmpUrl);
 
-            await page.GetByTestId("settings-nav-ai").ClickAsync();
-            await Expect(page.Locator("#set-ai")).ToBeVisibleAsync();
-            var openAiProvider = page.Locator(".set-ai-provider").Filter(new() { HasText = "GPT-4o, o1" });
+            await page.GetByTestId(UiTestIds.Settings.NavAi).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.AiPanel)).ToBeVisibleAsync();
+            var openAiProvider = page.GetByTestId(UiTestIds.Settings.AiProvider("openai"));
             await openAiProvider.ClickAsync();
-            await Expect(openAiProvider).ToHaveClassAsync(new Regex("active"));
-            await Expect(page.GetByTestId("settings-test-connection")).ToBeVisibleAsync();
+            await Expect(openAiProvider).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Settings.TestConnection)).ToBeVisibleAsync();
 
-            await page.GetByTestId("settings-nav-appearance").ClickAsync();
-            await Expect(page.GetByTestId("settings-appearance-panel")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();
 
-            await page.GetByTestId("settings-nav-about").ClickAsync();
-            await Expect(page.GetByTestId("settings-about-panel")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Settings.NavAbout).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.AboutPanel)).ToBeVisibleAsync();
 
-            await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
-            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync(
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync(
                 "data-camera-autostart",
                 cameraToggleWasOn ? new Regex("false") : new Regex("true"));
             if (!cameraToggleWasOn)
             {
-                await page.WaitForTimeoutAsync(750);
-                var hasVideoTrack = await page.Locator("#rd-camera").EvaluateAsync<bool>(
+                await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderCameraInitDelayMs);
+                var hasVideoTrack = await page.Locator($"#{UiDomIds.Teleprompter.Camera}").EvaluateAsync<bool>(
                     "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0");
                 Assert.True(hasVideoTrack);
             }
@@ -289,7 +293,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/library");
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
             var cameraDeviceId = await page.EvaluateAsync<string>(
                 """
                 async () => {
@@ -392,12 +396,12 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
                 """,
                 new { cameraDeviceId });
 
-            await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.Locator(".rd-camera")).ToHaveCountAsync(1);
-            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-role", "primary");
-            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-device-id", cameraDeviceId);
-            await Expect(page.Locator("#rd-camera-overlay-1")).ToHaveCountAsync(0);
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveCountAsync(1);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-role", "primary");
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-device-id", cameraDeviceId);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.CameraOverlay(1)}")).ToHaveCountAsync(0);
         }
         finally
         {

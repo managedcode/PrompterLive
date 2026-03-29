@@ -15,42 +15,42 @@
 @inject IScriptSessionService SessionService
 @inject IEnumerable<IStreamingOutputProvider> StreamingProviders
 
-<div id="screen-settings" class="screen active" data-testid="settings-page">
+<div id="screen-settings" class="screen active" data-testid="@UiTestIds.Settings.Page">
     <div class="set-layout">
         <div class="set-sidebar">
             <div class="set-back-row">
                 <h2 class="set-title">Settings</h2>
             </div>
             <nav class="set-nav">
-                <a class="set-nav-item active" onclick="showSetSection('cloud', event)" data-testid="settings-nav-cloud">
+                <a class="set-nav-item active" onclick="showSetSection('cloud', event)" data-testid="@UiTestIds.Settings.NavCloud">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
                     Cloud Sync
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('files', event)" data-testid="settings-nav-files">
+                <a class="set-nav-item" onclick="showSetSection('files', event)" data-testid="@UiTestIds.Settings.NavFiles">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     File Storage
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('cameras', event)" data-testid="settings-nav-cameras">
+                <a class="set-nav-item" onclick="showSetSection('cameras', event)" data-testid="@UiTestIds.Settings.NavCameras">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
                     Cameras
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('mics', event)" data-testid="settings-nav-mics">
+                <a class="set-nav-item" onclick="showSetSection('mics', event)" data-testid="@UiTestIds.Settings.NavMics">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
                     Microphones
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('streaming', event)" data-testid="settings-nav-streaming">
+                <a class="set-nav-item" onclick="showSetSection('streaming', event)" data-testid="@UiTestIds.Settings.NavStreaming">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" /><line x1="2" y1="20" x2="2.01" y2="20" /></svg>
                     Streaming
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('ai', event)" data-testid="settings-nav-ai">
+                <a class="set-nav-item" onclick="showSetSection('ai', event)" data-testid="@UiTestIds.Settings.NavAi">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
                     AI Provider
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('appearance', event)" data-testid="settings-nav-appearance">
+                <a class="set-nav-item" onclick="showSetSection('appearance', event)" data-testid="@UiTestIds.Settings.NavAppearance">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
                     Appearance
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('about', event)" data-testid="settings-nav-about">
+                <a class="set-nav-item" onclick="showSetSection('about', event)" data-testid="@UiTestIds.Settings.NavAbout">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                     About
                 </a>
@@ -58,7 +58,7 @@
         </div>
 
         <div class="set-main">
-            <section class="set-section set-panel" id="set-cloud">
+            <section class="set-section set-panel" id="set-cloud" data-testid="@UiTestIds.Settings.CloudPanel">
                 <h3 class="set-section-title">Cloud Storage</h3>
                 <p class="set-section-desc">Connect cloud accounts to sync your scripts across devices.</p>
 
@@ -98,7 +98,7 @@
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-files" style="display:none">
+            <section class="set-section set-panel" id="set-files" style="display:none" data-testid="@UiTestIds.Settings.FilesPanel">
                 <h3 class="set-section-title">File Storage</h3>
                 <p class="set-section-desc">Where scripts, recordings, and exports are saved locally.</p>
 
@@ -128,16 +128,16 @@
                     </div>
                     <div class="set-field set-field-toggle">
                         <label>Auto-save every 30 seconds</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        <div class="set-toggle on" data-testid="@UiTestIds.Settings.FileAutoSave"><div class="set-toggle-thumb"></div></div>
                     </div>
                     <div class="set-field set-field-toggle">
                         <label>Keep backup copies</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                        <div class="set-toggle on" data-testid="@UiTestIds.Settings.FileBackupCopies"><div class="set-toggle-thumb"></div></div>
                     </div>
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-cameras" style="display:none">
+            <section class="set-section set-panel" id="set-cameras" style="display:none" data-testid="@UiTestIds.Settings.CamerasPanel">
                 <h3 class="set-section-title">Cameras</h3>
                 <p class="set-section-desc">Configure cameras for teleprompter overlay and recording.</p>
 
@@ -147,7 +147,7 @@
                         <select class="set-select"
                                 value="@SelectedCameraId"
                                 @onchange="OnDefaultCameraChanged"
-                                data-testid="settings-default-camera">
+                                data-testid="@UiTestIds.Settings.DefaultCamera">
                             <option value="">No camera selected</option>
                             @foreach (var camera in _cameraDevices)
                             {
@@ -160,7 +160,7 @@
                         <select class="set-select"
                                 value="@_studioSettings.Camera.Resolution"
                                 @onchange="OnCameraResolutionChanged"
-                                data-testid="settings-camera-resolution">
+                                data-testid="@UiTestIds.Settings.CameraResolution">
                             <option value="@CameraResolutionPreset.FullHd1080">1920 x 1080 (Full HD)</option>
                             <option value="@CameraResolutionPreset.Hd720">1280 x 720 (HD)</option>
                             <option value="@CameraResolutionPreset.UltraHd4K">3840 x 2160 (4K)</option>
@@ -171,7 +171,7 @@
                         <label>Mirror Camera (Flip Horizontal)</label>
                         <div class="set-toggle @(_studioSettings.Camera.MirrorCamera ? "on" : null)"
                              @onclick="ToggleDefaultCameraMirrorAsync"
-                             data-testid="settings-camera-mirror-toggle">
+                             data-testid="@UiTestIds.Settings.CameraMirrorToggle">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
                         <label>Auto-start Camera on Read</label>
                         <div class="set-toggle @(SessionService.State.ReaderSettings.ShowCameraScene ? "on" : null)"
                              @onclick="ToggleReaderCameraSceneAsync"
-                             data-testid="settings-reader-camera-toggle">
+                             data-testid="@UiTestIds.Settings.ReaderCameraToggle">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
                         <strong>@(_permissions.CameraGranted ? "Camera access is ready" : "Camera access is required")</strong>
                         <span>Teleprompter background video and multi-camera scene selection run directly in the browser.</span>
                     </div>
-                    <button class="set-btn-golden" @onclick="RequestMediaAccessAsync" data-testid="settings-request-media">
+                    <button class="set-btn-golden" @onclick="RequestMediaAccessAsync" data-testid="@UiTestIds.Settings.RequestMedia">
                         @(_permissions.CameraGranted && _permissions.MicrophoneGranted ? "Refresh Devices" : "Enable Camera + Mic")
                     </button>
                 </div>
@@ -199,7 +199,7 @@
                     <h4 class="set-sub-title">Scene Cameras</h4>
                     @if (_sceneCameras.Count == 0)
                     {
-                        <div class="set-empty-card" data-testid="settings-no-cameras">
+                        <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoCameras">
                             Add at least one camera to drive the teleprompter background and stream scene.
                         </div>
                     }
@@ -209,7 +209,7 @@
                             @foreach (var source in _sceneCameras)
                             {
                                 var inOutput = source.Transform.IncludeInOutput;
-                                <article class="set-scene-card" data-testid="settings-scene-camera-@source.SourceId">
+                                <article class="set-scene-card" data-testid="@UiTestIds.Settings.SceneCamera(source.SourceId)">
                                     <div class="set-scene-head">
                                         <div>
                                             <span class="set-account-name">@source.Label</span>
@@ -218,8 +218,12 @@
                                         <button class="set-btn-outline" @onclick="() => RemoveSceneCameraAsync(source.SourceId)">Remove</button>
                                     </div>
                                     <div class="set-chip-row">
-                                        <button class="set-chip-btn @(source.Transform.MirrorHorizontal ? "active" : null)" @onclick="() => ToggleSceneMirrorAsync(source.SourceId)">Mirror</button>
-                                        <button class="set-chip-btn @(source.Transform.MirrorVertical ? "active" : null)" @onclick="() => ToggleSceneFlipAsync(source.SourceId)">Flip Vertical</button>
+                                        <button class="set-chip-btn @(source.Transform.MirrorHorizontal ? "active" : null)"
+                                                @onclick="() => ToggleSceneMirrorAsync(source.SourceId)"
+                                                data-testid="@UiTestIds.Settings.SceneMirror(source.SourceId)">Mirror</button>
+                                        <button class="set-chip-btn @(source.Transform.MirrorVertical ? "active" : null)"
+                                                @onclick="() => ToggleSceneFlipAsync(source.SourceId)"
+                                                data-testid="@UiTestIds.Settings.SceneFlip(source.SourceId)">Flip Vertical</button>
                                         <button class="set-chip-btn @(inOutput ? "active" : null)" @onclick="() => ToggleSceneOutputAsync(source.SourceId)">Include In Output</button>
                                     </div>
                                 </article>
@@ -240,7 +244,7 @@
                             @foreach (var camera in _cameraDevices)
                             {
                                 var alreadyAdded = _sceneCameras.Any(source => string.Equals(source.DeviceId, camera.DeviceId, StringComparison.Ordinal));
-                                <article class="set-device-card" data-testid="settings-camera-device-@camera.DeviceId">
+                                <article class="set-device-card" data-testid="@UiTestIds.Settings.CameraDevice(camera.DeviceId)">
                                     <div>
                                         <span class="set-account-name">@camera.Label</span>
                                         <span class="set-account-status @(camera.IsDefault ? "set-connected" : "set-disconnected")">@(camera.IsDefault ? "Browser default camera" : "Available camera")</span>
@@ -256,7 +260,7 @@
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-mics" style="display:none">
+            <section class="set-section set-panel" id="set-mics" style="display:none" data-testid="@UiTestIds.Settings.MicsPanel">
                 <h3 class="set-section-title">Microphones</h3>
                 <p class="set-section-desc">Audio input for recording and streaming.</p>
 
@@ -266,7 +270,7 @@
                         <select class="set-select"
                                 value="@SelectedMicrophoneId"
                                 @onchange="OnPrimaryMicrophoneChanged"
-                                data-testid="settings-primary-mic">
+                                data-testid="@UiTestIds.Settings.PrimaryMic">
                             <option value="">No microphone selected</option>
                             @foreach (var microphone in _microphoneDevices)
                             {
@@ -276,7 +280,7 @@
                     </div>
                     <div class="set-field">
                         <label>Input Level</label>
-                        <div class="set-level-bar" data-testid="settings-mic-level-shell">
+                        <div class="set-level-bar">
                             <div class="set-level-fill" style="width:@($"{_studioSettings.Microphone.InputLevelPercent}%")"></div>
                             <div class="set-level-thumb" style="left:@($"{_studioSettings.Microphone.InputLevelPercent}%")"></div>
                             <input type="range"
@@ -286,15 +290,15 @@
                                    step="1"
                                    value="@_studioSettings.Microphone.InputLevelPercent"
                                    @oninput="UpdatePrimaryMicLevelAsync"
-                                   data-testid="settings-mic-level" />
+                                   data-testid="@UiTestIds.Settings.MicLevel" />
                         </div>
-                        <span class="set-inline-value" data-testid="settings-mic-level-value">@($"{_studioSettings.Microphone.InputLevelPercent}%")</span>
+                        <span class="set-inline-value" data-testid="@UiTestIds.Settings.MicLevelValue">@($"{_studioSettings.Microphone.InputLevelPercent}%")</span>
                     </div>
                     <div class="set-field set-field-toggle">
                         <label>Noise Suppression</label>
                         <div class="set-toggle @(_studioSettings.Microphone.NoiseSuppression ? "on" : null)"
                              @onclick="ToggleNoiseSuppressionAsync"
-                             data-testid="settings-noise-suppression">
+                             data-testid="@UiTestIds.Settings.NoiseSuppression">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -302,7 +306,7 @@
                         <label>Echo Cancellation</label>
                         <div class="set-toggle @(_studioSettings.Microphone.EchoCancellation ? "on" : null)"
                              @onclick="ToggleEchoCancellationAsync"
-                             data-testid="settings-echo-cancellation">
+                             data-testid="@UiTestIds.Settings.EchoCancellation">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -312,7 +316,7 @@
                     <h4 class="set-sub-title">Audio Sync + Routing</h4>
                     @if (_microphoneDevices.Count == 0)
                     {
-                        <div class="set-empty-card" data-testid="settings-no-mics">
+                        <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoMics">
                             No microphones are currently visible to the browser.
                         </div>
                     }
@@ -322,7 +326,7 @@
                             @foreach (var microphone in _microphoneDevices)
                             {
                                 var inputState = GetAudioInput(microphone);
-                                <article class="set-scene-card" data-testid="settings-mic-device-@microphone.DeviceId">
+                                <article class="set-scene-card" data-testid="@UiTestIds.Settings.MicDevice(microphone.DeviceId)">
                                     <div class="set-scene-head">
                                         <div>
                                             <span class="set-account-name">@microphone.Label</span>
@@ -345,7 +349,7 @@
                                                    step="20"
                                                    value="@inputState.DelayMs"
                                                    @oninput="args => UpdateAudioDelayAsync(microphone, args)"
-                                                   data-testid="settings-mic-delay-@microphone.DeviceId" />
+                                                   data-testid="@UiTestIds.Settings.MicDelay(microphone.DeviceId)" />
                                             <span class="set-inline-value">@inputState.DelayMs ms</span>
                                         </div>
                                         <div class="set-field">
@@ -376,7 +380,7 @@
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-streaming" style="display:none">
+            <section class="set-section set-panel" id="set-streaming" style="display:none" data-testid="@UiTestIds.Settings.StreamingPanel">
                 <h3 class="set-section-title">Streaming</h3>
                 <p class="set-section-desc">Configure output for live streaming and recording.</p>
 
@@ -386,7 +390,7 @@
                         <select class="set-select"
                                 value="@_studioSettings.Streaming.OutputMode"
                                 @onchange="OnOutputModeChanged"
-                                data-testid="settings-output-mode">
+                                data-testid="@UiTestIds.Settings.OutputMode">
                             <option value="@StreamingOutputMode.VirtualCamera">Virtual Camera (OBS/Zoom)</option>
                             <option value="@StreamingOutputMode.NdiOutput">NDI Output</option>
                             <option value="@StreamingOutputMode.DirectRtmp">Direct RTMP</option>
@@ -398,7 +402,7 @@
                         <select class="set-select"
                                 value="@_studioSettings.Streaming.OutputResolution"
                                 @onchange="OnOutputResolutionChanged"
-                                data-testid="settings-output-resolution">
+                                data-testid="@UiTestIds.Settings.OutputResolution">
                             <option value="@StreamingResolutionPreset.FullHd1080p30">1920 x 1080 @@ 30fps</option>
                             <option value="@StreamingResolutionPreset.FullHd1080p60">1920 x 1080 @@ 60fps</option>
                             <option value="@StreamingResolutionPreset.Hd720p30">1280 x 720 @@ 30fps</option>
@@ -411,13 +415,13 @@
                                class="set-input"
                                value="@_studioSettings.Streaming.BitrateKbps"
                                @oninput="UpdateStreamingBitrateAsync"
-                               data-testid="settings-bitrate" />
+                               data-testid="@UiTestIds.Settings.Bitrate" />
                     </div>
                     <div class="set-field set-field-toggle">
                         <label>Show Text Overlay on Stream</label>
                         <div class="set-toggle @(_studioSettings.Streaming.ShowTextOverlay ? "on" : null)"
                              @onclick="ToggleStreamTextOverlayAsync"
-                             data-testid="settings-stream-text-overlay">
+                             data-testid="@UiTestIds.Settings.StreamTextOverlay">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -425,7 +429,7 @@
                         <label>Include Camera in Output</label>
                         <div class="set-toggle @(_studioSettings.Streaming.IncludeCameraInOutput ? "on" : null)"
                              @onclick="ToggleStreamIncludeCameraAsync"
-                             data-testid="settings-stream-include-camera">
+                             data-testid="@UiTestIds.Settings.StreamIncludeCamera">
                             <div class="set-toggle-thumb"></div>
                         </div>
                     </div>
@@ -436,7 +440,7 @@
                                placeholder="rtmp://live.example.com/stream"
                                value="@_studioSettings.Streaming.RtmpUrl"
                                @oninput="UpdateRtmpUrlAsync"
-                               data-testid="settings-rtmp-url" />
+                               data-testid="@UiTestIds.Settings.RtmpUrl" />
                     </div>
                     <div class="set-field">
                         <label>Stream Key</label>
@@ -444,7 +448,7 @@
                                class="set-input"
                                value="@_studioSettings.Streaming.StreamKey"
                                @oninput="UpdateStreamKeyAsync"
-                               data-testid="settings-stream-key" />
+                               data-testid="@UiTestIds.Settings.StreamKey" />
                     </div>
                 </div>
 
@@ -453,7 +457,7 @@
                     <div class="set-device-list">
                         @foreach (var descriptor in _streamingDescriptors)
                         {
-                            <article class="set-device-card" data-testid="settings-stream-provider-@descriptor.ProviderId">
+                            <article class="set-device-card" data-testid="@UiTestIds.Settings.StreamProvider(descriptor.ProviderId)">
                                 <div>
                                     <span class="set-account-name">@descriptor.DisplayName</span>
                                     <span class="set-account-status @(descriptor.IsReady ? "set-connected" : "set-disconnected")">@descriptor.Summary</span>
@@ -465,14 +469,14 @@
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-ai" style="display:none">
+            <section class="set-section set-panel" id="set-ai" style="display:none" data-testid="@UiTestIds.Settings.AiPanel">
                 <h3 class="set-section-title">AI Provider</h3>
                 <p class="set-section-desc">Connect an AI provider to enable rewriting, expanding, and formatting scripts with AI assistance.</p>
 
                 <div class="set-subsection">
                     <h4 class="set-sub-title">Provider</h4>
                     <div class="set-ai-providers">
-                        <label class="set-ai-provider active">
+                        <label class="set-ai-provider active" data-testid="@UiTestIds.Settings.AiProvider("claude-api")">
                             <input type="radio" name="ai-provider" checked />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(196,160,96,.12); color:#E8D5B0;">
@@ -484,7 +488,7 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="set-ai-provider">
+                        <label class="set-ai-provider" data-testid="@UiTestIds.Settings.AiProvider("openai")">
                             <input type="radio" name="ai-provider" />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(16,163,127,.12); color:#34D399;">
@@ -496,7 +500,7 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="set-ai-provider">
+                        <label class="set-ai-provider" data-testid="@UiTestIds.Settings.AiProvider("ollama")">
                             <input type="radio" name="ai-provider" />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(99,102,241,.12); color:#818CF8;">
@@ -508,7 +512,7 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="set-ai-provider">
+                        <label class="set-ai-provider" data-testid="@UiTestIds.Settings.AiProvider("claude-code")">
                             <input type="radio" name="ai-provider" />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(236,72,153,.12); color:#F472B6;">
@@ -520,7 +524,7 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="set-ai-provider">
+                        <label class="set-ai-provider" data-testid="@UiTestIds.Settings.AiProvider("copilot")">
                             <input type="radio" name="ai-provider" />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(59,130,246,.12); color:#60A5FA;">
@@ -532,7 +536,7 @@
                                 </div>
                             </div>
                         </label>
-                        <label class="set-ai-provider">
+                        <label class="set-ai-provider" data-testid="@UiTestIds.Settings.AiProvider("codex")">
                             <input type="radio" name="ai-provider" />
                             <div class="set-ai-provider-inner">
                                 <div class="set-ai-logo" style="background:rgba(234,179,8,.12); color:#FBBF24;">
@@ -567,11 +571,11 @@
                             <input type="text" class="set-input" placeholder="https://api.anthropic.com" />
                         </div>
                     </div>
-                    <button class="set-btn-golden" style="margin-top:16px" data-testid="settings-test-connection">Test Connection</button>
+                    <button class="set-btn-golden" style="margin-top:16px" data-testid="@UiTestIds.Settings.TestConnection">Test Connection</button>
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-appearance" style="display:none" data-testid="settings-appearance-panel">
+            <section class="set-section set-panel" id="set-appearance" style="display:none" data-testid="@UiTestIds.Settings.AppearancePanel">
                 <h3 class="set-section-title">Appearance</h3>
                 <p class="set-section-desc">Tune the reading environment and chrome for the standalone WebAssembly experience.</p>
 
@@ -604,7 +608,7 @@
                 </div>
             </section>
 
-            <section class="set-section set-panel" id="set-about" style="display:none" data-testid="settings-about-panel">
+            <section class="set-section set-panel" id="set-about" style="display:none" data-testid="@UiTestIds.Settings.AboutPanel">
                 <h3 class="set-section-title">About</h3>
                 <p class="set-section-desc">Current runtime information for the standalone Prompter.live build.</p>
 

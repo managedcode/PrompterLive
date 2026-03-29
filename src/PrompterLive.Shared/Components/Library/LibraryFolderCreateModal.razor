@@ -1,12 +1,12 @@
 <div class="lib-modal-backdrop"
      @onclick="HandleCancelCreateFolderAsync"
-     data-testid="library-new-folder-overlay">
+     data-testid="@UiTestIds.Library.NewFolderOverlay">
     <section class="lib-modal-card lib-folder-modal"
              role="dialog"
              aria-modal="true"
              aria-labelledby="library-folder-modal-title"
              @onclick:stopPropagation="true"
-             data-testid="library-new-folder-card">
+             data-testid="@UiTestIds.Library.NewFolderCard">
         <div class="lib-folder-modal-header">
             <div class="dcreate-icon lib-folder-modal-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -29,14 +29,14 @@
                        @oninput="HandleFolderNameInput"
                        placeholder="Roadshows"
                        autofocus
-                       data-testid="library-new-folder-name" />
+                       data-testid="@UiTestIds.Library.NewFolderName" />
             </label>
             <label class="folder-form-label">
                 <span>Parent</span>
                 <select class="folder-form-select"
                         value="@FolderDraftParentId"
                         @onchange="HandleFolderParentChange"
-                        data-testid="library-new-folder-parent">
+                        data-testid="@UiTestIds.Library.NewFolderParent">
                     <option value="@LibrarySelectionKeys.Root">Top Level</option>
                     @foreach (var folder in FolderOptions)
                     {
@@ -50,11 +50,11 @@
             <button class="dcard-act"
                     type="button"
                     @onclick="HandleCancelCreateFolderAsync"
-                    data-testid="library-new-folder-cancel">Cancel</button>
+                    data-testid="@UiTestIds.Library.NewFolderCancel">Cancel</button>
             <button class="dcard-act dcard-act-go"
                     type="button"
                     @onclick="HandleSubmitCreateFolderAsync"
-                    data-testid="library-new-folder-submit">Create</button>
+                    data-testid="@UiTestIds.Library.NewFolderSubmit">Create</button>
         </div>
     </section>
 </div>

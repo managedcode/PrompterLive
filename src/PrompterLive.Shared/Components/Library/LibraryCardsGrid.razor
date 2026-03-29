@@ -2,12 +2,12 @@
     @foreach (var card in Cards)
     {
         <article class="dcard"
-                 style="--emo:@card.AccentColor"
+                style="--emo:@card.AccentColor"
                  @onclick="() => OnOpenScript.InvokeAsync(card.Id)"
                  data-testid="@card.TestId">
             <div class="dcard-menu-wrap">
                 <button class="dcard-menu-btn"
-                        data-testid="library-card-menu-@card.Id"
+                        data-testid="@UiTestIds.Library.CardMenu(card.Id)"
                         onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <circle cx="12" cy="5" r="2" />
@@ -23,7 +23,9 @@
                         </svg>
                         Rename
                     </button>
-                    <button @onclick:stopPropagation="true" @onclick="() => OnDuplicateScript.InvokeAsync(card.Id)">
+                    <button @onclick:stopPropagation="true"
+                            @onclick="() => OnDuplicateScript.InvokeAsync(card.Id)"
+                            data-testid="@UiTestIds.Library.CardDuplicate(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" />
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
@@ -32,7 +34,7 @@
                     </button>
                     <div class="dcard-dropdown-group">
                         <div class="dcard-dropdown-label">Move to...</div>
-                        <button data-testid="library-move-@card.Id-@LibrarySelectionKeys.None"
+                        <button data-testid="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
                                 @onclick:stopPropagation="true"
                                 @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, null))">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,7 +45,7 @@
                         </button>
                         @foreach (var folder in FolderOptions)
                         {
-                            <button data-testid="library-move-@card.Id-@folder.Id"
+                            <button data-testid="@UiTestIds.Library.Move(card.Id, folder.Id)"
                                     @onclick:stopPropagation="true"
                                     @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, folder.Id))">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -88,14 +90,20 @@
                     </div>
                 </div>
                 <div class="dcard-actions">
-                    <button class="dcard-act" @onclick:stopPropagation="true" @onclick="() => OnLearnScript.InvokeAsync(card.Id)">
+                    <button class="dcard-act"
+                            @onclick:stopPropagation="true"
+                            @onclick="() => OnLearnScript.InvokeAsync(card.Id)"
+                            data-testid="@UiTestIds.Library.CardLearn(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </svg>
                         Learn
                     </button>
-                    <button class="dcard-act dcard-act-go" @onclick:stopPropagation="true" @onclick="() => OnReadScript.InvokeAsync(card.Id)">
+                    <button class="dcard-act dcard-act-go"
+                            @onclick:stopPropagation="true"
+                            @onclick="() => OnReadScript.InvokeAsync(card.Id)"
+                            data-testid="@UiTestIds.Library.CardRead(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="5,3 19,12 5,21" />
                         </svg>
@@ -106,7 +114,7 @@
         </article>
     }
 
-    <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-testid="library-create-script">
+    <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-testid="@UiTestIds.Library.CreateScript">
         <div class="dcard-create-inner">
             <div class="dcreate-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -120,7 +128,7 @@
 
     <article class="dcard dcard-create dcard-create-folder"
              @onclick="HandleStartCreateFolderAsync"
-             data-testid="library-folder-create-tile">
+             data-testid="@UiTestIds.Library.FolderCreateTile">
         <div class="dcard-create-inner">
             <div class="dcreate-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

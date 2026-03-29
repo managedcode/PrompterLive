@@ -1,6 +1,7 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -19,7 +20,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
     public void EditorPage_ChangingSourceHeadersRefreshesStructureTreeWithoutLegacyInspector()
     {
         Services.GetRequiredService<NavigationManager>()
-            .NavigateTo("http://localhost/editor?id=quantum-computing");
+            .NavigateTo(AppTestData.Routes.EditorQuantum);
         var cut = Render<EditorPage>();
 
         cut.WaitForAssertion(() =>
@@ -30,7 +31,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
             Assert.DoesNotContain("ACTIVE BLOCK", cut.Markup, StringComparison.Ordinal);
         });
 
-        var source = cut.Find("[data-testid='editor-source-input']");
+        var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
         var updatedSource = (source.GetAttribute("value") ?? string.Empty)
             .Replace("## [Introduction|280WPM|neutral|0:00-1:10]", "## [Launch Angle|305WPM|focused|1:00-2:00]", StringComparison.Ordinal)
             .Replace("### [Overview Block|280WPM|neutral]", "### [Signal Block|305WPM|professional]", StringComparison.Ordinal);
@@ -39,7 +40,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var currentSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value");
+            var currentSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value");
             Assert.Contains("## [Launch Angle|305WPM|focused|1:00-2:00]", currentSource);
             Assert.Contains("### [Signal Block|305WPM|professional]", currentSource);
             Assert.Contains("data-nav=\"seg-0\"", cut.Markup, StringComparison.Ordinal);
@@ -57,24 +58,38 @@ public sealed class EditorStructureAuthoringTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("Product Launch", cut.Markup);
-            Assert.Equal("-40", cut.Find("[data-testid='editor-speed-xslow']").GetAttribute("value"));
+            Assert.Equal(EditorStructureAuthoringTestSource.DefaultXslowOffset, cut.FindByTestId(UiTestIds.Editor.SpeedXslow).GetAttribute("value"));
         });
 
-        cut.Find("[data-testid='editor-speed-xslow']").Change("-45");
-        cut.Find("[data-testid='editor-speed-slow']").Change("-15");
-        cut.Find("[data-testid='editor-speed-fast']").Change("30");
-        cut.Find("[data-testid='editor-speed-xfast']").Change("55");
+        cut.FindByTestId(UiTestIds.Editor.SpeedXslow).Change(EditorStructureAuthoringTestSource.UpdatedXslowOffset);
+        cut.FindByTestId(UiTestIds.Editor.SpeedSlow).Change(EditorStructureAuthoringTestSource.UpdatedSlowOffset);
+        cut.FindByTestId(UiTestIds.Editor.SpeedFast).Change(EditorStructureAuthoringTestSource.UpdatedFastOffset);
+        cut.FindByTestId(UiTestIds.Editor.SpeedXfast).Change(EditorStructureAuthoringTestSource.UpdatedXfastOffset);
 
         cut.WaitForAssertion(() =>
         {
-            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
+            var visibleSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty;
             var persistedText = _harness.Session.State.Text;
 
-            Assert.DoesNotContain("xslow_offset:", visibleSource, StringComparison.Ordinal);
-            Assert.Contains("xslow_offset: -45", persistedText, StringComparison.Ordinal);
-            Assert.Contains("slow_offset: -15", persistedText, StringComparison.Ordinal);
-            Assert.Contains("fast_offset: 30", persistedText, StringComparison.Ordinal);
-            Assert.Contains("xfast_offset: 55", persistedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorStructureAuthoringTestSource.XslowOffsetField, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(EditorStructureAuthoringTestSource.UpdatedXslowPersistence, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorStructureAuthoringTestSource.UpdatedSlowPersistence, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorStructureAuthoringTestSource.UpdatedFastPersistence, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorStructureAuthoringTestSource.UpdatedXfastPersistence, persistedText, StringComparison.Ordinal);
         });
+    }
+
+    private static class EditorStructureAuthoringTestSource
+    {
+        public const string DefaultXslowOffset = "-40";
+        public const string UpdatedFastOffset = "30";
+        public const string UpdatedFastPersistence = "fast_offset: 30";
+        public const string UpdatedSlowOffset = "-15";
+        public const string UpdatedSlowPersistence = "slow_offset: -15";
+        public const string UpdatedXfastOffset = "55";
+        public const string UpdatedXfastPersistence = "xfast_offset: 55";
+        public const string UpdatedXslowOffset = "-45";
+        public const string UpdatedXslowPersistence = "xslow_offset: -45";
+        public const string XslowOffsetField = "xslow_offset:";
     }
 }

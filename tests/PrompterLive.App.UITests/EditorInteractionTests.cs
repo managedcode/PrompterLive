@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -15,11 +16,11 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -32,12 +33,12 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await Expect(page.GetByTestId("editor-floating-bar")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-float-emphasis").ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
 
-            var value = await page.GetByTestId("editor-source-input").InputValueAsync();
-            Assert.Contains("[emphasis]welcome[/emphasis]", value, StringComparison.Ordinal);
-            await Expect(page.GetByTestId("editor-source-highlight")).ToContainTextAsync("[emphasis]welcome[/emphasis]");
+            var value = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
+            Assert.Contains(BrowserTestConstants.Editor.EmphasisFragment, value, StringComparison.Ordinal);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync(BrowserTestConstants.Editor.EmphasisFragment);
         }
         finally
         {
@@ -52,12 +53,12 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            var initialValue = await page.GetByTestId("editor-source-input").InputValueAsync();
+            var initialValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const addition = "\n[pause:2s]";
@@ -68,20 +69,20 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(new Regex(@"\[pause:2s\]\s*$"));
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
-            await page.GetByTestId("editor-undo").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(initialValue);
+            await page.GetByTestId(UiTestIds.Editor.Undo).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(initialValue);
 
-            await page.GetByTestId("editor-redo").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(new Regex(@"\[pause:2s\]\s*$"));
+            await page.GetByTestId(UiTestIds.Editor.Redo).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
-            await page.GetByTestId("editor-source-input").ClickAsync();
-            await page.Keyboard.PressAsync("Meta+Z");
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(initialValue);
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).ClickAsync();
+            await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Undo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(initialValue);
 
-            await page.Keyboard.PressAsync("Meta+Shift+Z");
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(new Regex(@"\[pause:2s\]\s*$"));
+            await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Redo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
         }
         finally
         {
@@ -96,10 +97,10 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -112,16 +113,16 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await Expect(page.GetByTestId("editor-floating-bar")).ToBeVisibleAsync();
-            await Expect(page.GetByTestId("editor-floating-ai")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingAi)).ToBeVisibleAsync();
 
-            await page.GetByTestId("editor-floating-slow").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[slow\]transformative moment\[/slow\]"));
+            await page.GetByTestId(UiTestIds.Editor.FloatingSlow).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.SlowFragment)));
 
             await page.ReloadAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[slow\]transformative moment\[/slow\]"));
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.SlowFragment)));
         }
         finally
         {
@@ -136,11 +137,11 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=quantum-computing");
-            await Expect(page.GetByText("ACTIVE SEGMENT")).ToHaveCountAsync(0);
-            await Expect(page.GetByText("ACTIVE BLOCK")).ToHaveCountAsync(0);
-            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Introduction");
-            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Overview Block");
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Editor.ActiveSegmentName)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Editor.ActiveBlockName)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync("Introduction");
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(0, 0))).ToContainTextAsync("Overview Block");
         }
         finally
         {
@@ -155,10 +156,10 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            var visibleSource = await page.GetByTestId("editor-source-input").InputValueAsync();
+            var visibleSource = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
             Assert.DoesNotContain("---", visibleSource, StringComparison.Ordinal);
             Assert.DoesNotContain("title:", visibleSource, StringComparison.Ordinal);
             Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
@@ -177,10 +178,10 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -193,29 +194,29 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await page.GetByTestId("editor-format-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-format")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-format-highlight").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[highlight\]welcome\[/highlight\]"));
+            await page.GetByTestId(UiTestIds.Editor.FormatTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuFormat)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.FormatHighlight).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.HighlightFragment)));
 
-            await page.GetByTestId("editor-pause-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-pause")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-pause-two-seconds").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(new Regex(@"\[pause:2s\]"));
+            await page.GetByTestId(UiTestIds.Editor.PauseTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuPause)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.PauseFragment)));
 
-            await page.GetByTestId("editor-insert-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-insert")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-insert-block").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
+            await page.GetByTestId(UiTestIds.Editor.InsertTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuInsert)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.InsertBlock).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
                 new Regex(@"### \[Block Name\|140WPM\]"));
 
-            var valueBeforeAi = await page.GetByTestId("editor-source-input").InputValueAsync();
-            await page.GetByTestId("editor-ai").ClickAsync();
-            await Expect(page.GetByTestId("editor-ai-panel")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-ai-action-simplify").ClickAsync();
+            var valueBeforeAi = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
+            await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.AiPanel)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.AiActionSimplify).ClickAsync();
 
-            var valueAfterAi = await page.GetByTestId("editor-source-input").InputValueAsync();
+            var valueAfterAi = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
             Assert.NotEqual(valueBeforeAi, valueAfterAi);
         }
         finally
@@ -231,10 +232,10 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-source-input")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -247,13 +248,13 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await page.GetByTestId("editor-color-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-color")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-color-green").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[green\]welcome\[/green\]"));
+            await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuColor)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.ColorGreen).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.GreenFragment)));
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -266,12 +267,12 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await page.GetByTestId("editor-color-trigger").ClickAsync();
-            await page.GetByTestId("editor-color-clear").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).Not.ToHaveValueAsync(
-                new Regex(@"\[green\]welcome\[/green\]"));
+            await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.ColorClear).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).Not.ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.GreenFragment)));
 
-            await page.GetByTestId("editor-source-input").EvaluateAsync(
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
@@ -284,23 +285,23 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await page.GetByTestId("editor-emotion-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-emotion")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-emotion-professional").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[professional\]transformative moment\[/professional\]"));
+            await page.GetByTestId(UiTestIds.Editor.EmotionTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuEmotion)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.EmotionProfessional).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.ProfessionalFragment)));
 
-            await page.GetByTestId("editor-speed-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-speed")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-speed-custom-wpm").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[180WPM\].+\[/180WPM\]"));
+            await page.GetByTestId(UiTestIds.Editor.SpeedTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuSpeed)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.SpeedCustomWpm).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.CustomWpmToken)));
 
-            await page.GetByTestId("editor-insert-trigger").ClickAsync();
-            await Expect(page.GetByTestId("editor-menu-insert")).ToBeVisibleAsync();
-            await page.GetByTestId("editor-insert-pronunciation").ClickAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(
-                new Regex(@"\[pronunciation:guide\].+\[/pronunciation\]"));
+            await page.GetByTestId(UiTestIds.Editor.InsertTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuInsert)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.InsertPronunciation).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.PronunciationToken)));
         }
         finally
         {

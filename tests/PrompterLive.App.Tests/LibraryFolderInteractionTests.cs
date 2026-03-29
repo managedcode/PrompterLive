@@ -1,6 +1,7 @@
 using Bunit;
 using PrompterLive.Core.Services.Samples;
 using PrompterLive.Shared.Components.Library;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Services.Library;
 using PrompterLive.Shared.Tests;
@@ -23,24 +24,24 @@ public sealed class LibraryFolderInteractionTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='library-folder-create-tile']").Click();
+        cut.FindByTestId(UiTestIds.Library.FolderCreateTile).Click();
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains("library-new-folder-overlay", cut.Markup);
-            Assert.Contains("library-new-folder-card", cut.Markup);
+            Assert.Contains(UiTestIds.Library.NewFolderOverlay, cut.Markup, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Library.NewFolderCard, cut.Markup, StringComparison.Ordinal);
         });
-        cut.Find("[data-testid='library-new-folder-name']").Input("Roadshows");
-        cut.Find("[data-testid='library-new-folder-parent']").Change(SampleLibraryFolderCatalog.PresentationsFolderId);
-        cut.Find("[data-testid='library-new-folder-submit']").Click();
+        cut.FindByTestId(UiTestIds.Library.NewFolderName).Input(AppTestData.Folders.Roadshows);
+        cut.FindByTestId(UiTestIds.Library.NewFolderParent).Change(AppTestData.Folders.PresentationsId);
+        cut.FindByTestId(UiTestIds.Library.NewFolderSubmit).Click();
 
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("Roadshows", cut.Markup);
-            Assert.Contains("library-folder-roadshows", cut.Markup);
+            Assert.Contains(UiTestIds.Library.Folder("roadshows"), cut.Markup, StringComparison.Ordinal);
         });
 
         var createdFolder = (await _harness.FolderRepository.ListAsync())
-            .Single(folder => folder.Name == "Roadshows");
+            .Single(folder => folder.Name == AppTestData.Folders.Roadshows);
 
         Assert.Equal(SampleLibraryFolderCatalog.PresentationsFolderId, createdFolder.ParentId);
     }
@@ -52,33 +53,33 @@ public sealed class LibraryFolderInteractionTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='library-folder-create-start']").Click();
-        cut.WaitForAssertion(() => Assert.Contains("library-new-folder-overlay", cut.Markup));
+        cut.FindByTestId(UiTestIds.Library.FolderCreateStart).Click();
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Library.NewFolderOverlay, cut.Markup, StringComparison.Ordinal));
 
-        cut.Find("[data-testid='library-new-folder-cancel']").Click();
+        cut.FindByTestId(UiTestIds.Library.NewFolderCancel).Click();
 
         cut.WaitForAssertion(() =>
         {
-            Assert.DoesNotContain("library-new-folder-overlay", cut.Markup);
-            Assert.DoesNotContain("library-new-folder-card", cut.Markup);
+            Assert.DoesNotContain(UiTestIds.Library.NewFolderOverlay, cut.Markup, StringComparison.Ordinal);
+            Assert.DoesNotContain(UiTestIds.Library.NewFolderCard, cut.Markup, StringComparison.Ordinal);
         });
 
         var folders = await _harness.FolderRepository.ListAsync();
-        Assert.DoesNotContain(folders, folder => folder.Name == "Roadshows");
+        Assert.DoesNotContain(folders, folder => folder.Name == AppTestData.Folders.Roadshows);
     }
 
     [Fact]
     public async Task LibraryPage_MovesScriptIntoFolder_AndUpdatesVisibleCards()
     {
         var roadshowsFolder = await _harness.FolderRepository.CreateAsync(
-            "Roadshows",
+            AppTestData.Folders.Roadshows,
             SampleLibraryFolderCatalog.PresentationsFolderId);
         var cut = Render<LibraryPage>();
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='library-card-menu-rsvp-tech-demo']").Click();
-        cut.Find($"[data-testid='library-move-rsvp-tech-demo-{roadshowsFolder.Id}']").Click();
+        cut.FindByTestId(UiTestIds.Library.CardMenu(SampleScriptCatalog.DemoSampleId)).Click();
+        cut.FindByTestId(UiTestIds.Library.Move(SampleScriptCatalog.DemoSampleId, roadshowsFolder.Id)).Click();
 
         cut.WaitForAssertion(() =>
         {
@@ -86,13 +87,13 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.Equal(roadshowsFolder.Id, document?.FolderId);
         });
 
-        cut.Find($"[data-testid='library-folder-{roadshowsFolder.Id}']").Click();
+        cut.FindByTestId(UiTestIds.Library.Folder(roadshowsFolder.Id)).Click();
 
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("Product Launch", cut.Markup);
             Assert.DoesNotContain("Security Incident", cut.Markup);
-            Assert.Contains("library-folder-roadshows", cut.Markup);
+            Assert.Contains(UiTestIds.Library.Folder(roadshowsFolder.Id), cut.Markup, StringComparison.Ordinal);
         });
     }
 
@@ -102,7 +103,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         await _harness.FolderRepository.InitializeAsync(SampleLibraryFolderCatalog.CreateSeedFolders());
         await _harness.Repository.InitializeAsync(SampleScriptCatalog.CreateSeedDocuments());
         var roadshowsFolder = await _harness.FolderRepository.CreateAsync(
-            "Roadshows",
+            AppTestData.Folders.Roadshows,
             SampleLibraryFolderCatalog.PresentationsFolderId);
         await _harness.Repository.MoveToFolderAsync(SampleScriptCatalog.DemoSampleId, roadshowsFolder.Id);
         _harness.JsRuntime.SavedValues["prompterlive.library"] = new LibraryViewState(
@@ -116,8 +117,8 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         {
             Assert.Contains("Product Launch", cut.Markup);
             Assert.DoesNotContain("Security Incident", cut.Markup);
-            Assert.Contains("library-folder-roadshows", cut.Markup);
-            Assert.Contains("active", cut.Find("[data-testid='library-sort-date']").ClassName);
+            Assert.Contains(UiTestIds.Library.Folder(roadshowsFolder.Id), cut.Markup, StringComparison.Ordinal);
+            Assert.Contains("active", cut.FindByTestId(UiTestIds.Library.SortDate).ClassName);
         });
     }
 }

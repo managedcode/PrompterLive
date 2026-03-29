@@ -1,4 +1,5 @@
 using Bunit;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -20,15 +21,15 @@ public sealed class EditorVisualSourceTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
-            var highlightedText = cut.Find("[data-testid='editor-source-highlight']").TextContent;
+            var visibleSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty;
+            var highlightedText = cut.FindByTestId(UiTestIds.Editor.SourceHighlight).TextContent;
 
-            Assert.DoesNotContain("---", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("title:", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
-            Assert.StartsWith("## [Intro|140WPM|warm]", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("title:", highlightedText, StringComparison.Ordinal);
-            Assert.DoesNotContain("author:", highlightedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.FrontMatterFence, visibleSource, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.TitleFieldPrefix, visibleSource, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.AuthorFieldPrefix, visibleSource, StringComparison.Ordinal);
+            Assert.StartsWith(AppTestData.Editor.BodyHeading, visibleSource, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.TitleFieldPrefix, highlightedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.AuthorFieldPrefix, highlightedText, StringComparison.Ordinal);
         });
     }
 
@@ -39,8 +40,31 @@ public sealed class EditorVisualSourceTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='editor-author']").Change("Test Speaker");
-        cut.Find("[data-testid='editor-source-input']").Input(
+        cut.FindByTestId(UiTestIds.Editor.Author).Change(AppTestData.Editor.TestSpeaker);
+        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorVisualTestSource.RewrittenBody);
+
+        cut.WaitForAssertion(() =>
+        {
+            var visibleSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty;
+            var persistedText = _harness.Session.State.Text;
+
+            Assert.DoesNotContain(EditorVisualTestSource.AuthorFieldPrefix, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.FrontMatterFence, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.AuthorPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.HighlightedLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.CallToActionHeading, persistedText, StringComparison.Ordinal);
+        });
+    }
+
+    private static class EditorVisualTestSource
+    {
+        public const string AuthorFieldPrefix = "author:";
+        public const string TitleFieldPrefix = "title:";
+        public const string FrontMatterFence = "---";
+        public const string AuthorPersistenceLine = "author: \"Test Speaker\"";
+        public const string HighlightedLine = "[highlight]Stay with us[/highlight]";
+        public const string CallToActionHeading = "## [Call to Action|150WPM|motivational]";
+        public const string RewrittenBody =
             """
             ## [Intro|140WPM|warm]
             ### [Opening Block|140WPM]
@@ -49,18 +73,6 @@ public sealed class EditorVisualSourceTests : BunitContext
             ## [Call to Action|150WPM|motivational]
             ### [Closing Block|150WPM]
             [highlight]Stay with us[/highlight] through the final reveal.
-            """);
-
-        cut.WaitForAssertion(() =>
-        {
-            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
-            var persistedText = _harness.Session.State.Text;
-
-            Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
-            Assert.Contains("---", persistedText, StringComparison.Ordinal);
-            Assert.Contains("author: \"Test Speaker\"", persistedText, StringComparison.Ordinal);
-            Assert.Contains("[highlight]Stay with us[/highlight]", persistedText, StringComparison.Ordinal);
-            Assert.Contains("## [Call to Action|150WPM|motivational]", persistedText, StringComparison.Ordinal);
-        });
+            """;
     }
 }

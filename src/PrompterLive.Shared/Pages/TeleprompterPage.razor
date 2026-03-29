@@ -19,7 +19,7 @@
 
 <div id="screen-teleprompter"
      class="screen active"
-     data-testid="teleprompter-page"
+     data-testid="@UiTestIds.Teleprompter.Page"
      data-screen-title="@_screenTitle"
      data-screen-subtitle="@_screenSubtitle">
     <div class="rd">
@@ -38,7 +38,7 @@
         <div class="rd-camera-tint" id="rd-camera-tint"></div>
 
         <div class="rd-ui">
-            <button class="rd-back" onclick="navigateTo('editor')" data-testid="teleprompter-back">
+            <button class="rd-back" onclick="navigateTo('editor')" data-testid="@UiTestIds.Teleprompter.Back">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6" /></svg>
             </button>
 
@@ -47,12 +47,12 @@
             <div class="rd-sliders">
                 <div class="rd-slider-group">
                     <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="8" x2="3" y2="16" /><line x1="21" y1="8" x2="21" y2="16" /></svg>
-                    <input type="range" class="rd-vslider" id="rd-focal-slider" min="15" max="55" value="30" oninput="changeFocalPoint(this.value)" data-testid="teleprompter-focal-slider">
+                    <input type="range" class="rd-vslider" id="rd-focal-slider" min="15" max="55" value="30" oninput="changeFocalPoint(this.value)" data-testid="@UiTestIds.Teleprompter.FocalSlider">
                     <span class="rd-slider-val" id="rd-focal-val">30%</span>
                 </div>
                 <div class="rd-slider-group">
                     <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="8,9 5,12 8,15" /><polyline points="16,9 19,12 16,15" /></svg>
-                    <input type="range" class="rd-vslider" id="rd-width-slider" min="400" max="1100" value="750" oninput="changeTextWidth(this.value)" data-testid="teleprompter-width-slider">
+                    <input type="range" class="rd-vslider" id="rd-width-slider" min="400" max="1100" value="750" oninput="changeTextWidth(this.value)" data-testid="@UiTestIds.Teleprompter.WidthSlider">
                     <span class="rd-slider-val" id="rd-width-val">750</span>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                                     <span class="rd-emo-name">@entry.card.EmotionLabel</span>
                                     <span class="rd-emo-wpm">@entry.card.TargetWpm <small>WPM</small></span>
                                 </div>
-                                <p class="rd-cluster-text">
+                                <p class="rd-cluster-text" data-testid="@UiTestIds.Teleprompter.CardText(entry.index)">
                                     @for (var chunkIndex = 0; chunkIndex < entry.card.Chunks.Count; chunkIndex++)
                                     {
                                         var chunk = entry.card.Chunks[chunkIndex];
@@ -87,7 +87,7 @@
                                             : null;
                                         if (chunk is ReaderGroupViewModel group)
                                         {
-                                            <span class="rd-g">
+                                            <span class="rd-g" data-testid="@UiTestIds.Teleprompter.CardGroup(entry.index, chunkIndex)">
                                                 @for (var wordIndex = 0; wordIndex < group.Words.Count; wordIndex++)
                                                 {
                                                     var word = group.Words[wordIndex];
@@ -132,36 +132,37 @@
                 </div>
             </div>
             <div class="rd-edge-info">
-                <span class="rd-edge-section">@_edgeSectionLabel</span>
+                <span class="rd-edge-section" data-testid="@UiTestIds.Teleprompter.EdgeSection">@_edgeSectionLabel</span>
                 <span class="rd-time"
+                      id="@UiDomIds.Teleprompter.Time"
                       data-total-seconds="@_totalSeconds"
                       data-total-ms="@_totalDurationMilliseconds">0:00 / @_durationLabel</span>
             </div>
 
             <div class="rd-controls">
                 <div class="rd-ctrl-group">
-                    <button class="rd-ctrl-btn" onclick="changeFontSize(-4)" title="Smaller text" data-testid="teleprompter-font-down">
+                    <button class="rd-ctrl-btn" onclick="changeFontSize(-4)" title="Smaller text" data-testid="@UiTestIds.Teleprompter.FontDown">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /></svg>
                     </button>
                     <span class="rd-ctrl-label" id="rd-font-label">36</span>
-                    <button class="rd-ctrl-btn" onclick="changeFontSize(4)" title="Larger text" data-testid="teleprompter-font-up">
+                    <button class="rd-ctrl-btn" onclick="changeFontSize(4)" title="Larger text" data-testid="@UiTestIds.Teleprompter.FontUp">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                     </button>
                 </div>
 
                 <div class="rd-ctrl-group rd-ctrl-main">
-                    <button class="rd-ctrl-btn" onclick="jumpCard(-1)" title="Previous block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(-1)" title="Back one word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" onclick="toggleTp()" title="Play / Pause" data-testid="teleprompter-play-toggle">
+                    <button class="rd-ctrl-btn" onclick="jumpCard(-1)" title="Previous block" data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(-1)" title="Back one word" data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" onclick="toggleTp()" title="Play / Pause" data-testid="@UiTestIds.Teleprompter.PlayToggle">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
                     </button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(1)" title="Forward one word"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                    <button class="rd-ctrl-btn" onclick="jumpCard(1)" title="Next block"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(1)" title="Forward one word" data-testid="@UiTestIds.Teleprompter.NextWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                    <button class="rd-ctrl-btn" onclick="jumpCard(1)" title="Next block" data-testid="@UiTestIds.Teleprompter.NextBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
                 </div>
 
                 <div class="rd-ctrl-group">
                     <span class="rd-ctrl-label rd-block-indicator" id="rd-block-indicator">1 / @_cards.Count</span>
-                    <button class="rd-ctrl-btn" id="rd-cam-btn" onclick="toggleReaderCamera()" title="Camera" data-testid="teleprompter-camera-toggle">
+                    <button class="rd-ctrl-btn" id="rd-cam-btn" onclick="toggleReaderCamera()" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
                     </button>
                 </div>
@@ -188,6 +189,7 @@
     private IReadOnlyList<ReaderCardViewModel> _cards = [ReaderCardViewModel.Empty];
     private const string LoadReaderOperation = "Teleprompter load";
     private const string LoadReaderMessage = "Unable to prepare teleprompter playback.";
+    private const int MaxReaderGroupCharacterCount = 24;
     private const int MaxReaderGroupWordCount = 5;
 
     protected override Task OnParametersSetAsync()
@@ -290,28 +292,28 @@
         {
             var transform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
             _cameraLayer = new ReaderCameraLayerViewModel(
-                ElementId: "rd-camera",
+                ElementId: UiDomIds.Teleprompter.Camera,
                 DeviceId: configuredCamera!.DeviceId,
                 AutoStart: autoStart,
                 Role: "primary",
                 Order: 0,
                 CssClass: "rd-camera rd-camera-base",
                 Style: BuildPrimaryCameraStyle(transform),
-                TestId: "teleprompter-camera-layer-primary");
+                TestId: UiTestIds.Teleprompter.CameraBackground);
             return;
         }
 
         if (primarySceneCamera is not null)
         {
             _cameraLayer = new ReaderCameraLayerViewModel(
-                ElementId: "rd-camera",
+                ElementId: UiDomIds.Teleprompter.Camera,
                 DeviceId: primarySceneCamera.DeviceId,
                 AutoStart: autoStart,
                 Role: "primary",
                 Order: 0,
                 CssClass: "rd-camera rd-camera-base",
                 Style: BuildPrimaryCameraStyle(primarySceneCamera.Transform),
-                TestId: "teleprompter-camera-layer-primary");
+                TestId: UiTestIds.Teleprompter.CameraBackground);
             return;
         }
 
@@ -321,14 +323,14 @@
         var defaultTransform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
 
         _cameraLayer = new ReaderCameraLayerViewModel(
-            ElementId: "rd-camera",
+            ElementId: UiDomIds.Teleprompter.Camera,
             DeviceId: defaultCamera?.DeviceId ?? string.Empty,
             AutoStart: autoStart && !string.IsNullOrWhiteSpace(defaultCamera?.DeviceId),
             Role: "primary",
             Order: 0,
             CssClass: "rd-camera rd-camera-base",
             Style: BuildPrimaryCameraStyle(defaultTransform),
-            TestId: "teleprompter-camera-layer-primary");
+            TestId: UiTestIds.Teleprompter.CameraBackground);
     }
 
     private async Task<List<ReaderCardViewModel>> BuildReaderCardsAsync()
@@ -407,7 +409,7 @@
                 $"{Math.Max(8d, seed.WordCount * 100d / totalWords):0.##}%",
                 ToAlphaColor(seed.AccentColor, 0.35),
                 seed.Chunks,
-                $"teleprompter-card-{index}"))
+                UiTestIds.Teleprompter.Card(index)))
             .ToList();
     }
 
@@ -453,6 +455,7 @@
     {
         var chunks = new List<ReaderChunkViewModel>();
         var currentGroup = new List<ReaderWordViewModel>();
+        var currentCharacterCount = 0;
 
         foreach (var word in words)
         {
@@ -466,6 +469,7 @@
                 }
 
                 FlushGroup(chunks, currentGroup);
+                currentCharacterCount = 0;
                 chunks.Add(new ReaderPauseViewModel(
                     pauseDuration,
                     pauseDuration >= 600 ? "rd-pause rd-pause-med" : "rd-pause"));
@@ -477,14 +481,22 @@
                 continue;
             }
 
+            var wordLength = word.CleanText.Length;
+            currentCharacterCount += wordLength;
+            if (currentGroup.Count > 0)
+            {
+                currentCharacterCount += 1;
+            }
+
             currentGroup.Add(new ReaderWordViewModel(
                 word.CleanText,
                 BuildReaderWordClass(word.Metadata),
                 Math.Max(120, (int)Math.Round(word.DisplayDuration.TotalMilliseconds))));
 
-            if (ShouldEndReaderGroup(word.CleanText, currentGroup.Count))
+            if (ShouldEndReaderGroup(word.CleanText, currentGroup.Count, currentCharacterCount))
             {
                 FlushGroup(chunks, currentGroup);
+                currentCharacterCount = 0;
             }
         }
 
@@ -492,9 +504,14 @@
         return chunks;
     }
 
-    private static bool ShouldEndReaderGroup(string cleanText, int wordCount)
+    private static bool ShouldEndReaderGroup(string cleanText, int wordCount, int characterCount)
     {
         if (wordCount >= MaxReaderGroupWordCount)
+        {
+            return true;
+        }
+
+        if (characterCount >= MaxReaderGroupCharacterCount)
         {
             return true;
         }
@@ -799,7 +816,7 @@
             "100%",
             "rgba(233, 127, 0, 0.35)",
             [new ReaderGroupViewModel([new ReaderWordViewModel("Ready", "tps-warm", 600)])],
-            "teleprompter-card-fallback");
+            UiTestIds.Teleprompter.Card(999));
     }
 
     private abstract record ReaderChunkViewModel;
@@ -821,13 +838,13 @@
         string TestId)
     {
         public static ReaderCameraLayerViewModel Placeholder { get; } = new(
-            "rd-camera",
+            UiDomIds.Teleprompter.Camera,
             string.Empty,
             false,
             "primary",
             0,
             "rd-camera rd-camera-base",
             string.Empty,
-            "teleprompter-camera-layer-primary");
+            UiTestIds.Teleprompter.CameraBackground);
     }
 }

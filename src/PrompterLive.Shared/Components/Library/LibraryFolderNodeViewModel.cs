@@ -1,3 +1,5 @@
+using PrompterLive.Shared.Contracts;
+
 namespace PrompterLive.Shared.Components.Library;
 
 public sealed record LibraryFolderNodeViewModel(
@@ -12,5 +14,5 @@ public sealed record LibraryFolderNodeViewModel(
 {
     public bool HasChildren => Children.Count > 0;
 
-    public string TestId => $"library-folder-{Id}";
+    public string TestId => UiTestIds.Library.Folder(Id);
 }

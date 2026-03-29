@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using PrompterLive.Shared.Components.Editor;
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -7,20 +8,6 @@ namespace PrompterLive.App.UITests;
 [Collection(StandaloneAppCollection.Name)]
 public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
 {
-    private const string AlphaToken = "Alpha";
-    private const int FloatingBarSettleDelayMs = 500;
-    private const string BasicFixtureSource = """
-        ## [Intro|140WPM|warm]
-        ### [Opening Block|140WPM]
-        Alpha
-        """;
-
-    private const string ColoredFixtureSource = """
-        ## [Intro|140WPM|warm]
-        ### [Opening Block|140WPM]
-        [green]Alpha[/green]
-        """;
-
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
@@ -35,7 +22,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
                 await OpenEditorAsync(page);
                 await page.GetByTestId(scenario.TriggerTestId).ClickAsync();
                 await Expect(page.GetByTestId(scenario.PanelTestId))
-                    .ToBeVisibleAsync(new() { Timeout = 5_000 });
+                    .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
             }
 
             foreach (var scenario in EditorToolbarCoverageScenarios.AiScenarios)
@@ -43,13 +30,13 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
                 await OpenEditorAsync(page);
                 if (scenario.RequiresSelection)
                 {
-                    await SetSourceTextAndSelectAlphaAsync(page, BasicFixtureSource);
-                    await page.WaitForTimeoutAsync(FloatingBarSettleDelayMs);
+                    await SetSourceTextAndSelectAlphaAsync(page, BrowserTestSource.AlphaSource);
+                    await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
                 }
 
                 await page.GetByTestId(scenario.TestId).ClickAsync();
-                await Expect(page.GetByTestId("editor-ai-panel"))
-                    .ToBeVisibleAsync(new() { Timeout = 5_000 });
+                await Expect(page.GetByTestId(UiTestIds.Editor.AiPanel))
+                    .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
             }
         }
         finally
@@ -74,9 +61,9 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
                     await page.GetByTestId(scenario.MenuTriggerTestId).ClickAsync();
                 }
 
-                var beforeValue = await page.GetByTestId("editor-source-input").InputValueAsync();
+                var beforeValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
                 await page.GetByTestId(scenario.TestId).ClickAsync();
-                var afterValue = await page.GetByTestId("editor-source-input").InputValueAsync();
+                var afterValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
 
                 AssertCommandMutation(scenario, beforeValue, afterValue);
             }
@@ -97,14 +84,14 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
             foreach (var scenario in EditorToolbarCoverageScenarios.FloatingCommandScenarios)
             {
                 await OpenEditorAsync(page);
-                await SetSourceTextAndSelectAlphaAsync(page, BasicFixtureSource);
-                await Expect(page.GetByTestId("editor-floating-bar"))
-                    .ToBeVisibleAsync(new() { Timeout = 5_000 });
-                await page.WaitForTimeoutAsync(FloatingBarSettleDelayMs);
+                await SetSourceTextAndSelectAlphaAsync(page, BrowserTestSource.AlphaSource);
+                await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar))
+                    .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+                await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
 
-                var beforeValue = await page.GetByTestId("editor-source-input").InputValueAsync();
+                var beforeValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
                 await page.GetByTestId(scenario.TestId).ClickAsync();
-                var afterValue = await page.GetByTestId("editor-source-input").InputValueAsync();
+                var afterValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
 
                 AssertCommandMutation(scenario, beforeValue, afterValue);
             }
@@ -125,14 +112,14 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
             {
                 var expectedFragment = string.Concat(
                     scenario.Command.PrimaryToken,
-                    AlphaToken,
+                    BrowserTestSource.AlphaToken,
                     scenario.Command.SecondaryToken);
                 Assert.Contains(expectedFragment, afterValue, StringComparison.Ordinal);
                 break;
             }
             case EditorCommandKind.ClearColor:
-                Assert.DoesNotContain("[green]Alpha[/green]", afterValue, StringComparison.Ordinal);
-                Assert.Contains(AlphaToken, afterValue, StringComparison.Ordinal);
+                Assert.DoesNotContain(BrowserTestSource.ColoredAlphaToken, afterValue, StringComparison.Ordinal);
+                Assert.Contains(BrowserTestSource.AlphaToken, afterValue, StringComparison.Ordinal);
                 break;
             default:
             {
@@ -145,23 +132,23 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
 
     private static async Task OpenEditorAsync(IPage page)
     {
-        await page.GotoAsync("/editor?id=rsvp-tech-demo");
-        await Expect(page.GetByTestId("editor-page"))
-            .ToBeVisibleAsync(new() { Timeout = 10_000 });
-        await Expect(page.GetByTestId("editor-source-input"))
-            .ToBeVisibleAsync(new() { Timeout = 10_000 });
+        await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+        await Expect(page.GetByTestId(UiTestIds.Editor.Page))
+            .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+        await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput))
+            .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
     }
 
     private static Task PrepareScenarioAsync(IPage page, EditorCommandScenario scenario) =>
         scenario.SelectionMode switch
         {
-            EditorScenarioSelectionMode.WrapSelection => SetSourceTextAndSelectAlphaAsync(page, BasicFixtureSource),
+            EditorScenarioSelectionMode.WrapSelection => SetSourceTextAndSelectAlphaAsync(page, BrowserTestSource.AlphaSource),
             EditorScenarioSelectionMode.ClearColorSelection => SetSourceTextAndSelectColoredAlphaAsync(page),
-            _ => SetSourceTextAndSetCaretAtEndAsync(page, BasicFixtureSource)
+            _ => SetSourceTextAndSetCaretAtEndAsync(page, BrowserTestSource.AlphaSource)
         };
 
     private static Task SetSourceTextAndSelectAlphaAsync(IPage page, string text) =>
-        page.GetByTestId("editor-source-input").EvaluateAsync(
+        page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
             """
             (element, value) => {
                 element.focus();
@@ -178,7 +165,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
             text);
 
     private static Task SetSourceTextAndSelectColoredAlphaAsync(IPage page) =>
-        page.GetByTestId("editor-source-input").EvaluateAsync(
+        page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
             """
             (element, value) => {
                 element.focus();
@@ -192,10 +179,10 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
                 element.dispatchEvent(new Event("keyup", { bubbles: true }));
             }
             """,
-            ColoredFixtureSource);
+            BrowserTestSource.ColoredSource);
 
     private static Task SetSourceTextAndSetCaretAtEndAsync(IPage page, string text) =>
-        page.GetByTestId("editor-source-input").EvaluateAsync(
+        page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
             """
             (element, value) => {
                 element.focus();
@@ -209,4 +196,20 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
             }
             """,
             text);
+
+    private static class BrowserTestSource
+    {
+        internal const string AlphaToken = "Alpha";
+        internal const string ColoredAlphaToken = "[green]Alpha[/green]";
+        internal const string AlphaSource = """
+            ## [Intro|140WPM|warm]
+            ### [Opening Block|140WPM]
+            Alpha
+            """;
+        internal const string ColoredSource = """
+            ## [Intro|140WPM|warm]
+            ### [Opening Block|140WPM]
+            [green]Alpha[/green]
+            """;
+    }
 }

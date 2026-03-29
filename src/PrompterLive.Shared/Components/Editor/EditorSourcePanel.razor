@@ -64,7 +64,7 @@
 
     @if (_isAiPanelOpen)
     {
-        <div class="ed-ai-panel" data-testid="editor-ai-panel">
+        <div class="ed-ai-panel" data-testid="@UiTestIds.Editor.AiPanel">
             <div class="ed-ai-panel-head">
                 <div>
                     <strong>Local Assistant</strong>
@@ -73,15 +73,15 @@
                 <button class="ed-ai-close" type="button" aria-label="Close AI panel" @onclick="ToggleAiPanel">×</button>
             </div>
             <div class="ed-ai-actions">
-                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-simplify" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Simplify)'>
+                <button class="ed-ai-action" type="button" data-testid="@UiTestIds.Editor.AiActionSimplify" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Simplify)'>
                     <strong>Simplify</strong>
                     <span>Shorten dense phrases and normalize wording.</span>
                 </button>
-                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-expand" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Expand)'>
+                <button class="ed-ai-action" type="button" data-testid="@UiTestIds.Editor.AiActionExpand" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Expand)'>
                     <strong>Expand</strong>
                     <span>Add one follow-through sentence to the current selection.</span>
                 </button>
-                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-pauses" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.AddDeliveryPauses)'>
+                <button class="ed-ai-action" type="button" data-testid="@UiTestIds.Editor.AiActionPauses" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.AddDeliveryPauses)'>
                     <strong>Add Delivery Pauses</strong>
                     <span>Convert punctuation into TPS-friendly pause markers.</span>
                 </button>
@@ -93,9 +93,9 @@
         <div class="ed-source-stage">
             <div class="ed-source-highlight"
                  @ref="_overlayRef"
-                 data-testid="editor-source-highlight">@HighlightMarkup</div>
+                 data-testid="@UiTestIds.Editor.SourceHighlight">@HighlightMarkup</div>
             <textarea class="ed-source-input"
-                      data-testid="editor-source-input"
+                      data-testid="@UiTestIds.Editor.SourceInput"
                       spellcheck="false"
                       autocapitalize="off"
                       autocomplete="off"
@@ -111,7 +111,7 @@
             @if (Selection.HasSelection)
             {
                 <span class="ed-float-bar"
-                      data-testid="editor-floating-bar"
+                      data-testid="@UiTestIds.Editor.FloatingBar"
                       style="@FloatingBarStyle">
                     @for (var groupIndex = 0; groupIndex < FloatingActionGroups.Count; groupIndex++)
                     {
@@ -137,7 +137,7 @@
 
         @if (!string.IsNullOrWhiteSpace(ErrorMessage))
         {
-            <div class="ed-source-error" data-testid="editor-error">@ErrorMessage</div>
+            <div class="ed-source-error" data-testid="@UiTestIds.Editor.Error">@ErrorMessage</div>
         }
     </div>
 

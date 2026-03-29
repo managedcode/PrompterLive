@@ -1,4 +1,5 @@
 using Bunit;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -20,10 +21,10 @@ public sealed class ScreenShellContractTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.Find("[data-testid='library-page']"));
-            Assert.NotNull(cut.Find("[data-testid='library-folder-create-tile']"));
-            Assert.Contains("Product Launch", cut.Markup);
-            Assert.Contains("TED: Leadership", cut.Markup);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Library.Page));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Library.FolderCreateTile));
+            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup);
+            Assert.Contains(AppTestData.Scripts.TedLeadershipTitle, cut.Markup);
         });
     }
 
@@ -34,14 +35,14 @@ public sealed class ScreenShellContractTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var sourceInput = cut.Find("[data-testid='editor-source-input']");
+            var sourceInput = cut.FindByTestId(UiTestIds.Editor.SourceInput);
 
             Assert.DoesNotContain("profile:", sourceInput.GetAttribute("value"), StringComparison.Ordinal);
             Assert.DoesNotContain("author:", sourceInput.GetAttribute("value"), StringComparison.Ordinal);
-            Assert.NotNull(cut.Find("[data-testid='editor-profile']"));
-            Assert.NotNull(cut.Find("[data-testid='editor-base-wpm']"));
-            Assert.NotNull(cut.Find("[data-testid='editor-author']"));
-            Assert.NotNull(cut.Find("[data-testid='editor-version']"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.Profile));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.BaseWpm));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.Author));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.Version));
         });
     }
 
@@ -52,11 +53,11 @@ public sealed class ScreenShellContractTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.Find("[data-testid='learn-page']"));
-            Assert.NotNull(cut.Find("#rsvp-word"));
-            Assert.NotNull(cut.Find(".rsvp-orp-line"));
-            Assert.NotNull(cut.Find("#rsvp-ctx-l"));
-            Assert.NotNull(cut.Find("#rsvp-ctx-r"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Page));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Word));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.OrpLine));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextLeft));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextRight));
             Assert.Contains("PrompterLiveDesign.setRsvpTimeline", string.Join('\n', _harness.JsRuntime.Invocations));
         });
     }
@@ -68,10 +69,10 @@ public sealed class ScreenShellContractTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.Find("[data-testid='teleprompter-page']"));
-            Assert.NotNull(cut.Find("#rd-camera"));
-            Assert.NotNull(cut.Find("[data-testid='teleprompter-camera-toggle']"));
-            Assert.NotNull(cut.Find(".rd-card-active .rd-cluster-text"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.Page));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle));
+            Assert.NotNull(cut.FindByTestId($"{UiTestIds.Teleprompter.Card(0)}-text"));
             Assert.DoesNotContain("rd-camera-overlay-", cut.Markup, StringComparison.Ordinal);
             Assert.Contains("data-total-ms=\"", cut.Markup, StringComparison.Ordinal);
         });
@@ -84,12 +85,12 @@ public sealed class ScreenShellContractTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.Find("[data-testid='settings-page']"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.Page));
             Assert.Contains("Cloud Storage", cut.Markup);
             Assert.Contains("Streaming", cut.Markup);
             Assert.Contains("Audio Sync + Routing", cut.Markup);
             Assert.Contains("Default Camera", cut.Markup);
-            Assert.Contains("Broadcast mic", cut.Markup);
+            Assert.Contains(AppTestData.Scripts.BroadcastMic, cut.Markup);
         });
     }
 }

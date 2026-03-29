@@ -1,3 +1,4 @@
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -5,12 +6,6 @@ namespace PrompterLive.App.UITests;
 [Collection(StandaloneAppCollection.Name)]
 public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 {
-    private const string TypedScript = """
-        ## [Typed Intro|175WPM|focused|0:05-0:20]
-        ### [Typed Block|165WPM|professional]
-        This is a typed TPS script. / [highlight]Every word[/highlight] stays in sync. //
-        """;
-
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
@@ -20,28 +15,28 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/editor?id=quantum-computing");
-            await Expect(page.GetByTestId("editor-source-input"))
-                .ToBeVisibleAsync(new() { Timeout = 10_000 });
-            await Expect(page.GetByText("ACTIVE SEGMENT")).ToHaveCountAsync(0);
-            await Expect(page.GetByText("ACTIVE BLOCK")).ToHaveCountAsync(0);
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.ActiveSegmentName)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Editor.ActiveBlockName)).ToHaveCountAsync(0);
 
-            await page.GetByTestId("editor-source-input").ClickAsync();
-            await page.Keyboard.PressAsync("Meta+A");
-            await page.Keyboard.PressAsync("Backspace");
-            await page.Keyboard.TypeAsync(TypedScript);
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).ClickAsync();
+            await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.SelectAll);
+            await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Backspace);
+            await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.TypedScript);
 
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(TypedScript);
-            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Typed Intro");
-            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Typed Block");
-            await Expect(page.GetByTestId("editor-source-highlight"))
-                .ToContainTextAsync("[highlight]Every word[/highlight]");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Editor.TypedScript);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync(BrowserTestConstants.Editor.TypedTitle);
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(0, 0))).ToContainTextAsync(BrowserTestConstants.Editor.TypedBlock);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight))
+                .ToContainTextAsync(BrowserTestConstants.Editor.TypedHighlight);
 
-            await page.WaitForTimeoutAsync(800);
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.PersistDelayMs);
             await page.ReloadAsync();
-            await Expect(page.GetByTestId("editor-source-input")).ToHaveValueAsync(TypedScript);
-            await Expect(page.Locator("[data-nav='seg-0']")).ToContainTextAsync("Typed Intro");
-            await Expect(page.Locator("[data-nav='blk-0-0']")).ToContainTextAsync("Typed Block");
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Editor.TypedScript);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync(BrowserTestConstants.Editor.TypedTitle);
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(0, 0))).ToContainTextAsync(BrowserTestConstants.Editor.TypedBlock);
         }
         finally
         {

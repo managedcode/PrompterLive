@@ -18,6 +18,9 @@
 - Click real controls instead of only checking static HTML.
 - This suite is intentionally non-parallel and owns `http://localhost:5051` while it runs.
 - Do not keep separate concurrent `dotnet build` or `dotnet test` processes alive against the same test assets.
+- Prefer `PrompterLive.Shared.Contracts.AppRoutes`, `UiTestIds`, and other named constants over inline route or selector strings.
+- Use `data-testid` first. Raw text, role-name, and CSS selectors are allowed only when no stable `data-testid` contract exists yet and the missing contract is fixed in the same task.
+- Magic numbers in waits, delays, seeded values, and timeouts must be named constants.
 
 ## Project-Local Commands
 
@@ -33,3 +36,4 @@
 - Keep selectors stable via `data-testid` whenever possible.
 - Stable origin and media permissions are part of the runtime contract. Do not reintroduce random ports or manual startup steps.
 - Flaky browser tests are failures; fix the cause instead of weakening the assertion.
+- Do not duplicate route strings, test ids, or storage keys across tests; centralize them.

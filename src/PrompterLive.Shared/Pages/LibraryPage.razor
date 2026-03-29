@@ -1,7 +1,7 @@
 @page "/"
 @page "/library"
 
-<div id="screen-library" class="screen active" data-testid="library-page">
+<div id="screen-library" class="screen active" data-testid="@UiTestIds.Library.Page">
     <LibrarySidebar Folders="_folderNodes"
                     AllScriptCount="_allCards.Count"
                     IsAllSelected="IsAllSelected"
@@ -14,16 +14,16 @@
                 <span class="sort-label">Sort by</span>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
                         @onclick="() => SetSortMode(LibrarySortMode.Name)"
-                        data-testid="library-sort-name">Name</button>
+                        data-testid="@UiTestIds.Library.SortName">Name</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Date)"
                         @onclick="() => SetSortMode(LibrarySortMode.Date)"
-                        data-testid="library-sort-date">Date</button>
+                        data-testid="@UiTestIds.Library.SortDate">Date</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Duration)"
                         @onclick="() => SetSortMode(LibrarySortMode.Duration)"
-                        data-testid="library-sort-duration">Duration</button>
+                        data-testid="@UiTestIds.Library.SortDuration">Duration</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Wpm)"
                         @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
-                        data-testid="library-sort-wpm">WPM</button>
+                        data-testid="@UiTestIds.Library.SortWpm">WPM</button>
             </div>
 
             <LibraryCardsGrid Cards="_cards"

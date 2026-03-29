@@ -2,6 +2,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Layout;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
@@ -30,7 +31,7 @@ public sealed class UiTraceLoggingTests : BunitContext
         });
 
         var navigation = Services.GetRequiredService<NavigationManager>();
-        navigation.NavigateTo("/settings");
+        navigation.NavigateTo(AppTestData.Routes.Settings);
 
         cut.WaitForAssertion(() =>
         {
@@ -38,7 +39,7 @@ public sealed class UiTraceLoggingTests : BunitContext
                 logProvider.Entries,
                 entry => entry.Category.Contains(nameof(MainLayout), StringComparison.Ordinal) &&
                     entry.Message.Contains("Route changed to", StringComparison.Ordinal) &&
-                    entry.Message.Contains("/settings", StringComparison.Ordinal));
+                    entry.Message.Contains(AppTestData.Routes.Settings, StringComparison.Ordinal));
         });
     }
 
@@ -54,15 +55,15 @@ public sealed class UiTraceLoggingTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='library-folder-presentations']").Click();
-        cut.Find("[data-testid='library-folder-create-start']").Click();
-        cut.Find("[data-testid='library-new-folder-cancel']").Click();
-        cut.Find("[data-testid='library-folder-create-start']").Click();
-        cut.Find("[data-testid='library-new-folder-name']").Input("Roadshows");
-        cut.Find("[data-testid='library-new-folder-parent']").Change("presentations");
-        cut.Find("[data-testid='library-new-folder-submit']").Click();
+        cut.FindByTestId(UiTestIds.Library.Folder(AppTestData.Folders.PresentationsId)).Click();
+        cut.FindByTestId(UiTestIds.Library.FolderCreateStart).Click();
+        cut.FindByTestId(UiTestIds.Library.NewFolderCancel).Click();
+        cut.FindByTestId(UiTestIds.Library.FolderCreateStart).Click();
+        cut.FindByTestId(UiTestIds.Library.NewFolderName).Input(AppTestData.Folders.Roadshows);
+        cut.FindByTestId(UiTestIds.Library.NewFolderParent).Change(AppTestData.Folders.PresentationsId);
+        cut.FindByTestId(UiTestIds.Library.NewFolderSubmit).Click();
 
-        cut.WaitForAssertion(() => Assert.Contains("library-folder-roadshows", cut.Markup));
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Library.Folder("roadshows"), cut.Markup, StringComparison.Ordinal));
 
         Assert.Contains(
             logProvider.Entries,

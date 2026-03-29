@@ -7,7 +7,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveSegment.Name"
-               data-testid="editor-active-segment-name"
+               data-testid="@UiTestIds.Editor.ActiveSegmentName"
                @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.Name), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
@@ -17,14 +17,14 @@
                value="@GetNumericValue(ActiveSegment.TargetWpm)"
                min="80"
                max="600"
-               data-testid="editor-active-segment-wpm"
+               data-testid="@UiTestIds.Editor.ActiveSegmentWpm"
                @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.TargetWpm), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
         <label>Emotion</label>
         <select class="ed-meta-select"
                 value="@ActiveSegment.EmotionLabel"
-                data-testid="editor-active-segment-emotion"
+                data-testid="@UiTestIds.Editor.ActiveSegmentEmotion"
                 @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.EmotionLabel), eventArgs.Value?.ToString() ?? string.Empty)">
             @foreach (var option in EditorEmotionCatalog.Options)
             {
@@ -41,7 +41,7 @@
                    type="text"
                    value="@ActiveSegment.Timing"
                    placeholder="0:00-0:00"
-                   data-testid="editor-active-segment-timing"
+                   data-testid="@UiTestIds.Editor.ActiveSegmentTiming"
                    @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.Timing), eventArgs.Value?.ToString() ?? string.Empty)" />
         </div>
     }
@@ -52,7 +52,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveBlock.Name"
-               data-testid="editor-active-block-name"
+               data-testid="@UiTestIds.Editor.ActiveBlockName"
                @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.Name), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
@@ -62,14 +62,14 @@
                value="@GetNumericValue(ActiveBlock.TargetWpm)"
                min="80"
                max="600"
-               data-testid="editor-active-block-wpm"
+               data-testid="@UiTestIds.Editor.ActiveBlockWpm"
                @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.TargetWpm), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
         <label>Emotion</label>
         <select class="ed-meta-select"
                 value="@ActiveBlock.EmotionLabel"
-                data-testid="editor-active-block-emotion"
+                data-testid="@UiTestIds.Editor.ActiveBlockEmotion"
                 @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.EmotionLabel), eventArgs.Value?.ToString() ?? string.Empty)">
             <option value="">Inherit</option>
             @foreach (var option in EditorEmotionCatalog.Options)

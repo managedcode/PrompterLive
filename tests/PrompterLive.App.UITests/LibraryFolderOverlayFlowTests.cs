@@ -1,3 +1,4 @@
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -14,19 +15,19 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync("/library");
-            await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
 
-            await page.GetByTestId("library-folder-create-start").ClickAsync();
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.FolderCreateStart).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
 
-            var nameInput = page.GetByTestId("library-new-folder-name");
+            var nameInput = page.GetByTestId(UiTestIds.Library.NewFolderName);
             Assert.Equal(string.Empty, await nameInput.InputValueAsync());
             await nameInput.ClickAsync();
-            await nameInput.PressSequentiallyAsync("Roadshows");
-            await Expect(nameInput).ToHaveValueAsync("Roadshows");
+            await nameInput.PressSequentiallyAsync(BrowserTestConstants.Folders.RoadshowsName);
+            await Expect(nameInput).ToHaveValueAsync(BrowserTestConstants.Folders.RoadshowsName);
 
-            var overlayStyles = await page.GetByTestId("library-new-folder-overlay").EvaluateAsync<string[]>(
+            var overlayStyles = await page.GetByTestId(UiTestIds.Library.NewFolderOverlay).EvaluateAsync<string[]>(
                 @"element => {
                     const style = getComputedStyle(element);
                     return [
@@ -39,17 +40,17 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
             Assert.DoesNotContain("linear-gradient", overlayStyles[1], StringComparison.OrdinalIgnoreCase);
             Assert.Contains("blur", overlayStyles[2], StringComparison.OrdinalIgnoreCase);
 
-            await page.GetByTestId("library-new-folder-parent").SelectOptionAsync("presentations");
-            await page.GetByTestId("library-new-folder-submit").ClickAsync();
+            await page.GetByTestId(UiTestIds.Library.NewFolderParent).SelectOptionAsync(BrowserTestConstants.Folders.PresentationsId);
+            await page.GetByTestId(UiTestIds.Library.NewFolderSubmit).ClickAsync();
 
-            await Expect(page.GetByTestId("library-new-folder-overlay")).ToBeHiddenAsync();
-            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
             await page.ReloadAsync();
 
-            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
-            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
         }
         finally
         {

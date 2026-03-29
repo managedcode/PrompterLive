@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PrompterLive.Shared.Components.Diagnostics;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Tests;
 
@@ -59,7 +60,7 @@ public sealed class DiagnosticsTests : BunitContext
             Assert.Contains("Forced diagnostics failure.", cut.Markup);
         });
 
-        cut.Find("[data-testid='diagnostics-dismiss']").Click();
+        cut.FindByTestId(UiTestIds.Diagnostics.Dismiss).Click();
 
         cut.WaitForAssertion(() =>
         {

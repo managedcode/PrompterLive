@@ -1,4 +1,5 @@
 using Bunit;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -18,17 +19,17 @@ public sealed class LibraryFolderOverlayTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains("Product Launch", cut.Markup));
 
-        cut.Find("[data-testid='library-folder-create-start']").Click();
-        var nameInput = cut.Find("[data-testid='library-new-folder-name']");
+        cut.FindByTestId(UiTestIds.Library.FolderCreateStart).Click();
+        var nameInput = cut.FindByTestId(UiTestIds.Library.NewFolderName);
 
         Assert.Equal(string.Empty, nameInput.GetAttribute("value"));
 
-        nameInput.Input("Roadshows");
+        nameInput.Input(AppTestData.Folders.Roadshows);
 
         cut.WaitForAssertion(() =>
         {
-            var updatedInput = cut.Find("[data-testid='library-new-folder-name']");
-            Assert.Equal("Roadshows", updatedInput.GetAttribute("value"));
+            var updatedInput = cut.FindByTestId(UiTestIds.Library.NewFolderName);
+            Assert.Equal(AppTestData.Folders.Roadshows, updatedInput.GetAttribute("value"));
         });
     }
 }

@@ -1,4 +1,4 @@
-using Microsoft.Playwright;
+using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterLive.App.UITests;
@@ -11,33 +11,34 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
     [Fact]
     public async Task ScreenNavigation_UsesSpaRoutingWithoutReloadingBrowserContext()
     {
+        const string nonce = "spa-nav-stable";
         var page = await _fixture.NewPageAsync();
 
         try
         {
-            await page.GotoAsync("/editor?id=quantum-computing");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync(new() { Timeout = 15_000 });
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            const string nonce = "spa-nav-stable";
             await page.EvaluateAsync("value => window.__prompterSpaNonce = value", nonce);
 
-            await page.GetByRole(AriaRole.Button, new() { Name = "Learn" }).ClickAsync();
-            await page.WaitForURLAsync("**/learn?id=quantum-computing");
-            await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorLearn).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.LearnQuantum));
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
             Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
 
-            await page.GotoAsync("/editor?id=quantum-computing");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
             await page.EvaluateAsync("value => window.__prompterSpaNonce = value", nonce);
 
-            await page.GetByRole(AriaRole.Button, new() { Name = "Read" }).ClickAsync();
-            await page.WaitForURLAsync("**/teleprompter?id=quantum-computing");
-            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorRead).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.TeleprompterQuantum));
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
             Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
 
-            await page.GetByTestId("teleprompter-back").ClickAsync();
-            await page.WaitForURLAsync("**/editor?id=quantum-computing");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.Back).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.EditorQuantum));
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
             Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
         }
         finally

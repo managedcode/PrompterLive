@@ -9,6 +9,15 @@ const routeMap = {
     teleprompter: '/teleprompter',
     settings: '/settings'
 };
+const testIds = {
+    header: {
+        editorLearn: 'header-editor-learn',
+        editorRead: 'header-editor-read',
+        libraryBreadcrumbCurrent: 'header-library-breadcrumb-current',
+        libraryNewScript: 'header-library-new-script',
+        librarySearch: 'library-search'
+    }
+};
 const scriptScopedScreens = new Set(['editor', 'rsvp', 'teleprompter']);
 let blazorNavigator = null;
 
@@ -93,14 +102,14 @@ function updateAppHeader(screenId) {
                 <div class="lib-breadcrumb">
                     <span class="bc-item">All Scripts</span>
                     <span class="bc-sep">/</span>
-                    <span class="bc-item bc-current">Presentations</span>
+                    <span class="bc-item bc-current" data-testid="${testIds.header.libraryBreadcrumbCurrent}">Presentations</span>
                 </div>`;
             right.innerHTML = `
                 <div class="lib-search">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="text" placeholder="Search..." data-testid="library-search" oninput="filterLibraryCards(this.value)" />
+                    <input type="text" placeholder="Search..." data-testid="${testIds.header.librarySearch}" oninput="filterLibraryCards(this.value)" />
                 </div>
-                <button class="btn-create" onclick="navigateTo('editor')">
+                <button class="btn-create" onclick="navigateTo('editor')" data-testid="${testIds.header.libraryNewScript}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     New Script
                 </button>`;
@@ -110,11 +119,11 @@ function updateAppHeader(screenId) {
             const meta = getScreenMeta(screenId);
             center.innerHTML = `${backBtn}<span class="top-bar-title">${meta.title}</span>`;
             right.innerHTML = `
-                <button class="btn-ghost" onclick="navigateTo('rsvp')">
+                <button class="btn-ghost" onclick="navigateTo('rsvp')" data-testid="${testIds.header.editorLearn}">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                     Learn
                 </button>
-                <button class="btn-gold" onclick="navigateTo('teleprompter')">
+                <button class="btn-gold" onclick="navigateTo('teleprompter')" data-testid="${testIds.header.editorRead}">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>
                     Read
                 </button>`;

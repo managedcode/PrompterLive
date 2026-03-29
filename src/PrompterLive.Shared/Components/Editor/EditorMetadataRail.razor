@@ -7,7 +7,7 @@
         <select class="ed-meta-select"
                 value="@Profile"
                 @onchange="OnProfileChange"
-                data-testid="editor-profile">
+                data-testid="@UiTestIds.Editor.Profile">
             <option value="Actor">Actor</option>
             <option value="RSVP">RSVP</option>
         </select>
@@ -20,7 +20,7 @@
                min="80"
                max="600"
                @onchange="OnBaseWpmChange"
-               data-testid="editor-base-wpm" />
+               data-testid="@UiTestIds.Editor.BaseWpm" />
     </div>
     <div class="ed-meta-field">
         <label>Duration</label>
@@ -28,7 +28,7 @@
                class="ed-meta-input"
                value="@Status.Duration"
                readonly
-               data-testid="editor-duration" />
+               data-testid="@UiTestIds.Editor.Duration" />
     </div>
     <div class="ed-meta-field">
         <label>Author</label>
@@ -36,7 +36,7 @@
                class="ed-meta-input"
                value="@Author"
                @onchange="OnAuthorChange"
-               data-testid="editor-author" />
+               data-testid="@UiTestIds.Editor.Author" />
     </div>
     <div class="ed-meta-field">
         <label>Created</label>
@@ -44,7 +44,7 @@
                class="ed-meta-input"
                value="@CreatedDate"
                @onchange="OnCreatedDateChange"
-               data-testid="editor-created" />
+               data-testid="@UiTestIds.Editor.Created" />
     </div>
     <div class="ed-meta-field">
         <label>Version</label>
@@ -52,7 +52,7 @@
                class="ed-meta-input"
                value="@Version"
                @onchange="OnVersionChange"
-               data-testid="editor-version" />
+               data-testid="@UiTestIds.Editor.Version" />
     </div>
 
     <div class="ed-section-label" style="margin-top:18px">SPEED OFFSETS</div>
@@ -63,7 +63,7 @@
                    class="ed-meta-input ed-meta-num"
                    value="@XslowOffset"
                    @onchange="OnXslowOffsetChange"
-                   data-testid="editor-speed-xslow" />
+                   data-testid="@UiTestIds.Editor.SpeedXslow" />
             <span class="ed-meta-unit" style="color:#FF8A8A">%</span>
         </div>
     </div>
@@ -74,7 +74,7 @@
                    class="ed-meta-input ed-meta-num"
                    value="@SlowOffset"
                    @onchange="OnSlowOffsetChange"
-                   data-testid="editor-speed-slow" />
+                   data-testid="@UiTestIds.Editor.SpeedSlow" />
             <span class="ed-meta-unit" style="color:#FFB86A">%</span>
         </div>
     </div>
@@ -85,7 +85,7 @@
                    class="ed-meta-input ed-meta-num"
                    value="@FastOffset"
                    @onchange="OnFastOffsetChange"
-                   data-testid="editor-speed-fast" />
+                   data-testid="@UiTestIds.Editor.SpeedFast" />
             <span class="ed-meta-unit" style="color:#8ECFFF">%</span>
         </div>
     </div>
@@ -96,7 +96,7 @@
                    class="ed-meta-input ed-meta-num"
                    value="@XfastOffset"
                    @onchange="OnXfastOffsetChange"
-                   data-testid="editor-speed-xfast" />
+                   data-testid="@UiTestIds.Editor.SpeedXfast" />
             <span class="ed-meta-unit" style="color:#80B8FF">%</span>
         </div>
     </div>

@@ -1,6 +1,7 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Pages;
 using PrompterLive.Shared.Tests;
 
@@ -13,12 +14,12 @@ public sealed class TeleprompterFidelityTests : BunitContext
     {
         var harness = TestHarnessFactory.Create(this);
         Services.GetRequiredService<NavigationManager>()
-            .NavigateTo("http://localhost/teleprompter?id=security-incident");
+            .NavigateTo(AppTestData.Routes.TeleprompterSecurityIncident);
         var cut = Render<TeleprompterPage>();
 
         cut.WaitForAssertion(() =>
         {
-            var groups = cut.FindAll(".rd-card-active .rd-g");
+            var groups = cut.FindAll($"{BunitTestSelectors.BuildTestIdSelector(UiTestIds.Teleprompter.Card(0))} [data-testid^='{UiTestIds.Teleprompter.CardGroupPrefix(0)}']");
             var groupTexts = groups.Select(group => group.TextContent).ToArray();
 
             Assert.NotEmpty(groups);
