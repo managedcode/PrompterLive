@@ -4,7 +4,6 @@ author: "Sam Wilson"
 profile: "Actor"
 base_wpm: 130
 version: "1.0"
-folder: "investors"
 display_duration: "8:00"
 display_word_count: 1040
 display_segment_count: 5

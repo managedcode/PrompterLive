@@ -43,6 +43,7 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
         string text,
         string? documentName = null,
         string? existingId = null,
+        string? folderId = null,
         CancellationToken cancellationToken = default)
     {
         var normalizedTitle = string.IsNullOrWhiteSpace(title) ? "Untitled Script" : title.Trim();
@@ -52,16 +53,32 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
         var id = string.IsNullOrWhiteSpace(existingId)
             ? Slugify(Path.GetFileNameWithoutExtension(normalizedDocumentName))
             : existingId;
+        var persistedFolderId = ResolveFolderId(existingId, folderId);
 
         var document = new StoredScriptDocument(
             id,
             normalizedTitle,
             text ?? string.Empty,
             normalizedDocumentName,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            persistedFolderId);
 
         _documents[id] = document;
         return Task.FromResult(document);
+    }
+
+    public Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default)
+    {
+        if (_documents.TryGetValue(id, out var document))
+        {
+            _documents[id] = document with
+            {
+                UpdatedAt = DateTimeOffset.UtcNow,
+                FolderId = string.IsNullOrWhiteSpace(folderId) ? null : folderId
+            };
+        }
+
+        return Task.CompletedTask;
     }
 
     public Task DeleteAsync(string id, CancellationToken cancellationToken = default)
@@ -90,5 +107,22 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
 
         slug = slug.Trim('-');
         return string.IsNullOrWhiteSpace(slug) ? "untitled-script" : slug;
+    }
+
+    private string? ResolveFolderId(string? existingId, string? folderId)
+    {
+        if (!string.IsNullOrWhiteSpace(folderId))
+        {
+            return folderId;
+        }
+
+        if (string.IsNullOrWhiteSpace(existingId))
+        {
+            return null;
+        }
+
+        return _documents.TryGetValue(existingId, out var existingDocument)
+            ? existingDocument.FolderId
+            : null;
     }
 }

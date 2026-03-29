@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using Bunit;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
+using PrompterLive.Core.Models.Library;
 using PrompterLive.Core.Models.Media;
 using PrompterLive.Core.Services;
 using PrompterLive.Core.Services.Media;
@@ -20,6 +21,7 @@ internal static class TestHarnessFactory
     {
         var jsRuntime = new TestJsRuntime();
         var repository = new InMemoryScriptRepository();
+        var folderRepository = new InMemoryLibraryFolderRepository();
         var parser = new TpsParser();
         var compiler = new ScriptCompiler();
         var previewService = new ScriptPreviewService(parser, compiler);
@@ -29,6 +31,7 @@ internal static class TestHarnessFactory
         var deviceService = new FakeMediaDeviceService(devices ?? DefaultDevices);
 
         context.Services.AddSingleton<IJSRuntime>(jsRuntime);
+        context.Services.AddSingleton<ILibraryFolderRepository>(folderRepository);
         context.Services.AddSingleton<IScriptRepository>(repository);
         context.Services.AddSingleton<IScriptSessionService>(session);
         context.Services.AddSingleton(parser);
@@ -49,7 +52,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, RtmpStreamingOutputProvider>();
 
-        return new AppHarness(jsRuntime, repository, session, sceneService, permissionService, deviceService);
+        return new AppHarness(jsRuntime, repository, folderRepository, session, sceneService, permissionService, deviceService);
     }
 
     private static IReadOnlyList<MediaDeviceInfo> DefaultDevices =>
@@ -62,6 +65,7 @@ internal static class TestHarnessFactory
 internal sealed record AppHarness(
     TestJsRuntime JsRuntime,
     InMemoryScriptRepository Repository,
+    InMemoryLibraryFolderRepository FolderRepository,
     ScriptSessionService Session,
     MediaSceneService SceneService,
     FakeMediaPermissionService PermissionService,
@@ -166,7 +170,8 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
                 document.Title,
                 document.DocumentName,
                 document.UpdatedAt,
-                CountWords(document.Text)))
+                CountWords(document.Text),
+                document.FolderId))
             .ToList();
 
         return Task.FromResult<IReadOnlyList<StoredScriptSummary>>(summaries);
@@ -183,6 +188,7 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
         string text,
         string? documentName = null,
         string? existingId = null,
+        string? folderId = null,
         CancellationToken cancellationToken = default)
     {
         var normalizedTitle = string.IsNullOrWhiteSpace(title) ? "Untitled Script" : title.Trim();
@@ -192,16 +198,32 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
         var id = string.IsNullOrWhiteSpace(existingId)
             ? Slugify(Path.GetFileNameWithoutExtension(normalizedDocumentName))
             : existingId;
+        var persistedFolderId = ResolveFolderId(existingId, folderId);
 
         var document = new StoredScriptDocument(
             id,
             normalizedTitle,
             text ?? string.Empty,
             normalizedDocumentName,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            persistedFolderId);
 
         _documents[id] = document;
         return Task.FromResult(document);
+    }
+
+    public Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default)
+    {
+        if (_documents.TryGetValue(id, out var document))
+        {
+            _documents[id] = document with
+            {
+                UpdatedAt = DateTimeOffset.UtcNow,
+                FolderId = string.IsNullOrWhiteSpace(folderId) ? null : folderId
+            };
+        }
+
+        return Task.CompletedTask;
     }
 
     public Task DeleteAsync(string id, CancellationToken cancellationToken = default)
@@ -230,5 +252,107 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
 
         slug = slug.Trim('-');
         return string.IsNullOrWhiteSpace(slug) ? "untitled-script" : slug;
+    }
+
+    private string? ResolveFolderId(string? existingId, string? folderId)
+    {
+        if (!string.IsNullOrWhiteSpace(folderId))
+        {
+            return folderId;
+        }
+
+        if (string.IsNullOrWhiteSpace(existingId))
+        {
+            return null;
+        }
+
+        return _documents.TryGetValue(existingId, out var existingDocument)
+            ? existingDocument.FolderId
+            : null;
+    }
+}
+
+internal sealed class InMemoryLibraryFolderRepository : ILibraryFolderRepository
+{
+    private readonly Dictionary<string, StoredLibraryFolder> _folders = new(StringComparer.Ordinal);
+
+    public Task InitializeAsync(IEnumerable<StoredLibraryFolder> seedFolders, CancellationToken cancellationToken = default)
+    {
+        foreach (var folder in seedFolders)
+        {
+            _folders[folder.Id] = folder;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyList<StoredLibraryFolder>> ListAsync(CancellationToken cancellationToken = default)
+    {
+        var folders = _folders.Values
+            .OrderBy(folder => folder.DisplayOrder)
+            .ThenBy(folder => folder.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<StoredLibraryFolder>>(folders);
+    }
+
+    public Task<StoredLibraryFolder> CreateAsync(
+        string name,
+        string? parentId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedName = name.Trim();
+        var folder = new StoredLibraryFolder(
+            Id: BuildUniqueId(normalizedName),
+            Name: normalizedName,
+            ParentId: string.IsNullOrWhiteSpace(parentId) ? null : parentId,
+            DisplayOrder: ResolveDisplayOrder(parentId),
+            UpdatedAt: DateTimeOffset.UtcNow);
+
+        _folders[folder.Id] = folder;
+        return Task.FromResult(folder);
+    }
+
+    private string BuildUniqueId(string name)
+    {
+        var baseId = Slugify(name);
+        if (!_folders.ContainsKey(baseId))
+        {
+            return baseId;
+        }
+
+        var suffix = 2;
+        var candidate = baseId;
+        while (_folders.ContainsKey(candidate))
+        {
+            candidate = $"{baseId}-{suffix}";
+            suffix++;
+        }
+
+        return candidate;
+    }
+
+    private int ResolveDisplayOrder(string? parentId) =>
+        _folders.Values
+            .Where(folder => string.Equals(folder.ParentId, parentId, StringComparison.Ordinal))
+            .Select(folder => folder.DisplayOrder)
+            .DefaultIfEmpty(-1)
+            .Max() + 1;
+
+    private static string Slugify(string value)
+    {
+        var slug = new string(value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(character => char.IsLetterOrDigit(character) ? character : '-')
+            .ToArray());
+
+        while (slug.Contains("--", StringComparison.Ordinal))
+        {
+            slug = slug.Replace("--", "-", StringComparison.Ordinal);
+        }
+
+        slug = slug.Trim('-');
+        return string.IsNullOrWhiteSpace(slug) ? "untitled-folder" : slug;
     }
 }

@@ -5,4 +5,5 @@ public sealed partial record StoredScriptDocument(
     string Title,
     string Text,
     string DocumentName,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? FolderId = null);

@@ -1,0 +1,58 @@
+<a class="@BuildCssClass()"
+   @onclick="HandleSelectAsync"
+   data-testid="@Node.TestId">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        @if (Node.ShowChevron && Node.IsExpanded)
+        {
+            <polyline points="6,9 12,15 18,9" />
+        }
+        else
+        {
+            <polyline points="9,18 15,12 9,6" />
+        }
+    </svg>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    </svg>
+    <span>@Node.Name</span>
+    <span class="nav-count">@Node.TotalCount</span>
+</a>
+
+@if (Node.IsExpanded && Node.Children.Count > 0)
+{
+    <div class="folder-children">
+        @foreach (var child in Node.Children)
+        {
+            <LibraryFolderTreeItem Node="child" OnSelectFolder="OnSelectFolder" />
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public LibraryFolderNodeViewModel Node { get; set; } = null!;
+
+    [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }
+
+    private Task HandleSelectAsync() => OnSelectFolder.InvokeAsync(Node.Id);
+
+    private string BuildCssClass()
+    {
+        var classes = new List<string> { "folder-item" };
+        if (Node.Depth > 0)
+        {
+            classes.Add("folder-child");
+        }
+
+        if (Node.IsExpanded)
+        {
+            classes.Add("folder-open");
+        }
+
+        if (Node.IsSelected)
+        {
+            classes.Add("active");
+        }
+
+        return string.Join(' ', classes);
+    }
+}

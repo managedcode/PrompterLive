@@ -1217,6 +1217,12 @@ window.PrompterLiveDesign = {
             void initializeReaderCamera();
         }
     },
+    setLibraryBreadcrumb(label) {
+        const breadcrumbCurrent = document.querySelector('.bc-current');
+        if (breadcrumbCurrent && typeof label === 'string' && label.trim().length > 0) {
+            breadcrumbCurrent.textContent = label;
+        }
+    },
     setRsvpTimeline(entries, options) {
         const nextEntries = Array.isArray(entries)
             ? entries

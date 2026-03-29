@@ -4,7 +4,6 @@ author: "Jane Doe"
 profile: "Actor"
 base_wpm: 140
 version: "1.0"
-folder: "product"
 display_duration: "10:00"
 display_word_count: 1420
 display_segment_count: 4

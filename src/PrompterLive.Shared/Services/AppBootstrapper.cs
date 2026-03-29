@@ -1,12 +1,14 @@
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Media;
 using PrompterLive.Core.Models.Workspace;
+using PrompterLive.Core.Services.Samples;
 
 namespace PrompterLive.Shared.Services;
 
 public sealed class AppBootstrapper
 {
     private readonly IScriptSessionService _sessionService;
+    private readonly ILibraryFolderRepository _libraryFolderRepository;
     private readonly IMediaSceneService _mediaSceneService;
     private readonly BrowserSettingsStore _settingsStore;
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -14,10 +16,12 @@ public sealed class AppBootstrapper
 
     public AppBootstrapper(
         IScriptSessionService sessionService,
+        ILibraryFolderRepository libraryFolderRepository,
         IMediaSceneService mediaSceneService,
         BrowserSettingsStore settingsStore)
     {
         _sessionService = sessionService;
+        _libraryFolderRepository = libraryFolderRepository;
         _mediaSceneService = mediaSceneService;
         _settingsStore = settingsStore;
     }
@@ -38,6 +42,7 @@ public sealed class AppBootstrapper
                 return;
             }
 
+            await _libraryFolderRepository.InitializeAsync(SampleLibraryFolderCatalog.CreateSeedFolders(), cancellationToken);
             await _sessionService.InitializeAsync(cancellationToken);
 
             var readerSettings = await _settingsStore.LoadAsync<ReaderSettings>("prompterlive.reader", cancellationToken);

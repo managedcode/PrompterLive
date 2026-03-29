@@ -1,0 +1,76 @@
+<div class="lib-sidebar">
+    <nav class="lib-nav">
+        <a class="nav-item @(IsAllSelected ? "active" : null)"
+           @onclick="HandleSelectAllAsync"
+           data-testid="library-folder-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+            All Scripts
+            <span class="nav-count">@AllScriptCount</span>
+        </a>
+        <a class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+            </svg>
+            Recent
+        </a>
+        <a class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            Favorites
+        </a>
+    </nav>
+
+    <div class="lib-folders-section">
+        <div class="lib-folders-header">
+            <span>Folders</span>
+            <button class="folder-add-btn"
+                    title="New folder"
+                    @onclick="HandleStartCreateAsync"
+                    data-testid="library-folder-create-start">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+            </button>
+        </div>
+        <nav class="lib-folder-tree">
+            @foreach (var folder in Folders)
+            {
+                <LibraryFolderTreeItem Node="folder" OnSelectFolder="OnSelectFolder" />
+            }
+        </nav>
+    </div>
+    <div class="lib-nav-spacer"></div>
+    <nav class="lib-nav lib-nav-bottom">
+        <a class="nav-item" onclick="navigateTo('settings')" data-testid="library-open-settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            Settings
+        </a>
+    </nav>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderNodeViewModel> Folders { get; set; } = [];
+
+    [Parameter, EditorRequired] public int AllScriptCount { get; set; }
+
+    [Parameter, EditorRequired] public bool IsAllSelected { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
+
+    private Task HandleSelectAllAsync() => OnSelectFolder.InvokeAsync(LibrarySelectionKeys.All);
+
+    private Task HandleStartCreateAsync() => OnStartCreateFolder.InvokeAsync();
+}

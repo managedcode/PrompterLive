@@ -22,6 +22,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<RsvpPlaybackEngine>();
         services.AddScoped<IScriptPreviewService, ScriptPreviewService>();
 
+        services.AddScoped<ILibraryFolderRepository, BrowserLibraryFolderRepository>();
         services.AddScoped<IScriptRepository, BrowserScriptRepository>();
         services.AddScoped<IScriptSessionService, ScriptSessionService>();
         services.AddScoped<IMediaPermissionService, BrowserMediaPermissionService>();

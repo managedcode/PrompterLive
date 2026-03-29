@@ -41,12 +41,34 @@ flowchart TD
     WasmHost["PrompterLive.App"]
     Ui["PrompterLive.Shared"]
     Domain["PrompterLive.Core"]
+    BrowserStorage["Browser storage adapters<br/>documents + folders + settings"]
     WebApis["localStorage / MediaDevices / Canvas / JS helpers"]
 
     Browser --> WasmHost
     WasmHost --> Ui
     Ui --> Domain
+    Ui --> BrowserStorage
+    BrowserStorage --> WebApis
     Ui --> WebApis
+```
+
+## Library Contracts
+
+```mermaid
+flowchart LR
+    LibraryPage["LibraryPage + Library components"]
+    ScriptRepo["IScriptRepository"]
+    FolderRepo["ILibraryFolderRepository"]
+    CardFactory["LibraryCardFactory"]
+    TreeBuilder["LibraryFolderTreeBuilder"]
+    LocalStorage["localStorage adapters"]
+
+    LibraryPage --> ScriptRepo
+    LibraryPage --> FolderRepo
+    LibraryPage --> CardFactory
+    LibraryPage --> TreeBuilder
+    ScriptRepo --> LocalStorage
+    FolderRepo --> LocalStorage
 ```
 
 ## Media Permission Model
@@ -70,6 +92,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - routed Razor screens: `library`, `editor`, `learn`, `teleprompter`, `settings`
 - exact design shell and imported `new-design` assets
 - browser interop and app DI wiring
+- dynamic library folder components and folder/document browser storage adapters
 
 Rules:
 
@@ -96,11 +119,18 @@ Rules:
 sequenceDiagram
     participant User
     participant Library
+    participant FolderStore
+    participant ScriptStore
     participant Editor
     participant Learn
     participant Reader
 
     User->>Library: Open app
+    Library->>FolderStore: Load folder tree
+    Library->>ScriptStore: Load local scripts
+    User->>Library: Create folder / move script
+    Library->>FolderStore: Persist folder changes
+    Library->>ScriptStore: Persist folder assignment
     Library->>Editor: Open or create script
     Editor->>Learn: Rehearse via RSVP
     Editor->>Reader: Enter teleprompter mode

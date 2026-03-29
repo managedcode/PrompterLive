@@ -11,4 +11,6 @@ public sealed class BrowserStoredScriptDocumentDto
     public string? DocumentName { get; set; }
 
     public DateTimeOffset UpdatedAt { get; set; }
+
+    public string? FolderId { get; set; }
 }

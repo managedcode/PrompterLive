@@ -4,7 +4,6 @@ author: "Maria Lopez"
 profile: "Actor"
 base_wpm: 160
 version: "1.0"
-folder: "ted"
 display_duration: "18:00"
 display_word_count: 2880
 display_segment_count: 6

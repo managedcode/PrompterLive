@@ -1,0 +1,232 @@
+<div class="dcards-grid">
+    @foreach (var card in Cards)
+    {
+        <article class="dcard"
+                 style="--emo:@card.AccentColor"
+                 @onclick="() => OnOpenScript.InvokeAsync(card.Id)"
+                 data-testid="@card.TestId">
+            <div class="dcard-menu-wrap">
+                <button class="dcard-menu-btn"
+                        data-testid="library-card-menu-@card.Id"
+                        onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="5" r="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <circle cx="12" cy="19" r="2" />
+                    </svg>
+                </button>
+                <div class="dcard-dropdown">
+                    <button @onclick:stopPropagation="true" @onclick="() => OnOpenScript.InvokeAsync(card.Id)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Rename
+                    </button>
+                    <button @onclick:stopPropagation="true" @onclick="() => OnDuplicateScript.InvokeAsync(card.Id)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Duplicate
+                    </button>
+                    <div class="dcard-dropdown-group">
+                        <div class="dcard-dropdown-label">Move to...</div>
+                        <button data-testid="library-move-@card.Id-@LibrarySelectionKeys.None"
+                                @onclick:stopPropagation="true"
+                                @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, null))">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                                <line x1="6" y1="18" x2="18" y2="6" />
+                            </svg>
+                            No Folder
+                        </button>
+                        @foreach (var folder in FolderOptions)
+                        {
+                            <button data-testid="library-move-@card.Id-@folder.Id"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, folder.Id))">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                                </svg>
+                                @folder.Label
+                            </button>
+                        }
+                    </div>
+                    <div class="dcard-dropdown-sep"></div>
+                    <button class="dcard-dropdown-danger"
+                            @onclick:stopPropagation="true"
+                            @onclick="() => OnDeleteScript.InvokeAsync(card.Id)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div class="dcard-inner">
+                <div class="dcard-cover @card.CoverClass">
+                    <div class="dcover-orb dcover-orb1"></div>
+                    <div class="dcover-orb dcover-orb2"></div>
+                    <h3 class="dcard-title">@card.Title</h3>
+                    <div class="dcover-meta">
+                        <span class="dcover-emo">@card.Emotion</span>
+                        <span>@card.ModeLabel</span>
+                        <span>@card.DurationLabel</span>
+                    </div>
+                </div>
+                <div class="dcard-data">
+                    <div class="ddata-row">
+                        <span>@card.WpmLabel</span>
+                        <span>@card.WordCountLabel</span>
+                        <span>@card.SegmentCountLabel</span>
+                    </div>
+                    <div class="ddata-foot">
+                        <span>@card.Author</span>
+                        <span>@card.UpdatedLabel</span>
+                    </div>
+                </div>
+                <div class="dcard-actions">
+                    <button class="dcard-act" @onclick:stopPropagation="true" @onclick="() => OnLearnScript.InvokeAsync(card.Id)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                        </svg>
+                        Learn
+                    </button>
+                    <button class="dcard-act dcard-act-go" @onclick:stopPropagation="true" @onclick="() => OnReadScript.InvokeAsync(card.Id)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21" />
+                        </svg>
+                        Read
+                    </button>
+                </div>
+            </div>
+        </article>
+    }
+
+    <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-testid="library-create-script">
+        <div class="dcard-create-inner">
+            <div class="dcreate-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+            </div>
+            <span class="dcreate-label">New Script</span>
+        </div>
+    </article>
+
+    @if (IsCreatingFolder)
+    {
+        <article class="dcard dcard-create dcard-create-folder dcard-folder-form" data-testid="library-new-folder-card">
+            <div class="dcard-create-inner dcard-folder-form-inner">
+                <div class="dcreate-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        <line x1="12" y1="11" x2="12" y2="17" />
+                        <line x1="9" y1="14" x2="15" y2="14" />
+                    </svg>
+                </div>
+                <label class="folder-form-label">
+                    <span>Name</span>
+                    <input class="folder-form-input"
+                           value="@FolderDraftName"
+                           @oninput="HandleFolderNameInput"
+                           data-testid="library-new-folder-name" />
+                </label>
+                <label class="folder-form-label">
+                    <span>Parent</span>
+                    <select class="folder-form-select"
+                            value="@FolderDraftParentId"
+                            @onchange="HandleFolderParentChange"
+                            data-testid="library-new-folder-parent">
+                        <option value="@LibrarySelectionKeys.Root">Top Level</option>
+                        @foreach (var folder in FolderOptions)
+                        {
+                            <option value="@folder.Id">@folder.Label</option>
+                        }
+                    </select>
+                </label>
+                <div class="folder-form-actions">
+                    <button class="dcard-act"
+                            type="button"
+                            @onclick="HandleCancelCreateFolderAsync"
+                            data-testid="library-new-folder-cancel">Cancel</button>
+                    <button class="dcard-act dcard-act-go"
+                            type="button"
+                            @onclick="HandleSubmitCreateFolderAsync"
+                            data-testid="library-new-folder-submit">Create</button>
+                </div>
+            </div>
+        </article>
+    }
+    else
+    {
+        <article class="dcard dcard-create dcard-create-folder"
+                 @onclick="HandleStartCreateFolderAsync"
+                 data-testid="library-folder-create-tile">
+            <div class="dcard-create-inner">
+                <div class="dcreate-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        <line x1="12" y1="11" x2="12" y2="17" />
+                        <line x1="9" y1="14" x2="15" y2="14" />
+                    </svg>
+                </div>
+                <span class="dcreate-label">New Folder</span>
+            </div>
+        </article>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<LibraryCardViewModel> Cards { get; set; } = [];
+
+    [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
+
+    [Parameter, EditorRequired] public bool IsCreatingFolder { get; set; }
+
+    [Parameter, EditorRequired] public string FolderDraftName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired] public string FolderDraftParentId { get; set; } = LibrarySelectionKeys.Root;
+
+    [Parameter, EditorRequired] public EventCallback<string> OnOpenScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnDuplicateScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<LibraryMoveRequest> OnMoveScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnDeleteScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnLearnScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnReadScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback OnCreateScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback OnCancelCreateFolder { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback OnSubmitCreateFolder { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnFolderDraftNameChanged { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnFolderDraftParentChanged { get; set; }
+
+    private Task HandleCreateScriptAsync() => OnCreateScript.InvokeAsync();
+
+    private Task HandleStartCreateFolderAsync() => OnStartCreateFolder.InvokeAsync();
+
+    private Task HandleCancelCreateFolderAsync() => OnCancelCreateFolder.InvokeAsync();
+
+    private Task HandleSubmitCreateFolderAsync() => OnSubmitCreateFolder.InvokeAsync();
+
+    private Task HandleFolderNameInput(ChangeEventArgs args) =>
+        OnFolderDraftNameChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task HandleFolderParentChange(ChangeEventArgs args) =>
+        OnFolderDraftParentChanged.InvokeAsync(args.Value?.ToString() ?? LibrarySelectionKeys.Root);
+}

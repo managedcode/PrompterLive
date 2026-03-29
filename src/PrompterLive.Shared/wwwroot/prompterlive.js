@@ -1,6 +1,8 @@
 (function () {
-    const storageKey = "prompterlive.library.v1";
-    const seedVersionKey = "prompterlive.library.seed-version";
+    const documentStorageKey = "prompterlive.library.v1";
+    const documentSeedVersionKey = "prompterlive.library.seed-version";
+    const folderStorageKey = "prompterlive.folders.v1";
+    const folderSeedVersionKey = "prompterlive.folders.seed-version";
     const settingsPrefix = "prompterlive.settings.";
     const streamMap = new Map();
     const readerAnimations = new Map();
@@ -17,7 +19,8 @@
                 title: title || "Untitled Script",
                 text: text || "",
                 documentName: documentName || "untitled-script.tps",
-                updatedAt: updatedAt || new Date().toISOString()
+                updatedAt: updatedAt || new Date().toISOString(),
+                folderId: null
             };
         }
 
@@ -30,8 +33,35 @@
             title: document.title ?? document.Title ?? "Untitled Script",
             text: document.text ?? document.Text ?? "",
             documentName: document.documentName ?? document.DocumentName ?? "untitled-script.tps",
-            updatedAt: document.updatedAt ?? document.UpdatedAt ?? new Date().toISOString()
+            updatedAt: document.updatedAt ?? document.UpdatedAt ?? new Date().toISOString(),
+            folderId: document.folderId ?? document.FolderId ?? null
         };
+    }
+
+    function normalizeFolder(folder) {
+        if (!folder || typeof folder !== "object") {
+            return null;
+        }
+
+        return {
+            id: folder.id ?? folder.Id ?? "",
+            name: folder.name ?? folder.Name ?? "Untitled Folder",
+            parentId: folder.parentId ?? folder.ParentId ?? null,
+            displayOrder: Number.isFinite(folder.displayOrder ?? folder.DisplayOrder)
+                ? folder.displayOrder ?? folder.DisplayOrder
+                : 0,
+            updatedAt: folder.updatedAt ?? folder.UpdatedAt ?? new Date().toISOString()
+        };
+    }
+
+    function normalizeFolders(folders) {
+        if (!Array.isArray(folders)) {
+            return [];
+        }
+
+        return folders
+            .map(normalizeFolder)
+            .filter(Boolean);
     }
 
     function normalizeDocuments(documents) {
@@ -57,7 +87,7 @@
 
     function readDocuments() {
         try {
-            const raw = window.localStorage.getItem(storageKey);
+            const raw = window.localStorage.getItem(documentStorageKey);
             if (!raw) {
                 return [];
             }
@@ -74,7 +104,24 @@
     }
 
     function writeDocuments(documents) {
-        window.localStorage.setItem(storageKey, JSON.stringify(documents));
+        window.localStorage.setItem(documentStorageKey, JSON.stringify(documents));
+    }
+
+    function readFolders() {
+        try {
+            const raw = window.localStorage.getItem(folderStorageKey);
+            if (!raw) {
+                return [];
+            }
+
+            return normalizeFolders(JSON.parse(raw));
+        } catch {
+            return [];
+        }
+    }
+
+    function writeFolders(folders) {
+        window.localStorage.setItem(folderStorageKey, JSON.stringify(folders));
     }
 
     async function stopStream(stream) {
@@ -104,15 +151,26 @@
                 writeDocuments(merged);
             },
             getSeedVersion() {
-                return window.localStorage.getItem(seedVersionKey);
+                return window.localStorage.getItem(documentSeedVersionKey);
             },
             setSeedVersion(version) {
                 if (!version) {
-                    window.localStorage.removeItem(seedVersionKey);
+                    window.localStorage.removeItem(documentSeedVersionKey);
                     return;
                 }
 
-                window.localStorage.setItem(seedVersionKey, version);
+                window.localStorage.setItem(documentSeedVersionKey, version);
+            },
+            getFolderSeedVersion() {
+                return window.localStorage.getItem(folderSeedVersionKey);
+            },
+            setFolderSeedVersion(version) {
+                if (!version) {
+                    window.localStorage.removeItem(folderSeedVersionKey);
+                    return;
+                }
+
+                window.localStorage.setItem(folderSeedVersionKey, version);
             },
             listDocuments() {
                 return readDocuments();
@@ -149,6 +207,32 @@
             deleteDocument(id) {
                 const documents = readDocuments().filter(document => document.id !== id);
                 writeDocuments(documents);
+            },
+            listFolders() {
+                return readFolders();
+            },
+            listFoldersJson() {
+                return JSON.stringify(readFolders());
+            },
+            saveFolder(folder) {
+                const normalizedFolder = normalizeFolder(folder);
+                if (!normalizedFolder) {
+                    return null;
+                }
+
+                const folders = readFolders();
+                const index = folders.findIndex(item => item.id === normalizedFolder.id);
+                if (index >= 0) {
+                    folders[index] = normalizedFolder;
+                } else {
+                    folders.push(normalizedFolder);
+                }
+
+                writeFolders(folders);
+                return normalizedFolder;
+            },
+            saveFolderJson(folder) {
+                return JSON.stringify(window.PrompterLive.storage.saveFolder(folder));
             }
         },
 

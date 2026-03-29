@@ -746,7 +746,7 @@ button {
     position: absolute;
     top: 36px;
     right: 0;
-    width: 180px;
+    width: 220px;
     background: rgba(12,20,24,.95);
     backdrop-filter: blur(16px);
     border: 1px solid var(--gold-14);
@@ -770,6 +770,22 @@ button {
     text-align: left;
 }
 .dcard-dropdown button:hover { background: var(--gold-07); color: var(--t1); }
+
+.dcard-dropdown-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 4px;
+}
+
+.dcard-dropdown-label {
+    padding: 8px 12px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--t4);
+}
 
 .dcard-dropdown-sep {
     height: 1px;
@@ -916,6 +932,56 @@ button {
 .dcard-create-folder .dcreate-label { color: #5EEAD4; }
 .dcard-create-folder .dcard-create-inner::before {
     background: radial-gradient(ellipse at 50% 40%, rgba(13,148,136,.05), transparent 60%);
+}
+
+.dcard-folder-form {
+    cursor: default;
+}
+
+.dcard-folder-form .dcard-create-inner {
+    align-items: stretch;
+    gap: 14px;
+}
+
+.folder-form-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--t3);
+    position: relative;
+    z-index: 1;
+}
+
+.folder-form-input,
+.folder-form-select {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(94,234,212,.18);
+    background: rgba(8,20,28,.72);
+    color: var(--t1);
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.folder-form-input:focus,
+.folder-form-select:focus {
+    outline: none;
+    border-color: rgba(94,234,212,.4);
+    box-shadow: 0 0 0 1px rgba(94,234,212,.18);
+}
+
+.folder-form-actions {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.folder-form-actions .dcard-act {
+    justify-content: center;
 }
 
 /* ---- Old card styles (kept for compatibility) ---- */

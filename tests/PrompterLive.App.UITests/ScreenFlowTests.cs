@@ -62,6 +62,37 @@ public sealed class ScreenFlowTests
     }
 
     [Fact]
+    public async Task LibraryScreen_CreatesFolderAndMovesScript()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync("/library");
+            await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
+            await page.GetByTestId("library-folder-create-tile").ClickAsync();
+            await Expect(page.GetByTestId("library-new-folder-card")).ToBeVisibleAsync();
+            await page.GetByTestId("library-new-folder-name").FillAsync("Roadshows");
+            await page.GetByTestId("library-new-folder-parent").SelectOptionAsync(new[] { "presentations" });
+            await page.GetByTestId("library-new-folder-submit").ClickAsync();
+            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
+            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+
+            await page.GetByTestId("library-folder-all").ClickAsync();
+            await page.GetByTestId("library-card-menu-rsvp-tech-demo").ClickAsync();
+            await page.GetByTestId("library-move-rsvp-tech-demo-roadshows").ClickAsync();
+            await page.GetByTestId("library-folder-roadshows").ClickAsync();
+
+            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
+            await Expect(page.GetByText("Security Incident")).ToBeHiddenAsync();
+        }
+        finally
+        {
+            await page.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task EditorAndLearnScreens_ExposeExpectedInteractiveControls()
     {
         var page = await _fixture.NewPageAsync();

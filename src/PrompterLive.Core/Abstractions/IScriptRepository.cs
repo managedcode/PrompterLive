@@ -15,7 +15,10 @@ public interface IScriptRepository
         string text,
         string? documentName = null,
         string? existingId = null,
+        string? folderId = null,
         CancellationToken cancellationToken = default);
+
+    Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

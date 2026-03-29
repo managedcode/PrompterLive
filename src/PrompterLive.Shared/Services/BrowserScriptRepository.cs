@@ -28,7 +28,7 @@ public sealed class BrowserScriptRepository : IScriptRepository
     public async Task<IReadOnlyList<StoredScriptSummary>> ListAsync(CancellationToken cancellationToken = default)
     {
         var json = await _jsRuntime.InvokeAsync<string>(
-            "PrompterLive.storage.listDocumentsJson",
+            BrowserStorageMethodNames.ListDocumentsJson,
             cancellationToken);
         var documents = JsonSerializer.Deserialize<List<BrowserStoredScriptDocumentDto>>(json, JsonOptions) ?? [];
 
@@ -40,7 +40,8 @@ public sealed class BrowserScriptRepository : IScriptRepository
                 document.Title,
                 document.DocumentName,
                 document.UpdatedAt,
-                CountWords(document.Text)))
+                CountWords(document.Text),
+                document.FolderId))
             .ToList();
     }
 
@@ -54,22 +55,25 @@ public sealed class BrowserScriptRepository : IScriptRepository
         string text,
         string? documentName = null,
         string? existingId = null,
+        string? folderId = null,
         CancellationToken cancellationToken = default)
     {
         title = string.IsNullOrWhiteSpace(title) ? "Untitled Script" : title.Trim();
         documentName = string.IsNullOrWhiteSpace(documentName)
-            ? $"{Slugify(title)}.tps"
+            ? $"{BrowserStorageSlugifier.Slugify(title)}.tps"
             : documentName;
+        var persistedFolderId = await ResolveFolderIdAsync(existingId, folderId, cancellationToken);
 
         var document = new StoredScriptDocument(
-            Id: string.IsNullOrWhiteSpace(existingId) ? Slugify(Path.GetFileNameWithoutExtension(documentName)) : existingId,
+            Id: string.IsNullOrWhiteSpace(existingId) ? BrowserStorageSlugifier.Slugify(Path.GetFileNameWithoutExtension(documentName)) : existingId,
             Title: title,
             Text: text ?? string.Empty,
             DocumentName: documentName,
-            UpdatedAt: DateTimeOffset.UtcNow);
+            UpdatedAt: DateTimeOffset.UtcNow,
+            FolderId: persistedFolderId);
 
         var json = await _jsRuntime.InvokeAsync<string>(
-            "PrompterLive.storage.saveDocumentJson",
+            BrowserStorageMethodNames.SaveDocumentJson,
             cancellationToken,
             ToDto(document));
         var dto = JsonSerializer.Deserialize<BrowserStoredScriptDocumentDto>(json, JsonOptions)
@@ -78,9 +82,29 @@ public sealed class BrowserScriptRepository : IScriptRepository
         return ToDocument(dto);
     }
 
+    public async Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default)
+    {
+        var document = await GetMappedAsync(id, cancellationToken);
+        if (document is null)
+        {
+            return;
+        }
+
+        var updated = document with
+        {
+            UpdatedAt = DateTimeOffset.UtcNow,
+            FolderId = string.IsNullOrWhiteSpace(folderId) ? null : folderId
+        };
+
+        await _jsRuntime.InvokeAsync<string>(
+            BrowserStorageMethodNames.SaveDocumentJson,
+            cancellationToken,
+            ToDto(updated));
+    }
+
     public Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync("PrompterLive.storage.deleteDocument", cancellationToken, id).AsTask();
+        return _jsRuntime.InvokeVoidAsync(BrowserStorageMethodNames.DeleteDocument, cancellationToken, id).AsTask();
     }
 
     private static int CountWords(string text) =>
@@ -90,7 +114,10 @@ public sealed class BrowserScriptRepository : IScriptRepository
 
     private async Task<StoredScriptDocument?> GetMappedAsync(string id, CancellationToken cancellationToken)
     {
-        var json = await _jsRuntime.InvokeAsync<string>("PrompterLive.storage.getDocumentJson", cancellationToken, id);
+        var json = await _jsRuntime.InvokeAsync<string>(
+            BrowserStorageMethodNames.GetDocumentJson,
+            cancellationToken,
+            id);
         var dto = JsonSerializer.Deserialize<BrowserStoredScriptDocumentDto?>(json, JsonOptions);
         return dto is null ? null : ToDocument(dto);
     }
@@ -100,7 +127,7 @@ public sealed class BrowserScriptRepository : IScriptRepository
         var seedList = seedDocuments.ToList();
         var existing = await ListAsync(cancellationToken);
         var seedVersion = await _jsRuntime.InvokeAsync<string?>(
-            "PrompterLive.storage.getSeedVersion",
+            BrowserStorageMethodNames.GetSeedVersion,
             cancellationToken);
         var forceRefresh = !string.Equals(seedVersion, SampleScriptCatalog.SeedVersion, StringComparison.Ordinal);
 
@@ -114,13 +141,13 @@ public sealed class BrowserScriptRepository : IScriptRepository
             foreach (var document in seedList)
             {
                 await _jsRuntime.InvokeAsync<string>(
-                    "PrompterLive.storage.saveDocumentJson",
+                    BrowserStorageMethodNames.SaveDocumentJson,
                     cancellationToken,
                     ToDto(document));
             }
 
             await _jsRuntime.InvokeVoidAsync(
-                "PrompterLive.storage.setSeedVersion",
+                BrowserStorageMethodNames.SetSeedVersion,
                 cancellationToken,
                 SampleScriptCatalog.SeedVersion);
             return;
@@ -133,27 +160,10 @@ public sealed class BrowserScriptRepository : IScriptRepository
         foreach (var document in seedList.Where(document => !existingIds.Contains(document.Id)))
         {
             await _jsRuntime.InvokeAsync<string>(
-                "PrompterLive.storage.saveDocumentJson",
+                BrowserStorageMethodNames.SaveDocumentJson,
                 cancellationToken,
                 ToDto(document));
         }
-    }
-
-    private static string Slugify(string value)
-    {
-        var slug = new string(value
-            .Trim()
-            .ToLowerInvariant()
-            .Select(character => char.IsLetterOrDigit(character) ? character : '-')
-            .ToArray());
-
-        while (slug.Contains("--", StringComparison.Ordinal))
-        {
-            slug = slug.Replace("--", "-", StringComparison.Ordinal);
-        }
-
-        slug = slug.Trim('-');
-        return string.IsNullOrWhiteSpace(slug) ? "untitled-script" : slug;
     }
 
     private static StoredScriptDocument ToDocument(BrowserStoredScriptDocumentDto dto)
@@ -163,7 +173,8 @@ public sealed class BrowserScriptRepository : IScriptRepository
             dto.Title ?? "Untitled Script",
             dto.Text ?? string.Empty,
             dto.DocumentName ?? "untitled-script.tps",
-            dto.UpdatedAt);
+            dto.UpdatedAt,
+            string.IsNullOrWhiteSpace(dto.FolderId) ? null : dto.FolderId);
     }
 
     private static BrowserStoredScriptDocumentDto ToDto(StoredScriptDocument document)
@@ -174,8 +185,28 @@ public sealed class BrowserScriptRepository : IScriptRepository
             Title = document.Title,
             Text = document.Text,
             DocumentName = document.DocumentName,
-            UpdatedAt = document.UpdatedAt
+            UpdatedAt = document.UpdatedAt,
+            FolderId = document.FolderId
         };
+    }
+
+    private async Task<string?> ResolveFolderIdAsync(
+        string? existingId,
+        string? folderId,
+        CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(folderId))
+        {
+            return folderId;
+        }
+
+        if (string.IsNullOrWhiteSpace(existingId))
+        {
+            return null;
+        }
+
+        var existingDocument = await GetMappedAsync(existingId, cancellationToken);
+        return existingDocument?.FolderId;
     }
 
 }

@@ -6,7 +6,7 @@ namespace PrompterLive.Core.Services.Samples;
 
 public static class SampleScriptCatalog
 {
-    public const string SeedVersion = "2026-03-29-new-design-v5";
+    public const string SeedVersion = "2026-03-29-new-design-v7";
     public const string DemoSampleId = "rsvp-tech-demo";
     public const string LeadershipSampleId = "ted-leadership";
     public const string SecuritySampleId = "security-incident";
@@ -38,11 +38,11 @@ public static class SampleScriptCatalog
     {
         return
         [
-            BuildDocument(DemoSampleId, "Product Launch", "test-script.tps", new DateTimeOffset(2026, 3, 25, 9, 0, 0, TimeSpan.Zero)),
-            BuildDocument(LeadershipSampleId, "TED: Leadership", "ted-leadership.tps", new DateTimeOffset(2026, 3, 20, 12, 0, 0, TimeSpan.Zero)),
-            BuildDocument(SecuritySampleId, "Security Incident", "security-incident.tps", new DateTimeOffset(2026, 3, 24, 8, 30, 0, TimeSpan.Zero)),
-            BuildDocument(ArchitectureSampleId, "Green Architecture", "green-architecture.tps", new DateTimeOffset(2026, 3, 18, 10, 15, 0, TimeSpan.Zero)),
-            BuildDocument(QuantumSampleId, "Quantum Computing", "quantum-computing.tps", new DateTimeOffset(2026, 3, 15, 16, 45, 0, TimeSpan.Zero))
+            BuildDocument(DemoSampleId, "Product Launch", "test-script.tps", new DateTimeOffset(2026, 3, 25, 9, 0, 0, TimeSpan.Zero), SampleLibraryFolderCatalog.ProductFolderId),
+            BuildDocument(LeadershipSampleId, "TED: Leadership", "ted-leadership.tps", new DateTimeOffset(2026, 3, 20, 12, 0, 0, TimeSpan.Zero), SampleLibraryFolderCatalog.TedTalksFolderId),
+            BuildDocument(SecuritySampleId, "Security Incident", "security-incident.tps", new DateTimeOffset(2026, 3, 24, 8, 30, 0, TimeSpan.Zero), SampleLibraryFolderCatalog.NewsReportsFolderId),
+            BuildDocument(ArchitectureSampleId, "Green Architecture", "green-architecture.tps", new DateTimeOffset(2026, 3, 18, 10, 15, 0, TimeSpan.Zero), SampleLibraryFolderCatalog.InvestorsFolderId),
+            BuildDocument(QuantumSampleId, "Quantum Computing", "quantum-computing.tps", new DateTimeOffset(2026, 3, 15, 16, 45, 0, TimeSpan.Zero), SampleLibraryFolderCatalog.InternalFolderId)
         ];
     }
 
@@ -53,14 +53,20 @@ public static class SampleScriptCatalog
         ReplaceableSampleIds.Contains(summary.Id) ||
         ReplaceableDocumentNames.Contains(summary.DocumentName);
 
-    private static StoredScriptDocument BuildDocument(string id, string title, string resourceFileName, DateTimeOffset updatedAt)
+    private static StoredScriptDocument BuildDocument(
+        string id,
+        string title,
+        string resourceFileName,
+        DateTimeOffset updatedAt,
+        string? folderId)
     {
         return new StoredScriptDocument(
             Id: id,
             Title: title,
             Text: ReadEmbeddedText(resourceFileName),
             DocumentName: resourceFileName,
-            UpdatedAt: updatedAt);
+            UpdatedAt: updatedAt,
+            FolderId: folderId);
     }
 
     private static string ReadEmbeddedText(string resourceFileName)
