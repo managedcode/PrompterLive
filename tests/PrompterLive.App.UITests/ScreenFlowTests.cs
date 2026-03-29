@@ -85,6 +85,14 @@ public sealed class ScreenFlowTests
 
             await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
             await Expect(page.GetByText("Security Incident")).ToBeHiddenAsync();
+            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
+
+            await page.ReloadAsync();
+
+            await Expect(page.GetByTestId("library-folder-roadshows")).ToBeVisibleAsync();
+            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
+            await Expect(page.GetByText("Security Incident")).ToBeHiddenAsync();
+            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("Roadshows");
         }
         finally
         {

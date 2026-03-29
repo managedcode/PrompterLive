@@ -1,6 +1,8 @@
 using Bunit;
 using PrompterLive.Core.Services.Samples;
+using PrompterLive.Shared.Components.Library;
 using PrompterLive.Shared.Pages;
+using PrompterLive.Shared.Services.Library;
 using PrompterLive.Shared.Tests;
 
 namespace PrompterLive.App.Tests;
@@ -64,6 +66,31 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.Contains("Product Launch", cut.Markup);
             Assert.DoesNotContain("Security Incident", cut.Markup);
             Assert.Contains("library-folder-roadshows", cut.Markup);
+        });
+    }
+
+    [Fact]
+    public async Task LibraryPage_RestoresPersistedFolderSelectionAfterReload()
+    {
+        await _harness.FolderRepository.InitializeAsync(SampleLibraryFolderCatalog.CreateSeedFolders());
+        await _harness.Repository.InitializeAsync(SampleScriptCatalog.CreateSeedDocuments());
+        var roadshowsFolder = await _harness.FolderRepository.CreateAsync(
+            "Roadshows",
+            SampleLibraryFolderCatalog.PresentationsFolderId);
+        await _harness.Repository.MoveToFolderAsync(SampleScriptCatalog.DemoSampleId, roadshowsFolder.Id);
+        _harness.JsRuntime.SavedValues["prompterlive.library"] = new LibraryViewState(
+            SelectedFolderId: roadshowsFolder.Id,
+            SortMode: LibrarySortMode.Date,
+            ExpandedFolderIds: [SampleLibraryFolderCatalog.PresentationsFolderId, roadshowsFolder.Id]);
+
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("Product Launch", cut.Markup);
+            Assert.DoesNotContain("Security Incident", cut.Markup);
+            Assert.Contains("library-folder-roadshows", cut.Markup);
+            Assert.Contains("active", cut.Find("[data-testid='library-sort-date']").ClassName);
         });
     }
 }

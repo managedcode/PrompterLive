@@ -13,9 +13,11 @@ namespace PrompterLive.Shared.Pages;
 
 public partial class LibraryPage : ComponentBase
 {
+    private const string LibrarySettingsKey = "prompterlive.library";
     private const string SyncLibraryBreadcrumbMethod = "PrompterLiveDesign.setLibraryBreadcrumb";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
+    [Inject] private BrowserSettingsStore SettingsStore { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private ILibraryFolderRepository LibraryFolderRepository { get; set; } = null!;
@@ -67,11 +69,13 @@ public partial class LibraryPage : ComponentBase
     {
         await Bootstrapper.EnsureReadyAsync();
 
+        await RestoreViewStateAsync();
         var folders = await LibraryFolderRepository.ListAsync();
         var summaries = await ScriptRepository.ListAsync();
         _folders = folders;
         _allCards = await LibraryCardFactory.BuildAsync(summaries, ScriptRepository, PreviewService, TpsParser);
         EnsureExpandedFolders();
+        NormalizeRestoredState();
         RebuildLibraryView();
     }
 
@@ -158,10 +162,11 @@ public partial class LibraryPage : ComponentBase
         await LoadLibraryAsync();
     }
 
-    private void SelectFolder(string folderId)
+    private async Task SelectFolder(string folderId)
     {
         _selectedFolderId = folderId;
         RebuildLibraryView();
+        await PersistViewStateAsync();
     }
 
     private void StartCreateFolder()
@@ -212,12 +217,14 @@ public partial class LibraryPage : ComponentBase
         _folderDraftParentId = ResolveDraftParentId();
         _selectedFolderId = folder.Id;
         await LoadLibraryAsync();
+        await PersistViewStateAsync();
     }
 
-    private void SetSortMode(LibrarySortMode sortMode)
+    private async Task SetSortMode(LibrarySortMode sortMode)
     {
         _sortMode = sortMode;
         RebuildLibraryView();
+        await PersistViewStateAsync();
     }
 
     private void RebuildLibraryView()
@@ -288,6 +295,50 @@ public partial class LibraryPage : ComponentBase
 
     private string ResolveDraftParentId() =>
         NormalizeDraftParentId(_selectedFolderId) ?? LibrarySelectionKeys.Root;
+
+    private void NormalizeRestoredState()
+    {
+        var validFolderIds = _folders
+            .Select(folder => folder.Id)
+            .ToHashSet(StringComparer.Ordinal);
+
+        if (!string.Equals(_selectedFolderId, LibrarySelectionKeys.All, StringComparison.Ordinal)
+            && !validFolderIds.Contains(_selectedFolderId))
+        {
+            _selectedFolderId = LibrarySelectionKeys.All;
+        }
+
+        _expandedFolderIds = _expandedFolderIds
+            .Where(validFolderIds.Contains)
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private async Task RestoreViewStateAsync()
+    {
+        var storedState = await SettingsStore.LoadAsync<LibraryViewState>(LibrarySettingsKey);
+        if (storedState is null)
+        {
+            return;
+        }
+
+        _selectedFolderId = string.IsNullOrWhiteSpace(storedState.SelectedFolderId)
+            ? LibrarySelectionKeys.All
+            : storedState.SelectedFolderId;
+        _sortMode = storedState.SortMode;
+        _expandedFolderIds = storedState.ExpandedFolderIds
+            .Where(folderId => !string.IsNullOrWhiteSpace(folderId))
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private Task PersistViewStateAsync()
+    {
+        var state = new LibraryViewState(
+            SelectedFolderId: _selectedFolderId,
+            SortMode: _sortMode,
+            ExpandedFolderIds: _expandedFolderIds.OrderBy(value => value, StringComparer.Ordinal).ToArray());
+
+        return SettingsStore.SaveAsync(LibrarySettingsKey, state);
+    }
 
     private static string? NormalizeDraftParentId(string? folderId) =>
         string.IsNullOrWhiteSpace(folderId) || string.Equals(folderId, LibrarySelectionKeys.All, StringComparison.Ordinal)
