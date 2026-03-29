@@ -1,4 +1,5 @@
 @namespace PrompterLive.Shared.Components.Editor
+@using PrompterLive.Core.Models.Editor
 @using PrompterLive.Shared.Services.Editor
 @inject EditorInterop Interop
 
@@ -23,166 +24,196 @@
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(FormatMenuId)">
             <div class="tb-label">Format</div>
             <div class="tb-row">
-                <button class="tb-btn tb-tip" type="button" data-tip="Bold — strong emphasis level 2. Markdown: **text**" data-testid="editor-bold" @onclick='() => RequestWrapAsync("**", "**")'><b>B</b></button>
-                <button class="tb-btn tb-tip" type="button" data-tip="Italic — emphasis level 1. Markdown: *text*" @onclick='() => RequestWrapAsync("*", "*")'><i>I</i></button>
-                <button class="tb-btn tb-tip" type="button" data-tip="Emphasis — standard emphasis level 1. TPS: [emphasis]text[/emphasis]" @onclick='() => RequestWrapAsync("[emphasis]", "[/emphasis]")'>Em</button>
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="More formatting options">
+                <button class="tb-btn tb-tip" type="button" data-tip="Bold — strong emphasis level 2. Markdown: **text**" data-testid="editor-bold" @onclick='() => ExecuteWrapCommandAsync("**", "**")'><b>B</b></button>
+                <button class="tb-btn tb-tip" type="button" data-tip="Italic — emphasis level 1. Markdown: *text*" @onclick='() => ExecuteWrapCommandAsync("*", "*")'><i>I</i></button>
+                <button class="tb-btn tb-tip" type="button" data-tip="Emphasis — standard emphasis level 1. TPS: [emphasis]text[/emphasis]" @onclick='() => ExecuteWrapCommandAsync("[emphasis]", "[/emphasis]")'>Em</button>
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-format-trigger"
+                        aria-expanded="@IsMenuOpen(FormatMenuId)"
+                        data-tip="More formatting options"
+                        @onclick='() => ToggleMenu(FormatMenuId)'>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown">
+            <div class="tb-dropdown" data-testid="editor-menu-format">
                 <div class="tb-drop-label">Formatting</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item" type="button" @onclick='() => RequestWrapAsync("**", "**")'><b style="color:var(--text-1)">B</b> Bold <small>**text**</small></button>
-                    <button class="tb-emo-item" type="button" @onclick='() => RequestWrapAsync("*", "*")'><i style="color:var(--text-1)">I</i> Italic <small>*text*</small></button>
-                    <button class="tb-emo-item" type="button" @onclick='() => RequestWrapAsync("[emphasis]", "[/emphasis]")'><span style="color:var(--gold-text);font-weight:600">Em</span> Emphasis <small>[emphasis]</small></button>
-                    <button class="tb-emo-item" type="button" @onclick='() => RequestWrapAsync("[highlight]", "[/highlight]")'><span style="background:rgba(255,232,122,.18);padding:1px 4px;border-radius:3px;color:#FFE87A">H</span> Highlight <small>[highlight]</small></button>
+                    <button class="tb-emo-item" type="button" @onclick='() => ExecuteWrapCommandAsync("**", "**")'><b style="color:var(--text-1)">B</b> Bold <small>**text**</small></button>
+                    <button class="tb-emo-item" type="button" @onclick='() => ExecuteWrapCommandAsync("*", "*")'><i style="color:var(--text-1)">I</i> Italic <small>*text*</small></button>
+                    <button class="tb-emo-item" type="button" @onclick='() => ExecuteWrapCommandAsync("[emphasis]", "[/emphasis]")'><span style="color:var(--gold-text);font-weight:600">Em</span> Emphasis <small>[emphasis]</small></button>
+                    <button class="tb-emo-item" type="button" data-testid="editor-format-highlight" @onclick='() => ExecuteWrapCommandAsync("[highlight]", "[/highlight]")'><span style="background:rgba(255,232,122,.18);padding:1px 4px;border-radius:3px;color:#FFE87A">H</span> Highlight <small>[highlight]</small></button>
                 </div>
             </div>
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(ColorMenuId)">
             <div class="tb-label">Color</div>
             <div class="tb-row">
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="Text color — wrap selected text with a color tag. 12 semantic colors optimized for dark teleprompter backgrounds">
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-color-trigger"
+                        aria-expanded="@IsMenuOpen(ColorMenuId)"
+                        data-tip="Text color — wrap selected text with a color tag. 12 semantic colors optimized for dark teleprompter backgrounds"
+                        @onclick='() => ToggleMenu(ColorMenuId)'>
                     <span class="cdot" style="background:#FF8A8A"></span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown">
+            <div class="tb-dropdown" data-testid="editor-menu-color">
                 <div class="tb-drop-label">TPS Colors</div>
                 <div class="tb-color-grid">
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#FF8A8A" data-tip="Red — warnings, emphasis. [red]text[/red]" @onclick='() => RequestWrapAsync("[red]", "[/red]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#6FE89A" data-tip="Green — positive, success. [green]text[/green]" @onclick='() => RequestWrapAsync("[green]", "[/green]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#8ECFFF" data-tip="Blue — calm, informational. [blue]text[/blue]" @onclick='() => RequestWrapAsync("[blue]", "[/blue]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFE87A" data-tip="Yellow — caution, highlight. [yellow]text[/yellow]" @onclick='() => RequestWrapAsync("[yellow]", "[/yellow]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFB86A" data-tip="Orange — attention. [orange]text[/orange]" @onclick='() => RequestWrapAsync("[orange]", "[/orange]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#D88AFF" data-tip="Purple — creative, special. [purple]text[/purple]" @onclick='() => RequestWrapAsync("[purple]", "[/purple]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#7DE8F0" data-tip="Cyan — cool, tech. [cyan]text[/cyan]" @onclick='() => RequestWrapAsync("[cyan]", "[/cyan]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#FF96C5" data-tip="Magenta — accent. [magenta]text[/magenta]" @onclick='() => RequestWrapAsync("[magenta]", "[/magenta]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFB3D1" data-tip="Pink — soft emphasis. [pink]text[/pink]" @onclick='() => RequestWrapAsync("[pink]", "[/pink]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#5EECC2" data-tip="Teal — professional. [teal]text[/teal]" @onclick='() => RequestWrapAsync("[teal]", "[/teal]")'></button>
-                    <button class="tb-cswatch tb-tip" type="button" style="background:#B8C0C8" data-tip="Gray — subdued, secondary text. [gray]text[/gray]" @onclick='() => RequestWrapAsync("[gray]", "[/gray]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#FF8A8A" data-tip="Red — warnings, emphasis. [red]text[/red]" @onclick='() => ExecuteWrapCommandAsync("[red]", "[/red]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" data-testid="editor-color-green" style="background:#6FE89A" data-tip="Green — positive, success. [green]text[/green]" @onclick='() => ExecuteWrapCommandAsync("[green]", "[/green]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#8ECFFF" data-tip="Blue — calm, informational. [blue]text[/blue]" @onclick='() => ExecuteWrapCommandAsync("[blue]", "[/blue]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFE87A" data-tip="Yellow — caution, highlight. [yellow]text[/yellow]" @onclick='() => ExecuteWrapCommandAsync("[yellow]", "[/yellow]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFB86A" data-tip="Orange — attention. [orange]text[/orange]" @onclick='() => ExecuteWrapCommandAsync("[orange]", "[/orange]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#D88AFF" data-tip="Purple — creative, special. [purple]text[/purple]" @onclick='() => ExecuteWrapCommandAsync("[purple]", "[/purple]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#7DE8F0" data-tip="Cyan — cool, tech. [cyan]text[/cyan]" @onclick='() => ExecuteWrapCommandAsync("[cyan]", "[/cyan]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#FF96C5" data-tip="Magenta — accent. [magenta]text[/magenta]" @onclick='() => ExecuteWrapCommandAsync("[magenta]", "[/magenta]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#FFB3D1" data-tip="Pink — soft emphasis. [pink]text[/pink]" @onclick='() => ExecuteWrapCommandAsync("[pink]", "[/pink]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#5EECC2" data-tip="Teal — professional. [teal]text[/teal]" @onclick='() => ExecuteWrapCommandAsync("[teal]", "[/teal]")'></button>
+                    <button class="tb-cswatch tb-tip" type="button" style="background:#B8C0C8" data-tip="Gray — subdued, secondary text. [gray]text[/gray]" @onclick='() => ExecuteWrapCommandAsync("[gray]", "[/gray]")'></button>
                 </div>
             </div>
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(EmotionMenuId)">
             <div class="tb-label">Emotion</div>
             <div class="tb-row">
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text">
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-emotion-trigger"
+                        aria-expanded="@IsMenuOpen(EmotionMenuId)"
+                        data-tip="Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text"
+                        @onclick='() => ToggleMenu(EmotionMenuId)'>
                     <span class="cdot" style="background:#FFB840"></span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown">
+            <div class="tb-dropdown" data-testid="editor-menu-emotion">
                 <div class="tb-drop-label">TPS Emotions</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Friendly, welcoming tone. Inline: [warm]text[/warm]" @onclick='() => RequestWrapAsync("[warm]", "[/warm]")'><span class="cdot" style="background:#FFB840"></span> Warm <small>😊</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Worried, empathetic. Inline: [concerned]text[/concerned]" @onclick='() => RequestWrapAsync("[concerned]", "[/concerned]")'><span class="cdot" style="background:#FF7A7A"></span> Concerned <small>😟</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Concentrated, precise. Inline: [focused]text[/focused]" @onclick='() => RequestWrapAsync("[focused]", "[/focused]")'><span class="cdot" style="background:#4AE0A0"></span> Focused <small>🎯</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Inspiring, encouraging. Inline: [motivational]text[/motivational]" @onclick='() => RequestWrapAsync("[motivational]", "[/motivational]")'><span class="cdot" style="background:#C88AFF"></span> Motivational <small>💪</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Default balanced tone. Inline: [neutral]text[/neutral]" @onclick='() => RequestWrapAsync("[neutral]", "[/neutral]")'><span class="cdot" style="background:#8ECFFF"></span> Neutral <small>😐</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Critical, immediate attention. Inline: [urgent]text[/urgent]" @onclick='() => RequestWrapAsync("[urgent]", "[/urgent]")'><span class="cdot" style="background:#FF6060"></span> Urgent <small>🚨</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Joyful, positive. Inline: [happy]text[/happy]" @onclick='() => RequestWrapAsync("[happy]", "[/happy]")'><span class="cdot" style="background:#FFE87A"></span> Happy <small>😄</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Enthusiastic, energetic. Inline: [excited]text[/excited]" @onclick='() => RequestWrapAsync("[excited]", "[/excited]")'><span class="cdot" style="background:#FF8AC8"></span> Excited <small>🚀</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Melancholy, somber. Inline: [sad]text[/sad]" @onclick='() => RequestWrapAsync("[sad]", "[/sad]")'><span class="cdot" style="background:#A0A8FF"></span> Sad <small>😢</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Peaceful, relaxed. Inline: [calm]text[/calm]" @onclick='() => RequestWrapAsync("[calm]", "[/calm]")'><span class="cdot" style="background:#5EECC2"></span> Calm <small>😌</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="High energy, dynamic. Inline: [energetic]text[/energetic]" @onclick='() => RequestWrapAsync("[energetic]", "[/energetic]")'><span class="cdot" style="background:#FFA050"></span> Energetic <small>⚡</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Business-like, formal. Inline: [professional]text[/professional]" @onclick='() => RequestWrapAsync("[professional]", "[/professional]")'><span class="cdot" style="background:#80B8FF"></span> Professional <small>💼</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Friendly, welcoming tone. Inline: [warm]text[/warm]" @onclick='() => ExecuteWrapCommandAsync("[warm]", "[/warm]")'><span class="cdot" style="background:#FFB840"></span> Warm <small>😊</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Worried, empathetic. Inline: [concerned]text[/concerned]" @onclick='() => ExecuteWrapCommandAsync("[concerned]", "[/concerned]")'><span class="cdot" style="background:#FF7A7A"></span> Concerned <small>😟</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Concentrated, precise. Inline: [focused]text[/focused]" @onclick='() => ExecuteWrapCommandAsync("[focused]", "[/focused]")'><span class="cdot" style="background:#4AE0A0"></span> Focused <small>🎯</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Inspiring, encouraging. Inline: [motivational]text[/motivational]" @onclick='() => ExecuteWrapCommandAsync("[motivational]", "[/motivational]")'><span class="cdot" style="background:#C88AFF"></span> Motivational <small>💪</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Default balanced tone. Inline: [neutral]text[/neutral]" @onclick='() => ExecuteWrapCommandAsync("[neutral]", "[/neutral]")'><span class="cdot" style="background:#8ECFFF"></span> Neutral <small>😐</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Critical, immediate attention. Inline: [urgent]text[/urgent]" @onclick='() => ExecuteWrapCommandAsync("[urgent]", "[/urgent]")'><span class="cdot" style="background:#FF6060"></span> Urgent <small>🚨</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Joyful, positive. Inline: [happy]text[/happy]" @onclick='() => ExecuteWrapCommandAsync("[happy]", "[/happy]")'><span class="cdot" style="background:#FFE87A"></span> Happy <small>😄</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Enthusiastic, energetic. Inline: [excited]text[/excited]" @onclick='() => ExecuteWrapCommandAsync("[excited]", "[/excited]")'><span class="cdot" style="background:#FF8AC8"></span> Excited <small>🚀</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Melancholy, somber. Inline: [sad]text[/sad]" @onclick='() => ExecuteWrapCommandAsync("[sad]", "[/sad]")'><span class="cdot" style="background:#A0A8FF"></span> Sad <small>😢</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Peaceful, relaxed. Inline: [calm]text[/calm]" @onclick='() => ExecuteWrapCommandAsync("[calm]", "[/calm]")'><span class="cdot" style="background:#5EECC2"></span> Calm <small>😌</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="High energy, dynamic. Inline: [energetic]text[/energetic]" @onclick='() => ExecuteWrapCommandAsync("[energetic]", "[/energetic]")'><span class="cdot" style="background:#FFA050"></span> Energetic <small>⚡</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Business-like, formal. Inline: [professional]text[/professional]" @onclick='() => ExecuteWrapCommandAsync("[professional]", "[/professional]")'><span class="cdot" style="background:#80B8FF"></span> Professional <small>💼</small></button>
                 </div>
             </div>
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(PauseMenuId)">
             <div class="tb-label">Pause</div>
             <div class="tb-row">
-                <button class="tb-btn tb-tip" type="button" data-tip="Short pause — inserts / marker (300ms silence)" @onclick='() => RequestInsertAsync("/")'>/</button>
-                <button class="tb-btn tb-tip" type="button" data-tip="Medium pause — inserts // marker (600ms silence)" @onclick='() => RequestInsertAsync("//")'>//</button>
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="More pause options">
+                <button class="tb-btn tb-tip" type="button" data-tip="Short pause — inserts / marker (300ms silence)" @onclick='() => ExecuteInsertCommandAsync("/")'>/</button>
+                <button class="tb-btn tb-tip" type="button" data-tip="Medium pause — inserts // marker (600ms silence)" @onclick='() => ExecuteInsertCommandAsync("//")'>//</button>
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-pause-trigger"
+                        aria-expanded="@IsMenuOpen(PauseMenuId)"
+                        data-tip="More pause options"
+                        @onclick='() => ToggleMenu(PauseMenuId)'>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12,6 12,12 16,14" /></svg>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown">
+            <div class="tb-dropdown" data-testid="editor-menu-pause">
                 <div class="tb-drop-label">Pause Types</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Short 300ms pause between clauses. Inserted as / in text" @onclick='() => RequestInsertAsync("/")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">/</span> Short pause <small>300ms</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Medium 600ms pause between sentences. Inserted as // in text" @onclick='() => RequestInsertAsync("//")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">//</span> Medium pause <small>600ms</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="1 second timed pause. [pause:1s]" @onclick='() => RequestInsertAsync("[pause:1s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 1 second <small>[pause:1s]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="2 second timed pause. [pause:2s]" @onclick='() => RequestInsertAsync("[pause:2s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 2 seconds <small>[pause:2s]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="3 second timed pause. [pause:3s]" @onclick='() => RequestInsertAsync("[pause:3s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 3 seconds <small>[pause:3s]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Custom timed pause in milliseconds. [pause:500ms]" @onclick='() => RequestInsertAsync("[pause:500ms]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> Custom (ms) <small>[pause:Nms]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Short 300ms pause between clauses. Inserted as / in text" @onclick='() => ExecuteInsertCommandAsync("/")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">/</span> Short pause <small>300ms</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Medium 600ms pause between sentences. Inserted as // in text" @onclick='() => ExecuteInsertCommandAsync("//")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">//</span> Medium pause <small>600ms</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="1 second timed pause. [pause:1s]" @onclick='() => ExecuteInsertCommandAsync("[pause:1s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 1 second <small>[pause:1s]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-testid="editor-pause-two-seconds" data-tip="2 second timed pause. [pause:2s]" @onclick='() => ExecuteInsertCommandAsync("[pause:2s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 2 seconds <small>[pause:2s]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="3 second timed pause. [pause:3s]" @onclick='() => ExecuteInsertCommandAsync("[pause:3s]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> 3 seconds <small>[pause:3s]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Custom timed pause in milliseconds. [pause:500ms]" @onclick='() => ExecuteInsertCommandAsync("[pause:500ms]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg> Custom (ms) <small>[pause:Nms]</small></button>
                 </div>
             </div>
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(SpeedMenuId)">
             <div class="tb-label">Speed</div>
             <div class="tb-row">
-                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Extra slow — base WPM × 0.6. Use for critical warnings, very careful delivery. [xslow]text[/xslow]" style="color:#FF8A8A" @onclick='() => RequestWrapAsync("[xslow]", "[/xslow]")'>×.6</button>
-                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Slow — base WPM × 0.8. Use for important points, emphasis. [slow]text[/slow]" style="color:#FFB86A" @onclick='() => RequestWrapAsync("[slow]", "[/slow]")'>×.8</button>
-                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Normal speed — resets to base WPM × 1.0. [normal]text[/normal]" @onclick='() => RequestWrapAsync("[normal]", "[/normal]")'>×1</button>
-                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Fast — base WPM × 1.25. Use for quick mentions, asides. [fast]text[/fast]" style="color:#8ECFFF" @onclick='() => RequestWrapAsync("[fast]", "[/fast]")'>×1.25</button>
-                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Extra fast — base WPM × 1.5. Use for rapid transitions, low-importance text. [xfast]text[/xfast]" style="color:#80B8FF" @onclick='() => RequestWrapAsync("[xfast]", "[/xfast]")'>×1.5</button>
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="Custom WPM and more speed options">
+                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Extra slow — base WPM × 0.6. Use for critical warnings, very careful delivery. [xslow]text[/xslow]" style="color:#FF8A8A" @onclick='() => ExecuteWrapCommandAsync("[xslow]", "[/xslow]")'>×.6</button>
+                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Slow — base WPM × 0.8. Use for important points, emphasis. [slow]text[/slow]" style="color:#FFB86A" @onclick='() => ExecuteWrapCommandAsync("[slow]", "[/slow]")'>×.8</button>
+                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Normal speed — resets to base WPM × 1.0. [normal]text[/normal]" @onclick='() => ExecuteWrapCommandAsync("[normal]", "[/normal]")'>×1</button>
+                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Fast — base WPM × 1.25. Use for quick mentions, asides. [fast]text[/fast]" style="color:#8ECFFF" @onclick='() => ExecuteWrapCommandAsync("[fast]", "[/fast]")'>×1.25</button>
+                <button class="tb-btn tb-speed tb-tip" type="button" data-tip="Extra fast — base WPM × 1.5. Use for rapid transitions, low-importance text. [xfast]text[/xfast]" style="color:#80B8FF" @onclick='() => ExecuteWrapCommandAsync("[xfast]", "[/xfast]")'>×1.5</button>
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-speed-trigger"
+                        aria-expanded="@IsMenuOpen(SpeedMenuId)"
+                        data-tip="Custom WPM and more speed options"
+                        @onclick='() => ToggleMenu(SpeedMenuId)'>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10" /></svg>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown" style="min-width:240px">
+            <div class="tb-dropdown" data-testid="editor-menu-speed" style="min-width:240px">
                 <div class="tb-drop-label">Speed Presets</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Very careful delivery. Critical warnings. base × 0.6 = 84 WPM at base 140" @onclick='() => RequestWrapAsync("[xslow]", "[/xslow]")'><span style="color:#FF8A8A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.6</span> Extra Slow <small>[xslow]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Important points, emphasis. base × 0.8 = 112 WPM at base 140" @onclick='() => RequestWrapAsync("[slow]", "[/slow]")'><span style="color:#FFB86A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.8</span> Slow <small>[slow]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Reset to base speed. base × 1.0 = 140 WPM at base 140" @onclick='() => RequestWrapAsync("[normal]", "[/normal]")'><span style="color:var(--text-2);font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.0</span> Normal <small>[normal]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Quick mentions, asides. base × 1.25 = 175 WPM at base 140" @onclick='() => RequestWrapAsync("[fast]", "[/fast]")'><span style="color:#8ECFFF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.25</span> Fast <small>[fast]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Rapid transitions, low-importance text. base × 1.5 = 210 WPM at base 140" @onclick='() => RequestWrapAsync("[xfast]", "[/xfast]")'><span style="color:#80B8FF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.5</span> Extra Fast <small>[xfast]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Very careful delivery. Critical warnings. base × 0.6 = 84 WPM at base 140" @onclick='() => ExecuteWrapCommandAsync("[xslow]", "[/xslow]")'><span style="color:#FF8A8A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.6</span> Extra Slow <small>[xslow]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Important points, emphasis. base × 0.8 = 112 WPM at base 140" @onclick='() => ExecuteWrapCommandAsync("[slow]", "[/slow]")'><span style="color:#FFB86A;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×0.8</span> Slow <small>[slow]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Reset to base speed. base × 1.0 = 140 WPM at base 140" @onclick='() => ExecuteWrapCommandAsync("[normal]", "[/normal]")'><span style="color:var(--text-2);font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.0</span> Normal <small>[normal]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Quick mentions, asides. base × 1.25 = 175 WPM at base 140" @onclick='() => ExecuteWrapCommandAsync("[fast]", "[/fast]")'><span style="color:#8ECFFF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.25</span> Fast <small>[fast]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Rapid transitions, low-importance text. base × 1.5 = 210 WPM at base 140" @onclick='() => ExecuteWrapCommandAsync("[xfast]", "[/xfast]")'><span style="color:#80B8FF;font-family:var(--font-mono);font-size:11px;font-weight:700;width:36px;text-align:right">×1.5</span> Extra Fast <small>[xfast]</small></button>
                 </div>
                 <div class="tb-drop-sep"></div>
                 <div class="tb-drop-label">Custom Speed</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Set an absolute WPM value for a text span. [180WPM]text[/180WPM]" @onclick='() => RequestWrapAsync("[180WPM]", "[/180WPM]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"></polygon></svg> Custom WPM <small>[NWPM]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Set an absolute WPM value for a text span. [180WPM]text[/180WPM]" @onclick='() => ExecuteWrapCommandAsync("[180WPM]", "[/180WPM]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" style="flex-shrink:0"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"></polygon></svg> Custom WPM <small>[NWPM]</small></button>
                 </div>
             </div>
         </div>
         <span class="tb-div"></span>
 
-        <div class="tb-section tb-dropdown-wrap">
+        <div class="@GetToolbarSectionCss(InsertMenuId)">
             <div class="tb-label">Insert</div>
             <div class="tb-row">
-                <button class="tb-btn tb-tip" type="button" data-tip="Edit Point — marks a natural place to stop or resume an editing session. [edit_point] or [edit_point:high]" @onclick='() => RequestInsertAsync("[edit_point]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg></button>
-                <button class="tb-btn tb-tip" type="button" data-tip="Pronunciation guide — add IPA or simple pronunciation. [phonetic:IPA]word[/phonetic]" @onclick='() => RequestWrapAsync("[phonetic:IPA]", "[/phonetic]", "word")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg></button>
-                <button class="tb-btn tb-tip" type="button" data-tip="Segment — major script section with name, WPM, and emotion. ## [Name|WPM|Emotion]" @onclick='() => RequestInsertAsync("## [Segment Name|140WPM|Neutral]\n")'>§</button>
-                <button class="tb-btn tb-has-dropdown tb-tip" type="button" data-tip="More insert options">
+                <button class="tb-btn tb-tip" type="button" data-tip="Edit Point — marks a natural place to stop or resume an editing session. [edit_point] or [edit_point:high]" @onclick='() => ExecuteInsertCommandAsync("[edit_point]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg></button>
+                <button class="tb-btn tb-tip" type="button" data-tip="Pronunciation guide — add IPA or simple pronunciation. [phonetic:IPA]word[/phonetic]" @onclick='() => ExecuteWrapCommandAsync("[phonetic:IPA]", "[/phonetic]", "word")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg></button>
+                <button class="tb-btn tb-tip" type="button" data-tip="Segment — major script section with name, WPM, and emotion. ## [Name|WPM|Emotion]" @onclick='() => ExecuteInsertCommandAsync("## [Segment Name|140WPM|Neutral]\n")'>§</button>
+                <button class="tb-btn tb-has-dropdown tb-tip"
+                        type="button"
+                        data-testid="editor-insert-trigger"
+                        aria-expanded="@IsMenuOpen(InsertMenuId)"
+                        data-tip="More insert options"
+                        @onclick='() => ToggleMenu(InsertMenuId)'>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6,9 12,15 18,9" /></svg>
                 </button>
             </div>
-            <div class="tb-dropdown" style="min-width:260px">
+            <div class="tb-dropdown" data-testid="editor-menu-insert" style="min-width:260px">
                 <div class="tb-drop-label">Structure</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Segment — major section of the script (Intro, Problem, Solution). ## [Name|WPM|Emotion|Timing]" @onclick='() => RequestInsertAsync("## [Segment Name|140WPM|Neutral]\n")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">§</span> Segment <small>## [Name]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Block — topic group within a segment. ### [Name|WPM|Emotion]" @onclick='() => RequestInsertAsync("### [Block Name|140WPM]\n")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">¶</span> Block <small>### [Name]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Segment — major section of the script (Intro, Problem, Solution). ## [Name|WPM|Emotion|Timing]" @onclick='() => ExecuteInsertCommandAsync("## [Segment Name|140WPM|Neutral]\n")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">§</span> Segment <small>## [Name]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-testid="editor-insert-block" data-tip="Block — topic group within a segment. ### [Name|WPM|Emotion]" @onclick='() => ExecuteInsertCommandAsync("### [Block Name|140WPM]\n")'><span style="color:var(--gold-text);font-weight:700;width:20px;text-align:center">¶</span> Block <small>### [Name]</small></button>
                 </div>
                 <div class="tb-drop-sep"></div>
                 <div class="tb-drop-label">Edit Points</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="High priority edit point — critical, must review. [edit_point:high]" @onclick='() => RequestInsertAsync("[edit_point:high]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> High priority <small>[edit_point:high]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Medium priority edit point — important but not critical. [edit_point:medium]" @onclick='() => RequestInsertAsync("[edit_point:medium]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB86A" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> Medium priority <small>[edit_point:medium]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Standard edit point — marks a natural break. [edit_point]" @onclick='() => RequestInsertAsync("[edit_point]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> Standard <small>[edit_point]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="High priority edit point — critical, must review. [edit_point:high]" @onclick='() => ExecuteInsertCommandAsync("[edit_point:high]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> High priority <small>[edit_point:high]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Medium priority edit point — important but not critical. [edit_point:medium]" @onclick='() => ExecuteInsertCommandAsync("[edit_point:medium]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB86A" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> Medium priority <small>[edit_point:medium]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Standard edit point — marks a natural break. [edit_point]" @onclick='() => ExecuteInsertCommandAsync("[edit_point]")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFD060" stroke-width="2" style="flex-shrink:0"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> Standard <small>[edit_point]</small></button>
                 </div>
                 <div class="tb-drop-sep"></div>
                 <div class="tb-drop-label">Pronunciation</div>
                 <div class="tb-emo-list">
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="IPA phonetic notation for precise pronunciation. [phonetic:IPA]word[/phonetic]" @onclick='() => RequestWrapAsync("[phonetic:IPA]", "[/phonetic]", "word")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2" style="flex-shrink:0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg> Phonetic (IPA) <small>[phonetic:...]</small></button>
-                    <button class="tb-emo-item tb-tip" type="button" data-tip="Simple pronunciation guide for easy reading. [pronunciation:guide]word[/pronunciation]" @onclick='() => RequestWrapAsync("[pronunciation:guide]", "[/pronunciation]", "word")'><span style="color:#D88AFF;font-weight:600;width:14px;text-align:center;flex-shrink:0;font-size:13px">Aa</span> Pronunciation <small>[pronunciation:...]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="IPA phonetic notation for precise pronunciation. [phonetic:IPA]word[/phonetic]" @onclick='() => ExecuteWrapCommandAsync("[phonetic:IPA]", "[/phonetic]", "word")'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D88AFF" stroke-width="2" style="flex-shrink:0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg> Phonetic (IPA) <small>[phonetic:...]</small></button>
+                    <button class="tb-emo-item tb-tip" type="button" data-tip="Simple pronunciation guide for easy reading. [pronunciation:guide]word[/pronunciation]" @onclick='() => ExecuteWrapCommandAsync("[pronunciation:guide]", "[/pronunciation]", "word")'><span style="color:#D88AFF;font-weight:600;width:14px;text-align:center;flex-shrink:0;font-size:13px">Aa</span> Pronunciation <small>[pronunciation:...]</small></button>
                 </div>
             </div>
         </div>
@@ -191,13 +222,44 @@
         <div class="tb-section">
             <div class="tb-label">AI</div>
             <div class="tb-row">
-                <button class="tb-btn tb-ai tb-tip" type="button" data-tip="AI Assistant — rewrite, expand, simplify, or auto-format your script with AI" data-testid="editor-ai">
+                <button class="tb-btn tb-ai tb-tip"
+                        type="button"
+                        data-tip="AI Assistant — rewrite, expand, simplify, or auto-format your script with AI"
+                        data-testid="editor-ai"
+                        @onclick="ToggleAiPanel">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
                     AI
                 </button>
             </div>
         </div>
     </div>
+
+    @if (_isAiPanelOpen)
+    {
+        <div class="ed-ai-panel" data-testid="editor-ai-panel">
+            <div class="ed-ai-panel-head">
+                <div>
+                    <strong>Local Assistant</strong>
+                    <p>Deterministic tools for rewrite, expand, and delivery cleanup without a backend.</p>
+                </div>
+                <button class="ed-ai-close" type="button" aria-label="Close AI panel" @onclick="ToggleAiPanel">×</button>
+            </div>
+            <div class="ed-ai-actions">
+                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-simplify" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Simplify)'>
+                    <strong>Simplify</strong>
+                    <span>Shorten dense phrases and normalize wording.</span>
+                </button>
+                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-expand" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.Expand)'>
+                    <strong>Expand</strong>
+                    <span>Add one follow-through sentence to the current selection.</span>
+                </button>
+                <button class="ed-ai-action" type="button" data-testid="editor-ai-action-pauses" @onclick='() => ExecuteAiActionAsync(EditorAiAssistAction.AddDeliveryPauses)'>
+                    <strong>Add Delivery Pauses</strong>
+                    <span>Convert punctuation into TPS-friendly pause markers.</span>
+                </button>
+            </div>
+        </div>
+    }
 
     <div class="ed-content ed-source-shell">
         <div class="ed-source-stage">
@@ -223,19 +285,19 @@
                 <span class="ed-float-bar"
                       data-testid="editor-floating-bar"
                       style="@FloatingBarStyle">
-                    <button class="efb-btn" type="button" title="Bold" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("**", "**")'><b>B</b></button>
-                    <button class="efb-btn" type="button" title="Italic" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("*", "*")'><i>I</i></button>
-                    <button class="efb-btn" type="button" title="Emphasis [emphasis]" data-testid="editor-float-emphasis" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[emphasis]", "[/emphasis]")'>Em</button>
-                    <button class="efb-btn" type="button" title="Highlight [highlight]" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[highlight]", "[/highlight]")'><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFE066" stroke-width="2"><rect x="3" y="14" width="18" height="6" rx="2"></rect><path d="M8 14V8a4 4 0 0 1 8 0v6"></path></svg></button>
+                    <button class="efb-btn" type="button" title="Bold" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("**", "**")'><b>B</b></button>
+                    <button class="efb-btn" type="button" title="Italic" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("*", "*")'><i>I</i></button>
+                    <button class="efb-btn" type="button" title="Emphasis [emphasis]" data-testid="editor-float-emphasis" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[emphasis]", "[/emphasis]")'>Em</button>
+                    <button class="efb-btn" type="button" title="Highlight [highlight]" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[highlight]", "[/highlight]")'><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFE066" stroke-width="2"><rect x="3" y="14" width="18" height="6" rx="2"></rect><path d="M8 14V8a4 4 0 0 1 8 0v6"></path></svg></button>
                     <span class="efb-sep"></span>
-                    <button class="efb-btn" type="button" title="Text Color" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[red]", "[/red]")'><span class="cdot" style="background:#FF8A8A"></span></button>
-                    <button class="efb-btn" type="button" title="Emotion" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[warm]", "[/warm]")'><span class="cdot" style="background:#FFB840"></span></button>
+                    <button class="efb-btn" type="button" title="Text Color" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[red]", "[/red]")'><span class="cdot" style="background:#FF8A8A"></span></button>
+                    <button class="efb-btn" type="button" title="Emotion" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[warm]", "[/warm]")'><span class="cdot" style="background:#FFB840"></span></button>
                     <span class="efb-sep"></span>
-                    <button class="efb-btn" type="button" title="Slow [slow]" data-testid="editor-floating-slow" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[slow]", "[/slow]")'>.8×</button>
-                    <button class="efb-btn" type="button" title="Fast [fast]" @onmousedown:preventDefault="true" @onclick='() => RequestWrapAsync("[fast]", "[/fast]")'>1.25×</button>
-                    <button class="efb-btn" type="button" title="Pause [pause]" @onmousedown:preventDefault="true" @onclick='() => RequestInsertAsync("[pause:1s]")'><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></button>
+                    <button class="efb-btn" type="button" title="Slow [slow]" data-testid="editor-floating-slow" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[slow]", "[/slow]")'>.8×</button>
+                    <button class="efb-btn" type="button" title="Fast [fast]" @onmousedown:preventDefault="true" @onclick='() => ExecuteWrapCommandAsync("[fast]", "[/fast]")'>1.25×</button>
+                    <button class="efb-btn" type="button" title="Pause [pause]" @onmousedown:preventDefault="true" @onclick='() => ExecuteInsertCommandAsync("[pause:1s]")'><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></button>
                     <span class="efb-sep"></span>
-                    <button class="efb-btn efb-ai" type="button" title="AI — rewrite, expand, simplify" data-testid="editor-floating-ai" @onmousedown:preventDefault="true">
+                    <button class="efb-btn efb-ai" type="button" title="AI — rewrite, expand, simplify" data-testid="editor-floating-ai" @onmousedown:preventDefault="true" @onclick="ToggleAiPanel">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z"></path></svg>
                         AI
                     </button>

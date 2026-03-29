@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using PrompterLive.Core.Models.CompiledScript;
 using PrompterLive.Core.Models.HeadCues;
 using PrompterLive.Core.Models.Tps;
@@ -27,8 +23,6 @@ public class ScriptCompiler
     private static readonly Regex BoldMarkdownRegex = new(@"\*\*([^*]+)\*\*", RegexOptions.Compiled);
     private static readonly Regex ItalicMarkdownRegex = new(@"\*(?!\*)([^*]+)\*(?!\*)", RegexOptions.Compiled);
     private static readonly Regex TokenSplitRegex = new(@"(\[[^\[\]]+\]|</?[^>]+>|\{[^{}]+\}|//|/)", RegexOptions.Compiled);
-    private static readonly Regex NumericWpmRegex = new(@"^(?:speed:|wpm:)?(\d+)(?:wpm)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
     public static readonly Dictionary<string, string> AvailableColors = new(StringComparer.OrdinalIgnoreCase)
     {
         { "red", "#FF5252" },
@@ -461,7 +455,7 @@ public class ScriptCompiler
         ApplyCurlyTag(name, argument, scopeStack);
     }
 
-    private void ApplyCurlyTag(string name, string? argument, Stack<ScopeFrame> scopeStack)
+    private static void ApplyCurlyTag(string name, string? argument, Stack<ScopeFrame> scopeStack)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -692,7 +686,7 @@ public class ScriptCompiler
         });
     }
 
-    private string NormalizeContent(string text)
+    private static string NormalizeContent(string text)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -749,29 +743,45 @@ public class ScriptCompiler
         return EmotionStyles["neutral"];
     }
 
-    private string CleanSegmentName(string name)
+    private static string CleanSegmentName(string name)
     {
         name = Regex.Replace(name, @"\|\d+WPM.*$", string.Empty, RegexOptions.IgnoreCase);
         return name.Trim();
     }
 
-    private string CleanBlockName(string name)
+    private static string CleanBlockName(string name)
     {
         name = Regex.Replace(name, @"\|\d+WPM.*$", string.Empty, RegexOptions.IgnoreCase);
         return name.Trim();
     }
 
-    private int CalculateORP(string word)
+    private static int CalculateORP(string word)
     {
         var length = word.Length;
-        if (length <= 2) return 0;
-        if (length <= 5) return 1;
-        if (length <= 9) return 2;
-        if (length <= 13) return 3;
+        if (length <= 2)
+        {
+            return 0;
+        }
+
+        if (length <= 5)
+        {
+            return 1;
+        }
+
+        if (length <= 9)
+        {
+            return 2;
+        }
+
+        if (length <= 13)
+        {
+            return 3;
+        }
+
         return 4;
     }
 
-    private TimeSpan CalculateDisplayDuration(string word, int wpm)
+    private static TimeSpan CalculateDisplayDuration(string word, int wpm)
     {
         var clamped = ClampWpm(wpm);
         var baseMs = 60000.0 / clamped;
@@ -781,16 +791,10 @@ public class ScriptCompiler
 
     private sealed record EmotionColorSet(string Background, string Text, string Accent);
 
-    private sealed class ScopeFrame
+    private sealed class ScopeFrame(string tag, ScriptCompiler.FormattingState state)
     {
-        public ScopeFrame(string tag, FormattingState state)
-        {
-            Tag = tag.ToLowerInvariant();
-            State = state;
-        }
-
-        public string Tag { get; }
-        public FormattingState State { get; }
+        public string Tag { get; } = tag.ToLowerInvariant();
+        public FormattingState State { get; } = state;
     }
 
     private sealed class FormattingState

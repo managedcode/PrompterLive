@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-
-
 namespace PrompterLive.Core.Models.HeadCues;
 
 public static class HeadCueCatalog

@@ -29,6 +29,7 @@ internal static class TestHarnessFactory
         var frontMatter = new TpsFrontMatterDocumentService();
         var textEditor = new TpsTextEditor();
         var structureEditor = new TpsStructureEditor();
+        var localAssistant = new EditorLocalAssistant();
         var previewService = new ScriptPreviewService(parser, compiler);
         var session = new ScriptSessionService(repository, parser, compiler, previewService);
         var sceneService = new MediaSceneService();
@@ -44,6 +45,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton(frontMatter);
         context.Services.AddSingleton(textEditor);
         context.Services.AddSingleton(structureEditor);
+        context.Services.AddSingleton(localAssistant);
         context.Services.AddSingleton<IScriptPreviewService>(previewService);
         context.Services.AddSingleton<EditorOutlineBuilder>();
         context.Services.AddSingleton<EditorInterop>();

@@ -2,33 +2,22 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 
 namespace PrompterLive.App.UITests;
 
-internal sealed class StaticSpaServer : IAsyncDisposable
+internal sealed class StaticSpaServer(
+    string appWwwrootDirectory,
+    string frameworkDirectory,
+    string sharedWwwrootDirectory,
+    string? hotReloadStaticAssetsDirectory,
+    string baseAddress) : IAsyncDisposable
 {
-    private readonly string _appWwwrootDirectory;
-    private readonly string _frameworkDirectory;
-    private readonly string _sharedWwwrootDirectory;
-    private readonly string? _hotReloadStaticAssetsDirectory;
-    private readonly string _baseAddress;
+    private readonly string _appWwwrootDirectory = appWwwrootDirectory;
+    private readonly string _frameworkDirectory = frameworkDirectory;
+    private readonly string _sharedWwwrootDirectory = sharedWwwrootDirectory;
+    private readonly string? _hotReloadStaticAssetsDirectory = hotReloadStaticAssetsDirectory;
+    private readonly string _baseAddress = baseAddress;
     private WebApplication? _app;
-
-    public StaticSpaServer(
-        string appWwwrootDirectory,
-        string frameworkDirectory,
-        string sharedWwwrootDirectory,
-        string? hotReloadStaticAssetsDirectory,
-        string baseAddress)
-    {
-        _appWwwrootDirectory = appWwwrootDirectory;
-        _frameworkDirectory = frameworkDirectory;
-        _sharedWwwrootDirectory = sharedWwwrootDirectory;
-        _hotReloadStaticAssetsDirectory = hotReloadStaticAssetsDirectory;
-        _baseAddress = baseAddress;
-    }
 
     public async Task StartAsync()
     {

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace PrompterLive.Core.Services.Rsvp;
 
 /// <summary>
@@ -9,9 +5,8 @@ namespace PrompterLive.Core.Services.Rsvp;
 /// Handles WPM settings, word timing, and playback state
 /// Based on proven RSVP algorithms from Squirt/Spritz implementations
 /// </summary>
-public class RsvpPlaybackEngine
+public class RsvpPlaybackEngine(RsvpTextProcessor textProcessor)
 {
-    private readonly RsvpTextProcessor _textProcessor;
     private int _wpm = 120; // Default comfortable reading speed
     private const int MIN_WPM = 50;
     private const int MAX_WPM = 1000;
@@ -30,11 +25,6 @@ public class RsvpPlaybackEngine
     private const double WaitAfterPeriod = 3.0;
     private const double WaitAfterParagraph = 3.5;
     private const double WaitAfterLongWord = 1.5;
-
-    public RsvpPlaybackEngine(RsvpTextProcessor textProcessor)
-    {
-        _textProcessor = textProcessor;
-    }
 
     /// <summary>
     /// Loads processed script timeline for phrase-aware pacing.
@@ -64,7 +54,7 @@ public class RsvpPlaybackEngine
             var intrinsicDurations = new double[phraseIndices.Length];
 
             double sumIntrinsic = 0;
-            for (int i = 0; i < phraseIndices.Length; i++)
+            for (var i = 0; i < phraseIndices.Length; i++)
             {
                 var wordIndex = phraseIndices[i];
                 var word = SafeGetWord(processedScript, wordIndex);
@@ -80,7 +70,7 @@ public class RsvpPlaybackEngine
 
             var scale = sumIntrinsic > 0 ? phrase.EstimatedDurationMs / sumIntrinsic : 1.0;
 
-            for (int i = 0; i < phraseIndices.Length; i++)
+            for (var i = 0; i < phraseIndices.Length; i++)
             {
                 var wordIndex = phraseIndices[i];
                 var scaledDuration = intrinsicDurations[i] * scale;
@@ -154,36 +144,50 @@ public class RsvpPlaybackEngine
     /// Calculate delay multiplier based on word characteristics
     /// Following Squirt.js algorithm for natural reading flow
     /// </summary>
-    private double GetDelayMultiplier(string word)
+    private static double GetDelayMultiplier(string word)
     {
         // Handle special abbreviations (Mr., Mrs., Ms., etc.)
         if (word is "Mr." or "Mrs." or "Ms." or "Dr." or "Jr." or "Sr.")
+        {
             return 1.0;
+        }
 
         // Get the last character, handling quotes
         var lastChar = word[^1];
         if (lastChar is '"' or '"' or '"' && word.Length > 1)
+        {
             lastChar = word[^2];
+        }
 
         // Check for paragraph break (newline)
         if (lastChar == '\n')
+        {
             return WaitAfterParagraph;
+        }
 
         // Check for sentence ending punctuation
         if (lastChar is '.' or '!' or '?')
+        {
             return WaitAfterPeriod;
+        }
 
         // Check for clause separators
         if (lastChar is ',' or ';' or ':' or '–' or '—')
+        {
             return WaitAfterComma;
+        }
 
         // Short words (< 4 chars) display slightly longer
         if (word.Length < 4)
+        {
             return WaitAfterShortWord;
+        }
 
         // Long words (> 11 chars) need more time
         if (word.Length > 11)
+        {
             return WaitAfterLongWord;
+        }
 
         // Normal words get standard timing
         return 1.0;
@@ -281,7 +285,7 @@ public class RsvpPlaybackEngine
         return ClampDuration(baseMs * delayMultiplier);
     }
 
-    private string SafeGetWord(RsvpTextProcessor.ProcessedScript script, int wordIndex)
+    private static string SafeGetWord(RsvpTextProcessor.ProcessedScript script, int wordIndex)
     {
         if (wordIndex >= 0 && wordIndex < script.AllWords.Count)
         {
@@ -300,13 +304,17 @@ public class RsvpPlaybackEngine
     public int GetNextSectionIndex(int currentIndex, List<int> sectionStarts)
     {
         // Find current section
-        int currentSection = 0;
-        for (int i = 0; i < sectionStarts.Count; i++)
+        var currentSection = 0;
+        for (var i = 0; i < sectionStarts.Count; i++)
         {
             if (sectionStarts[i] <= currentIndex)
+            {
                 currentSection = i;
+            }
             else
+            {
                 break;
+            }
         }
 
         // Return next section if exists
@@ -331,8 +339,8 @@ public class RsvpPlaybackEngine
             return 0;
         }
 
-        int currentSection = 0;
-        for (int i = 0; i < sectionStarts.Count; i++)
+        var currentSection = 0;
+        for (var i = 0; i < sectionStarts.Count; i++)
         {
             if (sectionStarts[i] <= currentIndex)
             {
@@ -363,7 +371,11 @@ public class RsvpPlaybackEngine
     /// <returns>Progress percentage (0-100)</returns>
     public double CalculateProgress(int currentIndex, int totalWords)
     {
-        if (totalWords == 0) return 0;
+        if (totalWords == 0)
+        {
+            return 0;
+        }
+
         return (currentIndex / (double)totalWords) * 100;
     }
 
@@ -375,10 +387,13 @@ public class RsvpPlaybackEngine
     /// <returns>Estimated time remaining</returns>
     public TimeSpan EstimateTimeRemaining(int currentIndex, List<string> words)
     {
-        if (currentIndex >= words.Count) return TimeSpan.Zero;
+        if (currentIndex >= words.Count)
+        {
+            return TimeSpan.Zero;
+        }
 
         double totalMs = 0;
-        for (int i = currentIndex; i < words.Count; i++)
+        for (var i = currentIndex; i < words.Count; i++)
         {
             totalMs += GetWordDisplayTime(i, words[i]).TotalMilliseconds;
         }

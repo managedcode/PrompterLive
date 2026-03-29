@@ -4,7 +4,6 @@ using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Library;
 using PrompterLive.Core.Services;
 using PrompterLive.Core.Services.Preview;
-using PrompterLive.Core.Services.Workspace;
 using PrompterLive.Shared.Components.Library;
 using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Services.Library;

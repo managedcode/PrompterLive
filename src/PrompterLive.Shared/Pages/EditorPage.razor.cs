@@ -33,6 +33,7 @@ public partial class EditorPage
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private EditorOutlineBuilder OutlineBuilder { get; set; } = null!;
+    [Inject] private EditorLocalAssistant LocalAssistant { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private TpsStructureEditor StructureEditor { get; set; } = null!;
@@ -204,8 +205,8 @@ public partial class EditorPage
         var document = _frontMatterService.Parse(state.Text);
         var metadata = document.Metadata;
 
-        _sourceText = state.Text;
-        _screenTitle = _frontMatterService.ResolveTitle(_sourceText, state.Title);
+        _sourceText = document.Body;
+        _screenTitle = _frontMatterService.ResolveTitle(state.Text, state.Title);
         _author = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Author, "PrompterLive");
         _baseWpm = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.BaseWpm, state.ScriptData?.TargetWpm ?? 140);
         _profile = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Profile, _baseWpm >= 250 ? "RSVP" : "Actor");
@@ -215,7 +216,7 @@ public partial class EditorPage
         _slowOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.SlowOffset, DefaultSlowOffset);
         _fastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.FastOffset, DefaultFastOffset);
         _xfastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.XfastOffset, DefaultXfastOffset);
-        _segments = OutlineBuilder.Build(state.ScriptData, document.Body, document.BodyStartIndex);
+        _segments = OutlineBuilder.Build(state.ScriptData, document.Body, 0);
         _errorMessage = state.ErrorMessage;
         if (resetHistory || !_history.IsInitialized)
         {
@@ -229,10 +230,12 @@ public partial class EditorPage
 
     private async Task PersistDraftAsync(string text)
     {
-        var title = _frontMatterService.ResolveTitle(text, _screenTitle);
+        _sourceText = text ?? string.Empty;
+        var persistedText = BuildPersistedDocument(_sourceText);
+        var title = _screenTitle;
         await SessionService.UpdateDraftAsync(
             title,
-            text,
+            persistedText,
             SessionService.State.DocumentName,
             SessionService.State.ScriptId);
 
@@ -248,24 +251,8 @@ public partial class EditorPage
 
     private async Task PersistMetadataAsync()
     {
-        var updatedText = _frontMatterService.Upsert(
-            _sourceText,
-            new Dictionary<string, string?>
-            {
-                [TpsFrontMatterDocumentService.MetadataKeys.Title] = _screenTitle,
-                [TpsFrontMatterDocumentService.MetadataKeys.Author] = string.IsNullOrWhiteSpace(_author) ? "PrompterLive" : _author,
-                [TpsFrontMatterDocumentService.MetadataKeys.Profile] = _profile,
-                [TpsFrontMatterDocumentService.MetadataKeys.BaseWpm] = _baseWpm.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                [TpsFrontMatterDocumentService.MetadataKeys.XslowOffset] = _xslowOffset.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                [TpsFrontMatterDocumentService.MetadataKeys.SlowOffset] = _slowOffset.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                [TpsFrontMatterDocumentService.MetadataKeys.FastOffset] = _fastOffset.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                [TpsFrontMatterDocumentService.MetadataKeys.XfastOffset] = _xfastOffset.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                [TpsFrontMatterDocumentService.MetadataKeys.Version] = string.IsNullOrWhiteSpace(_version) ? "1.0" : _version,
-                [TpsFrontMatterDocumentService.MetadataKeys.Created] = string.IsNullOrWhiteSpace(_createdDate) ? null : _createdDate
-            });
-
-        _history.TryRecord(updatedText, _selection.Range);
-        await PersistDraftAsync(updatedText);
+        _history.TryRecord(_sourceText, _selection.Range);
+        await PersistDraftAsync(_sourceText);
     }
 
     private void UpdateActiveOutlineSelection()

@@ -7,24 +7,16 @@ using PrompterLive.Core.Services.Samples;
 
 namespace PrompterLive.Core.Services.Workspace;
 
-public sealed class ScriptSessionService : IScriptSessionService
+public sealed class ScriptSessionService(
+    IScriptRepository repository,
+    TpsParser parser,
+    ScriptCompiler compiler,
+    IScriptPreviewService previewService) : IScriptSessionService
 {
-    private readonly IScriptRepository _repository;
-    private readonly TpsParser _parser;
-    private readonly ScriptCompiler _compiler;
-    private readonly IScriptPreviewService _previewService;
-
-    public ScriptSessionService(
-        IScriptRepository repository,
-        TpsParser parser,
-        ScriptCompiler compiler,
-        IScriptPreviewService previewService)
-    {
-        _repository = repository;
-        _parser = parser;
-        _compiler = compiler;
-        _previewService = previewService;
-    }
+    private readonly IScriptRepository _repository = repository;
+    private readonly TpsParser _parser = parser;
+    private readonly ScriptCompiler _compiler = compiler;
+    private readonly IScriptPreviewService _previewService = previewService;
 
     public ScriptWorkspaceState State { get; private set; } = ScriptWorkspaceState.Empty with
     {

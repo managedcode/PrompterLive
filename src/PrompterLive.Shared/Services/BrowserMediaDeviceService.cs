@@ -4,14 +4,9 @@ using PrompterLive.Core.Models.Media;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class BrowserMediaDeviceService : IMediaDeviceService
+public sealed class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDeviceService
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public BrowserMediaDeviceService(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public async Task<IReadOnlyList<MediaDeviceInfo>> GetDevicesAsync(CancellationToken cancellationToken = default)
     {

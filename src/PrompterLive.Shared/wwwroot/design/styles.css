@@ -2076,7 +2076,8 @@ button {
     box-shadow: 0 12px 40px rgba(0,0,0,.5);
     min-width: 180px;
 }
-.tb-dropdown-wrap:hover .tb-dropdown { display: block; }
+.tb-dropdown-wrap:hover .tb-dropdown,
+.tb-dropdown-wrap.open .tb-dropdown { display: block; }
 .tb-drop-label {
     font-size: 10px;
     font-weight: 600;
@@ -2472,6 +2473,84 @@ button {
 .ed-source-shell {
     position: relative;
     padding: 0;
+}
+
+.ed-ai-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 12px 28px 0;
+    padding: 18px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(212,176,112,.14);
+    background: linear-gradient(180deg, rgba(16,20,34,.94), rgba(10,14,24,.92));
+    box-shadow: 0 18px 50px rgba(0,0,0,.28);
+}
+
+.ed-ai-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ed-ai-panel-head strong {
+    display: block;
+    color: var(--t1);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.ed-ai-panel-head p {
+    margin: 0;
+    color: var(--t3);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.ed-ai-close {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    color: var(--t2);
+    font-size: 18px;
+}
+
+.ed-ai-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.ed-ai-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(212,176,112,.12);
+    background: rgba(255,255,255,.03);
+    color: var(--t2);
+    text-align: left;
+}
+
+.ed-ai-action strong {
+    color: var(--t1);
+    font-size: 13px;
+}
+
+.ed-ai-action span {
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.ed-ai-action:hover,
+.ed-ai-close:hover {
+    background: rgba(255,255,255,.08);
+    color: var(--t1);
 }
 
 .ed-source-stage {

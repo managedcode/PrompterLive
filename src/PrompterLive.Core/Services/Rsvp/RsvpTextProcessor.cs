@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using PrompterLive.Core.Models.Documents;
 
 namespace PrompterLive.Core.Services.Rsvp;
 
@@ -168,10 +164,7 @@ public class RsvpTextProcessor
             if (emotionMatch.Success)
             {
                 currentEmotion = emotionMatch.Groups[1].Value;
-                if (currentSegment != null)
-                {
-                    currentSegment.Emotion = currentEmotion;
-                }
+                currentSegment?.Emotion = currentEmotion;
             }
 
             // Parse speed metadata
@@ -179,10 +172,7 @@ public class RsvpTextProcessor
             if (speedMatch.Success && int.TryParse(speedMatch.Groups[1].Value, out var speed))
             {
                 currentSpeed = speed;
-                if (currentSegment != null)
-                {
-                    currentSegment.Speed = currentSpeed;
-                }
+                currentSegment?.Speed = currentSpeed;
             }
 
             // Process line with inline tags preserved
@@ -204,7 +194,7 @@ public class RsvpTextProcessor
                 }
 
                 var words = ProcessLine(cleanLine);
-                int wordPosInLine = 0;
+                var wordPosInLine = 0;
                 foreach (var word in words)
                 {
                     allWords.Add(word);
@@ -287,9 +277,12 @@ public class RsvpTextProcessor
     /// <summary>
     /// Removes YAML-style front matter block from the top of the document
     /// </summary>
-    private string StripFrontMatter(string text)
+    private static string StripFrontMatter(string text)
     {
-        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
         // (?s) enables singleline to allow dot to match newlines
         return Regex.Replace(text, @"(?s)^\s*---\s*.*?---\s*", string.Empty);
     }
@@ -318,7 +311,9 @@ public class RsvpTextProcessor
         {
             // Skip PAUSE markers
             if (token == "[PAUSE]" || token.StartsWith("[pause"))
+            {
                 continue;
+            }
 
             // Handle micro/phrase pauses '/' and '//': add pauses but do not display token
             if (token == "/")
@@ -336,7 +331,7 @@ public class RsvpTextProcessor
             words.Add(token);
 
             // Add pauses after sentence-ending punctuation
-            if (token.Any(c => ".!?".Contains(c)))
+            if (token.Any(".!?".Contains))
             {
                 // Add empty strings as pause markers
                 words.Add("");
@@ -355,7 +350,9 @@ public class RsvpTextProcessor
     public List<string> PreprocessText(string text)
     {
         if (string.IsNullOrEmpty(text))
+        {
             return new List<string>();
+        }
 
         // Split on whitespace
         var words = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -367,7 +364,7 @@ public class RsvpTextProcessor
             processedWords.Add(word);
 
             // Add pauses after sentence-ending punctuation
-            if (word.Any(c => ".!?".Contains(c)))
+            if (word.Any(".!?".Contains))
             {
                 // Add empty strings as pause markers for longer pause
                 processedWords.Add("");
@@ -388,15 +385,15 @@ public class RsvpTextProcessor
         var sectionStarts = new List<int>();
         sectionStarts.Add(0); // First word is always start of first section
 
-        for (int i = 0; i < words.Count - 1; i++)
+        for (var i = 0; i < words.Count - 1; i++)
         {
             var word = words[i];
 
             // If current word ends sentence, next non-empty word starts new section
-            if (!string.IsNullOrEmpty(word) && word.Any(c => ".!?".Contains(c)))
+            if (!string.IsNullOrEmpty(word) && word.Any(".!?".Contains))
             {
                 // Find next non-empty word
-                int nextWordIndex = i + 1;
+                var nextWordIndex = i + 1;
                 while (nextWordIndex < words.Count && string.IsNullOrEmpty(words[nextWordIndex]))
                 {
                     nextWordIndex++;
@@ -417,15 +414,22 @@ public class RsvpTextProcessor
     /// </summary>
     public bool IsImportantWord(string word)
     {
-        if (string.IsNullOrEmpty(word)) return false;
+        if (string.IsNullOrEmpty(word))
+        {
+            return false;
+        }
 
         // All caps words are important
         if (word.Length > 2 && word == word.ToUpper())
+        {
             return true;
+        }
 
         // Words with emphasis punctuation
-        if (word.Contains("!") || word.Contains("?") || word.Contains(":"))
+        if (word.Contains('!') || word.Contains('?') || word.Contains(':'))
+        {
             return true;
+        }
 
         return false;
     }
@@ -443,14 +447,18 @@ public class RsvpTextProcessor
     /// </summary>
     public bool HasPunctuation(string word)
     {
-        if (string.IsNullOrEmpty(word)) return false;
-        return word.Any(c => ",.;:!?".Contains(c));
+        if (string.IsNullOrEmpty(word))
+        {
+            return false;
+        }
+
+        return word.Any(",.;:!?".Contains);
     }
 
     /// <summary>
     /// Checks if content is in TPS format
     /// </summary>
-    private bool IsTpsFormat(string content)
+    private static bool IsTpsFormat(string content)
     {
         // Check for TPS-specific markers
         return content.Contains("## [") || content.Contains("### [") ||
@@ -461,7 +469,7 @@ public class RsvpTextProcessor
     /// <summary>
     /// Word metadata for inline formatting
     /// </summary>
-    private class WordMetadata
+    private sealed class WordMetadata
     {
         public int? Speed { get; set; }
         public string? Emotion { get; set; }
@@ -526,19 +534,58 @@ public class RsvpTextProcessor
             var emotionName = emojiMatch.Groups[2].Value.ToLower();
 
             // Map emoji to emotion or use emotion name if provided
-            if (emoji == "😊" || emotionName == "warm") currentInlineEmotion = "warm";
-            else if (emoji == "😟" || emotionName == "concerned") currentInlineEmotion = "concerned";
-            else if (emoji == "🎯" || emotionName == "focused") currentInlineEmotion = "focused";
-            else if (emoji == "💪" || emotionName == "motivational") currentInlineEmotion = "motivational";
-            else if (emoji == "⚡" || emotionName == "energetic") currentInlineEmotion = "energetic";
-            else if (emoji == "🚨" || emotionName == "urgent") currentInlineEmotion = "urgent";
-            else if (emoji == "😌" || emotionName == "calm") currentInlineEmotion = "calm";
-            else if (emoji == "😢" || emotionName == "sad") currentInlineEmotion = "sad";
-            else if (emoji == "😠" || emotionName == "angry") currentInlineEmotion = "angry";
-            else if (emoji == "😨" || emotionName == "fear") currentInlineEmotion = "fear";
-            else if (emoji == "💼" || emotionName == "professional") currentInlineEmotion = "professional";
-            else if (emoji == "🕊️" || emotionName == "peaceful") currentInlineEmotion = "peaceful";
-            else if (emoji == "🌧️" || emotionName == "melancholy") currentInlineEmotion = "melancholy";
+            if (emoji == "😊" || emotionName == "warm")
+            {
+                currentInlineEmotion = "warm";
+            }
+            else if (emoji == "😟" || emotionName == "concerned")
+            {
+                currentInlineEmotion = "concerned";
+            }
+            else if (emoji == "🎯" || emotionName == "focused")
+            {
+                currentInlineEmotion = "focused";
+            }
+            else if (emoji == "💪" || emotionName == "motivational")
+            {
+                currentInlineEmotion = "motivational";
+            }
+            else if (emoji == "⚡" || emotionName == "energetic")
+            {
+                currentInlineEmotion = "energetic";
+            }
+            else if (emoji == "🚨" || emotionName == "urgent")
+            {
+                currentInlineEmotion = "urgent";
+            }
+            else if (emoji == "😌" || emotionName == "calm")
+            {
+                currentInlineEmotion = "calm";
+            }
+            else if (emoji == "😢" || emotionName == "sad")
+            {
+                currentInlineEmotion = "sad";
+            }
+            else if (emoji == "😠" || emotionName == "angry")
+            {
+                currentInlineEmotion = "angry";
+            }
+            else if (emoji == "😨" || emotionName == "fear")
+            {
+                currentInlineEmotion = "fear";
+            }
+            else if (emoji == "💼" || emotionName == "professional")
+            {
+                currentInlineEmotion = "professional";
+            }
+            else if (emoji == "🕊️" || emotionName == "peaceful")
+            {
+                currentInlineEmotion = "peaceful";
+            }
+            else if (emoji == "🌧️" || emotionName == "melancholy")
+            {
+                currentInlineEmotion = "melancholy";
+            }
 
             // Remove emoji and emotion name from line
             processedLine = processedLine.Substring(emojiMatch.Length);
@@ -640,7 +687,7 @@ public class RsvpTextProcessor
     /// <summary>
     /// Removes TPS formatting tags from text
     /// </summary>
-    private string RemoveTpsFormatting(string text)
+    private static string RemoveTpsFormatting(string text)
     {
         // First check if this is a block header line and return empty if so
         if (Regex.IsMatch(text, @"^###\s*\[[^\]]+\]", RegexOptions.IgnoreCase))
@@ -835,7 +882,7 @@ public class RsvpTextProcessor
                             {
                                 // Add pause markers (one per 300ms)
                                 var pauseCount = Math.Max(1, phrase.PauseDuration.Value / 300);
-                                for (int i = 0; i < pauseCount; i++)
+                                for (var i = 0; i < pauseCount; i++)
                                 {
                                     allWords.Add("[PAUSE]");
                                     processedSegment.Words.Add("[PAUSE]");
@@ -898,7 +945,10 @@ public class RsvpTextProcessor
 
                 foreach (var rawWord in segmentWords)
                 {
-                    if (string.IsNullOrWhiteSpace(rawWord)) continue;
+                    if (string.IsNullOrWhiteSpace(rawWord))
+                    {
+                        continue;
+                    }
 
                     // Check for color tags
                     if (rawWord.StartsWith("[") && rawWord.EndsWith("]"))
@@ -971,9 +1021,12 @@ public class RsvpTextProcessor
     /// <summary>
     /// Normalize emotion string from TPS parser to standard emotion name
     /// </summary>
-    private string NormalizeEmotion(string? emotion)
+    private static string NormalizeEmotion(string? emotion)
     {
-        if (string.IsNullOrWhiteSpace(emotion)) return "neutral";
+        if (string.IsNullOrWhiteSpace(emotion))
+        {
+            return "neutral";
+        }
 
         // Remove emojis and normalize
         var normalized = Regex.Replace(emotion, @"[\p{So}\p{C}]", "").Trim().ToLower();
@@ -1000,7 +1053,7 @@ public class RsvpTextProcessor
     /// <summary>
     /// Check if a tag is a valid color tag
     /// </summary>
-    private bool IsColorTag(string tag)
+    private static bool IsColorTag(string tag)
     {
         var validColors = new[] { "red", "green", "blue", "orange", "purple", "yellow", "highlight" };
         return validColors.Contains(tag.ToLower());
@@ -1009,9 +1062,12 @@ public class RsvpTextProcessor
     /// <summary>
     /// Tokenize text into words
     /// </summary>
-    private string[] TokenizeText(string text)
+    private static string[] TokenizeText(string text)
     {
-        if (string.IsNullOrWhiteSpace(text)) return Array.Empty<string>();
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return Array.Empty<string>();
+        }
 
         return text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                   .Where(w => !string.IsNullOrWhiteSpace(w))
@@ -1162,34 +1218,47 @@ public class RsvpTextProcessor
     /// <summary>
     /// Check if a line is a technical marker that should not be displayed
     /// </summary>
-    private bool IsTechnicalMarker(string line)
+    private static bool IsTechnicalMarker(string line)
     {
-        if (string.IsNullOrWhiteSpace(line)) return false;
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return false;
+        }
 
         var trimmed = line.Trim();
 
         // Check for TPS segment headers: ## [SegmentName|WPM|Emotion]
         if (trimmed.StartsWith("## [") || trimmed.StartsWith("##["))
+        {
             return true;
+        }
 
         // Check for TPS block headers: ### [BlockName|WPM]
         if (trimmed.StartsWith("### [") || trimmed.StartsWith("###["))
+        {
             return true;
+        }
 
         // Check for OLD segment markers (for backwards compatibility): === SEGMENT ===
         if (trimmed.StartsWith("===") && trimmed.EndsWith("==="))
+        {
             return true;
+        }
 
         // Check for OLD block markers: --- BLOCK ---
         if (trimmed.StartsWith("---") && trimmed.EndsWith("---"))
+        {
             return true;
+        }
 
         // Check for TPS commands
         if (trimmed.StartsWith("@speed:") ||
             trimmed.StartsWith("@pause:") ||
             trimmed.StartsWith("@color:") ||
             trimmed.StartsWith("@emotion:"))
+        {
             return true;
+        }
 
         return false;
     }
@@ -1240,7 +1309,7 @@ public class RsvpTextProcessor
         var pendingPauseFlag = false;
         var lastEmotion = "neutral";
 
-        for (int i = 0; i < words.Count; i++)
+        for (var i = 0; i < words.Count; i++)
         {
             var word = words[i];
 
@@ -1377,7 +1446,7 @@ public class RsvpTextProcessor
         return word.Any(c => c is ',' or ';' or ':' or '—' or '–');
     }
 
-    private int GetSpeedForWord(ProcessedScript script, int wordIndex)
+    private static int GetSpeedForWord(ProcessedScript script, int wordIndex)
     {
         if (script.WordSpeedOverrides.TryGetValue(wordIndex, out var speed))
         {
@@ -1393,7 +1462,7 @@ public class RsvpTextProcessor
         return DefaultSegmentSpeed;
     }
 
-    private string GetEmotionForWord(ProcessedScript script, int wordIndex, string fallback)
+    private static string GetEmotionForWord(ProcessedScript script, int wordIndex, string fallback)
     {
         if (script.WordEmotionOverrides.TryGetValue(wordIndex, out var emotion) && !string.IsNullOrWhiteSpace(emotion))
         {
@@ -1413,7 +1482,7 @@ public class RsvpTextProcessor
         return fallback;
     }
 
-    private void BuildUpcomingEmotionLookup(ProcessedScript script)
+    private static void BuildUpcomingEmotionLookup(ProcessedScript script)
     {
         script.UpcomingEmotionByStartIndex.Clear();
         foreach (var phrase in script.PhraseGroups)
@@ -1425,7 +1494,7 @@ public class RsvpTextProcessor
         }
     }
 
-    private bool ShouldEndPhrase(string word, int currentPhraseWordCount)
+    private static bool ShouldEndPhrase(string word, int currentPhraseWordCount)
     {
         if (currentPhraseWordCount >= 5)
         {
@@ -1445,7 +1514,7 @@ public class RsvpTextProcessor
         return false;
     }
 
-    private int GetPauseDuration(ProcessedScript script, int wordIndex, string previousWord)
+    private static int GetPauseDuration(ProcessedScript script, int wordIndex, string previousWord)
     {
         if (script.PauseDurations.TryGetValue(wordIndex, out var duration) && duration > 0)
         {

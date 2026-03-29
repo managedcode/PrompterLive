@@ -2,14 +2,9 @@ using Microsoft.JSInterop;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class CameraPreviewInterop
+public sealed class CameraPreviewInterop(IJSRuntime jsRuntime)
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public CameraPreviewInterop(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public Task AttachCameraAsync(string elementId, string deviceId, bool muted = true)
     {

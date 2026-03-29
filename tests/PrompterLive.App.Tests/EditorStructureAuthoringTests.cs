@@ -64,11 +64,14 @@ public sealed class EditorStructureAuthoringTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var source = cut.Find("[data-testid='editor-source-input']").GetAttribute("value");
-            Assert.Contains("xslow_offset: -45", source);
-            Assert.Contains("slow_offset: -15", source);
-            Assert.Contains("fast_offset: 30", source);
-            Assert.Contains("xfast_offset: 55", source);
+            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
+            var persistedText = _harness.Session.State.Text;
+
+            Assert.DoesNotContain("xslow_offset:", visibleSource, StringComparison.Ordinal);
+            Assert.Contains("xslow_offset: -45", persistedText, StringComparison.Ordinal);
+            Assert.Contains("slow_offset: -15", persistedText, StringComparison.Ordinal);
+            Assert.Contains("fast_offset: 30", persistedText, StringComparison.Ordinal);
+            Assert.Contains("xfast_offset: 55", persistedText, StringComparison.Ordinal);
         });
     }
 }

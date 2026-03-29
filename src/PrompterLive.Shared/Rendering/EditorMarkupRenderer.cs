@@ -361,23 +361,15 @@ public static class EditorMarkupRenderer
             Regex.Replace(value.Trim(), @"\s+", " ");
     }
 
-    private sealed class ScopeFrame
+    private sealed class ScopeFrame(string name, EditorMarkupRenderer.ScopeKind kind, EditorMarkupRenderer.RenderState state, string? argument = null)
     {
-        public ScopeFrame(string name, ScopeKind kind, RenderState state, string? argument = null)
-        {
-            Name = name;
-            Kind = kind;
-            State = state;
-            Argument = argument;
-        }
+        public string Name { get; } = name;
 
-        public string Name { get; }
+        public ScopeKind Kind { get; } = kind;
 
-        public ScopeKind Kind { get; }
+        public RenderState State { get; } = state;
 
-        public RenderState State { get; }
-
-        public string? Argument { get; }
+        public string? Argument { get; } = argument;
 
         public StringBuilder Buffer { get; } = new();
     }

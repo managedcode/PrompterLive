@@ -2,27 +2,29 @@
 
 ## Intent
 
-The `/editor` screen is a TPS-native authoring surface. The editable source remains the system of record, while the structure sidebar, metadata rail, status bar, and highlighted overlay stay synchronized with that source.
+The `/editor` screen is a TPS-native authoring surface. The visible editor is body-only and styled inline, while metadata lives exclusively in the metadata rail and is composed back into the persisted TPS document during autosave.
 
 ## Main Flow
 
 ```mermaid
 flowchart LR
-    Source["Raw TPS source textarea"]
+    Source["Visible TPS body editor"]
     History["Undo/redo history"]
-    FrontMatter["Front-matter metadata"]
+    FrontMatter["Front-matter metadata rail"]
     Structure["Segment/block structure editor"]
+    LocalAi["Local AI helper panel"]
     Outline["Outline + status"]
     Highlight["Highlighted overlay"]
     Save["Autosave to script repository"]
 
     Source --> History
-    Source --> FrontMatter
+    FrontMatter --> Source
     Source --> Outline
     Source --> Highlight
-    FrontMatter --> Source
     Structure --> Source
+    LocalAi --> Source
     Source --> Save
+    FrontMatter --> Save
 ```
 
 ## Structure Editing Contract
@@ -47,8 +49,11 @@ sequenceDiagram
 ## Current Behavior
 
 - floating selection toolbar supports formatting actions and stays anchored to the selection
+- visible source input never shows front matter; metadata is edited only in the metadata rail
 - active segment and block can be edited through the left sidebar inspector
-- speed-offset metadata fields persist into front matter
+- toolbar dropdowns open explicitly by click and expose stable test selectors
+- local AI panel provides deterministic simplify, expand, and pause-format helpers without a backend
+- speed-offset metadata fields persist into front matter during autosave
 - source edits refresh metadata, outline, and status
 - metadata and structure edits rewrite the source rather than bypassing it
 

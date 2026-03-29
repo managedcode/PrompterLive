@@ -6,19 +6,14 @@ using PrompterLive.Core.Services.Samples;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class BrowserLibraryFolderRepository : ILibraryFolderRepository
+public sealed class BrowserLibraryFolderRepository(IJSRuntime jsRuntime) : ILibraryFolderRepository
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    private readonly IJSRuntime _jsRuntime;
-
-    public BrowserLibraryFolderRepository(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public async Task InitializeAsync(IEnumerable<StoredLibraryFolder> seedFolders, CancellationToken cancellationToken = default)
     {

@@ -1,5 +1,3 @@
-using System;
-
 namespace PrompterLive.Core.Models.CompiledScript;
 
 public class CompiledWord

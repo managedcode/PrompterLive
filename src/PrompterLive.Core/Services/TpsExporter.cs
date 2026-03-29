@@ -1,8 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using PrompterLive.Core.Models.Tps;
 
 namespace PrompterLive.Core.Services;
@@ -54,7 +50,7 @@ public class TpsExporter
                 segmentHeader.Append($"|{duration.Minutes:D2}:{duration.Seconds:D2}");
             }
 
-            segmentHeader.Append("]");
+            segmentHeader.Append(']');
             sb.AppendLine(segmentHeader.ToString());
             sb.AppendLine();
 
@@ -77,7 +73,7 @@ public class TpsExporter
                         blockHeader.Append($"|{block.Emotion}");
                     }
 
-                    blockHeader.Append("]");
+                    blockHeader.Append(']');
                     sb.AppendLine(blockHeader.ToString());
                     sb.AppendLine();
 

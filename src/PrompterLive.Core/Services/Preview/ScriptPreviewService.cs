@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using PrompterLive.Core.Models.CompiledScript;
 using PrompterLive.Core.Models.Tps;
-
-using PrompterLive.Core.Services;
 
 namespace PrompterLive.Core.Services.Preview;
 
@@ -15,18 +8,12 @@ public interface IScriptPreviewService
     Task<IReadOnlyList<SegmentPreviewModel>> BuildPreviewAsync(string? tpsContent, CancellationToken cancellationToken = default);
 }
 
-public class ScriptPreviewService : IScriptPreviewService
+public class ScriptPreviewService(TpsParser parser, ScriptCompiler compiler) : IScriptPreviewService
 {
     private const int DEFAULT_WPM = 120;
 
-    private readonly TpsParser _parser;
-    private readonly ScriptCompiler _compiler;
-
-    public ScriptPreviewService(TpsParser parser, ScriptCompiler compiler)
-    {
-        _parser = parser;
-        _compiler = compiler;
-    }
+    private readonly TpsParser _parser = parser;
+    private readonly ScriptCompiler _compiler = compiler;
 
     public async Task<IReadOnlyList<SegmentPreviewModel>> BuildPreviewAsync(string? tpsContent, CancellationToken cancellationToken = default)
     {
@@ -127,7 +114,7 @@ public class ScriptPreviewService : IScriptPreviewService
         return segments;
     }
 
-    private void ApplyDefaults(TpsDocument document)
+    private static void ApplyDefaults(TpsDocument document)
     {
         foreach (var segment in document.Segments)
         {

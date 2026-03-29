@@ -2,16 +2,11 @@ using PrompterLive.Core.Models.Workspace;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class StudioSettingsStore
+public sealed class StudioSettingsStore(BrowserSettingsStore settingsStore)
 {
     public const string StorageKey = "prompterlive.studio";
 
-    private readonly BrowserSettingsStore _settingsStore;
-
-    public StudioSettingsStore(BrowserSettingsStore settingsStore)
-    {
-        _settingsStore = settingsStore;
-    }
+    private readonly BrowserSettingsStore _settingsStore = settingsStore;
 
     public async Task<StudioSettings> LoadAsync(CancellationToken cancellationToken = default)
     {

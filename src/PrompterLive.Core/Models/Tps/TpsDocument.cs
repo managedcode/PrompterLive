@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PrompterLive.Core.Models.Tps;
 
 public class TpsDocument

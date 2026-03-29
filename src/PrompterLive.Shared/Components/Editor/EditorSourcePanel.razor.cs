@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using PrompterLive.Core.Models.Editor;
 using PrompterLive.Shared.Rendering;
 
 namespace PrompterLive.Shared.Components.Editor;
@@ -18,6 +19,8 @@ public partial class EditorSourcePanel : IAsyncDisposable
     [Parameter] public string? ErrorMessage { get; set; }
 
     [Parameter] public EventCallback<EditorCommandRequest> OnCommandRequested { get; set; }
+
+    [Parameter] public EventCallback<EditorAiAssistAction> OnAiActionRequested { get; set; }
 
     [Parameter] public EventCallback<EditorHistoryCommand> OnHistoryRequested { get; set; }
 
@@ -104,11 +107,13 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     private async Task OnSelectionInteractionAsync()
     {
+        CloseToolbarPanels();
         await RefreshSelectionAsync();
     }
 
     private async Task OnSourceInputAsync(ChangeEventArgs args)
     {
+        CloseToolbarPanels();
         await OnTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
         await RefreshSelectionAsync();
     }

@@ -1,5 +1,3 @@
-using System;
-
 namespace PrompterLive.Core.Services.Rsvp;
 
 /// <summary>
@@ -17,15 +15,20 @@ public class RsvpOrpCalculator
     public int CalculateOrpIndex(string word)
     {
         if (string.IsNullOrEmpty(word))
+        {
             return 0;
+        }
 
         var cleanWord = word.TrimEnd('.', '!', '?', ',', ';', ':', '"', '\'', ')', ']', '}');
         var length = cleanWord.Length;
 
-        if (length <= 1) return 0;
+        if (length <= 1)
+        {
+            return 0;
+        }
 
         // Milestone 5 spec: OrpCalculator: 30% position for 1-5 chars, 35% for 6-9, 40% for 10+
-        double orpPosition = length switch
+        var orpPosition = length switch
         {
             <= 5 => 0.30,   // 30% position
             <= 9 => 0.35,   // 35% position
@@ -46,7 +49,9 @@ public class RsvpOrpCalculator
     public (string PreORP, string OrpChar, string PostORP) SplitWordAtORP(string word)
     {
         if (string.IsNullOrEmpty(word))
+        {
             return ("", "", "");
+        }
 
         var orpIndex = CalculateOrpIndex(word);
 

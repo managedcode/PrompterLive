@@ -16,7 +16,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_UsesRawSourceTextareaAndRebuildsStructureWhenSourceChanges()
+    public void EditorPage_UsesVisibleBodyTextareaAndRebuildsStructureWhenSourceChanges()
     {
         var cut = Render<EditorPage>();
 
@@ -28,15 +28,6 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         var updatedSource =
             """
-            ---
-            title: "Product Launch"
-            author: "PrompterLive"
-            profile: "Actor"
-            base_wpm: 140
-            version: "1.0"
-            created: "2026-03-26"
-            ---
-
             ## [Fresh Opening|160WPM|focused]
             ### [Renamed Block|160WPM]
             Fresh copy for the editor runtime.
@@ -46,7 +37,10 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Equal(updatedSource, _harness.Session.State.Text);
+            Assert.Equal(updatedSource, cut.Find("[data-testid='editor-source-input']").GetAttribute("value"));
+            Assert.Contains("title: \"Product Launch\"", _harness.Session.State.Text, StringComparison.Ordinal);
+            Assert.Contains("author: \"Jane Doe\"", _harness.Session.State.Text, StringComparison.Ordinal);
+            Assert.Contains(updatedSource, _harness.Session.State.Text, StringComparison.Ordinal);
             Assert.Contains("Fresh Opening", cut.Markup);
             Assert.Contains("Renamed Block", cut.Markup);
             Assert.Contains("1 Segments", cut.Markup);
@@ -54,7 +48,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_MetadataChangesRewriteRawSourceFrontMatter()
+    public void EditorPage_MetadataChangesRewritePersistedFrontMatterWithoutLeakingIntoVisibleBody()
     {
         var cut = Render<EditorPage>();
 
@@ -68,13 +62,16 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var source = cut.Find("[data-testid='editor-source-input']").GetAttribute("value");
+            var visibleSource = cut.Find("[data-testid='editor-source-input']").GetAttribute("value") ?? string.Empty;
+            var persistedText = _harness.Session.State.Text;
 
-            Assert.Contains("profile: \"RSVP\"", source);
-            Assert.Contains("base_wpm: 210", source);
-            Assert.Contains("author: \"Test Speaker\"", source);
-            Assert.Contains("created: \"2026-03-26\"", source);
-            Assert.Contains("version: \"2.0\"", source);
+            Assert.DoesNotContain("profile:", visibleSource, StringComparison.Ordinal);
+            Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
+            Assert.Contains("profile: \"RSVP\"", persistedText, StringComparison.Ordinal);
+            Assert.Contains("base_wpm: 210", persistedText, StringComparison.Ordinal);
+            Assert.Contains("author: \"Test Speaker\"", persistedText, StringComparison.Ordinal);
+            Assert.Contains("created: \"2026-03-26\"", persistedText, StringComparison.Ordinal);
+            Assert.Contains("version: \"2.0\"", persistedText, StringComparison.Ordinal);
         });
     }
 

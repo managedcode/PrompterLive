@@ -5,26 +5,18 @@ using PrompterLive.Core.Services.Samples;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class AppBootstrapper
+public sealed class AppBootstrapper(
+    IScriptSessionService sessionService,
+    ILibraryFolderRepository libraryFolderRepository,
+    IMediaSceneService mediaSceneService,
+    BrowserSettingsStore settingsStore)
 {
-    private readonly IScriptSessionService _sessionService;
-    private readonly ILibraryFolderRepository _libraryFolderRepository;
-    private readonly IMediaSceneService _mediaSceneService;
-    private readonly BrowserSettingsStore _settingsStore;
+    private readonly IScriptSessionService _sessionService = sessionService;
+    private readonly ILibraryFolderRepository _libraryFolderRepository = libraryFolderRepository;
+    private readonly IMediaSceneService _mediaSceneService = mediaSceneService;
+    private readonly BrowserSettingsStore _settingsStore = settingsStore;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private bool _initialized;
-
-    public AppBootstrapper(
-        IScriptSessionService sessionService,
-        ILibraryFolderRepository libraryFolderRepository,
-        IMediaSceneService mediaSceneService,
-        BrowserSettingsStore settingsStore)
-    {
-        _sessionService = sessionService;
-        _libraryFolderRepository = libraryFolderRepository;
-        _mediaSceneService = mediaSceneService;
-        _settingsStore = settingsStore;
-    }
 
     public async Task EnsureReadyAsync(CancellationToken cancellationToken = default)
     {

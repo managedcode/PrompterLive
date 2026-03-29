@@ -2,14 +2,9 @@ using Microsoft.JSInterop;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class BrowserSettingsStore
+public sealed class BrowserSettingsStore(IJSRuntime jsRuntime)
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public BrowserSettingsStore(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public async Task<T?> LoadAsync<T>(string key, CancellationToken cancellationToken = default)
     {

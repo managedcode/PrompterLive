@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using PrompterLive.Shared.Services;
 using PrompterLive.App;
 using PrompterLive.App.Services;
+using PrompterLive.Shared.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

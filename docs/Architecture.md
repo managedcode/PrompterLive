@@ -75,9 +75,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    SourcePanel["EditorSourcePanel<br/>raw TPS textarea + highlight overlay"]
+    SourcePanel["EditorSourcePanel<br/>body-only source textarea + highlight overlay"]
     StructureSidebar["EditorStructureSidebar<br/>tree + structure inspector"]
     MetadataRail["EditorMetadataRail<br/>front matter + speed offsets"]
+    LocalAi["EditorLocalAssistant<br/>local rewrite helpers"]
     Page["EditorPage"]
     FrontMatter["TpsFrontMatterDocumentService"]
     StructureEditor["TpsStructureEditor"]
@@ -86,6 +87,7 @@ flowchart LR
     SourcePanel --> Page
     StructureSidebar --> Page
     MetadataRail --> Page
+    Page --> LocalAi
     Page --> FrontMatter
     Page --> StructureEditor
     Page --> Session

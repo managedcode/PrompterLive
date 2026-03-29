@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PrompterLive.Core.Services.Preview;
 
 public class SegmentPreviewModel

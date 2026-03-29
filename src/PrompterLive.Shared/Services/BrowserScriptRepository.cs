@@ -1,24 +1,19 @@
+using System.Text.Json;
 using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
 using PrompterLive.Core.Services.Samples;
-using System.Text.Json;
 
 namespace PrompterLive.Shared.Services;
 
-public sealed class BrowserScriptRepository : IScriptRepository
+public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepository
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    private readonly IJSRuntime _jsRuntime;
-
-    public BrowserScriptRepository(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
+    private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public Task InitializeAsync(IEnumerable<StoredScriptDocument> seedDocuments, CancellationToken cancellationToken = default)
     {
