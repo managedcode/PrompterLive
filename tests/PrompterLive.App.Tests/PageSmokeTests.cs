@@ -86,6 +86,10 @@ public sealed class PageSmokeTests : BunitContext
             Assert.Contains("AI Provider", cut.Markup);
             Assert.Contains("Appearance", cut.Markup);
             Assert.Contains("About", cut.Markup);
+            Assert.Contains("Default Camera", cut.Markup);
+            Assert.Contains("Mirror Camera (Flip Horizontal)", cut.Markup);
+            Assert.Contains("Input Level", cut.Markup);
+            Assert.Contains("Output Mode", cut.Markup);
             Assert.Contains("Front camera", cut.Markup);
             Assert.Contains("Broadcast mic", cut.Markup);
             Assert.Contains("Audio Sync + Routing", cut.Markup);

@@ -151,8 +151,24 @@ public sealed class ScreenFlowTests
             await Expect(page.Locator("#set-cameras")).ToBeVisibleAsync();
             await Expect(page.GetByTestId("settings-request-media")).ToBeVisibleAsync();
             await page.GetByTestId("settings-request-media").ClickAsync();
+            await Expect(page.GetByTestId("settings-default-camera")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-camera-resolution")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-camera-mirror-toggle")).ToBeVisibleAsync();
             await Expect(page.Locator("[data-testid^='settings-camera-device-']").First).ToBeVisibleAsync();
             await Expect(page.Locator("[data-testid^='settings-scene-camera-']").First).ToBeVisibleAsync();
+            await page.GetByTestId("settings-camera-resolution").SelectOptionAsync(new[] { "Hd720" });
+            await Expect(page.GetByTestId("settings-camera-resolution")).ToHaveValueAsync("Hd720");
+            var mirrorToggle = page.GetByTestId("settings-camera-mirror-toggle");
+            var mirrorWasOn = ((await mirrorToggle.GetAttributeAsync("class")) ?? string.Empty).Contains("on", StringComparison.Ordinal);
+            await mirrorToggle.ClickAsync();
+            if (mirrorWasOn)
+            {
+                await Expect(mirrorToggle).Not.ToHaveClassAsync(new Regex(@"\bon\b"));
+            }
+            else
+            {
+                await Expect(mirrorToggle).ToHaveClassAsync(new Regex(@"\bon\b"));
+            }
             await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Mirror" }).ClickAsync();
             await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Flip Vertical" }).ClickAsync();
             var readerCameraToggle = page.GetByTestId("settings-reader-camera-toggle");
@@ -169,9 +185,26 @@ public sealed class ScreenFlowTests
 
             await page.GetByTestId("settings-nav-mics").ClickAsync();
             await Expect(page.Locator("#set-mics")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-primary-mic")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-mic-level")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-noise-suppression")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-echo-cancellation")).ToBeVisibleAsync();
+            await page.GetByTestId("settings-mic-level").EvaluateAsync("element => { element.value = '82'; element.dispatchEvent(new Event('input', { bubbles: true })); }");
+            await Expect(page.GetByTestId("settings-mic-level-value")).ToHaveTextAsync("82%");
+            await page.GetByTestId("settings-noise-suppression").ClickAsync();
 
             await page.GetByTestId("settings-nav-streaming").ClickAsync();
             await Expect(page.Locator("#set-streaming")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-output-mode")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-output-resolution")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("settings-bitrate")).ToBeVisibleAsync();
+            await page.GetByTestId("settings-output-mode").SelectOptionAsync(new[] { "DirectRtmp" });
+            await page.GetByTestId("settings-bitrate").FillAsync("7200");
+            await page.GetByTestId("settings-rtmp-url").FillAsync("rtmp://live.example.com/stream");
+            await page.GetByTestId("settings-stream-key").FillAsync("sk-live-key");
+            await Expect(page.GetByTestId("settings-output-mode")).ToHaveValueAsync("DirectRtmp");
+            await Expect(page.GetByTestId("settings-bitrate")).ToHaveValueAsync("7200");
+            await Expect(page.GetByTestId("settings-rtmp-url")).ToHaveValueAsync("rtmp://live.example.com/stream");
 
             await page.GetByTestId("settings-nav-ai").ClickAsync();
             await Expect(page.Locator("#set-ai")).ToBeVisibleAsync();
@@ -197,6 +230,130 @@ public sealed class ScreenFlowTests
                     "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0");
                 Assert.True(hasVideoTrack);
             }
+        }
+        finally
+        {
+            await page.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task Teleprompter_RendersStoredMultiCameraSceneLayers()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync("/library");
+            var cameraDeviceId = await page.EvaluateAsync<string>(
+                """
+                async () => {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                        stream.getTracks().forEach(track => track.stop());
+                    } catch {
+                    }
+
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    return devices.find(device => device.kind === 'videoinput')?.deviceId ?? 'default';
+                }
+                """);
+            await page.EvaluateAsync(
+                """
+                ({ cameraDeviceId }) => {
+                    localStorage.setItem('prompterlive.settings.prompterlive.reader', JSON.stringify({
+                        CountdownSeconds: 3,
+                        FontScale: 1,
+                        TextWidth: 0.72,
+                        ScrollSpeed: 1,
+                        MirrorText: false,
+                        ShowFocusLine: true,
+                        ShowProgress: true,
+                        ShowCameraScene: true
+                    }));
+
+                    localStorage.setItem('prompterlive.settings.prompterlive.scene', JSON.stringify({
+                        Cameras: [
+                            {
+                                SourceId: 'scene-cam-a',
+                                DeviceId: cameraDeviceId,
+                                Label: 'Front camera',
+                                Transform: {
+                                    X: 0.82,
+                                    Y: 0.82,
+                                    Width: 0.28,
+                                    Height: 0.28,
+                                    Rotation: 0,
+                                    MirrorHorizontal: true,
+                                    MirrorVertical: false,
+                                    Visible: true,
+                                    IncludeInOutput: true,
+                                    ZIndex: 1,
+                                    Opacity: 1
+                                }
+                            },
+                            {
+                                SourceId: 'scene-cam-b',
+                                DeviceId: cameraDeviceId,
+                                Label: 'Side camera',
+                                Transform: {
+                                    X: 0.18,
+                                    Y: 0.18,
+                                    Width: 0.22,
+                                    Height: 0.22,
+                                    Rotation: 0,
+                                    MirrorHorizontal: false,
+                                    MirrorVertical: false,
+                                    Visible: true,
+                                    IncludeInOutput: true,
+                                    ZIndex: 2,
+                                    Opacity: 0.92
+                                }
+                            }
+                        ],
+                        PrimaryMicrophoneId: null,
+                        PrimaryMicrophoneLabel: null,
+                        AudioBus: {
+                            Inputs: [],
+                            MasterGain: 1,
+                            MonitorEnabled: true
+                        }
+                    }));
+
+                    localStorage.setItem('prompterlive.settings.prompterlive.studio', JSON.stringify({
+                        Camera: {
+                            DefaultCameraId: cameraDeviceId,
+                            Resolution: 0,
+                            MirrorCamera: true,
+                            AutoStartOnRead: true
+                        },
+                        Microphone: {
+                            DefaultMicrophoneId: null,
+                            InputLevelPercent: 65,
+                            NoiseSuppression: true,
+                            EchoCancellation: true
+                        },
+                        Streaming: {
+                            OutputMode: 0,
+                            OutputResolution: 0,
+                            BitrateKbps: 6000,
+                            ShowTextOverlay: true,
+                            IncludeCameraInOutput: true,
+                            RtmpUrl: '',
+                            StreamKey: ''
+                        }
+                    }));
+                }
+                """,
+                new { cameraDeviceId });
+
+            await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
+            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
+            await Expect(page.Locator(".rd-camera")).ToHaveCountAsync(2);
+            await Expect(page.GetByTestId("teleprompter-camera-layer-overlay-1")).ToBeVisibleAsync();
+            await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync("data-camera-role", "primary");
+            await Expect(page.Locator("#rd-camera-overlay-1")).ToHaveAttributeAsync("data-camera-role", "overlay");
+            await Expect(page.Locator("#rd-camera-overlay-1")).ToHaveAttributeAsync("style", new Regex("left:(18|82)%"));
         }
         finally
         {

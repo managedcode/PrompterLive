@@ -3,6 +3,7 @@
 @using PrompterLive.Core.Models.CompiledScript
 @using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Tps
+@using PrompterLive.Core.Models.Workspace
 @using PrompterLive.Core.Services.Samples
 
 @inject AppBootstrapper Bootstrapper
@@ -12,6 +13,7 @@
 @inject IMediaSceneService MediaSceneService
 @inject IScriptRepository ScriptRepository
 @inject IScriptSessionService SessionService
+@inject StudioSettingsStore StudioSettingsStore
 
 <div id="screen-teleprompter"
      class="screen active"
@@ -20,16 +22,20 @@
      data-screen-subtitle="@_screenSubtitle">
     <div class="rd">
         <div class="rd-gradient @_gradientClass" id="rd-gradient"></div>
-        <video class="rd-camera"
-               id="rd-camera"
-               autoplay
-               muted
-               playsinline
-               data-camera-device-id="@_cameraDeviceId"
-               data-camera-autostart="@_cameraAutoStart.ToString().ToLowerInvariant()"
-               data-camera-mirror="@_cameraMirror.ToString().ToLowerInvariant()"
-               data-camera-flip="@_cameraFlip.ToString().ToLowerInvariant()"
-               style="@_cameraStyle"></video>
+        @foreach (var layer in _cameraLayers)
+        {
+            <video class="@layer.CssClass"
+                   id="@layer.ElementId"
+                   autoplay
+                   muted
+                   playsinline
+                   data-camera-device-id="@layer.DeviceId"
+                   data-camera-autostart="@layer.AutoStart.ToString().ToLowerInvariant()"
+                   data-camera-role="@layer.Role"
+                   data-camera-order="@layer.Order"
+                   data-testid="@layer.TestId"
+                   style="@layer.Style"></video>
+        }
         <div class="rd-camera-tint" id="rd-camera-tint"></div>
 
         <div class="rd-ui">
@@ -165,11 +171,8 @@
     private int _totalSeconds = 1;
     private int _totalDurationMilliseconds = 1000;
     private bool _syncReader;
-    private string _cameraDeviceId = string.Empty;
-    private bool _cameraAutoStart;
-    private bool _cameraMirror = true;
-    private bool _cameraFlip;
-    private string _cameraStyle = string.Empty;
+    private StudioSettings _studioSettings = StudioSettings.Default;
+    private IReadOnlyList<ReaderCameraLayerViewModel> _cameraLayers = [ReaderCameraLayerViewModel.Placeholder];
     private IReadOnlyList<ReaderCardViewModel> _cards = [ReaderCardViewModel.Empty];
 
     protected override Task OnParametersSetAsync()
@@ -239,27 +242,105 @@
 
     private async Task PopulateCameraStateAsync()
     {
-        var sceneCamera = MediaSceneService.State.Cameras.FirstOrDefault(camera => camera.Transform.Visible);
+        _studioSettings = await StudioSettingsStore.LoadAsync();
+        var autoStart = SessionService.State.ReaderSettings.ShowCameraScene;
+        var devices = await MediaDeviceService.GetDevicesAsync();
+        var availableCameras = devices.Where(device => device.Kind == MediaDeviceKind.Camera).ToList();
+        var preferredCameraId = _studioSettings.Camera.DefaultCameraId;
+        var visibleSceneCameras = MediaSceneService.State.Cameras
+            .Where(camera => camera.Transform.Visible)
+            .OrderBy(camera => string.Equals(camera.DeviceId, preferredCameraId, StringComparison.Ordinal) ? 0 : 1)
+            .ThenByDescending(camera => camera.Transform.ZIndex)
+            .ThenBy(camera => camera.Label, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var configuredCamera = availableCameras.FirstOrDefault(device => string.Equals(device.DeviceId, preferredCameraId, StringComparison.Ordinal));
 
-        if (sceneCamera is null)
+        SceneCameraSource? primarySceneCamera = visibleSceneCameras.FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(preferredCameraId))
         {
-            var devices = await MediaDeviceService.GetDevicesAsync();
-            var defaultCamera = devices.FirstOrDefault(device => device.Kind == MediaDeviceKind.Camera)
-                ?? devices.FirstOrDefault(device => device.Kind == MediaDeviceKind.Camera);
+            primarySceneCamera = visibleSceneCameras.FirstOrDefault(camera => string.Equals(camera.DeviceId, preferredCameraId, StringComparison.Ordinal))
+                ?? primarySceneCamera;
+        }
 
-            _cameraDeviceId = defaultCamera?.DeviceId ?? string.Empty;
-            _cameraMirror = true;
-            _cameraFlip = false;
+        var layers = new List<ReaderCameraLayerViewModel>();
+        var shouldUseConfiguredPrimary = configuredCamera is not null &&
+            visibleSceneCameras.All(camera => !string.Equals(camera.DeviceId, configuredCamera.DeviceId, StringComparison.Ordinal));
+
+        if (shouldUseConfiguredPrimary)
+        {
+            var transform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
+            var configuredCameraDeviceId = configuredCamera!.DeviceId;
+            layers.Add(new ReaderCameraLayerViewModel(
+                ElementId: "rd-camera",
+                DeviceId: configuredCameraDeviceId,
+                AutoStart: autoStart,
+                Role: "primary",
+                Order: 0,
+                CssClass: "rd-camera rd-camera-base",
+                Style: BuildPrimaryCameraStyle(transform),
+                TestId: "teleprompter-camera-layer-primary"));
+
+            var overlayIndex = 0;
+            foreach (var overlay in visibleSceneCameras)
+            {
+                layers.Add(new ReaderCameraLayerViewModel(
+                    ElementId: $"rd-camera-overlay-{overlayIndex + 1}",
+                    DeviceId: overlay.DeviceId,
+                    AutoStart: autoStart,
+                    Role: "overlay",
+                    Order: overlayIndex + 1,
+                    CssClass: "rd-camera rd-camera-overlay",
+                    Style: BuildOverlayCameraStyle(overlay.Transform),
+                    TestId: $"teleprompter-camera-layer-overlay-{overlayIndex + 1}"));
+                overlayIndex++;
+            }
+        }
+        else if (primarySceneCamera is not null)
+        {
+            layers.Add(new ReaderCameraLayerViewModel(
+                ElementId: "rd-camera",
+                DeviceId: primarySceneCamera.DeviceId,
+                AutoStart: autoStart,
+                Role: "primary",
+                Order: 0,
+                CssClass: "rd-camera rd-camera-base",
+                Style: BuildPrimaryCameraStyle(primarySceneCamera.Transform),
+                TestId: "teleprompter-camera-layer-primary"));
+
+            var overlayIndex = 0;
+            foreach (var overlay in visibleSceneCameras.Where(camera => !string.Equals(camera.SourceId, primarySceneCamera.SourceId, StringComparison.Ordinal)))
+            {
+                layers.Add(new ReaderCameraLayerViewModel(
+                    ElementId: $"rd-camera-overlay-{overlayIndex + 1}",
+                    DeviceId: overlay.DeviceId,
+                    AutoStart: autoStart,
+                    Role: "overlay",
+                    Order: overlayIndex + 1,
+                    CssClass: "rd-camera rd-camera-overlay",
+                    Style: BuildOverlayCameraStyle(overlay.Transform),
+                    TestId: $"teleprompter-camera-layer-overlay-{overlayIndex + 1}"));
+                overlayIndex++;
+            }
         }
         else
         {
-            _cameraDeviceId = sceneCamera.DeviceId;
-            _cameraMirror = sceneCamera.Transform.MirrorHorizontal;
-            _cameraFlip = sceneCamera.Transform.MirrorVertical;
+            var defaultCamera = availableCameras.FirstOrDefault(device => string.Equals(device.DeviceId, preferredCameraId, StringComparison.Ordinal))
+                ?? availableCameras.FirstOrDefault(device => device.IsDefault)
+                ?? availableCameras.FirstOrDefault();
+
+            var transform = new MediaSourceTransform(MirrorHorizontal: _studioSettings.Camera.MirrorCamera);
+            layers.Add(new ReaderCameraLayerViewModel(
+                ElementId: "rd-camera",
+                DeviceId: defaultCamera?.DeviceId ?? string.Empty,
+                AutoStart: autoStart && !string.IsNullOrWhiteSpace(defaultCamera?.DeviceId),
+                Role: "primary",
+                Order: 0,
+                CssClass: "rd-camera rd-camera-base",
+                Style: BuildPrimaryCameraStyle(transform),
+                TestId: "teleprompter-camera-layer-primary"));
         }
 
-        _cameraAutoStart = SessionService.State.ReaderSettings.ShowCameraScene && !string.IsNullOrWhiteSpace(_cameraDeviceId);
-        _cameraStyle = BuildCameraStyle(_cameraMirror, _cameraFlip);
+        _cameraLayers = layers.Count > 0 ? layers : [ReaderCameraLayerViewModel.Placeholder];
     }
 
     private async Task<List<ReaderCardViewModel>> BuildReaderCardsAsync()
@@ -602,22 +683,63 @@
         return $"rgba({red}, {green}, {blue}, {opacity.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
     }
 
-    private static string BuildCameraStyle(bool mirror, bool flip)
+    private static string BuildPrimaryCameraStyle(MediaSourceTransform transform)
+    {
+        var styleParts = new List<string>();
+        var transformValue = BuildCameraTransform(transform, includeTranslate: false);
+        if (!string.IsNullOrWhiteSpace(transformValue))
+        {
+            styleParts.Add($"transform:{transformValue}");
+        }
+
+        styleParts.Add($"opacity:{transform.Opacity.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}");
+        return string.Join(';', styleParts) + ';';
+    }
+
+    private static string BuildOverlayCameraStyle(MediaSourceTransform transform)
+    {
+        var styleParts = new List<string>
+        {
+            $"left:{(transform.X * 100d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%",
+            $"top:{(transform.Y * 100d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%",
+            $"width:{(transform.Width * 100d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%",
+            $"height:{(transform.Height * 100d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%",
+            $"opacity:{transform.Opacity.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}"
+        };
+
+        var transformValue = BuildCameraTransform(transform, includeTranslate: true);
+        if (!string.IsNullOrWhiteSpace(transformValue))
+        {
+            styleParts.Add($"transform:{transformValue}");
+        }
+
+        return string.Join(';', styleParts) + ';';
+    }
+
+    private static string BuildCameraTransform(MediaSourceTransform transform, bool includeTranslate)
     {
         var transforms = new List<string>();
-        if (mirror)
+        if (includeTranslate)
+        {
+            transforms.Add("translate(-50%, -50%)");
+        }
+
+        if (Math.Abs(transform.Rotation) > 0.01)
+        {
+            transforms.Add($"rotate({transform.Rotation.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}deg)");
+        }
+
+        if (transform.MirrorHorizontal)
         {
             transforms.Add("scaleX(-1)");
         }
 
-        if (flip)
+        if (transform.MirrorVertical)
         {
             transforms.Add("scaleY(-1)");
         }
 
-        return transforms.Count == 0
-            ? string.Empty
-            : $"transform:{string.Join(' ', transforms)};";
+        return string.Join(' ', transforms);
     }
 
     private sealed record ReaderCardSeed(
@@ -673,4 +795,25 @@
     private sealed record ReaderPauseViewModel(int DurationMs, string CssClass) : ReaderChunkViewModel;
 
     private sealed record ReaderWordViewModel(string Text, string CssClass, int DurationMs, int PauseAfterMs = 0);
+
+    private sealed record ReaderCameraLayerViewModel(
+        string ElementId,
+        string DeviceId,
+        bool AutoStart,
+        string Role,
+        int Order,
+        string CssClass,
+        string Style,
+        string TestId)
+    {
+        public static ReaderCameraLayerViewModel Placeholder { get; } = new(
+            "rd-camera",
+            string.Empty,
+            false,
+            "primary",
+            0,
+            "rd-camera rd-camera-base",
+            string.Empty,
+            "teleprompter-camera-layer-primary");
+    }
 }

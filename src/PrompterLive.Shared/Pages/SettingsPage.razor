@@ -2,9 +2,11 @@
 @using PrompterLive.Core.Abstractions
 @using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Streaming
+@using PrompterLive.Core.Models.Workspace
 
 @inject AppBootstrapper Bootstrapper
 @inject BrowserSettingsStore SettingsStore
+@inject StudioSettingsStore StudioSettingsStore
 @inject IMediaPermissionService MediaPermissionService
 @inject IMediaDeviceService MediaDeviceService
 @inject IMediaSceneService MediaSceneService
@@ -137,6 +139,50 @@
                 <h3 class="set-section-title">Cameras</h3>
                 <p class="set-section-desc">Configure cameras for teleprompter overlay and recording.</p>
 
+                <div class="set-devices">
+                    <div class="set-field">
+                        <label>Default Camera</label>
+                        <select class="set-select"
+                                value="@SelectedCameraId"
+                                @onchange="OnDefaultCameraChanged"
+                                data-testid="settings-default-camera">
+                            <option value="">No camera selected</option>
+                            @foreach (var camera in _cameraDevices)
+                            {
+                                <option value="@camera.DeviceId">@camera.Label</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="set-field">
+                        <label>Resolution</label>
+                        <select class="set-select"
+                                value="@_studioSettings.Camera.Resolution"
+                                @onchange="OnCameraResolutionChanged"
+                                data-testid="settings-camera-resolution">
+                            <option value="@CameraResolutionPreset.FullHd1080">1920 x 1080 (Full HD)</option>
+                            <option value="@CameraResolutionPreset.Hd720">1280 x 720 (HD)</option>
+                            <option value="@CameraResolutionPreset.UltraHd4K">3840 x 2160 (4K)</option>
+                            <option value="@CameraResolutionPreset.Sd480">640 x 480 (SD)</option>
+                        </select>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Mirror Camera (Flip Horizontal)</label>
+                        <div class="set-toggle @(_studioSettings.Camera.MirrorCamera ? "on" : null)"
+                             @onclick="ToggleDefaultCameraMirrorAsync"
+                             data-testid="settings-camera-mirror-toggle">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Auto-start Camera on Read</label>
+                        <div class="set-toggle @(SessionService.State.ReaderSettings.ShowCameraScene ? "on" : null)"
+                             @onclick="ToggleReaderCameraSceneAsync"
+                             data-testid="settings-reader-camera-toggle">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="set-status-banner">
                     <div>
                         <strong>@(_permissions.CameraGranted ? "Camera access is ready" : "Camera access is required")</strong>
@@ -206,32 +252,57 @@
                         }
                     </div>
                 </div>
-
-                <div class="set-field set-field-toggle">
-                    <label>Auto-start camera on read</label>
-                    <div class="set-toggle @(SessionService.State.ReaderSettings.ShowCameraScene ? "on" : null)"
-                         @onclick="ToggleReaderCameraSceneAsync"
-                         data-testid="settings-reader-camera-toggle">
-                        <div class="set-toggle-thumb"></div>
-                    </div>
-                </div>
             </section>
 
             <section class="set-section set-panel" id="set-mics" style="display:none">
                 <h3 class="set-section-title">Microphones</h3>
                 <p class="set-section-desc">Audio input for recording and streaming.</p>
 
-                <div class="set-subsection">
-                    <h4 class="set-sub-title">Primary Microphone</h4>
+                <div class="set-devices">
                     <div class="set-field">
                         <label>Default Microphone</label>
-                        <select class="set-select" @onchange="OnPrimaryMicrophoneChanged" data-testid="settings-primary-mic">
+                        <select class="set-select"
+                                value="@SelectedMicrophoneId"
+                                @onchange="OnPrimaryMicrophoneChanged"
+                                data-testid="settings-primary-mic">
                             <option value="">No microphone selected</option>
                             @foreach (var microphone in _microphoneDevices)
                             {
-                                <option value="@microphone.DeviceId" selected="@string.Equals(_primaryMicrophoneId, microphone.DeviceId, StringComparison.Ordinal)">@microphone.Label</option>
+                                <option value="@microphone.DeviceId">@microphone.Label</option>
                             }
                         </select>
+                    </div>
+                    <div class="set-field">
+                        <label>Input Level</label>
+                        <div class="set-level-bar" data-testid="settings-mic-level-shell">
+                            <div class="set-level-fill" style="width:@($"{_studioSettings.Microphone.InputLevelPercent}%")"></div>
+                            <div class="set-level-thumb" style="left:@($"{_studioSettings.Microphone.InputLevelPercent}%")"></div>
+                            <input type="range"
+                                   class="set-level-range"
+                                   min="0"
+                                   max="100"
+                                   step="1"
+                                   value="@_studioSettings.Microphone.InputLevelPercent"
+                                   @oninput="UpdatePrimaryMicLevelAsync"
+                                   data-testid="settings-mic-level" />
+                        </div>
+                        <span class="set-inline-value" data-testid="settings-mic-level-value">@($"{_studioSettings.Microphone.InputLevelPercent}%")</span>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Noise Suppression</label>
+                        <div class="set-toggle @(_studioSettings.Microphone.NoiseSuppression ? "on" : null)"
+                             @onclick="ToggleNoiseSuppressionAsync"
+                             data-testid="settings-noise-suppression">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Echo Cancellation</label>
+                        <div class="set-toggle @(_studioSettings.Microphone.EchoCancellation ? "on" : null)"
+                             @onclick="ToggleEchoCancellationAsync"
+                             data-testid="settings-echo-cancellation">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -307,6 +378,74 @@
                 <h3 class="set-section-title">Streaming</h3>
                 <p class="set-section-desc">Configure output for live streaming and recording.</p>
 
+                <div class="set-devices">
+                    <div class="set-field">
+                        <label>Output Mode</label>
+                        <select class="set-select"
+                                value="@_studioSettings.Streaming.OutputMode"
+                                @onchange="OnOutputModeChanged"
+                                data-testid="settings-output-mode">
+                            <option value="@StreamingOutputMode.VirtualCamera">Virtual Camera (OBS/Zoom)</option>
+                            <option value="@StreamingOutputMode.NdiOutput">NDI Output</option>
+                            <option value="@StreamingOutputMode.DirectRtmp">Direct RTMP</option>
+                            <option value="@StreamingOutputMode.LocalRecording">Local Recording</option>
+                        </select>
+                    </div>
+                    <div class="set-field">
+                        <label>Output Resolution</label>
+                        <select class="set-select"
+                                value="@_studioSettings.Streaming.OutputResolution"
+                                @onchange="OnOutputResolutionChanged"
+                                data-testid="settings-output-resolution">
+                            <option value="@StreamingResolutionPreset.FullHd1080p30">1920 x 1080 @@ 30fps</option>
+                            <option value="@StreamingResolutionPreset.FullHd1080p60">1920 x 1080 @@ 60fps</option>
+                            <option value="@StreamingResolutionPreset.Hd720p30">1280 x 720 @@ 30fps</option>
+                            <option value="@StreamingResolutionPreset.UltraHd2160p30">3840 x 2160 @@ 30fps</option>
+                        </select>
+                    </div>
+                    <div class="set-field">
+                        <label>Bitrate (kbps)</label>
+                        <input type="number"
+                               class="set-input"
+                               value="@_studioSettings.Streaming.BitrateKbps"
+                               @oninput="UpdateStreamingBitrateAsync"
+                               data-testid="settings-bitrate" />
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Show Text Overlay on Stream</label>
+                        <div class="set-toggle @(_studioSettings.Streaming.ShowTextOverlay ? "on" : null)"
+                             @onclick="ToggleStreamTextOverlayAsync"
+                             data-testid="settings-stream-text-overlay">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Include Camera in Output</label>
+                        <div class="set-toggle @(_studioSettings.Streaming.IncludeCameraInOutput ? "on" : null)"
+                             @onclick="ToggleStreamIncludeCameraAsync"
+                             data-testid="settings-stream-include-camera">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                    <div class="set-field">
+                        <label>RTMP URL</label>
+                        <input type="text"
+                               class="set-input"
+                               placeholder="rtmp://live.example.com/stream"
+                               value="@_studioSettings.Streaming.RtmpUrl"
+                               @oninput="UpdateRtmpUrlAsync"
+                               data-testid="settings-rtmp-url" />
+                    </div>
+                    <div class="set-field">
+                        <label>Stream Key</label>
+                        <input type="password"
+                               class="set-input"
+                               value="@_studioSettings.Streaming.StreamKey"
+                               @oninput="UpdateStreamKeyAsync"
+                               data-testid="settings-stream-key" />
+                    </div>
+                </div>
+
                 <div class="set-subsection">
                     <h4 class="set-sub-title">Provider Targets</h4>
                     <div class="set-device-list">
@@ -320,47 +459,6 @@
                                 <span class="set-provider-kind">@descriptor.ProviderKind</span>
                             </article>
                         }
-                    </div>
-                </div>
-
-                <div class="set-devices">
-                    <div class="set-field">
-                        <label>Output Mode</label>
-                        <select class="set-select">
-                            <option>Virtual Camera (OBS/Zoom)</option>
-                            <option>NDI Output</option>
-                            <option>Direct RTMP</option>
-                            <option>Local Recording</option>
-                        </select>
-                    </div>
-                    <div class="set-field">
-                        <label>Output Resolution</label>
-                        <select class="set-select">
-                            <option>1920 x 1080 @@ 30fps</option>
-                            <option>1920 x 1080 @@ 60fps</option>
-                            <option>1280 x 720 @@ 30fps</option>
-                            <option>3840 x 2160 @@ 30fps</option>
-                        </select>
-                    </div>
-                    <div class="set-field">
-                        <label>Bitrate (kbps)</label>
-                        <input type="number" class="set-input" value="6000" />
-                    </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Show Text Overlay on Stream</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
-                    </div>
-                    <div class="set-field set-field-toggle">
-                        <label>Include Camera in Output</label>
-                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
-                    </div>
-                    <div class="set-field">
-                        <label>RTMP URL</label>
-                        <input type="text" class="set-input" placeholder="rtmp://live.example.com/stream" />
-                    </div>
-                    <div class="set-field">
-                        <label>Stream Key</label>
-                        <input type="password" class="set-input" value="sk-xxxxxxxxxxxx" />
                     </div>
                 </div>
             </section>
@@ -538,10 +636,13 @@
     private IReadOnlyList<MediaDeviceInfo> _cameraDevices = [];
     private IReadOnlyList<MediaDeviceInfo> _microphoneDevices = [];
     private IReadOnlyList<StreamingPublishDescriptor> _streamingDescriptors = [];
+    private StudioSettings _studioSettings = StudioSettings.Default;
     private string? _primaryMicrophoneId;
     private readonly IReadOnlyList<AudioRouteTarget> _routeTargets = Enum.GetValues<AudioRouteTarget>();
 
     private IReadOnlyList<SceneCameraSource> _sceneCameras => MediaSceneService.State.Cameras;
+    private string SelectedCameraId => ResolveSelectedCamera()?.DeviceId ?? string.Empty;
+    private string SelectedMicrophoneId => ResolveSelectedMicrophone()?.DeviceId ?? string.Empty;
 
     protected override Task OnParametersSetAsync()
     {
@@ -583,6 +684,8 @@
             .ToList();
 
         await SeedSceneDefaultsAsync();
+        _studioSettings = await StudioSettingsStore.LoadAsync();
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task SeedSceneDefaultsAsync()
@@ -617,6 +720,43 @@
         await LoadAsync();
     }
 
+    private async Task NormalizeStudioSettingsAsync()
+    {
+        var selectedCamera = ResolveSelectedCameraCandidate();
+        var selectedMicrophone = ResolveSelectedMicrophoneCandidate();
+        var selectedSceneCamera = ResolveSceneCamera(selectedCamera?.DeviceId);
+        var selectedAudioInput = selectedMicrophone is null ? null : GetAudioInput(selectedMicrophone);
+        var nextSettings = _studioSettings with
+        {
+            Camera = _studioSettings.Camera with
+            {
+                DefaultCameraId = selectedCamera?.DeviceId,
+                MirrorCamera = selectedSceneCamera?.Transform.MirrorHorizontal ?? _studioSettings.Camera.MirrorCamera,
+                AutoStartOnRead = SessionService.State.ReaderSettings.ShowCameraScene
+            },
+            Microphone = _studioSettings.Microphone with
+            {
+                DefaultMicrophoneId = selectedMicrophone?.DeviceId,
+                InputLevelPercent = ClampPercent(selectedAudioInput is null
+                    ? _studioSettings.Microphone.InputLevelPercent
+                    : (int)Math.Round(selectedAudioInput.Gain * 100d))
+            },
+            Streaming = _studioSettings.Streaming with
+            {
+                IncludeCameraInOutput = _sceneCameras.Count == 0
+                    ? _studioSettings.Streaming.IncludeCameraInOutput
+                    : _sceneCameras.Any(camera => camera.Transform.IncludeInOutput)
+            }
+        };
+
+        var hasChanges = !EqualityComparer<StudioSettings>.Default.Equals(_studioSettings, nextSettings);
+        _studioSettings = nextSettings;
+        if (hasChanges)
+        {
+            await PersistStudioSettingsAsync();
+        }
+    }
+
     private async Task ToggleCameraSelectionAsync(MediaDeviceInfo camera)
     {
         var existing = _sceneCameras.FirstOrDefault(source => string.Equals(source.DeviceId, camera.DeviceId, StringComparison.Ordinal));
@@ -630,12 +770,14 @@
         }
 
         await PersistSceneAsync();
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task RemoveSceneCameraAsync(string sourceId)
     {
         MediaSceneService.RemoveCamera(sourceId);
         await PersistSceneAsync();
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task ToggleSceneMirrorAsync(string sourceId)
@@ -648,6 +790,7 @@
 
         MediaSceneService.UpdateTransform(sourceId, source.Transform with { MirrorHorizontal = !source.Transform.MirrorHorizontal });
         await PersistSceneAsync();
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task ToggleSceneFlipAsync(string sourceId)
@@ -660,6 +803,7 @@
 
         MediaSceneService.UpdateTransform(sourceId, source.Transform with { MirrorVertical = !source.Transform.MirrorVertical });
         await PersistSceneAsync();
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task ToggleSceneOutputAsync(string sourceId)
@@ -672,6 +816,73 @@
 
         MediaSceneService.SetIncludeInOutput(sourceId, !source.Transform.IncludeInOutput);
         await PersistSceneAsync();
+        await NormalizeStudioSettingsAsync();
+    }
+
+    private async Task OnDefaultCameraChanged(ChangeEventArgs args)
+    {
+        var deviceId = args.Value?.ToString();
+        var camera = _cameraDevices.FirstOrDefault(device => string.Equals(device.DeviceId, deviceId, StringComparison.Ordinal));
+        _studioSettings = _studioSettings with
+        {
+            Camera = _studioSettings.Camera with
+            {
+                DefaultCameraId = camera?.DeviceId
+            }
+        };
+
+        if (camera is not null && !_sceneCameras.Any(source => string.Equals(source.DeviceId, camera.DeviceId, StringComparison.Ordinal)))
+        {
+            MediaSceneService.AddCamera(camera.DeviceId, camera.Label);
+            await PersistSceneAsync();
+        }
+
+        var selectedSceneCamera = ResolveSceneCamera(camera?.DeviceId);
+        if (selectedSceneCamera is not null)
+        {
+            _studioSettings = _studioSettings with
+            {
+                Camera = _studioSettings.Camera with
+                {
+                    MirrorCamera = selectedSceneCamera.Transform.MirrorHorizontal
+                }
+            };
+        }
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task OnCameraResolutionChanged(ChangeEventArgs args)
+    {
+        if (!Enum.TryParse<CameraResolutionPreset>(args.Value?.ToString(), out var resolution))
+        {
+            return;
+        }
+
+        _studioSettings = _studioSettings with
+        {
+            Camera = _studioSettings.Camera with { Resolution = resolution }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleDefaultCameraMirrorAsync()
+    {
+        var nextMirror = !_studioSettings.Camera.MirrorCamera;
+        var selectedSceneCamera = ResolveSceneCamera(SelectedCameraId);
+        if (selectedSceneCamera is not null)
+        {
+            MediaSceneService.UpdateTransform(selectedSceneCamera.SourceId, selectedSceneCamera.Transform with { MirrorHorizontal = nextMirror });
+            await PersistSceneAsync();
+        }
+
+        _studioSettings = _studioSettings with
+        {
+            Camera = _studioSettings.Camera with { MirrorCamera = nextMirror }
+        };
+
+        await PersistStudioSettingsAsync();
     }
 
     private async Task ToggleReaderCameraSceneAsync()
@@ -680,6 +891,13 @@
         var next = current with { ShowCameraScene = !current.ShowCameraScene };
         await SessionService.UpdateReaderSettingsAsync(next);
         await SettingsStore.SaveAsync("prompterlive.reader", next);
+
+        _studioSettings = _studioSettings with
+        {
+            Camera = _studioSettings.Camera with { AutoStartOnRead = next.ShowCameraScene }
+        };
+
+        await PersistStudioSettingsAsync();
     }
 
     private async Task OnPrimaryMicrophoneChanged(ChangeEventArgs args)
@@ -695,6 +913,11 @@
         }
 
         await PersistSceneAsync();
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with { DefaultMicrophoneId = microphone?.DeviceId }
+        };
+        await NormalizeStudioSettingsAsync();
     }
 
     private async Task ToggleMicMuteAsync(MediaDeviceInfo microphone)
@@ -726,6 +949,18 @@
         var current = GetAudioInput(microphone);
         MediaSceneService.UpsertAudioInput(current with { Gain = gainPercent / 100d });
         await PersistSceneAsync();
+
+        if (string.Equals(_primaryMicrophoneId, microphone.DeviceId, StringComparison.Ordinal))
+        {
+            _studioSettings = _studioSettings with
+            {
+                Microphone = _studioSettings.Microphone with
+                {
+                    InputLevelPercent = ClampPercent((int)Math.Round(gainPercent))
+                }
+            };
+            await PersistStudioSettingsAsync();
+        }
     }
 
     private async Task UpdateAudioRouteAsync(MediaDeviceInfo microphone, ChangeEventArgs args)
@@ -752,6 +987,217 @@
         _primaryMicrophoneId = MediaSceneService.State.PrimaryMicrophoneId;
         await SettingsStore.SaveAsync("prompterlive.scene", MediaSceneService.State);
     }
+
+    private Task PersistStudioSettingsAsync() => StudioSettingsStore.SaveAsync(_studioSettings);
+
+    private MediaDeviceInfo? ResolveSelectedCamera() =>
+        _cameraDevices.FirstOrDefault(device => string.Equals(device.DeviceId, ResolveSelectedCameraCandidate()?.DeviceId, StringComparison.Ordinal))
+        ?? ResolveSelectedCameraCandidate();
+
+    private MediaDeviceInfo? ResolveSelectedCameraCandidate()
+    {
+        if (!string.IsNullOrWhiteSpace(_studioSettings.Camera.DefaultCameraId))
+        {
+            var configured = _cameraDevices.FirstOrDefault(device => string.Equals(device.DeviceId, _studioSettings.Camera.DefaultCameraId, StringComparison.Ordinal));
+            if (configured is not null)
+            {
+                return configured;
+            }
+        }
+
+        var sceneCamera = _sceneCameras.FirstOrDefault();
+        if (sceneCamera is not null)
+        {
+            return _cameraDevices.FirstOrDefault(device => string.Equals(device.DeviceId, sceneCamera.DeviceId, StringComparison.Ordinal))
+                ?? new MediaDeviceInfo(sceneCamera.DeviceId, sceneCamera.Label, MediaDeviceKind.Camera);
+        }
+
+        return _cameraDevices.FirstOrDefault(device => device.IsDefault) ?? _cameraDevices.FirstOrDefault();
+    }
+
+    private SceneCameraSource? ResolveSceneCamera(string? deviceId)
+    {
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            return _sceneCameras.FirstOrDefault(camera => string.Equals(camera.DeviceId, deviceId, StringComparison.Ordinal));
+        }
+
+        return _sceneCameras.FirstOrDefault();
+    }
+
+    private MediaDeviceInfo? ResolveSelectedMicrophone() =>
+        _microphoneDevices.FirstOrDefault(device => string.Equals(device.DeviceId, ResolveSelectedMicrophoneCandidate()?.DeviceId, StringComparison.Ordinal))
+        ?? ResolveSelectedMicrophoneCandidate();
+
+    private MediaDeviceInfo? ResolveSelectedMicrophoneCandidate()
+    {
+        if (!string.IsNullOrWhiteSpace(_primaryMicrophoneId))
+        {
+            var current = _microphoneDevices.FirstOrDefault(device => string.Equals(device.DeviceId, _primaryMicrophoneId, StringComparison.Ordinal));
+            if (current is not null)
+            {
+                return current;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(_studioSettings.Microphone.DefaultMicrophoneId))
+        {
+            var configured = _microphoneDevices.FirstOrDefault(device => string.Equals(device.DeviceId, _studioSettings.Microphone.DefaultMicrophoneId, StringComparison.Ordinal));
+            if (configured is not null)
+            {
+                return configured;
+            }
+        }
+
+        return _microphoneDevices.FirstOrDefault(device => device.IsDefault) ?? _microphoneDevices.FirstOrDefault();
+    }
+
+    private async Task UpdatePrimaryMicLevelAsync(ChangeEventArgs args)
+    {
+        if (!double.TryParse(args.Value?.ToString(), out var percent))
+        {
+            return;
+        }
+
+        var clampedPercent = ClampPercent((int)Math.Round(percent));
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with { InputLevelPercent = clampedPercent }
+        };
+
+        var primaryMicrophone = ResolveSelectedMicrophone();
+        if (primaryMicrophone is not null)
+        {
+            var current = GetAudioInput(primaryMicrophone);
+            MediaSceneService.UpsertAudioInput(current with { Gain = clampedPercent / 100d });
+            await PersistSceneAsync();
+        }
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleNoiseSuppressionAsync()
+    {
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with
+            {
+                NoiseSuppression = !_studioSettings.Microphone.NoiseSuppression
+            }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleEchoCancellationAsync()
+    {
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with
+            {
+                EchoCancellation = !_studioSettings.Microphone.EchoCancellation
+            }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task OnOutputModeChanged(ChangeEventArgs args)
+    {
+        if (!Enum.TryParse<StreamingOutputMode>(args.Value?.ToString(), out var outputMode))
+        {
+            return;
+        }
+
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { OutputMode = outputMode }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task OnOutputResolutionChanged(ChangeEventArgs args)
+    {
+        if (!Enum.TryParse<StreamingResolutionPreset>(args.Value?.ToString(), out var outputResolution))
+        {
+            return;
+        }
+
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { OutputResolution = outputResolution }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task UpdateStreamingBitrateAsync(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var bitrate))
+        {
+            return;
+        }
+
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { BitrateKbps = Math.Max(250, bitrate) }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleStreamTextOverlayAsync()
+    {
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with
+            {
+                ShowTextOverlay = !_studioSettings.Streaming.ShowTextOverlay
+            }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleStreamIncludeCameraAsync()
+    {
+        var nextValue = !_studioSettings.Streaming.IncludeCameraInOutput;
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { IncludeCameraInOutput = nextValue }
+        };
+
+        foreach (var camera in _sceneCameras)
+        {
+            MediaSceneService.SetIncludeInOutput(camera.SourceId, nextValue);
+        }
+
+        await PersistSceneAsync();
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task UpdateRtmpUrlAsync(ChangeEventArgs args)
+    {
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { RtmpUrl = args.Value?.ToString() ?? string.Empty }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task UpdateStreamKeyAsync(ChangeEventArgs args)
+    {
+        _studioSettings = _studioSettings with
+        {
+            Streaming = _studioSettings.Streaming with { StreamKey = args.Value?.ToString() ?? string.Empty }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private static int ClampPercent(int value) => Math.Max(0, Math.Min(100, value));
 
     private static string FormatRouteTarget(AudioRouteTarget routeTarget) =>
         routeTarget switch

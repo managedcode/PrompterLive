@@ -28,6 +28,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<IMediaDeviceService, BrowserMediaDeviceService>();
         services.AddScoped<IMediaSceneService, MediaSceneService>();
         services.AddScoped<BrowserSettingsStore>();
+        services.AddScoped<StudioSettingsStore>();
         services.AddScoped<CameraPreviewInterop>();
         services.AddScoped<AppBootstrapper>();
 

@@ -42,6 +42,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<RsvpEmotionAnalyzer>();
         context.Services.AddSingleton<RsvpPlaybackEngine>();
         context.Services.AddSingleton<BrowserSettingsStore>();
+        context.Services.AddSingleton<StudioSettingsStore>();
         context.Services.AddSingleton<CameraPreviewInterop>();
         context.Services.AddSingleton<AppBootstrapper>();
         context.Services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();

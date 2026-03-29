@@ -2694,11 +2694,31 @@ button {
     background: radial-gradient(circle at 20% 20%, rgba(78, 94, 163, 0.2), transparent 42%),
         linear-gradient(135deg, rgba(12, 18, 30, 0.88), rgba(20, 33, 62, 0.78));
     transition: opacity 220ms ease;
+    pointer-events: none;
+}
+.rd-camera-base {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.rd-camera-overlay {
+    inset: auto;
+    border-radius: 22px;
+    border: 1px solid rgba(232, 213, 176, 0.18);
+    box-shadow: 0 20px 48px rgba(4, 8, 14, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    object-fit: cover;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(78, 94, 163, 0.2), transparent 42%),
+        linear-gradient(135deg, rgba(10, 14, 20, 0.92), rgba(18, 30, 52, 0.84));
 }
 .rd-camera-off { color: var(--t4); }
 .rd-camera.active .rd-camera-off { display: none; }
 .rd-camera.active {
     opacity: 0.9;
+}
+.rd-camera-overlay.active {
+    opacity: 0.96;
 }
 
 .rd-camera-tint {
@@ -3868,11 +3888,13 @@ body::before {
     background: var(--gold-07);
     border-radius: 3px;
     position: relative;
+    margin-top: 4px;
 }
 .set-level-fill {
     height: 100%;
     background: linear-gradient(90deg, #6EE7B7, #C4A060);
     border-radius: 3px;
+    pointer-events: none;
 }
 .set-level-thumb {
     width: 14px;
@@ -3884,6 +3906,15 @@ body::before {
     top: -4px;
     transform: translateX(-50%);
     box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    pointer-events: none;
+}
+.set-level-range {
+    position: absolute;
+    inset: -6px 0;
+    width: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
 }
 
 /* ============================================

@@ -908,51 +908,66 @@ function scheduleNextWord() {
     }, Math.max(120, delay));
 }
 
+function getReaderCameraElements() {
+    return Array.from(document.querySelectorAll('.rd-camera[data-camera-role]'));
+}
+
 // Camera toggle
 async function setReaderCameraActive(nextActive) {
-    const cam = document.getElementById('rd-camera');
+    const cameras = getReaderCameraElements();
     const tint = document.getElementById('rd-camera-tint');
     const btn = document.getElementById('rd-cam-btn');
-    if (!cam || !tint || !btn) {
+    if (!cameras.length || !tint || !btn) {
         return;
     }
 
-    const cameraDeviceId = cam.dataset.cameraDeviceId || '';
-
-    if (nextActive && cameraDeviceId) {
-        try {
-            await window.PrompterLive.media.attachCamera('rd-camera', cameraDeviceId, true);
-        } catch {
-            // Leave the visual state in place even if the browser blocks access.
-        }
-    } else if (!nextActive) {
-        try {
-            await window.PrompterLive.media.detachCamera('rd-camera');
-        } catch {
-        }
+    const attachableCameras = cameras.filter(camera => (camera.dataset.cameraDeviceId || '').length > 0);
+    if (!attachableCameras.length) {
+        cameras.forEach(camera => camera.classList.remove('active'));
+        tint.classList.remove('active');
+        btn.classList.remove('active');
+        return;
     }
 
-    cam.classList.toggle('active', nextActive);
+    if (nextActive) {
+        await Promise.all(attachableCameras.map(async camera => {
+            try {
+                await window.PrompterLive.media.attachCamera(camera.id, camera.dataset.cameraDeviceId || '', true);
+            } catch {
+                // Leave the visual state in place even if the browser blocks access.
+            }
+        }));
+    } else {
+        await Promise.all(cameras.map(async camera => {
+            try {
+                await window.PrompterLive.media.detachCamera(camera.id);
+            } catch {
+            }
+        }));
+    }
+
+    cameras.forEach(camera => camera.classList.toggle('active', nextActive));
     tint.classList.toggle('active', nextActive);
     btn.classList.toggle('active', nextActive);
 }
 
 async function toggleReaderCamera() {
-    const cam = document.getElementById('rd-camera');
-    if (!cam) {
+    const cameras = getReaderCameraElements();
+    if (!cameras.length) {
         return;
     }
 
-    await setReaderCameraActive(!cam.classList.contains('active'));
+    const isActive = cameras.some(camera => camera.classList.contains('active'));
+    await setReaderCameraActive(!isActive);
 }
 
 async function initializeReaderCamera() {
-    const cam = document.getElementById('rd-camera');
-    if (!cam) {
+    const cameras = getReaderCameraElements();
+    if (!cameras.length) {
         return;
     }
 
-    const shouldAutoStart = cam.dataset.cameraAutostart === 'true';
+    const shouldAutoStart = cameras.some(camera => camera.dataset.cameraAutostart === 'true');
     if (shouldAutoStart) {
         await setReaderCameraActive(true);
     } else {
