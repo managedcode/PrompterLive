@@ -6,30 +6,36 @@ namespace PrompterLive.Core.Services.Samples;
 
 public static class SampleScriptCatalog
 {
-    public const string SeedVersion = "2026-03-29-new-design-v2";
+    public const string SeedVersion = "2026-03-29-new-design-v4";
     public const string DemoSampleId = "rsvp-tech-demo";
-    public const string ComprehensiveSampleId = "comprehensive-rsvp-demo";
+    public const string LeadershipSampleId = "ted-leadership";
+    public const string SecuritySampleId = "security-incident";
+    public const string ArchitectureSampleId = "green-architecture";
+    public const string QuantumSampleId = "quantum-computing";
 
     public static IReadOnlyList<StoredScriptDocument> CreateSeedDocuments()
     {
         return
         [
-            BuildDocument(DemoSampleId, "RSVP Technology Demo", "test-script.tps"),
-            BuildDocument(ComprehensiveSampleId, "Comprehensive RSVP Demo", "comprehensive-demo.tps")
+            BuildDocument(DemoSampleId, "Product Launch", "test-script.tps", new DateTimeOffset(2026, 3, 25, 9, 0, 0, TimeSpan.Zero)),
+            BuildDocument(LeadershipSampleId, "TED: Leadership", "ted-leadership.tps", new DateTimeOffset(2026, 3, 20, 12, 0, 0, TimeSpan.Zero)),
+            BuildDocument(SecuritySampleId, "Security Incident", "security-incident.tps", new DateTimeOffset(2026, 3, 24, 8, 30, 0, TimeSpan.Zero)),
+            BuildDocument(ArchitectureSampleId, "Green Architecture", "green-architecture.tps", new DateTimeOffset(2026, 3, 18, 10, 15, 0, TimeSpan.Zero)),
+            BuildDocument(QuantumSampleId, "Quantum Computing", "quantum-computing.tps", new DateTimeOffset(2026, 3, 15, 16, 45, 0, TimeSpan.Zero))
         ];
     }
 
     public static StoredScriptDocument GetById(string sampleId) =>
         CreateSeedDocuments().First(document => string.Equals(document.Id, sampleId, StringComparison.Ordinal));
 
-    private static StoredScriptDocument BuildDocument(string id, string title, string resourceFileName)
+    private static StoredScriptDocument BuildDocument(string id, string title, string resourceFileName, DateTimeOffset updatedAt)
     {
         return new StoredScriptDocument(
             Id: id,
             Title: title,
             Text: ReadEmbeddedText(resourceFileName),
             DocumentName: resourceFileName,
-            UpdatedAt: DateTimeOffset.UtcNow);
+            UpdatedAt: updatedAt);
     }
 
     private static string ReadEmbeddedText(string resourceFileName)

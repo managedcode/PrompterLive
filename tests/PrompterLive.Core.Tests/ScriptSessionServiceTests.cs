@@ -17,7 +17,7 @@ public sealed class ScriptSessionServiceTests
 
         var library = await repository.ListAsync();
 
-        Assert.True(library.Count >= 2);
+        Assert.True(library.Count >= 5);
         Assert.Equal("Fresh Take", session.State.Title);
         Assert.Equal("fresh-take.tps", session.State.DocumentName);
         Assert.True(session.State.WordCount > 0);
@@ -35,7 +35,7 @@ public sealed class ScriptSessionServiceTests
         await session.LoadSampleAsync(SampleScriptCatalog.DemoSampleId);
 
         Assert.Equal(SampleScriptCatalog.DemoSampleId, session.State.ScriptId);
-        Assert.Equal("RSVP Technology Demo", session.State.Title);
+        Assert.Equal("Product Launch", session.State.Title);
         Assert.Contains(session.State.PreviewSegments, segment => segment.Title == "Intro");
         Assert.Contains(session.State.PreviewSegments, segment => segment.Title == "Call to Action");
         Assert.True(session.State.EstimatedDuration > TimeSpan.Zero);

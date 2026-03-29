@@ -1,9 +1,10 @@
 ---
-title: "RSVP Technology Demo"
-author: "You"
-profile: "RSVP"
+title: "Product Launch"
+author: "Jane Doe"
+profile: "Actor"
 base_wpm: 140
 version: "1.0"
+folder: "product"
 ---
 
 ## [Intro|140WPM|warm]

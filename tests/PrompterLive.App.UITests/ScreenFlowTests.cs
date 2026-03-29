@@ -23,8 +23,8 @@ public sealed class ScreenFlowTests
         {
             await page.GotoAsync("/library");
             await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
-            await Expect(page.GetByText("RSVP Technology Demo")).ToBeVisibleAsync();
-            await Expect(page.Locator(".dcover-meta").First).ToContainTextAsync("RSVP");
+            await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("library-card-rsvp-tech-demo").Locator(".dcover-meta")).ToContainTextAsync("Actor");
             await page.GetByRole(AriaRole.Button, new() { Name = "Date" }).ClickAsync();
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Date" })).ToHaveClassAsync(new Regex("active"));
             var tedTalksFolder = page.Locator(".folder-item").Filter(new() { HasText = "TED Talks" });
@@ -86,7 +86,7 @@ public sealed class ScreenFlowTests
 
             await page.GotoAsync("/learn?id=rsvp-tech-demo");
             await Expect(page.GetByTestId("learn-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
-            await Expect(page.Locator("#app-header-center")).ToContainTextAsync("RSVP Technology Demo", new() { Timeout = 15000 });
+            await Expect(page.Locator("#app-header-center")).ToContainTextAsync("Product Launch", new() { Timeout = 15000 });
             await Expect(page.Locator("#rsvp-next-phrase")).Not.ToHaveTextAsync(string.Empty);
             await page.GetByTestId("learn-speed-up").ClickAsync();
             await Expect(page.Locator("#rsvp-speed")).ToHaveTextAsync("310");

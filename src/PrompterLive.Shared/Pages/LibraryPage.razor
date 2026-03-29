@@ -11,10 +11,12 @@
 <div id="screen-library" class="screen active" data-testid="library-page">
     <div class="lib-sidebar">
         <nav class="lib-nav">
-            <a class="nav-item active">
+            <a class="nav-item @(IsFolderSelected(LibraryFolderKey.All) ? "active" : null)"
+               @onclick="() => SelectFolder(LibraryFolderKey.All)"
+               data-testid="library-folder-all">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>
                 All Scripts
-                <span class="nav-count">@_cards.Count</span>
+                <span class="nav-count">@_allCards.Count</span>
             </a>
             <a class="nav-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12,6 12,12 16,14" /></svg>
@@ -34,47 +36,61 @@
                 </button>
             </div>
             <nav class="lib-folder-tree">
-                <a class="folder-item folder-open active">
+                <a class="folder-item @(IsPresentationFolderActive ? "folder-open active" : null)"
+                   @onclick="() => SelectFolder(LibraryFolderKey.Presentations)"
+                   data-testid="library-folder-presentations">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9" /></svg>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     <span>Presentations</span>
-                    <span class="nav-count">@_cards.Count</span>
+                    <span class="nav-count">@GetFolderCount(LibraryFolderKey.Presentations)</span>
                 </a>
                 <div class="folder-children">
-                    <a class="folder-item folder-child">
+                    <a class="folder-item folder-child @(IsFolderSelected(LibraryFolderKey.Product) ? "active" : null)"
+                       @onclick="() => SelectFolder(LibraryFolderKey.Product)"
+                       data-testid="library-folder-product">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                         <span>Product</span>
-                        <span class="nav-count">@Math.Max(1, _cards.Count / 2)</span>
+                        <span class="nav-count">@GetFolderCount(LibraryFolderKey.Product)</span>
                     </a>
-                    <a class="folder-item folder-child">
+                    <a class="folder-item folder-child @(IsFolderSelected(LibraryFolderKey.Investors) ? "active" : null)"
+                       @onclick="() => SelectFolder(LibraryFolderKey.Investors)"
+                       data-testid="library-folder-investors">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                         <span>Investors</span>
-                        <span class="nav-count">@Math.Max(1, _cards.Count - Math.Max(1, _cards.Count / 2))</span>
+                        <span class="nav-count">@GetFolderCount(LibraryFolderKey.Investors)</span>
                     </a>
                 </div>
-                <a class="folder-item">
+                <a class="folder-item @(IsFolderSelected(LibraryFolderKey.Podcasts) ? "active" : null)"
+                   @onclick="() => SelectFolder(LibraryFolderKey.Podcasts)"
+                   data-testid="library-folder-podcasts">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6" /></svg>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     <span>Podcasts</span>
-                    <span class="nav-count">@Math.Max(1, _cards.Count)</span>
+                    <span class="nav-count">@GetFolderCount(LibraryFolderKey.Podcasts)</span>
                 </a>
-                <a class="folder-item">
+                <a class="folder-item @(IsFolderSelected(LibraryFolderKey.NewsReports) ? "active" : null)"
+                   @onclick="() => SelectFolder(LibraryFolderKey.NewsReports)"
+                   data-testid="library-folder-news">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6" /></svg>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     <span>News Reports</span>
-                    <span class="nav-count">@Math.Max(1, _cards.Count)</span>
+                    <span class="nav-count">@GetFolderCount(LibraryFolderKey.NewsReports)</span>
                 </a>
-                <a class="folder-item">
+                <a class="folder-item @(IsFolderSelected(LibraryFolderKey.TedTalks) ? "active" : null)"
+                   @onclick="() => SelectFolder(LibraryFolderKey.TedTalks)"
+                   data-testid="library-folder-ted">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6" /></svg>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     <span>TED Talks</span>
-                    <span class="nav-count">@Math.Max(1, _cards.Count)</span>
+                    <span class="nav-count">@GetFolderCount(LibraryFolderKey.TedTalks)</span>
                 </a>
-                <a class="folder-item">
+                <a class="folder-item @(IsFolderSelected(LibraryFolderKey.Internal) ? "active" : null)"
+                   @onclick="() => SelectFolder(LibraryFolderKey.Internal)"
+                   data-testid="library-folder-internal">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6" /></svg>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
                     <span>Internal</span>
-                    <span class="nav-count">@Math.Max(1, _cards.Count)</span>
+                    <span class="nav-count">@GetFolderCount(LibraryFolderKey.Internal)</span>
                 </a>
             </nav>
         </div>
@@ -91,10 +107,18 @@
         <div class="lib-scroll">
             <div class="lib-sort-bar">
                 <span class="sort-label">Sort by</span>
-                <button class="sort-btn active">Name</button>
-                <button class="sort-btn">Date</button>
-                <button class="sort-btn">Duration</button>
-                <button class="sort-btn">WPM</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Name)"
+                        data-testid="library-sort-name">Name</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Date)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Date)"
+                        data-testid="library-sort-date">Date</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Duration)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Duration)"
+                        data-testid="library-sort-duration">Duration</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Wpm)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
+                        data-testid="library-sort-wpm">WPM</button>
             </div>
 
             <div class="dcards-grid">
@@ -156,7 +180,15 @@
 
 @code {
     private bool _loadLibrary = true;
+    private IReadOnlyList<LibraryCardViewModel> _allCards = [];
     private IReadOnlyList<LibraryCardViewModel> _cards = [];
+    private LibrarySortMode _sortMode = LibrarySortMode.Name;
+    private string _selectedFolder = LibraryFolderKey.All;
+
+    private bool IsPresentationFolderActive =>
+        IsFolderSelected(LibraryFolderKey.Presentations) ||
+        IsFolderSelected(LibraryFolderKey.Product) ||
+        IsFolderSelected(LibraryFolderKey.Investors);
 
     protected override Task OnParametersSetAsync()
     {
@@ -214,13 +246,18 @@
                 summary.WordCount,
                 previewSegments.Count > 0 ? previewSegments.Count : 1,
                 author,
+                summary.UpdatedAt,
                 summary.UpdatedAt.ToLocalTime().ToString("MMM dd"),
                 profile,
+                duration,
                 FormatDuration(duration),
+                ResolveFolderKey(parsed.Metadata, summary.Id),
+                ResolveDisplayOrder(summary.Id),
                 $"library-card-{summary.Id}"));
         }
 
-        _cards = nextCards;
+        _allCards = nextCards;
+        ApplyLibraryView();
     }
 
     private async Task CreateScriptAsync()
@@ -286,7 +323,106 @@
         await LoadLibraryAsync();
     }
 
+    private void SelectFolder(string folderKey)
+    {
+        _selectedFolder = folderKey;
+        ApplyLibraryView();
+    }
+
+    private void SetSortMode(LibrarySortMode sortMode)
+    {
+        _sortMode = sortMode;
+        ApplyLibraryView();
+    }
+
+    private void ApplyLibraryView()
+    {
+        IEnumerable<LibraryCardViewModel> cards = _allCards;
+
+        cards = _selectedFolder switch
+        {
+            LibraryFolderKey.Presentations => cards.Where(card => card.FolderKey is LibraryFolderKey.Product or LibraryFolderKey.Investors),
+            LibraryFolderKey.All => cards,
+            _ => cards.Where(card => string.Equals(card.FolderKey, _selectedFolder, StringComparison.Ordinal))
+        };
+
+        cards = _sortMode switch
+        {
+            LibrarySortMode.Date => cards.OrderByDescending(card => card.UpdatedAt),
+            LibrarySortMode.Duration => cards.OrderByDescending(card => card.Duration),
+            LibrarySortMode.Wpm => cards.OrderByDescending(card => card.AverageWpm),
+            _ => cards
+                .OrderBy(card => card.DisplayOrder)
+                .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase)
+        };
+
+        _cards = cards.ToList();
+    }
+
+    private bool IsFolderSelected(string folderKey) =>
+        string.Equals(_selectedFolder, folderKey, StringComparison.Ordinal);
+
+    private int GetFolderCount(string folderKey)
+    {
+        if (string.Equals(folderKey, LibraryFolderKey.All, StringComparison.Ordinal))
+        {
+            return _allCards.Count;
+        }
+
+        if (string.Equals(folderKey, LibraryFolderKey.Presentations, StringComparison.Ordinal))
+        {
+            return _allCards.Count(card => card.FolderKey is LibraryFolderKey.Product or LibraryFolderKey.Investors);
+        }
+
+        return _allCards.Count(card => string.Equals(card.FolderKey, folderKey, StringComparison.Ordinal));
+    }
+
+    private string? GetSortClass(LibrarySortMode sortMode) =>
+        _sortMode == sortMode ? "active" : null;
+
     private static Task NoopAsync() => Task.CompletedTask;
+
+    private static string ResolveFolderKey(IReadOnlyDictionary<string, string> metadata, string id)
+    {
+        if (metadata.TryGetValue("folder", out var folderValue) && !string.IsNullOrWhiteSpace(folderValue))
+        {
+            var normalized = folderValue.Trim().ToLowerInvariant();
+            return normalized switch
+            {
+                "product" => LibraryFolderKey.Product,
+                "investors" => LibraryFolderKey.Investors,
+                "podcasts" or "podcast" => LibraryFolderKey.Podcasts,
+                "news" or "newsreports" or "news-reports" => LibraryFolderKey.NewsReports,
+                "ted" or "tedtalks" or "ted-talks" => LibraryFolderKey.TedTalks,
+                "internal" => LibraryFolderKey.Internal,
+                _ => ResolveFolderKeyFallback(id)
+            };
+        }
+
+        return ResolveFolderKeyFallback(id);
+    }
+
+    private static string ResolveFolderKeyFallback(string id) =>
+        id switch
+        {
+            SampleScriptCatalog.DemoSampleId => LibraryFolderKey.Product,
+            SampleScriptCatalog.LeadershipSampleId => LibraryFolderKey.TedTalks,
+            SampleScriptCatalog.SecuritySampleId => LibraryFolderKey.NewsReports,
+            SampleScriptCatalog.ArchitectureSampleId => LibraryFolderKey.Investors,
+            SampleScriptCatalog.QuantumSampleId => LibraryFolderKey.Internal,
+            _ => LibraryFolderKey.Internal
+        };
+
+    private static int ResolveDisplayOrder(string id) =>
+        id switch
+        {
+            SampleScriptCatalog.DemoSampleId => 0,
+            SampleScriptCatalog.SecuritySampleId => 1,
+            SampleScriptCatalog.LeadershipSampleId => 2,
+            SampleScriptCatalog.ArchitectureSampleId => 3,
+            SampleScriptCatalog.QuantumSampleId => 4,
+            _ => 100
+        };
 
     private static string ResolveCoverClass(string? emotionKey) =>
         NormalizeEmotion(emotionKey) switch
@@ -328,9 +464,13 @@
         int WordCount,
         int SegmentCount,
         string Author,
+        DateTimeOffset UpdatedAt,
         string UpdatedLabel,
         string ModeLabel,
+        TimeSpan Duration,
         string DurationLabel,
+        string FolderKey,
+        int DisplayOrder,
         string TestId)
     {
         public string WpmLabel => $"{AverageWpm} WPM";
@@ -338,5 +478,25 @@
         public string WordCountLabel => $"{WordCount:N0} words";
 
         public string SegmentCountLabel => $"{SegmentCount} segment{(SegmentCount == 1 ? string.Empty : "s")}";
+    }
+
+    private enum LibrarySortMode
+    {
+        Name,
+        Date,
+        Duration,
+        Wpm
+    }
+
+    private static class LibraryFolderKey
+    {
+        public const string All = "all";
+        public const string Presentations = "presentations";
+        public const string Product = "product";
+        public const string Investors = "investors";
+        public const string Podcasts = "podcasts";
+        public const string NewsReports = "news";
+        public const string TedTalks = "ted";
+        public const string Internal = "internal";
     }
 }

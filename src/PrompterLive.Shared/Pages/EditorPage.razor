@@ -288,30 +288,56 @@
             <div class="ed-section-label">METADATA</div>
             <div class="ed-meta-field">
                 <label>Profile</label>
-                <select class="ed-meta-select">
-                    <option selected="@(_profile == "Actor")">Actor</option>
-                    <option selected="@(_profile == "RSVP")">RSVP</option>
+                <select class="ed-meta-select"
+                        value="@_profile"
+                        @onchange="OnProfileChangedAsync"
+                        data-testid="editor-profile">
+                    <option value="Actor">Actor</option>
+                    <option value="RSVP">RSVP</option>
                 </select>
             </div>
             <div class="ed-meta-field">
                 <label>Base WPM</label>
-                <input type="number" class="ed-meta-input" value="@_baseWpm" min="80" max="600" />
+                <input type="number"
+                       class="ed-meta-input"
+                       value="@_baseWpm"
+                       min="80"
+                       max="600"
+                       @onchange="OnBaseWpmChangedAsync"
+                       data-testid="editor-base-wpm" />
             </div>
             <div class="ed-meta-field">
                 <label>Duration</label>
-                <input type="text" class="ed-meta-input" value="@_duration" placeholder="MM:SS" />
+                <input type="text"
+                       class="ed-meta-input"
+                       value="@_duration"
+                       placeholder="MM:SS"
+                       readonly
+                       data-testid="editor-duration" />
             </div>
             <div class="ed-meta-field">
                 <label>Author</label>
-                <input type="text" class="ed-meta-input" value="@_author" />
+                <input type="text"
+                       class="ed-meta-input"
+                       value="@_author"
+                       @onchange="OnAuthorChangedAsync"
+                       data-testid="editor-author" />
             </div>
             <div class="ed-meta-field">
                 <label>Created</label>
-                <input type="date" class="ed-meta-input" value="@_createdDate" />
+                <input type="date"
+                       class="ed-meta-input"
+                       value="@_createdDate"
+                       @onchange="OnCreatedDateChangedAsync"
+                       data-testid="editor-created" />
             </div>
             <div class="ed-meta-field">
                 <label>Version</label>
-                <input type="text" class="ed-meta-input" value="@_version" />
+                <input type="text"
+                       class="ed-meta-input"
+                       value="@_version"
+                       @onchange="OnVersionChangedAsync"
+                       data-testid="editor-version" />
             </div>
 
             <div class="ed-section-label" style="margin-top:18px">SPEED OFFSETS</div>
@@ -358,7 +384,7 @@
     public string? ScriptId { get; set; }
 
     private bool _loadState = true;
-    private string _screenTitle = "RSVP Technology Demo";
+    private string _screenTitle = "Product Launch";
     private string _profile = "Actor";
     private string _author = "PrompterLive";
     private string _version = "1.0";
@@ -424,10 +450,82 @@
         _author = GetMetadata(metadata, "author", "PrompterLive");
         _version = GetMetadata(metadata, "version", "1.0");
         _profile = GetMetadata(metadata, "profile", _baseWpm >= 250 ? "RSVP" : "Actor");
+        _createdDate = GetMetadata(
+            metadata,
+            "created",
+            _createdDate);
 
         _segments = BuildEditorSegments(state.ScriptData?.Segments);
         _segmentCount = _segments.Count;
         _blockCount = _segments.Sum(segment => segment.Blocks.Count);
+    }
+
+    private async Task OnProfileChangedAsync(ChangeEventArgs args)
+    {
+        _profile = args.Value?.ToString()?.Trim() switch
+        {
+            "RSVP" => "RSVP",
+            _ => "Actor"
+        };
+
+        await PersistMetadataAsync();
+    }
+
+    private async Task OnBaseWpmChangedAsync(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var parsed))
+        {
+            _baseWpm = Math.Clamp(parsed, 80, 600);
+            await PersistMetadataAsync();
+        }
+    }
+
+    private async Task OnAuthorChangedAsync(ChangeEventArgs args)
+    {
+        _author = args.Value?.ToString()?.Trim() ?? string.Empty;
+        await PersistMetadataAsync();
+    }
+
+    private async Task OnCreatedDateChangedAsync(ChangeEventArgs args)
+    {
+        _createdDate = args.Value?.ToString()?.Trim() ?? string.Empty;
+        await PersistMetadataAsync();
+    }
+
+    private async Task OnVersionChangedAsync(ChangeEventArgs args)
+    {
+        _version = args.Value?.ToString()?.Trim() ?? string.Empty;
+        await PersistMetadataAsync();
+    }
+
+    private async Task PersistMetadataAsync()
+    {
+        var (metadata, body) = SplitFrontMatter(SessionService.State.Text);
+
+        metadata["title"] = _screenTitle;
+        metadata["author"] = string.IsNullOrWhiteSpace(_author) ? "PrompterLive" : _author.Trim();
+        metadata["profile"] = _profile;
+        metadata["base_wpm"] = _baseWpm.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        metadata["version"] = string.IsNullOrWhiteSpace(_version) ? "1.0" : _version.Trim();
+
+        if (string.IsNullOrWhiteSpace(_createdDate))
+        {
+            metadata.Remove("created");
+        }
+        else
+        {
+            metadata["created"] = _createdDate;
+        }
+
+        var updatedText = BuildFrontMatter(metadata, body);
+        await SessionService.UpdateDraftAsync(
+            _screenTitle,
+            updatedText,
+            SessionService.State.DocumentName,
+            SessionService.State.ScriptId);
+
+        PopulateEditorState();
+        StateHasChanged();
     }
 
     private static IReadOnlyList<EditorSegmentViewModel> BuildEditorSegments(ScriptSegment[]? segments)
@@ -554,6 +652,95 @@
         var safeDuration = duration <= TimeSpan.Zero ? TimeSpan.FromSeconds(1) : duration;
         return $"{(int)safeDuration.TotalMinutes}:{safeDuration.Seconds:00}";
     }
+
+    private static (Dictionary<string, string> Metadata, string Body) SplitFrontMatter(string text)
+    {
+        var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return (metadata, string.Empty);
+        }
+
+        var match = System.Text.RegularExpressions.Regex.Match(
+            text,
+            @"\A---\s*\r?\n(?<front>.*?)\r?\n---\s*\r?\n?",
+            System.Text.RegularExpressions.RegexOptions.Singleline);
+
+        if (!match.Success)
+        {
+            return (metadata, text);
+        }
+
+        var frontMatter = match.Groups["front"].Value;
+        foreach (var line in frontMatter.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var separatorIndex = line.IndexOf(':');
+            if (separatorIndex <= 0)
+            {
+                continue;
+            }
+
+            var key = line[..separatorIndex].Trim();
+            var value = line[(separatorIndex + 1)..].Trim().Trim('"');
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                metadata[key] = value;
+            }
+        }
+
+        return (metadata, text[match.Length..]);
+    }
+
+    private static string BuildFrontMatter(IReadOnlyDictionary<string, string> metadata, string body)
+    {
+        var builder = new System.Text.StringBuilder();
+        builder.AppendLine("---");
+
+        foreach (var key in PreferredMetadataOrder.Where(metadata.ContainsKey))
+        {
+            builder.Append(key);
+            builder.Append(": ");
+            builder.AppendLine(FormatMetadataValue(key, metadata[key]));
+        }
+
+        foreach (var entry in metadata
+            .Where(entry => !PreferredMetadataOrder.Contains(entry.Key, StringComparer.OrdinalIgnoreCase))
+            .OrderBy(entry => entry.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            builder.Append(entry.Key);
+            builder.Append(": ");
+            builder.AppendLine(FormatMetadataValue(entry.Key, entry.Value));
+        }
+
+        builder.AppendLine("---");
+        builder.AppendLine();
+        builder.Append(body.TrimStart());
+        return builder.ToString();
+    }
+
+    private static string FormatMetadataValue(string key, string value)
+    {
+        value ??= string.Empty;
+
+        if (string.Equals(key, "base_wpm", StringComparison.OrdinalIgnoreCase) &&
+            int.TryParse(value, out _))
+        {
+            return value;
+        }
+
+        return $"\"{value.Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
+    }
+
+    private static readonly string[] PreferredMetadataOrder =
+    [
+        "title",
+        "author",
+        "profile",
+        "base_wpm",
+        "version",
+        "created",
+        "folder"
+    ];
 
     private sealed record EditorSegmentViewModel(
         int Index,

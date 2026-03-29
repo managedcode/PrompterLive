@@ -12,8 +12,8 @@ public sealed class StandaloneAppCollection : ICollectionFixture<StandaloneAppFi
 
 public sealed class StandaloneAppFixture : IAsyncLifetime
 {
-    private const string BaseAddressValue = "http://localhost:5040";
-    private Process? _process;
+    private const string BaseAddressValue = "http://localhost:5051";
+    private StaticSpaServer? _server;
 
     public string BaseAddress => BaseAddressValue;
     public IPlaywright Playwright { get; private set; } = null!;
@@ -21,18 +21,15 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var serverState = await GetServerStateAsync();
-        if (serverState == ServerState.Invalid)
-        {
-            await StopListeningProcessAsync();
-            serverState = ServerState.NotRunning;
-        }
-
-        if (serverState != ServerState.Valid)
-        {
-            _process = StartAppProcess();
-            await WaitForServerAsync();
-        }
+        await StopListeningProcessAsync();
+        _server = new StaticSpaServer(
+            GetAppWwwrootDirectory(),
+            GetFrameworkDirectory(),
+            GetSharedWwwrootDirectory(),
+            GetHotReloadStaticAssetsDirectory(),
+            BaseAddressValue);
+        await _server.StartAsync();
+        await WaitForServerAsync();
 
         Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
         Browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -49,11 +46,9 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
         }
 
         Playwright?.Dispose();
-
-        if (_process is { HasExited: false })
+        if (_server is not null)
         {
-            _process.Kill(entireProcessTree: true);
-            await _process.WaitForExitAsync();
+            await _server.DisposeAsync();
         }
     }
 
@@ -63,39 +58,6 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
         {
             BaseURL = BaseAddress
         });
-    }
-
-    private static Process StartAppProcess()
-    {
-        var projectDirectory = Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory,
-            "../../../../../src/PrompterLive.App"));
-
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = "run",
-                WorkingDirectory = projectDirectory,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
-
-        process.OutputDataReceived += static (_, _) => { };
-        process.ErrorDataReceived += static (_, _) => { };
-
-        if (!process.Start())
-        {
-            throw new InvalidOperationException("Failed to start PrompterLive.App.");
-        }
-
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-        return process;
     }
 
     private static async Task WaitForServerAsync()
@@ -154,13 +116,7 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
 
     private static string? GetExpectedFrameworkAssetName()
     {
-        var frameworkDirectory = Path.Combine(
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../src/PrompterLive.App")),
-            "bin",
-            "Debug",
-            "net10.0",
-            "wwwroot",
-            "_framework");
+        var frameworkDirectory = GetFrameworkDirectory();
 
         if (!Directory.Exists(frameworkDirectory))
         {
@@ -193,12 +149,12 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
 
     private static async Task<IReadOnlyList<int>> GetListeningPidsAsync()
     {
-        var process = new Process
+        using var process = new System.Diagnostics.Process
         {
-            StartInfo = new ProcessStartInfo
+            StartInfo = new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "lsof",
-                Arguments = "-t -iTCP:5040 -sTCP:LISTEN",
+                Arguments = "-t -iTCP:5051 -sTCP:LISTEN",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -219,6 +175,41 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
             .Select(value => int.TryParse(value, out var pid) ? pid : 0)
             .Where(pid => pid > 0)
             .ToArray();
+    }
+
+    private static string GetAppWwwrootDirectory() =>
+        Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "../../../../../src/PrompterLive.App/wwwroot"));
+
+    private static string GetFrameworkDirectory() =>
+        Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "../../../../../src/PrompterLive.App/bin/Debug/net10.0/wwwroot/_framework"));
+
+    private static string GetSharedWwwrootDirectory() =>
+        Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "../../../../../src/PrompterLive.Shared/wwwroot"));
+
+    private static string? GetHotReloadStaticAssetsDirectory()
+    {
+        var packagesRoot = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".nuget",
+            "packages",
+            "microsoft.dotnet.hotreload.webassembly.browser");
+
+        if (!Directory.Exists(packagesRoot))
+        {
+            return null;
+        }
+
+        return Directory
+            .EnumerateDirectories(packagesRoot)
+            .OrderByDescending(path => path, StringComparer.OrdinalIgnoreCase)
+            .Select(path => Path.Combine(path, "staticwebassets"))
+            .FirstOrDefault(Directory.Exists);
     }
 
     private enum ServerState

@@ -21,8 +21,8 @@ public sealed class PageSmokeTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("screen-library", cut.Markup);
-            Assert.Contains("RSVP Technology Demo", cut.Markup);
-            Assert.Contains("Comprehensive RSVP Demo", cut.Markup);
+            Assert.Contains("Product Launch", cut.Markup);
+            Assert.Contains("TED: Leadership", cut.Markup);
             Assert.Contains("New Script", cut.Markup);
         });
     }
