@@ -54,7 +54,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -83,7 +83,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -111,7 +111,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 

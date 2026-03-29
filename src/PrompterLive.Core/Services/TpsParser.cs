@@ -274,7 +274,7 @@ public partial class TpsParser
         return Task.FromResult(document);
     }
 
-    private TimeSpan? ParseDuration(string durationString)
+    private static TimeSpan? ParseDuration(string durationString)
     {
         if (string.IsNullOrWhiteSpace(durationString))
         {
@@ -702,7 +702,7 @@ public partial class TpsParser
     /// <summary>
     /// Parse phrases within a block
     /// </summary>
-    private List<ScriptPhrase> ParsePhrases(string blockContent)
+    private static List<ScriptPhrase> ParsePhrases(string blockContent)
     {
         var phrases = new List<ScriptPhrase>();
 

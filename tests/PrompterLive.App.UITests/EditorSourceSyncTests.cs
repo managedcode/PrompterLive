@@ -46,7 +46,7 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 }

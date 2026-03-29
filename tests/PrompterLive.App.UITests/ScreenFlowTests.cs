@@ -52,7 +52,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -91,7 +91,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -139,7 +139,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -268,7 +268,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -392,7 +392,7 @@ public sealed class ScreenFlowTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 }

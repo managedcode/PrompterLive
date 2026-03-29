@@ -42,7 +42,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -86,7 +86,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -126,7 +126,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -155,7 +155,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -187,7 +187,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -241,7 +241,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 
@@ -325,7 +325,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture)
         }
         finally
         {
-            await page.CloseAsync();
+            await page.Context.CloseAsync();
         }
     }
 }

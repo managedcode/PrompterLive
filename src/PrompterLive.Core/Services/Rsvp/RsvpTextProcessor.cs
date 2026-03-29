@@ -290,7 +290,7 @@ public class RsvpTextProcessor
     /// <summary>
     /// Process a single line of text into words with phrase markers
     /// </summary>
-    private List<string> ProcessLine(string line)
+    private static List<string> ProcessLine(string line)
     {
         var words = new List<string>();
 
@@ -479,7 +479,7 @@ public class RsvpTextProcessor
     /// <summary>
     /// Process a line and extract inline formatting metadata
     /// </summary>
-    private (string cleanLine, List<WordMetadata>? metadata) ProcessLineWithTags(string line)
+    private static (string cleanLine, List<WordMetadata>? metadata) ProcessLineWithTags(string line)
     {
         var metadata = new List<WordMetadata>();
         var currentColor = "";

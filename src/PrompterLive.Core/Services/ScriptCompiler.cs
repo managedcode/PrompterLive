@@ -432,7 +432,7 @@ public class ScriptCompiler
         return true;
     }
 
-    private void HandleCurlyTagToken(string token, Stack<ScopeFrame> scopeStack)
+    private static void HandleCurlyTagToken(string token, Stack<ScopeFrame> scopeStack)
     {
         var inner = token.Substring(1, token.Length - 2).Trim();
         if (string.Equals(inner, "/", StringComparison.Ordinal))
@@ -640,7 +640,7 @@ public class ScriptCompiler
         return 1000;
     }
 
-    private void AddWord(List<CompiledWord> words, string token, FormattingState state)
+    private static void AddWord(List<CompiledWord> words, string token, FormattingState state)
     {
         var clean = token.Trim();
         if (string.IsNullOrEmpty(clean))
