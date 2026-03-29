@@ -23,6 +23,7 @@ public sealed class PageSmokeTests : BunitContext
             Assert.Contains("screen-library", cut.Markup);
             Assert.Contains("Product Launch", cut.Markup);
             Assert.Contains("TED: Leadership", cut.Markup);
+            Assert.DoesNotContain("Comprehensive RSVP Demo", cut.Markup);
             Assert.Contains("New Script", cut.Markup);
         });
     }

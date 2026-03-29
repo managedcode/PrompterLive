@@ -98,6 +98,7 @@ public sealed class BrowserScriptRepository : IScriptRepository
     private async Task InitializeSeedDataAsync(IEnumerable<StoredScriptDocument> seedDocuments, CancellationToken cancellationToken)
     {
         var seedList = seedDocuments.ToList();
+        var existing = await ListAsync(cancellationToken);
         var seedVersion = await _jsRuntime.InvokeAsync<string?>(
             "PrompterLive.storage.getSeedVersion",
             cancellationToken);
@@ -105,6 +106,11 @@ public sealed class BrowserScriptRepository : IScriptRepository
 
         if (forceRefresh)
         {
+            foreach (var existingDocument in existing.Where(SampleScriptCatalog.ShouldReplaceOnSeedRefresh))
+            {
+                await DeleteAsync(existingDocument.Id, cancellationToken);
+            }
+
             foreach (var document in seedList)
             {
                 await _jsRuntime.InvokeAsync<string>(
@@ -120,7 +126,6 @@ public sealed class BrowserScriptRepository : IScriptRepository
             return;
         }
 
-        var existing = await ListAsync(cancellationToken);
         var existingIds = existing
             .Select(document => document.Id)
             .ToHashSet(StringComparer.Ordinal);

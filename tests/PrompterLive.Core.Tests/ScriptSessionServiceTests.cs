@@ -17,7 +17,7 @@ public sealed class ScriptSessionServiceTests
 
         var library = await repository.ListAsync();
 
-        Assert.True(library.Count >= 5);
+        Assert.Equal(5, library.Count);
         Assert.Equal("Fresh Take", session.State.Title);
         Assert.Equal("fresh-take.tps", session.State.DocumentName);
         Assert.True(session.State.WordCount > 0);

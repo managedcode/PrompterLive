@@ -6,12 +6,33 @@ namespace PrompterLive.Core.Services.Samples;
 
 public static class SampleScriptCatalog
 {
-    public const string SeedVersion = "2026-03-29-new-design-v4";
+    public const string SeedVersion = "2026-03-29-new-design-v5";
     public const string DemoSampleId = "rsvp-tech-demo";
     public const string LeadershipSampleId = "ted-leadership";
     public const string SecuritySampleId = "security-incident";
     public const string ArchitectureSampleId = "green-architecture";
     public const string QuantumSampleId = "quantum-computing";
+    public const string LegacyComprehensiveSampleId = "comprehensive-demo";
+
+    private static readonly HashSet<string> ReplaceableSampleIds = new(StringComparer.Ordinal)
+    {
+        DemoSampleId,
+        LeadershipSampleId,
+        SecuritySampleId,
+        ArchitectureSampleId,
+        QuantumSampleId,
+        LegacyComprehensiveSampleId
+    };
+
+    private static readonly HashSet<string> ReplaceableDocumentNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "test-script.tps",
+        "ted-leadership.tps",
+        "security-incident.tps",
+        "green-architecture.tps",
+        "quantum-computing.tps",
+        "comprehensive-demo.tps"
+    };
 
     public static IReadOnlyList<StoredScriptDocument> CreateSeedDocuments()
     {
@@ -27,6 +48,10 @@ public static class SampleScriptCatalog
 
     public static StoredScriptDocument GetById(string sampleId) =>
         CreateSeedDocuments().First(document => string.Equals(document.Id, sampleId, StringComparison.Ordinal));
+
+    public static bool ShouldReplaceOnSeedRefresh(StoredScriptSummary summary) =>
+        ReplaceableSampleIds.Contains(summary.Id) ||
+        ReplaceableDocumentNames.Contains(summary.DocumentName);
 
     private static StoredScriptDocument BuildDocument(string id, string title, string resourceFileName, DateTimeOffset updatedAt)
     {

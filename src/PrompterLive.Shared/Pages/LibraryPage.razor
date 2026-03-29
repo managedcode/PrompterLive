@@ -225,16 +225,21 @@
             var parsed = await TpsParser.ParseAsync(document.Text);
 
             var firstSegment = previewSegments.FirstOrDefault();
-            var averageWpm = previewSegments.Count > 0
+            var computedWpm = previewSegments.Count > 0
                 ? (int)Math.Round(previewSegments.Average(segment => segment.TargetWpm))
                 : 140;
-            var duration = TimeSpan.FromMinutes(summary.WordCount / (double)Math.Max(averageWpm, 1));
+            var averageWpm = ResolveDisplayInt(parsed.Metadata, "display_wpm", computedWpm);
+            var duration = ResolveDisplayDuration(
+                parsed.Metadata,
+                TimeSpan.FromMinutes(summary.WordCount / (double)Math.Max(averageWpm, 1)));
             var author = parsed.Metadata.TryGetValue("author", out var metadataAuthor) && !string.IsNullOrWhiteSpace(metadataAuthor)
                 ? metadataAuthor
                 : "You";
             var profile = parsed.Metadata.TryGetValue("profile", out var metadataProfile) && !string.IsNullOrWhiteSpace(metadataProfile)
                 ? metadataProfile.Trim().Trim('"')
-                : (averageWpm >= 250 ? "RSVP" : "Actor");
+                : (computedWpm >= 250 ? "RSVP" : "Actor");
+            var wordCount = ResolveDisplayInt(parsed.Metadata, "display_word_count", summary.WordCount);
+            var segmentCount = ResolveDisplayInt(parsed.Metadata, "display_segment_count", previewSegments.Count > 0 ? previewSegments.Count : 1);
 
             nextCards.Add(new LibraryCardViewModel(
                 summary.Id,
@@ -243,8 +248,8 @@
                 ResolveCoverClass(firstSegment?.EmotionKey),
                 ResolveAccentColor(firstSegment?.AccentColor, firstSegment?.BackgroundColor),
                 averageWpm,
-                summary.WordCount,
-                previewSegments.Count > 0 ? previewSegments.Count : 1,
+                wordCount,
+                segmentCount,
                 author,
                 summary.UpdatedAt,
                 summary.UpdatedAt.ToLocalTime().ToString("MMM dd"),
@@ -450,8 +455,46 @@
 
     private static string FormatDuration(TimeSpan duration)
     {
-        var rounded = TimeSpan.FromMinutes(Math.Max(1, Math.Round(duration.TotalMinutes)));
-        return $"{(int)rounded.TotalMinutes}:{rounded.Seconds:00}";
+        var safeDuration = duration <= TimeSpan.Zero ? TimeSpan.FromSeconds(1) : duration;
+        return $"{(int)safeDuration.TotalMinutes}:{safeDuration.Seconds:00}";
+    }
+
+    private static int ResolveDisplayInt(IReadOnlyDictionary<string, string> metadata, string key, int fallback)
+    {
+        if (metadata.TryGetValue(key, out var rawValue) &&
+            int.TryParse(rawValue.Trim().Trim('"'), out var parsedValue) &&
+            parsedValue > 0)
+        {
+            return parsedValue;
+        }
+
+        return fallback;
+    }
+
+    private static TimeSpan ResolveDisplayDuration(IReadOnlyDictionary<string, string> metadata, TimeSpan fallback)
+    {
+        if (!metadata.TryGetValue("display_duration", out var rawValue))
+        {
+            return fallback;
+        }
+
+        var normalized = rawValue.Trim().Trim('"');
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return fallback;
+        }
+
+        var parts = normalized.Split(':', StringSplitOptions.TrimEntries);
+        return parts.Length switch
+        {
+            2 when int.TryParse(parts[0], out var minutes) && int.TryParse(parts[1], out var seconds)
+                => TimeSpan.FromMinutes(minutes) + TimeSpan.FromSeconds(seconds),
+            3 when int.TryParse(parts[0], out var hours) &&
+                   int.TryParse(parts[1], out var parsedMinutes) &&
+                   int.TryParse(parts[2], out var parsedSeconds)
+                => new TimeSpan(hours, parsedMinutes, parsedSeconds),
+            _ => fallback
+        };
     }
 
     private sealed record LibraryCardViewModel(

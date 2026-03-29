@@ -13,6 +13,7 @@ public sealed class StandaloneAppCollection : ICollectionFixture<StandaloneAppFi
 public sealed class StandaloneAppFixture : IAsyncLifetime
 {
     private const string BaseAddressValue = "http://localhost:5051";
+    private readonly List<IBrowserContext> _contexts = [];
     private StaticSpaServer? _server;
 
     public string BaseAddress => BaseAddressValue;
@@ -34,12 +35,22 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
         Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
         Browser = await Playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = true
+            Headless = true,
+            Args =
+            [
+                "--use-fake-ui-for-media-stream",
+                "--use-fake-device-for-media-stream"
+            ]
         });
     }
 
     public async Task DisposeAsync()
     {
+        foreach (var context in _contexts)
+        {
+            await context.DisposeAsync();
+        }
+
         if (Browser is not null)
         {
             await Browser.DisposeAsync();
@@ -54,10 +65,16 @@ public sealed class StandaloneAppFixture : IAsyncLifetime
 
     public async Task<IPage> NewPageAsync()
     {
-        return await Browser.NewPageAsync(new BrowserNewPageOptions
+        var context = await Browser.NewContextAsync(new BrowserNewContextOptions
         {
             BaseURL = BaseAddress
         });
+        await context.GrantPermissionsAsync(["camera", "microphone"], new BrowserContextGrantPermissionsOptions
+        {
+            Origin = BaseAddress
+        });
+        _contexts.Add(context);
+        return await context.NewPageAsync();
     }
 
     private static async Task WaitForServerAsync()

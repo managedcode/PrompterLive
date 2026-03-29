@@ -25,11 +25,16 @@ public sealed class ScreenFlowTests
             await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
             await Expect(page.GetByText("Product Launch")).ToBeVisibleAsync();
             await Expect(page.GetByTestId("library-card-rsvp-tech-demo").Locator(".dcover-meta")).ToContainTextAsync("Actor");
+            await page.GetByTestId("library-search").FillAsync("Quantum");
+            await Expect(page.GetByText("Quantum Computing")).ToBeVisibleAsync();
+            await Expect(page.GetByText("Product Launch")).ToBeHiddenAsync();
+            await page.GetByTestId("library-search").FillAsync(string.Empty);
             await page.GetByRole(AriaRole.Button, new() { Name = "Date" }).ClickAsync();
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Date" })).ToHaveClassAsync(new Regex("active"));
             var tedTalksFolder = page.Locator(".folder-item").Filter(new() { HasText = "TED Talks" });
             await tedTalksFolder.ClickAsync();
             await Expect(tedTalksFolder).ToHaveClassAsync(new Regex("active"));
+            await Expect(page.Locator(".bc-current")).ToHaveTextAsync("TED Talks");
 
             var menuWrap = page.Locator(".dcard-menu-wrap").First;
             await menuWrap.Locator(".dcard-menu-btn").ClickAsync();
@@ -145,6 +150,11 @@ public sealed class ScreenFlowTests
             await page.GetByTestId("settings-nav-cameras").ClickAsync();
             await Expect(page.Locator("#set-cameras")).ToBeVisibleAsync();
             await Expect(page.GetByTestId("settings-request-media")).ToBeVisibleAsync();
+            await page.GetByTestId("settings-request-media").ClickAsync();
+            await Expect(page.Locator("[data-testid^='settings-camera-device-']").First).ToBeVisibleAsync();
+            await Expect(page.Locator("[data-testid^='settings-scene-camera-']").First).ToBeVisibleAsync();
+            await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Mirror" }).ClickAsync();
+            await page.Locator("[data-testid^='settings-scene-camera-']").First.GetByRole(AriaRole.Button, new() { Name = "Flip Vertical" }).ClickAsync();
             var readerCameraToggle = page.GetByTestId("settings-reader-camera-toggle");
             var cameraToggleWasOn = ((await readerCameraToggle.GetAttributeAsync("class")) ?? string.Empty).Contains("on", StringComparison.Ordinal);
             await readerCameraToggle.ClickAsync();
@@ -180,6 +190,13 @@ public sealed class ScreenFlowTests
             await Expect(page.Locator("#rd-camera")).ToHaveAttributeAsync(
                 "data-camera-autostart",
                 cameraToggleWasOn ? new Regex("false") : new Regex("true"));
+            if (!cameraToggleWasOn)
+            {
+                await page.WaitForTimeoutAsync(750);
+                var hasVideoTrack = await page.Locator("#rd-camera").EvaluateAsync<bool>(
+                    "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0");
+                Assert.True(hasVideoTrack);
+            }
         }
         finally
         {

@@ -5,6 +5,10 @@ profile: "Actor"
 base_wpm: 130
 version: "1.0"
 folder: "investors"
+display_duration: "8:00"
+display_word_count: 1040
+display_segment_count: 5
+display_wpm: 130
 ---
 
 ## [Opening|130WPM|calm|0:00-0:55]
