@@ -1,16 +1,10 @@
 # AGENTS.md
 
-## Purpose
+## Project Purpose
 
 `PrompterLive.Core` is the host-neutral domain layer.
 
-It owns:
-
-- TPS parsing, compilation, export
-- RSVP helpers
-- preview and workspace state
-- media scene models
-- streaming provider descriptors
+It owns TPS parsing, compilation, export, RSVP helpers, preview and workspace state, media scene models, and streaming provider descriptors.
 
 ## Entry Points
 
@@ -29,12 +23,17 @@ It owns:
 - No browser or server runtime assumptions.
 - Keep types serializable and reusable from the WebAssembly app.
 
-## Commands
+## Project-Local Commands
 
 - `dotnet build /Users/ksemenenko/Developer/PrompterLive/src/PrompterLive.Core/PrompterLive.Core.csproj`
 - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj`
 
-## Risks
+## Applicable Skills
+
+- no special skill is required for most core work; follow the root repo policy and architecture map first
+
+## Local Risks Or Protected Areas
 
 - TPS compatibility matters more than cosmetic refactors.
 - Do not let UI-specific shortcuts leak into domain parsing or RSVP behavior.
+- Respect root maintainability limits. Large parser/compiler edits need explicit decomposition or documented exceptions.
