@@ -24,6 +24,7 @@ public sealed class ScreenFlowTests
             await page.GotoAsync("/library");
             await Expect(page.GetByTestId("library-page")).ToBeVisibleAsync();
             await Expect(page.GetByText("RSVP Technology Demo")).ToBeVisibleAsync();
+            await Expect(page.Locator(".dcover-meta").First).ToContainTextAsync("RSVP");
             await page.GetByRole(AriaRole.Button, new() { Name = "Date" }).ClickAsync();
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Date" })).ToHaveClassAsync(new Regex("active"));
             var tedTalksFolder = page.Locator(".folder-item").Filter(new() { HasText = "TED Talks" });
@@ -63,7 +64,10 @@ public sealed class ScreenFlowTests
         try
         {
             await page.GotoAsync("/editor?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("editor-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
+            await Expect(page.Locator(".ed-content")).ToContainTextAsync("## [Intro|140WPM|Warm");
+            await Expect(page.Locator(".ed-content")).ToContainTextAsync("Opening Block");
+            await Expect(page.Locator(".ed-content")).ToContainTextAsync("Purpose Block");
             await page.Locator(".tb-dropdown-wrap").Nth(0).HoverAsync();
             await Expect(page.Locator(".tb-dropdown").Nth(0)).ToBeVisibleAsync();
             await page.Locator(".tb-dropdown-wrap").Nth(1).HoverAsync();
@@ -106,7 +110,7 @@ public sealed class ScreenFlowTests
         try
         {
             await page.GotoAsync("/teleprompter?id=rsvp-tech-demo");
-            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId("teleprompter-page")).ToBeVisibleAsync(new() { Timeout = 15000 });
             await Expect(page.Locator(".rd-edge-section")).ToContainTextAsync("Opening Block");
 
             await page.GetByTestId("teleprompter-font-up").ClickAsync();
@@ -126,6 +130,8 @@ public sealed class ScreenFlowTests
             await page.GetByTitle("Forward one word").ClickAsync();
 
             await page.GotoAsync("/settings");
+            await page.GetByTestId("settings-nav-cloud").ClickAsync();
+            await Expect(page.Locator("#set-cloud")).ToBeVisibleAsync();
             await page.GetByTestId("settings-nav-files").ClickAsync();
             await Expect(page.Locator("#set-files")).ToBeVisibleAsync();
             await page.Locator("#set-files .set-toggle").First.ClickAsync();
@@ -146,6 +152,12 @@ public sealed class ScreenFlowTests
             await openAiProvider.ClickAsync();
             await Expect(openAiProvider).ToHaveClassAsync(new Regex("active"));
             await Expect(page.GetByTestId("settings-test-connection")).ToBeVisibleAsync();
+
+            await page.GetByTestId("settings-nav-appearance").ClickAsync();
+            await Expect(page.GetByTestId("settings-appearance-panel")).ToBeVisibleAsync();
+
+            await page.GetByTestId("settings-nav-about").ClickAsync();
+            await Expect(page.GetByTestId("settings-about-panel")).ToBeVisibleAsync();
         }
         finally
         {

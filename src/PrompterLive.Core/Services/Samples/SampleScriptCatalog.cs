@@ -6,6 +6,7 @@ namespace PrompterLive.Core.Services.Samples;
 
 public static class SampleScriptCatalog
 {
+    public const string SeedVersion = "2026-03-29-new-design";
     public const string DemoSampleId = "rsvp-tech-demo";
     public const string ComprehensiveSampleId = "comprehensive-rsvp-demo";
 

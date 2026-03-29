@@ -1,6 +1,7 @@
 ---
 title: "Comprehensive RSVP Demo - All TPS Features"
 author: "Teleprompter Team"
+profile: "RSVP"
 base_wpm: 140
 version: "1.0"
 description: "Complete demonstration of all TPS format capabilities"
@@ -22,9 +23,9 @@ This system represents a breakthrough in reading technology that eliminates the 
 
 ### [Science Block|160WPM|focused]
 
-RSVP stands for {highlight,blue}Rapid Serial Visual Presentation{/}, a technique that displays text one word at a time at precisely calculated intervals to optimize comprehension and speed.
+RSVP stands for [blue][highlight]Rapid Serial Visual Presentation[/highlight][/blue], a technique that displays text one word at a time at precisely calculated intervals to optimize comprehension and speed.
 
-The science behind this approach is based on decades of research into <emphasis>cognitive processing</emphasis> and visual perception patterns.
+The science behind this approach is based on decades of research into [emphasis]cognitive processing[/emphasis] and visual perception patterns.
 
 ## [Problem Definition|110WPM|concerned|2:30-4:15]
 
@@ -50,7 +51,7 @@ Each word appears at the exact moment your brain is ready to process it, elimina
 
 ### [Benefits Block|180WPM|passionate]
 
-With proper practice, users achieve reading speeds of 600 to 1000 words per minute while maintaining {emphasize,strong}full comprehension{/}.
+With proper practice, users achieve reading speeds of 600 to 1000 words per minute while maintaining [emphasis]full comprehension[/emphasis].
 
 The system includes: adaptive speed control, emotion-based visual cues, context preservation, and intelligent pause detection for maximum effectiveness.
 

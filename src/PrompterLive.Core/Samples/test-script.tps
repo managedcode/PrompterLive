@@ -1,74 +1,87 @@
 ---
 title: "RSVP Technology Demo"
-author: "Teleprompter Team"
+author: "You"
+profile: "RSVP"
 base_wpm: 140
 version: "1.0"
 ---
 
-## [Introduction|130WPM|warm|0:00-1:30]
+## [Intro|140WPM|warm]
 
 ### [Opening Block|140WPM]
 
-Welcome to the revolutionary RSVP Teleprompter technology demonstration. This innovative system transforms how you consume and present information by displaying words one at a time at your optimal reading pace.
+Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
+will be a [green]transformative moment[/green] for our company. //
 
-Today we will explore the science behind rapid serial visual presentation and discover how this breakthrough can <emphasis>dramatically</emphasis> increase your reading speed.
+[pause:2s]
 
-### [Science Block|150WPM]
+### [Purpose Block|150WPM]
 
-The key to RSVP success lies in precise timing calculations and optimal recognition point positioning. Each word appears at the exact moment your brain is ready to process it.
+[emphasis]Today[/emphasis], / we're not just launching a product - /
+we're introducing a [highlight]solution[/highlight] that will [emphasis]revolutionize[/emphasis] /
+how our customers interact with technology. //
 
-Traditional reading requires your eyes to constantly move and refocus, but RSVP eliminates this inefficiency by bringing the text directly to your natural focal point.
+## [Problem|150WPM|concerned]
 
-## [Problem Phase|110WPM|concerned|1:30-3:00]
+### [Statistics Block|150WPM|neutral]
 
-### [Challenge Block|120WPM|worried]
+But first, / let's address the [xslow][red]elephant in the room[/red][/xslow]. /
+Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem. //
 
-Most people struggle with slow reading speeds that limit their productivity and comprehension. This becomes a major [pause:500ms] **PROBLEM** when dealing with large volumes of information in today's fast-paced world.
+[edit_point:high]
 
-The average person reads only 200-300 words per minute, leaving countless hours of potential learning and productivity on the table.
+According to recent studies, /
+[slow][emphasis]73% of users abandon[/emphasis][/slow] applications within the first three interactions /
+due to [highlight]complexity and poor user experience[/highlight]. //
 
-### [Impact Block|100WPM|serious]
+### [Impact Block|140WPM]
 
-This reading inefficiency affects millions of professionals, students, and researchers worldwide. Every single day, valuable opportunities are missed due to slow information processing speeds.
+This affects [emphasis]millions[/emphasis] of people worldwide, /
+costing businesses [red]billions in revenue[/red] annually. //
 
-[edit_point:high] The cost of this limitation compounds over time, creating significant barriers to personal and professional growth.
+## [Solution|160WPM|focused]
 
-## [Solution Phase|150WPM|focused|3:00-4:30]
+### [Introduction Block|150WPM]
 
-### [Innovation Block|160WPM|motivational]
+That's where our [blue][emphasis]new platform[/emphasis][/blue] comes in. /
+We've developed a [green]local-first teleprompter workflow[/green] that /
+[highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experience[/emphasis]. //
 
-Our RSVP technology directly addresses these core issues very effectively. By presenting words at precisely calculated intervals and positions, we eliminate the need for eye movement and reduce cognitive load.
+### [Benefits Block|160WPM|excited]
 
-The system adapts to your natural reading rhythm while gradually increasing speed, ensuring **maximum comprehension** at optimal velocity.
+With our solution, / you can expect a [green][emphasis]50% reduction[/emphasis][/green] in user abandonment /
+and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
 
-### [Benefits Block|170WPM|excited]
+[pause:1s]
 
-Practice with this system and you will achieve reading speeds of 600 to 1000 words per minute while maintaining full comprehension of the material being presented.
+[xfast]Full details are available in the handout.[/xfast] /
+[highlight]Thank you[/highlight] for your time. //
 
-{highlight,blue}Enhanced focus and reduced eye strain{/} make this the perfect solution for extended reading sessions and professional presentations.
+[edit_point:medium]
 
-## [Demonstration Phase|140WPM|excited|4:30-6:00]  
+## [Call to Action|130WPM|motivational]
 
-### [Live Demo Block|150WPM|motivational]
+### [Inspiration Block|130WPM|motivational]
 
-Right now, you are experiencing this technology firsthand. Notice how your eyes remain fixed on a single point while words flow naturally into your field of vision.
+This is not just about better technology. / It's about creating experiences /
+that respect people's time, attention, and energy. //
 
-The <emphasis>emotional indicators</emphasis> and gradient backgrounds help maintain engagement and provide context clues about the content's tone and importance.
+[purple]Let's build tools that feel human, useful, and memorable.[/purple] //
 
-### [Features Block|160WPM|focused]
+[slow]I want each of you to [emphasis]imagine[/emphasis] a world[/slow] /
+where [cyan]every interaction is intuitive[/cyan], /
+every workflow is [teal]seamless[/teal], /
+and every user feels [orange]empowered[/orange]. //
 
-Advanced features include customizable speed controls, emotion-based visual cues, context word display, and intelligent pause detection for optimal comprehension.
+[pause:3s]
 
-[edit_point:medium] Real-time analytics track your progress and suggest optimal reading speeds based on content complexity and your performance metrics.
+### [Closing Block|140WPM|energetic]
 
-## [Call to Action|130WPM|motivational|6:00-7:00]
+[urgent]The time to act is now.[/urgent] //
 
-### [Results Block|140WPM|excited]
+[180WPM]Join us in building the future of [pronunciation:TELE-promp-ter]teleprompter[/pronunciation] technology.[/180WPM] /
+[fast]Visit our booth in the exhibition hall for live demos.[/fast] /
+[motivational]Together, we will change how the world communicates.[/motivational] //
+[yellow]**Thank you**[/yellow] - [magenta]you are the future[/magenta]. //
 
-Transform your reading experience today with RSVP Teleprompter technology. Join thousands of users who have already revolutionized their information consumption and presentation capabilities.
-
-### [Closing Block|130WPM|warm]
-
-Thank you for experiencing the future of reading technology. [pause:1s] Start your journey to faster, more efficient reading today, and unlock your full potential with RSVP Teleprompter.
-
-**Ready to get started?** The future of reading is here, and it's waiting for you.
+[edit_point:high]

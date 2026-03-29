@@ -36,7 +36,8 @@ public sealed class ScriptSessionServiceTests
 
         Assert.Equal(SampleScriptCatalog.DemoSampleId, session.State.ScriptId);
         Assert.Equal("RSVP Technology Demo", session.State.Title);
-        Assert.Contains(session.State.PreviewSegments, segment => segment.Title == "Introduction");
+        Assert.Contains(session.State.PreviewSegments, segment => segment.Title == "Intro");
+        Assert.Contains(session.State.PreviewSegments, segment => segment.Title == "Call to Action");
         Assert.True(session.State.EstimatedDuration > TimeSpan.Zero);
     }
 

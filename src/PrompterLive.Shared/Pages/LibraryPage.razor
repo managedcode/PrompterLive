@@ -200,6 +200,9 @@
             var author = parsed.Metadata.TryGetValue("author", out var metadataAuthor) && !string.IsNullOrWhiteSpace(metadataAuthor)
                 ? metadataAuthor
                 : "You";
+            var profile = parsed.Metadata.TryGetValue("profile", out var metadataProfile) && !string.IsNullOrWhiteSpace(metadataProfile)
+                ? metadataProfile.Trim().Trim('"')
+                : (averageWpm >= 250 ? "RSVP" : "Actor");
 
             nextCards.Add(new LibraryCardViewModel(
                 summary.Id,
@@ -212,7 +215,7 @@
                 previewSegments.Count > 0 ? previewSegments.Count : 1,
                 author,
                 summary.UpdatedAt.ToLocalTime().ToString("MMM dd"),
-                averageWpm >= 250 ? "RSVP" : "Actor",
+                profile,
                 FormatDuration(duration),
                 $"library-card-{summary.Id}"));
         }

@@ -31,11 +31,11 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
                     AI Provider
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('appearance', event)">
+                <a class="set-nav-item" onclick="showSetSection('appearance', event)" data-testid="settings-nav-appearance">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
                     Appearance
                 </a>
-                <a class="set-nav-item" onclick="showSetSection('about', event)">
+                <a class="set-nav-item" onclick="showSetSection('about', event)" data-testid="settings-nav-about">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                     About
                 </a>
@@ -335,6 +335,63 @@
                         </div>
                     </div>
                     <button class="set-btn-golden" style="margin-top:16px" data-testid="settings-test-connection">Test Connection</button>
+                </div>
+            </section>
+
+            <section class="set-section set-panel" id="set-appearance" style="display:none" data-testid="settings-appearance-panel">
+                <h3 class="set-section-title">Appearance</h3>
+                <p class="set-section-desc">Tune the reading environment and chrome for the standalone WebAssembly experience.</p>
+
+                <div class="set-devices">
+                    <div class="set-field">
+                        <label>Reader Theme</label>
+                        <select class="set-select">
+                            <option>Emotion Driven</option>
+                            <option>Warm Studio</option>
+                            <option>Focused Emerald</option>
+                            <option>Midnight Neutral</option>
+                        </select>
+                    </div>
+                    <div class="set-field">
+                        <label>Layout Density</label>
+                        <select class="set-select">
+                            <option>Cinematic</option>
+                            <option>Balanced</option>
+                            <option>Compact</option>
+                        </select>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Show Header Chrome</label>
+                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                    </div>
+                    <div class="set-field set-field-toggle">
+                        <label>Use Ambient Gradient Motion</label>
+                        <div class="set-toggle on"><div class="set-toggle-thumb"></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="set-section set-panel" id="set-about" style="display:none" data-testid="settings-about-panel">
+                <h3 class="set-section-title">About</h3>
+                <p class="set-section-desc">Current runtime information for the standalone Prompter.live build.</p>
+
+                <div class="set-devices">
+                    <div class="set-field">
+                        <label>Product</label>
+                        <input type="text" class="set-input" value="Prompter.live" readonly />
+                    </div>
+                    <div class="set-field">
+                        <label>Runtime</label>
+                        <input type="text" class="set-input" value="Blazor WebAssembly" readonly />
+                    </div>
+                    <div class="set-field">
+                        <label>Version</label>
+                        <input type="text" class="set-input" value="0.1.0-dev" readonly />
+                    </div>
+                    <div class="set-field">
+                        <label>Storage Model</label>
+                        <input type="text" class="set-input" value="Local browser storage only" readonly />
+                    </div>
                 </div>
             </section>
         </div>

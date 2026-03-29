@@ -75,5 +75,7 @@ public sealed class PageSmokeTests : BunitContext
         Assert.Contains("File Storage", cut.Markup);
         Assert.Contains("Streaming", cut.Markup);
         Assert.Contains("AI Provider", cut.Markup);
+        Assert.Contains("Appearance", cut.Markup);
+        Assert.Contains("About", cut.Markup);
     }
 }

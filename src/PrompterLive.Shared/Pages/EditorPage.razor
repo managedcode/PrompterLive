@@ -422,7 +422,7 @@
         _baseWpm = TryGetInt(metadata, "base_wpm", state.ScriptData?.TargetWpm ?? 140);
         _author = GetMetadata(metadata, "author", "PrompterLive");
         _version = GetMetadata(metadata, "version", "1.0");
-        _profile = _baseWpm >= 250 ? "RSVP" : "Actor";
+        _profile = GetMetadata(metadata, "profile", _baseWpm >= 250 ? "RSVP" : "Actor");
 
         _segments = BuildEditorSegments(state.ScriptData?.Segments);
         _segmentCount = _segments.Count;
@@ -563,6 +563,18 @@
                 return $"<span class=\"mk-tag\">{{highlight,{match.Groups[1].Value}}}</span><span class=\"mk-hl {colorClass}\">{match.Groups[2].Value}</span><span class=\"mk-tag\">{{/}}</span>";
             },
             System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+
+        html = System.Text.RegularExpressions.Regex.Replace(
+            html,
+            @"(?<=^|\s)/(?!/)(?=\s|<br>|$)",
+            "<span class=\"mk-pause\">/</span>",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+        html = System.Text.RegularExpressions.Regex.Replace(
+            html,
+            @"(?<=^|\s)//(?=\s|<br>|$)",
+            "<span class=\"mk-pause\">//</span>",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
 
         html = System.Text.RegularExpressions.Regex.Replace(
             html,

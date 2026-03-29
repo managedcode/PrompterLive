@@ -1,5 +1,6 @@
 (function () {
     const storageKey = "prompterlive.library.v1";
+    const seedVersionKey = "prompterlive.library.seed-version";
     const settingsPrefix = "prompterlive.settings.";
     const streamMap = new Map();
     const readerAnimations = new Map();
@@ -101,6 +102,17 @@
                 );
 
                 writeDocuments(merged);
+            },
+            getSeedVersion() {
+                return window.localStorage.getItem(seedVersionKey);
+            },
+            setSeedVersion(version) {
+                if (!version) {
+                    window.localStorage.removeItem(seedVersionKey);
+                    return;
+                }
+
+                window.localStorage.setItem(seedVersionKey, version);
             },
             listDocuments() {
                 return readDocuments();

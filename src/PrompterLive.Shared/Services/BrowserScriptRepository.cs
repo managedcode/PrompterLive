@@ -1,6 +1,7 @@
 using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
+using PrompterLive.Core.Services.Samples;
 using System.Text.Json;
 
 namespace PrompterLive.Shared.Services;
@@ -96,24 +97,40 @@ public sealed class BrowserScriptRepository : IScriptRepository
 
     private async Task InitializeSeedDataAsync(IEnumerable<StoredScriptDocument> seedDocuments, CancellationToken cancellationToken)
     {
+        var seedList = seedDocuments.ToList();
+        var seedVersion = await _jsRuntime.InvokeAsync<string?>(
+            "PrompterLive.storage.getSeedVersion",
+            cancellationToken);
+        var forceRefresh = !string.Equals(seedVersion, SampleScriptCatalog.SeedVersion, StringComparison.Ordinal);
+
+        if (forceRefresh)
+        {
+            foreach (var document in seedList)
+            {
+                await _jsRuntime.InvokeAsync<string>(
+                    "PrompterLive.storage.saveDocumentJson",
+                    cancellationToken,
+                    ToDto(document));
+            }
+
+            await _jsRuntime.InvokeVoidAsync(
+                "PrompterLive.storage.setSeedVersion",
+                cancellationToken,
+                SampleScriptCatalog.SeedVersion);
+            return;
+        }
+
         var existing = await ListAsync(cancellationToken);
         var existingIds = existing
             .Select(document => document.Id)
             .ToHashSet(StringComparer.Ordinal);
 
-        foreach (var document in seedDocuments)
+        foreach (var document in seedList.Where(document => !existingIds.Contains(document.Id)))
         {
-            if (existingIds.Contains(document.Id))
-            {
-                continue;
-            }
-
             await _jsRuntime.InvokeAsync<string>(
                 "PrompterLive.storage.saveDocumentJson",
                 cancellationToken,
                 ToDto(document));
-
-            existingIds.Add(document.Id);
         }
     }
 
