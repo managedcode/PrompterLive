@@ -46,12 +46,12 @@
             <div class="go-live-center-stage">
                 <GoLiveProgramFeedCard ActiveSourceLabel="@ActiveSourceLabel"
                                        ActiveSessionLabel="@ActiveSessionLabel"
+                                       Camera="@ActiveCamera"
                                        IsArmed="@HasAnyLiveOutput"
                                        IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
                                        IsStreamActive="@GoLiveSession.State.IsStreamActive"
                                        ProgramResolutionLabel="@ProgramResolutionLabel"
                                        SelectedSourceLabel="@SelectedSourceLabel"
-                                       StageCaptionLines="@StageCaptionLines"
                                        StageFrameRateLabel="@StageFrameRateLabel" />
             </div>
 
@@ -124,217 +124,11 @@
                             <strong>0.0%</strong>
                         </div>
                     </div>
-                </section>
-            </aside>
-        </section>
 
-        <section class="go-live-routing-section">
-            <div class="go-live-routing-copy">
-                <span class="go-live-sidebar-title">Advanced destinations</span>
-                <h3>Destination routing</h3>
-                <p>Arm the targets that should receive the active program feed and keep stream controls aligned with the new studio layout.</p>
-            </div>
-
-            <div class="go-live-routing-grid">
-                <section class="live-targets-grid">
-                    <GoLiveDestinationCard Title="LiveKit"
-                                           Description="Publish the same browser-composed program feed to a LiveKit room."
-                                           Summary="@LiveKitSummary"
-                                           StatusLabel="@LiveKitStatusLabel"
-                                           IsEnabled="@_studioSettings.Streaming.LiveKitEnabled"
-                                           IsReady="@LiveKitDescriptor.IsReady"
-                                           ToggleTestId="@UiTestIds.GoLive.LiveKitToggle"
-                                           CardTestId="@UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)"
-                                           OnToggle="ToggleLiveKitAsync">
-                        <GoLiveDestinationSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.LiveKit"
-                                                       Sources="@SceneCameras"
-                                                       SelectedSourceIds="@GetDestinationSourceIds(GoLiveTargetCatalog.TargetIds.LiveKit)"
-                                                       ToggleSource="@(sourceId => ToggleDestinationSourceAsync(GoLiveTargetCatalog.TargetIds.LiveKit, sourceId))" />
-                        <div class="set-field">
-                            <label>Server URL</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.LiveKitServerUrl" @oninput="UpdateLiveKitServerAsync" data-testid="@UiTestIds.GoLive.LiveKitServer" />
-                        </div>
-                        <div class="set-field">
-                            <label>Room Name</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.LiveKitRoomName" @oninput="UpdateLiveKitRoomAsync" data-testid="@UiTestIds.GoLive.LiveKitRoom" />
-                        </div>
-                        <div class="set-field">
-                            <label>Access Token</label>
-                            <input type="password" class="set-input" value="@_studioSettings.Streaming.LiveKitToken" @oninput="UpdateLiveKitTokenAsync" data-testid="@UiTestIds.GoLive.LiveKitToken" />
-                        </div>
-                    </GoLiveDestinationCard>
-
-                    <GoLiveDestinationCard Title="VDO.Ninja"
-                                           Description="Create a browser publishing session that can run in parallel with teleprompter."
-                                           Summary="@VdoSummary"
-                                           StatusLabel="@VdoStatusLabel"
-                                           IsEnabled="@_studioSettings.Streaming.VdoNinjaEnabled"
-                                           IsReady="@VdoDescriptor.IsReady"
-                                           ToggleTestId="@UiTestIds.GoLive.VdoToggle"
-                                           CardTestId="@UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.VdoNinja)"
-                                           OnToggle="ToggleVdoNinjaAsync">
-                        <GoLiveDestinationSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.VdoNinja"
-                                                       Sources="@SceneCameras"
-                                                       SelectedSourceIds="@GetDestinationSourceIds(GoLiveTargetCatalog.TargetIds.VdoNinja)"
-                                                       ToggleSource="@(sourceId => ToggleDestinationSourceAsync(GoLiveTargetCatalog.TargetIds.VdoNinja, sourceId))" />
-                        <div class="set-field">
-                            <label>Room Name</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.VdoNinjaRoomName" @oninput="UpdateVdoNinjaRoomAsync" data-testid="@UiTestIds.GoLive.VdoRoom" />
-                        </div>
-                        <div class="set-field">
-                            <label>Publish URL</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.VdoNinjaPublishUrl" @oninput="UpdateVdoNinjaPublishUrlAsync" data-testid="@UiTestIds.GoLive.VdoPublishUrl" />
-                        </div>
-                    </GoLiveDestinationCard>
-
-                    <GoLiveDestinationCard Title="YouTube Live"
-                                           Description="Arm a YouTube destination that the RTMP relay can push alongside other targets."
-                                           Summary="@YoutubeSummary"
-                                           StatusLabel="@YoutubeStatusLabel"
-                                           IsEnabled="@_studioSettings.Streaming.YoutubeEnabled"
-                                           IsReady="@YoutubeDescriptor.IsReady"
-                                           ToggleTestId="@UiTestIds.GoLive.YoutubeToggle"
-                                           CardTestId="@UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)"
-                                           OnToggle="ToggleYoutubeAsync">
-                        <GoLiveDestinationSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.Youtube"
-                                                       Sources="@SceneCameras"
-                                                       SelectedSourceIds="@GetDestinationSourceIds(GoLiveTargetCatalog.TargetIds.Youtube)"
-                                                       ToggleSource="@(sourceId => ToggleDestinationSourceAsync(GoLiveTargetCatalog.TargetIds.Youtube, sourceId))" />
-                        <div class="set-field">
-                            <label>RTMP / RTMPS URL</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.YoutubeRtmpUrl" @oninput="UpdateYoutubeUrlAsync" data-testid="@UiTestIds.GoLive.YoutubeUrl" />
-                        </div>
-                        <div class="set-field">
-                            <label>Stream Key</label>
-                            <input type="password" class="set-input" value="@_studioSettings.Streaming.YoutubeStreamKey" @oninput="UpdateYoutubeKeyAsync" data-testid="@UiTestIds.GoLive.YoutubeKey" />
-                        </div>
-                    </GoLiveDestinationCard>
-
-                    <GoLiveDestinationCard Title="Twitch"
-                                           Description="Keep Twitch armed in the same live session without leaving the browser runtime."
-                                           Summary="@TwitchSummary"
-                                           StatusLabel="@TwitchStatusLabel"
-                                           IsEnabled="@_studioSettings.Streaming.TwitchEnabled"
-                                           IsReady="@TwitchDescriptor.IsReady"
-                                           ToggleTestId="@UiTestIds.GoLive.TwitchToggle"
-                                           CardTestId="@UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)"
-                                           OnToggle="ToggleTwitchAsync">
-                        <GoLiveDestinationSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.Twitch"
-                                                       Sources="@SceneCameras"
-                                                       SelectedSourceIds="@GetDestinationSourceIds(GoLiveTargetCatalog.TargetIds.Twitch)"
-                                                       ToggleSource="@(sourceId => ToggleDestinationSourceAsync(GoLiveTargetCatalog.TargetIds.Twitch, sourceId))" />
-                        <div class="set-field">
-                            <label>RTMP URL</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.TwitchRtmpUrl" @oninput="UpdateTwitchUrlAsync" data-testid="@UiTestIds.GoLive.TwitchUrl" />
-                        </div>
-                        <div class="set-field">
-                            <label>Stream Key</label>
-                            <input type="password" class="set-input" value="@_studioSettings.Streaming.TwitchStreamKey" @oninput="UpdateTwitchKeyAsync" data-testid="@UiTestIds.GoLive.TwitchKey" />
-                        </div>
-                    </GoLiveDestinationCard>
-
-                    <GoLiveDestinationCard Title="Custom RTMP"
-                                           Description="Use a custom relay, event CDN, or private ingest endpoint together with the rest of the stack."
-                                           Summary="@CustomRtmpSummary"
-                                           StatusLabel="@CustomRtmpStatusLabel"
-                                           IsEnabled="@_studioSettings.Streaming.CustomRtmpEnabled"
-                                           IsReady="@CustomRtmpDescriptor.IsReady"
-                                           ToggleTestId="@UiTestIds.GoLive.CustomRtmpToggle"
-                                           CardTestId="@UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.CustomRtmp)"
-                                           OnToggle="ToggleCustomRtmpAsync">
-                        <GoLiveDestinationSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.CustomRtmp"
-                                                       Sources="@SceneCameras"
-                                                       SelectedSourceIds="@GetDestinationSourceIds(GoLiveTargetCatalog.TargetIds.CustomRtmp)"
-                                                       ToggleSource="@(sourceId => ToggleDestinationSourceAsync(GoLiveTargetCatalog.TargetIds.CustomRtmp, sourceId))" />
-                        <div class="set-field">
-                            <label>Target Name</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.CustomRtmpName" @oninput="UpdateCustomRtmpNameAsync" data-testid="@UiTestIds.GoLive.CustomRtmpName" />
-                        </div>
-                        <div class="set-field">
-                            <label>RTMP / RTMPS URL</label>
-                            <input type="text" class="set-input" value="@_studioSettings.Streaming.CustomRtmpUrl" @oninput="UpdateCustomRtmpUrlAsync" data-testid="@UiTestIds.GoLive.CustomRtmpUrl" />
-                        </div>
-                        <div class="set-field">
-                            <label>Stream Key</label>
-                            <input type="password" class="set-input" value="@_studioSettings.Streaming.CustomRtmpStreamKey" @oninput="UpdateCustomRtmpKeyAsync" data-testid="@UiTestIds.GoLive.CustomRtmpKey" />
-                        </div>
-                    </GoLiveDestinationCard>
-                </section>
-
-                <aside class="go-live-rail-card go-live-output-panel">
-                    <div class="go-live-routing-copy">
-                        <span class="go-live-sidebar-title">Output control</span>
-                        <h3>Program output</h3>
-                        <p>Keep stream settings, camera inclusion, and jump links available without breaking the new studio composition.</p>
-                    </div>
-
-                    <div class="set-devices go-live-output-fields">
-                        <div class="set-field">
-                            <label>Output Mode</label>
-                            <select class="set-select"
-                                    value="@SelectedOutputModeValue"
-                                    @onchange="OnOutputModeChanged">
-                                <option value="virtual-camera">Virtual Camera</option>
-                                <option value="ndi-output">NDI Output</option>
-                                <option value="direct-rtmp">Direct RTMP</option>
-                                <option value="local-recording">Local Recording</option>
-                            </select>
-                        </div>
-                        <div class="set-field">
-                            <label>Output Resolution</label>
-                            <select class="set-select"
-                                    value="@_studioSettings.Streaming.OutputResolution"
-                                    @onchange="OnOutputResolutionChanged"
-                                    data-testid="@UiTestIds.GoLive.OutputResolution">
-                                <option value="@StreamingResolutionPreset.FullHd1080p30">1920 x 1080 @@ 30fps</option>
-                                <option value="@StreamingResolutionPreset.FullHd1080p60">1920 x 1080 @@ 60fps</option>
-                                <option value="@StreamingResolutionPreset.Hd720p30">1280 x 720 @@ 30fps</option>
-                                <option value="@StreamingResolutionPreset.UltraHd2160p30">3840 x 2160 @@ 30fps</option>
-                            </select>
-                        </div>
-                        <div class="set-field">
-                            <label>Bitrate (kbps)</label>
-                            <input type="number"
-                                   class="set-input"
-                                   value="@_studioSettings.Streaming.BitrateKbps"
-                                   @oninput="UpdateStreamingBitrateAsync"
-                                   data-testid="@UiTestIds.GoLive.Bitrate" />
-                        </div>
-                        <div class="set-field set-field-toggle">
-                            <label>Show Text Overlay</label>
-                            <div class="set-toggle @(_studioSettings.Streaming.ShowTextOverlay ? "on" : null)"
-                                 @onclick="ToggleStreamTextOverlayAsync"
-                                 data-testid="@UiTestIds.GoLive.StreamTextOverlay">
-                                <div class="set-toggle-thumb"></div>
-                            </div>
-                        </div>
-                        <div class="set-field set-field-toggle">
-                            <label>Include Camera in Output</label>
-                            <div class="set-toggle @(_studioSettings.Streaming.IncludeCameraInOutput ? "on" : null)"
-                                 @onclick="ToggleStreamIncludeCameraAsync"
-                                 data-testid="@UiTestIds.GoLive.StreamIncludeCamera">
-                                <div class="set-toggle-thumb"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="go-live-stat-grid">
-                        <div>
-                            <span>Video</span>
-                            <strong>@VideoTelemetry</strong>
-                        </div>
-                        <div>
-                            <span>Audio</span>
-                            <strong>@AudioTelemetry</strong>
-                        </div>
-                        <div>
-                            <span>Bitrate</span>
-                            <strong>@BitrateTelemetry</strong>
-                        </div>
-                        <div>
-                            <span>Destinations</span>
-                            <strong>@ActiveDestinationsTelemetry</strong>
-                        </div>
+                    <div class="go-live-settings-hint">
+                        <span class="set-section-label">Configured in Settings</span>
+                        <a class="set-btn-outline"
+                           href="@AppRoutes.Settings">Manage outputs</a>
                     </div>
 
                     @if (HasScriptContext)
@@ -348,8 +142,8 @@
                                data-testid="@UiTestIds.GoLive.OpenRead">Open Read</a>
                         </div>
                     }
-                </aside>
-            </div>
+                </section>
+            </aside>
         </section>
     </div>
 </div>

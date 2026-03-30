@@ -31,7 +31,12 @@ internal static partial class BrowserTestConstants
 
     public static class Learn
     {
+        public const string DemoProbeWord = "believe";
+        public const int DemoProbeStepLimit = 12;
+        public const int DemoViewportHeight = 899;
+        public const int DemoViewportWidth = 1598;
         public const string EndOfScriptText = "End of script.";
+        public const int MaxDemoVisibleContextWordGapPx = 72;
         public const string MidFlowWord = "this";
         public const string NextPhraseFragment = "our monitoring systems detected unauthorized";
         public const string QuantumProbeWord = "intuition";
@@ -262,11 +267,14 @@ internal static partial class BrowserTestConstants
     public static class Diagnostics
     {
         public const string BootstrapDetail = "Forced bootstrap diagnostics from browser test.";
+        public const string BootstrapManualSource = "manual";
+        public const string ConsoleErrorType = "error";
         public const string ConnectivityOfflineTitle = "Connection lost";
         public const string ConnectivityOnlineTitle = "Connection restored";
         public const string ForcedFailureDetail = "Forced diagnostics failure from browser test.";
         public const string CreateFolderFailure = "Unable to create this folder.";
         public const string FolderStorageKey = "prompterlive.folders.v1";
+        public const string ShellConsoleErrorPrefix = "[PrompterLive.shell]";
         public const string ShowBootstrapErrorScript = "detail => window.PrompterLive.shell.showBootstrapError(detail)";
         public const string ShowConnectivityOfflineScript = "() => window.PrompterLive.shell.showConnectivityOffline()";
         public const string ShowConnectivityOnlineScript = "() => window.PrompterLive.shell.showConnectivityOnline()";

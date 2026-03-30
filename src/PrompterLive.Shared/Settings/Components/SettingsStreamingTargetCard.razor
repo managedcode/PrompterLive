@@ -1,0 +1,48 @@
+@namespace PrompterLive.Shared.Components.Settings
+
+<article class="live-card live-destination-card"
+         data-testid="@CardTestId">
+    <div class="live-card-header">
+        <div>
+            <h3 class="live-card-title">@Title</h3>
+            <p class="live-card-desc">@Description</p>
+        </div>
+        <div class="set-toggle @(IsEnabled ? OnCssClass : null)"
+             @onclick="OnToggle"
+             data-testid="@ToggleTestId">
+            <div class="set-toggle-thumb"></div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(StatusLabel) || !string.IsNullOrWhiteSpace(Summary))
+    {
+        <div class="live-status-row">
+            <span class="live-status @(IsReady ? ReadyCssClass : PendingCssClass)">@StatusLabel</span>
+            <span class="live-status-text">@Summary</span>
+        </div>
+    }
+
+    @if (ChildContent is not null)
+    {
+        <div class="set-devices">
+            @ChildContent
+        </div>
+    }
+</article>
+
+@code {
+    private const string OnCssClass = "on";
+    private const string PendingCssClass = "pending";
+    private const string ReadyCssClass = "ready";
+
+    [Parameter] public string CardTestId { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Description { get; set; } = string.Empty;
+    [Parameter] public bool IsEnabled { get; set; }
+    [Parameter] public bool IsReady { get; set; }
+    [Parameter] public EventCallback OnToggle { get; set; }
+    [Parameter] public string StatusLabel { get; set; } = string.Empty;
+    [Parameter] public string Summary { get; set; } = string.Empty;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string ToggleTestId { get; set; } = string.Empty;
+}

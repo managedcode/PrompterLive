@@ -44,6 +44,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<AppBootstrapper>();
         services.AddScoped<AppShellService>();
         services.AddScoped<GoLiveSessionService>();
+        services.AddScoped<ShellDiagnosticsInterop>();
         services.AddScoped<UiDiagnosticsService>();
 
         services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();

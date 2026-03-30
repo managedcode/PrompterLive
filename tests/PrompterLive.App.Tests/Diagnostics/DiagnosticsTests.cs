@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using PrompterLive.Shared.Components.Diagnostics;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Localization;
+using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Tests;
 
@@ -14,6 +15,9 @@ namespace PrompterLive.App.Tests;
 
 public sealed class DiagnosticsTests : BunitContext
 {
+    private const string ShellDiagnosticsDetail = "Forced bootstrap diagnostics failure.";
+    private const string ShellDiagnosticsSource = "manual";
+
     [Fact]
     public async Task UiDiagnosticsService_LogsRecoverableFailureAndStoresBannerEntry()
     {
@@ -102,6 +106,35 @@ public sealed class DiagnosticsTests : BunitContext
             logProvider.Entries,
                 entry => entry.Level == LogLevel.Critical &&
                 entry.Message.Contains("Unhandled UI exception reached the global error boundary.", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task ShellDiagnosticsInterop_LogsShellErrorsReportedFromJavaScript()
+    {
+        var logProvider = new RecordingLoggerProvider();
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.ClearProviders();
+            builder.AddProvider(logProvider);
+        });
+
+        var jsRuntime = new TestJsRuntime();
+        var interop = new ShellDiagnosticsInterop(
+            jsRuntime,
+            loggerFactory.CreateLogger<ShellDiagnosticsInterop>());
+
+        await interop.AttachAsync();
+        await interop.ReportShellError(ShellDiagnosticsSource, ShellDiagnosticsDetail);
+
+        Assert.Contains(
+            AppJsInterop.AttachShellDiagnosticsLoggerMethod,
+            jsRuntime.Invocations);
+        Assert.Contains(
+            logProvider.Entries,
+            entry => entry.Level == LogLevel.Error &&
+                entry.Category.Contains(nameof(ShellDiagnosticsInterop), StringComparison.Ordinal) &&
+                entry.Message.Contains("App shell error reported from manual.", StringComparison.Ordinal) &&
+                entry.Message.Contains(ShellDiagnosticsDetail, StringComparison.Ordinal));
     }
 
     private string Text(UiTextKey key) =>

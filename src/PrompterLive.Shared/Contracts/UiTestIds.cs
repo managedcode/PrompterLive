@@ -216,6 +216,7 @@ public static class UiTestIds
         public const string NavCloud = "settings-nav-cloud";
         public const string NavFiles = "settings-nav-files";
         public const string NavMics = "settings-nav-mics";
+        public const string NavStreaming = "settings-nav-streaming";
         public const string NoiseSuppression = "settings-noise-suppression";
         public const string Page = "settings-page";
         public const string PrimaryMic = "settings-primary-mic";
@@ -223,6 +224,33 @@ public static class UiTestIds
         public const string RequestMedia = "settings-request-media";
         public const string NoCameras = "settings-no-cameras";
         public const string NoMics = "settings-no-mics";
+        public const string StreamingBitrate = "settings-streaming-bitrate";
+        public const string StreamingCustomRtmpKey = "settings-streaming-custom-rtmp-key";
+        public const string StreamingCustomRtmpName = "settings-streaming-custom-rtmp-name";
+        public const string StreamingCustomRtmpToggle = "settings-streaming-custom-rtmp-toggle";
+        public const string StreamingCustomRtmpUrl = "settings-streaming-custom-rtmp-url";
+        public const string StreamingIncludeCamera = "settings-streaming-include-camera";
+        public const string StreamingLiveKitRoom = "settings-streaming-livekit-room";
+        public const string StreamingLiveKitServer = "settings-streaming-livekit-server";
+        public const string StreamingLiveKitToggle = "settings-streaming-livekit-toggle";
+        public const string StreamingLiveKitToken = "settings-streaming-livekit-token";
+        public const string StreamingNdiToggle = "settings-streaming-ndi-toggle";
+        public const string StreamingObsToggle = "settings-streaming-obs-toggle";
+        public const string StreamingOutputResolution = "settings-streaming-output-resolution";
+        public const string StreamingOutputMode = "settings-streaming-output-mode";
+        public const string StreamingPanel = "settings-streaming-panel";
+        public const string StreamingRecordingToggle = "settings-streaming-recording-toggle";
+        public const string StreamingSourcePickerEmpty = "settings-streaming-source-picker-empty";
+        public const string StreamingTextOverlay = "settings-streaming-text-overlay";
+        public const string StreamingTwitchKey = "settings-streaming-twitch-key";
+        public const string StreamingTwitchToggle = "settings-streaming-twitch-toggle";
+        public const string StreamingTwitchUrl = "settings-streaming-twitch-url";
+        public const string StreamingVdoPublishUrl = "settings-streaming-vdo-publish-url";
+        public const string StreamingVdoRoom = "settings-streaming-vdo-room";
+        public const string StreamingVdoToggle = "settings-streaming-vdo-toggle";
+        public const string StreamingYoutubeKey = "settings-streaming-youtube-key";
+        public const string StreamingYoutubeToggle = "settings-streaming-youtube-toggle";
+        public const string StreamingYoutubeUrl = "settings-streaming-youtube-url";
         public const string TestConnection = "settings-test-connection";
 
         public static string AiProvider(string providerId) => $"settings-ai-provider-{providerId}";
@@ -240,6 +268,14 @@ public static class UiTestIds
         public static string SceneFlip(string sourceId) => $"settings-scene-flip-{sourceId}";
 
         public static string SceneMirror(string sourceId) => $"settings-scene-mirror-{sourceId}";
+
+        public static string StreamingProviderCard(string providerId) => $"settings-streaming-provider-{providerId}";
+
+        public static string StreamingProviderSourcePicker(string providerId) => $"settings-streaming-provider-sources-{providerId}";
+
+        public static string StreamingProviderSourceSummary(string providerId) => $"settings-streaming-provider-source-summary-{providerId}";
+
+        public static string StreamingProviderSourceToggle(string providerId, string sourceId) => $"settings-streaming-provider-source-{providerId}-{sourceId}";
     }
 
     public static class GoLive
@@ -261,7 +297,9 @@ public static class UiTestIds
         public const string OpenSettings = "go-live-open-settings";
         public const string OutputResolution = "go-live-output-resolution";
         public const string Page = "go-live-page";
+        public const string ProgramEmpty = "go-live-program-empty";
         public const string ProgramCard = "go-live-program-card";
+        public const string ProgramVideo = "go-live-program-video";
         public const string PreviewRail = "go-live-preview-rail";
         public const string PreviewCard = "go-live-preview-card";
         public const string PreviewEmpty = "go-live-preview-empty";
@@ -298,5 +336,7 @@ public static class UiTestIds
         public static string SourceCamera(string sourceId) => $"go-live-source-camera-{sourceId}";
 
         public static string SourceCameraAction(string deviceId) => $"go-live-source-camera-action-{deviceId}";
+
+        public static string SourceVideo(string sourceId) => $"go-live-source-video-{sourceId}";
     }
 }

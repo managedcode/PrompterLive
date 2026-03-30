@@ -65,30 +65,21 @@
     background: transparent;
     color: inherit;
     text-align: left;
-}
-
-.go-live-source-swatch {
+.go-live-source-video-shell {
     position: relative;
-    display: block;
-    min-height: 64px;
-    border-radius: 8px;
+    overflow: hidden;
+    min-height: 90px;
+    border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, .04);
+    background: rgba(8, 12, 18, .96);
 }
 
-.go-live-source-swatch-a {
-    background: linear-gradient(180deg, rgba(36, 59, 89, .88), rgba(18, 28, 44, .96));
-}
-
-.go-live-source-swatch-b {
-    background: linear-gradient(180deg, rgba(72, 44, 95, .9), rgba(32, 18, 52, .98));
-}
-
-.go-live-source-swatch-c {
-    background: linear-gradient(180deg, rgba(30, 84, 42, .88), rgba(18, 42, 22, .96));
-}
-
-.go-live-source-swatch-d {
-    background: linear-gradient(180deg, rgba(76, 73, 36, .86), rgba(31, 30, 15, .96));
+.go-live-source-video {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    display: block;
+    background: rgba(8, 12, 18, .96);
 }
 
 .go-live-source-copy {

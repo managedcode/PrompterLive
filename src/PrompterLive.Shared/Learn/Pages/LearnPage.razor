@@ -43,18 +43,23 @@
 
         <div class="rsvp-bottom">
             <div class="rsvp-speed">
-                <button class="rsvp-btn" onclick="changeRsvpSpeed(-10)" data-testid="@UiTestIds.Learn.SpeedDown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                <button class="rsvp-btn" @onclick="DecreaseRsvpSpeedAsync" data-testid="@UiTestIds.Learn.SpeedDown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
                 <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed">@_speed</span><small>WPM</small></div>
-                <button class="rsvp-btn" onclick="changeRsvpSpeed(10)" data-testid="@UiTestIds.Learn.SpeedUp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                <button class="rsvp-btn" @onclick="IncreaseRsvpSpeedAsync" data-testid="@UiTestIds.Learn.SpeedUp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
             </div>
             <div class="rsvp-play-row">
-                <button class="rsvp-btn" onclick="stepRsvpWord(-5)" title="Back 5 words" data-testid="@UiTestIds.Learn.StepBackwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
-                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(-1)" title="Back 1 word" data-testid="@UiTestIds.Learn.StepBackward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                <button class="rsvp-play" id="rsvp-play-btn" onclick="toggleRsvp()" data-testid="@UiTestIds.Learn.PlayToggle">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                <button class="rsvp-btn" @onclick="StepRsvpBackwardLargeAsync" title="Back 5 words" data-testid="@UiTestIds.Learn.StepBackwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
+                <button class="rsvp-btn rsvp-btn-sm" @onclick="StepRsvpBackwardAsync" title="Back 1 word" data-testid="@UiTestIds.Learn.StepBackward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                <button class="rsvp-play" id="rsvp-play-btn" @onclick="ToggleRsvpPlaybackAsync" data-testid="@UiTestIds.Learn.PlayToggle">
+                    <span data-toggle-icon="play" hidden>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
+                    </span>
+                    <span data-toggle-icon="pause">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                    </span>
                 </button>
-                <button class="rsvp-btn rsvp-btn-sm" onclick="stepRsvpWord(1)" title="Forward 1 word" data-testid="@UiTestIds.Learn.StepForward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                <button class="rsvp-btn" onclick="stepRsvpWord(5)" title="Forward 5 words" data-testid="@UiTestIds.Learn.StepForwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
+                <button class="rsvp-btn rsvp-btn-sm" @onclick="StepRsvpForwardAsync" title="Forward 1 word" data-testid="@UiTestIds.Learn.StepForward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                <button class="rsvp-btn" @onclick="StepRsvpForwardLargeAsync" title="Forward 5 words" data-testid="@UiTestIds.Learn.StepForwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
             </div>
             <div class="rsvp-pos" id="rsvp-progress-label">@_progressLabel</div>
         </div>
@@ -89,6 +94,11 @@
     private const string ReadyWord = "Ready";
     private const int PreviewWordCount = 10;
     private const string WpmSuffix = " WPM";
+    private const int RsvpMaxSpeed = 600;
+    private const int RsvpMinSpeed = 100;
+    private const int RsvpSpeedStep = 10;
+    private const int RsvpStepLarge = 5;
+    private const int RsvpStepSmall = 1;
 
     protected override Task OnParametersSetAsync()
     {
@@ -166,6 +176,33 @@
     }
 
     private static string BuildWpmLabel(int speed) => string.Concat(speed, WpmSuffix);
+
+    private Task DecreaseRsvpSpeedAsync() => ChangeRsvpSpeedAsync(-RsvpSpeedStep);
+
+    private Task IncreaseRsvpSpeedAsync() => ChangeRsvpSpeedAsync(RsvpSpeedStep);
+
+    private Task StepRsvpBackwardLargeAsync() => StepRsvpWordAsync(-RsvpStepLarge);
+
+    private Task StepRsvpBackwardAsync() => StepRsvpWordAsync(-RsvpStepSmall);
+
+    private Task StepRsvpForwardAsync() => StepRsvpWordAsync(RsvpStepSmall);
+
+    private Task StepRsvpForwardLargeAsync() => StepRsvpWordAsync(RsvpStepLarge);
+
+    private async Task ToggleRsvpPlaybackAsync()
+    {
+        await JS.InvokeVoidAsync(AppJsInterop.ToggleRsvpPlaybackMethod);
+    }
+
+    private async Task ChangeRsvpSpeedAsync(int delta)
+    {
+        _speed = Math.Clamp(_speed + delta, RsvpMinSpeed, RsvpMaxSpeed);
+        Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
+        await JS.InvokeVoidAsync(AppJsInterop.ChangeRsvpSpeedMethod, delta);
+    }
+
+    private Task StepRsvpWordAsync(int delta) =>
+        JS.InvokeVoidAsync(AppJsInterop.StepRsvpWordMethod, delta).AsTask();
 
     private async Task EnsureSessionLoadedAsync()
     {

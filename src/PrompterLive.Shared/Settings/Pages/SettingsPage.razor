@@ -661,7 +661,13 @@
         _primaryMicrophoneId = MediaSceneService.State.PrimaryMicrophoneId;
 
         await SeedSceneDefaultsAsync();
-        _studioSettings = await StudioSettingsStore.LoadAsync();
+        var loadedSettings = await StudioSettingsStore.LoadAsync();
+        _studioSettings = StreamingSettingsNormalizer.Normalize(loadedSettings, _sceneCameras);
+        if (!EqualityComparer<StudioSettings>.Default.Equals(loadedSettings, _studioSettings))
+        {
+            await PersistStudioSettingsAsync();
+        }
+
         await NormalizeStudioSettingsAsync();
     }
 

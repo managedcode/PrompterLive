@@ -1,4 +1,5 @@
 @namespace PrompterLive.Shared.Components.GoLive
+@using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Workspace
 
 <section class="go-live-stage-shell"
@@ -14,21 +15,26 @@
         <span class="live-status @(IsArmed ? ReadyCssClass : PendingCssClass)">@ActiveSessionLabel</span>
     </div>
 
-    <div class="go-live-stage-viewport">
-        <div class="go-live-stage-tint"></div>
-
-        <div class="go-live-stage-copy">
-            @foreach (var line in EffectiveStageCaptionLines)
-            {
-                <p>@line</p>
-            }
-        </div>
-
-        <div class="go-live-stage-footer">
-            <span>@EffectiveProgramResolutionLabel</span>
-            <span>@EffectiveStageFrameRateLabel</span>
-        </div>
-    </div>
+    <GoLiveCameraSurface Camera="@Camera"
+                         ContainerClass="go-live-stage-viewport"
+                         ContainerDomId="@UiDomIds.GoLive.ProgramStage"
+                         VideoClass="go-live-stage-video"
+                         VideoDomId="@UiDomIds.GoLive.ProgramVideo"
+                         VideoTestId="@UiTestIds.GoLive.ProgramVideo">
+        <OverlayContent>
+            <div class="go-live-stage-footer">
+                <span>@EffectiveProgramResolutionLabel</span>
+                <span>@EffectiveStageFrameRateLabel</span>
+            </div>
+        </OverlayContent>
+        <EmptyContent>
+            <div class="set-empty-card go-live-stage-empty"
+                 data-testid="@UiTestIds.GoLive.ProgramEmpty">
+                <div class="set-account-name">@NoCameraTitle</div>
+                <div class="live-card-desc">@NoCameraDescription</div>
+            </div>
+        </EmptyContent>
+    </GoLiveCameraSurface>
 
     <div class="go-live-stage-meta">
         <article class="go-live-stage-meta-card">
@@ -49,6 +55,8 @@
 @code {
     private const string DefaultTitle = "Program";
     private const string IdleStateCss = "idle";
+    private const string NoCameraDescription = "Add or include a camera in Settings to send a live program feed.";
+    private const string NoCameraTitle = "No program camera";
     private const string PendingCssClass = "pending";
     private const string ReadyCssClass = "ready";
     private const string RecordingStateCss = "recording";
@@ -62,6 +70,7 @@
     [Parameter] public EventCallback<ChangeEventArgs> BitrateChanged { get; set; }
     [Parameter] public string BitrateTelemetry { get; set; } = string.Empty;
     [Parameter] public bool CanControlProgram { get; set; }
+    [Parameter] public SceneCameraSource? Camera { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool IncludeCameraInOutput { get; set; }
     [Parameter] public bool IsArmed { get; set; }
@@ -75,7 +84,6 @@
     [Parameter] public string RecordingActionLabel { get; set; } = string.Empty;
     [Parameter] public bool ShowTextOverlay { get; set; }
     [Parameter] public string SelectedSourceLabel { get; set; } = string.Empty;
-    [Parameter] public IReadOnlyList<string> StageCaptionLines { get; set; } = [];
     [Parameter] public string StageFrameRateLabel { get; set; } = string.Empty;
     [Parameter] public EventCallback SwitchSelectedSource { get; set; }
     [Parameter] public string SwitchActionLabel { get; set; } = string.Empty;
@@ -87,13 +95,6 @@
     [Parameter] public string Title { get; set; } = DefaultTitle;
     [Parameter] public string VideoTelemetry { get; set; } = string.Empty;
 
-    private IReadOnlyList<string> FallbackStageCaptionLines =>
-    [
-        SelectedSourceLabel,
-        VideoTelemetry,
-        AudioTelemetry
-    ];
-
     private string EffectiveProgramResolutionLabel =>
         string.IsNullOrWhiteSpace(ProgramResolutionLabel)
             ? OutputResolution.ToString()
@@ -103,11 +104,6 @@
         string.IsNullOrWhiteSpace(StageFrameRateLabel)
             ? BitrateTelemetry
             : StageFrameRateLabel;
-
-    private IReadOnlyList<string> EffectiveStageCaptionLines =>
-        StageCaptionLines.Count == 0
-            ? FallbackStageCaptionLines
-            : StageCaptionLines;
 
     private string LiveState => IsRecordingActive
         ? RecordingStateCss

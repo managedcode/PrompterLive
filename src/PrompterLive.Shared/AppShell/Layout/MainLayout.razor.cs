@@ -7,6 +7,7 @@ using PrompterLive.Core.Abstractions;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Localization;
 using PrompterLive.Shared.Services;
+using PrompterLive.Shared.Services.Diagnostics;
 
 namespace PrompterLive.Shared.Layout;
 
@@ -27,6 +28,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
+    [Inject] private ShellDiagnosticsInterop ShellDiagnosticsInterop { get; set; } = null!;
     [Inject] private ILogger<MainLayout> Logger { get; set; } = null!;
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
@@ -143,6 +145,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
             return;
         }
 
+        await ShellDiagnosticsInterop.AttachAsync();
         await Bootstrapper.EnsureReadyAsync();
         _navigationBridge = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync(AppJsInterop.AttachNavigatorMethod, _navigationBridge);

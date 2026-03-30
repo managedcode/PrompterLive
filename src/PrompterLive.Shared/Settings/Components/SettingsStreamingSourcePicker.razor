@@ -1,0 +1,66 @@
+@namespace PrompterLive.Shared.Components.Settings
+
+<section class="live-destination-sources"
+         data-testid="@UiTestIds.Settings.StreamingProviderSourcePicker(TargetId)">
+    <div class="live-destination-sources-header">
+        <span class="set-section-label">@SectionLabel</span>
+        <span class="live-status @(SelectedCount > 0 ? ReadyCssClass : PendingCssClass)"
+              data-testid="@UiTestIds.Settings.StreamingProviderSourceSummary(TargetId)">
+            @SourceSummary
+        </span>
+    </div>
+
+    @if (Sources.Count == 0)
+    {
+        <div class="set-empty-card live-destination-sources-empty"
+             data-testid="@UiTestIds.Settings.StreamingSourcePickerEmpty">
+            @EmptyStateMessage
+        </div>
+    }
+    else
+    {
+        <div class="live-destination-source-grid">
+            @foreach (var source in Sources)
+            {
+                var isSelected = SelectedSourceIdSet.Contains(source.SourceId);
+                <button type="button"
+                        class="live-destination-source-chip @(isSelected ? ChipEnabledCssClass : null)"
+                        data-testid="@UiTestIds.Settings.StreamingProviderSourceToggle(TargetId, source.SourceId)"
+                        @onclick="() => ToggleSource.InvokeAsync(source.SourceId)">
+                    <span class="live-destination-source-name">@source.Label</span>
+                    <span class="live-destination-source-state">@(isSelected ? SelectedLabel : AvailableLabel)</span>
+                </button>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private const string AvailableLabel = "Available";
+    private const string CameraPluralLabel = "cameras selected";
+    private const string CameraSingularLabel = "camera selected";
+    private const string ChipEnabledCssClass = "on";
+    private const string EmptyStateMessage = "No scene cameras are available for this destination yet.";
+    private const string NoSourceLabel = "No cameras selected";
+    private const string PendingCssClass = "pending";
+    private const string ReadyCssClass = "ready";
+    private const string SectionLabel = "DESTINATION SOURCES";
+    private const string SelectedLabel = "Selected";
+
+    [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
+    [Parameter] public IReadOnlyList<string> SelectedSourceIds { get; set; } = [];
+    [Parameter] public string TargetId { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ToggleSource { get; set; }
+
+    private int SelectedCount => SelectedSourceIdSet.Count;
+
+    private HashSet<string> SelectedSourceIdSet => SelectedSourceIds.ToHashSet(StringComparer.Ordinal);
+
+    private string SourceSummary =>
+        SelectedCount switch
+        {
+            0 => NoSourceLabel,
+            1 => string.Concat(SelectedCount.ToString(System.Globalization.CultureInfo.InvariantCulture), " ", CameraSingularLabel),
+            _ => string.Concat(SelectedCount.ToString(System.Globalization.CultureInfo.InvariantCulture), " ", CameraPluralLabel)
+        };
+}

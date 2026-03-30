@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Layout;
 using PrompterLive.Shared.Pages;
+using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Tests;
 
 namespace PrompterLive.App.Tests;
@@ -15,7 +16,7 @@ public sealed class UiTraceLoggingTests : BunitContext
     public void MainLayout_LogsNavigatorAttach_AndRouteChanges()
     {
         var logProvider = new RecordingLoggerProvider();
-        _ = TestHarnessFactory.Create(
+        var harness = TestHarnessFactory.Create(
             this,
             configureLogging: builder => builder.AddProvider(logProvider));
 
@@ -29,6 +30,10 @@ public sealed class UiTraceLoggingTests : BunitContext
                 entry => entry.Category.Contains(nameof(MainLayout), StringComparison.Ordinal) &&
                     entry.Message.Contains("Attached SPA navigator bridge.", StringComparison.Ordinal));
         });
+
+        Assert.Contains(
+            AppJsInterop.AttachShellDiagnosticsLoggerMethod,
+            harness.JsRuntime.Invocations);
 
         var navigation = Services.GetRequiredService<NavigationManager>();
         navigation.NavigateTo(AppTestData.Routes.Settings);

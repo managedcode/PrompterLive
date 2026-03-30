@@ -17,10 +17,8 @@
         }
         else
         {
-            @for (var index = 0; index < Sources.Count; index++)
+            @foreach (var source in Sources)
             {
-                var source = Sources[index];
-
                 <article class="go-live-source-tile"
                          data-testid="@UiTestIds.GoLive.SourceCamera(source.SourceId)">
                     <button type="button"
@@ -29,12 +27,17 @@
                             data-selected="@IsSelected(source)"
                             @onclick="() => SelectSource.InvokeAsync(source.SourceId)"
                             data-testid="@UiTestIds.GoLive.SourceCameraSelect(source.SourceId)">
-                        <span class="go-live-source-swatch @ResolveSwatchCss(index)">
-                            @if (source.Transform.IncludeInOutput || IsActive(source))
-                            {
-                                <span class="go-live-source-dot"></span>
-                            }
-                        </span>
+                        <GoLiveCameraSurface Camera="@source"
+                                             ContainerClass="go-live-source-video-shell"
+                                             VideoClass="go-live-source-video"
+                                             VideoTestId="@UiTestIds.GoLive.SourceVideo(source.SourceId)">
+                            <OverlayContent>
+                                @if (source.Transform.IncludeInOutput || IsActive(source))
+                                {
+                                    <span class="go-live-source-dot"></span>
+                                }
+                            </OverlayContent>
+                        </GoLiveCameraSurface>
                         <span class="go-live-source-copy">
                             <strong>@source.Label</strong>
                             <span>@GetSourceStatus(source)</span>
@@ -86,11 +89,6 @@
     private const string SourceIncludedLabel = "Included in program output";
     private const string SourceLiveLabel = "Ready for live switch";
     private const string SourceSceneOnlyLabel = "Scene only";
-    private const string SwatchACssClass = "go-live-source-swatch-a";
-    private const string SwatchBCssClass = "go-live-source-swatch-b";
-    private const string SwatchCCssClass = "go-live-source-swatch-c";
-    private const string SwatchDCssClass = "go-live-source-swatch-d";
-
     [Parameter] public string? ActiveSourceId { get; set; }
     [Parameter] public string Description { get; set; } = DefaultDescription;
     [Parameter] public bool HasPrimaryMicrophone { get; set; }
@@ -120,12 +118,4 @@
             ? SourceLiveLabel
             : SourceSceneOnlyLabel;
     }
-
-    private static string ResolveSwatchCss(int index) => (index % 4) switch
-    {
-        0 => SwatchACssClass,
-        1 => SwatchBCssClass,
-        2 => SwatchCCssClass,
-        _ => SwatchDCssClass
-    };
 }

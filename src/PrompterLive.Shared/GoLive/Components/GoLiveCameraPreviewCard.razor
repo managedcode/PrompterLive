@@ -1,7 +1,4 @@
-@implements IAsyncDisposable
 @namespace PrompterLive.Shared.Components.GoLive
-@inject CameraPreviewInterop CameraPreviewInterop
-@inject Microsoft.Extensions.Logging.ILogger<GoLiveCameraPreviewCard> Logger
 
 <section id="@UiDomIds.GoLive.PreviewCard"
          class="go-live-preview-shell"
@@ -16,27 +13,21 @@
         </span>
     </div>
 
-    <div class="go-live-preview-stage">
-        @if (HasCamera)
-        {
-            <video id="@UiDomIds.GoLive.PreviewVideo"
-                   class="go-live-preview-video"
-                   style="@PreviewVideoStyle"
-                   autoplay
-                   playsinline
-                   muted
-                   data-testid="@UiTestIds.GoLive.PreviewVideo"></video>
-        }
-        else
-        {
+    <GoLiveCameraSurface Camera="@Camera"
+                         ContainerClass="go-live-preview-stage"
+                         ContainerDomId="@UiDomIds.GoLive.PreviewStage"
+                         VideoClass="go-live-preview-video"
+                         VideoDomId="@UiDomIds.GoLive.PreviewVideo"
+                         VideoTestId="@UiTestIds.GoLive.PreviewVideo">
+        <EmptyContent>
             <div id="@UiDomIds.GoLive.PreviewEmpty"
                  class="set-empty-card go-live-preview-empty"
                  data-testid="@UiTestIds.GoLive.PreviewEmpty">
                 <div class="set-account-name">@EmptyTitle</div>
                 <div class="live-card-desc">@EmptyDescription</div>
             </div>
-        }
-    </div>
+        </EmptyContent>
+    </GoLiveCameraSurface>
 
     <div class="go-live-preview-footer">
         <div>
@@ -63,8 +54,6 @@
     private const string EmptyTitle = "No camera";
     private const string LiveStatusLabel = "Live Preview";
     private const string PendingStatusCssClass = "pending";
-    private const string PreviewAttachFailureMessage = "Failed to attach Go Live preview camera for device {DeviceId}.";
-    private const string PreviewDetachFailureMessage = "Failed to detach Go Live preview camera.";
     private const string ReadyStatusCssClass = "ready";
 
     [Parameter] public SceneCameraSource? Camera { get; set; }
@@ -76,88 +65,4 @@
     [Parameter] public string Title { get; set; } = DefaultTitle;
 
     private bool HasCamera => Camera is not null;
-
-    private string? _attachedDeviceId;
-
-    private string PreviewVideoStyle =>
-        Camera is null
-            ? string.Empty
-            : BuildPreviewVideoStyle(Camera.Transform);
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var nextDeviceId = Camera?.DeviceId;
-
-        try
-        {
-            if (string.IsNullOrWhiteSpace(nextDeviceId))
-            {
-                if (!string.IsNullOrWhiteSpace(_attachedDeviceId))
-                {
-                    await CameraPreviewInterop.DetachCameraAsync(UiDomIds.GoLive.PreviewVideo);
-                    _attachedDeviceId = null;
-                }
-
-                return;
-            }
-
-            if (string.Equals(_attachedDeviceId, nextDeviceId, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            _attachedDeviceId = nextDeviceId;
-            await CameraPreviewInterop.AttachCameraAsync(UiDomIds.GoLive.PreviewVideo, nextDeviceId);
-        }
-        catch (Exception exception)
-        {
-            Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(Logger, exception, PreviewAttachFailureMessage, nextDeviceId);
-            _attachedDeviceId = null;
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (string.IsNullOrWhiteSpace(_attachedDeviceId))
-        {
-            return;
-        }
-
-        try
-        {
-            await CameraPreviewInterop.DetachCameraAsync(UiDomIds.GoLive.PreviewVideo);
-            _attachedDeviceId = null;
-        }
-        catch (Exception exception)
-        {
-            Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(Logger, exception, PreviewDetachFailureMessage);
-            _attachedDeviceId = null;
-        }
-    }
-
-    private static string BuildPreviewVideoStyle(MediaSourceTransform transform)
-    {
-        var transforms = new List<string>();
-        if (Math.Abs(transform.Rotation) > 0.01)
-        {
-            transforms.Add($"rotate({transform.Rotation.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}deg)");
-        }
-
-        if (transform.MirrorHorizontal)
-        {
-            transforms.Add("scaleX(-1)");
-        }
-
-        if (transform.MirrorVertical)
-        {
-            transforms.Add("scaleY(-1)");
-        }
-
-        if (transforms.Count == 0)
-        {
-            return string.Empty;
-        }
-
-        return string.Concat("transform:", string.Join(' ', transforms), ";");
-    }
 }

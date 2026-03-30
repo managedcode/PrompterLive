@@ -1,0 +1,143 @@
+@implements IAsyncDisposable
+@namespace PrompterLive.Shared.Components.GoLive
+@inject CameraPreviewInterop CameraPreviewInterop
+@inject Microsoft.Extensions.Logging.ILogger<GoLiveCameraSurface> Logger
+
+<div class="@ContainerClass"
+     id="@ContainerDomIdOrNull"
+     data-testid="@ContainerTestIdOrNull">
+    @if (HasCamera)
+    {
+        <video id="@VideoElementId"
+               class="@VideoClass"
+               style="@VideoStyle"
+               autoplay
+               playsinline
+               muted="@Muted"
+               data-testid="@VideoTestIdOrNull"></video>
+
+        @if (OverlayContent is not null)
+        {
+            @OverlayContent
+        }
+    }
+    else if (EmptyContent is not null)
+    {
+        @EmptyContent
+    }
+</div>
+
+@code {
+    private const string AttachFailureMessage = "Failed to attach Go Live camera surface for device {DeviceId}.";
+    private const string DetachFailureMessage = "Failed to detach Go Live camera surface.";
+
+    private readonly string _generatedVideoId = $"go-live-camera-{Guid.NewGuid():N}";
+    private string? _attachedDeviceId;
+
+    [Parameter] public SceneCameraSource? Camera { get; set; }
+    [Parameter] public string ContainerClass { get; set; } = string.Empty;
+    [Parameter] public string? ContainerDomId { get; set; }
+    [Parameter] public string? ContainerTestId { get; set; }
+    [Parameter] public RenderFragment? EmptyContent { get; set; }
+    [Parameter] public bool Muted { get; set; } = true;
+    [Parameter] public RenderFragment? OverlayContent { get; set; }
+    [Parameter] public string VideoClass { get; set; } = string.Empty;
+    [Parameter] public string? VideoDomId { get; set; }
+    [Parameter] public string? VideoTestId { get; set; }
+
+    private bool HasCamera => Camera is not null;
+
+    private string? ContainerDomIdOrNull =>
+        string.IsNullOrWhiteSpace(ContainerDomId) ? null : ContainerDomId;
+
+    private string? ContainerTestIdOrNull =>
+        string.IsNullOrWhiteSpace(ContainerTestId) ? null : ContainerTestId;
+
+    private string VideoElementId =>
+        string.IsNullOrWhiteSpace(VideoDomId)
+            ? _generatedVideoId
+            : VideoDomId;
+
+    private string? VideoTestIdOrNull =>
+        string.IsNullOrWhiteSpace(VideoTestId) ? null : VideoTestId;
+
+    private string VideoStyle =>
+        Camera is null
+            ? string.Empty
+            : BuildVideoStyle(Camera.Transform);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var nextDeviceId = Camera?.DeviceId;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(nextDeviceId))
+            {
+                await DetachIfNeededAsync();
+                return;
+            }
+
+            if (string.Equals(_attachedDeviceId, nextDeviceId, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            await DetachIfNeededAsync();
+            _attachedDeviceId = nextDeviceId;
+            await CameraPreviewInterop.AttachCameraAsync(VideoElementId, nextDeviceId, Muted);
+        }
+        catch (Exception exception)
+        {
+            Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(Logger, exception, AttachFailureMessage, nextDeviceId);
+            _attachedDeviceId = null;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await DetachIfNeededAsync();
+        }
+        catch (Exception exception)
+        {
+            Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(Logger, exception, DetachFailureMessage);
+            _attachedDeviceId = null;
+        }
+    }
+
+    private async Task DetachIfNeededAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_attachedDeviceId))
+        {
+            return;
+        }
+
+        await CameraPreviewInterop.DetachCameraAsync(VideoElementId);
+        _attachedDeviceId = null;
+    }
+
+    private static string BuildVideoStyle(MediaSourceTransform transform)
+    {
+        var transforms = new List<string>();
+        if (Math.Abs(transform.Rotation) > 0.01)
+        {
+            transforms.Add($"rotate({transform.Rotation.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}deg)");
+        }
+
+        if (transform.MirrorHorizontal)
+        {
+            transforms.Add("scaleX(-1)");
+        }
+
+        if (transform.MirrorVertical)
+        {
+            transforms.Add("scaleY(-1)");
+        }
+
+        return transforms.Count == 0
+            ? string.Empty
+            : string.Concat("transform:", string.Join(' ', transforms), ";");
+    }
+}

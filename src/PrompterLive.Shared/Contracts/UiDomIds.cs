@@ -10,7 +10,10 @@ public static class UiDomIds
 
     public static class GoLive
     {
+        public const string ProgramStage = "go-live-program-stage";
+        public const string ProgramVideo = "go-live-program-video";
         public const string PreviewCard = "go-live-preview-card";
+        public const string PreviewStage = "go-live-preview-stage";
         public const string PreviewEmpty = "go-live-preview-empty";
         public const string PreviewVideo = "go-live-preview-video";
     }

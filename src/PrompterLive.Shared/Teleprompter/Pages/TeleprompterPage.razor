@@ -48,13 +48,13 @@
             <div class="rd-sliders">
                 <div class="rd-slider-group">
                     <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="8" x2="3" y2="16" /><line x1="21" y1="8" x2="21" y2="16" /></svg>
-                    <input type="range" class="rd-vslider" id="rd-focal-slider" min="15" max="55" value="30" oninput="changeFocalPoint(this.value)" data-testid="@UiTestIds.Teleprompter.FocalSlider">
-                    <span class="rd-slider-val" id="rd-focal-val">30%</span>
+                    <input type="range" class="rd-vslider" id="rd-focal-slider" min="15" max="55" value="@_readerFocalPointPercent" @oninput="HandleReaderFocalPointInputAsync" data-testid="@UiTestIds.Teleprompter.FocalSlider">
+                    <span class="rd-slider-val" id="rd-focal-val">@_readerFocalPointPercent%</span>
                 </div>
                 <div class="rd-slider-group">
                     <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="8,9 5,12 8,15" /><polyline points="16,9 19,12 16,15" /></svg>
-                    <input type="range" class="rd-vslider" id="rd-width-slider" min="400" max="1100" value="750" oninput="changeTextWidth(this.value)" data-testid="@UiTestIds.Teleprompter.WidthSlider">
-                    <span class="rd-slider-val" id="rd-width-val">750</span>
+                    <input type="range" class="rd-vslider" id="rd-width-slider" min="400" max="1100" value="@_readerTextWidth" @oninput="HandleReaderTextWidthInputAsync" data-testid="@UiTestIds.Teleprompter.WidthSlider">
+                    <span class="rd-slider-val" id="rd-width-val">@_readerTextWidth</span>
                 </div>
             </div>
 
@@ -142,28 +142,33 @@
 
             <div class="rd-controls">
                 <div class="rd-ctrl-group">
-                    <button class="rd-ctrl-btn" onclick="changeFontSize(-4)" title="Smaller text" data-testid="@UiTestIds.Teleprompter.FontDown">
+                    <button class="rd-ctrl-btn" @onclick="DecreaseReaderFontSizeAsync" title="Smaller text" data-testid="@UiTestIds.Teleprompter.FontDown">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /></svg>
                     </button>
-                    <span class="rd-ctrl-label" id="rd-font-label">36</span>
-                    <button class="rd-ctrl-btn" onclick="changeFontSize(4)" title="Larger text" data-testid="@UiTestIds.Teleprompter.FontUp">
+                    <span class="rd-ctrl-label" id="rd-font-label">@_readerFontSize</span>
+                    <button class="rd-ctrl-btn" @onclick="IncreaseReaderFontSizeAsync" title="Larger text" data-testid="@UiTestIds.Teleprompter.FontUp">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                     </button>
                 </div>
 
                 <div class="rd-ctrl-group rd-ctrl-main">
-                    <button class="rd-ctrl-btn" onclick="jumpCard(-1)" title="Previous block" data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(-1)" title="Back one word" data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" onclick="toggleTp()" title="Play / Pause" data-testid="@UiTestIds.Teleprompter.PlayToggle">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                    <button class="rd-ctrl-btn" @onclick="JumpToPreviousReaderCardAsync" title="Previous block" data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-sm" @onclick="StepReaderBackwardAsync" title="Back one word" data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" @onclick="ToggleReaderPlaybackAsync" title="Play / Pause" data-testid="@UiTestIds.Teleprompter.PlayToggle">
+                        <span data-toggle-icon="play" hidden>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
+                        </span>
+                        <span data-toggle-icon="pause">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                        </span>
                     </button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" onclick="stepWord(1)" title="Forward one word" data-testid="@UiTestIds.Teleprompter.NextWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                    <button class="rd-ctrl-btn" onclick="jumpCard(1)" title="Next block" data-testid="@UiTestIds.Teleprompter.NextBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
+                    <button class="rd-ctrl-btn rd-ctrl-sm" @onclick="StepReaderForwardAsync" title="Forward one word" data-testid="@UiTestIds.Teleprompter.NextWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                    <button class="rd-ctrl-btn" @onclick="JumpToNextReaderCardAsync" title="Next block" data-testid="@UiTestIds.Teleprompter.NextBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
                 </div>
 
                 <div class="rd-ctrl-group">
                     <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator">@BuildBlockIndicatorLabel()</span>
-                    <button class="rd-ctrl-btn" id="rd-cam-btn" onclick="toggleReaderCamera()" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
+                    <button class="rd-ctrl-btn" id="rd-cam-btn" @onclick="ToggleReaderCameraAsync" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
                     </button>
                 </div>
@@ -184,10 +189,27 @@
     private string _durationLabel = "0:00";
     private int _totalSeconds = 1;
     private int _totalDurationMilliseconds = 1000;
+    private int _readerFontSize = DefaultReaderFontSize;
+    private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
+    private int _readerTextWidth = DefaultReaderTextWidth;
     private bool _syncReader;
     private StudioSettings _studioSettings = StudioSettings.Default;
     private ReaderCameraLayerViewModel _cameraLayer = ReaderCameraLayerViewModel.Placeholder;
     private IReadOnlyList<ReaderCardViewModel> _cards = [];
+    private const int DefaultReaderFontSize = 36;
+    private const int DefaultReaderFocalPointPercent = 30;
+    private const int DefaultReaderTextWidth = 750;
+    private const int ReaderBackwardStep = -1;
+    private const int ReaderCardBackwardStep = -1;
+    private const int ReaderCardForwardStep = 1;
+    private const int ReaderFontStep = 4;
+    private const int ReaderForwardStep = 1;
+    private const int ReaderMaxFontSize = 56;
+    private const int ReaderMaxTextWidth = 1100;
+    private const int ReaderMaxFocalPointPercent = 55;
+    private const int ReaderMinFontSize = 24;
+    private const int ReaderMinTextWidth = 400;
+    private const int ReaderMinFocalPointPercent = 15;
     private const string LoadReaderOperation = "Teleprompter load";
     private const string LoadReaderMessage = "Unable to prepare teleprompter playback.";
     private const int MaxReaderGroupCharacterCount = 24;
@@ -277,6 +299,60 @@
             : AppRoutes.EditorWithId(SessionService.State.ScriptId);
         Navigation.NavigateTo(route);
         return Task.CompletedTask;
+    }
+
+    private Task DecreaseReaderFontSizeAsync() => ChangeReaderFontSizeAsync(-ReaderFontStep);
+
+    private Task IncreaseReaderFontSizeAsync() => ChangeReaderFontSizeAsync(ReaderFontStep);
+
+    private Task StepReaderBackwardAsync() => StepReaderWordAsync(ReaderBackwardStep);
+
+    private Task StepReaderForwardAsync() => StepReaderWordAsync(ReaderForwardStep);
+
+    private Task JumpToPreviousReaderCardAsync() => JumpReaderCardAsync(ReaderCardBackwardStep);
+
+    private Task JumpToNextReaderCardAsync() => JumpReaderCardAsync(ReaderCardForwardStep);
+
+    private async Task ChangeReaderFontSizeAsync(int delta)
+    {
+        _readerFontSize = Math.Clamp(_readerFontSize + delta, ReaderMinFontSize, ReaderMaxFontSize);
+        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderFontSizeMethod, delta);
+    }
+
+    private async Task HandleReaderFocalPointInputAsync(ChangeEventArgs args)
+    {
+        _readerFocalPointPercent = ParseReaderControlValue(args.Value, ReaderMinFocalPointPercent, ReaderMaxFocalPointPercent, _readerFocalPointPercent);
+        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderFocalPointMethod, _readerFocalPointPercent);
+    }
+
+    private async Task HandleReaderTextWidthInputAsync(ChangeEventArgs args)
+    {
+        _readerTextWidth = ParseReaderControlValue(args.Value, ReaderMinTextWidth, ReaderMaxTextWidth, _readerTextWidth);
+        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderTextWidthMethod, _readerTextWidth);
+    }
+
+    private Task StepReaderWordAsync(int direction) =>
+        JS.InvokeVoidAsync(AppJsInterop.StepReaderWordMethod, direction).AsTask();
+
+    private Task JumpReaderCardAsync(int direction) =>
+        JS.InvokeVoidAsync(AppJsInterop.JumpReaderCardMethod, direction).AsTask();
+
+    private Task ToggleReaderPlaybackAsync() =>
+        JS.InvokeVoidAsync(AppJsInterop.ToggleReaderPlaybackMethod).AsTask();
+
+    private Task ToggleReaderCameraAsync() =>
+        JS.InvokeVoidAsync(AppJsInterop.ToggleReaderCameraMethod).AsTask();
+
+    private static int ParseReaderControlValue(object? rawValue, int min, int max, int fallback)
+    {
+        if (rawValue is null)
+        {
+            return fallback;
+        }
+
+        return int.TryParse(rawValue.ToString(), out var parsed)
+            ? Math.Clamp(parsed, min, max)
+            : fallback;
     }
 
     private async Task PopulateCameraStateAsync()

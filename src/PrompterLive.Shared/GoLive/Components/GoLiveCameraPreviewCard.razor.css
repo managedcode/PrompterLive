@@ -22,7 +22,7 @@
     min-height: 112px;
     border: 1px solid rgba(214, 166, 91, .06);
     border-radius: 12px;
-    background: linear-gradient(180deg, rgba(62, 33, 77, .84), rgba(28, 14, 41, .98));
+    background: rgba(8, 12, 18, .96);
 }
 
 .go-live-preview-video {
