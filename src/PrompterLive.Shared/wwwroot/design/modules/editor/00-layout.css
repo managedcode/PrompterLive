@@ -1,0 +1,285 @@
+/* Module: 00-layout.css */
+/* Editor layout, structure sidebar, right rail, and floating toolbar shell. */
+
+/* ============================================
+   EDITOR
+   ============================================ */
+
+.ed-layout {
+    display: flex;
+    height: 100%;
+    padding: 10px;
+    gap: 10px;
+    overflow: hidden;
+}
+.ed-layout > * {
+    min-width: 0;
+}
+
+/* ---- Editor Sidebar: glassmorphism, structure only ---- */
+
+.ed-sidebar {
+    position: relative;
+    z-index: 1;
+    width: var(--sidebar-width);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    box-shadow:
+        0 8px 32px rgba(0,0,0,.3),
+        inset 0 1px 0 var(--gold-06);
+    padding-top: 14px;
+}
+
+.ed-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--glass2);
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ed-back:hover { background: var(--glass3); color: var(--t1); }
+
+.ed-doc-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    outline: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    min-width: 0;
+    flex: 1;
+    background: linear-gradient(135deg, #F5E6D0, #C4A882);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.ed-doc-name:focus {
+    background: var(--glass2);
+    -webkit-background-clip: padding-box;
+    -webkit-text-fill-color: var(--t1);
+}
+
+.ed-structure { flex: 1; overflow-y: auto; padding: 16px 12px; overflow-x: hidden; }
+
+.ed-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #6A7E78;
+    padding: 0 12px;
+    margin-bottom: 10px;
+}
+
+.ed-tree { display: flex; flex-direction: column; gap: 2px; }
+
+.ed-tree-seg {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--t1);
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+}
+.ed-tree-seg:hover { background: var(--glass2); }
+.ed-tree-seg.active { background: var(--accent-g); border: 1px solid rgba(232,130,92,.1); color: #E8D5B0; }
+
+.ed-tree-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--sc);
+    flex-shrink: 0;
+}
+
+.ed-tree-seg small {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 500;
+    color: #7A8E88;
+}
+
+.ed-tree-children { padding-left: 24px; }
+
+.ed-tree-block {
+    display: flex;
+    align-items: center;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: #8A9E98;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+}
+.ed-tree-block:hover { background: var(--glass); color: var(--t1); }
+.ed-tree-block.active { background: var(--glass2); color: var(--t1); }
+.ed-tree-block code {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #7A8E88;
+    background: var(--glass);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.ed-structure-inspector {
+    border-top: 1px solid var(--gold-06);
+    padding: 16px 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Navigation flash when clicking structure item */
+.ed-nav-flash {
+    animation: navFlash 1.2s ease-out;
+}
+@keyframes navFlash {
+    0%   { box-shadow: inset 0 0 0 2px rgba(212,176,112,.5), 0 0 20px rgba(212,176,112,.15); }
+    100% { box-shadow: inset 0 0 0 2px transparent, 0 0 0 transparent; }
+}
+
+.ed-stats {
+    padding: 16px 20px;
+    border-top: 1px solid var(--gold-06);
+}
+.ed-stats .ed-section-label { padding: 0; margin-bottom: 12px; }
+
+.ed-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+}
+.ed-stat span { color: #8A9E98; }
+.ed-stat b { color: var(--t1); font-family: var(--mono); font-size: 13px; }
+
+/* AI toolbar button */
+.ed-tool-ai {
+    color: #E8D5B0 !important;
+    font-weight: 600;
+}
+
+/* Editor Right sidebar — metadata panel */
+.ed-right {
+    width: 340px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 20px 16px;
+    box-shadow:
+        0 8px 32px rgba(0,0,0,.3),
+        inset 0 1px 0 var(--gold-06);
+    overflow-y: auto;
+}
+
+/* ---- Bottom floating toolbar (Figma-style) ---- */
+.ed-bottom-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    margin: 0 auto 8px;
+    width: fit-content;
+    background: rgba(8,12,18,.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-10);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    flex-shrink: 0;
+    z-index: 20;
+}
+.ebb-group {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+.ebb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-3);
+    background: transparent;
+    border-radius: var(--radius-sm);
+    height: 32px;
+    font-family: var(--font-sans);
+    border: none;
+    cursor: pointer;
+}
+.ebb-btn:hover { background: var(--gold-09); color: var(--text-1); }
+.ebb-btn b { font-weight: 700; }
+.ebb-btn i { font-style: italic; }
+.ebb-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--gold-08);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+.ebb-ai {
+    color: var(--gold-text);
+    font-weight: 600;
+}
+.ebb-ai:hover { background: var(--gold-12); }
+
+/* Tooltips for bottom bar */
+.ebb-btn[title] { position: relative; }
+.ebb-btn[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-1);
+    background: rgba(4,6,10,.94);
+    border: 1px solid var(--gold-08);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s;
+    z-index: 200;
+    font-family: var(--font-sans);
+}
+.ebb-btn[title]:hover::after { opacity: 1; }
+
+/* Sidebar action buttons */
+.ed-sidebar-actions {
+    padding: 14px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+

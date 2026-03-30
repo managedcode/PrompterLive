@@ -55,8 +55,9 @@ public sealed class GoLiveSessionService
         var selectedSource = ResolveSource(sceneCameras, State.SelectedSourceId)
             ?? ResolveSource(sceneCameras, State.ActiveSourceId)
             ?? ResolveDefaultSource(sceneCameras);
-        var activeSource = ResolveSource(sceneCameras, State.ActiveSourceId)
-            ?? selectedSource;
+        var activeSource = ResolveOperationalSource(sceneCameras, State.ActiveSourceId)
+            ?? ResolveOperationalSource(sceneCameras, selectedSource?.SourceId ?? string.Empty)
+            ?? ResolveDefaultSource(sceneCameras);
 
         SetState(State with
         {
@@ -90,7 +91,7 @@ public sealed class GoLiveSessionService
 
     public void SwitchToSelectedSource(IReadOnlyList<SceneCameraSource> sceneCameras)
     {
-        var source = ResolveSource(sceneCameras, State.SelectedSourceId)
+        var source = ResolveOperationalSource(sceneCameras, State.SelectedSourceId)
             ?? ResolveDefaultSource(sceneCameras);
         if (source is null)
         {
@@ -182,5 +183,13 @@ public sealed class GoLiveSessionService
     private static SceneCameraSource? ResolveSource(IReadOnlyList<SceneCameraSource> sceneCameras, string sourceId)
     {
         return sceneCameras.FirstOrDefault(camera => string.Equals(camera.SourceId, sourceId, StringComparison.Ordinal));
+    }
+
+    private static SceneCameraSource? ResolveOperationalSource(IReadOnlyList<SceneCameraSource> sceneCameras, string sourceId)
+    {
+        var source = ResolveSource(sceneCameras, sourceId);
+        return source is not null && source.Transform.Visible && source.Transform.IncludeInOutput
+            ? source
+            : null;
     }
 }

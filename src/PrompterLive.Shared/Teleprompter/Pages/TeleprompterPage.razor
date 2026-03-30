@@ -9,6 +9,7 @@
 @using PrompterLive.Shared.Services.Diagnostics
 
 @inject AppBootstrapper Bootstrapper
+@inject CameraPreviewInterop CameraPreviewInterop
 @inject ScriptCompiler Compiler
 @inject UiDiagnosticsService Diagnostics
 @inject IJSRuntime JS
@@ -20,30 +21,29 @@
 @inject IScriptSessionService SessionService
 @inject StudioSettingsStore StudioSettingsStore
 
-<div id="screen-teleprompter"
+<div id="@UiDomIds.Design.TeleprompterScreen"
      class="screen active"
      data-testid="@UiTestIds.Teleprompter.Page">
     <div class="rd">
         <div class="rd-gradient @_gradientClass" id="rd-gradient"></div>
-        <video class="@_cameraLayer.CssClass"
+        <video class="@BuildCameraCssClass()"
                id="@_cameraLayer.ElementId"
                autoplay
                muted
                playsinline
                data-camera-device-id="@_cameraLayer.DeviceId"
-               data-camera-autostart="@_cameraLayer.AutoStart.ToString().ToLowerInvariant()"
                data-camera-role="@_cameraLayer.Role"
                data-camera-order="@_cameraLayer.Order"
                data-testid="@_cameraLayer.TestId"
                style="@_cameraLayer.Style"></video>
-        <div class="rd-camera-tint" id="rd-camera-tint"></div>
+        <div class="@BuildCameraTintCssClass()" id="@UiDomIds.Teleprompter.CameraTint"></div>
 
         <div class="rd-ui">
             <button class="rd-back" @onclick="NavigateBackToEditorAsync" data-testid="@UiTestIds.Teleprompter.Back">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6" /></svg>
             </button>
 
-            <div class="rd-countdown" id="rd-countdown">3</div>
+            <div class="@BuildCountdownCssClass()" id="@UiDomIds.Teleprompter.Countdown">@BuildCountdownLabel()</div>
 
             <div class="rd-sliders">
                 <div class="rd-slider-group">
@@ -60,14 +60,14 @@
 
             <div class="rd-stage">
                 <div class="rd-center-guide"></div>
-                <div class="rd-guide-h" id="rd-guide-h"></div>
-                <div class="rd-guide-v rd-guide-v-l" id="rd-guide-v-l"></div>
-                <div class="rd-guide-v rd-guide-v-r" id="rd-guide-v-r"></div>
+                <div class="rd-guide-h" id="@UiDomIds.Teleprompter.FocalGuide" style="@BuildFocalGuideStyle()"></div>
+                <div class="rd-guide-v rd-guide-v-l" id="@UiDomIds.Teleprompter.WidthGuideLeft"></div>
+                <div class="rd-guide-v rd-guide-v-r" id="@UiDomIds.Teleprompter.WidthGuideRight"></div>
 
-                <div class="rd-cluster-wrap" id="rd-cluster-wrap">
+                <div class="rd-cluster-wrap" id="@UiDomIds.Teleprompter.ClusterWrap" style="@BuildClusterWrapStyle()">
                     @foreach (var entry in _cards.Select((card, index) => (card, index)))
                     {
-                        <div class="rd-card @(entry.index == 0 ? "rd-card-active" : "rd-card-next")"
+                        <div class="@BuildReaderCardCssClass(entry.index)"
                              data-card="@entry.index"
                              data-segment-name="@entry.card.DisplayName"
                              data-segment-emotion="@entry.card.EmotionKey"
@@ -88,11 +88,11 @@
                                             : null;
                                         if (chunk is ReaderGroupViewModel group)
                                         {
-                                            <span class="rd-g" data-testid="@UiTestIds.Teleprompter.CardGroup(entry.index, chunkIndex)">
+                                            <span class="@BuildReaderGroupCssClass(entry.index, group)" data-testid="@UiTestIds.Teleprompter.CardGroup(entry.index, chunkIndex)">
                                                 @for (var wordIndex = 0; wordIndex < group.Words.Count; wordIndex++)
                                                 {
                                                     var word = group.Words[wordIndex];
-                                                    <span class="rd-w @word.CssClass"
+                                                    <span class="@BuildReaderWordCssClass(entry.index, word)"
                                                           data-ms="@word.DurationMs"
                                                           data-pause-ms="@word.PauseAfterMs">@word.Text</span>
                                                     @if (wordIndex < group.Words.Count - 1)
@@ -119,16 +119,16 @@
                 </div>
 
                 <div class="rd-pause-indicator" id="rd-pause-bar">
-                    <div class="rd-pause-fill"></div>
+                    <div class="rd-pause-fill" id="@UiDomIds.Teleprompter.PauseFill"></div>
                 </div>
             </div>
 
             <div class="rd-edge-progress">
-                <div class="rd-edge-fill" id="rd-progress-fill" style="width:0%"></div>
+                <div class="rd-edge-fill" id="@UiDomIds.Teleprompter.ProgressFill" style="@BuildReaderProgressStyle()"></div>
                 <div class="rd-edge-segs">
-                    @foreach (var card in _cards)
+                    @foreach (var entry in _cards.Select((card, index) => (card, index)))
                     {
-                        <div style="width:@card.WidthPercentString;--sc:@card.EdgeColor"></div>
+                        <div style="@BuildEdgeSegmentStyle(entry.card, entry.index)"></div>
                     }
                 </div>
             </div>
@@ -137,7 +137,7 @@
                 <span class="rd-time"
                       id="@UiDomIds.Teleprompter.Time"
                       data-total-seconds="@_totalSeconds"
-                      data-total-ms="@_totalDurationMilliseconds">0:00 / @_durationLabel</span>
+                      data-total-ms="@_totalDurationMilliseconds">@BuildElapsedLabel()</span>
             </div>
 
             <div class="rd-controls">
@@ -155,10 +155,10 @@
                     <button class="rd-ctrl-btn" @onclick="JumpToPreviousReaderCardAsync" title="Previous block" data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
                     <button class="rd-ctrl-btn rd-ctrl-sm" @onclick="StepReaderBackwardAsync" title="Back one word" data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
                     <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" @onclick="ToggleReaderPlaybackAsync" title="Play / Pause" data-testid="@UiTestIds.Teleprompter.PlayToggle">
-                        <span data-toggle-icon="play" hidden>
+                        <span data-toggle-icon="play" hidden="@_isReaderPlaying">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
                         </span>
-                        <span data-toggle-icon="pause">
+                        <span data-toggle-icon="pause" hidden="@(!_isReaderPlaying)">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
                         </span>
                     </button>
@@ -168,7 +168,7 @@
 
                 <div class="rd-ctrl-group">
                     <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator">@BuildBlockIndicatorLabel()</span>
-                    <button class="rd-ctrl-btn" id="rd-cam-btn" @onclick="ToggleReaderCameraAsync" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
+                    <button class="@BuildCameraButtonCssClass()" id="@UiDomIds.Teleprompter.CameraButton" @onclick="ToggleReaderCameraAsync" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
                     </button>
                 </div>
@@ -189,6 +189,7 @@
     private string _durationLabel = "0:00";
     private int _totalSeconds = 1;
     private int _totalDurationMilliseconds = 1000;
+    private int _activeReaderCardIndex;
     private int _readerFontSize = DefaultReaderFontSize;
     private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
     private int _readerTextWidth = DefaultReaderTextWidth;
@@ -243,7 +244,11 @@
         if (_syncReader)
         {
             _syncReader = false;
-            await JS.InvokeVoidAsync(AppJsInterop.InitializeDesignMethod, "teleprompter");
+            await EnsureReaderBridgeAttachedAsync();
+            await JS.InvokeVoidAsync(AppJsInterop.InitializeDesignMethod, UiDomIds.Design.TeleprompterScreen);
+            await JS.InvokeVoidAsync(AppJsInterop.SetReaderFontSizeMethod, _readerFontSize);
+            await JS.InvokeVoidAsync(AppJsInterop.SetReaderFocalPointMethod, _readerFocalPointPercent);
+            await JS.InvokeVoidAsync(AppJsInterop.SetReaderTextWidthMethod, _readerTextWidth);
         }
     }
 
@@ -276,6 +281,7 @@
         var firstCard = _cards[0];
         _gradientClass = firstCard.BackgroundClass;
         _edgeSectionLabel = firstCard.DisplayName;
+        _activeReaderCardIndex = 0;
         _screenSubtitle = string.Equals(firstCard.SectionName, firstCard.DisplayName, StringComparison.Ordinal)
             ? $"{firstCard.DisplayName} · {firstCard.EmotionLabel}"
             : $"{firstCard.SectionName} · {firstCard.DisplayName}";
@@ -290,7 +296,7 @@
     private string BuildBlockIndicatorLabel() =>
         _cards.Count == 0
             ? string.Empty
-            : $"1 / {_cards.Count}";
+            : $"{_activeReaderCardIndex + 1} / {_cards.Count}";
 
     private Task NavigateBackToEditorAsync()
     {
@@ -316,19 +322,19 @@
     private async Task ChangeReaderFontSizeAsync(int delta)
     {
         _readerFontSize = Math.Clamp(_readerFontSize + delta, ReaderMinFontSize, ReaderMaxFontSize);
-        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderFontSizeMethod, delta);
+        await JS.InvokeVoidAsync(AppJsInterop.SetReaderFontSizeMethod, _readerFontSize);
     }
 
     private async Task HandleReaderFocalPointInputAsync(ChangeEventArgs args)
     {
         _readerFocalPointPercent = ParseReaderControlValue(args.Value, ReaderMinFocalPointPercent, ReaderMaxFocalPointPercent, _readerFocalPointPercent);
-        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderFocalPointMethod, _readerFocalPointPercent);
+        await JS.InvokeVoidAsync(AppJsInterop.SetReaderFocalPointMethod, _readerFocalPointPercent);
     }
 
     private async Task HandleReaderTextWidthInputAsync(ChangeEventArgs args)
     {
         _readerTextWidth = ParseReaderControlValue(args.Value, ReaderMinTextWidth, ReaderMaxTextWidth, _readerTextWidth);
-        await JS.InvokeVoidAsync(AppJsInterop.ChangeReaderTextWidthMethod, _readerTextWidth);
+        await JS.InvokeVoidAsync(AppJsInterop.SetReaderTextWidthMethod, _readerTextWidth);
     }
 
     private Task StepReaderWordAsync(int direction) =>

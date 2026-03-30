@@ -2,6 +2,12 @@ namespace PrompterLive.Shared.Contracts;
 
 public static class UiDomIds
 {
+    public static class Design
+    {
+        public const string LearnScreen = "screen-rsvp";
+        public const string TeleprompterScreen = "screen-teleprompter";
+    }
+
     public static class Settings
     {
         public const string CameraPreviewVideo = "settings-camera-preview-video";
@@ -24,6 +30,8 @@ public static class UiDomIds
         public const string ContextLeft = "rsvp-ctx-l";
         public const string ContextRight = "rsvp-ctx-r";
         public const string NextPhrase = "rsvp-next-phrase";
+        public const string PauseFill = "rsvp-pause-fill";
+        public const string ProgressFill = "rsvp-progress-fill";
         public const string Speed = "rsvp-speed";
         public const string Word = "rsvp-word";
     }
@@ -32,10 +40,19 @@ public static class UiDomIds
     {
         public const string BlockIndicator = "rd-block-indicator";
         public const string Camera = "rd-camera";
+        public const string CameraButton = "rd-cam-btn";
+        public const string CameraTint = "rd-camera-tint";
+        public const string ClusterWrap = "rd-cluster-wrap";
+        public const string Countdown = "rd-countdown";
         public const string FontLabel = "rd-font-label";
+        public const string FocalGuide = "rd-guide-h";
         public const string HeaderSegment = "rd-header-segment";
+        public const string PauseFill = "rd-pause-fill";
         public const string ProgressFill = "rd-progress-fill";
+        public const string Stage = "rd-stage";
         public const string Time = "rd-time";
+        public const string WidthGuideLeft = "rd-guide-v-l";
+        public const string WidthGuideRight = "rd-guide-v-r";
         public const string WidthValue = "rd-width-val";
 
         public static string CameraOverlay(int order) => $"rd-camera-overlay-{order}";

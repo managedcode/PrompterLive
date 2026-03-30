@@ -1,0 +1,182 @@
+/* Module: 00-sidebar.css */
+/* Library sidebar, folder tree, and breadcrumb scaffolding. */
+
+/* ============================================
+   LIBRARY
+   ============================================ */
+
+#screen-library { display: none; }
+#screen-library.active { display: flex; }
+
+.lib-sidebar {
+    width: var(--sidebar-width);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: var(--glass-border-light);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.lib-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 14px;
+    margin-bottom: 28px;
+    height: 48px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(145deg, rgba(245,200,80,.1), rgba(196,168,130,.06));
+    border: 1px solid rgba(245,200,80,.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(245,200,80,.06), inset 0 1px 0 var(--gold-08);
+}
+
+.lib-logo span {
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+    background: linear-gradient(135deg, #F5E6D0, #C4A882);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Nav + Folder tree */
+.lib-nav { display: flex; flex-direction: column; gap: 2px; }
+.lib-nav-spacer { flex: 1; }
+
+/* Folder tree in sidebar */
+.lib-folders-section {
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+.lib-folders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    margin-bottom: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--t4);
+}
+.folder-add-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--t4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.folder-add-btn:hover { background: var(--glass2); color: var(--t2); }
+
+.lib-folder-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--t3);
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.folder-item:hover { background: var(--glass2); color: var(--t2); }
+.folder-item.active { background: var(--glass3); color: var(--t1); }
+
+.folder-item .nav-count {
+    margin-left: auto;
+}
+
+/* Chevron icon size */
+.folder-item > svg:first-child {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    opacity: .5;
+}
+
+.folder-children {
+    padding-left: 30px;
+    border-left: 1px solid var(--gold-08);
+    margin-left: 16px;
+}
+.folder-child {
+    font-size: 12px;
+    padding: 6px 10px;
+    color: var(--t4);
+}
+.folder-child > svg:first-child { display: none; }
+.folder-child:hover { color: var(--t2); }
+
+/* Breadcrumb */
+.lib-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+.bc-item { color: var(--t4); cursor: pointer; font-size: 14px; }
+.bc-item:hover { color: var(--t2); }
+.bc-current {
+    font-weight: 700;
+    background: linear-gradient(135deg, #F5E6D0, #C4A882);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.bc-sep { color: var(--t4); }
+.lib-nav-bottom { border-top: 1px solid var(--border); padding-top: 12px; }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--t3);
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.nav-item:hover { color: var(--t2); background: var(--glass2); }
+.nav-item.active {
+    color: #E8D5B0;
+    background: linear-gradient(135deg, rgba(245,200,80,.07), var(--gold-05));
+    border: 1px solid rgba(245,200,80,.1);
+}
+.nav-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    color: #C4A882;
+    background: rgba(245,200,80,.06);
+    padding: 2px 8px;
+    border-radius: 7px;
+    font-family: var(--mono);
+}
+

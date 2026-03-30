@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Localization;
@@ -13,16 +12,11 @@ namespace PrompterLive.Shared.Layout;
 
 public partial class MainLayout : LayoutComponentBase, IDisposable
 {
-    private const string AttachNavigatorLogMessage = "Attached SPA navigator bridge.";
-    private const string ClientNavigationHomeLogMessage = "Client navigation requested for library.";
-    private const string ClientNavigationEditorLogMessage = "Client navigation requested for editor.";
     private const string GoLiveWidgetIdleElapsed = "00:00:00";
     private const string GoLiveWidgetLiveStateLabel = "Live";
     private const string GoLiveWidgetRecordingStateLabel = "Rec";
     private const string GoLiveWidgetStreamingRecordingStateLabel = "Live + Rec";
     private const string RouteChangedLogTemplate = "Route changed to {Location}.";
-
-    private DotNetObjectReference<MainLayout>? _navigationBridge;
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
@@ -31,7 +25,6 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     [Inject] private ShellDiagnosticsInterop ShellDiagnosticsInterop { get; set; } = null!;
     [Inject] private ILogger<MainLayout> Logger { get; set; } = null!;
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
-    [Inject] private IJSRuntime JS { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     private AppShellState ShellState => Shell.State;
@@ -147,23 +140,6 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
         await ShellDiagnosticsInterop.AttachAsync();
         await Bootstrapper.EnsureReadyAsync();
-        _navigationBridge = DotNetObjectReference.Create(this);
-        await JS.InvokeVoidAsync(AppJsInterop.AttachNavigatorMethod, _navigationBridge);
-        Logger.LogInformation(AttachNavigatorLogMessage);
-    }
-
-    [JSInvokable]
-    public void NavigateHomeClient()
-    {
-        Logger.LogInformation(ClientNavigationHomeLogMessage);
-        Navigation.NavigateTo(AppRoutes.Library);
-    }
-
-    [JSInvokable]
-    public void NavigateEditorClient()
-    {
-        Logger.LogInformation(ClientNavigationEditorLogMessage);
-        Navigation.NavigateTo(Shell.GetEditorRoute());
     }
 
     private void HandleShellStateChanged() => InvokeAsync(StateHasChanged);
@@ -289,6 +265,5 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         Navigation.LocationChanged -= HandleLocationChanged;
         Shell.StateChanged -= HandleShellStateChanged;
         GoLiveSession.StateChanged -= HandleGoLiveSessionChanged;
-        _navigationBridge?.Dispose();
     }
 }

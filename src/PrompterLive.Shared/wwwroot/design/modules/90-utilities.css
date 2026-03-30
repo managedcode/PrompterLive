@@ -1,0 +1,129 @@
+/* Module: 90-utilities.css */
+/* Shared scrollbar, tooltip, AI-provider, and global responsive utilities. */
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--gold-03); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--gold-12); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-20); }
+
+/* ============================================
+   STYLED TOOLTIPS (CSS-only)
+   ============================================ */
+
+.ed-tool[title] {
+    position: relative;
+}
+.ed-tool[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 500;
+    color: #E0E6E4;
+    background: rgba(8,12,18,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gold-12);
+    padding: 5px 12px;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s;
+    z-index: 200;
+    font-family: var(--font);
+}
+.ed-tool[title]:hover::after {
+    opacity: 1;
+}
+
+/* ============================================
+   AI PROVIDER SETTINGS
+   ============================================ */
+
+.set-ai-providers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+.set-ai-provider {
+    cursor: pointer;
+}
+.set-ai-provider input[type="radio"] {
+    display: none;
+}
+.set-ai-provider-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--gold-03);
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    transition: border-color .15s, background .15s;
+}
+.set-ai-provider-inner:hover {
+    background: var(--gold-05);
+    border-color: var(--gold-12);
+}
+.set-ai-provider.active .set-ai-provider-inner,
+.set-ai-provider input:checked + .set-ai-provider-inner {
+    border-color: var(--gold-30);
+    background: var(--gold-06);
+}
+.set-ai-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.set-ai-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--t1);
+}
+.set-ai-desc {
+    display: block;
+    font-size: 12px;
+    color: #7A8E88;
+    margin-top: 2px;
+}
+.set-subsection {
+    margin-bottom: 32px;
+}
+.set-sub-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #8A9E98;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 12px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .lib-sidebar { display: none; }
+    .lib-main { padding: 24px 20px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .ed-layout { padding: 0; gap: 0; }
+    .ed-sidebar { display: none; }
+    .ed-right { display: none; }
+    .tp-chunk p { font-size: 22px; }
+    .tp-current p { font-size: 26px; }
+    .tp-scroll { padding: 0 6%; }
+    .rsvp-word { font-size: 52px; }
+}

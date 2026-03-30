@@ -1,0 +1,255 @@
+/* Module: 30-bento-cards.css */
+/* Library bento cards, covers, and primary actions. */
+
+/* ---- Bento-style data cards (Linear.app inspired) ---- */
+.dcards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+/* Card wrapper — gradient border via padding trick */
+.dcard {
+    position: relative;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    /* Gradient border */
+    background: linear-gradient(160deg, var(--gold-10) 0%, var(--gold-03) 40%, var(--gold-05) 100%);
+    padding: 1px;
+}
+.dcard:hover {
+    background: linear-gradient(160deg,
+        color-mix(in srgb, var(--emo) 18%, transparent) 0%,
+        var(--gold-05) 40%,
+        color-mix(in srgb, var(--emo) 10%, transparent) 100%);
+    box-shadow: 0 0 0 1px var(--gold-16);
+}
+/* Glow on hover */
+.dcard::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 17px;
+    background: radial-gradient(circle at 50% 0%, var(--emo, var(--gold-10)), transparent 60%);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+.dcard:hover::after { opacity: .15; }
+
+/* Inner card — true glass: translucent, blurred, layered */
+.dcard-inner {
+    background: rgba(10,14,20,.55);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    border-radius: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    box-shadow:
+        inset 0 1px 0 var(--gold-10),
+        inset 0 -1px 0 color-mix(in srgb, var(--gold-12) 45%, transparent),
+        inset 0 0 0 1px var(--gold-06),
+        0 20px 60px rgba(0,0,0,.4),
+        0 4px 12px rgba(0,0,0,.25);
+}
+.dcard-inner::after,
+.dcard-create-inner::after {
+    content: '';
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--gold-08) 20%, transparent) 0%,
+        color-mix(in srgb, var(--gold-16) 75%, transparent) 50%,
+        color-mix(in srgb, var(--gold-08) 20%, transparent) 100%);
+    pointer-events: none;
+}
+
+/* ---- Card cover art — surreal Dalí-inspired orbs ---- */
+/* Cover — clean gradient with glass overlay */
+.dcard-cover {
+    position: relative;
+    height: 200px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+}
+/* Glass scrim at bottom for text readability */
+.dcard-cover::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80%;
+    background: linear-gradient(to top, rgba(10,14,20,.7), transparent);
+    pointer-events: none;
+}
+
+/* Floating organic orbs — varied positions per card via nth-child */
+/* Cover orbs — softer, more transparent, less blur */
+.dcover-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(35px);
+    pointer-events: none;
+    opacity: .7;
+}
+.dcover-orb1 { width: 100px; height: 100px; }
+.dcover-orb2 { width: 60px; height: 80px; border-radius: 40% 60% 50% 50%; }
+
+/* Vary orb positions per card — no two look the same */
+.dcard:nth-child(1) .dcover-orb1 { top: -25px; right: -15px; }
+.dcard:nth-child(1) .dcover-orb2 { bottom: -10px; left: 15%; }
+.dcard:nth-child(2) .dcover-orb1 { top: -15px; left: -20px; }
+.dcard:nth-child(2) .dcover-orb2 { bottom: -20px; right: 10%; }
+.dcard:nth-child(3) .dcover-orb1 { bottom: -30px; right: 20%; }
+.dcard:nth-child(3) .dcover-orb2 { top: -10px; left: 30%; }
+.dcard:nth-child(4) .dcover-orb1 { top: 50%; left: -25px; transform: translateY(-50%); }
+.dcard:nth-child(4) .dcover-orb2 { top: -15px; right: -10px; }
+.dcard:nth-child(5) .dcover-orb1 { bottom: -20px; left: 40%; }
+.dcard:nth-child(5) .dcover-orb2 { top: -20px; right: 25%; }
+
+/* Emotion palettes — painterly, layered, Dalí landscapes */
+.dcover-warm {
+    background:
+        radial-gradient(ellipse 80% 60% at 30% 80%, rgba(180,90,20,.25), transparent),
+        linear-gradient(135deg, rgba(42,26,8,.7), rgba(30,18,8,.6) 35%, rgba(20,16,10,.5) 70%, rgba(14,13,10,.4));
+}
+.dcover-warm .dcover-orb1 { background: rgba(233,127,0,.5); }
+.dcover-warm .dcover-orb2 { background: rgba(255,200,60,.3); }
+
+.dcover-urgent {
+    background:
+        radial-gradient(ellipse 70% 50% at 70% 20%, rgba(180,30,30,.22), transparent),
+        linear-gradient(200deg, rgba(42,14,14,.65), rgba(32,10,10,.55) 35%, rgba(22,8,8,.45) 70%, rgba(14,6,6,.35));
+}
+.dcover-urgent .dcover-orb1 { background: rgba(220,38,38,.5); }
+.dcover-urgent .dcover-orb2 { background: rgba(255,130,130,.25); }
+
+.dcover-motivational {
+    background:
+        radial-gradient(ellipse 60% 70% at 50% 90%, rgba(100,40,200,.18), transparent),
+        linear-gradient(170deg, rgba(32,16,48,.7), rgba(22,10,34,.6) 35%, rgba(16,8,24,.5) 70%, rgba(10,6,14,.4));
+}
+.dcover-motivational .dcover-orb1 { background: rgba(140,70,255,.5); }
+.dcover-motivational .dcover-orb2 { background: rgba(200,150,255,.25); }
+
+.dcover-calm {
+    background:
+        radial-gradient(ellipse 90% 40% at 50% 100%, rgba(13,148,136,.15), transparent),
+        linear-gradient(145deg, rgba(16,34,34,.65), rgba(12,26,26,.55) 35%, rgba(8,20,20,.45) 70%, rgba(6,14,14,.35));
+}
+.dcover-calm .dcover-orb1 { background: rgba(13,180,160,.4); }
+.dcover-calm .dcover-orb2 { background: rgba(100,240,220,.22); }
+
+.dcover-neutral {
+    background:
+        radial-gradient(ellipse 50% 80% at 80% 10%, rgba(37,99,235,.15), transparent),
+        linear-gradient(190deg, rgba(16,24,48,.65), rgba(12,18,36,.55) 35%, rgba(8,14,26,.45) 70%, rgba(6,10,14,.35));
+}
+.dcover-neutral .dcover-orb1 { background: rgba(50,120,255,.4); }
+.dcover-neutral .dcover-orb2 { background: rgba(150,200,255,.22); }
+
+/* Title on cover — clean, high contrast */
+.dcard-cover .dcard-title {
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    color: #E8D5B0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 12px rgba(0,0,0,.7), 0 0 30px rgba(0,0,0,.4);
+}
+
+.dcover-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: rgba(232,213,176,.6);
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+.dcover-emo {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--emo);
+    text-shadow: 0 0 12px var(--emo);
+}
+
+/* Data section — slight glass tint */
+.dcard-data {
+    padding: 14px 20px;
+    background: rgba(6,8,16,.3);
+    flex: 1;
+}
+.ddata-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--t1);
+    margin-bottom: 10px;
+}
+.ddata-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--t3);
+    padding-top: 8px;
+    border-top: 1px solid var(--gold-07);
+}
+
+.dcard-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px 16px;
+}
+.dcard-act {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--t3);
+    background: var(--gold-04);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--gold-10);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+.dcard-act:hover { background: var(--gold-09); color: var(--t1); border-color: var(--gold-14); }
+
+.dcard-act-go {
+    background: var(--gold-05);
+    color: var(--emo);
+    border-color: color-mix(in srgb, var(--emo) 20%, transparent);
+    padding-left: 11px;
+}
+.dcard-act-go:hover {
+    background: color-mix(in srgb, var(--emo) 12%, transparent);
+    color: #E8D5B0;
+    border-color: color-mix(in srgb, var(--emo) 30%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--emo) 10%, transparent);
+}
+

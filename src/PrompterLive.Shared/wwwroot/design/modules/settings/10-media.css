@@ -1,0 +1,255 @@
+/* Module: 10-media.css */
+/* Settings media controls, monitoring UI, and responsive adjustments. */
+
+/* Path field with browse button */
+.set-path-field {
+    display: flex;
+    gap: 8px;
+}
+.set-path-field .set-input {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--t3);
+}
+.set-path-field .set-btn-outline {
+    flex-shrink: 0;
+}
+.set-input::placeholder { color: var(--t4); }
+
+.set-status-banner,
+.set-device-card,
+.set-scene-card,
+.set-empty-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    background: rgba(10,14,20,.5);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.set-status-banner {
+    margin-bottom: 24px;
+}
+
+.set-status-banner strong {
+    display: block;
+    color: var(--t1);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.set-status-banner span,
+.set-provider-kind,
+.set-inline-value {
+    color: var(--t3);
+    font-size: 12px;
+}
+
+.set-device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.set-empty-card {
+    justify-content: flex-start;
+    color: var(--t3);
+}
+
+.set-scene-card,
+.set-device-card {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.set-scene-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.set-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.set-chip-btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--gold-12);
+    background: var(--gold-04);
+    color: var(--t3);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.set-chip-btn.active {
+    background: var(--gold-10);
+    color: #F5E6D0;
+    border-color: var(--gold-25);
+}
+
+.set-inline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.set-range {
+    width: 100%;
+    accent-color: #E8D5B0;
+}
+
+.set-mic-monitor {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: rgba(10,14,20,.6);
+    border: 1px solid var(--gold-08);
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.set-mic-monitor-track {
+    position: relative;
+    flex: 1;
+    height: 18px;
+    overflow: hidden;
+    border-radius: 999px;
+    background:
+        linear-gradient(90deg, rgba(110,231,183,.12), rgba(232,213,176,.16)),
+        rgba(245,230,208,.04);
+    border: 1px solid rgba(255,255,255,.06);
+}
+
+.set-mic-monitor-track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent calc(10% - 1px),
+            rgba(255,255,255,.08) calc(10% - 1px),
+            rgba(255,255,255,.08) 10%);
+    pointer-events: none;
+}
+
+.set-mic-monitor-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #6EE7B7 0%, #C4A060 72%, #F2B866 100%);
+    box-shadow: 0 0 18px rgba(110,231,183,.2);
+    transition: width .12s linear;
+}
+
+.set-mic-monitor[data-live-state="active"] .set-mic-monitor-fill {
+    box-shadow: 0 0 20px rgba(110,231,183,.34);
+}
+
+.set-mic-monitor-readout {
+    min-width: 64px;
+    text-align: right;
+    color: var(--t1);
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.set-mic-monitor-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.set-mic-monitor-meta .set-section-label {
+    display: inline-block;
+    padding: 0;
+    margin-bottom: 6px;
+}
+
+/* Toggle switch */
+.set-toggle {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--gold-09);
+    border: 1px solid var(--gold-10);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+.set-toggle.on {
+    background: var(--gold-20);
+    border-color: var(--gold-30);
+}
+.set-toggle-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--t3);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.set-toggle.on .set-toggle-thumb {
+    left: auto;
+    right: 2px;
+    background: #F5E6D0;
+}
+
+/* Level bar (mic input) */
+.set-level-bar {
+    height: 6px;
+    background: var(--gold-07);
+    border-radius: 3px;
+    position: relative;
+    margin-top: 4px;
+}
+.set-level-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6EE7B7, #C4A060);
+    border-radius: 3px;
+    pointer-events: none;
+}
+.set-level-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #F5E6D0;
+    border: 2px solid rgba(0,0,0,.3);
+    position: absolute;
+    top: -4px;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    pointer-events: none;
+}
+.set-level-range {
+    position: absolute;
+    inset: -6px 0;
+    width: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+    .set-media-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

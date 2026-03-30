@@ -1,0 +1,129 @@
+/* Module: 20-table.css */
+/* Library table presentation and row actions. */
+
+/* ---- Table (Linear/Notion style) ---- */
+.lib-table {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--gold-03);
+}
+
+.tbl-header {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 40px;
+    background: var(--gold-04);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--t4);
+}
+.tbl-header .tbl-sortable { cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.tbl-header .tbl-sortable:hover { color: var(--t2); }
+.tbl-header .tbl-sorted { color: var(--t2); }
+
+.tbl-row {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 48px;
+    border-bottom: 1px solid var(--gold-05);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--t2);
+}
+.tbl-row:last-child { border-bottom: none; }
+.tbl-row:hover { background: var(--gold-04); }
+
+.tbl-col { flex-shrink: 0; }
+.tbl-col-name { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; overflow: hidden; }
+.tbl-col-name strong { color: var(--t1); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tbl-col-emotion { width: 110px; }
+.tbl-col-profile { width: 60px; color: var(--t3); font-size: 12px; }
+.tbl-col-dur { width: 65px; font-family: var(--mono); font-size: 12px; }
+.tbl-col-wpm { width: 50px; font-family: var(--mono); font-size: 12px; }
+.tbl-col-words { width: 65px; font-family: var(--mono); font-size: 12px; }
+.tbl-col-seg { width: 35px; font-family: var(--mono); font-size: 12px; text-align: center; }
+.tbl-col-date { width: 70px; font-size: 12px; color: var(--t4); }
+.tbl-col-actions { width: 70px; display: flex; gap: 6px; justify-content: flex-end; }
+
+.tbl-emo-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Emotion badges — visible, distinct colors */
+.tbl-emotion-badge {
+    display: inline-flex;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    border-radius: 6px;
+}
+.warm-badge { color: #FDBA74; background: rgba(233,127,0,.15); }
+.urgent-badge { color: #FCA5A5; background: rgba(185,28,28,.15); }
+.motivational-badge { color: #C4B5FD; background: rgba(124,58,237,.15); }
+.calm-badge { color: #5EEAD4; background: rgba(13,148,136,.15); }
+.neutral-badge { color: #93C5FD; background: rgba(37,99,235,.15); }
+.energetic-badge { color: #FDBA74; background: rgba(234,88,12,.15); }
+
+/* Table action buttons */
+.tbl-act {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--gold-05);
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    opacity: 0;
+}
+.tbl-row:hover .tbl-act { opacity: 1; }
+.tbl-act:hover { background: var(--gold-09); color: var(--t1); border-color: var(--border); }
+
+.tbl-act-play {
+    background: linear-gradient(135deg, rgba(212,99,123,.2), rgba(168,85,184,.15));
+    color: #E8A0B4;
+    border-color: rgba(212,99,123,.15);
+    padding-left: 2px;
+}
+.tbl-act-play:hover {
+    background: linear-gradient(135deg, rgba(212,99,123,.3), rgba(168,85,184,.25));
+    color: #E8D5B0;
+}
+
+/* ---- Sort bar ---- */
+.lib-sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+.sort-label { font-size: 12px; color: var(--t4); margin-right: 4px; }
+.sort-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--t4);
+    background: transparent;
+    border-radius: 8px;
+}
+.sort-btn:hover { color: var(--t2); background: var(--gold-05); }
+.sort-btn.active {
+    background: rgba(245,200,80,.06);
+    border: 1px solid rgba(245,200,80,.1);
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    color: #F5E6D0;
+}
+

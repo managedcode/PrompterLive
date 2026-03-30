@@ -1,0 +1,66 @@
+/* Module: 20-content.css */
+/* Editor YAML and segment content styling. */
+
+/* Segments — visible emotion stripe */
+.ed-seg {
+    margin-bottom: 48px;
+    border-left: 4px solid var(--border);
+    padding-left: 28px;
+    position: relative;
+}
+.ed-seg::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 4px;
+}
+.ed-seg[data-e="warm"] { border-left-color: #F59E0B; }
+.ed-seg[data-e="warm"]::before { background: #F59E0B; }
+.ed-seg[data-e="concerned"] { border-left-color: #EF4444; }
+.ed-seg[data-e="concerned"]::before { background: #EF4444; }
+.ed-seg[data-e="focused"] { border-left-color: #10B981; }
+.ed-seg[data-e="focused"]::before { background: #10B981; }
+.ed-seg[data-e="motivational"] { border-left-color: #A855F7; }
+.ed-seg[data-e="motivational"]::before { background: #A855F7; }
+.ed-seg[data-e="neutral"] { border-left-color: #74C0FC; }
+.ed-seg[data-e="neutral"]::before { background: #74C0FC; }
+.ed-seg[data-e="urgent"] { border-left-color: #FF3B3B; }
+.ed-seg[data-e="urgent"]::before { background: #FF3B3B; }
+.ed-seg[data-e="happy"] { border-left-color: #FFE066; }
+.ed-seg[data-e="happy"]::before { background: #FFE066; }
+.ed-seg[data-e="excited"] { border-left-color: #F472B6; }
+.ed-seg[data-e="excited"]::before { background: #F472B6; }
+.ed-seg[data-e="sad"] { border-left-color: #818CF8; }
+.ed-seg[data-e="sad"]::before { background: #818CF8; }
+.ed-seg[data-e="calm"] { border-left-color: #38D9A9; }
+.ed-seg[data-e="calm"]::before { background: #38D9A9; }
+.ed-seg[data-e="energetic"] { border-left-color: #FB923C; }
+.ed-seg[data-e="energetic"]::before { background: #FB923C; }
+.ed-seg[data-e="professional"] { border-left-color: #60A5FA; }
+.ed-seg[data-e="professional"]::before { background: #60A5FA; }
+
+.ed-seg-h {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    letter-spacing: -.5px;
+}
+
+.ed-blk { margin-bottom: 28px; }
+
+.ed-blk-h {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--t2);
+}
+
+.ed-p {
+    color: var(--t1);
+    font-size: 17px;
+    line-height: 2.2;
+}
+

@@ -17,41 +17,40 @@ public sealed class BrowserLibraryFolderRepository(IJSRuntime jsRuntime) : ILibr
 
     public async Task InitializeAsync(IEnumerable<StoredLibraryFolder> seedFolders, CancellationToken cancellationToken = default)
     {
-        var currentVersion = await _jsRuntime.InvokeAsync<string?>(
-            BrowserStorageMethodNames.GetFolderSeedVersion,
-            cancellationToken);
+        var currentVersion = await LoadStorageValueAsync(BrowserStorageKeys.FolderSeedVersion, cancellationToken);
         var folders = await ListAsync(cancellationToken);
 
         if (!string.Equals(currentVersion, SampleLibraryFolderCatalog.SeedVersion, StringComparison.Ordinal))
         {
+            var nextFolders = await LoadFoldersAsync(cancellationToken);
             foreach (var seedFolder in seedFolders)
             {
-                await SaveInternalAsync(seedFolder, cancellationToken);
+                var seedFolderDto = ToDto(seedFolder);
+                nextFolders.RemoveAll(folder => string.Equals(folder.Id, seedFolderDto.Id, StringComparison.Ordinal));
+                nextFolders.Add(seedFolderDto);
             }
 
-            await _jsRuntime.InvokeVoidAsync(
-                BrowserStorageMethodNames.SetFolderSeedVersion,
-                cancellationToken,
-                SampleLibraryFolderCatalog.SeedVersion);
+            await SaveFoldersAsync(nextFolders, cancellationToken);
+            await SaveStorageValueAsync(BrowserStorageKeys.FolderSeedVersion, SampleLibraryFolderCatalog.SeedVersion, cancellationToken);
             return;
         }
 
+        var nextFolderDtos = await LoadFoldersAsync(cancellationToken);
         var existingIds = folders
             .Select(folder => folder.Id)
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var seedFolder in seedFolders.Where(folder => !existingIds.Contains(folder.Id)))
         {
-            await SaveInternalAsync(seedFolder, cancellationToken);
+            nextFolderDtos.Add(ToDto(seedFolder));
         }
+
+        await SaveFoldersAsync(nextFolderDtos, cancellationToken);
     }
 
     public async Task<IReadOnlyList<StoredLibraryFolder>> ListAsync(CancellationToken cancellationToken = default)
     {
-        var json = await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.ListFoldersJson,
-            cancellationToken);
-        var folders = JsonSerializer.Deserialize<List<BrowserStoredLibraryFolderDto>>(json, JsonOptions) ?? [];
+        var folders = await LoadFoldersAsync(cancellationToken);
 
         return folders
             .Select(MapFolder)
@@ -86,13 +85,19 @@ public sealed class BrowserLibraryFolderRepository(IJSRuntime jsRuntime) : ILibr
         StoredLibraryFolder folder,
         CancellationToken cancellationToken)
     {
-        var json = await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.SaveFolderJson,
-            cancellationToken,
-            ToDto(folder));
-        var dto = JsonSerializer.Deserialize<BrowserStoredLibraryFolderDto>(json, JsonOptions)
-            ?? throw new InvalidOperationException("Folder storage returned an empty payload.");
+        var folders = await LoadFoldersAsync(cancellationToken);
+        var dto = ToDto(folder);
+        var existingIndex = folders.FindIndex(item => string.Equals(item.Id, dto.Id, StringComparison.Ordinal));
+        if (existingIndex >= 0)
+        {
+            folders[existingIndex] = dto;
+        }
+        else
+        {
+            folders.Add(dto);
+        }
 
+        await SaveFoldersAsync(folders, cancellationToken);
         return MapFolder(dto);
     }
 
@@ -142,5 +147,40 @@ public sealed class BrowserLibraryFolderRepository(IJSRuntime jsRuntime) : ILibr
         }
 
         return candidate;
+    }
+
+    private async Task<List<BrowserStoredLibraryFolderDto>> LoadFoldersAsync(CancellationToken cancellationToken)
+    {
+        var json = await LoadStorageValueAsync(BrowserStorageKeys.FolderLibrary, cancellationToken);
+        return string.IsNullOrWhiteSpace(json)
+            ? []
+            : JsonSerializer.Deserialize<List<BrowserStoredLibraryFolderDto>>(json, JsonOptions) ?? [];
+    }
+
+    private Task SaveFoldersAsync(
+        List<BrowserStoredLibraryFolderDto> folders,
+        CancellationToken cancellationToken)
+    {
+        return SaveStorageValueAsync(
+            BrowserStorageKeys.FolderLibrary,
+            JsonSerializer.Serialize(folders, JsonOptions),
+            cancellationToken);
+    }
+
+    private Task<string?> LoadStorageValueAsync(string key, CancellationToken cancellationToken)
+    {
+        return _jsRuntime.InvokeAsync<string?>(
+            BrowserStorageMethodNames.LoadStorageValue,
+            cancellationToken,
+            key).AsTask();
+    }
+
+    private Task SaveStorageValueAsync(string key, string value, CancellationToken cancellationToken)
+    {
+        return _jsRuntime.InvokeVoidAsync(
+            BrowserStorageMethodNames.SaveStorageValue,
+            cancellationToken,
+            key,
+            value).AsTask();
     }
 }

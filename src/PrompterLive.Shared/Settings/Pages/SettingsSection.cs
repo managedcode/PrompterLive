@@ -6,6 +6,7 @@ public enum SettingsSection
     Files,
     Cameras,
     Mics,
+    Streaming,
     Ai,
     Appearance,
     About

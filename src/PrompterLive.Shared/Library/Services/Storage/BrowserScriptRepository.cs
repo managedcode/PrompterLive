@@ -22,10 +22,7 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
 
     public async Task<IReadOnlyList<StoredScriptSummary>> ListAsync(CancellationToken cancellationToken = default)
     {
-        var json = await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.ListDocumentsJson,
-            cancellationToken);
-        var documents = JsonSerializer.Deserialize<List<BrowserStoredScriptDocumentDto>>(json, JsonOptions) ?? [];
+        var documents = await LoadDocumentsAsync(cancellationToken);
 
         return documents
             .Select(ToDocument)
@@ -67,14 +64,20 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
             UpdatedAt: DateTimeOffset.UtcNow,
             FolderId: persistedFolderId);
 
-        var json = await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.SaveDocumentJson,
-            cancellationToken,
-            ToDto(document));
-        var dto = JsonSerializer.Deserialize<BrowserStoredScriptDocumentDto>(json, JsonOptions)
-            ?? throw new InvalidOperationException("Storage returned an empty document payload.");
+        var documents = await LoadDocumentsAsync(cancellationToken);
+        var nextDocument = ToDto(document);
+        var existingIndex = documents.FindIndex(item => string.Equals(item.Id, nextDocument.Id, StringComparison.Ordinal));
+        if (existingIndex >= 0)
+        {
+            documents[existingIndex] = nextDocument;
+        }
+        else
+        {
+            documents.Add(nextDocument);
+        }
 
-        return ToDocument(dto);
+        await SaveDocumentsAsync(documents, cancellationToken);
+        return document;
     }
 
     public async Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default)
@@ -91,15 +94,23 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
             FolderId = string.IsNullOrWhiteSpace(folderId) ? null : folderId
         };
 
-        await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.SaveDocumentJson,
-            cancellationToken,
-            ToDto(updated));
+        var documents = await LoadDocumentsAsync(cancellationToken);
+        var updatedDto = ToDto(updated);
+        var existingIndex = documents.FindIndex(item => string.Equals(item.Id, updatedDto.Id, StringComparison.Ordinal));
+        if (existingIndex < 0)
+        {
+            return;
+        }
+
+        documents[existingIndex] = updatedDto;
+        await SaveDocumentsAsync(documents, cancellationToken);
     }
 
-    public Task DeleteAsync(string id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync(BrowserStorageMethodNames.DeleteDocument, cancellationToken, id).AsTask();
+        var documents = await LoadDocumentsAsync(cancellationToken);
+        documents.RemoveAll(document => string.Equals(document.Id, id, StringComparison.Ordinal));
+        await SaveDocumentsAsync(documents, cancellationToken);
     }
 
     private static int CountWords(string text) =>
@@ -109,11 +120,8 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
 
     private async Task<StoredScriptDocument?> GetMappedAsync(string id, CancellationToken cancellationToken)
     {
-        var json = await _jsRuntime.InvokeAsync<string>(
-            BrowserStorageMethodNames.GetDocumentJson,
-            cancellationToken,
-            id);
-        var dto = JsonSerializer.Deserialize<BrowserStoredScriptDocumentDto?>(json, JsonOptions);
+        var dto = (await LoadDocumentsAsync(cancellationToken))
+            .FirstOrDefault(document => string.Equals(document.Id, id, StringComparison.Ordinal));
         return dto is null ? null : ToDocument(dto);
     }
 
@@ -121,44 +129,41 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
     {
         var seedList = seedDocuments.ToList();
         var existing = await ListAsync(cancellationToken);
-        var seedVersion = await _jsRuntime.InvokeAsync<string?>(
-            BrowserStorageMethodNames.GetSeedVersion,
-            cancellationToken);
+        var seedVersion = await LoadStorageValueAsync(BrowserStorageKeys.DocumentSeedVersion, cancellationToken);
         var forceRefresh = !string.Equals(seedVersion, SampleScriptCatalog.SeedVersion, StringComparison.Ordinal);
 
         if (forceRefresh)
         {
-            foreach (var existingDocument in existing.Where(SampleScriptCatalog.ShouldReplaceOnSeedRefresh))
+            var replaceIds = existing
+                .Where(SampleScriptCatalog.ShouldReplaceOnSeedRefresh)
+                .Select(document => document.Id)
+                .ToHashSet(StringComparer.Ordinal);
+            var nextDocuments = (await LoadDocumentsAsync(cancellationToken))
+                .Where(document => !replaceIds.Contains(document.Id ?? string.Empty))
+                .ToList();
+
+            foreach (var seedDocument in seedList.Select(ToDto))
             {
-                await DeleteAsync(existingDocument.Id, cancellationToken);
+                nextDocuments.RemoveAll(document => string.Equals(document.Id, seedDocument.Id, StringComparison.Ordinal));
+                nextDocuments.Add(seedDocument);
             }
 
-            foreach (var document in seedList)
-            {
-                await _jsRuntime.InvokeAsync<string>(
-                    BrowserStorageMethodNames.SaveDocumentJson,
-                    cancellationToken,
-                    ToDto(document));
-            }
-
-            await _jsRuntime.InvokeVoidAsync(
-                BrowserStorageMethodNames.SetSeedVersion,
-                cancellationToken,
-                SampleScriptCatalog.SeedVersion);
+            await SaveDocumentsAsync(nextDocuments, cancellationToken);
+            await SaveStorageValueAsync(BrowserStorageKeys.DocumentSeedVersion, SampleScriptCatalog.SeedVersion, cancellationToken);
             return;
         }
 
-        var existingIds = existing
+        var documents = await LoadDocumentsAsync(cancellationToken);
+        var existingIds = documents
             .Select(document => document.Id)
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var document in seedList.Where(document => !existingIds.Contains(document.Id)))
         {
-            await _jsRuntime.InvokeAsync<string>(
-                BrowserStorageMethodNames.SaveDocumentJson,
-                cancellationToken,
-                ToDto(document));
+            documents.Add(ToDto(document));
         }
+
+        await SaveDocumentsAsync(documents, cancellationToken);
     }
 
     private static StoredScriptDocument ToDocument(BrowserStoredScriptDocumentDto dto)
@@ -202,6 +207,41 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime) : IScriptRepos
 
         var existingDocument = await GetMappedAsync(existingId, cancellationToken);
         return existingDocument?.FolderId;
+    }
+
+    private async Task<List<BrowserStoredScriptDocumentDto>> LoadDocumentsAsync(CancellationToken cancellationToken)
+    {
+        var json = await LoadStorageValueAsync(BrowserStorageKeys.DocumentLibrary, cancellationToken);
+        return string.IsNullOrWhiteSpace(json)
+            ? []
+            : JsonSerializer.Deserialize<List<BrowserStoredScriptDocumentDto>>(json, JsonOptions) ?? [];
+    }
+
+    private Task SaveDocumentsAsync(
+        List<BrowserStoredScriptDocumentDto> documents,
+        CancellationToken cancellationToken)
+    {
+        return SaveStorageValueAsync(
+            BrowserStorageKeys.DocumentLibrary,
+            JsonSerializer.Serialize(documents, JsonOptions),
+            cancellationToken);
+    }
+
+    private Task<string?> LoadStorageValueAsync(string key, CancellationToken cancellationToken)
+    {
+        return _jsRuntime.InvokeAsync<string?>(
+            BrowserStorageMethodNames.LoadStorageValue,
+            cancellationToken,
+            key).AsTask();
+    }
+
+    private Task SaveStorageValueAsync(string key, string value, CancellationToken cancellationToken)
+    {
+        return _jsRuntime.InvokeVoidAsync(
+            BrowserStorageMethodNames.SaveStorageValue,
+            cancellationToken,
+            key,
+            value).AsTask();
     }
 
 }

@@ -1,0 +1,290 @@
+/* Module: 50-go-live.css */
+/* Go Live layout, cards, preview, and responsive behavior. */
+
+/* ============================================
+   GO LIVE
+   ============================================ */
+
+.live-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 24px 48px 48px;
+}
+
+.live-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 28px;
+    background: rgba(10,14,20,.52);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--gold-08);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.live-hero-copy {
+    max-width: 620px;
+}
+
+.live-hero-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.live-grid,
+.live-targets-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.live-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+}
+
+.live-targets-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.live-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    padding: 22px 24px;
+    background: rgba(10,14,20,.5);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-08);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.live-destination-card {
+    min-height: 100%;
+}
+
+.live-card-header,
+.live-status-row,
+.live-source-item,
+.live-mic-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.live-card-title {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--t1);
+}
+
+.live-card-desc {
+    margin: 0;
+    color: var(--t3);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.live-status-row {
+    align-items: flex-start;
+}
+
+.live-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--gold-12);
+    background: var(--gold-05);
+    color: var(--t2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.live-status.ready {
+    background: rgba(110,231,183,.12);
+    border-color: rgba(110,231,183,.32);
+    color: #9BF3C9;
+}
+
+.live-status.pending {
+    background: rgba(196,168,130,.09);
+    border-color: var(--gold-16);
+    color: #E8D5B0;
+}
+
+.live-status-text {
+    color: var(--t3);
+    font-size: 12px;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.live-preview-card {
+    gap: 16px;
+}
+
+.live-preview-stage {
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+    border: 1px solid var(--gold-08);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(84, 189, 255, .12), transparent 34%),
+        linear-gradient(135deg, rgba(10, 18, 28, .96), rgba(15, 25, 42, .88));
+    box-shadow: inset 0 1px 0 var(--gold-06);
+}
+
+.live-preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: rgba(10,14,20,.45);
+}
+
+.live-preview-overlay {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(8, 12, 18, .18), rgba(8, 12, 18, .72));
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(12px);
+}
+
+.live-preview-empty {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+.live-local-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.live-source-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.live-destination-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    background: rgba(255,255,255,.02);
+}
+
+.live-destination-sources-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.live-destination-source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.live-destination-source-chip {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 148px;
+    padding: 11px 14px;
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    background: rgba(255,255,255,.02);
+    color: var(--t2);
+    text-align: left;
+    transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+}
+
+.live-destination-source-chip:hover {
+    border-color: var(--gold-20);
+    transform: translateY(-1px);
+}
+
+.live-destination-source-chip.on {
+    border-color: rgba(110,231,183,.32);
+    background: rgba(110,231,183,.09);
+}
+
+.live-destination-source-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--t1);
+}
+
+.live-destination-source-state {
+    font-size: 11px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--t3);
+}
+
+.live-destination-sources-empty {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+}
+
+.live-source-item,
+.live-mic-summary {
+    padding: 14px 16px;
+    border: 1px solid var(--gold-08);
+    border-radius: 14px;
+    background: rgba(255,255,255,.02);
+}
+
+@media (max-width: 1240px) {
+    .live-grid,
+    .live-targets-grid,
+    .live-local-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .live-layout {
+        padding: 20px 20px 40px;
+    }
+
+    .live-hero,
+    .live-card-header,
+    .live-source-item,
+    .live-mic-summary {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+

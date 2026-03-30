@@ -1,15 +1,7 @@
 (function () {
-    const documentStorageKey = "prompterlive.library.v1";
-    const documentSeedVersionKey = "prompterlive.library.seed-version";
-    const folderStorageKey = "prompterlive.folders.v1";
-    const folderSeedVersionKey = "prompterlive.folders.seed-version";
     const settingsPrefix = "prompterlive.settings.";
     const cultureSettingKey = settingsPrefix + "culture";
     const defaultCultureName = "en";
-    const blockedCulturePrefix = "ru";
-    const cultureSeparator = "-";
-    const alternateCultureSeparator = "_";
-    const supportedCultures = new Set(["en", "uk", "fr", "es", "pt", "it"]);
     const streamMap = new Map();
     const audioMonitorMap = new Map();
     const readerAnimations = new Map();
@@ -22,126 +14,22 @@
     const shellStateOffline = "offline";
     const shellStateOnline = "online";
     const shellErrorUiId = "blazor-error-ui";
-    const shellErrorEyebrowId = "app-shell-error-eyebrow";
-    const shellErrorTitleId = "app-shell-error-title";
-    const shellErrorMessageId = "app-shell-error-message";
     const shellErrorDetailId = "app-shell-error-detail";
     const shellConnectivityUiId = "app-connectivity-ui";
-    const shellConnectivityEyebrowId = "app-connectivity-eyebrow";
     const shellConnectivityTitleId = "app-connectivity-title";
     const shellConnectivityMessageId = "app-connectivity-message";
     const shellConnectivityRetryId = "app-connectivity-retry";
     const shellConnectivityDismissId = "app-connectivity-dismiss";
-    const shellBootstrapReloadSelector = "[data-testid='diagnostics-bootstrap-reload']";
     const shellBootstrapDismissSelector = "[data-testid='diagnostics-bootstrap-dismiss']";
-    const shellText = {
-        en: {
-            errorEyebrow: "Diagnostics",
-            errorTitle: "Prompter.live hit a shell error",
-            errorMessage: "The app shell could not recover automatically. Reload the app to restore editing, reading, and live tools.",
-            reload: "Reload App",
-            dismiss: "Dismiss",
-            connectivityEyebrow: "Connection",
-            offlineTitle: "Connection lost",
-            offlineMessage: "Prompter.live is offline. Live routing, cloud sync, and remote publishing will resume when the browser reconnects.",
-            onlineTitle: "Connection restored",
-            onlineMessage: "The browser connection is back. Continue working or reload if anything still looks stale.",
-            retry: "Retry Now"
-        },
-        uk: {
-            errorEyebrow: "Діагностика",
-            errorTitle: "У Prompter.live сталася помилка оболонки",
-            errorMessage: "Оболонка застосунку не змогла відновитися автоматично. Перезавантажте застосунок, щоб повернути редагування, читання і live-інструменти.",
-            reload: "Перезавантажити",
-            dismiss: "Закрити",
-            connectivityEyebrow: "Зʼєднання",
-            offlineTitle: "Зʼєднання втрачено",
-            offlineMessage: "Prompter.live офлайн. Live routing, хмарна синхронізація та віддалена публікація відновляться, коли браузер перепідключиться.",
-            onlineTitle: "Зʼєднання відновлено",
-            onlineMessage: "Браузер знову онлайн. Можна продовжувати роботу або перезавантажити застосунок, якщо щось усе ще виглядає застарілим.",
-            retry: "Спробувати знову"
-        },
-        fr: {
-            errorEyebrow: "Diagnostic",
-            errorTitle: "Prompter.live a rencontré une erreur de shell",
-            errorMessage: "Le shell de l’application n’a pas pu se rétablir automatiquement. Rechargez l’application pour retrouver l’édition, la lecture et le live.",
-            reload: "Recharger",
-            dismiss: "Fermer",
-            connectivityEyebrow: "Connexion",
-            offlineTitle: "Connexion perdue",
-            offlineMessage: "Prompter.live est hors ligne. Le routage live, la synchronisation cloud et la publication distante reprendront quand le navigateur se reconnectera.",
-            onlineTitle: "Connexion rétablie",
-            onlineMessage: "La connexion du navigateur est de retour. Continuez à travailler ou rechargez si quelque chose semble encore obsolète.",
-            retry: "Réessayer"
-        },
-        es: {
-            errorEyebrow: "Diagnóstico",
-            errorTitle: "Prompter.live encontró un error del shell",
-            errorMessage: "El shell de la aplicación no pudo recuperarse automáticamente. Recarga la aplicación para restaurar edición, lectura y herramientas en vivo.",
-            reload: "Recargar",
-            dismiss: "Cerrar",
-            connectivityEyebrow: "Conexión",
-            offlineTitle: "Conexión perdida",
-            offlineMessage: "Prompter.live está sin conexión. El enrutado en vivo, la sincronización en la nube y la publicación remota se reanudarán cuando el navegador vuelva a conectarse.",
-            onlineTitle: "Conexión restaurada",
-            onlineMessage: "La conexión del navegador volvió. Sigue trabajando o recarga si algo aún se ve desactualizado.",
-            retry: "Reintentar"
-        },
-        pt: {
-            errorEyebrow: "Diagnóstico",
-            errorTitle: "O Prompter.live encontrou um erro de shell",
-            errorMessage: "O shell do app não conseguiu se recuperar automaticamente. Recarregue o app para restaurar edição, leitura e ferramentas ao vivo.",
-            reload: "Recarregar",
-            dismiss: "Fechar",
-            connectivityEyebrow: "Conexão",
-            offlineTitle: "Conexão perdida",
-            offlineMessage: "O Prompter.live está offline. O roteamento ao vivo, a sincronização em nuvem e a publicação remota voltarão quando o navegador reconectar.",
-            onlineTitle: "Conexão restaurada",
-            onlineMessage: "A conexão do navegador voltou. Continue trabalhando ou recarregue se algo ainda parecer desatualizado.",
-            retry: "Tentar novamente"
-        },
-        it: {
-            errorEyebrow: "Diagnostica",
-            errorTitle: "Prompter.live ha rilevato un errore della shell",
-            errorMessage: "La shell dell’app non è riuscita a riprendersi automaticamente. Ricarica l’app per ripristinare modifica, lettura e strumenti live.",
-            reload: "Ricarica",
-            dismiss: "Chiudi",
-            connectivityEyebrow: "Connessione",
-            offlineTitle: "Connessione persa",
-            offlineMessage: "Prompter.live è offline. Il routing live, la sincronizzazione cloud e la pubblicazione remota riprenderanno quando il browser si riconnetterà.",
-            onlineTitle: "Connessione ripristinata",
-            onlineMessage: "La connessione del browser è tornata. Continua a lavorare oppure ricarica se qualcosa sembra ancora non aggiornato.",
-            retry: "Riprova"
-        }
-    };
+    const shellConsoleErrorPrefix = "[PrompterLive.shell]";
+    const shellDiagnosticsBridgeFailureSource = "logger-bridge-failure";
+    const shellDiagnosticsReportMethodName = "ReportShellError";
+    const shellErrorSourceManual = "manual";
+    const shellErrorSourceUnhandledRejection = "unhandledrejection";
+    const shellErrorSourceWindowError = "window.error";
     let connectivityHideTimer = 0;
-
-    function normalizeCultureName(cultureName) {
-        if (!cultureName || typeof cultureName !== "string") {
-            return "";
-        }
-
-        return cultureName
-            .trim()
-            .replaceAll(alternateCultureSeparator, cultureSeparator)
-            .toLowerCase();
-    }
-
-    function resolveSupportedCulture(cultureName) {
-        const normalizedCulture = normalizeCultureName(cultureName);
-        if (!normalizedCulture) {
-            return "";
-        }
-
-        const languageName = normalizedCulture.split(cultureSeparator)[0];
-        if (languageName === blockedCulturePrefix) {
-            return defaultCultureName;
-        }
-
-        return supportedCultures.has(languageName)
-            ? languageName
-            : "";
-    }
+    let shellDiagnosticsLogger = null;
+    let pendingShellErrors = [];
 
     function getBrowserCultures() {
         if (Array.isArray(window.navigator.languages) && window.navigator.languages.length > 0) {
@@ -151,34 +39,19 @@
         return [window.navigator.language || defaultCultureName];
     }
 
-    function getPreferredCulture() {
-        const storedCulture = resolveSupportedCulture(window.localStorage.getItem(cultureSettingKey));
-        if (storedCulture) {
-            return storedCulture;
-        }
-
-        for (const browserCulture of getBrowserCultures()) {
-            const supportedCulture = resolveSupportedCulture(browserCulture);
-            if (supportedCulture) {
-                return supportedCulture;
-            }
-        }
-
-        return defaultCultureName;
+    function getStoredCulture() {
+        return window.localStorage.getItem(cultureSettingKey) || "";
     }
 
     function applyDocumentCulture(cultureName) {
-        const normalizedCulture = resolveSupportedCulture(cultureName) || defaultCultureName;
+        const normalizedCulture = typeof cultureName === "string" && cultureName.trim()
+            ? cultureName.trim()
+            : defaultCultureName;
         if (document && document.documentElement) {
             document.documentElement.lang = normalizedCulture;
         }
 
         return normalizedCulture;
-    }
-
-    function getShellStrings() {
-        const cultureName = resolveSupportedCulture(document?.documentElement?.lang) || defaultCultureName;
-        return shellText[cultureName] || shellText[defaultCultureName];
     }
 
     function setShellText(elementId, value) {
@@ -204,38 +77,73 @@
         detailElement.textContent = detail;
     }
 
+    function normalizeShellDetail(detail) {
+        return typeof detail === "string"
+            ? detail.trim()
+            : "";
+    }
+
+    function normalizeShellSource(source) {
+        return typeof source === "string" && source.trim()
+            ? source.trim()
+            : shellErrorSourceManual;
+    }
+
+    function queueShellError(source, detail) {
+        pendingShellErrors.push({
+            source: normalizeShellSource(source),
+            detail: normalizeShellDetail(detail)
+        });
+    }
+
+    function reportShellErrorToLogger(source, detail) {
+        const normalizedSource = normalizeShellSource(source);
+        const normalizedDetail = normalizeShellDetail(detail);
+        if (!shellDiagnosticsLogger?.invokeMethodAsync) {
+            queueShellError(normalizedSource, normalizedDetail);
+            return;
+        }
+
+        shellDiagnosticsLogger
+            .invokeMethodAsync(shellDiagnosticsReportMethodName, normalizedSource, normalizedDetail)
+            .catch(error => {
+                queueShellError(normalizedSource, normalizedDetail);
+                console.error(
+                    shellConsoleErrorPrefix,
+                    shellDiagnosticsBridgeFailureSource,
+                    error?.message || "");
+            });
+    }
+
+    function flushPendingShellErrors() {
+        if (!shellDiagnosticsLogger?.invokeMethodAsync || pendingShellErrors.length === 0) {
+            return;
+        }
+
+        const pendingErrors = pendingShellErrors;
+        pendingShellErrors = [];
+
+        for (const pendingError of pendingErrors) {
+            reportShellErrorToLogger(pendingError.source, pendingError.detail);
+        }
+    }
+
+    function attachDiagnosticsLogger(logger) {
+        shellDiagnosticsLogger = logger || null;
+        flushPendingShellErrors();
+    }
+
+    function logShellError(source, detail) {
+        const normalizedSource = normalizeShellSource(source);
+        const normalizedDetail = normalizeShellDetail(detail);
+        console.error(shellConsoleErrorPrefix, normalizedSource, normalizedDetail);
+        reportShellErrorToLogger(normalizedSource, normalizedDetail);
+    }
+
     function hideBootstrapError() {
         const errorUi = document.getElementById(shellErrorUiId);
         if (errorUi) {
             errorUi.style.display = "none";
-        }
-    }
-
-    function updateShellCopy() {
-        const strings = getShellStrings();
-        setShellText(shellErrorEyebrowId, strings.errorEyebrow);
-        setShellText(shellErrorTitleId, strings.errorTitle);
-        setShellText(shellErrorMessageId, strings.errorMessage);
-        setShellText(shellConnectivityEyebrowId, strings.connectivityEyebrow);
-
-        const reloadButton = document.querySelector(shellBootstrapReloadSelector);
-        if (reloadButton) {
-            reloadButton.textContent = strings.reload;
-        }
-
-        const bootstrapDismissButton = document.querySelector(shellBootstrapDismissSelector);
-        if (bootstrapDismissButton) {
-            bootstrapDismissButton.textContent = strings.dismiss;
-        }
-
-        const retryButton = document.getElementById(shellConnectivityRetryId);
-        if (retryButton) {
-            retryButton.textContent = strings.retry;
-        }
-
-        const connectivityDismissButton = document.getElementById(shellConnectivityDismissId);
-        if (connectivityDismissButton) {
-            connectivityDismissButton.textContent = strings.dismiss;
         }
     }
 
@@ -257,14 +165,13 @@
             return;
         }
 
-        const strings = getShellStrings();
         const isOnline = state === shellStateOnline;
-        setShellText(
-            shellConnectivityTitleId,
-            isOnline ? strings.onlineTitle : strings.offlineTitle);
+        setShellText(shellConnectivityTitleId, isOnline ? "Connection restored" : "Connection lost");
         setShellText(
             shellConnectivityMessageId,
-            isOnline ? strings.onlineMessage : strings.offlineMessage);
+            isOnline
+                ? "The browser connection is back. Continue working or reload if anything still looks stale."
+                : "Prompter.live is offline. Live routing, cloud sync, and remote publishing will resume when the browser reconnects.");
 
         connectivityUi.hidden = false;
         connectivityUi.dataset.state = state;
@@ -277,20 +184,18 @@
         }
     }
 
-    function showBootstrapError(detail) {
+    function showBootstrapError(detail, source = shellErrorSourceManual) {
         const errorUi = document.getElementById(shellErrorUiId);
         if (!errorUi) {
             return;
         }
 
-        updateShellCopy();
+        logShellError(source, detail);
         showShellDetail(detail);
         errorUi.style.display = "grid";
     }
 
     function initializeAppShell() {
-        updateShellCopy();
-
         const errorUi = document.getElementById(shellErrorUiId);
         if (errorUi) {
             const errorUiObserver = new MutationObserver(() => {
@@ -323,139 +228,23 @@
         window.addEventListener("offline", () => showConnectivityStatus(shellStateOffline));
         window.addEventListener("online", () => showConnectivityStatus(shellStateOnline));
         window.addEventListener("error", event => {
-            if (event?.message) {
-                showBootstrapError(event.message);
+            const detail = event?.message || event?.filename || "";
+            if (detail) {
+                showBootstrapError(detail, shellErrorSourceWindowError);
             }
         });
         window.addEventListener("unhandledrejection", event => {
             const reason = event?.reason;
             const detail = typeof reason === "string"
                 ? reason
-                : reason?.message || "";
+                : reason?.message || reason?.toString?.() || "";
 
-            showBootstrapError(detail);
+            showBootstrapError(detail, shellErrorSourceUnhandledRejection);
         });
 
         if (window.navigator && window.navigator.onLine === false) {
             showConnectivityStatus(shellStateOffline);
         }
-    }
-
-    function normalizeDocument(document) {
-        if (!document) {
-            return null;
-        }
-
-        if (Array.isArray(document)) {
-            const [id, title, text, documentName, updatedAt] = document;
-            return {
-                id: id || "",
-                title: title || "Untitled Script",
-                text: text || "",
-                documentName: documentName || "untitled-script.tps",
-                updatedAt: updatedAt || new Date().toISOString(),
-                folderId: null
-            };
-        }
-
-        if (typeof document !== "object") {
-            return null;
-        }
-
-        return {
-            id: document.id ?? document.Id ?? "",
-            title: document.title ?? document.Title ?? "Untitled Script",
-            text: document.text ?? document.Text ?? "",
-            documentName: document.documentName ?? document.DocumentName ?? "untitled-script.tps",
-            updatedAt: document.updatedAt ?? document.UpdatedAt ?? new Date().toISOString(),
-            folderId: document.folderId ?? document.FolderId ?? null
-        };
-    }
-
-    function normalizeFolder(folder) {
-        if (!folder || typeof folder !== "object") {
-            return null;
-        }
-
-        return {
-            id: folder.id ?? folder.Id ?? "",
-            name: folder.name ?? folder.Name ?? "Untitled Folder",
-            parentId: folder.parentId ?? folder.ParentId ?? null,
-            displayOrder: Number.isFinite(folder.displayOrder ?? folder.DisplayOrder)
-                ? folder.displayOrder ?? folder.DisplayOrder
-                : 0,
-            updatedAt: folder.updatedAt ?? folder.UpdatedAt ?? new Date().toISOString()
-        };
-    }
-
-    function normalizeFolders(folders) {
-        if (!Array.isArray(folders)) {
-            return [];
-        }
-
-        return folders
-            .map(normalizeFolder)
-            .filter(Boolean);
-    }
-
-    function normalizeDocuments(documents) {
-        if (!documents) {
-            return [];
-        }
-
-        if (Array.isArray(documents)) {
-            if (documents.length === 0) {
-                return [];
-            }
-
-            if (typeof documents[0] !== "object" || documents[0] === null) {
-                return normalizeDocument(documents) ? [normalizeDocument(documents)] : [];
-            }
-
-            return documents.map(normalizeDocument).filter(Boolean);
-        }
-
-        const normalized = normalizeDocument(documents);
-        return normalized ? [normalized] : [];
-    }
-
-    function readDocuments() {
-        try {
-            const raw = window.localStorage.getItem(documentStorageKey);
-            if (!raw) {
-                return [];
-            }
-
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-                return normalizeDocuments(parsed);
-            }
-
-            return normalizeDocuments(parsed);
-        } catch {
-            return [];
-        }
-    }
-
-    function writeDocuments(documents) {
-        window.localStorage.setItem(documentStorageKey, JSON.stringify(documents));
-    }
-
-    function readFolders() {
-        try {
-            const raw = window.localStorage.getItem(folderStorageKey);
-            if (!raw) {
-                return [];
-            }
-
-            return normalizeFolders(JSON.parse(raw));
-        } catch {
-            return [];
-        }
-    }
-
-    function writeFolders(folders) {
-        window.localStorage.setItem(folderStorageKey, JSON.stringify(folders));
     }
 
     async function stopStream(stream) {
@@ -595,22 +384,28 @@
         }
     }
 
-    applyDocumentCulture(getPreferredCulture());
+    applyDocumentCulture(getStoredCulture() || getBrowserCultures()[0] || defaultCultureName);
     initializeAppShell();
 
     window.PrompterLive = {
         localization: {
-            getPreferredCulture() {
-                return applyDocumentCulture(getPreferredCulture());
+            applyDocumentCulture(cultureName) {
+                return applyDocumentCulture(cultureName);
             },
-            setPreferredCulture(cultureName) {
+            getBrowserCultures() {
+                return getBrowserCultures();
+            },
+            getStoredCulture() {
+                return getStoredCulture();
+            },
+            setStoredCulture(cultureName) {
                 const normalizedCulture = applyDocumentCulture(cultureName);
                 window.localStorage.setItem(cultureSettingKey, normalizedCulture);
-                updateShellCopy();
                 return normalizedCulture;
             }
         },
         shell: {
+            attachDiagnosticsLogger,
             hideBootstrapError,
             hideConnectivityStatus,
             showBootstrapError,
@@ -622,105 +417,19 @@
             }
         },
         storage: {
-            ensureSeedData(seedDocuments) {
-                const current = readDocuments();
-                const normalizedSeedDocuments = normalizeDocuments(seedDocuments);
-
-                if (current.length === 0) {
-                    writeDocuments(normalizedSeedDocuments);
+            load(key) {
+                return window.localStorage.getItem(key);
+            },
+            remove(key) {
+                window.localStorage.removeItem(key);
+            },
+            save(key, value) {
+                if (typeof value !== "string") {
+                    window.localStorage.removeItem(key);
                     return;
                 }
 
-                const existingIds = new Set(current.map(document => document.id));
-                const merged = current.concat(
-                    normalizedSeedDocuments.filter(document => !existingIds.has(document.id))
-                );
-
-                writeDocuments(merged);
-            },
-            getSeedVersion() {
-                return window.localStorage.getItem(documentSeedVersionKey);
-            },
-            setSeedVersion(version) {
-                if (!version) {
-                    window.localStorage.removeItem(documentSeedVersionKey);
-                    return;
-                }
-
-                window.localStorage.setItem(documentSeedVersionKey, version);
-            },
-            getFolderSeedVersion() {
-                return window.localStorage.getItem(folderSeedVersionKey);
-            },
-            setFolderSeedVersion(version) {
-                if (!version) {
-                    window.localStorage.removeItem(folderSeedVersionKey);
-                    return;
-                }
-
-                window.localStorage.setItem(folderSeedVersionKey, version);
-            },
-            listDocuments() {
-                return readDocuments();
-            },
-            listDocumentsJson() {
-                return JSON.stringify(readDocuments());
-            },
-            getDocument(id) {
-                return readDocuments().find(document => document.id === id) ?? null;
-            },
-            getDocumentJson(id) {
-                return JSON.stringify(window.PrompterLive.storage.getDocument(id));
-            },
-            saveDocument(document) {
-                const normalizedDocument = normalizeDocument(document);
-                if (!normalizedDocument) {
-                    return null;
-                }
-
-                const documents = readDocuments();
-                const index = documents.findIndex(item => item.id === normalizedDocument.id);
-                if (index >= 0) {
-                    documents[index] = normalizedDocument;
-                } else {
-                    documents.push(normalizedDocument);
-                }
-
-                writeDocuments(documents);
-                return normalizedDocument;
-            },
-            saveDocumentJson(document) {
-                return JSON.stringify(window.PrompterLive.storage.saveDocument(document));
-            },
-            deleteDocument(id) {
-                const documents = readDocuments().filter(document => document.id !== id);
-                writeDocuments(documents);
-            },
-            listFolders() {
-                return readFolders();
-            },
-            listFoldersJson() {
-                return JSON.stringify(readFolders());
-            },
-            saveFolder(folder) {
-                const normalizedFolder = normalizeFolder(folder);
-                if (!normalizedFolder) {
-                    return null;
-                }
-
-                const folders = readFolders();
-                const index = folders.findIndex(item => item.id === normalizedFolder.id);
-                if (index >= 0) {
-                    folders[index] = normalizedFolder;
-                } else {
-                    folders.push(normalizedFolder);
-                }
-
-                writeFolders(folders);
-                return normalizedFolder;
-            },
-            saveFolderJson(folder) {
-                return JSON.stringify(window.PrompterLive.storage.saveFolder(folder));
+                window.localStorage.setItem(key, value);
             }
         },
 

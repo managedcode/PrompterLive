@@ -1,0 +1,65 @@
+/* Module: 00-base.css */
+/* Base tokens, reset, and global shell primitives. */
+
+/* ============================================
+   TELEPROMPTER — REFINED DESIGN SYSTEM
+   ============================================ */
+
+/* Design tokens: see tokens.css
+   Legacy aliases for backward compat within this file */
+:root {
+    --bg: var(--bg-1);
+    --bg2: var(--bg-2);
+    --bg3: var(--bg-3);
+    --bg4: var(--bg-4);
+    --bg5: var(--bg-5);
+    --glass: var(--gold-04);
+    --glass2: var(--gold-07);
+    --glass3: var(--gold-10);
+    --t1: var(--text-1);
+    --t2: var(--text-2);
+    --t3: var(--text-3);
+    --t4: var(--text-4);
+    --border: var(--gold-08);
+    --border2: var(--gold-14);
+    --accent: var(--gold);
+    --accent2: #D4B070;
+    --accent-g: var(--gold-12);
+    --orp-red: #E8825C;
+    --r: var(--radius-lg);
+    --r2: var(--radius-xl);
+    --font: var(--font-sans);
+    --mono: var(--font-mono);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+    height: 100%;
+    font-family: var(--font);
+    /* Bokeh on body — visible through all screens */
+    background: #080A14;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080' viewBox='0 0 1920 1080'%3E%3Cdefs%3E%3ClinearGradient id='bbg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23080A14'/%3E%3Cstop offset='.5' stop-color='%230A0C18'/%3E%3Cstop offset='1' stop-color='%23080A14'/%3E%3C/linearGradient%3E%3Cfilter id='bb'%3E%3CfeGaussianBlur stdDeviation='120'/%3E%3C/filter%3E%3C/defs%3E%3Crect fill='url(%23bbg)' width='1920' height='1080'/%3E%3Cg filter='url(%23bb)'%3E%3Ccircle cx='200' cy='180' r='220' fill='%23E97F00' opacity='.14'/%3E%3Ccircle cx='650' cy='100' r='180' fill='%23DC2626' opacity='.09'/%3E%3Ccircle cx='1100' cy='250' r='250' fill='%237C3AED' opacity='.11'/%3E%3Ccircle cx='1600' cy='150' r='200' fill='%230D9488' opacity='.1'/%3E%3Ccircle cx='400' cy='700' r='220' fill='%232563EB' opacity='.09'/%3E%3Ccircle cx='1350' cy='750' r='180' fill='%23E97F00' opacity='.07'/%3E%3Ccircle cx='850' cy='500' r='180' fill='%237C3AED' opacity='.07'/%3E%3Ccircle cx='1700' cy='600' r='150' fill='%230D9488' opacity='.06'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--t1);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+::selection { background: var(--accent-g); }
+
+.screen {
+    display: none;
+    height: calc(100vh - 52px);
+}
+.screen.active { display: flex; }
+
+button {
+    font-family: var(--font);
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+

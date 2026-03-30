@@ -1,0 +1,229 @@
+/* Module: 00-shell.css */
+/* Reader gradients, stage shell, camera, and TPS token primitives. */
+
+/* ============================================
+   READER (RSVP Teleprompter)
+   ============================================ */
+
+.rd {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #080E12;
+}
+
+/* Emotion gradient — rich 4-stop vertical gradient, smooth transitions between emotions */
+.rd-gradient {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    z-index: 0;
+    transition: background 3s ease;
+    background: linear-gradient(180deg, #0D2818 0%, #1A4D33 30%, #0F3025 70%, #0A1C15 100%);
+}
+/* Warm — golden amber */
+.rd-gradient.warm { background: linear-gradient(180deg, #1C1408 0%, #2E2210 30%, #1C1408 70%, #100E06 100%); }
+/* Concerned — deep red */
+.rd-gradient.concerned { background: linear-gradient(180deg, #1C0E0E 0%, #2E1616 30%, #1C0E0E 70%, #120808 100%); }
+/* Focused — emerald green */
+.rd-gradient.focused { background: linear-gradient(180deg, #0D2818 0%, #1A4D33 30%, #0F3025 70%, #0A1C15 100%); }
+/* Motivational — deep purple */
+.rd-gradient.motivational { background: linear-gradient(180deg, #150D1C 0%, #251640 30%, #1A0F2E 70%, #0E0818 100%); }
+/* Neutral — slate blue */
+.rd-gradient.neutral { background: linear-gradient(180deg, #0C0E18 0%, #141828 30%, #0E1020 70%, #080A14 100%); }
+/* Urgent — vivid red */
+.rd-gradient.urgent { background: linear-gradient(180deg, #1C0808 0%, #3E1010 30%, #2A0C0C 70%, #140606 100%); }
+/* Happy — warm yellow */
+.rd-gradient.happy { background: linear-gradient(180deg, #1C1808 0%, #2E2A10 30%, #1C1808 70%, #100E06 100%); }
+/* Excited — hot pink */
+.rd-gradient.excited { background: linear-gradient(180deg, #1C0C14 0%, #2E1224 30%, #1C0C14 70%, #12060C 100%); }
+/* Sad — deep indigo */
+.rd-gradient.sad { background: linear-gradient(180deg, #0C0C1C 0%, #121230 30%, #0C0C1C 70%, #060610 100%); }
+/* Calm — teal */
+.rd-gradient.calm { background: linear-gradient(180deg, #081C1C 0%, #0E2E2E 30%, #081C1C 70%, #041010 100%); }
+/* Energetic — orange-red */
+.rd-gradient.energetic { background: linear-gradient(180deg, #1C1008 0%, #2E1A0E 30%, #1C1008 70%, #100A04 100%); }
+/* Professional — navy */
+.rd-gradient.professional { background: linear-gradient(180deg, #08101C 0%, #0E1A2E 30%, #08101C 70%, #040A10 100%); }
+
+/* Camera */
+.rd-camera {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    transition: opacity 220ms ease;
+    pointer-events: none;
+}
+.rd-camera-off { color: var(--t4); }
+.rd-camera.active .rd-camera-off { display: none; }
+.rd-camera.active {
+    opacity: 0.9;
+}
+
+.rd-camera-tint {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: rgba(5,5,8,.7);
+    pointer-events: none;
+    display: none;
+}
+.rd-camera-tint.active { display: block; }
+
+/* UI layer */
+.rd-ui {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header removed — immersive reading mode */
+
+.rd-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--gold-06);
+    color: rgba(232,213,176,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+.rd-btn:hover { background: var(--gold-10); color: #E8D5B0; }
+.rd-btn.active { background: var(--accent-g); color: var(--accent); }
+
+/* Floating back button — immersive */
+.rd-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(232,213,176,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(232,213,176,.06);
+    cursor: pointer;
+    transition: all .3s;
+}
+.rd-back:hover {
+    color: rgba(232,213,176,.5);
+    background: var(--gold-06);
+    border-color: var(--gold-10);
+}
+
+/* Stage — active cluster always centered vertically */
+.rd-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    /* Spotlight mask: fade text above reading zone and below */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,.3) 8%,
+        black 22%,
+        black 75%,
+        rgba(0,0,0,.4) 90%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,.3) 8%,
+        black 22%,
+        black 75%,
+        rgba(0,0,0,.4) 90%,
+        transparent 100%
+    );
+}
+
+/* Cluster container — active cluster pinned to vertical center */
+.rd-cluster-wrap {
+    position: relative;
+    padding: 0 4%;
+    max-width: 750px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    --rd-font-size: 36px;
+}
+
+/* Clusters */
+.rd-cluster {
+    width: 100%;
+    text-align: left;
+}
+
+.rd-cluster p {
+    line-height: 1.6;
+    letter-spacing: -.2px;
+}
+.rd-cluster b { font-weight: 700; }
+
+/* ── TPS Inline Colors (per TPS_FORMAT.md dark-BG spec) ── */
+.tps-red { color: #FF6B6B; }
+.tps-green { color: #51CF66; }
+.tps-blue { color: #74C0FC; }
+.tps-yellow { color: #FFE066; }
+.tps-orange { color: #FFA94D; }
+.tps-purple { color: #CC5DE8; }
+.tps-cyan { color: #66D9E8; }
+.tps-magenta { color: #F783AC; }
+.tps-pink { color: #FAA2C1; }
+.tps-teal { color: #38D9A9; }
+.tps-white { color: #F8F9FA; }
+.tps-gray { color: #ADB5BD; }
+
+/* ── TPS Highlight — yellow background overlay ── */
+.tps-highlight {
+    background: rgba(255,224,102,.12);
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin: 0 -2px;
+}
+
+/* ── TPS Emphasis ── */
+.tps-em { font-style: italic; }
+.tps-strong { font-weight: 900; }
+.tps-emphasis { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+/* ── TPS Emotion Inline Colors ── */
+.tps-warm { color: #FFA94D; }
+.tps-concerned { color: #FF6B6B; }
+.tps-focused { color: #51CF66; }
+.tps-motivational { color: #CC5DE8; }
+.tps-neutral { color: #74C0FC; }
+.tps-urgent { color: #FF4444; font-weight: 900; }
+.tps-happy { color: #FFE066; }
+.tps-excited { color: #FAA2C1; }
+.tps-sad { color: #7B68EE; }
+.tps-calm { color: #38D9A9; }
+.tps-energetic { color: #FF6347; }
+.tps-professional { color: #5B7FFF; }
+
+/* ── TPS Speed Indicators (visual cue for speed tags) ── */
+.tps-xslow { letter-spacing: 1.5px; }
+.tps-slow { letter-spacing: 0.5px; }
+.tps-fast { letter-spacing: -0.3px; }
+.tps-xfast { letter-spacing: -0.5px; opacity: .7; }
+

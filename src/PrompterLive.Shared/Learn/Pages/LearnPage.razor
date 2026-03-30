@@ -1,14 +1,18 @@
 @page "/learn"
 @namespace PrompterLive.Shared.Pages
-@using PrompterLive.Core.Services.Rsvp
-@using PrompterLive.Core.Samples
-@using PrompterLive.Shared.Services.Diagnostics
 
-<div id="screen-rsvp"
+<div id="@UiDomIds.Design.LearnScreen"
      class="screen active"
+     tabindex="0"
+     @ref="_screenRoot"
+     @onkeydown="HandleLearnKeyDownAsync"
      data-testid="@UiTestIds.Learn.Page">
     <div class="rsvp">
-        <div class="rsvp-progress"><div class="rsvp-progress-fill" style="width:0%"></div></div>
+        <div class="rsvp-progress">
+            <div id="@UiDomIds.Learn.ProgressFill"
+                 class="rsvp-progress-fill"
+                 style="width:@_progressFillWidth"></div>
+        </div>
 
         <div class="rsvp-display">
             <div class="rsvp-crosshair">
@@ -20,13 +24,28 @@
             </div>
 
             <div class="rsvp-h-row">
-                <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft"></div>
-
-                <div class="rsvp-focus-shell">
-                    <div class="rsvp-focus" id="@UiDomIds.Learn.Word" data-testid="@UiTestIds.Learn.Word"></div>
+                <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft">
+                    @foreach (var word in _leftContextWords)
+                    {
+                        <span>@word</span>
+                    }
                 </div>
 
-                <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight"></div>
+                <div class="rsvp-focus-shell">
+                    <div class="rsvp-focus" id="@UiDomIds.Learn.Word" data-testid="@UiTestIds.Learn.Word">
+                        @foreach (var character in _currentWordCharacters)
+                        {
+                            <span class="@(character.IsOrp ? OrpClassName : null)">@character.Value</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight">
+                    @foreach (var word in _rightContextWords)
+                    {
+                        <span>@word</span>
+                    }
+                </div>
             </div>
 
             <div class="rsvp-orp-line" data-testid="@UiTestIds.Learn.OrpLine"></div>
@@ -37,7 +56,7 @@
             </div>
 
             <div class="rsvp-pause-track">
-                <div class="rsvp-pause-fill"></div>
+                <div id="@UiDomIds.Learn.PauseFill" class="rsvp-pause-fill"></div>
             </div>
         </div>
 
@@ -65,277 +84,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
-    [Inject] private AppShellService Shell { get; set; } = null!;
-    [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
-    [Inject] private IScriptSessionService SessionService { get; set; } = null!;
-    [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
-    [Inject] private RsvpTextProcessor TextProcessor { get; set; } = null!;
-    [Inject] private RsvpPlaybackEngine PlaybackEngine { get; set; } = null!;
-    [Inject] private IJSRuntime JS { get; set; } = null!;
-
-    [SupplyParameterFromQuery(Name = "id")]
-    public string? ScriptId { get; set; }
-
-    private string _screenTitle = string.Empty;
-    private string _screenSubtitle = string.Empty;
-    private string _nextPhrase = string.Empty;
-    private string _progressLabel = string.Empty;
-    private string[] _rsvpWords = [];
-    private int _speed = 300;
-    private bool _loadState = true;
-    private bool _syncWords;
-    private IReadOnlyList<RsvpTimelineEntry> _timeline = [];
-    private const string LoadLearnOperation = "Learn load";
-    private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
-    private const string EndOfScriptPhrase = "End of script.";
-    private const string ReadyWord = "Ready";
-    private const int PreviewWordCount = 10;
-    private const string WpmSuffix = " WPM";
-    private const int RsvpMaxSpeed = 600;
-    private const int RsvpMinSpeed = 100;
-    private const int RsvpSpeedStep = 10;
-    private const int RsvpStepLarge = 5;
-    private const int RsvpStepSmall = 1;
-
-    protected override Task OnParametersSetAsync()
-    {
-        _loadState = true;
-        return Task.CompletedTask;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_loadState)
-        {
-            _loadState = false;
-            await Diagnostics.RunAsync(
-                LoadLearnOperation,
-                LoadLearnMessage,
-                async () =>
-                {
-                    await Bootstrapper.EnsureReadyAsync();
-                    await EnsureSessionLoadedAsync();
-                    PopulateLearnState();
-                    StateHasChanged();
-                });
-            return;
-        }
-
-        if (_syncWords)
-        {
-            _syncWords = false;
-            await JS.InvokeVoidAsync(
-                AppJsInterop.SetRsvpTimelineMethod,
-                _timeline.Select(entry => new
-                {
-                    word = entry.Word,
-                    durationMs = entry.DurationMs,
-                    pauseAfterMs = entry.PauseAfterMs,
-                    baseWpm = entry.BaseWpm,
-                    nextPhrase = entry.NextPhrase,
-                    emotion = entry.Emotion
-                }).ToArray(),
-                new
-                {
-                    speed = _speed,
-                    index = 0,
-                    autoPlay = SessionService.State.LearnSettings.AutoPlay
-                });
-        }
-    }
-
-    private void PopulateLearnState()
-    {
-        var processed = TextProcessor.ParseScript(SessionService.State.Text);
-        var words = processed.AllWords
-            .Where(word => !string.IsNullOrWhiteSpace(word))
-            .ToArray();
-
-        if (words.Length == 0)
-        {
-            words = [ReadyWord];
-        }
-
-        _screenTitle = SessionService.State.Title;
-        _screenSubtitle = processed.Segments.FirstOrDefault()?.Title ?? "Intro / Opening Block";
-        _speed = SessionService.State.LearnSettings.WordsPerMinute > 0
-            ? SessionService.State.LearnSettings.WordsPerMinute
-            : processed.Segments.FirstOrDefault()?.Speed ?? 300;
-        PlaybackEngine.WordsPerMinute = _speed;
-        PlaybackEngine.LoadTimeline(processed);
-
-        _timeline = BuildTimeline(processed);
-        _rsvpWords = _timeline.Select(entry => entry.Word).ToArray();
-        _nextPhrase = BuildInitialNextPhrase(_timeline);
-        _progressLabel = BuildProgressLabel(_timeline, 0, _speed);
-        _syncWords = true;
-        Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
-    }
-
-    private static string BuildWpmLabel(int speed) => string.Concat(speed, WpmSuffix);
-
-    private Task DecreaseRsvpSpeedAsync() => ChangeRsvpSpeedAsync(-RsvpSpeedStep);
-
-    private Task IncreaseRsvpSpeedAsync() => ChangeRsvpSpeedAsync(RsvpSpeedStep);
-
-    private Task StepRsvpBackwardLargeAsync() => StepRsvpWordAsync(-RsvpStepLarge);
-
-    private Task StepRsvpBackwardAsync() => StepRsvpWordAsync(-RsvpStepSmall);
-
-    private Task StepRsvpForwardAsync() => StepRsvpWordAsync(RsvpStepSmall);
-
-    private Task StepRsvpForwardLargeAsync() => StepRsvpWordAsync(RsvpStepLarge);
-
-    private async Task ToggleRsvpPlaybackAsync()
-    {
-        await JS.InvokeVoidAsync(AppJsInterop.ToggleRsvpPlaybackMethod);
-    }
-
-    private async Task ChangeRsvpSpeedAsync(int delta)
-    {
-        _speed = Math.Clamp(_speed + delta, RsvpMinSpeed, RsvpMaxSpeed);
-        Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
-        await JS.InvokeVoidAsync(AppJsInterop.ChangeRsvpSpeedMethod, delta);
-    }
-
-    private Task StepRsvpWordAsync(int delta) =>
-        JS.InvokeVoidAsync(AppJsInterop.StepRsvpWordMethod, delta).AsTask();
-
-    private async Task EnsureSessionLoadedAsync()
-    {
-        if (!string.IsNullOrWhiteSpace(ScriptId))
-        {
-            var document = await ScriptRepository.GetAsync(ScriptId);
-            if (document is not null &&
-                !string.Equals(SessionService.State.ScriptId, document.Id, StringComparison.Ordinal))
-            {
-                await SessionService.OpenAsync(document);
-            }
-
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(SessionService.State.ScriptId))
-        {
-            await SessionService.LoadSampleAsync(SampleScriptCatalog.DemoSampleId);
-        }
-    }
-
-    private IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed)
-    {
-        var entries = new List<RsvpTimelineEntry>();
-
-        for (var wordIndex = 0; wordIndex < processed.AllWords.Count; wordIndex++)
-        {
-            var word = processed.AllWords[wordIndex];
-            if (string.IsNullOrWhiteSpace(word))
-            {
-                continue;
-            }
-
-            entries.Add(new RsvpTimelineEntry(
-                Word: word,
-                DurationMs: Math.Max(120, (int)Math.Round(PlaybackEngine.GetWordDisplayTime(wordIndex, word).TotalMilliseconds)),
-                PauseAfterMs: PlaybackEngine.GetPauseAfterMilliseconds(wordIndex) ?? 0,
-                BaseWpm: ResolveBaseWpm(processed, wordIndex, _speed),
-                NextPhrase: ResolveNextPhrase(processed, wordIndex),
-                Emotion: ResolveEmotion(processed, wordIndex)));
-        }
-
-        return entries.Count == 0
-            ? [new RsvpTimelineEntry(ReadyWord, 240, 0, Math.Max(100, _speed), EndOfScriptPhrase, "neutral")]
-            : entries;
-    }
-
-    private static string ResolveNextPhrase(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
-    {
-        var nextPhrase = processed.PhraseGroups.FirstOrDefault(group => group.StartWordIndex > currentWordIndex);
-        if (nextPhrase is not null && nextPhrase.Words.Count > 0)
-        {
-            return string.Join(' ', nextPhrase.Words.Take(PreviewWordCount));
-        }
-
-        var fallbackWords = processed.AllWords
-            .Skip(currentWordIndex + 1)
-            .Where(word => !string.IsNullOrWhiteSpace(word))
-            .Take(PreviewWordCount)
-            .ToArray();
-
-        return fallbackWords.Length == 0
-            ? EndOfScriptPhrase
-            : string.Join(' ', fallbackWords);
-    }
-
-    private static string ResolveEmotion(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
-    {
-        if (processed.WordEmotionOverrides.TryGetValue(currentWordIndex, out var emotion) &&
-            !string.IsNullOrWhiteSpace(emotion))
-        {
-            return emotion;
-        }
-
-        if (processed.WordToSegmentMap.TryGetValue(currentWordIndex, out var segmentIndex) &&
-            segmentIndex >= 0 &&
-            segmentIndex < processed.Segments.Count)
-        {
-            return processed.Segments[segmentIndex].Emotion;
-        }
-
-        return "neutral";
-    }
-
-    private static int ResolveBaseWpm(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex, int fallback)
-    {
-        if (processed.WordSpeedOverrides.TryGetValue(currentWordIndex, out var wordSpeed) && wordSpeed > 0)
-        {
-            return wordSpeed;
-        }
-
-        if (processed.WordToSegmentMap.TryGetValue(currentWordIndex, out var segmentIndex) &&
-            segmentIndex >= 0 &&
-            segmentIndex < processed.Segments.Count)
-        {
-            return processed.Segments[segmentIndex].Speed;
-        }
-
-        return fallback;
-    }
-
-    private static string BuildProgressLabel(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex, int wordsPerMinute)
-    {
-        var safeTimeline = timeline.Count == 0
-            ? [new RsvpTimelineEntry(ReadyWord, 240, 0, Math.Max(100, wordsPerMinute), EndOfScriptPhrase, "neutral")]
-            : timeline;
-
-        var remainingMilliseconds = safeTimeline
-            .Skip(Math.Max(0, currentIndex + 1))
-            .Sum(entry => entry.DurationMs + entry.PauseAfterMs);
-
-        var remainingSeconds = (int)Math.Ceiling(remainingMilliseconds / 1000d);
-        return $"Word {Math.Min(currentIndex + 1, safeTimeline.Count)} / {safeTimeline.Count} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
-    }
-
-    private static string BuildInitialNextPhrase(IReadOnlyList<RsvpTimelineEntry> timeline)
-    {
-        if (timeline.Count == 0)
-        {
-            return EndOfScriptPhrase;
-        }
-
-        var nextPhrase = timeline[0].NextPhrase;
-        return string.IsNullOrWhiteSpace(nextPhrase)
-            ? EndOfScriptPhrase
-            : nextPhrase;
-    }
-
-    private sealed record RsvpTimelineEntry(
-        string Word,
-        int DurationMs,
-        int PauseAfterMs,
-        int BaseWpm,
-        string NextPhrase,
-        string Emotion);
-}

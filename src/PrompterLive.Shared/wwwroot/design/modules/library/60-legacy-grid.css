@@ -1,0 +1,337 @@
+/* Module: 60-legacy-grid.css */
+/* Legacy library grid cards and hover actions kept for compatibility. */
+
+/* ---- Cards: gradient-border glassmorphism ---- */
+
+.card {
+    position: relative;
+    border-radius: var(--r2);
+    overflow: hidden;
+    cursor: pointer;
+    /* Gradient border via background trick */
+    background: linear-gradient(160deg, var(--gold-10), var(--gold-04) 40%, var(--gold-07));
+    padding: 1px; /* the "border" thickness */
+}
+.card:hover {
+    background: linear-gradient(160deg, var(--gold-16), var(--gold-06) 40%, var(--gold-10));
+}
+
+/* Inner card sits on top, creating the gradient-border illusion */
+.card-visual,
+.card-info {
+    position: relative;
+}
+
+/* Card top — thin gradient strip with emotion */
+.card-top {
+    height: 48px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: calc(var(--r2) - 1px) calc(var(--r2) - 1px) 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-visual {
+    height: 160px;
+    padding: 20px 24px;
+    overflow: hidden;
+    border-radius: var(--r2) var(--r2) 0 0;
+}
+
+/* Emotion gradients — rich, visible tones */
+.warm-grad {
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(233,127,0,.18), transparent 55%),
+        linear-gradient(160deg, #1A1508, #14100A 50%, #0C1418);
+}
+.urgent-grad {
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(185,28,28,.18), transparent 55%),
+        linear-gradient(160deg, #1A0E0E, #140A0A 50%, #0C1418);
+}
+.motivational-grad {
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(124,58,237,.18), transparent 55%),
+        linear-gradient(160deg, #15101C, #100A16 50%, #0C1418);
+}
+.calm-grad {
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(13,148,136,.18), transparent 55%),
+        linear-gradient(160deg, #0C1818, #0A1414 50%, #0C1418);
+}
+.neutral-grad {
+    background:
+        radial-gradient(ellipse at 70% 20%, rgba(37,99,235,.16), transparent 55%),
+        linear-gradient(160deg, #0C1220, #0A0E18 50%, #0C1418);
+}
+
+.card-visual-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-emotion-tag {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--t1);
+    background: var(--gold-09);
+    border: 1px solid var(--gold-12);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+    margin-bottom: 14px;
+}
+.tag-rsvp {
+    color: var(--accent);
+    background: var(--accent-g);
+    border-color: rgba(232,130,92,.15);
+}
+
+.card-preview-lines {
+    flex: 1;
+    overflow: hidden;
+}
+.card-preview-lines p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--t2);
+}
+.card-preview-lines b {
+    color: var(--t1);
+    font-weight: 700;
+}
+.c-green { color: #6EE7B7; }
+.c-red { color: #FCA5A5; }
+.c-blue { color: #93C5FD; }
+.c-purple { color: #C4B5FD; }
+.c-teal { color: #5EEAD4; }
+
+.card-visual-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to top, #0C1418, transparent);
+    z-index: 2;
+}
+
+/* Card body — data focused */
+.card-body {
+    padding: 16px 20px 14px;
+    background: #0C1418;
+}
+.card-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    margin-bottom: 6px;
+    color: var(--t1);
+}
+.card-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--t3);
+    margin-bottom: 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    margin-bottom: 12px;
+}
+.card-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--t3);
+    font-family: var(--mono);
+}
+.card-stat svg { color: var(--t4); flex-shrink: 0; }
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--t4);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.card-profile-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--t4);
+    background: rgba(0,0,0,.2);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* Inline action bar */
+.card-actions-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 20px 14px;
+    background: #0C1418;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 calc(var(--r2) - 1px) calc(var(--r2) - 1px);
+}
+.card-act {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--t3);
+    background: var(--gold-05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.card-act:hover { background: var(--gold-09); color: var(--t1); }
+
+.card-act-primary {
+    background: linear-gradient(135deg, rgba(212,99,123,.2), rgba(168,85,184,.15));
+    color: #E8A0B4;
+    border-color: rgba(212,99,123,.2);
+}
+.card-act-primary:hover {
+    background: linear-gradient(135deg, rgba(212,99,123,.3), rgba(168,85,184,.25));
+    color: #F0B8C8;
+}
+
+.card-info {
+    padding: 18px 24px 22px;
+    background: #0C1418;
+    border-radius: 0 0 var(--r2) var(--r2);
+}
+.card-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    margin-bottom: 8px;
+    color: var(--t1);
+}
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--t3);
+    font-family: var(--mono);
+}
+.dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--t4);
+}
+
+/* Hover overlay — frosted glass with subtle gradient */
+.card-hover-actions {
+    position: absolute;
+    inset: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background:
+        radial-gradient(ellipse at 50% 40%, rgba(232,130,92,.06), transparent 60%),
+        rgba(8,14,18,.92);
+    backdrop-filter: blur(20px);
+    opacity: 0;
+    z-index: 10;
+    border-radius: calc(var(--r2) - 1px);
+}
+.card:hover .card-hover-actions { opacity: 1; }
+
+.card-action-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gold-12);
+    backdrop-filter: blur(12px);
+    color: #F5E6D0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 4px;
+    box-shadow: 0 0 24px var(--gold-10);
+    border: 1px solid var(--gold-30);
+}
+.card-action-btn:hover {
+    background: var(--gold-20);
+    border-color: var(--gold-45);
+}
+
+.card-action-sm {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--gold-09);
+    border: 1px solid var(--gold-12);
+    color: var(--t2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card-action-sm:hover {
+    background: var(--gold-14);
+    color: #E8D5B0;
+}
+
+/* New card */
+.card-new {
+    background: transparent;
+    border: 1px dashed var(--gold-15);
+    min-height: 240px;
+    padding: 0;
+}
+.card-new:hover {
+    border-color: var(--accent);
+    background: var(--accent-g);
+}
+.card-new .card-hover-actions { display: none; }
+.card-new-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--t4);
+    font-size: 15px;
+    font-weight: 600;
+}
+.card-new:hover .card-new-content { color: var(--accent); }
+.card-new-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--gold-05);
+    border: 1px solid var(--gold-10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card-new:hover .card-new-icon { background: var(--accent-g); }
+

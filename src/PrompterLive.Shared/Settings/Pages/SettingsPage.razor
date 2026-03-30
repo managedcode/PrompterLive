@@ -3,6 +3,7 @@
 @using PrompterLive.Core.Abstractions
 @using PrompterLive.Core.Models.Media
 @using PrompterLive.Core.Models.Workspace
+@using PrompterLive.Shared.Components.Settings
 @using PrompterLive.Shared.Services.Diagnostics
 
 @inject AppBootstrapper Bootstrapper
@@ -37,6 +38,10 @@
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Mics)" @onclick="() => ShowSection(SettingsSection.Mics)" data-testid="@UiTestIds.Settings.NavMics">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
                     Microphones
+                </button>
+                <button type="button" class="@GetNavItemCssClass(SettingsSection.Streaming)" @onclick="() => ShowSection(SettingsSection.Streaming)" data-testid="@UiTestIds.Settings.NavStreaming">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>
+                    Streaming
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Ai)" @onclick="() => ShowSection(SettingsSection.Ai)" data-testid="@UiTestIds.Settings.NavAi">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
@@ -420,6 +425,44 @@
                 </div>
             </section>
 
+            <section class="set-section set-panel"
+                     id="set-streaming"
+                     style="@GetSectionDisplayStyle(SettingsSection.Streaming)"
+                     data-testid="@UiTestIds.Settings.StreamingPanel">
+                <h3 class="set-section-title">Streaming + Outputs</h3>
+                <p class="set-section-desc">Store output targets, browser-side stream credentials, and source routing here so Go Live stays focused on switching and running the session.</p>
+
+                <SettingsStreamingPanel Settings="@_studioSettings.Streaming"
+                                        Sources="@_sceneCameras"
+                                        SelectedOutputModeValue="@SelectedStreamingOutputModeValue"
+                                        ToggleObs="ToggleObsOutputAsync"
+                                        ToggleNdi="ToggleNdiOutputAsync"
+                                        ToggleRecording="ToggleRecordingOutputAsync"
+                                        ToggleLiveKit="ToggleLiveKitSettingsAsync"
+                                        ToggleVdo="ToggleVdoSettingsAsync"
+                                        ToggleYoutube="ToggleYoutubeSettingsAsync"
+                                        ToggleTwitch="ToggleTwitchSettingsAsync"
+                                        ToggleCustomRtmp="ToggleCustomRtmpSettingsAsync"
+                                        ToggleDestinationSource="ToggleStreamingDestinationSourceAsync"
+                                        OutputModeChanged="OnStreamingOutputModeChanged"
+                                        OutputResolutionChanged="OnStreamingOutputResolutionChanged"
+                                        BitrateChanged="UpdateStreamingBitrateAsync"
+                                        ToggleTextOverlay="ToggleSettingsTextOverlayAsync"
+                                        ToggleIncludeCamera="ToggleSettingsIncludeCameraAsync"
+                                        LiveKitServerChanged="UpdateLiveKitServerSettingAsync"
+                                        LiveKitRoomChanged="UpdateLiveKitRoomSettingAsync"
+                                        LiveKitTokenChanged="UpdateLiveKitTokenSettingAsync"
+                                        VdoRoomChanged="UpdateVdoRoomSettingAsync"
+                                        VdoPublishUrlChanged="UpdateVdoPublishUrlSettingAsync"
+                                        YoutubeUrlChanged="UpdateYoutubeUrlSettingAsync"
+                                        YoutubeKeyChanged="UpdateYoutubeKeySettingAsync"
+                                        TwitchUrlChanged="UpdateTwitchUrlSettingAsync"
+                                        TwitchKeyChanged="UpdateTwitchKeySettingAsync"
+                                        CustomRtmpNameChanged="UpdateCustomRtmpNameSettingAsync"
+                                        CustomRtmpUrlChanged="UpdateCustomRtmpUrlSettingAsync"
+                                        CustomRtmpKeyChanged="UpdateCustomRtmpKeySettingAsync" />
+            </section>
+
             <section class="set-section set-panel" id="set-ai" style="@GetSectionDisplayStyle(SettingsSection.Ai)" data-testid="@UiTestIds.Settings.AiPanel">
                 <h3 class="set-section-title">AI Provider</h3>
                 <p class="set-section-desc">Connect an AI provider to enable rewriting, expanding, and formatting scripts with AI assistance.</p>
@@ -607,8 +650,8 @@
     private const string PersistStudioOperation = "Settings save studio";
     private const string PersistStudioMessage = "Unable to save studio settings.";
     private const string GoLiveBannerAction = "Open Go Live";
-    private const string GoLiveBannerDescription = "Choose live destinations and route active scene cameras from the dedicated Go Live screen.";
-    private const string GoLiveBannerTitle = "Live routing lives in Go Live";
+    private const string GoLiveBannerDescription = "Configure cameras, outputs, and stream destinations here, then use Go Live only to switch sources and run the session.";
+    private const string GoLiveBannerTitle = "Go Live runs the session you configure here";
 
     private IReadOnlyList<SceneCameraSource> _sceneCameras => MediaSceneService.State.Cameras;
     private string SelectedCameraId => ResolveSelectedCamera()?.DeviceId ?? string.Empty;

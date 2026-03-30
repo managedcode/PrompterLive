@@ -1,0 +1,267 @@
+/* Module: 30-rsvp.css */
+/* RSVP screen layout, focus word, and playback controls. */
+
+/* ============================================
+   RSVP
+   ============================================ */
+
+.rsvp {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* Rich green gradient like actual app */
+    background: linear-gradient(180deg, #0D2818 0%, #1A4D33 30%, #0F3025 70%, #0A1C15 100%);
+}
+
+.rsvp-top {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.rsvp-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--glass2);
+    color: var(--t3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.rsvp-back:hover { background: var(--glass3); color: var(--t1); }
+
+.rsvp-info { flex: 1; }
+.rsvp-doc {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+    background: linear-gradient(135deg, #F5E6D0, #C4A882);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.rsvp-loc { font-size: 12px; color: #7A8E88; }
+
+.rsvp-wpm-badge {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--accent);
+    background: var(--accent-g);
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+.rsvp-progress {
+    height: 2px;
+    background: var(--bg3);
+    flex-shrink: 0;
+}
+.rsvp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 1px;
+}
+
+/* RSVP Display — horizontal 3-word context layout */
+.rsvp-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+}
+
+/* Crosshair above focus word */
+.rsvp-crosshair {
+    margin-bottom: 32px;
+    opacity: .5;
+}
+
+/* Horizontal row: left context | focus | right context */
+.rsvp-h-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    width: 100%;
+    max-width: 1100px;
+    gap: 16px;
+}
+
+.rsvp-ctx-left, .rsvp-ctx-right {
+    display: flex;
+    gap: 18px;
+    font-size: 36px;
+    font-weight: 400;
+    color: rgba(232,213,176,.4);
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+}
+.rsvp-ctx-left > span,
+.rsvp-ctx-right > span {
+    transform: translateX(var(--rsvp-context-word-shift, 0px));
+}
+.rsvp-ctx-left {
+    justify-content: flex-end;
+    padding-right: 24px;
+}
+.rsvp-ctx-right {
+    justify-content: flex-start;
+    padding-left: 24px;
+}
+
+.rsvp-focus-shell {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex: 0 0 clamp(580px, 60vw, 780px);
+    min-width: min(580px, 100%);
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Focus word — large, centered, with ORP highlight */
+.rsvp-focus {
+    font-size: 76px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.rsvp-focus span { color: var(--t1); }
+.rsvp-focus .orp { color: var(--orp-red); font-weight: 900; }
+
+/* Vertical ORP line */
+.rsvp-orp-line {
+    position: absolute;
+    top: 15%;
+    bottom: 40%;
+    left: 50%;
+    width: 1.5px;
+    background: linear-gradient(to bottom, transparent, rgba(255,82,82,.25), transparent);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+/* Phrase preview below */
+.rsvp-phrase {
+    margin-top: 40px;
+    text-align: center;
+    max-width: 500px;
+    opacity: .4;
+}
+.rsvp-phrase-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--t4);
+    margin-bottom: 8px;
+    display: block;
+}
+.rsvp-phrase p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--t3);
+}
+
+/* Pause bar */
+.rsvp-pause-track {
+    width: 200px;
+    height: 4px;
+    background: var(--gold-07);
+    border-radius: 2px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+.rsvp-pause-fill {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    width: 0%;
+}
+
+.rsvp-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 40px 48px;
+    flex-shrink: 0;
+}
+
+.rsvp-speed {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.rsvp-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--glass2);
+    color: var(--t2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+}
+.rsvp-btn:hover { background: var(--glass3); color: var(--t1); }
+.rsvp-btn-sm { width: 34px; height: 34px; border-radius: 10px; opacity: .6; }
+.rsvp-btn-sm:hover { opacity: 1; }
+
+.rsvp-speed-num {
+    text-align: center;
+    min-width: 70px;
+}
+.rsvp-speed-num span {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: var(--mono);
+    display: block;
+}
+.rsvp-speed-num small {
+    font-size: 10px;
+    color: var(--t4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.rsvp-play-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.rsvp-play {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gold-10);
+    backdrop-filter: blur(12px);
+    color: #F5E6D0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gold-30);
+    box-shadow: 0 0 24px var(--gold-08);
+}
+.rsvp-play:hover {
+    background: var(--gold-16);
+    border-color: var(--gold-45);
+    box-shadow: 0 0 36px var(--gold-12);
+}
+
+.rsvp-pos {
+    font-size: 12px;
+    color: var(--t4);
+}
+

@@ -1,0 +1,362 @@
+/* Module: 20-controls.css */
+/* Reader controls, guides, sliders, previews, and ambient overlays. */
+
+/* Next cluster */
+.rd-cluster-next {
+    opacity: .1;
+}
+.rd-cluster-next p {
+    font-size: 20px;
+    color: var(--t3);
+}
+.rd-cluster-next .rd-cluster-emotion { margin-bottom: 10px; }
+
+/* Center guide — subtle horizontal line where eyes focus */
+.rd-center-guide {
+    display: none;
+}
+
+/* ── Adjustment guide lines — visible while dragging sliders ── */
+.rd-guide-h {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(232,213,176,.25);
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .25s;
+    top: 30%;
+}
+.rd-guide-h.active { opacity: 1; }
+.rd-guide-h::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -3px;
+    height: 7px;
+    background: linear-gradient(to bottom, transparent, rgba(232,213,176,.06), transparent);
+}
+.rd-guide-v {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(232,213,176,.20);
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .25s;
+}
+.rd-guide-v.active { opacity: 1; }
+.rd-guide-v::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -3px;
+    width: 7px;
+    background: linear-gradient(to right, transparent, rgba(232,213,176,.04), transparent);
+}
+
+/* Pause indicator */
+.rd-pause-indicator {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 3px;
+    background: var(--gold-07);
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0;
+}
+.rd-pause-indicator.active { opacity: 1; }
+.rd-pause-fill {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    width: 0%;
+}
+
+/* Edge progress bar — full width at bottom */
+.rd-edge-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 10;
+}
+.rd-edge-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--accent);
+    z-index: 2;
+    transition: width .3s;
+}
+.rd-edge-segs {
+    display: flex;
+    position: absolute;
+    inset: 0;
+}
+.rd-edge-segs > div {
+    height: 100%;
+    background: var(--sc);
+    border-right: 1px solid rgba(5,5,8,.6);
+    transition: opacity .5s ease;
+}
+
+/* Edge info — section + time at bottom corners */
+.rd-edge-info {
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 10;
+    pointer-events: none;
+    opacity: .15;
+    transition: opacity .3s;
+}
+.rd-edge-info:hover { opacity: .4; pointer-events: auto; }
+.rd-edge-section {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(232,213,176,.6);
+}
+
+.rd-time {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: rgba(232,213,176,.3);
+    white-space: nowrap;
+}
+
+/* ── Countdown overlay ── */
+.rd-countdown {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+    font-size: 140px;
+    font-weight: 300;
+    color: rgba(232,213,176,.7);
+    letter-spacing: -4px;
+    pointer-events: none;
+    text-shadow: 0 0 80px rgba(232,213,176,.2), 0 4px 30px rgba(0,0,0,.5);
+}
+.rd-countdown.active {
+    display: flex;
+    background: rgba(10,10,15,.60);
+}
+
+/* ── Right-edge vertical sliders (focal point + text width) ── */
+.rd-sliders {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 6px;
+    background: rgba(20,18,12,.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--gold-08);
+    border-radius: 12px;
+    opacity: .2;
+    transition: opacity .4s;
+}
+.rd-sliders:hover {
+    opacity: .75;
+}
+.rd-slider-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.rd-slider-icon {
+    color: rgba(232,213,176,.5);
+    flex-shrink: 0;
+}
+.rd-slider-val {
+    font-size: 9px;
+    font-family: var(--mono);
+    color: rgba(232,213,176,.35);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Vertical range input */
+.rd-vslider {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 100px;
+    background: transparent;
+    cursor: pointer;
+}
+.rd-vslider::-webkit-slider-runnable-track {
+    width: 3px;
+    height: 100%;
+    background: rgba(232,213,176,.10);
+    border-radius: 2px;
+}
+.rd-vslider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(232,213,176,.45);
+    border: 2px solid rgba(232,213,176,.15);
+    margin-left: -5.5px;
+    cursor: grab;
+    transition: background .2s;
+}
+.rd-vslider::-webkit-slider-thumb:hover {
+    background: rgba(232,213,176,.7);
+}
+.rd-vslider::-moz-range-track {
+    width: 3px;
+    height: 100%;
+    background: rgba(232,213,176,.10);
+    border-radius: 2px;
+    border: none;
+}
+.rd-vslider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(232,213,176,.45);
+    border: 2px solid rgba(232,213,176,.15);
+    cursor: grab;
+}
+/* Countdown uses no CSS animations — digits appear/disappear instantly */
+
+/* ── Reader Control Bar ── */
+.rd-controls {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(20,18,12,.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-08);
+    border-radius: 16px;
+    opacity: .85;
+    transition: opacity .3s;
+}
+.rd-controls:hover { opacity: 1; }
+
+.rd-ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.rd-ctrl-main {
+    padding: 0 8px;
+    border-left: 1px solid var(--gold-06);
+    border-right: 1px solid var(--gold-06);
+    margin: 0 4px;
+}
+
+.rd-ctrl-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(232,213,176,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+}
+.rd-ctrl-btn:hover {
+    background: var(--gold-08);
+    color: #E8D5B0;
+}
+.rd-ctrl-btn.active {
+    background: var(--accent-g);
+    color: var(--accent);
+}
+.rd-ctrl-sm {
+    width: 28px;
+    height: 28px;
+    opacity: .5;
+}
+.rd-ctrl-sm:hover { opacity: 1; }
+.rd-ctrl-play {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--gold-06);
+}
+.rd-ctrl-play:hover {
+    background: var(--gold-12);
+}
+
+.rd-ctrl-label {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: rgba(232,213,176,.35);
+    min-width: 24px;
+    text-align: center;
+    user-select: none;
+}
+.rd-block-indicator {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    min-width: 36px;
+}
+
+/* ── Card previews (mini snippets above/below) ── */
+.rd-card-prev {
+    transform: translateY(-85%) scale(.55);
+    opacity: .08;
+    z-index: 1;
+    pointer-events: none;
+    filter: blur(1px);
+}
+.rd-card-next {
+    transform: translateY(85%) scale(.55);
+    opacity: .08;
+    z-index: 1;
+    pointer-events: none;
+    filter: blur(1px);
+}
+
+/* Subtle noise texture on body */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+}
+

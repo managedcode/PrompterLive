@@ -1,15 +1,12 @@
 using PrompterLive.Core.Models.Media;
 using PrompterLive.Core.Models.Workspace;
-using PrompterLive.Core.Services.Preview;
 
 namespace PrompterLive.Shared.Pages;
 
 public partial class GoLivePage
 {
-    private const string ActiveDestinationsIdleLabel = "No live destinations armed";
-    private const string AudioTelemetryLabel = "Audio ready";
     private const string CameraFallbackLabel = "No camera selected";
-    private const string DefaultProgramTimerLabel = "00:03:45";
+    private const string DefaultProgramTimerLabel = "00:00:00";
     private const string ProgramBadgeIdleLabel = "Ready";
     private const string ProgramBadgeLiveLabel = "Live";
     private const string ProgramBadgeRecordingLabel = "Rec";
@@ -20,9 +17,6 @@ public partial class GoLivePage
     private const string SessionRecordingLabel = "Recording";
     private const string SessionStreamingLabel = "Streaming";
     private const string SessionStreamingRecordingLabel = "Streaming + Recording";
-    private const string StageCaptionFallbackLead = "Good morning everyone,";
-    private const string StageCaptionFallbackMiddle = "and welcome to what I believe";
-    private const string StageCaptionFallbackEnd = "will be a transformative moment for our company.";
     private const string StageFrameRate30Label = "30 FPS";
     private const string StageFrameRate60Label = "60 FPS";
     private const string StreamButtonLabel = "Start Stream";
@@ -31,8 +25,6 @@ public partial class GoLivePage
     private const string SwitchButtonLabel = "Switch";
 
     private SceneCameraSource? ActiveCamera => ResolveSessionSource(GoLiveSession.State.ActiveSourceId) ?? PreviewCamera;
-
-    private string ActiveDestinationsTelemetry => BuildActiveDestinationsTelemetry();
 
     private string ActiveSessionLabel => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
@@ -47,6 +39,7 @@ public partial class GoLivePage
     private bool CanControlProgram => SelectedCamera is not null;
 
     private bool CanSwitchProgram => SelectedCamera is not null
+        && IsOperationalCamera(SelectedCamera)
         && !string.Equals(SelectedCamera.SourceId, ActiveCamera?.SourceId, StringComparison.Ordinal);
 
     private string PrimarySessionBadge => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
@@ -67,19 +60,11 @@ public partial class GoLivePage
 
     private SceneCameraSource? SelectedCamera => ResolveSessionSource(GoLiveSession.State.SelectedSourceId) ?? ActiveCamera;
 
-    private IReadOnlyList<string> StageCaptionLines => BuildStageCaptionLines();
-
     private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.OutputResolution);
 
     private string StreamActionLabel => GoLiveSession.State.IsStreamActive ? StreamStopLabel : StreamButtonLabel;
 
     private string SwitchActionLabel => CanSwitchProgram ? SwitchButtonLabel : SwitchButtonDisabledLabel;
-
-    private string VideoTelemetry => $"{FormatOutputResolution(_studioSettings.Streaming.OutputResolution)} · {ActiveSourceLabel}";
-
-    private string AudioTelemetry => HasPrimaryMicrophone
-        ? $"{PrimaryMicrophoneLabel} · {PrimaryMicrophoneRoute}"
-        : AudioTelemetryLabel;
 
     private string BitrateTelemetry => $"{_studioSettings.Streaming.BitrateKbps} kbps";
 
@@ -151,99 +136,6 @@ public partial class GoLivePage
         _ => StageFrameRate30Label
     };
 
-    private IReadOnlyList<string> BuildStageCaptionLines()
-    {
-        if (SessionService.State.PreviewSegments.Count == 0)
-        {
-            return [StageCaptionFallbackLead, StageCaptionFallbackMiddle, StageCaptionFallbackEnd];
-        }
-
-        var segment = SessionService.State.PreviewSegments[0];
-        var lines = ExtractCaptionLines(segment);
-        return lines.Count == 0
-            ? [StageCaptionFallbackLead, StageCaptionFallbackMiddle, StageCaptionFallbackEnd]
-            : lines;
-    }
-
-    private static List<string> ExtractCaptionLines(SegmentPreviewModel segment)
-    {
-        var sourceText = string.IsNullOrWhiteSpace(segment.Content)
-            ? segment.Blocks.FirstOrDefault()?.Text
-            : segment.Content;
-        if (string.IsNullOrWhiteSpace(sourceText))
-        {
-            return [];
-        }
-
-        var normalized = sourceText
-            .Replace("\r", " ", StringComparison.Ordinal)
-            .Replace("\n", " ", StringComparison.Ordinal)
-            .Trim();
-        if (string.IsNullOrWhiteSpace(normalized))
-        {
-            return [];
-        }
-
-        var chunks = normalized
-            .Split(['.', '!', '?'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Where(chunk => !string.IsNullOrWhiteSpace(chunk))
-            .Take(3)
-            .ToList();
-
-        if (chunks.Count == 0)
-        {
-            return [];
-        }
-
-        for (var index = 0; index < chunks.Count; index++)
-        {
-            chunks[index] = chunks[index].Trim();
-        }
-
-        return chunks;
-    }
-
-    private string BuildActiveDestinationsTelemetry()
-    {
-        var names = new List<string>();
-
-        if (_studioSettings.Streaming.ObsVirtualCameraEnabled)
-        {
-            names.Add("OBS");
-        }
-
-        if (_studioSettings.Streaming.NdiOutputEnabled)
-        {
-            names.Add("NDI");
-        }
-
-        if (_studioSettings.Streaming.LiveKitEnabled)
-        {
-            names.Add("LiveKit");
-        }
-
-        if (_studioSettings.Streaming.VdoNinjaEnabled)
-        {
-            names.Add("VDO");
-        }
-
-        if (_studioSettings.Streaming.YoutubeEnabled)
-        {
-            names.Add("YouTube");
-        }
-
-        if (_studioSettings.Streaming.TwitchEnabled)
-        {
-            names.Add("Twitch");
-        }
-
-        if (_studioSettings.Streaming.CustomRtmpEnabled)
-        {
-            names.Add(_studioSettings.Streaming.CustomRtmpName);
-        }
-
-        return names.Count == 0
-            ? ActiveDestinationsIdleLabel
-            : string.Join(" · ", names);
-    }
+    private static bool IsOperationalCamera(SceneCameraSource camera) =>
+        camera.Transform.Visible && camera.Transform.IncludeInOutput;
 }
