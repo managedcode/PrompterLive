@@ -71,6 +71,9 @@ internal static partial class BrowserTestConstants
 
     public static class Editor
     {
+        public const string FirstProbeCharacter = "d";
+        public const string NewDraftProbeText = "dc";
+        public const string SecondProbeCharacter = "c";
         public const string BodyHeading = "## [Intro|140WPM|warm]";
         public const string DisplayDuration = "12:34";
         public const string LegacyActiveBlockLabel = "ACTIVE BLOCK";
@@ -280,6 +283,8 @@ internal static partial class BrowserTestConstants
         public const int FastVisibleTimeoutMs = 5_000;
         public const int DefaultVisibleTimeoutMs = 10_000;
         public const int ExtendedVisibleTimeoutMs = 15_000;
+        public const int NewDraftPersistGraceDelayMs = 700;
+        public const int NewDraftPersistSettleDelayMs = 1_800;
         public const int FloatingToolbarSettleDelayMs = 500;
         public const int LearnPlaybackDelayMs = 900;
         public const int ReaderPlaybackDelayMs = 2_500;
@@ -312,6 +317,7 @@ internal static partial class BrowserTestConstants
 
     public static class Routes
     {
+        public static string Editor => AppRoutes.Editor;
         public static string Library => AppRoutes.Library;
         public static string Settings => AppRoutes.Settings;
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);

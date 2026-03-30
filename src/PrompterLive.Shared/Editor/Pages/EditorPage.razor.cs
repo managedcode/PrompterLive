@@ -19,6 +19,7 @@ public partial class EditorPage
     private const string EditorSyntaxMessage = "The TPS draft has a syntax issue. Fix it and keep writing.";
     private const int AutosaveDelayMilliseconds = 450;
     private const int DraftSyncDelayMilliseconds = 75;
+    private const int UntitledDraftAutosaveDelayMilliseconds = 1_500;
     private const string DefaultAuthor = "PrompterLive";
     private const string DefaultProfileActor = "Actor";
     private const string DefaultProfileRsvp = "RSVP";

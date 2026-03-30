@@ -66,6 +66,8 @@ public static class UiTestIds
 
         public static string CardMenu(string scriptId) => $"library-card-menu-{scriptId}";
 
+        public static string CardMenuDropdown(string scriptId) => $"library-card-menu-dropdown-{scriptId}";
+
         public static string CardRead(string scriptId) => $"library-card-read-{scriptId}";
 
         public static string Folder(string folderId) => $"library-folder-{folderId}";

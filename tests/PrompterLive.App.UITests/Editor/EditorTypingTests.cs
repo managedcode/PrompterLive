@@ -119,6 +119,43 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
+    [Fact]
+    public async Task EditorScreen_NewDraftDoesNotReplaceRouteWhileTypingIsStillSettling()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Editor);
+            var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
+
+            await Expect(sourceInput)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+
+            await sourceInput.ClickAsync();
+            await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.FirstProbeCharacter);
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.NewDraftPersistGraceDelayMs);
+
+            var graceUri = new Uri(page.Url);
+            Assert.Equal(BrowserTestConstants.Routes.Editor, graceUri.AbsolutePath);
+            Assert.True(string.IsNullOrEmpty(graceUri.Query));
+
+            await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.SecondProbeCharacter);
+            await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Editor.NewDraftProbeText);
+
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.NewDraftPersistSettleDelayMs);
+
+            var currentUri = new Uri(page.Url);
+            Assert.Equal(BrowserTestConstants.Routes.Editor, currentUri.AbsolutePath);
+            Assert.True(currentUri.Query.Contains(AppRoutes.ScriptIdQueryKey, StringComparison.Ordinal));
+            await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Editor.NewDraftProbeText);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
     private sealed class EditorSurfaceState
     {
         public string HighlightOpacity { get; set; } = string.Empty;

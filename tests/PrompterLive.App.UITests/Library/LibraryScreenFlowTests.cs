@@ -71,6 +71,31 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Fact]
+    public Task LibraryScreen_KeepsOnlyOneCardMenuOpen_AndCardClickDismissesDropdown() =>
+        RunPageAsync(async page =>
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+
+            var demoDropdown = page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId));
+            var leadershipDropdown = page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.LeadershipId));
+
+            await Expect(demoDropdown).ToBeHiddenAsync();
+            await Expect(leadershipDropdown).ToBeHiddenAsync();
+
+            await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)).ClickAsync();
+            await Expect(demoDropdown).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)).ClickAsync();
+            await Expect(leadershipDropdown).ToBeVisibleAsync();
+            await Expect(demoDropdown).ToBeHiddenAsync();
+
+            await page.GetByTestId(BrowserTestConstants.Elements.QuantumCard).ClickAsync();
+            await Expect(leadershipDropdown).ToBeHiddenAsync();
+            Assert.Equal(BrowserTestConstants.Routes.Library, new Uri(page.Url).AbsolutePath);
+        });
+
+    [Fact]
     public Task LibraryScreen_FolderChipsFilterCards() =>
         RunPageAsync(async page =>
         {

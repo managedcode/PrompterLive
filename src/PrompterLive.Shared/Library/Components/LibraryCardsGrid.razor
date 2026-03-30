@@ -4,28 +4,35 @@
     {
         <article class="dcard"
                 style="--emo:@card.AccentColor"
-                 @onclick="() => OnOpenScript.InvokeAsync(card.Id)"
+                 @onclick="() => HandleCardClickAsync(card.Id)"
                  data-testid="@card.TestId">
-            <div class="dcard-menu-wrap">
+            <div class="@GetCardMenuWrapClass(card.Id)"
+                 @onclick:stopPropagation="true">
                 <button class="dcard-menu-btn"
+                        type="button"
                         data-testid="@UiTestIds.Library.CardMenu(card.Id)"
-                        onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
+                        @onclick="() => ToggleCardMenu(card.Id)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <circle cx="12" cy="5" r="2" />
                         <circle cx="12" cy="12" r="2" />
                         <circle cx="12" cy="19" r="2" />
                     </svg>
                 </button>
-                <div class="dcard-dropdown">
-                    <button @onclick:stopPropagation="true" @onclick="() => OnOpenScript.InvokeAsync(card.Id)">
+                <div class="dcard-dropdown"
+                     data-testid="@UiTestIds.Library.CardMenuDropdown(card.Id)"
+                     @onclick:stopPropagation="true">
+                    <button type="button"
+                            @onclick:stopPropagation="true"
+                            @onclick="() => HandleOpenScriptAsync(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                         Rename
                     </button>
-                    <button @onclick:stopPropagation="true"
-                            @onclick="() => OnDuplicateScript.InvokeAsync(card.Id)"
+                    <button type="button"
+                            @onclick:stopPropagation="true"
+                            @onclick="() => HandleDuplicateScriptAsync(card.Id)"
                             data-testid="@UiTestIds.Library.CardDuplicate(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -35,9 +42,10 @@
                     </button>
                     <div class="dcard-dropdown-group">
                         <div class="dcard-dropdown-label">Move to...</div>
-                        <button data-testid="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
+                        <button type="button"
+                                data-testid="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
                                 @onclick:stopPropagation="true"
-                                @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, null))">
+                                @onclick="() => HandleMoveScriptAsync(card.Id, null)">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="6" y1="6" x2="18" y2="18" />
                                 <line x1="6" y1="18" x2="18" y2="6" />
@@ -46,9 +54,10 @@
                         </button>
                         @foreach (var folder in FolderOptions)
                         {
-                            <button data-testid="@UiTestIds.Library.Move(card.Id, folder.Id)"
+                            <button type="button"
+                                    data-testid="@UiTestIds.Library.Move(card.Id, folder.Id)"
                                     @onclick:stopPropagation="true"
-                                    @onclick="() => OnMoveScript.InvokeAsync(new LibraryMoveRequest(card.Id, folder.Id))">
+                                    @onclick="() => HandleMoveScriptAsync(card.Id, folder.Id)">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                                 </svg>
@@ -57,9 +66,10 @@
                         }
                     </div>
                     <div class="dcard-dropdown-sep"></div>
-                    <button class="dcard-dropdown-danger"
+                    <button type="button"
+                            class="dcard-dropdown-danger"
                             @onclick:stopPropagation="true"
-                            @onclick="() => OnDeleteScript.InvokeAsync(card.Id)">
+                            @onclick="() => HandleDeleteScriptAsync(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3,6 5,6 21,6" />
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -144,6 +154,10 @@
 </div>
 
 @code {
+    private const string CardMenuWrapClass = "dcard-menu-wrap";
+    private const string CardMenuWrapOpenClass = CardMenuWrapClass + " open";
+    private string? _openCardMenuId;
+
     [Parameter, EditorRequired] public IReadOnlyList<LibraryCardViewModel> Cards { get; set; } = [];
 
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
@@ -164,7 +178,54 @@
 
     [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
 
+    private string GetCardMenuWrapClass(string cardId) =>
+        string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
+            ? CardMenuWrapOpenClass
+            : CardMenuWrapClass;
+
+    private void ToggleCardMenu(string cardId)
+    {
+        _openCardMenuId = string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
+            ? null
+            : cardId;
+    }
+
+    private async Task HandleCardClickAsync(string cardId)
+    {
+        if (!string.IsNullOrWhiteSpace(_openCardMenuId))
+        {
+            _openCardMenuId = null;
+            return;
+        }
+
+        await OnOpenScript.InvokeAsync(cardId);
+    }
+
     private Task HandleCreateScriptAsync() => OnCreateScript.InvokeAsync();
 
     private Task HandleStartCreateFolderAsync() => OnStartCreateFolder.InvokeAsync();
+
+    private async Task HandleOpenScriptAsync(string cardId)
+    {
+        _openCardMenuId = null;
+        await OnOpenScript.InvokeAsync(cardId);
+    }
+
+    private async Task HandleDuplicateScriptAsync(string cardId)
+    {
+        _openCardMenuId = null;
+        await OnDuplicateScript.InvokeAsync(cardId);
+    }
+
+    private async Task HandleMoveScriptAsync(string cardId, string? folderId)
+    {
+        _openCardMenuId = null;
+        await OnMoveScript.InvokeAsync(new LibraryMoveRequest(cardId, folderId));
+    }
+
+    private async Task HandleDeleteScriptAsync(string cardId)
+    {
+        _openCardMenuId = null;
+        await OnDeleteScript.InvokeAsync(cardId);
+    }
 }

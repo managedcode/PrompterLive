@@ -104,7 +104,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
     private async Task OnSourceInputAsync(ChangeEventArgs args)
     {
         CloseToolbarPanels();
-        await RefreshSelectionAsync();
         await OnTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
     }
 

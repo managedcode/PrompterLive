@@ -52,7 +52,7 @@ public partial class EditorPage
     {
         try
         {
-            await Task.Delay(AutosaveDelayMilliseconds, cancellationToken);
+            await Task.Delay(GetAutosaveDelayMilliseconds(), cancellationToken);
             await InvokeAsync(() => PersistDraftAsync(_sourceText));
         }
         catch (OperationCanceledException)
@@ -71,4 +71,9 @@ public partial class EditorPage
         _autosaveCancellationSource.Dispose();
         _autosaveCancellationSource = null;
     }
+
+    private int GetAutosaveDelayMilliseconds() =>
+        string.IsNullOrWhiteSpace(SessionService.State.ScriptId)
+            ? UntitledDraftAutosaveDelayMilliseconds
+            : AutosaveDelayMilliseconds;
 }
