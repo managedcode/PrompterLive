@@ -102,12 +102,18 @@ public static class UiTestIds
         public const string Error = "editor-error";
         public const string FloatingAi = "editor-floating-ai";
         public const string FloatingBar = "editor-floating-bar";
+        public const string FloatingEmotion = "editor-float-emotion";
+        public const string FloatingEmotionMenu = "editor-floating-emotion-menu";
+        public const string FloatingEmotionProfessional = "editor-float-emotion-professional";
         public const string FloatingPause = "editor-float-pause";
         public const string FloatingSlow = "editor-floating-slow";
         public const string FloatEmphasis = "editor-float-emphasis";
         public const string FormatHighlight = "editor-format-highlight";
         public const string FormatTrigger = "editor-format-trigger";
         public const string InsertBlock = "editor-insert-block";
+        public const string InsertBlockMenu = "editor-insert-block-menu";
+        public const string InsertSegment = "editor-insert-segment";
+        public const string InsertSegmentMenu = "editor-insert-segment-menu";
         public const string InsertPronunciation = "editor-insert-pronunciation";
         public const string InsertTrigger = "editor-insert-trigger";
         public const string MenuColor = "editor-menu-color";
@@ -125,6 +131,7 @@ public static class UiTestIds
         public const string Redo = "editor-redo";
         public const string SourceHighlight = "editor-source-highlight";
         public const string SourceInput = "editor-source-input";
+        public const string SourceScrollHost = "editor-source-scroll-host";
         public const string SourceStage = "editor-source-stage";
         public const string SpeedFast = "editor-speed-fast";
         public const string SpeedCustomWpm = "editor-speed-custom-wpm";

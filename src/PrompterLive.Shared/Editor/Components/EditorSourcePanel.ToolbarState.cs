@@ -5,10 +5,13 @@ namespace PrompterLive.Shared.Components.Editor;
 public partial class EditorSourcePanel
 {
     private EditorSelectionViewModel _floatingBarAnchor = EditorSelectionViewModel.Empty;
+    private string? _openFloatingMenuId;
     private string? _openMenuId;
     private bool _pendingFloatingBarReanchor = true;
 
     private static IReadOnlyList<EditorToolbarSectionDescriptor> ToolbarSections => EditorToolbarCatalog.Sections;
+
+    private static IReadOnlyList<EditorToolbarActionDescriptor> FloatingEmotionActions => EditorToolbarCatalog.FloatingEmotionActions;
 
     private static IReadOnlyList<IReadOnlyList<EditorToolbarActionDescriptor>> FloatingActionGroups => EditorToolbarCatalog.FloatingActionGroups;
 
@@ -59,6 +62,7 @@ public partial class EditorSourcePanel
     private void CloseToolbarPanels()
     {
         _openMenuId = null;
+        _openFloatingMenuId = null;
     }
 
     protected string FloatingBarStyle => BuildFloatingBarStyle(
@@ -95,16 +99,26 @@ public partial class EditorSourcePanel
     private bool GetActionDisabled(EditorToolbarActionDescriptor action) =>
         action.HistoryCommand switch
         {
-            EditorHistoryCommand.Undo => !CanUndo,
-            EditorHistoryCommand.Redo => !CanRedo,
+            EditorHistoryCommand.Undo => !_visibleCanUndo,
+            EditorHistoryCommand.Redo => !_visibleCanRedo,
             _ => false
         };
 
     private bool IsMenuOpen(string menuId) =>
         string.Equals(_openMenuId, menuId, StringComparison.Ordinal);
 
+    private bool IsFloatingMenuOpen(string menuId) =>
+        string.Equals(_openFloatingMenuId, menuId, StringComparison.Ordinal);
+
     private void ToggleMenu(string menuId)
     {
+        if (string.Equals(menuId, EditorToolbarMenuIds.FloatingEmotion, StringComparison.Ordinal))
+        {
+            _openFloatingMenuId = IsFloatingMenuOpen(menuId) ? null : menuId;
+            return;
+        }
+
+        _openFloatingMenuId = null;
         _openMenuId = IsMenuOpen(menuId) ? null : menuId;
     }
 

@@ -12,7 +12,6 @@ public partial class GoLivePage : ComponentBase
 {
     private const string DefaultMicRouteLabel = "Monitor + Stream";
     private const string DisabledReadyPrefix = "Selected routing:";
-    private const string DisabledStatusLabel = "Disabled";
     private const string DisabledSummary = "Enable this destination to arm it for the current program feed.";
     private const string GoLiveDefaultTitle = "Product Launch";
     private const string GoLiveLoadMessage = "Unable to prepare live routing right now.";
@@ -21,10 +20,7 @@ public partial class GoLivePage : ComponentBase
     private const string GoLiveSceneOperation = "Go Live save scene";
     private const string GoLiveStudioMessage = "Unable to save live routing settings.";
     private const string GoLiveStudioOperation = "Go Live save studio";
-    private const string NeedsSetupStatusLabel = "Needs setup";
-    private const string NoDestinationSourceSummary = "Select at least one scene camera for this destination.";
     private const string NoMicrophoneLabel = "No microphone";
-    private const string ReadyStatusLabel = "Ready";
     private const string SceneSettingsKey = "prompterlive.scene";
     private const string SelectedCameraSingularLabel = "selected camera";
     private const string SelectedCameraPluralLabel = "selected cameras";

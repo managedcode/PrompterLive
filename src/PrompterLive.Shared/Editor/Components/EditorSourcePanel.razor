@@ -62,7 +62,8 @@
         }
     </div>
 
-    <div class="ed-content ed-source-shell">
+    <div class="ed-content ed-source-shell"
+         data-testid="@UiTestIds.Editor.SourceScrollHost">
         <div class="ed-source-stage"
              data-testid="@UiTestIds.Editor.SourceStage">
             <div class="ed-source-highlight"
@@ -104,6 +105,25 @@
                         {
                             <span class="efb-sep"></span>
                         }
+                    }
+
+                    @if (IsFloatingMenuOpen(EditorToolbarMenuIds.FloatingEmotion))
+                    {
+                        <span class="efb-dropdown"
+                              data-testid="@UiTestIds.Editor.FloatingEmotionMenu">
+                            <span class="efb-dropdown-label">TPS Emotions</span>
+                            <span class="efb-menu-list">
+                                @foreach (var action in FloatingEmotionActions)
+                                {
+                                    <button class="@action.CssClass"
+                                            type="button"
+                                            title="@action.Tooltip"
+                                            data-testid="@action.TestId"
+                                            @onmousedown:preventDefault="@action.PreventMouseDown"
+                                            @onclick="() => ExecuteToolbarActionAsync(action)">@((MarkupString)action.ContentHtml)</button>
+                                }
+                            </span>
+                        </span>
                     }
                 </span>
             }

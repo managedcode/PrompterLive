@@ -28,6 +28,8 @@ public partial class EditorSourcePanel
     private bool _syncOverlayAfterRender = true;
     private bool _surfaceInteropReady;
     private bool _syncScrollAfterRender = true;
+    private bool _visibleCanRedo;
+    private bool _visibleCanUndo;
 
     [Parameter] public bool CanRedo { get; set; }
 
@@ -70,6 +72,8 @@ public partial class EditorSourcePanel
             _hasPendingLocalInputText = false;
         }
 
+        _visibleCanUndo = CanUndo;
+        _visibleCanRedo = CanRedo;
         UpdateFloatingBarAnchor();
     }
 
@@ -175,12 +179,20 @@ public partial class EditorSourcePanel
     private async Task OnSourceInputAsync(ChangeEventArgs args)
     {
         var hadOpenToolbarMenu = HasOpenToolbarMenu;
+        var historyStateChanged = !_visibleCanUndo || _visibleCanRedo;
         CloseToolbarPanels();
 
         _lastTypedText = args.Value?.ToString() ?? string.Empty;
         _hasPendingLocalInputText = true;
-        _skipNextRender = _surfaceInteropReady && !hadOpenToolbarMenu;
+        _visibleCanUndo = true;
+        _visibleCanRedo = false;
+        _skipNextRender = _surfaceInteropReady && !hadOpenToolbarMenu && !historyStateChanged;
         await OnTextChanged.InvokeAsync(_lastTypedText);
+
+        if (historyStateChanged)
+        {
+            StateHasChanged();
+        }
     }
 
     private async Task RefreshSelectionAsync(bool requestComponentRender = true)

@@ -178,7 +178,8 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                 (args) => {
                     const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
                     const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
-                    if (!input || !overlay) {
+                    const stage = document.querySelector(`[data-testid="${args.stageTestId}"]`);
+                    if (!input || !overlay || !stage) {
                         throw new Error("Unable to attach the editor typing probe.");
                     }
 
@@ -193,32 +194,32 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
 
                     input.addEventListener("input", () => {
                         const started = performance.now();
-                        const expectedLength = input.value.length;
-
-                        const settle = () => {
-                            const renderedLength = Number.parseInt(
-                                overlay.dataset[args.renderedLengthDataAttribute] ?? "-1",
-                                10);
-
-                            if (renderedLength === expectedLength) {
-                                samples.push(performance.now() - started);
-                                return;
-                            }
-
-                            requestAnimationFrame(settle);
-                        };
-
-                        requestAnimationFrame(settle);
+                        requestAnimationFrame(() => {
+                            samples.push({
+                                latency: performance.now() - started,
+                                typingModeActive: stage.classList.contains(args.typingStateClass),
+                                inputVisible: getComputedStyle(input).color !== args.transparentInputColor
+                            });
+                        });
                     }, { passive: true });
 
-                    window.__editorTypingProbe = { samples, longTasks, observer };
+                    window.__editorTypingProbe = {
+                        observer,
+                        samples,
+                        longTasks,
+                        stage,
+                        input,
+                        overlay
+                    };
                 }
                 """,
                 new
                 {
                     inputTestId = UiTestIds.Editor.SourceInput,
                     overlayTestId = UiTestIds.Editor.SourceHighlight,
-                    renderedLengthDataAttribute = BrowserTestConstants.Editor.OverlayRenderedLengthDataAttribute
+                    stageTestId = UiTestIds.Editor.SourceStage,
+                    transparentInputColor = BrowserTestConstants.Editor.TransparentInputColor,
+                    typingStateClass = BrowserTestConstants.Editor.SourceStageTypingClass
                 });
 
             await page.Keyboard.TypeAsync(
@@ -230,7 +231,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
 
             var probeResult = await page.EvaluateAsync<TypingProbeResult>(
                 """
-                () => {
+                (args) => {
                     const probe = window.__editorTypingProbe;
                     if (!probe) {
                         throw new Error("Editor typing probe data is missing.");
@@ -239,14 +240,28 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                     probe.observer.disconnect();
                     return {
                         sampleCount: probe.samples.length,
-                        maxLatency: probe.samples.length ? Math.max(...probe.samples) : -1,
+                        maxLatency: probe.samples.length ? Math.max(...probe.samples.map(sample => sample.latency)) : -1,
                         longTaskCount: probe.longTasks.length,
-                        maxLongTaskDuration: probe.longTasks.length ? Math.max(...probe.longTasks) : 0
+                        maxLongTaskDuration: probe.longTasks.length ? Math.max(...probe.longTasks) : 0,
+                        sawTypingMode: probe.samples.some(sample => sample.typingModeActive),
+                        sawVisibleInput: probe.samples.some(sample => sample.inputVisible),
+                        finalInputColor: getComputedStyle(probe.input).color,
+                        finalOverlayOpacity: getComputedStyle(probe.overlay).opacity,
+                        finalRenderedLength: Number.parseInt(
+                            probe.overlay.dataset.renderedLength ?? '-1',
+                            10),
+                        finalTypingModeActive: probe.stage.classList.contains(args.typingStateClass)
                     };
                 }
-                """);
+                """,
+                new
+                {
+                    typingStateClass = BrowserTestConstants.Editor.SourceStageTypingClass
+                });
 
             Assert.True(probeResult.SampleCount > 0);
+            Assert.True(probeResult.SawTypingMode);
+            Assert.True(probeResult.SawVisibleInput);
             Assert.InRange(
                 probeResult.MaxLatency,
                 0,
@@ -255,6 +270,10 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                 probeResult.LongTaskCount,
                 0,
                 BrowserTestConstants.Editor.MaxTypingLongTaskCount);
+            Assert.False(probeResult.FinalTypingModeActive);
+            Assert.Equal(BrowserTestConstants.Editor.TransparentInputColor, probeResult.FinalInputColor);
+            Assert.Equal(BrowserTestConstants.Editor.VisibleOverlayOpacity, probeResult.FinalOverlayOpacity);
+            Assert.Equal(BrowserTestConstants.Editor.TypingResponsivenessProbeText.Length, probeResult.FinalRenderedLength);
         }
         finally
         {
@@ -273,11 +292,23 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
 
     private sealed class TypingProbeResult
     {
+        public string FinalInputColor { get; set; } = string.Empty;
+
+        public string FinalOverlayOpacity { get; set; } = string.Empty;
+
+        public int FinalRenderedLength { get; set; }
+
+        public bool FinalTypingModeActive { get; set; }
+
         public int LongTaskCount { get; set; }
 
         public double MaxLatency { get; set; }
 
         public double MaxLongTaskDuration { get; set; }
+
+        public bool SawTypingMode { get; set; }
+
+        public bool SawVisibleInput { get; set; }
 
         public int SampleCount { get; set; }
     }

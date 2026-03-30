@@ -53,35 +53,38 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
         try
         {
             await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
+            var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
+            await Expect(sourceInput).ToBeVisibleAsync();
 
-            var initialValue = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
+            var initialValue = await sourceInput.InputValueAsync();
 
-            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
+            await sourceInput.ClickAsync();
+            await sourceInput.EvaluateAsync(
                 """
                 element => {
-                    const addition = "\n[pause:2s]";
+                    const end = element.value.length;
                     element.focus();
-                    element.setSelectionRange(element.value.length, element.value.length);
-                    element.value = element.value + addition;
-                    element.dispatchEvent(new Event("input", { bubbles: true }));
+                    element.setSelectionRange(end, end);
                 }
                 """);
+            await page.GetByTestId(UiTestIds.Editor.PauseTrigger).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.MenuPause)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds).ClickAsync();
 
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
+            await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
             await page.GetByTestId(UiTestIds.Editor.Undo).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(initialValue);
+            await Expect(sourceInput).ToHaveValueAsync(initialValue);
 
             await page.GetByTestId(UiTestIds.Editor.Redo).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
+            await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
-            await page.GetByTestId(UiTestIds.Editor.SourceInput).ClickAsync();
+            await sourceInput.ClickAsync();
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Undo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(initialValue);
+            await Expect(sourceInput).ToHaveValueAsync(initialValue);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Redo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
+            await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
         }
         finally
         {
@@ -122,6 +125,43 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
             await page.ReloadAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
                 new Regex(Regex.Escape(BrowserTestConstants.Editor.SlowFragment)));
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task EditorScreen_FloatingEmotionMenuAppliesSelectedEmotion()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
+                """
+                element => {
+                    const text = element.value;
+                    const target = "transformative moment";
+                    const start = text.indexOf(target);
+                    element.focus();
+                    element.setSelectionRange(start, start + target.length);
+                    element.dispatchEvent(new Event("select", { bubbles: true }));
+                    element.dispatchEvent(new Event("keyup", { bubbles: true }));
+                }
+                """);
+
+            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.FloatingEmotion).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingEmotionMenu)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Editor.FloatingEmotionProfessional).ClickAsync();
+
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.ProfessionalFragment)));
         }
         finally
         {
@@ -232,7 +272,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
 
             await page.GetByTestId(UiTestIds.Editor.InsertTrigger).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.MenuInsert)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.InsertBlock).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.InsertBlockMenu).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
                 new Regex(@"### \[Block Name\|140WPM\]"));
 
@@ -255,6 +295,32 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
             var valueAfterAi = await page.GetByTestId(UiTestIds.Editor.SourceInput).InputValueAsync();
             Assert.NotEqual(valueBeforeAi, valueAfterAi);
             Assert.Contains(BrowserTestConstants.Editor.SimplifiedMoment, valueAfterAi, StringComparison.Ordinal);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task EditorScreen_TopToolbarShowsVisibleStructureButtons()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Editor);
+            var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
+            await Expect(sourceInput).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.InsertSegment)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.InsertBlock)).ToBeVisibleAsync();
+
+            await sourceInput.ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.InsertSegment).ClickAsync();
+            await Expect(sourceInput).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureSegmentToken)));
+
+            await page.GetByTestId(UiTestIds.Editor.InsertBlock).ClickAsync();
+            await Expect(sourceInput).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureBlockToken)));
         }
         finally
         {

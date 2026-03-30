@@ -47,6 +47,7 @@ public static class EditorToolbarMenuIds
     public const string Format = "format";
     public const string Color = "color";
     public const string Emotion = "emotion";
+    public const string FloatingEmotion = "floating-emotion";
     public const string Pause = "pause";
     public const string Speed = "speed";
     public const string Insert = "insert";
@@ -206,13 +207,14 @@ public static class EditorToolbarCatalog
             [
                 Insert("insert-edit-point", EditPointIconGold, "Edit Point — marks a natural place to stop or resume an editing session. [edit_point] or [edit_point:high]", "editor-insert-edit-point", "[edit_point]"),
                 Wrap("insert-phonetic", PhoneticIcon, "Pronunciation guide — add IPA or simple pronunciation. [phonetic:IPA]word[/phonetic]", "editor-insert-phonetic", "[phonetic:IPA]", "[/phonetic]", placeholder: "word"),
-                Insert("insert-segment", "§", "Segment — major script section with name, WPM, and emotion. ## [Name|WPM|Emotion]", "editor-insert-segment", "## [Segment Name|140WPM|Neutral]\n"),
+                Insert("insert-segment", "##", "Segment — major script section with name, WPM, and emotion. ## [Name|WPM|Emotion]", UiTestIds.Editor.InsertSegment, "## [Segment Name|140WPM|Neutral]\n", cssClass: "tb-btn tb-tip tb-speed"),
+                Insert("insert-block", "###", "Block — topic group within a segment. ### [Name|WPM|Emotion]", UiTestIds.Editor.InsertBlock, "### [Block Name|140WPM]\n", cssClass: "tb-btn tb-tip tb-speed"),
                 Toggle(EditorToolbarMenuIds.Insert, "editor-insert-trigger", "More insert options", ChevronDownIcon)
             ],
             [
                 new("Structure", [
-                    Insert("insert-segment-menu", "<span style=\"color:var(--gold-text);font-weight:700;width:20px;text-align:center\">§</span> Segment <small>## [Name]</small>", "Segment — major section of the script (Intro, Problem, Solution). ## [Name|WPM|Emotion|Timing]", "editor-insert-segment-menu", "## [Segment Name|140WPM|Neutral]\n", cssClass: "tb-emo-item tb-tip"),
-                    Insert("insert-block-menu", "<span style=\"color:var(--gold-text);font-weight:700;width:20px;text-align:center\">¶</span> Block <small>### [Name]</small>", "Block — topic group within a segment. ### [Name|WPM|Emotion]", "editor-insert-block", "### [Block Name|140WPM]\n", cssClass: "tb-emo-item tb-tip")
+                    Insert("insert-segment-menu", "<span style=\"color:var(--gold-text);font-weight:700;width:20px;text-align:center\">##</span> Segment <small>## [Name]</small>", "Segment — major section of the script (Intro, Problem, Solution). ## [Name|WPM|Emotion|Timing]", UiTestIds.Editor.InsertSegmentMenu, "## [Segment Name|140WPM|Neutral]\n", cssClass: "tb-emo-item tb-tip"),
+                    Insert("insert-block-menu", "<span style=\"color:var(--gold-text);font-weight:700;width:20px;text-align:center\">###</span> Block <small>### [Name]</small>", "Block — topic group within a segment. ### [Name|WPM|Emotion]", UiTestIds.Editor.InsertBlockMenu, "### [Block Name|140WPM]\n", cssClass: "tb-emo-item tb-tip")
                 ]),
                 new("Edit Points", [
                     Insert("insert-edit-point-high", $"{EditPointIconRed} High priority <small>[edit_point:high]</small>", "High priority edit point — critical, must review. [edit_point:high]", "editor-insert-edit-point-high", "[edit_point:high]", cssClass: "tb-emo-item tb-tip"),
@@ -252,7 +254,7 @@ public static class EditorToolbarCatalog
         ],
         [
             FloatingWrap("float-color", "<span class=\"cdot\" style=\"background:#FF8A8A\"></span>", "Text Color", "editor-float-color", "[red]", "[/red]"),
-            FloatingWrap("float-emotion", "<span class=\"cdot\" style=\"background:#FFB840\"></span>", "Emotion", "editor-float-emotion", "[warm]", "[/warm]")
+            FloatingToggle(EditorToolbarMenuIds.FloatingEmotion, "<span class=\"cdot\" style=\"background:#FFB840\"></span>" + ChevronDownIcon, "Emotion", UiTestIds.Editor.FloatingEmotion)
         ],
         [
             FloatingWrap("float-slow", ".8×", "Slow [slow]", "editor-floating-slow", "[slow]", "[/slow]"),
@@ -267,6 +269,22 @@ public static class EditorToolbarCatalog
                 UiTestIds.Editor.FloatingAi,
                 EditorAiAssistAction.Simplify)
         ]
+    ];
+
+    public static IReadOnlyList<EditorToolbarActionDescriptor> FloatingEmotionActions { get; } =
+    [
+        FloatingWrap("float-emotion-warm", "<span class=\"cdot\" style=\"background:#FFB840\"></span> Warm <small>😊</small>", "Friendly, welcoming tone. Inline: [warm]text[/warm]", "editor-float-emotion-warm", "[warm]", "[/warm]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-concerned", "<span class=\"cdot\" style=\"background:#FF7A7A\"></span> Concerned <small>😟</small>", "Worried, empathetic. Inline: [concerned]text[/concerned]", "editor-float-emotion-concerned", "[concerned]", "[/concerned]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-focused", "<span class=\"cdot\" style=\"background:#4AE0A0\"></span> Focused <small>🎯</small>", "Concentrated, precise. Inline: [focused]text[/focused]", "editor-float-emotion-focused", "[focused]", "[/focused]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-motivational", "<span class=\"cdot\" style=\"background:#C88AFF\"></span> Motivational <small>💪</small>", "Inspiring, encouraging. Inline: [motivational]text[/motivational]", "editor-float-emotion-motivational", "[motivational]", "[/motivational]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-neutral", "<span class=\"cdot\" style=\"background:#8ECFFF\"></span> Neutral <small>😐</small>", "Default balanced tone. Inline: [neutral]text[/neutral]", "editor-float-emotion-neutral", "[neutral]", "[/neutral]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-urgent", "<span class=\"cdot\" style=\"background:#FF6060\"></span> Urgent <small>🚨</small>", "Critical, immediate attention. Inline: [urgent]text[/urgent]", "editor-float-emotion-urgent", "[urgent]", "[/urgent]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-happy", "<span class=\"cdot\" style=\"background:#FFE87A\"></span> Happy <small>😄</small>", "Joyful, positive. Inline: [happy]text[/happy]", "editor-float-emotion-happy", "[happy]", "[/happy]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-excited", "<span class=\"cdot\" style=\"background:#FF8AC8\"></span> Excited <small>🚀</small>", "Enthusiastic, energetic. Inline: [excited]text[/excited]", "editor-float-emotion-excited", "[excited]", "[/excited]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-sad", "<span class=\"cdot\" style=\"background:#A0A8FF\"></span> Sad <small>😢</small>", "Melancholy, somber. Inline: [sad]text[/sad]", "editor-float-emotion-sad", "[sad]", "[/sad]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-calm", "<span class=\"cdot\" style=\"background:#5EECC2\"></span> Calm <small>😌</small>", "Peaceful, relaxed. Inline: [calm]text[/calm]", "editor-float-emotion-calm", "[calm]", "[/calm]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-energetic", "<span class=\"cdot\" style=\"background:#FFA050\"></span> Energetic <small>⚡</small>", "High energy, dynamic. Inline: [energetic]text[/energetic]", "editor-float-emotion-energetic", "[energetic]", "[/energetic]", cssClass: "efb-menu-item"),
+        FloatingWrap("float-emotion-professional", "<span class=\"cdot\" style=\"background:#80B8FF\"></span> Professional <small>💼</small>", "Business-like, formal. Inline: [professional]text[/professional]", UiTestIds.Editor.FloatingEmotionProfessional, "[professional]", "[/professional]", cssClass: "efb-menu-item")
     ];
 
     private static EditorToolbarActionDescriptor Ai(
@@ -316,11 +334,32 @@ public static class EditorToolbarCatalog
             Command: new EditorCommandRequest(EditorCommandKind.Insert, token),
             PreventMouseDown: true);
 
+    private static EditorToolbarActionDescriptor FloatingToggle(string menuId, string contentHtml, string tooltip, string testId) =>
+        new(
+            menuId,
+            EditorToolbarActionType.ToggleMenu,
+            "efb-btn",
+            contentHtml,
+            tooltip,
+            testId,
+            MenuId: menuId,
+            PreventMouseDown: true);
+
     private static EditorToolbarActionDescriptor FloatingWrap(string key, string contentHtml, string tooltip, string testId, string openingToken, string closingToken) =>
+        FloatingWrap(key, contentHtml, tooltip, testId, openingToken, closingToken, "efb-btn");
+
+    private static EditorToolbarActionDescriptor FloatingWrap(
+        string key,
+        string contentHtml,
+        string tooltip,
+        string testId,
+        string openingToken,
+        string closingToken,
+        string cssClass) =>
         new(
             key,
             EditorToolbarActionType.Command,
-            "efb-btn",
+            cssClass,
             contentHtml,
             tooltip,
             testId,

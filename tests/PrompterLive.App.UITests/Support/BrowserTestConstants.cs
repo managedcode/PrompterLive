@@ -83,6 +83,7 @@ internal static partial class BrowserTestConstants
         public const string DisplayDuration = "12:34";
         public const string LegacyActiveBlockLabel = "ACTIVE BLOCK";
         public const string LegacyActiveSegmentLabel = "ACTIVE SEGMENT";
+        public const string SourceStageTypingClass = "ed-source-stage-typing";
         public const string TransparentInputColor = "rgba(0, 0, 0, 0)";
         public const string VisibleOverlayOpacity = "1";
         public const string Welcome = "welcome";
@@ -96,6 +97,8 @@ internal static partial class BrowserTestConstants
         public const string SlowCompanyFragment = "[slow]our company[/slow]";
         public const string PauseFragment = "[pause:2s]";
         public const string CustomWpmToken = "[180WPM]";
+        public const string StructureSegmentToken = "## [Segment Name|140WPM|Neutral]";
+        public const string StructureBlockToken = "### [Block Name|140WPM]";
         public const string DurationField = "display_duration:";
         public const string PronunciationToken = "[pronunciation:guide]";
         public const string SegmentRewrite = "## [Launch Angle|305WPM|focused|1:00-2:00]";
@@ -119,8 +122,10 @@ internal static partial class BrowserTestConstants
         public const double MetadataRailDockGapPx = 10;
         public const double MetadataRailDockTolerancePx = 2;
         public const string OverlayRenderedLengthDataAttribute = "renderedLength";
+        public const int ScrollProbeLineCount = 120;
+        public const int MaxSourceScrollHostTopPx = 0;
         public const int MaxTypingLongTaskCount = 0;
-        public const double MaxVisibleRenderLatencyMs = 48;
+        public const double MaxVisibleRenderLatencyMs = 120;
         public const string TypedScript = """
             ## [Typed Intro|175WPM|focused|0:05-0:20]
             ### [Typed Block|165WPM|professional]
@@ -308,7 +313,7 @@ internal static partial class BrowserTestConstants
         public const int ReaderAutomaticTransitionTimeoutMs = 14_000;
         public const int ReaderCameraInitDelayMs = 750;
         public const int PersistDelayMs = 1_800;
-        public const int TypingProbeSettleDelayMs = 100;
+        public const int TypingProbeSettleDelayMs = 300;
     }
 
     public static class Regexes

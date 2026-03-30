@@ -112,6 +112,7 @@ Browser test execution rules:
 - Major user flows MUST be covered by long Playwright scenarios that execute real browser interactions end to end.
 - Major browser scenarios MUST capture screenshot artifacts under `output/playwright/`.
 - Editor typing and latency fixes are not done until they are reproduced and cleared on the live dev-host editor with real keyboard input, not only synthetic input helpers or the static UI-test host.
+- Editor surface changes must ship with real-browser checks for scroll behavior, floating toolbar dropdowns, and TPS section controls when those areas are touched; static component tests alone are not enough.
 
 Do not override the production app runtime URL with `--urls` or random ports. Media permissions are origin-bound, so local development must stay on the stable launch-settings origin. If `dotnet run` fails because that port is already in use, stop the existing dev-server process instead of switching the app host to a new port. The browser-test harness is the exception: it must resolve a fresh dynamic loopback port and propagate the actual origin into Playwright `BaseURL` and permission grants.
 

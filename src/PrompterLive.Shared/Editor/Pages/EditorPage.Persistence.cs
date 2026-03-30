@@ -60,7 +60,11 @@ public partial class EditorPage
         try
         {
             await Task.Delay(GetAutosaveDelayMilliseconds(), cancellationToken);
-            await InvokeAsync(() => PersistDraftAsync(_sourceText));
+            await InvokeAsync(() =>
+            {
+                _skipNextRenderFromTyping = false;
+                return PersistDraftAsync(_sourceText);
+            });
         }
         catch (OperationCanceledException)
         {
@@ -80,6 +84,7 @@ public partial class EditorPage
             await Task.Delay(DraftAnalysisDelayMilliseconds, cancellationToken);
             await InvokeAsync(() =>
             {
+                _skipNextRenderFromTyping = false;
                 RefreshDraftViewFromSource();
                 StateHasChanged();
             });

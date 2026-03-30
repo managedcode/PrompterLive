@@ -1,6 +1,8 @@
 (function () {
     const offscreenMirrorLeftPx = -99999;
     const floatingToolbarMinimumTopCssVariable = "--ed-floatbar-min-top";
+    const typingOverlayDebounceMilliseconds = 120;
+    const typingVisualStateClass = "ed-source-stage-typing";
     const textareaMirrorStyleProperties = [
         "whiteSpace",
         "wordBreak",
@@ -30,6 +32,7 @@
     const scopeKindPronunciation = "pronunciation";
     const renderedLengthDataAttribute = "renderedLength";
     const editorSurfaceStates = new WeakMap();
+    const overlaySurfaceStates = new WeakMap();
     const colorClasses = new Map([
         ["red", "mk-color-red"],
         ["green", "mk-color-green"],
@@ -75,26 +78,44 @@
             const existingState = editorSurfaceStates.get(textarea);
             if (existingState) {
                 existingState.overlay = overlay;
+                existingState.stage = resolveEditorStage(textarea);
+                overlaySurfaceStates.set(overlay, existingState);
+                cancelDeferredOverlayRender(existingState);
                 renderSurfaceOverlay(overlay, textarea.value);
+                deactivateTypingVisualState(existingState);
                 return true;
             }
 
             const state = {
                 overlay,
+                stage: resolveEditorStage(textarea),
+                pendingRenderFrameId: 0,
+                pendingRenderTimeoutId: 0,
                 onInput() {
-                    renderSurfaceOverlay(state.overlay, textarea.value);
-                    window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+                    activateTypingVisualState(state);
+                    scheduleDeferredOverlayRender(textarea, state);
                 }
             };
 
             textarea.addEventListener("input", state.onInput);
             editorSurfaceStates.set(textarea, state);
+            overlaySurfaceStates.set(overlay, state);
             renderSurfaceOverlay(overlay, textarea.value);
+            deactivateTypingVisualState(state);
             return true;
         },
 
         renderOverlay(overlay, text) {
+            const state = overlaySurfaceStates.get(overlay);
+            if (state) {
+                cancelDeferredOverlayRender(state);
+            }
+
             renderSurfaceOverlay(overlay, text);
+
+            if (state) {
+                deactivateTypingVisualState(state);
+            }
         },
 
         syncScroll(textarea, overlay) {
@@ -257,6 +278,66 @@
         }
 
         overlay.dataset[renderedLengthDataAttribute] = String((text || "").length);
+    }
+
+    function activateTypingVisualState(state) {
+        if (!state || !state.stage) {
+            return;
+        }
+
+        state.stage.classList.add(typingVisualStateClass);
+    }
+
+    function cancelDeferredOverlayRender(state) {
+        if (!state) {
+            return;
+        }
+
+        if (state.pendingRenderTimeoutId) {
+            window.clearTimeout(state.pendingRenderTimeoutId);
+            state.pendingRenderTimeoutId = 0;
+        }
+
+        if (state.pendingRenderFrameId) {
+            window.cancelAnimationFrame(state.pendingRenderFrameId);
+            state.pendingRenderFrameId = 0;
+        }
+    }
+
+    function deactivateTypingVisualState(state) {
+        if (!state || !state.stage) {
+            return;
+        }
+
+        state.stage.classList.remove(typingVisualStateClass);
+    }
+
+    function renderDeferredOverlay(textarea, state) {
+        if (!textarea || !state || !state.overlay) {
+            deactivateTypingVisualState(state);
+            return;
+        }
+
+        renderSurfaceOverlay(state.overlay, textarea.value);
+        window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+        deactivateTypingVisualState(state);
+    }
+
+    function resolveEditorStage(textarea) {
+        return textarea
+            ? textarea.closest(".ed-source-stage")
+            : null;
+    }
+
+    function scheduleDeferredOverlayRender(textarea, state) {
+        cancelDeferredOverlayRender(state);
+        state.pendingRenderTimeoutId = window.setTimeout(() => {
+            state.pendingRenderTimeoutId = 0;
+            state.pendingRenderFrameId = window.requestAnimationFrame(() => {
+                state.pendingRenderFrameId = 0;
+                renderDeferredOverlay(textarea, state);
+            });
+        }, typingOverlayDebounceMilliseconds);
     }
 
     function renderSourceHighlight(text) {

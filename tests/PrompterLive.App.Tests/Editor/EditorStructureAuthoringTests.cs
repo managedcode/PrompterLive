@@ -9,6 +9,7 @@ namespace PrompterLive.App.Tests;
 
 public sealed class EditorStructureAuthoringTests : BunitContext
 {
+    private static readonly TimeSpan StructureRefreshTimeout = TimeSpan.FromSeconds(3);
     private readonly AppHarness _harness;
 
     public EditorStructureAuthoringTests()
@@ -40,15 +41,16 @@ public sealed class EditorStructureAuthoringTests : BunitContext
         source.Input(updatedSource);
 
         cut.WaitForAssertion(() =>
-        {
-            var currentSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value");
-            Assert.Contains("## [Launch Angle|305WPM|focused|1:00-2:00]", currentSource);
-            Assert.Contains("### [Signal Block|305WPM|professional]", currentSource);
-            Assert.Contains("data-nav=\"seg-0\"", cut.Markup, StringComparison.Ordinal);
-            Assert.Contains("Launch Angle", cut.Markup, StringComparison.Ordinal);
-            Assert.Contains("Signal Block", cut.Markup, StringComparison.Ordinal);
-            Assert.DoesNotContain("ACTIVE SEGMENT", cut.Markup, StringComparison.Ordinal);
-        });
+            {
+                var currentSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value");
+                Assert.Contains("## [Launch Angle|305WPM|focused|1:00-2:00]", currentSource);
+                Assert.Contains("### [Signal Block|305WPM|professional]", currentSource);
+                Assert.Contains("data-nav=\"seg-0\"", cut.Markup, StringComparison.Ordinal);
+                Assert.Contains("Launch Angle", cut.Markup, StringComparison.Ordinal);
+                Assert.Contains("Signal Block", cut.Markup, StringComparison.Ordinal);
+                Assert.DoesNotContain("ACTIVE SEGMENT", cut.Markup, StringComparison.Ordinal);
+            },
+            StructureRefreshTimeout);
     }
 
     [Fact]
