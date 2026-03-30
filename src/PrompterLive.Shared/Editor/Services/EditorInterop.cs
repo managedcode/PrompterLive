@@ -7,54 +7,40 @@ namespace PrompterLive.Shared.Services.Editor;
 
 public sealed class EditorInterop(IJSRuntime jsRuntime)
 {
-    private const string EditorSurfaceNamespace = "EditorSurfaceInterop";
-    private const string GetSelectionStateMethod = EditorSurfaceNamespace + ".getSelectionState";
-    private const string SetSelectionMethod = EditorSurfaceNamespace + ".setSelection";
-    private const string SyncScrollMethod = EditorSurfaceNamespace + ".syncScroll";
     private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public ValueTask SyncScrollAsync(ElementReference textarea, ElementReference overlay) =>
-        _jsRuntime.InvokeVoidAsync(SyncScrollMethod, textarea, overlay);
+        _jsRuntime.InvokeVoidAsync(EditorSurfaceInteropMethodNames.SyncScroll, textarea, overlay);
 
     public async Task<EditorSelectionViewModel> GetSelectionAsync(ElementReference textarea)
     {
         var result = await _jsRuntime.InvokeAsync<EditorSelectionInteropResult?>(
-            GetSelectionStateMethod,
+            EditorSurfaceInteropMethodNames.GetSelectionState,
             textarea);
 
-        if (result is null)
-        {
-            return EditorSelectionViewModel.Empty;
-        }
-
-        return new EditorSelectionViewModel(
-            new EditorSelectionRange(result.Start, result.End),
-            result.Line,
-            result.Column,
-            result.ToolbarTop,
-            result.ToolbarLeft);
+        return MapSelection(result);
     }
 
     public async Task<EditorSelectionViewModel> SetSelectionAsync(ElementReference textarea, int start, int end)
     {
         var result = await _jsRuntime.InvokeAsync<EditorSelectionInteropResult?>(
-            SetSelectionMethod,
+            EditorSurfaceInteropMethodNames.SetSelection,
             textarea,
             start,
             end);
 
-        if (result is null)
-        {
-            return EditorSelectionViewModel.Empty;
-        }
-
-        return new EditorSelectionViewModel(
-            new EditorSelectionRange(result.Start, result.End),
-            result.Line,
-            result.Column,
-            result.ToolbarTop,
-            result.ToolbarLeft);
+        return MapSelection(result);
     }
+
+    private static EditorSelectionViewModel MapSelection(EditorSelectionInteropResult? result) =>
+        result is null
+            ? EditorSelectionViewModel.Empty
+            : new EditorSelectionViewModel(
+                new EditorSelectionRange(result.Start, result.End),
+                result.Line,
+                result.Column,
+                result.ToolbarTop,
+                result.ToolbarLeft);
 
     private sealed record EditorSelectionInteropResult(
         int Start,

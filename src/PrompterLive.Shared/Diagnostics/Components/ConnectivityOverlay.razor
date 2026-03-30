@@ -1,0 +1,55 @@
+@implements IDisposable
+@namespace PrompterLive.Shared.Components.Diagnostics
+@inject NavigationManager Navigation
+@inject PrompterLive.Shared.Services.Diagnostics.BrowserConnectivityService Connectivity
+
+@if (Connectivity.IsVisible)
+{
+    <section id="@UiDomIds.Diagnostics.ConnectivityUi"
+             class="app-shell-overlay app-shell-overlay-status"
+             role="status"
+             aria-live="assertive"
+             data-state="@Connectivity.State"
+             data-testid="@UiTestIds.Diagnostics.Connectivity">
+        <div class="app-shell-card app-shell-card-status">
+            <span class="app-shell-eyebrow">Connection</span>
+            <h2 id="@UiDomIds.Diagnostics.ConnectivityTitle">@Connectivity.Title</h2>
+            <p id="@UiDomIds.Diagnostics.ConnectivityMessage">@Connectivity.Message</p>
+            <div class="app-shell-actions">
+                <button type="button"
+                        id="@UiDomIds.Diagnostics.ConnectivityRetry"
+                        class="app-shell-btn app-shell-btn-primary"
+                        @onclick="HandleRetry"
+                        data-testid="@UiTestIds.Diagnostics.ConnectivityRetry">Retry Now</button>
+                <button type="button"
+                        id="@UiDomIds.Diagnostics.ConnectivityDismiss"
+                        class="app-shell-btn"
+                        @onclick="HandleDismiss"
+                        data-testid="@UiTestIds.Diagnostics.ConnectivityDismiss">Dismiss</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Connectivity.Changed += HandleConnectivityChanged;
+    }
+
+    private void HandleDismiss() => Connectivity.Dismiss();
+
+    private void HandleRetry()
+    {
+        Connectivity.Dismiss();
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    private void HandleConnectivityChanged(object? sender, EventArgs args) =>
+        InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Connectivity.Changed -= HandleConnectivityChanged;
+    }
+}

@@ -109,6 +109,7 @@ flowchart LR
 - `Directory.Packages.props` is the canonical source for NuGet package versions.
 - `Directory.Build.props` is the canonical source for shared target framework, analyzer policy, and assembly/app version settings.
 - `global.json` pins the expected .NET SDK for local and CI builds.
+- Vendored browser SDK release pins live in `vendored-streaming-sdks.json`, and the exact release sync or watch flow is documented in `docs/Features/VendoredStreamingSdkReleases.md`.
 
 ## Runtime Boundaries
 
@@ -184,24 +185,24 @@ flowchart LR
 ```mermaid
 flowchart LR
     WasmHost["PrompterLive.App<br/>ILogger configuration"]
-    Layout["MainLayout + DiagnosticsBanner"]
+    Layout["MainLayout + DiagnosticsBanner + ConnectivityOverlay"]
     Boundary["LoggingErrorBoundary"]
-    Shell["index.html + app.css shell overlays"]
-    ShellJs["prompterlive.js shell connectivity handlers"]
+    Bootstrap["index.html bootstrap error shell"]
+    Connectivity["BrowserConnectivityService"]
     Diagnostics["UiDiagnosticsService"]
     Pages["Library / Editor / Learn / Teleprompter / Go Live / Settings"]
     Browser["BrowserSettingsStore"]
     Session["ScriptSessionService"]
 
-    WasmHost --> Shell
-    WasmHost --> ShellJs
+    WasmHost --> Bootstrap
     WasmHost --> Diagnostics
     Pages --> Diagnostics
+    Pages --> Connectivity
     Browser --> WasmHost
     Session --> WasmHost
     Diagnostics --> Layout
+    Connectivity --> Layout
     Boundary --> Diagnostics
-    ShellJs --> Shell
 ```
 
 ```mermaid
@@ -209,9 +210,10 @@ sequenceDiagram
     participant User
     participant Page as "Routed page"
     participant Diagnostics as "UiDiagnosticsService"
+    participant Connectivity as "BrowserConnectivityService"
     participant Logger as "ILogger"
     participant Boundary as "LoggingErrorBoundary"
-    participant Shell as "Shell overlay"
+    participant Overlay as "Connectivity overlay"
 
     User->>Page: Trigger load/save/device action
     Page->>Diagnostics: RunAsync(operation, message, action)
@@ -224,8 +226,9 @@ sequenceDiagram
         Boundary->>Logger: Critical exception
         Boundary->>Diagnostics: ReportFatal(...)
         Boundary-->>User: Fatal fallback with retry/library actions
-    else Browser offline or bootstrap failure
-        Shell-->>User: Styled reconnect or bootstrap error overlay
+    else Browser offline or restored
+        Page->>Connectivity: Start connectivity monitor
+        Connectivity-->>User: Styled offline/online overlay
     end
 ```
 

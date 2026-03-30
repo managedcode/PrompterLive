@@ -13,7 +13,7 @@ namespace PrompterLive.App.Tests;
 public sealed class UiTraceLoggingTests : BunitContext
 {
     [Fact]
-    public void MainLayout_LogsNavigatorAttach_AndRouteChanges()
+    public void MainLayout_LogsRouteChanges_WithoutShellBridgeInterop()
     {
         var logProvider = new RecordingLoggerProvider();
         var harness = TestHarnessFactory.Create(
@@ -23,17 +23,9 @@ public sealed class UiTraceLoggingTests : BunitContext
         var cut = Render<MainLayout>(parameters => parameters
             .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Contains(
-                logProvider.Entries,
-                entry => entry.Category.Contains(nameof(MainLayout), StringComparison.Ordinal) &&
-                    entry.Message.Contains("Attached SPA navigator bridge.", StringComparison.Ordinal));
-        });
-
-        Assert.Contains(
-            AppJsInterop.AttachShellDiagnosticsLoggerMethod,
-            harness.JsRuntime.Invocations);
+        Assert.DoesNotContain(
+            harness.JsRuntime.Invocations,
+            invocation => invocation.Contains("PrompterLive.shell", StringComparison.Ordinal));
 
         var navigation = Services.GetRequiredService<NavigationManager>();
         navigation.NavigateTo(AppTestData.Routes.Settings);

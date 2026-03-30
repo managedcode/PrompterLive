@@ -1,5 +1,7 @@
 @implements IAsyncDisposable
 @namespace PrompterLive.Shared.Components
+@using System.Globalization
+@using Microsoft.JSInterop
 @inject Microsoft.Extensions.Logging.ILogger<SettingsMicrophoneLevelCard> Logger
 @inject MicrophoneLevelInterop MicrophoneLevelInterop
 
@@ -19,15 +21,14 @@
     {
         <div id="@UiDomIds.Settings.MicrophoneLevelMonitor"
              class="set-mic-monitor"
-             data-live-level="0"
-             data-live-state="idle"
+             data-live-level="@_levelPercent"
+             data-live-state="@MonitorState"
              data-testid="@UiTestIds.Settings.MicPreviewMeter">
             <div class="set-mic-monitor-track">
-                <div class="set-mic-monitor-fill" data-mic-role="fill"></div>
+                <div class="set-mic-monitor-fill" style="@MonitorFillStyle"></div>
             </div>
             <div class="set-mic-monitor-readout"
-                 data-mic-role="value"
-                 data-testid="@UiTestIds.Settings.MicPreviewValue">0%</div>
+                 data-testid="@UiTestIds.Settings.MicPreviewValue">@MonitorValueText</div>
         </div>
 
         <div class="set-mic-monitor-meta">
@@ -64,6 +65,10 @@
     private const string PreviewEyebrow = "PRIMARY MICROPHONE";
     private const string ReadyStatusCssClass = "ready";
     private const string ReadyStatusLabel = "Live level";
+    private const string ActiveStateValue = "active";
+    private const string IdleStateValue = "idle";
+    private const string FillWidthStyleFormat = "width: {0}%;";
+    private const string PercentageSuffix = "%";
     private const string StartMonitorFailureMessage = "Failed to start Settings microphone monitor for device {DeviceId}.";
     private const string StopMonitorFailureMessage = "Failed to stop Settings microphone monitor.";
 
@@ -94,6 +99,16 @@
     private string MicrophoneLabel => Microphone?.Label ?? string.Empty;
 
     private string? _attachedDeviceId;
+    private DotNetObjectReference<MicrophoneLevelObserver>? _observerReference;
+    private int _levelPercent;
+
+    private string MonitorFillStyle =>
+        string.Format(CultureInfo.InvariantCulture, FillWidthStyleFormat, _levelPercent);
+
+    private string MonitorState => _levelPercent > 0 ? ActiveStateValue : IdleStateValue;
+
+    private string MonitorValueText =>
+        string.Concat(_levelPercent.ToString(CultureInfo.InvariantCulture), PercentageSuffix);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -113,24 +128,31 @@
 
             await StopMonitoringAsync();
             _attachedDeviceId = nextDeviceId;
-            await MicrophoneLevelInterop.StartAsync(UiDomIds.Settings.MicrophoneLevelMonitor, nextDeviceId);
+            _observerReference ??= DotNetObjectReference.Create(new MicrophoneLevelObserver(HandleLevelChangedAsync));
+            await MicrophoneLevelInterop.StartAsync(
+                UiDomIds.Settings.MicrophoneLevelMonitor,
+                nextDeviceId,
+                _observerReference);
         }
         catch (Exception exception)
         {
             Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(Logger, exception, StartMonitorFailureMessage, Microphone?.DeviceId);
             _attachedDeviceId = null;
+            await HandleLevelChangedAsync(0);
         }
     }
 
     public async ValueTask DisposeAsync()
     {
         await StopMonitoringAsync();
+        _observerReference?.Dispose();
     }
 
     private async Task StopMonitoringAsync()
     {
         if (string.IsNullOrWhiteSpace(_attachedDeviceId))
         {
+            await HandleLevelChangedAsync(0);
             return;
         }
 
@@ -145,6 +167,13 @@
         finally
         {
             _attachedDeviceId = null;
+            await HandleLevelChangedAsync(0);
         }
+    }
+
+    private Task HandleLevelChangedAsync(int levelPercent)
+    {
+        _levelPercent = Math.Clamp(levelPercent, 0, 100);
+        return InvokeAsync(StateHasChanged);
     }
 }

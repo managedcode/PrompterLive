@@ -337,6 +337,7 @@ Ask first:
 - random-port local startup
 - brittle selectors without `data-testid`
 - design drift from `new-design`
+- murky JavaScript or interop layers that keep product UI behavior in JS when Blazor can own it cleanly
 - runtime dependencies fetched from random external sources instead of vendored release artifacts
 - progress updates that talk about internal skill routing instead of the concrete repo change
 - long exploratory work before producing the concrete vendored files the user explicitly asked for

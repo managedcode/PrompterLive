@@ -1,0 +1,86 @@
+name: watch-vendored-streaming-sdks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check upstream release tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p output
+          python scripts/vendored_streaming_sdks.py check-updates \
+            --summary-json output/vendored-streaming-sdk-update-summary.json \
+            --issue-body output/vendored-streaming-sdk-update-issue.md
+
+      - name: Read update summary
+        id: summary
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          summary = json.loads(Path("output/vendored-streaming-sdk-update-summary.json").read_text(encoding="utf-8"))
+          print(f"has_updates={'true' if summary['hasUpdates'] else 'false'}")
+          print(f"issue_title={summary['issueTitle']}")
+          PY
+
+      - name: Create or update tracking issue
+        if: steps.summary.outputs.has_updates == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+
+            const title = process.env.ISSUE_TITLE;
+            const body = fs.readFileSync("output/vendored-streaming-sdk-update-issue.md", "utf8");
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: "open",
+              per_page: 100
+            });
+
+            const existing = issues.find((issue) => issue.title === title);
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              });
+              core.info(`Updated issue #${existing.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body
+              });
+              core.info(`Created issue #${created.data.number}`);
+            }
+        env:
+          ISSUE_TITLE: ${{ steps.summary.outputs.issue_title }}

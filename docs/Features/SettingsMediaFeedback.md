@@ -53,7 +53,7 @@ flowchart LR
     MicInterop["MicrophoneLevelInterop"]
     Scene["IMediaSceneService"]
     Studio["StudioSettingsStore"]
-    Browser["prompterlive.js media helpers"]
+    Browser["browser-media.js thin bridge"]
 
     Page --> CameraCard
     Page --> MicCard
@@ -70,6 +70,7 @@ flowchart LR
 - live camera preview must stay in `Settings`, not in the shared header or `Go Live`
 - live microphone level must reflect real browser input, not the stored gain percentage alone
 - preview and monitor lifecycles must stop when their settings section is no longer active
+- the microphone meter UI must stay Blazor-owned; JS may sample browser audio and report numeric levels only
 - UI contracts for the feedback cards must use stable shared `UiTestIds` and `UiDomIds`
 - browser acceptance must verify real synthetic media attachment and live activity through the deterministic media harness
 - this document is about setup feedback only; routing remains documented in [GoLiveRuntime.md](./GoLiveRuntime.md)

@@ -1,0 +1,42 @@
+name: sync-vendored-streaming-sdks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sync pinned vendored SDKs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/vendored_streaming_sdks.py sync
+
+      - name: Verify vendored SDK layout
+        run: python scripts/vendored_streaming_sdks.py verify
+
+      - name: Upload vendored SDK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendored-streaming-sdks
+          path: |
+            vendored-streaming-sdks.json
+            src/PrompterLive.Shared/wwwroot/vendor/livekit-client/
+            src/PrompterLive.Shared/wwwroot/vendor/vdo.ninja/

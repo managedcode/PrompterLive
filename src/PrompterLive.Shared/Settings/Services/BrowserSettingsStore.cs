@@ -23,7 +23,7 @@ public sealed class BrowserSettingsStore(IJSRuntime jsRuntime, ILogger<BrowserSe
             var json = await _jsRuntime.InvokeAsync<string?>(
                 BrowserStorageMethodNames.LoadSettingJson,
                 cancellationToken,
-                key);
+                ResolveStorageKey(key));
 
             return string.IsNullOrWhiteSpace(json)
                 ? default
@@ -45,7 +45,7 @@ public sealed class BrowserSettingsStore(IJSRuntime jsRuntime, ILogger<BrowserSe
             await _jsRuntime.InvokeVoidAsync(
                 BrowserStorageMethodNames.SaveSettingJson,
                 cancellationToken,
-                key,
+                ResolveStorageKey(key),
                 json);
         }
         catch (Exception exception)
@@ -54,4 +54,7 @@ public sealed class BrowserSettingsStore(IJSRuntime jsRuntime, ILogger<BrowserSe
             throw;
         }
     }
+
+    private static string ResolveStorageKey(string key) =>
+        string.Concat(BrowserStorageKeys.SettingsPrefix, key);
 }

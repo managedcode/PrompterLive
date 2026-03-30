@@ -1,6 +1,21 @@
 (function () {
-    const floatingToolbarAnchorMinTopPx = 44;
     const offscreenMirrorLeftPx = -99999;
+    const floatingToolbarMinimumTopCssVariable = "--ed-floatbar-min-top";
+    const textareaMirrorStyleProperties = [
+        "whiteSpace",
+        "wordBreak",
+        "overflowWrap",
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "lineHeight",
+        "letterSpacing",
+        "fontVariantLigatures",
+        "tabSize",
+        "padding",
+        "border",
+        "boxSizing"
+    ];
     const editorSurfaceNamespace = "EditorSurfaceInterop";
 
     window[editorSurfaceNamespace] = {
@@ -57,7 +72,7 @@
             end,
             line,
             column,
-            toolbarTop: Math.max(floatingToolbarAnchorMinTopPx, coords.top),
+            toolbarTop: Math.max(getFloatingToolbarMinimumTopPx(textarea), coords.top),
             toolbarLeft: coords.left
         };
     }
@@ -71,88 +86,40 @@
     }
 
     function measureTextareaCaretGeometry(textarea, index) {
-        const style = window.getComputedStyle(textarea);
-        const mirror = document.createElement("div");
-        const span = document.createElement("span");
         const value = textarea.value;
+        return measureWithTextareaMirror(textarea, (mirror, style) => {
+            const span = document.createElement("span");
 
-        mirror.style.position = "absolute";
-        mirror.style.visibility = "hidden";
-        mirror.style.whiteSpace = style.whiteSpace;
-        mirror.style.wordBreak = style.wordBreak;
-        mirror.style.overflowWrap = style.overflowWrap;
-        mirror.style.fontFamily = style.fontFamily;
-        mirror.style.fontSize = style.fontSize;
-        mirror.style.fontWeight = style.fontWeight;
-        mirror.style.lineHeight = style.lineHeight;
-        mirror.style.letterSpacing = style.letterSpacing;
-        mirror.style.fontVariantLigatures = style.fontVariantLigatures;
-        mirror.style.tabSize = style.tabSize;
-        mirror.style.padding = style.padding;
-        mirror.style.border = style.border;
-        mirror.style.boxSizing = style.boxSizing;
-        mirror.style.width = `${textarea.clientWidth}px`;
-        mirror.style.left = `${offscreenMirrorLeftPx}px`;
-        mirror.style.top = "0";
+            mirror.textContent = value.slice(0, index);
+            span.textContent = value.slice(index, index + 1) || " ";
+            mirror.appendChild(span);
 
-        mirror.textContent = value.slice(0, index);
-        span.textContent = value.slice(index, index + 1) || " ";
-        mirror.appendChild(span);
-        document.body.appendChild(mirror);
-
-        const top = textarea.offsetTop + span.offsetTop - textarea.scrollTop - getLineTopInsetPx(style);
-        const left = textarea.offsetLeft + span.offsetLeft - textarea.scrollLeft;
-        document.body.removeChild(mirror);
-
-        return {
-            top,
-            left
-        };
+            return {
+                top: textarea.offsetTop + span.offsetTop - textarea.scrollTop - getLineTopInsetPx(style),
+                left: textarea.offsetLeft + span.offsetLeft - textarea.scrollLeft
+            };
+        });
     }
 
     function measureTextareaRangeGeometry(textarea, start, end) {
-        const style = window.getComputedStyle(textarea);
-        const mirror = document.createElement("div");
-        const selection = document.createElement("span");
         const value = textarea.value;
+        return measureWithTextareaMirror(textarea, (mirror, style) => {
+            const selection = document.createElement("span");
 
-        mirror.style.position = "absolute";
-        mirror.style.visibility = "hidden";
-        mirror.style.whiteSpace = style.whiteSpace;
-        mirror.style.wordBreak = style.wordBreak;
-        mirror.style.overflowWrap = style.overflowWrap;
-        mirror.style.fontFamily = style.fontFamily;
-        mirror.style.fontSize = style.fontSize;
-        mirror.style.fontWeight = style.fontWeight;
-        mirror.style.lineHeight = style.lineHeight;
-        mirror.style.letterSpacing = style.letterSpacing;
-        mirror.style.fontVariantLigatures = style.fontVariantLigatures;
-        mirror.style.tabSize = style.tabSize;
-        mirror.style.padding = style.padding;
-        mirror.style.border = style.border;
-        mirror.style.boxSizing = style.boxSizing;
-        mirror.style.width = `${textarea.clientWidth}px`;
-        mirror.style.left = `${offscreenMirrorLeftPx}px`;
-        mirror.style.top = "0";
+            mirror.textContent = value.slice(0, start);
+            selection.textContent = value.slice(start, end) || " ";
+            mirror.appendChild(selection);
 
-        mirror.textContent = value.slice(0, start);
-        selection.textContent = value.slice(start, end) || " ";
-        mirror.appendChild(selection);
-        document.body.appendChild(mirror);
+            const mirrorRect = mirror.getBoundingClientRect();
+            const selectionRect = selection.getBoundingClientRect();
+            const selectionRects = selection.getClientRects();
+            const firstRect = selectionRects[0] || selectionRect;
 
-        const mirrorRect = mirror.getBoundingClientRect();
-        const selectionRect = selection.getBoundingClientRect();
-        const selectionRects = selection.getClientRects();
-        const firstRect = selectionRects[0] || selectionRect;
-        const top = textarea.offsetTop + firstRect.top - mirrorRect.top - textarea.scrollTop - getLineTopInsetPx(style);
-        const left = textarea.offsetLeft + selectionRect.left - mirrorRect.left - textarea.scrollLeft + (selectionRect.width / 2);
-
-        document.body.removeChild(mirror);
-
-        return {
-            top,
-            left
-        };
+            return {
+                top: textarea.offsetTop + firstRect.top - mirrorRect.top - textarea.scrollTop - getLineTopInsetPx(style),
+                left: textarea.offsetLeft + selectionRect.left - mirrorRect.left - textarea.scrollLeft + (selectionRect.width / 2)
+            };
+        });
     }
 
     function getLineTopInsetPx(style) {
@@ -163,5 +130,43 @@
         }
 
         return Math.max(0, lineHeight - fontSize);
+    }
+
+    function getFloatingToolbarMinimumTopPx(textarea) {
+        const value = Number.parseFloat(
+            window.getComputedStyle(textarea).getPropertyValue(floatingToolbarMinimumTopCssVariable));
+
+        return Number.isFinite(value)
+            ? value
+            : 0;
+    }
+
+    function measureWithTextareaMirror(textarea, measure) {
+        const style = window.getComputedStyle(textarea);
+        const mirror = createTextareaMirror(textarea, style);
+        document.body.appendChild(mirror);
+
+        try {
+            return measure(mirror, style);
+        }
+        finally {
+            document.body.removeChild(mirror);
+        }
+    }
+
+    function createTextareaMirror(textarea, style) {
+        const mirror = document.createElement("div");
+
+        mirror.style.position = "absolute";
+        mirror.style.visibility = "hidden";
+        mirror.style.width = `${textarea.clientWidth}px`;
+        mirror.style.left = `${offscreenMirrorLeftPx}px`;
+        mirror.style.top = "0";
+
+        for (const property of textareaMirrorStyleProperties) {
+            mirror.style[property] = style[property];
+        }
+
+        return mirror;
     }
 })();

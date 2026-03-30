@@ -1,18 +1,22 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.JSInterop;
 using PrompterLive.Core.Models.Editor;
 using PrompterLive.Shared.Rendering;
 
 namespace PrompterLive.Shared.Components.Editor;
 
-public partial class EditorSourcePanel : IAsyncDisposable
+public partial class EditorSourcePanel
 {
-    private const string FloatingBarEdgePaddingVariable = "var(--ed-floatbar-edge)";
+    private const string FocusSelectionFailureMessage = "Editor selection focus interop failed during source panel update.";
+    private const string RefreshSelectionFailureMessage = "Editor selection refresh interop failed during source panel update.";
     private const string RedoKeyLower = "y";
+    private const string ScrollSyncFailureMessage = "Editor overlay scroll sync interop failed during source panel update.";
     private const string UndoKeyLower = "z";
     private ElementReference _overlayRef;
     private ElementReference _textareaRef;
-    private EditorSelectionViewModel _domSelection = EditorSelectionViewModel.Empty;
 
     [Parameter] public bool CanRedo { get; set; }
 
@@ -36,10 +40,12 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     [Parameter] public string Text { get; set; } = string.Empty;
 
+    [Inject] private ILogger<EditorSourcePanel> Logger { get; set; } = NullLogger<EditorSourcePanel>.Instance;
+
     protected MarkupString HighlightMarkup => TpsSourceHighlighter.Render(Text);
 
     protected string FloatingBarStyle =>
-        $"left:clamp({FloatingBarEdgePaddingVariable}, {Selection.ToolbarLeft}px, calc(100% - {FloatingBarEdgePaddingVariable})); top:{Selection.ToolbarTop}px; bottom:auto;";
+        $"left:clamp({EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression}, {Selection.ToolbarLeft}px, calc(100% - {EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression})); top:{Selection.ToolbarTop}px; bottom:auto;";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -48,20 +54,17 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     public async Task FocusRangeAsync(int start, int end)
     {
-        try
-        {
-            _domSelection = await Interop.SetSelectionAsync(_textareaRef, start, end);
-            await OnSelectionChanged.InvokeAsync(_domSelection);
-            StateHasChanged();
-        }
-        catch
-        {
-        }
-    }
+        var selection = await RunSelectionInteropAsync(
+            () => Interop.SetSelectionAsync(_textareaRef, start, end),
+            FocusSelectionFailureMessage);
 
-    public async ValueTask DisposeAsync()
-    {
-        await Task.CompletedTask;
+        if (selection is null)
+        {
+            return;
+        }
+
+        await OnSelectionChanged.InvokeAsync(selection);
+        StateHasChanged();
     }
 
     protected Task RequestInsertAsync(string token, int? caretOffset = null) =>
@@ -113,25 +116,51 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     private async Task RefreshSelectionAsync()
     {
-        try
+        var selection = await RunSelectionInteropAsync(
+            () => Interop.GetSelectionAsync(_textareaRef),
+            RefreshSelectionFailureMessage);
+
+        if (selection is null)
         {
-            _domSelection = await Interop.GetSelectionAsync(_textareaRef);
-            await OnSelectionChanged.InvokeAsync(_domSelection);
-            StateHasChanged();
+            return;
         }
-        catch
-        {
-        }
+
+        await OnSelectionChanged.InvokeAsync(selection);
+        StateHasChanged();
     }
 
-    private async Task SafeSyncScrollAsync()
+    private Task SafeSyncScrollAsync() =>
+        RunInteropAsync(
+            () => Interop.SyncScrollAsync(_textareaRef, _overlayRef),
+            ScrollSyncFailureMessage);
+
+    private async Task<EditorSelectionViewModel?> RunSelectionInteropAsync(
+        Func<Task<EditorSelectionViewModel>> operation,
+        string failureMessage)
     {
         try
         {
-            await Interop.SyncScrollAsync(_textareaRef, _overlayRef);
+            return await operation();
         }
-        catch
+        catch (Exception exception) when (IsExpectedInteropException(exception))
         {
+            Logger.LogDebug(exception, failureMessage);
+            return null;
         }
     }
+
+    private async Task RunInteropAsync(Func<ValueTask> operation, string failureMessage)
+    {
+        try
+        {
+            await operation();
+        }
+        catch (Exception exception) when (IsExpectedInteropException(exception))
+        {
+            Logger.LogDebug(exception, failureMessage);
+        }
+    }
+
+    private static bool IsExpectedInteropException(Exception exception) =>
+        exception is InvalidOperationException or JSException or ObjectDisposedException or TaskCanceledException;
 }

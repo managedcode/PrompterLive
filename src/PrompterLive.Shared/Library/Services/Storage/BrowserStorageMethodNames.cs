@@ -2,9 +2,9 @@ namespace PrompterLive.Shared.Services;
 
 internal static class BrowserStorageMethodNames
 {
-    public const string LoadSettingJson = "PrompterLive.settings.loadJson";
-    public const string LoadStorageValue = "PrompterLive.storage.load";
-    public const string RemoveStorageValue = "PrompterLive.storage.remove";
-    public const string SaveSettingJson = "PrompterLive.settings.saveJson";
-    public const string SaveStorageValue = "PrompterLive.storage.save";
+    public const string LoadSettingJson = "localStorage.getItem";
+    public const string LoadStorageValue = "localStorage.getItem";
+    public const string RemoveStorageValue = "localStorage.removeItem";
+    public const string SaveSettingJson = "localStorage.setItem";
+    public const string SaveStorageValue = "localStorage.setItem";
 }

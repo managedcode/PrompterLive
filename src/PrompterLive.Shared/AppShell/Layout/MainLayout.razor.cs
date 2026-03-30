@@ -20,9 +20,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
+    [Inject] private BrowserConnectivityService Connectivity { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
-    [Inject] private ShellDiagnosticsInterop ShellDiagnosticsInterop { get; set; } = null!;
     [Inject] private ILogger<MainLayout> Logger { get; set; } = null!;
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -138,7 +138,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
             return;
         }
 
-        await ShellDiagnosticsInterop.AttachAsync();
+        await Connectivity.StartAsync();
         await Bootstrapper.EnsureReadyAsync();
     }
 

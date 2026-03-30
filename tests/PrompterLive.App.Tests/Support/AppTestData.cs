@@ -33,7 +33,7 @@ internal static class AppTestData
 
     public static class Camera
     {
-        public const string AttachCameraInvocation = "PrompterLive.media.attachCamera";
+        public const string AttachCameraInvocation = "BrowserMediaInterop.attachCamera";
         public const string FirstDeviceId = "cam-1";
         public const string FirstSourceId = "scene-cam-a";
         public const string FrontCamera = "Front camera";
@@ -47,8 +47,8 @@ internal static class AppTestData
 
     public static class Microphone
     {
-        public const string StartLevelMonitorInvocation = "PrompterLive.media.startMicrophoneLevelMonitor";
-        public const string StopLevelMonitorInvocation = "PrompterLive.media.stopMicrophoneLevelMonitor";
+        public const string StartLevelMonitorInvocation = "BrowserMediaInterop.startMicrophoneLevelMonitor";
+        public const string StopLevelMonitorInvocation = "BrowserMediaInterop.stopMicrophoneLevelMonitor";
     }
 
     public static class Editor

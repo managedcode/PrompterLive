@@ -10,11 +10,15 @@ public sealed class BrowserMediaPermissionService(IJSRuntime jsRuntime) : IMedia
 
     public async Task<MediaPermissionsState> QueryAsync(CancellationToken cancellationToken = default)
     {
-        return await _jsRuntime.InvokeAsync<MediaPermissionsState>("PrompterLive.media.queryPermissions", cancellationToken);
+        return await _jsRuntime.InvokeAsync<MediaPermissionsState>(
+            BrowserMediaInteropMethodNames.QueryPermissions,
+            cancellationToken);
     }
 
     public async Task<MediaPermissionsState> RequestAsync(CancellationToken cancellationToken = default)
     {
-        return await _jsRuntime.InvokeAsync<MediaPermissionsState>("PrompterLive.media.requestPermissions", cancellationToken);
+        return await _jsRuntime.InvokeAsync<MediaPermissionsState>(
+            BrowserMediaInteropMethodNames.RequestPermissions,
+            cancellationToken);
     }
 }

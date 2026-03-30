@@ -94,7 +94,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<MicrophoneLevelInterop>();
         context.Services.AddSingleton(bootstrapper);
         context.Services.AddSingleton<GoLiveSessionService>();
-        context.Services.AddSingleton<ShellDiagnosticsInterop>();
+        context.Services.AddSingleton<BrowserConnectivityService>();
         context.Services.AddSingleton<UiDiagnosticsService>();
         context.Services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
@@ -130,8 +130,11 @@ internal sealed record AppHarness(
 
 internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRuntime
 {
-    private const string LoadSettingJsonIdentifier = "PrompterLive.settings.loadJson";
-    private const string SaveSettingJsonIdentifier = "PrompterLive.settings.saveJson";
+    private const string EvaluateIdentifier = "eval";
+    private const string LoadSettingJsonIdentifier = "localStorage.getItem";
+    private const string RemoveStorageValueIdentifier = "localStorage.removeItem";
+    private const string SaveSettingJsonIdentifier = "localStorage.setItem";
+    private const string NavigatorOnlineExpression = "navigator.onLine";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -168,10 +171,10 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
 
         var result = identifier switch
         {
+            EvaluateIdentifier => Evaluate(args),
             LoadSettingJsonIdentifier => LoadJson(args),
-            "PrompterLive.settings.load" => Load(args),
             SaveSettingJsonIdentifier => SaveJson(args),
-            "PrompterLive.settings.save" => Save(args),
+            RemoveStorageValueIdentifier => Remove(args),
             _ => null
         };
 
@@ -188,12 +191,6 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         return (TValue)result;
     }
 
-    private object? Load(object?[]? args)
-    {
-        var key = args?.FirstOrDefault()?.ToString() ?? string.Empty;
-        return SavedValues.TryGetValue(key, out var value) ? value : null;
-    }
-
     public T GetSavedValue<T>(string key)
     {
         if (SavedValues.TryGetValue(key, out var value) && value is T typedValue)
@@ -208,13 +205,6 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         }
 
         throw new KeyNotFoundException($"No saved value was found for '{key}'.");
-    }
-
-    private object? Save(object?[]? args)
-    {
-        var key = args?.FirstOrDefault()?.ToString() ?? string.Empty;
-        SavedValues[key] = args?.Skip(1).FirstOrDefault();
-        return null;
     }
 
     private object? LoadJson(object?[]? args)
@@ -236,6 +226,25 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         var json = args?.Skip(1).FirstOrDefault()?.ToString() ?? string.Empty;
         SavedJsonValues[key] = json;
         return null;
+    }
+
+    private object? Remove(object?[]? args)
+    {
+        var key = args?.FirstOrDefault()?.ToString() ?? string.Empty;
+        SavedJsonValues.Remove(key);
+        SavedValues.Remove(key);
+        return null;
+    }
+
+    private static object? Evaluate(object?[]? args)
+    {
+        var expression = args?.FirstOrDefault()?.ToString() ?? string.Empty;
+        return expression switch
+        {
+            NavigatorOnlineExpression => true,
+            _ when expression.Contains("navigator.languages", StringComparison.Ordinal) => new[] { "en" },
+            _ => null
+        };
     }
 }
 

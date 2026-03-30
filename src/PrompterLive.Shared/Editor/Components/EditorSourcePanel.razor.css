@@ -33,7 +33,7 @@
 
 .ed-content{flex:1;position:relative;z-index:2;overflow-y:auto;width:100%;padding:0;font-family:var(--mono);font-size:16px;line-height:2;}
 .ed-source-shell{position:relative;}
-.ed-source-stage{--ed-floatbar-edge:240px;position:relative;min-height:100%;}
+.ed-source-stage{--ed-floatbar-edge:240px;--ed-floatbar-min-top:44px;position:relative;min-height:100%;}
 .ed-source-highlight,.ed-source-input{box-sizing:border-box;font-family:var(--mono);font-size:16px;line-height:2;letter-spacing:normal;font-variant-ligatures:none;padding:40px 48px;tab-size:4;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;}
 .ed-source-highlight{position:relative;z-index:1;pointer-events:none;color:var(--t1);min-height:100%;}
 .ed-source-input{position:absolute;inset:0;z-index:2;width:100%;min-height:100%;border:0;outline:none;resize:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--t1);overflow:auto;}

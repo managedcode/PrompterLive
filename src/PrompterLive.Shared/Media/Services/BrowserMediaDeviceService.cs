@@ -10,7 +10,9 @@ public sealed class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDevi
 
     public async Task<IReadOnlyList<MediaDeviceInfo>> GetDevicesAsync(CancellationToken cancellationToken = default)
     {
-        var devices = await _jsRuntime.InvokeAsync<BrowserMediaDeviceDto[]>("PrompterLive.media.listDevices", cancellationToken);
+        var devices = await _jsRuntime.InvokeAsync<BrowserMediaDeviceDto[]>(
+            BrowserMediaInteropMethodNames.ListDevices,
+            cancellationToken);
 
         return devices.Select(device => new MediaDeviceInfo(
             device.DeviceId,

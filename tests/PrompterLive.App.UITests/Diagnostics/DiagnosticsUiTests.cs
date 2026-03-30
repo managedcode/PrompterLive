@@ -1,4 +1,3 @@
-using Microsoft.Playwright;
 using PrompterLive.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -55,77 +54,6 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture) : IClassFix
     }
 
     [Fact]
-    public async Task AppShell_ShowsStyledBootstrapErrorOverlay()
-    {
-        var page = await _fixture.NewPageAsync();
-
-        try
-        {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await page.EvaluateAsync(
-                BrowserTestConstants.Diagnostics.ShowBootstrapErrorScript,
-                BrowserTestConstants.Diagnostics.BootstrapDetail);
-
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.Bootstrap)).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.Bootstrap))
-                .ToContainTextAsync(BrowserTestConstants.Diagnostics.BootstrapDetail);
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.BootstrapReload)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Diagnostics.BootstrapDismiss).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.Bootstrap)).ToBeHiddenAsync();
-        }
-        finally
-        {
-            await page.Context.CloseAsync();
-        }
-    }
-
-    [Fact]
-    public async Task AppShell_LogsBootstrapErrorsToBrowserConsole()
-    {
-        var page = await _fixture.NewPageAsync();
-        var consoleMessageSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        void HandleConsole(object? _, IConsoleMessage message)
-        {
-            if (!string.Equals(message.Type, BrowserTestConstants.Diagnostics.ConsoleErrorType, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            if (!message.Text.Contains(BrowserTestConstants.Diagnostics.BootstrapDetail, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            consoleMessageSource.TrySetResult(message.Text);
-        }
-
-        page.Console += HandleConsole;
-
-        try
-        {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await page.EvaluateAsync(
-                BrowserTestConstants.Diagnostics.ShowBootstrapErrorScript,
-                BrowserTestConstants.Diagnostics.BootstrapDetail);
-
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.Bootstrap)).ToBeVisibleAsync();
-
-            var consoleMessage = await consoleMessageSource.Task.WaitAsync(
-                TimeSpan.FromMilliseconds(BrowserTestConstants.Timing.DefaultVisibleTimeoutMs));
-
-            Assert.Contains(BrowserTestConstants.Diagnostics.ShellConsoleErrorPrefix, consoleMessage, StringComparison.Ordinal);
-            Assert.Contains(BrowserTestConstants.Diagnostics.BootstrapManualSource, consoleMessage, StringComparison.Ordinal);
-            Assert.Contains(BrowserTestConstants.Diagnostics.BootstrapDetail, consoleMessage, StringComparison.Ordinal);
-        }
-        finally
-        {
-            page.Console -= HandleConsole;
-            await page.Context.CloseAsync();
-        }
-    }
-
-    [Fact]
     public async Task AppShell_ShowsConnectivityOverlayForOfflineAndOnlineStates()
     {
         var page = await _fixture.NewPageAsync();
@@ -134,12 +62,12 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture) : IClassFix
         {
             await page.GotoAsync(BrowserTestConstants.Routes.Library);
 
-            await page.EvaluateAsync(BrowserTestConstants.Diagnostics.ShowConnectivityOfflineScript);
+            await page.Context.SetOfflineAsync(true);
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
                 .ToContainTextAsync(BrowserTestConstants.Diagnostics.ConnectivityOfflineTitle);
 
-            await page.EvaluateAsync(BrowserTestConstants.Diagnostics.ShowConnectivityOnlineScript);
+            await page.Context.SetOfflineAsync(false);
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
                 .ToContainTextAsync(BrowserTestConstants.Diagnostics.ConnectivityOnlineTitle);
 

@@ -2,6 +2,15 @@ namespace PrompterLive.Shared.Contracts;
 
 public static class UiDomIds
 {
+    public static class Diagnostics
+    {
+        public const string ConnectivityDismiss = "app-connectivity-dismiss";
+        public const string ConnectivityMessage = "app-connectivity-message";
+        public const string ConnectivityRetry = "app-connectivity-retry";
+        public const string ConnectivityTitle = "app-connectivity-title";
+        public const string ConnectivityUi = "app-connectivity-ui";
+    }
+
     public static class Design
     {
         public const string LearnScreen = "screen-rsvp";

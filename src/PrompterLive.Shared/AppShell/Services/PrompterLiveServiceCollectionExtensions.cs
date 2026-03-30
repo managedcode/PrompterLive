@@ -43,8 +43,8 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<MicrophoneLevelInterop>();
         services.AddScoped<AppBootstrapper>();
         services.AddScoped<AppShellService>();
+        services.AddScoped<BrowserConnectivityService>();
         services.AddScoped<GoLiveSessionService>();
-        services.AddScoped<ShellDiagnosticsInterop>();
         services.AddScoped<UiDiagnosticsService>();
 
         services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();

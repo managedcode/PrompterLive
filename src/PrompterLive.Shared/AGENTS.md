@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-`PrompterLive.Shared` contains the routed Razor UI, exact design shell, CSS/JS assets, and browser-side service wiring.
+`PrompterLive.Shared` contains the routed Razor UI, exact design shell, CSS assets, thin browser interop, and browser-side service wiring.
 
 ## Entry Points
 
@@ -18,8 +18,9 @@
 - `Diagnostics/*`
 - `Media/*`
 - `wwwroot/design/*`
-- `wwwroot/prompterlive-shell.js`
-- `wwwroot/prompterlive-browser.js`
+- `Diagnostics/Services/BrowserConnectivityService.cs`
+- `Diagnostics/Components/ConnectivityOverlay.razor`
+- `wwwroot/media/browser-media.js`
 
 ## Boundaries
 
