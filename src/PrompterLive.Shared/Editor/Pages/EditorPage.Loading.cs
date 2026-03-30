@@ -1,6 +1,6 @@
 using System.Globalization;
 using PrompterLive.Core.Services.Editor;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 
 namespace PrompterLive.Shared.Pages;
 

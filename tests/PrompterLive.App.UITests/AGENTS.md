@@ -6,9 +6,18 @@
 
 ## Entry Points
 
-- `StandaloneAppFixture.cs`
-- `StaticSpaServer.cs`
-- `ScreenFlowTests.cs`
+- `Infrastructure/*`
+- `AppShell/*`
+- `Diagnostics/*`
+- `Editor/*`
+- `GoLive/*`
+- `Learn/*`
+- `Library/*`
+- `Localization/*`
+- `Media/*`
+- `Scenarios/*`
+- `Teleprompter/*`
+- `Support/*`
 
 ## Boundaries
 
@@ -16,6 +25,7 @@
 - The fixture self-hosts the built WASM assets on a dynamically assigned local loopback origin for Playwright.
 - Each fixture startup MUST request a fresh OS-assigned loopback port. Never hardcode or reuse a fixed browser-test port across runs.
 - The fixture also injects a deterministic synthetic media harness before page scripts run, so browser tests can verify camera and microphone flows without real hardware.
+- Keep browser specs grouped by routed feature or cross-cutting acceptance concern instead of returning to a flat file dump.
 - Verify routed flows in a real browser.
 - Click real controls instead of only checking static HTML.
 - This suite is the primary acceptance gate for the product.

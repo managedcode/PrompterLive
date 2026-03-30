@@ -33,6 +33,12 @@ flowchart LR
     Tests --> Core
 ```
 
+## Vertical Slice Layout
+
+- `src/PrompterLive.Shared` keeps routed UI in feature slices: `AppShell`, `Diagnostics`, `Editor`, `Library`, `Learn`, `Teleprompter`, `GoLive`, `Settings`, and `Media`.
+- `src/PrompterLive.Core` keeps host-neutral behavior in matching domain slices: `Tps`, `Editor`, `Workspace`, `Library`, `Rsvp`, `Media`, `Streaming`, `Localization`, and `Samples`.
+- `tests/PrompterLive.Core.Tests`, `tests/PrompterLive.App.Tests`, and `tests/PrompterLive.App.UITests` mirror those feature slices and reserve `Support` or `Infrastructure` for shared harness code.
+
 ## Build Governance
 
 - `Directory.Packages.props` is the canonical source for NuGet package versions.
@@ -208,7 +214,8 @@ If a native embedded browser host returns later, media access must not rely on s
 ### `src/PrompterLive.Shared`
 
 - routed Razor screens: `library`, `editor`, `learn`, `teleprompter`, `go-live`, `settings`
-- page files are organized as `Pages/<ScreenName>/...` so each screen keeps its Razor file and page-local partials together
+- vertical slices own their routed pages, components, renderers, and feature-local services under folders such as `Editor/`, `Library/`, `Teleprompter/`, and `GoLive/`
+- only true cross-cutting UI assets stay outside feature slices: `Contracts/`, `Localization/`, `wwwroot/`, root bootstrap files, and `AppShell/`
 - exact design shell and imported `new-design` assets
 - shared UI localization catalog for supported browser cultures
 - browser interop and app DI wiring
@@ -228,6 +235,7 @@ Rules:
 
 ### `src/PrompterLive.Core`
 
+- feature slices keep related abstractions, models, previews, and services together under `Tps/`, `Editor/`, `Workspace/`, `Library/`, `Rsvp/`, `Media/`, and `Streaming/`
 - TPS parser, compiler, exporter
 - RSVP helpers
 - workspace state and preview generation
@@ -330,9 +338,9 @@ flowchart LR
 
 ## Test Strategy
 
-- `PrompterLive.Core.Tests`: domain correctness and regression tests
-- `PrompterLive.App.Tests`: bUnit screen-shell coverage for the routed UI
-- `PrompterLive.App.UITests`: Playwright browser flows that click real controls on every screen
+- `PrompterLive.Core.Tests`: domain correctness and regression tests grouped by core slice plus `Support/`
+- `PrompterLive.App.Tests`: bUnit coverage grouped by routed feature slice plus `Support/`
+- `PrompterLive.App.UITests`: Playwright browser flows grouped by browser feature slice plus `Infrastructure/`, `Scenarios/`, `Media/`, and `Support/`
 
 ## Constraints
 

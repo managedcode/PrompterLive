@@ -1,6 +1,6 @@
 using PrompterLive.Core.Models.Media;
 using PrompterLive.Core.Models.Workspace;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 using PrompterLive.Core.Services.Streaming;
 
 namespace PrompterLive.Shared.Pages;

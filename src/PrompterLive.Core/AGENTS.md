@@ -8,19 +8,22 @@ It owns TPS parsing, compilation, export, RSVP helpers, preview and workspace st
 
 ## Entry Points
 
-- `Services/TpsParser.cs`
-- `Services/ScriptCompiler.cs`
-- `Services/TpsExporter.cs`
-- `Services/Rsvp/*`
-- `Services/Workspace/ScriptSessionService.cs`
-- `Services/Media/MediaSceneService.cs`
-- `Services/Streaming/*`
+- `Tps/*`
+- `Editor/*`
+- `Workspace/*`
+- `Library/*`
+- `Rsvp/*`
+- `Media/*`
+- `Streaming/*`
+- `Localization/*`
+- `Samples/*`
 
 ## Boundaries
 
 - No Blazor dependencies.
 - No JavaScript interop.
 - No browser or server runtime assumptions.
+- Keep abstractions, models, preview helpers, and services colocated inside their owning feature slices.
 - Keep types serializable and reusable from the WebAssembly app.
 
 ## Project-Local Commands
@@ -35,5 +38,6 @@ It owns TPS parsing, compilation, export, RSVP helpers, preview and workspace st
 ## Local Risks Or Protected Areas
 
 - TPS compatibility matters more than cosmetic refactors.
+- `Models/` and legacy `Services/` roots should not become new flat dumping grounds; prefer the owning feature slice first.
 - Do not let UI-specific shortcuts leak into domain parsing or RSVP behavior.
 - Respect root maintainability limits. Large parser/compiler edits need explicit decomposition or documented exceptions.

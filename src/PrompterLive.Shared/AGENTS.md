@@ -6,16 +6,24 @@
 
 ## Entry Points
 
-- `Routes.razor`
-- `Layout/MainLayout.razor`
-- `Pages/<ScreenName>/*`
-- `Services/PrompterLiveServiceCollectionExtensions.cs`
+- `AppShell/Routes.razor`
+- `AppShell/Layout/MainLayout.razor`
+- `AppShell/Services/PrompterLiveServiceCollectionExtensions.cs`
+- `Editor/*`
+- `Library/*`
+- `Learn/*`
+- `Teleprompter/*`
+- `GoLive/*`
+- `Settings/*`
+- `Diagnostics/*`
+- `Media/*`
 - `wwwroot/design/*`
 - `wwwroot/prompterlive.js`
 
 ## Boundaries
 
 - Keep markup aligned with `new-design`.
+- Keep routed pages, feature components, renderers, and feature-local services inside their owning slice folders.
 - Keep app-specific UI logic here, but keep business rules in `PrompterLive.Core`.
 - Preserve `data-testid` selectors used by Playwright.
 - Do not add server-only dependencies.
@@ -33,5 +41,6 @@
 ## Local Risks Or Protected Areas
 
 - Small class-name changes can break design fidelity badly because the CSS comes from `new-design`.
+- `AppShell`, `Contracts`, `Localization`, and `wwwroot` are cross-cutting; do not turn them back into dumping grounds for feature code.
 - Routed shell and page navigation belong in Blazor; keep `wwwroot/design/app.js` limited to browser/runtime interop.
 - JS interop and saved browser state are part of the real runtime contract; do not treat them as decorative.

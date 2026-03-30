@@ -6,16 +6,20 @@
 
 ## Entry Points
 
-- `TpsRoundTripTests.cs`
-- `ScriptSessionServiceTests.cs`
-- `MediaSceneServiceTests.cs`
-- `StreamingProviderTests.cs`
-- `RsvpEmotionAnalyzerTests.cs`
+- `Tps/*`
+- `Workspace/*`
+- `Media/*`
+- `Streaming/*`
+- `Rsvp/*`
+- `Editor/*`
+- `Localization/*`
+- `Support/*`
 
 ## Boundaries
 
 - Cover public domain behavior, not Blazor rendering.
 - Keep assertions on caller-visible contracts and serialized state.
+- Mirror `PrompterLive.Core` slices where possible instead of accumulating flat test roots.
 - Do not move browser concerns into this project.
 
 ## Project-Local Commands

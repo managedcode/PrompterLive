@@ -5,7 +5,7 @@ using PrompterLive.Core.Models.CompiledScript;
 using PrompterLive.Core.Models.Documents;
 using PrompterLive.Core.Models.Workspace;
 using PrompterLive.Core.Services.Preview;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 
 namespace PrompterLive.Core.Services.Workspace;
 

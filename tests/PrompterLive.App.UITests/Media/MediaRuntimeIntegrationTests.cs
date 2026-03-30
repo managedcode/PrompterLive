@@ -99,13 +99,9 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
 
+            await TeleprompterCameraDriver.EnsureDisabledAsync(page);
             await page.EvaluateAsync(BrowserTestConstants.Media.ClearRequestLogScript);
-            await page.GetByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
-
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementHasVideoStreamScript,
-                UiDomIds.Teleprompter.Camera,
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await TeleprompterCameraDriver.EnsureEnabledAsync(page);
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.Media.HasVideoOnlyRequestScript,
                 new object[] { BrowserTestConstants.Media.PrimaryCameraId },
@@ -123,11 +119,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
             Assert.True(state.Metadata!.IsSynthetic);
             Assert.Equal(BrowserTestConstants.Media.PrimaryCameraId, state.Metadata.VideoDeviceId);
 
-            await page.GetByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementHasNoStreamScript,
-                UiDomIds.Teleprompter.Camera,
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await TeleprompterCameraDriver.EnsureDisabledAsync(page);
         }
         finally
         {

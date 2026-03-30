@@ -1,6 +1,6 @@
 using PrompterLive.Core.Services;
 using PrompterLive.Core.Services.Editor;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 using PrompterLive.Shared.Services.Editor;
 
 namespace PrompterLive.App.Tests;

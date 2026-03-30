@@ -167,12 +167,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
         await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
         await page.GetByTestId(UiTestIds.Teleprompter.PreviousBlock).ClickAsync();
         await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
-        await page.GetByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
-
-        await page.WaitForFunctionAsync(
-            BrowserTestConstants.Media.ElementHasVideoStreamScript,
-            UiDomIds.Teleprompter.Camera,
-            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+        await TeleprompterCameraDriver.EnsureEnabledAsync(page);
         await UiScenarioArtifacts.CapturePageAsync(page, BrowserTestConstants.ReaderWorkflow.Name, BrowserTestConstants.ReaderWorkflow.TeleprompterCameraStep);
     }
 

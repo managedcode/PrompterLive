@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text;
 using PrompterLive.Core.Models.Documents;
 
-namespace PrompterLive.Core.Services.Samples;
+namespace PrompterLive.Core.Samples;
 
 public static class SampleScriptCatalog
 {

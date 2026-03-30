@@ -50,6 +50,27 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Fact]
+    public Task LibraryScreen_NewScriptActionsOpenEmptyEditorDraft() =>
+        RunPageAsync(async page =>
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Header.LibraryNewScript).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Editor));
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
+
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Library.CreateScript).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Editor));
+            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
+        });
+
+    [Fact]
     public Task LibraryScreen_FolderChipsFilterCards() =>
         RunPageAsync(async page =>
         {

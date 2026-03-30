@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Media;
 using PrompterLive.Core.Models.Workspace;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 
 namespace PrompterLive.Shared.Services;
 

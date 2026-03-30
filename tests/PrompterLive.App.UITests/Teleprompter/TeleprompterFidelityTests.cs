@@ -45,12 +45,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
     private static async Task EnsureCameraLayerIsActiveAsync(Microsoft.Playwright.IPage page)
     {
         var cameraLayer = page.GetByTestId(UiTestIds.Teleprompter.CameraBackground);
-        var isActive = await cameraLayer.EvaluateAsync<bool>("element => element.classList.contains('active')");
-        if (!isActive)
-        {
-            await page.GetByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
-        }
-
+        await TeleprompterCameraDriver.EnsureEnabledAsync(page);
         await Expect(cameraLayer).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
     }
 }

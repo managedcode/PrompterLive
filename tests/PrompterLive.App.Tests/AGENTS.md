@@ -6,17 +6,22 @@
 
 ## Entry Points
 
-- `ScreenShellContractTests.cs`
-- `SettingsInteractionTests.cs`
-- `EditorMetadataInteractionTests.cs`
-- `EditorMarkupRendererTests.cs`
-- `TeleprompterSceneTests.cs`
-- `TestSupport.cs`
+- `AppShell/*`
+- `Diagnostics/*`
+- `Editor/*`
+- `GoLive/*`
+- `Library/*`
+- `Localization/*`
+- `Reader/*`
+- `Settings/*`
+- `Teleprompter/*`
+- `Support/*`
 
 ## Boundaries
 
 - Cover rendered UI structure and meaningful user-visible interactions.
 - Keep the harness close to the real shared-service registration shape.
+- Mirror `PrompterLive.Shared` feature slices instead of collecting unrelated tests in one root.
 - Do not add smoke-only placeholders; every test here must assert a meaningful UI contract.
 - Do not replace browser acceptance tests; this project complements them.
 - Prefer shared `PrompterLive.Shared.Contracts` constants over inline test ids, route literals, and DOM ids.

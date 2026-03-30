@@ -1,6 +1,6 @@
 using PrompterLive.Core.Models.Library;
 
-namespace PrompterLive.Core.Services.Samples;
+namespace PrompterLive.Core.Samples;
 
 public static class SampleLibraryFolderCatalog
 {

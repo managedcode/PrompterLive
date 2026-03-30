@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.JSInterop;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
-using PrompterLive.Core.Services.Samples;
+using PrompterLive.Core.Samples;
 
 namespace PrompterLive.Shared.Services;
 
