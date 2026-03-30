@@ -1,5 +1,4 @@
 using System.Globalization;
-using PrompterLive.Core.Models.Workspace;
 using PrompterLive.Shared.Components.Editor;
 
 namespace PrompterLive.Shared.Pages;
@@ -27,7 +26,7 @@ public partial class EditorPage
     private async Task OnDurationChangedAsync(string value)
     {
         _displayDuration = value.Trim();
-        UpdateStatus(SessionService.State);
+        UpdateStatus();
         await PersistMetadataAsync();
     }
 
@@ -51,7 +50,7 @@ public partial class EditorPage
         await PersistDraftAsync(_sourceText);
     }
 
-    private void UpdateStatus(ScriptWorkspaceState state)
+    private void UpdateStatus()
     {
         _status = new EditorStatusViewModel(
             _selection.Line,
@@ -60,8 +59,8 @@ public partial class EditorPage
             _baseWpm,
             _segments.Count,
             _segments.Sum(segment => segment.Blocks.Count),
-            state.WordCount,
-            ResolveDisplayedDuration(state.EstimatedDuration),
+            _draftMetrics.WordCount,
+            ResolveDisplayedDuration(_draftMetrics.EstimatedDuration),
             _version);
     }
 

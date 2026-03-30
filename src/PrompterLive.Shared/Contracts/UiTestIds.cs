@@ -116,6 +116,8 @@ public static class UiTestIds
         public const string MenuInsert = "editor-menu-insert";
         public const string MenuPause = "editor-menu-pause";
         public const string MenuSpeed = "editor-menu-speed";
+        public const string MainPanel = "editor-main-panel";
+        public const string MetadataRail = "editor-metadata-rail";
         public const string Page = "editor-page";
         public const string PauseTrigger = "editor-pause-trigger";
         public const string PauseTwoSeconds = "editor-pause-two-seconds";

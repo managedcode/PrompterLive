@@ -10,7 +10,6 @@ namespace PrompterLive.Shared.Pages;
 
 public partial class GoLivePage : ComponentBase
 {
-    private const string CustomRtmpReadySummary = "Use a custom relay, event CDN, or private ingest endpoint together with the rest of the stack.";
     private const string DefaultMicRouteLabel = "Monitor + Stream";
     private const string DisabledReadyPrefix = "Selected routing:";
     private const string DisabledStatusLabel = "Disabled";
@@ -69,24 +68,6 @@ public partial class GoLivePage : ComponentBase
         ? AppRoutes.LearnWithId(SessionService.State.ScriptId)
         : AppRoutes.Learn;
 
-    private GoLiveDestinationState CustomRtmpDescriptor => BuildRtmpDestinationState(
-        _studioSettings.Streaming.CustomRtmpEnabled,
-        _studioSettings.Streaming.CustomRtmpName,
-        _studioSettings.Streaming.CustomRtmpUrl,
-        _studioSettings.Streaming.CustomRtmpStreamKey,
-        GoLiveTargetCatalog.TargetIds.CustomRtmp,
-        CustomRtmpReadySummary);
-
-    private string CustomRtmpStatusLabel => CustomRtmpDescriptor.StatusLabel;
-
-    private string CustomRtmpSummary => CustomRtmpDescriptor.Summary;
-
-    private GoLiveDestinationState LiveKitDescriptor => BuildLiveKitState();
-
-    private string LiveKitStatusLabel => LiveKitDescriptor.StatusLabel;
-
-    private string LiveKitSummary => LiveKitDescriptor.Summary;
-
     private SceneCameraSource? PreviewCamera =>
         SceneCameras.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)
         ?? SceneCameras.FirstOrDefault(camera => camera.Transform.Visible)
@@ -113,36 +94,6 @@ public partial class GoLivePage : ComponentBase
         : AppRoutes.Teleprompter;
 
     private IReadOnlyList<SceneCameraSource> SceneCameras => MediaSceneService.State.Cameras;
-
-    private GoLiveDestinationState TwitchDescriptor => BuildRtmpDestinationState(
-        _studioSettings.Streaming.TwitchEnabled,
-        GoLiveTargetCatalog.TargetNames.Twitch,
-        _studioSettings.Streaming.TwitchRtmpUrl,
-        _studioSettings.Streaming.TwitchStreamKey,
-        GoLiveTargetCatalog.TargetIds.Twitch,
-        TwitchReadySummary);
-
-    private string TwitchStatusLabel => TwitchDescriptor.StatusLabel;
-
-    private string TwitchSummary => TwitchDescriptor.Summary;
-
-    private GoLiveDestinationState VdoDescriptor => BuildVdoState();
-
-    private string VdoStatusLabel => VdoDescriptor.StatusLabel;
-
-    private string VdoSummary => VdoDescriptor.Summary;
-
-    private GoLiveDestinationState YoutubeDescriptor => BuildRtmpDestinationState(
-        _studioSettings.Streaming.YoutubeEnabled,
-        GoLiveTargetCatalog.TargetNames.Youtube,
-        _studioSettings.Streaming.YoutubeRtmpUrl,
-        _studioSettings.Streaming.YoutubeStreamKey,
-        GoLiveTargetCatalog.TargetIds.Youtube,
-        YoutubeReadySummary);
-
-    private string YoutubeStatusLabel => YoutubeDescriptor.StatusLabel;
-
-    private string YoutubeSummary => YoutubeDescriptor.Summary;
 
     protected override Task OnParametersSetAsync()
     {

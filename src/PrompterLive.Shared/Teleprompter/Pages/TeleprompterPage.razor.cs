@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using PrompterLive.Core.Abstractions;
-using PrompterLive.Core.Models.CompiledScript;
 using PrompterLive.Core.Models.Media;
-using PrompterLive.Core.Models.Tps;
 using PrompterLive.Core.Models.Workspace;
 using PrompterLive.Core.Samples;
 using PrompterLive.Core.Services;
@@ -175,7 +172,7 @@ public partial class TeleprompterPage : IAsyncDisposable
             .ToList();
         var configuredCamera = availableCameras.FirstOrDefault(device => string.Equals(device.DeviceId, preferredCameraId, StringComparison.Ordinal));
 
-        SceneCameraSource? primarySceneCamera = visibleSceneCameras.FirstOrDefault();
+        var primarySceneCamera = visibleSceneCameras.FirstOrDefault();
         if (!string.IsNullOrWhiteSpace(preferredCameraId))
         {
             primarySceneCamera = visibleSceneCameras.FirstOrDefault(camera => string.Equals(camera.DeviceId, preferredCameraId, StringComparison.Ordinal))

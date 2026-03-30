@@ -4,19 +4,30 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
 using PrompterLive.Core.Models.Editor;
-using PrompterLive.Shared.Rendering;
 
 namespace PrompterLive.Shared.Components.Editor;
 
 public partial class EditorSourcePanel
 {
     private const string FocusSelectionFailureMessage = "Editor selection focus interop failed during source panel update.";
+    private const string InitializeSurfaceFailureMessage = "Editor surface interop failed during source panel initialization.";
     private const string RefreshSelectionFailureMessage = "Editor selection refresh interop failed during source panel update.";
     private const string RedoKeyLower = "y";
     private const string ScrollSyncFailureMessage = "Editor overlay scroll sync interop failed during source panel update.";
     private const string UndoKeyLower = "z";
     private ElementReference _overlayRef;
     private ElementReference _textareaRef;
+    private bool _hasPendingLocalInputText;
+    private bool _lastRenderedCanRedo;
+    private bool _lastRenderedCanUndo;
+    private string? _lastRenderedErrorMessage;
+    private EditorSelectionViewModel _lastRenderedSelection = EditorSelectionViewModel.Empty;
+    private string _lastRenderedText = string.Empty;
+    private string _lastTypedText = string.Empty;
+    private bool _skipNextRender;
+    private bool _syncOverlayAfterRender = true;
+    private bool _surfaceInteropReady;
+    private bool _syncScrollAfterRender = true;
 
     [Parameter] public bool CanRedo { get; set; }
 
@@ -42,14 +53,59 @@ public partial class EditorSourcePanel
 
     [Inject] private ILogger<EditorSourcePanel> Logger { get; set; } = NullLogger<EditorSourcePanel>.Instance;
 
-    protected MarkupString HighlightMarkup => TpsSourceHighlighter.Render(Text);
+    protected override void OnParametersSet()
+    {
+        var textChanged = !string.Equals(Text, _lastRenderedText, StringComparison.Ordinal);
+        var isLocalTextEcho = _hasPendingLocalInputText &&
+                              textChanged &&
+                              string.Equals(Text, _lastTypedText, StringComparison.Ordinal);
+        var selectionNeedsRender = Selection.HasSelection || _lastRenderedSelection.HasSelection;
 
-    protected string FloatingBarStyle =>
-        $"left:clamp({EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression}, {Selection.ToolbarLeft}px, calc(100% - {EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression})); top:{Selection.ToolbarTop}px; bottom:auto;";
+        _skipNextRender = _surfaceInteropReady && isLocalTextEcho && !selectionNeedsRender;
+        _syncOverlayAfterRender |= textChanged;
+        _syncScrollAfterRender |= textChanged;
+
+        if (!isLocalTextEcho)
+        {
+            _hasPendingLocalInputText = false;
+        }
+
+        UpdateFloatingBarAnchor();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await EnsureSurfaceInteropReadyAsync();
+
+        if (_surfaceInteropReady && (firstRender || _syncOverlayAfterRender))
+        {
+            _syncOverlayAfterRender = false;
+            await SafeRenderOverlayAsync();
+        }
+
+        if (!firstRender && !_syncScrollAfterRender)
+        {
+            return;
+        }
+
+        _syncScrollAfterRender = false;
         await SafeSyncScrollAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        if (_skipNextRender)
+        {
+            _skipNextRender = false;
+            return false;
+        }
+
+        _lastRenderedText = Text;
+        _lastRenderedSelection = Selection;
+        _lastRenderedCanUndo = CanUndo;
+        _lastRenderedCanRedo = CanRedo;
+        _lastRenderedErrorMessage = ErrorMessage;
+        return true;
     }
 
     public async Task FocusRangeAsync(int start, int end)
@@ -64,6 +120,7 @@ public partial class EditorSourcePanel
         }
 
         await OnSelectionChanged.InvokeAsync(selection);
+        _syncScrollAfterRender = true;
         StateHasChanged();
     }
 
@@ -94,27 +151,39 @@ public partial class EditorSourcePanel
     private async Task OnScrollAsync()
     {
         await SafeSyncScrollAsync();
-        await RefreshSelectionAsync();
+        if (Selection.HasSelection)
+        {
+            await RefreshSelectionAsync();
+        }
     }
 
     private async Task OnSelectionInteractionAsync()
     {
+        RequestFloatingBarReanchor();
         CloseToolbarPanels();
         await RefreshSelectionAsync();
     }
 
     // A late textarea select event can arrive after a toolbar click and should
     // refresh selection state without dismissing the menu the user just opened.
-    private Task OnSourceSelectAsync() =>
-        RefreshSelectionAsync();
+    private Task OnSourceSelectAsync()
+    {
+        RequestFloatingBarReanchor();
+        return RefreshSelectionAsync();
+    }
 
     private async Task OnSourceInputAsync(ChangeEventArgs args)
     {
+        var hadOpenToolbarMenu = HasOpenToolbarMenu;
         CloseToolbarPanels();
-        await OnTextChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+        _lastTypedText = args.Value?.ToString() ?? string.Empty;
+        _hasPendingLocalInputText = true;
+        _skipNextRender = _surfaceInteropReady && !hadOpenToolbarMenu;
+        await OnTextChanged.InvokeAsync(_lastTypedText);
     }
 
-    private async Task RefreshSelectionAsync()
+    private async Task RefreshSelectionAsync(bool requestComponentRender = true)
     {
         var selection = await RunSelectionInteropAsync(
             () => Interop.GetSelectionAsync(_textareaRef),
@@ -126,13 +195,51 @@ public partial class EditorSourcePanel
         }
 
         await OnSelectionChanged.InvokeAsync(selection);
-        StateHasChanged();
+        if (requestComponentRender)
+        {
+            _syncScrollAfterRender = Selection.HasSelection || selection.HasSelection;
+            StateHasChanged();
+        }
     }
 
-    private Task SafeSyncScrollAsync() =>
-        RunInteropAsync(
+    private async Task EnsureSurfaceInteropReadyAsync()
+    {
+        if (_surfaceInteropReady)
+        {
+            return;
+        }
+
+        _surfaceInteropReady = await RunInitializationInteropAsync(
+            () => Interop.InitializeAsync(_textareaRef, _overlayRef),
+            InitializeSurfaceFailureMessage);
+    }
+
+    private async Task SafeSyncScrollAsync()
+    {
+        _ = await RunInteropAsync(
             () => Interop.SyncScrollAsync(_textareaRef, _overlayRef),
             ScrollSyncFailureMessage);
+    }
+
+    private async Task SafeRenderOverlayAsync()
+    {
+        _ = await RunInteropAsync(
+            () => Interop.RenderOverlayAsync(_overlayRef, Text),
+            InitializeSurfaceFailureMessage);
+    }
+
+    private async Task<bool> RunInitializationInteropAsync(Func<ValueTask<bool>> operation, string failureMessage)
+    {
+        try
+        {
+            return await operation();
+        }
+        catch (Exception exception) when (IsExpectedInteropException(exception))
+        {
+            Logger.LogDebug(exception, failureMessage);
+            return false;
+        }
+    }
 
     private async Task<EditorSelectionViewModel?> RunSelectionInteropAsync(
         Func<Task<EditorSelectionViewModel>> operation,
@@ -149,15 +256,17 @@ public partial class EditorSourcePanel
         }
     }
 
-    private async Task RunInteropAsync(Func<ValueTask> operation, string failureMessage)
+    private async Task<bool> RunInteropAsync(Func<ValueTask> operation, string failureMessage)
     {
         try
         {
             await operation();
+            return true;
         }
         catch (Exception exception) when (IsExpectedInteropException(exception))
         {
             Logger.LogDebug(exception, failureMessage);
+            return false;
         }
     }
 

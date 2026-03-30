@@ -106,12 +106,21 @@ internal static partial class BrowserTestConstants
         public const string TypedMultilineSelectionStart = "Typed Intro";
         public const string TypedMultilineSelectionEnd = "professional";
         public const string TypedSelectionTarget = "script";
+        public const string ToolbarPinnedSelectionTarget = "welcome";
+        public const int ToolbarPinnedSelectionCharacterCount = 7;
+        public const double FloatingBarPinnedMaxDriftPx = 4;
         public const string SimplifiedMoment = "clear moment";
+        public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
         public const int ClickNearStartOffsetX = 140;
         public const int ClickNearStartOffsetY = 70;
         public const double FloatingBarMinHeightPx = 40;
         public const double FloatingBarMinGapAboveSelectionPx = 4;
+        public const double MetadataRailDockGapPx = 10;
+        public const double MetadataRailDockTolerancePx = 2;
+        public const string OverlayRenderedLengthDataAttribute = "renderedLength";
+        public const int MaxTypingLongTaskCount = 0;
+        public const double MaxVisibleRenderLatencyMs = 48;
         public const string TypedScript = """
             ## [Typed Intro|175WPM|focused|0:05-0:20]
             ### [Typed Block|165WPM|professional]
@@ -289,7 +298,7 @@ internal static partial class BrowserTestConstants
         public const int DefaultVisibleTimeoutMs = 10_000;
         public const int ExtendedVisibleTimeoutMs = 15_000;
         public const int NewDraftPersistGraceDelayMs = 700;
-        public const int NewDraftPersistSettleDelayMs = 1_800;
+        public const int NewDraftPersistSettleDelayMs = 2_200;
         public const int FloatingToolbarSettleDelayMs = 500;
         public const int LearnPlaybackDelayMs = 900;
         public const int ReaderPlaybackDelayMs = 2_500;
@@ -298,7 +307,8 @@ internal static partial class BrowserTestConstants
         public const int ReaderPostTransitionAdvanceDelayMs = 1_600;
         public const int ReaderAutomaticTransitionTimeoutMs = 14_000;
         public const int ReaderCameraInitDelayMs = 750;
-        public const int PersistDelayMs = 800;
+        public const int PersistDelayMs = 1_800;
+        public const int TypingProbeSettleDelayMs = 100;
     }
 
     public static class Regexes
@@ -314,10 +324,12 @@ internal static partial class BrowserTestConstants
 
     public static class Keyboard
     {
+        public const string ArrowRight = "ArrowRight";
         public const string SelectAll = "Meta+A";
         public const string Backspace = "Backspace";
         public const string Undo = "Meta+Z";
         public const string Redo = "Meta+Shift+Z";
+        public const string Shift = "Shift";
     }
 
     public static class Routes

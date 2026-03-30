@@ -119,6 +119,67 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
         }
     }
 
+    [Fact]
+    public async Task EditorScreen_FloatingToolbarStaysPinnedAfterFloatingFormatAction()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
+            await Expect(sourceInput).ToBeVisibleAsync();
+
+            await sourceInput.EvaluateAsync(
+                """
+                (element, target) => {
+                    element.focus();
+                    const start = element.value.indexOf(target);
+                    element.setSelectionRange(start, start);
+                }
+                """,
+                BrowserTestConstants.Editor.ToolbarPinnedSelectionTarget);
+
+            await page.Keyboard.DownAsync(BrowserTestConstants.Keyboard.Shift);
+
+            try
+            {
+                for (var index = 0; index < BrowserTestConstants.Editor.ToolbarPinnedSelectionCharacterCount; index++)
+                {
+                    await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.ArrowRight);
+                }
+            }
+            finally
+            {
+                await page.Keyboard.UpAsync(BrowserTestConstants.Keyboard.Shift);
+            }
+
+            var floatingBar = page.GetByTestId(UiTestIds.Editor.FloatingBar);
+            await Expect(floatingBar).ToBeVisibleAsync();
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
+
+            var before = await GetRequiredBoundingBoxAsync(floatingBar);
+
+            await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
+
+            var after = await GetRequiredBoundingBoxAsync(floatingBar);
+
+            Assert.InRange(
+                Math.Abs(after.X - before.X),
+                0,
+                BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
+            Assert.InRange(
+                Math.Abs(after.Y - before.Y),
+                0,
+                BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
     private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(ILocator locator) =>
         await locator.EvaluateAsync<LayoutBounds>(
             """

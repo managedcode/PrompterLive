@@ -86,7 +86,9 @@ public sealed class EditorStylesheetContractTests
         Assert.DoesNotContain(".ed-source-highlight", globalStylesheet, StringComparison.Ordinal);
 
         Assert.Contains(nameof(EditorSurfaceInteropMethodNames), interopSource, StringComparison.Ordinal);
+        Assert.Contains("EditorSurfaceInteropMethodNames.Initialize", interopSource, StringComparison.Ordinal);
         Assert.Contains("EditorSurfaceInteropMethodNames.GetSelectionState", interopSource, StringComparison.Ordinal);
+        Assert.Contains("EditorSurfaceInteropMethodNames.RenderOverlay", interopSource, StringComparison.Ordinal);
         Assert.Contains("EditorSurfaceInteropMethodNames.SetSelection", interopSource, StringComparison.Ordinal);
         Assert.Contains("EditorSurfaceInteropMethodNames.SyncScroll", interopSource, StringComparison.Ordinal);
         Assert.Contains($"editorSurfaceNamespace = \"{EditorSurfaceInteropMethodNames.Namespace}\"", editorSupportScript, StringComparison.Ordinal);

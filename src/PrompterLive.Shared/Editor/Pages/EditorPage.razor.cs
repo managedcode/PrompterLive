@@ -17,8 +17,8 @@ public partial class EditorPage
     private const string PersistDraftMessage = "Unable to save the current draft.";
     private const string EditorSyntaxOperation = "Editor syntax";
     private const string EditorSyntaxMessage = "The TPS draft has a syntax issue. Fix it and keep writing.";
-    private const int AutosaveDelayMilliseconds = 450;
-    private const int DraftSyncDelayMilliseconds = 75;
+    private const int DraftAnalysisDelayMilliseconds = 1_000;
+    private const int AutosaveDelayMilliseconds = 1_500;
     private const int UntitledDraftAutosaveDelayMilliseconds = 1_500;
     private const string DefaultAuthor = "PrompterLive";
     private const string DefaultProfileActor = "Actor";
@@ -27,8 +27,8 @@ public partial class EditorPage
 
     private readonly EditorDocumentHistory _history = new();
     private readonly TpsFrontMatterDocumentService _frontMatterService = new();
+    private CancellationTokenSource? _draftAnalysisCancellationSource;
     private CancellationTokenSource? _autosaveCancellationSource;
-    private CancellationTokenSource? _draftSyncCancellationSource;
     private bool _loadState = true;
     private int? _activeBlockIndex;
     private int _activeSegmentIndex;
@@ -41,8 +41,10 @@ public partial class EditorPage
     private string _screenTitle = "Product Launch";
     private EditorSelectionViewModel _selection = EditorSelectionViewModel.Empty;
     private IReadOnlyList<EditorOutlineSegmentViewModel> _segments = [];
+    private bool _skipNextRenderFromTyping;
     private EditorSourcePanel? _sourcePanel;
     private string _sourceText = string.Empty;
+    private EditorDraftMetrics _draftMetrics = EditorDraftMetrics.Empty;
     private EditorStatusViewModel _status = new(1, 1, "Actor", 140, 0, 0, 0, "0:00", "1.0");
     private string _version = DefaultVersion;
 
@@ -60,4 +62,15 @@ public partial class EditorPage
 
     [SupplyParameterFromQuery(Name = "id")]
     public string? ScriptId { get; set; }
+
+    protected override bool ShouldRender()
+    {
+        if (!_skipNextRenderFromTyping)
+        {
+            return true;
+        }
+
+        _skipNextRenderFromTyping = false;
+        return false;
+    }
 }

@@ -203,7 +203,7 @@ public partial class TeleprompterPage
 
     private int GetChunkWordStartIndex(int cardIndex, int chunkIndex)
     {
-        var card = _cards[cardIndex];
+        _ = _cards[cardIndex];
         var total = 0;
 
         for (var index = 0; index < chunkIndex; index++)

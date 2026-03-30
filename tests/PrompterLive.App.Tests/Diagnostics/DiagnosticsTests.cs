@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using PrompterLive.Shared.Components.Diagnostics;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Localization;
-using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Tests;
 

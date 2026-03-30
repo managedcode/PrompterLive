@@ -4,8 +4,8 @@ public partial class EditorPage
 {
     private async Task PersistDraftAsync(string text)
     {
+        CancelDraftAnalysis();
         CancelAutosave();
-        CancelDraftStateSync();
         await UpdateDraftStateAsync(text, persistDocument: true, CancellationToken.None);
     }
 
@@ -48,6 +48,13 @@ public partial class EditorPage
         _ = RunAutosaveAsync(_autosaveCancellationSource.Token);
     }
 
+    private void QueueDraftAnalysis()
+    {
+        CancelDraftAnalysis();
+        _draftAnalysisCancellationSource = new CancellationTokenSource();
+        _ = RunDraftAnalysisAsync(_draftAnalysisCancellationSource.Token);
+    }
+
     private async Task RunAutosaveAsync(CancellationToken cancellationToken)
     {
         try
@@ -56,6 +63,34 @@ public partial class EditorPage
             await InvokeAsync(() => PersistDraftAsync(_sourceText));
         }
         catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private async Task RunDraftAnalysisAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(DraftAnalysisDelayMilliseconds, cancellationToken);
+            await InvokeAsync(() =>
+            {
+                RefreshDraftViewFromSource();
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        catch (InvalidOperationException)
         {
         }
     }
@@ -70,6 +105,18 @@ public partial class EditorPage
         _autosaveCancellationSource.Cancel();
         _autosaveCancellationSource.Dispose();
         _autosaveCancellationSource = null;
+    }
+
+    private void CancelDraftAnalysis()
+    {
+        if (_draftAnalysisCancellationSource is null)
+        {
+            return;
+        }
+
+        _draftAnalysisCancellationSource.Cancel();
+        _draftAnalysisCancellationSource.Dispose();
+        _draftAnalysisCancellationSource = null;
     }
 
     private int GetAutosaveDelayMilliseconds() =>

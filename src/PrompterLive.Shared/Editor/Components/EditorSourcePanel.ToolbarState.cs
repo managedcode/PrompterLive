@@ -4,7 +4,9 @@ namespace PrompterLive.Shared.Components.Editor;
 
 public partial class EditorSourcePanel
 {
+    private EditorSelectionViewModel _floatingBarAnchor = EditorSelectionViewModel.Empty;
     private string? _openMenuId;
+    private bool _pendingFloatingBarReanchor = true;
 
     private static IReadOnlyList<EditorToolbarSectionDescriptor> ToolbarSections => EditorToolbarCatalog.Sections;
 
@@ -12,6 +14,7 @@ public partial class EditorSourcePanel
 
     private Task ExecuteAiActionAsync(EditorAiAssistAction action)
     {
+        PreserveFloatingBarAnchor();
         CloseToolbarPanels();
         return OnAiActionRequested.InvokeAsync(action);
     }
@@ -24,6 +27,7 @@ public partial class EditorSourcePanel
                 ToggleMenu(action.MenuId ?? string.Empty);
                 break;
             case EditorToolbarActionType.History:
+                PreserveFloatingBarAnchor();
                 CloseToolbarPanels();
                 if (action.HistoryCommand is { } historyCommand)
                 {
@@ -32,6 +36,7 @@ public partial class EditorSourcePanel
 
                 break;
             case EditorToolbarActionType.Ai:
+                PreserveFloatingBarAnchor();
                 CloseToolbarPanels();
                 if (action.AiAction is { } aiAction)
                 {
@@ -40,6 +45,7 @@ public partial class EditorSourcePanel
 
                 break;
             default:
+                PreserveFloatingBarAnchor();
                 CloseToolbarPanels();
                 if (action.Command is { } command)
                 {
@@ -54,6 +60,11 @@ public partial class EditorSourcePanel
     {
         _openMenuId = null;
     }
+
+    protected string FloatingBarStyle => BuildFloatingBarStyle(
+        _floatingBarAnchor.HasSelection
+            ? _floatingBarAnchor
+            : Selection);
 
     private string GetToolbarSectionCss(EditorToolbarSectionDescriptor section)
     {
@@ -79,7 +90,7 @@ public partial class EditorSourcePanel
 
     private bool HasOpenToolbarMenu => !string.IsNullOrWhiteSpace(_openMenuId);
 
-    private bool ShouldRenderFloatingBar => Selection.HasSelection && !HasOpenToolbarMenu;
+    private bool ShouldRenderFloatingBar => _floatingBarAnchor.HasSelection && !HasOpenToolbarMenu;
 
     private bool GetActionDisabled(EditorToolbarActionDescriptor action) =>
         action.HistoryCommand switch
@@ -96,4 +107,41 @@ public partial class EditorSourcePanel
     {
         _openMenuId = IsMenuOpen(menuId) ? null : menuId;
     }
+
+    private void PreserveFloatingBarAnchor()
+    {
+        _pendingFloatingBarReanchor = false;
+    }
+
+    private void RequestFloatingBarReanchor()
+    {
+        _pendingFloatingBarReanchor = true;
+    }
+
+    private void UpdateFloatingBarAnchor()
+    {
+        if (!Selection.HasSelection)
+        {
+            _floatingBarAnchor = EditorSelectionViewModel.Empty;
+            _pendingFloatingBarReanchor = true;
+            return;
+        }
+
+        if (!_floatingBarAnchor.HasSelection || _pendingFloatingBarReanchor)
+        {
+            _floatingBarAnchor = Selection;
+            _pendingFloatingBarReanchor = false;
+            return;
+        }
+
+        _floatingBarAnchor = _floatingBarAnchor with
+        {
+            Range = Selection.Range,
+            Line = Selection.Line,
+            Column = Selection.Column
+        };
+    }
+
+    private static string BuildFloatingBarStyle(EditorSelectionViewModel selection) =>
+        $"left:clamp({EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression}, {selection.ToolbarLeft}px, calc(100% - {EditorSourcePanelStyleVariables.FloatingBarEdgePaddingExpression})); top:{selection.ToolbarTop}px; bottom:auto;";
 }

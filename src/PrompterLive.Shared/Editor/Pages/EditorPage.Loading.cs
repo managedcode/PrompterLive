@@ -75,12 +75,13 @@ public partial class EditorPage
         _xfastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.XfastOffset, DefaultXfastOffset);
         _segments = OutlineBuilder.Build(state.ScriptData, document.Body, 0);
         _errorMessage = state.ErrorMessage;
+        UpdateDraftMetrics(state);
 
         UpdateSyntaxDiagnostics();
         ResetHistoryIfNeeded(resetHistory);
         UpdateActiveOutlineSelection();
         RefreshStructureAuthoringState();
-        UpdateStatus(state);
+        UpdateStatus();
         Shell.ShowEditor(_screenTitle, state.ScriptId);
     }
 

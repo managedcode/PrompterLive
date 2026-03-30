@@ -7,6 +7,7 @@
 
 .ed-layout {
     display: flex;
+    align-items: stretch;
     height: 100%;
     padding: 10px;
     gap: 10px;
@@ -181,6 +182,7 @@
 /* Editor Right sidebar — metadata panel */
 .ed-right {
     width: 340px;
+    align-self: stretch;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -282,4 +284,3 @@
     gap: 8px;
     margin-top: auto;
 }
-

@@ -67,6 +67,9 @@ sequenceDiagram
 - metadata edits rewrite the persisted TPS document without surfacing YAML in the editor body
 - typing stays local-first while autosave persists on a short debounce instead of every keystroke
 - the styled TPS overlay remains visible while the real textarea owns caret and selection, so editing stays inline instead of switching to a plain-text mode
+- the highlight overlay subtree is JS-owned while Blazor keeps workflow state, preventing per-keystroke DOM diff churn and keeping browser typing responsive
+- plain `input` events no longer force a page-wide Blazor render; sidebar, metadata rail, and status refresh only after draft analysis or explicit selection/navigation interactions
+- selection interop stays off the keystroke path and runs only for caret/selection workflows that actually need toolbar anchoring or focus moves
 - the source highlight and textarea share the same wrapping metrics, preventing caret/text drift on multiline editing
 - native textarea clicks own caret placement; the stage shell no longer steals click-to-caret behavior
 - `EditorSourcePanel` owns its editor-only CSS and browser support script, so the shell keeps loading support assets but the active editor surface no longer depends on global stylesheet or shell-script rules

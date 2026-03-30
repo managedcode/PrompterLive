@@ -18,7 +18,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_UsesVisibleBodyTextareaAndRebuildsStructureWhenSourceChanges()
+    public async Task EditorPage_UsesVisibleBodyTextareaAndRebuildsStructureWhenSourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -39,15 +39,23 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(updatedSource);
 
+        await Task.Delay(EditorSourceInteractionTestSource.PostDraftAnalysisObservationDelay);
+
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
-            Assert.Contains(EditorSourceInteractionTestSource.TitlePersistenceLine, _harness.Session.State.Text, StringComparison.Ordinal);
-            Assert.Contains(EditorSourceInteractionTestSource.AuthorPersistenceLine, _harness.Session.State.Text, StringComparison.Ordinal);
-            Assert.Contains(updatedSource, _harness.Session.State.Text, StringComparison.Ordinal);
             Assert.Contains("Fresh Opening", cut.Markup);
             Assert.Contains("Renamed Block", cut.Markup);
             Assert.Contains(EditorSourceInteractionTestSource.SingleSegmentLabel, cut.Markup);
+        });
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostAutosaveObservationDelay);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(EditorSourceInteractionTestSource.TitlePersistenceLine, _harness.Session.State.Text, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.AuthorPersistenceLine, _harness.Session.State.Text, StringComparison.Ordinal);
+            Assert.Contains(updatedSource, _harness.Session.State.Text, StringComparison.Ordinal);
         });
     }
 
@@ -86,7 +94,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_HistoryButtonsReplaySourceChanges()
+    public async Task EditorPage_HistoryButtonsReplaySourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -103,6 +111,8 @@ public sealed class EditorSourceInteractionTests : BunitContext
         var updatedSource = string.Concat(initialSource, Environment.NewLine, EditorSourceInteractionTestSource.EditPointToken);
 
         sourceEditor.Input(updatedSource);
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostDraftAnalysisObservationDelay);
 
         cut.WaitForAssertion(() =>
         {
@@ -125,7 +135,56 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_KeyboardUndoAndRedoReplaySourceChanges()
+    public async Task EditorPage_TypingStaysLocalFirstUntilAutosaveDebounce()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.EditorDemo);
+        var cut = Render<EditorPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+            Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
+        });
+
+        var sourceEditor = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+        var initialSource = sourceEditor.GetAttribute("value")!;
+        var initialSessionWordCount = _harness.Session.State.WordCount;
+        var updatedSource = string.Concat(
+            initialSource,
+            Environment.NewLine,
+            EditorSourceInteractionTestSource.LocalFirstTypingLine);
+
+        sourceEditor.Input(updatedSource);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.DoesNotContain(
+                EditorSourceInteractionTestSource.LocalFirstTypingLine,
+                _harness.Session.State.Text,
+                StringComparison.Ordinal);
+            Assert.Equal(initialSessionWordCount, _harness.Session.State.WordCount);
+        });
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostDraftAnalysisObservationDelay);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
+            Assert.Contains(EditorSourceInteractionTestSource.LocalFirstTypingLine, cut.Markup, StringComparison.Ordinal);
+            Assert.Equal(initialSessionWordCount, _harness.Session.State.WordCount);
+        });
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostAutosaveObservationDelay);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.True(_harness.Session.State.WordCount > initialSessionWordCount);
+        });
+    }
+
+    [Fact]
+    public async Task EditorPage_KeyboardUndoAndRedoReplaySourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -142,6 +201,8 @@ public sealed class EditorSourceInteractionTests : BunitContext
         var updatedSource = string.Concat(initialSource, Environment.NewLine, EditorSourceInteractionTestSource.EditPointToken);
 
         sourceEditor.Input(updatedSource);
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostDraftAnalysisObservationDelay);
 
         cut.WaitForAssertion(() =>
         {
@@ -200,10 +261,13 @@ public sealed class EditorSourceInteractionTests : BunitContext
         public const string ProfilePersistenceLine = "profile: \"RSVP\"";
         public const string ProfileRsvp = "RSVP";
         public const string RedoKey = "y";
+        public const int PostDraftAnalysisObservationDelay = 1_200;
+        public const int PostAutosaveObservationDelay = 1_700;
         public const string SingleSegmentLabel = "1 Segments";
         public const string TestSpeakerPersistenceLine = "author: \"Test Speaker\"";
         public const string TitlePersistenceLine = "title: \"Product Launch\"";
         public const string UndoKey = "z";
         public const string VersionPersistenceLine = "version: \"2.0\"";
+        public const string LocalFirstTypingLine = "steady local typing proof";
     }
 }

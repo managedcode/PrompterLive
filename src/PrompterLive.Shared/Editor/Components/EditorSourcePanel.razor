@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Components
 @inject EditorInterop Interop
 
-<div class="ed-main">
+<div class="ed-main" data-testid="@UiTestIds.Editor.MainPanel">
     <div class="ed-toolbar">
         @for (var sectionIndex = 0; sectionIndex < ToolbarSections.Count; sectionIndex++)
         {
@@ -67,7 +67,7 @@
              data-testid="@UiTestIds.Editor.SourceStage">
             <div class="ed-source-highlight"
                  @ref="_overlayRef"
-                 data-testid="@UiTestIds.Editor.SourceHighlight">@HighlightMarkup</div>
+                 data-testid="@UiTestIds.Editor.SourceHighlight"></div>
             <textarea class="ed-source-input"
                       data-testid="@UiTestIds.Editor.SourceInput"
                       spellcheck="false"
@@ -78,7 +78,6 @@
                       @ref="_textareaRef"
                       @oninput="OnSourceInputAsync"
                       @onkeydown="OnSourceKeyDownAsync"
-                      @onkeyup="OnSelectionInteractionAsync"
                       @onmouseup="OnSelectionInteractionAsync"
                       @onselect="OnSourceSelectAsync"
                       @onscroll="OnScrollAsync"></textarea>

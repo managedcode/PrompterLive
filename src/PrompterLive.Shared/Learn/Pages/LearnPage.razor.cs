@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Workspace;
 using PrompterLive.Core.Samples;

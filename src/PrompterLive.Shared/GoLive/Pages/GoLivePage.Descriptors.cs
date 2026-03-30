@@ -10,9 +10,7 @@ namespace PrompterLive.Shared.Pages;
 public partial class GoLivePage
 {
     private const string LiveKitReadySummary = "Publish the selected cameras to a LiveKit room.";
-    private const string TwitchReadySummary = "Keep the selected cameras armed for Twitch in the same live session.";
     private const string VdoNinjaReadySummary = "Create a browser publishing session for the selected cameras in parallel with teleprompter.";
-    private const string YoutubeReadySummary = "Arm the selected cameras for a YouTube RTMP relay.";
 
     private GoLiveDestinationState BuildLiveKitState()
     {
@@ -97,33 +95,11 @@ public partial class GoLivePage
             : new GoLiveDestinationState(true, false, NeedsSetupStatusLabel, descriptor.Summary);
     }
 
-    private GoLiveDestinationState BuildLocalOutputState(
-        bool isEnabled,
-        string readySummary,
-        string targetId)
-    {
-        var selectedSourceIds = GetDestinationSourceIds(targetId);
-        if (!isEnabled)
-        {
-            return new GoLiveDestinationState(
-                false,
-                selectedSourceIds.Count > 0,
-                DisabledStatusLabel,
-                BuildDisabledSummary(selectedSourceIds.Count));
-        }
-
-        return selectedSourceIds.Count > 0
-            ? new GoLiveDestinationState(true, true, ReadyStatusLabel, BuildReadySummary(selectedSourceIds.Count, readySummary))
-            : new GoLiveDestinationState(true, false, NeedsSetupStatusLabel, NoDestinationSourceSummary);
-    }
-
     private IReadOnlyList<string> GetDestinationSourceIds(string targetId) =>
         GoLiveDestinationRouting.GetSelectedSourceIds(_studioSettings.Streaming, targetId, SceneCameras);
 
     private IStreamingOutputProvider GetProvider(StreamingProviderKind kind) =>
         StreamingProviders.First(provider => provider.Kind == kind);
-
-    private static string GetInputValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
 
     private static string FormatRouteTarget(AudioRouteTarget routeTarget) =>
         routeTarget switch

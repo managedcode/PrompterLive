@@ -66,8 +66,8 @@ public partial class EditorPage
     {
         _sourceText = text ?? string.Empty;
         _history.TryRecord(_sourceText, _selection.Range);
-        RefreshDraftViewFromSource();
-        QueueDraftStateSync();
+        _skipNextRenderFromTyping = true;
+        QueueDraftAnalysis();
         QueueAutosave();
         return Task.CompletedTask;
     }
@@ -76,7 +76,7 @@ public partial class EditorPage
     {
         UpdateActiveOutlineSelection();
         RefreshStructureAuthoringState();
-        UpdateStatus(SessionService.State);
+        UpdateStatus();
     }
 
     private void UpdateActiveOutlineSelection()

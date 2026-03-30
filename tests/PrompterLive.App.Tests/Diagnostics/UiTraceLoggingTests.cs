@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using PrompterLive.Shared.Contracts;
 using PrompterLive.Shared.Layout;
 using PrompterLive.Shared.Pages;
-using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Tests;
 
 namespace PrompterLive.App.Tests;
