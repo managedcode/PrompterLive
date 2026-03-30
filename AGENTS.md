@@ -15,6 +15,67 @@ Stack: `.NET 10`, Blazor WebAssembly, Razor Class Library, xUnit, bUnit, Playwri
 
 There is no backend in the runtime shape. The app must boot directly in the browser from the WebAssembly host.
 
+
+## Rule Precedence
+
+1. Read the solution-root `AGENTS.md` first.
+2. Read the nearest local `AGENTS.md` for the area you will edit.
+3. Apply the stricter rule when both files speak to the same topic.
+4. Local `AGENTS.md` files may refine or tighten root rules, but they must not silently weaken them.
+5. If a local rule needs an exception, document it explicitly in the nearest local `AGENTS.md`, ADR, or feature doc.
+
+## Conversations (Self-Learning)
+
+Learn the user's stable habits, preferences, and corrections. Record durable rules here instead of relying on chat history.
+
+Before doing any non-trivial task, evaluate the latest user message.
+If it contains a durable rule, correction, preference, or workflow change, update `AGENTS.md` first.
+If it is only task-local scope, do not turn it into a lasting rule.
+
+Update this file when the user gives:
+
+- a repeated correction
+- a permanent requirement
+- a lasting preference
+- a workflow change
+- a high-signal frustration that indicates a rule was missed
+
+Extract rules aggressively when the user says things equivalent to:
+
+- "never", "don't", "stop", "avoid"
+- "always", "must", "make sure", "should"
+- "remember", "keep in mind", "note that"
+- "from now on", "going forward"
+- "the workflow is", "we do it like this"
+
+Preferences belong in `## Preferences`:
+
+- positive preferences go under `Likes`
+- negative preferences go under `Dislikes`
+- comparisons should become explicit rules or preferences
+
+Corrections should update an existing rule when possible instead of creating duplicates.
+
+Treat these as strong signals and record them immediately:
+
+- anger, swearing, sarcasm, or explicit frustration
+- ALL CAPS, repeated punctuation, or "don't do this again"
+- the same mistake happening twice
+- the user manually undoing or rejecting a recurring pattern
+
+Do not record:
+
+- one-off instructions for the current task
+- temporary exceptions
+- requirements that are already captured elsewhere without change
+
+Rule format:
+
+- one instruction per bullet
+- place it in the right section
+- capture the why, not only the literal wording
+- remove obsolete rules when a better one replaces them
+
 ## Rules to Follow (Mandatory)
 
 ### Commands
