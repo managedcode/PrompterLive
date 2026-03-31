@@ -3,6 +3,7 @@ using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using PrompterLive.App.Tests;
 using PrompterLive.Core.Abstractions;
 using PrompterLive.Core.Models.Documents;
 using PrompterLive.Core.Models.Library;
@@ -17,6 +18,8 @@ using PrompterLive.Core.Services.Workspace;
 using PrompterLive.Shared.Services;
 using PrompterLive.Shared.Services.Diagnostics;
 using PrompterLive.Shared.Services.Editor;
+using PrompterLive.Shared.Settings.Models;
+using PrompterLive.Shared.Settings.Services;
 
 namespace PrompterLive.Shared.Tests;
 
@@ -97,9 +100,15 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<RsvpPlaybackEngine>();
         context.Services.AddSingleton(settingsStore);
         context.Services.AddSingleton<BrowserThemeService>();
+        context.Services.AddSingleton<IAppVersionProvider>(
+            new StaticAppVersionProvider(
+                new AppVersionInfo(
+                    AppTestData.About.Version,
+                    AppTestData.About.BuildNumber)));
         context.Services.AddSingleton(shell);
         context.Services.AddSingleton<StudioSettingsStore>();
         context.Services.AddSingleton<CameraPreviewInterop>();
+        context.Services.AddSingleton<LearnRsvpLayoutInterop>();
         context.Services.AddSingleton<MicrophoneLevelInterop>();
         context.Services.AddSingleton<TeleprompterReaderInterop>();
         context.Services.AddSingleton<GoLiveOutputInterop>();

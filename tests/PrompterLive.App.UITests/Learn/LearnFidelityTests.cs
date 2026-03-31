@@ -6,6 +6,8 @@ namespace PrompterLive.App.UITests;
 public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
+    private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
+    private readonly record struct FocusWordSlackMeasurement(double SlackPx);
     private readonly record struct VisibleContextWordGapMeasurement(double LeftWordGapPx, double RightWordGapPx);
 
     [Fact]
@@ -64,6 +66,56 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             Assert.Equal(BrowserTestConstants.Learn.ContextWordCount, leftContextCount);
             Assert.Equal(BrowserTestConstants.Learn.ContextWordCount, rightContextCount);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task LearnScreen_DemoContextRails_ShowTwoWordsPerSideWithoutRightRailClipping()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.Learn.DemoViewportWidth,
+                BrowserTestConstants.Learn.DemoViewportHeight);
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await StepUntilWordAsync(
+                page,
+                BrowserTestConstants.Learn.DemoContextLayoutProbeWord,
+                BrowserTestConstants.Learn.DemoContextLayoutProbeStepLimit);
+
+            var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
+            var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+
+            Assert.Equal(
+                [
+                    BrowserTestConstants.Learn.DemoLeftContextFirstWord,
+                    BrowserTestConstants.Learn.DemoLeftContextSecondWord
+                ],
+                leftWords);
+            Assert.Equal(
+                [
+                    BrowserTestConstants.Learn.DemoRightContextFirstWord,
+                    BrowserTestConstants.Learn.DemoRightContextSecondWord
+                ],
+                rightWords);
+
+            var clip = await MeasureContextRailClipAsync(page);
+
+            Assert.True(
+                clip.LeftClipPx <= BrowserTestConstants.Learn.MaxRailClipPx,
+                $"Expected the left Learn context rail to avoid clipping visible words, but it clipped by {clip.LeftClipPx:0.##}px.");
+            Assert.True(
+                clip.RightClipPx <= BrowserTestConstants.Learn.MaxRailClipPx,
+                $"Expected the right Learn context rail to avoid clipping visible words, but it clipped by {clip.RightClipPx:0.##}px.");
         }
         finally
         {
@@ -170,6 +222,184 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
+    [Fact]
+    public async Task LearnScreen_LeadershipPreviewState_ShowsCurrentSentenceContextAndCloserContext()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.Learn.LeadershipViewportWidth,
+                BrowserTestConstants.Learn.LeadershipViewportHeight);
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnLeadership);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await StepUntilWordAsync(
+                page,
+                BrowserTestConstants.Learn.LeadershipPreviewProbeWord,
+                BrowserTestConstants.Learn.LeadershipPreviewProbeStepLimit);
+
+            var gaps = await MeasureVisibleContextWordGapsAsync(page);
+
+            Assert.True(
+                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
+                $"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            Assert.True(
+                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
+                $"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+
+            await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase))
+                .ToContainTextAsync(BrowserTestConstants.Learn.LeadershipCurrentSentencePreviewText);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task LearnScreen_LeadershipUncertainState_StaysSentenceLocalAndDropsPunctuation()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.Learn.LeadershipViewportWidth,
+                BrowserTestConstants.Learn.LeadershipViewportHeight);
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnLeadership);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await StepUntilWordAsync(
+                page,
+                BrowserTestConstants.Learn.LeadershipCleanSentenceProbeWord,
+                BrowserTestConstants.Learn.LeadershipCleanSentenceProbeStepLimit);
+
+            var gaps = await MeasureVisibleContextWordGapsAsync(page);
+            Assert.True(
+                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
+                $"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            Assert.True(
+                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
+                $"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+
+            var focusWordOverflowPx = await MeasureFocusWordOverflowAsync(page);
+            Assert.True(
+                focusWordOverflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx,
+                $"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {focusWordOverflowPx:0.##}px.");
+
+            var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
+            var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+
+            Assert.Equal([BrowserTestConstants.Learn.LeadershipLeftContextWord], leftWords);
+            Assert.Equal(
+                [
+                    BrowserTestConstants.Learn.LeadershipRightContextFirstWord,
+                    BrowserTestConstants.Learn.LeadershipRightContextSecondWord
+                ],
+                rightWords);
+
+            await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase))
+                .ToHaveTextAsync(BrowserTestConstants.Learn.LeadershipCleanSentencePreviewText);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task LearnScreen_LongFocusWord_FitsWithoutClipping()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await StepUntilWordAsync(
+                page,
+                BrowserTestConstants.Learn.LongWordProbeWord,
+                BrowserTestConstants.Learn.LongWordProbeStepLimit);
+
+            var overflowPx = await MeasureFocusWordOverflowAsync(page);
+
+            Assert.True(
+                overflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx,
+                $"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {overflowPx:0.##}px.");
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task LearnScreen_FocusWord_UsesPackedHorizontalStackAroundOrp()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await StepUntilWordAsync(
+                page,
+                BrowserTestConstants.Learn.DemoFocusStackProbeWord,
+                BrowserTestConstants.Learn.DemoFocusStackProbeStepLimit);
+
+            var slack = await MeasureFocusWordSlackAsync(page);
+
+            Assert.True(
+                slack.SlackPx <= BrowserTestConstants.Learn.MaxFocusWordSlackPx,
+                $"Expected the Learn focus word to use a packed horizontal stack, but it still had {slack.SlackPx:0.##}px of internal slack.");
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task LearnScreen_WpmIncrease_AcceleratesPlaybackCadence()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var baselineAdvance = await MeasurePlaybackAdvanceAsync(page);
+
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await IncreaseLearnSpeedAsync(page, BrowserTestConstants.Learn.PlaybackSpeedIncreaseClicks);
+            await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+                .ToHaveTextAsync(BrowserTestConstants.Learn.FasterPlaybackSpeedText);
+
+            var fasterAdvance = await MeasurePlaybackAdvanceAsync(page);
+
+            Assert.True(
+                fasterAdvance >= baselineAdvance + BrowserTestConstants.Learn.MinimumPlaybackAdvanceDeltaWords,
+                $"Expected higher WPM to advance more words. Baseline advanced {baselineAdvance}, faster mode advanced {fasterAdvance}.");
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
     private static Task<double> MeasureOrpDeltaAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync<double>(
             """
@@ -194,6 +424,22 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             targetId => {
                 const element = document.getElementById(targetId);
                 return element ? element.children.length : -1;
+            }
+            """,
+            elementId);
+
+    private static Task<string[]> ReadContextWordsAsync(Microsoft.Playwright.IPage page, string elementId) =>
+        page.EvaluateAsync<string[]>(
+            """
+            targetId => {
+                const element = document.getElementById(targetId);
+                if (!element) {
+                    return [];
+                }
+
+                return Array.from(element.children)
+                    .map(child => child.textContent?.trim() ?? '')
+                    .filter(text => text.length > 0);
             }
             """,
             elementId);
@@ -227,6 +473,35 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
     {
         var rawWord = await page.GetByTestId(UiTestIds.Learn.Word).TextContentAsync();
         return string.Concat((rawWord ?? string.Empty).Where(character => !char.IsWhiteSpace(character)));
+    }
+
+    private static async Task IncreaseLearnSpeedAsync(Microsoft.Playwright.IPage page, int clickCount)
+    {
+        for (var clickIndex = 0; clickIndex < clickCount; clickIndex++)
+        {
+            await page.GetByTestId(UiTestIds.Learn.SpeedUp).ClickAsync();
+        }
+    }
+
+    private static async Task<int> MeasurePlaybackAdvanceAsync(Microsoft.Playwright.IPage page)
+    {
+        var startWordNumber = await ReadProgressWordNumberAsync(page);
+
+        await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
+        await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackProbeWindowMs);
+        await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
+
+        var endWordNumber = await ReadProgressWordNumberAsync(page);
+        return endWordNumber - startWordNumber;
+    }
+
+    private static async Task<int> ReadProgressWordNumberAsync(Microsoft.Playwright.IPage page)
+    {
+        var progressLabel = await page.GetByTestId(UiTestIds.Learn.ProgressLabel).TextContentAsync() ?? string.Empty;
+        var parts = progressLabel.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 && int.TryParse(parts[1], out var wordNumber)
+            ? wordNumber
+            : 0;
     }
 
     private static Task<ContextGapMeasurement> MeasureContextGapsAsync(Microsoft.Playwright.IPage page) =>
@@ -279,5 +554,93 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
                 left = UiTestIds.Learn.ContextLeft,
                 focus = UiTestIds.Learn.Word,
                 right = UiTestIds.Learn.ContextRight
+            });
+
+    private static Task<ContextRailClipMeasurement> MeasureContextRailClipAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<ContextRailClipMeasurement>(
+            """
+            ids => {
+                const leftRail = document.querySelector(`[data-testid="${ids.left}"]`);
+                const rightRail = document.querySelector(`[data-testid="${ids.right}"]`);
+                if (!leftRail || !rightRail) {
+                    return { leftClipPx: 999, rightClipPx: 999 };
+                }
+
+                const leftOverflowVisible = getComputedStyle(leftRail).overflowX === 'visible';
+                const rightOverflowVisible = getComputedStyle(rightRail).overflowX === 'visible';
+                const leftWord = leftRail.firstElementChild;
+                const rightWord = rightRail.lastElementChild;
+                const leftRailRect = leftRail.getBoundingClientRect();
+                const rightRailRect = rightRail.getBoundingClientRect();
+                const leftWordRect = leftWord?.getBoundingClientRect();
+                const rightWordRect = rightWord?.getBoundingClientRect();
+
+                return {
+                    leftClipPx: leftOverflowVisible || !leftWordRect
+                        ? 0
+                        : Math.max(leftRailRect.left - leftWordRect.left, 0),
+                    rightClipPx: rightOverflowVisible || !rightWordRect
+                        ? 0
+                        : Math.max(rightWordRect.right - rightRailRect.right, 0)
+                };
+            }
+            """,
+            new
+            {
+                left = UiTestIds.Learn.ContextLeft,
+                right = UiTestIds.Learn.ContextRight
+            });
+
+    private static Task<FocusWordSlackMeasurement> MeasureFocusWordSlackAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<FocusWordSlackMeasurement>(
+            """
+            ids => {
+                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const leading = word?.querySelector('.rsvp-focus-leading');
+                const orp = word?.querySelector('.rsvp-focus-orp');
+                const trailing = word?.querySelector('.rsvp-focus-trailing');
+                if (!leading || !orp || !trailing) {
+                    return { slackPx: 999 };
+                }
+
+                const wordRect = word.getBoundingClientRect();
+                const leadingRect = leading.getBoundingClientRect();
+                const orpRect = orp.getBoundingClientRect();
+                const trailingRect = trailing.getBoundingClientRect();
+                const occupiedWidth = leadingRect.width + orpRect.width + trailingRect.width;
+                const slackPx = Math.max(wordRect.width - occupiedWidth, 0);
+
+                return { slackPx };
+            }
+            """,
+            new
+            {
+                word = UiTestIds.Learn.Word
+            });
+
+    private static Task<double> MeasureFocusWordOverflowAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<double>(
+            """
+            ids => {
+                const display = document.querySelector(`[data-testid="${ids.display}"]`);
+                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const leading = word?.querySelector('.rsvp-focus-leading');
+                const trailing = word?.querySelector('.rsvp-focus-trailing');
+                if (!display || !word || !leading || !trailing) {
+                    return 999;
+                }
+
+                const displayRect = display.getBoundingClientRect();
+                const leadingRect = leading.getBoundingClientRect();
+                const trailingRect = trailing.getBoundingClientRect();
+                const leftOverflow = Math.max(displayRect.left - leadingRect.left, 0);
+                const rightOverflow = Math.max(trailingRect.right - displayRect.right, 0);
+                return Math.max(leftOverflow, rightOverflow);
+            }
+            """,
+            new
+            {
+                display = UiTestIds.Learn.Display,
+                word = UiTestIds.Learn.Word
             });
 }

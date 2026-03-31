@@ -151,10 +151,12 @@ public static class UiTestIds
     {
         public const string ContextLeft = "learn-context-left";
         public const string ContextRight = "learn-context-right";
+        public const string Display = "learn-display";
         public const string NextPhrase = "learn-next-phrase";
         public const string OrpLine = "learn-orp-line";
         public const string Page = "learn-page";
         public const string PlayToggle = "learn-play-toggle";
+        public const string ProgressLabel = "learn-progress-label";
         public const string SpeedDown = "learn-speed-down";
         public const string SpeedUp = "learn-speed-up";
         public const string StepBackward = "learn-step-backward";
@@ -162,6 +164,7 @@ public static class UiTestIds
         public const string StepForward = "learn-step-forward";
         public const string StepForwardLarge = "learn-step-forward-large";
         public const string Word = "learn-word";
+        public const string WordShell = "learn-word-shell";
     }
 
     public static class Teleprompter
@@ -197,7 +200,9 @@ public static class UiTestIds
 
     public static class Settings
     {
+        public const string AboutAppCard = "settings-about-app-card";
         public const string AboutPanel = "settings-about-panel";
+        public const string AboutVersion = "settings-about-version";
         public const string AppearancePanel = "settings-appearance-panel";
         public const string AiPanel = "settings-ai-panel";
         public const string CameraFrameRate = "settings-camera-frame-rate";

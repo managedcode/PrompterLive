@@ -75,6 +75,13 @@ internal static class AppTestData
         public const string LightColorScheme = "light";
     }
 
+    public static class About
+    {
+        public const string BuildNumber = "777";
+        public const string Version = "0.1.777";
+        public const string VersionSubtitle = "Version 0.1.777 · Build 777";
+    }
+
     public static class Editor
     {
         public const string TestSpeaker = "Test Speaker";

@@ -10,12 +10,12 @@ namespace PrompterLive.Shared.Pages;
 
 public partial class LearnPage : IAsyncDisposable
 {
-    private const int DefaultContextWordCount = 5;
+    private const int DefaultContextWordCount = 2;
     private const string EndOfScriptPhrase = "End of script.";
     private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
     private const string LoadLearnOperation = "Learn load";
-    private const int MinimumLoopDelayMilliseconds = 150;
-    private const int MinimumWordDurationMilliseconds = 120;
+    private const int MinimumLoopDelayMilliseconds = 60;
+    private const int MinimumWordDurationMilliseconds = 60;
     private const string NeutralEmotion = "neutral";
     private const string ReadyWord = "Ready";
     private const int PreviewWordCount = 10;
@@ -35,12 +35,14 @@ public partial class LearnPage : IAsyncDisposable
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
+    [Inject] private LearnRsvpLayoutInterop LearnRsvpLayoutInterop { get; set; } = null!;
     [Inject] private RsvpTextProcessor TextProcessor { get; set; } = null!;
 
     [SupplyParameterFromQuery(Name = AppRoutes.ScriptIdQueryKey)]
     public string? ScriptId { get; set; }
 
     private CancellationTokenSource? _playbackCts;
+    private ElementReference _focusRow;
     private ElementReference _screenRoot;
     private string _nextPhrase = string.Empty;
     private string _progressFillWidth = "0%";
@@ -53,6 +55,7 @@ public partial class LearnPage : IAsyncDisposable
     private bool _isPlaying;
     private bool _loadState = true;
     private bool _focusScreenAfterRender = true;
+    private bool _syncFocusLayoutAfterRender;
     private bool _startPlaybackAfterLayoutSync;
     private string _currentWordLeading = string.Empty;
     private string _currentWordOrp = string.Empty;
@@ -91,6 +94,12 @@ public partial class LearnPage : IAsyncDisposable
         {
             _focusScreenAfterRender = false;
             await _screenRoot.FocusAsync();
+        }
+
+        if (_syncFocusLayoutAfterRender)
+        {
+            _syncFocusLayoutAfterRender = false;
+            await LearnRsvpLayoutInterop.SyncLayoutAsync(_focusRow);
         }
 
         if (_startPlaybackAfterLayoutSync)
@@ -271,30 +280,33 @@ public partial class LearnPage : IAsyncDisposable
             _nextPhrase = EndOfScriptPhrase;
             _progressFillWidth = "0%";
             _progressLabel = string.Empty;
+            _syncFocusLayoutAfterRender = true;
             return;
         }
 
         _currentIndex = Math.Clamp(_currentIndex, 0, _timeline.Count - 1);
         var entry = _timeline[_currentIndex];
-        var focusWord = BuildFocusWord(entry.Word);
+        var displayWord = NormalizeDisplayWord(entry.Word);
+        var focusWord = BuildFocusWord(string.IsNullOrWhiteSpace(displayWord) ? entry.Word : displayWord);
+        var sentenceRange = ResolveSentenceRange(_timeline, _currentIndex);
         _currentWordLeading = focusWord.Leading;
         _currentWordOrp = focusWord.Orp;
         _currentWordTrailing = focusWord.Trailing;
-        _leftContextWords = _timeline
-            .Skip(Math.Max(0, _currentIndex - _contextWordCount))
-            .Take(_currentIndex - Math.Max(0, _currentIndex - _contextWordCount))
-            .Select(item => item.Word)
-            .ToArray();
-        _rightContextWords = _timeline
-            .Skip(_currentIndex + 1)
-            .Take(_contextWordCount)
-            .Select(item => item.Word)
-            .ToArray();
-        _nextPhrase = string.IsNullOrWhiteSpace(entry.NextPhrase)
+        _leftContextWords = BuildDisplayContextWords(
+            _timeline,
+            Math.Max(sentenceRange.StartIndex, _currentIndex - _contextWordCount),
+            _currentIndex);
+        _rightContextWords = BuildDisplayContextWords(
+            _timeline,
+            _currentIndex + 1,
+            Math.Min(sentenceRange.EndIndex + 1, _currentIndex + 1 + _contextWordCount));
+        var rawPreviewText = string.IsNullOrWhiteSpace(entry.NextPhrase)
             ? ResolveFallbackNextPhrase(_timeline, _currentIndex)
             : entry.NextPhrase;
+        _nextPhrase = BuildDisplayPreviewText(rawPreviewText);
         _progressFillWidth = $"{((_currentIndex + 1) * 100d / _timeline.Count):0.##}%";
         _progressLabel = BuildProgressLabel(_timeline, _currentIndex, _speed);
+        _syncFocusLayoutAfterRender = true;
     }
 
     private async Task EnsureSessionLoadedAsync()

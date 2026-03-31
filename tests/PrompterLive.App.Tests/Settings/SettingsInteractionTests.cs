@@ -136,6 +136,24 @@ public sealed class SettingsInteractionTests : BunitContext
     }
 
     [Fact]
+    public void AboutSection_RendersInjectedAppVersionMetadata()
+    {
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.NavAbout, cut.Markup, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Settings.NavAbout).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                AppTestData.About.VersionSubtitle,
+                cut.FindByTestId(UiTestIds.Settings.AboutVersion).TextContent.Trim());
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.AboutAppCard));
+        });
+    }
+
+    [Fact]
     public void CameraPreview_AttachesSelectedCameraAfterMediaAccessIsGranted()
     {
         var cut = Render<SettingsPage>();

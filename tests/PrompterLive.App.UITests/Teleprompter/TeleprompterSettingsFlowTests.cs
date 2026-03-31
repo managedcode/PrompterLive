@@ -176,6 +176,8 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         await page.GetByTestId(UiTestIds.Settings.NavAbout).ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutPanel)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.AboutAppCard)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.AboutVersion)).ToHaveTextAsync(BrowserTestConstants.Regexes.SettingsAboutVersion);
     }
 
     private static async Task<bool> ToggleReaderCameraAsync(Microsoft.Playwright.IPage page)

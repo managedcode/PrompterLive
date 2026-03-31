@@ -41,6 +41,7 @@ public static class PrompterLiveServiceCollectionExtensions
         services.AddScoped<BrowserThemeService>();
         services.AddScoped<StudioSettingsStore>();
         services.AddScoped<CameraPreviewInterop>();
+        services.AddScoped<LearnRsvpLayoutInterop>();
         services.AddScoped<MicrophoneLevelInterop>();
         services.AddScoped<TeleprompterReaderInterop>();
         services.AddScoped<AppBootstrapper>();

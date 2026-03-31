@@ -85,68 +85,79 @@
 
 /* Horizontal row: left context | focus | right context */
 .rsvp-h-row {
+    --rsvp-focus-shift: 0px;
+    --rsvp-context-left-offset: 220px;
+    --rsvp-context-right-offset: 220px;
+    position: relative;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 1100px;
-    gap: 0;
+    max-width: none;
+    min-height: 132px;
+    min-width: 0;
+    overflow: visible;
 }
 
 .rsvp-ctx-left, .rsvp-ctx-right {
     display: flex;
+    align-items: baseline;
     gap: 18px;
     font-size: 36px;
     font-weight: 400;
     color: rgba(232,213,176,.4);
     white-space: nowrap;
-    overflow: hidden;
-    flex: 1 1 0;
-    min-width: 0;
+    overflow: visible;
+    position: absolute;
+    top: 50%;
+    min-width: max-content;
+    pointer-events: none;
+    transform: translateY(-50%);
+    z-index: 0;
 }
 .rsvp-ctx-left {
+    right: calc(50% + var(--rsvp-context-left-offset));
     justify-content: flex-end;
-    padding-right: 24px;
 }
 .rsvp-ctx-right {
+    left: calc(50% + var(--rsvp-context-right-offset));
     justify-content: flex-start;
-    padding-left: 24px;
 }
 
 .rsvp-focus-shell {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    flex: 0 1 clamp(340px, 38vw, 480px);
-    min-width: min(340px, 100%);
-    max-width: 100%;
-    overflow: hidden;
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transform: translateX(var(--rsvp-focus-shift));
+    z-index: 1;
 }
 
 /* Focus word — large, centered, with ORP highlight */
 .rsvp-focus {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    display: inline-flex;
     align-items: baseline;
     font-size: 76px;
     font-weight: 800;
     letter-spacing: 1px;
     white-space: nowrap;
-    flex-shrink: 0;
-    width: 100%;
+    flex: 0 0 auto;
+    line-height: 1;
 }
-.rsvp-focus-segment { color: var(--t1); }
+.rsvp-focus-segment {
+    color: var(--t1);
+    flex: 0 0 auto;
+}
 .rsvp-focus-leading {
-    justify-self: end;
     text-align: right;
 }
 .rsvp-focus-orp {
     color: var(--orp-red);
     font-weight: 900;
-    justify-self: center;
-}
-.rsvp-focus-trailing {
-    justify-self: start;
 }
 
 /* Vertical ORP line */
@@ -165,7 +176,7 @@
 .rsvp-phrase {
     margin-top: 40px;
     text-align: center;
-    max-width: 500px;
+    max-width: min(640px, 78vw);
     opacity: .4;
 }
 .rsvp-phrase-label {
@@ -181,6 +192,7 @@
     font-size: 16px;
     line-height: 1.5;
     color: var(--t3);
+    text-wrap: balance;
 }
 
 /* Pause bar */

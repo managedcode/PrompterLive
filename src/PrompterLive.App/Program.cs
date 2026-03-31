@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using PrompterLive.App;
 using PrompterLive.App.Services;
 using PrompterLive.Shared.Services;
+using PrompterLive.Shared.Settings.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -17,6 +18,7 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.Components.WebAssembly.Rendering
 
 builder.Services.AddLocalization();
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
+builder.Services.AddSingleton<IAppVersionProvider>(_ => AppVersionProviderFactory.CreateFromAssembly(typeof(Program).Assembly));
 builder.Services.AddPrompterLiveShared();
 
 var host = builder.Build();

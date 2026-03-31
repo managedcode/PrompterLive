@@ -95,10 +95,10 @@ public partial class LearnPage
 
     private static string ResolveNextPhrase(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
     {
-        var nextPhrase = processed.PhraseGroups.FirstOrDefault(group => group.StartWordIndex > currentWordIndex);
-        if (nextPhrase is not null && nextPhrase.Words.Count > 0)
+        var currentSentencePreview = ResolveCurrentSentencePreview(processed.AllWords, currentWordIndex);
+        if (!string.IsNullOrWhiteSpace(currentSentencePreview))
         {
-            return string.Join(' ', nextPhrase.Words.Take(PreviewWordCount));
+            return currentSentencePreview;
         }
 
         var fallbackWords = processed.AllWords
@@ -111,6 +111,79 @@ public partial class LearnPage
             ? EndOfScriptPhrase
             : string.Join(' ', fallbackWords);
     }
+
+    private static string ResolveCurrentSentencePreview(IReadOnlyList<string> words, int currentWordIndex)
+    {
+        if (words.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var safeIndex = Math.Clamp(currentWordIndex, 0, words.Count - 1);
+        if (string.IsNullOrWhiteSpace(words[safeIndex]))
+        {
+            return string.Empty;
+        }
+
+        var startIndex = FindSentenceStartIndex(words, safeIndex);
+        var endIndex = FindSentenceEndIndex(words, safeIndex);
+        var previewWords = words
+            .Skip(startIndex)
+            .Take(endIndex - startIndex + 1)
+            .Where(word => !string.IsNullOrWhiteSpace(word))
+            .ToArray();
+
+        return previewWords.Length == 0
+            ? string.Empty
+            : string.Join(' ', previewWords);
+    }
+
+    private static int FindSentenceStartIndex(IReadOnlyList<string> words, int currentWordIndex)
+    {
+        var startIndex = currentWordIndex;
+
+        for (var index = currentWordIndex - 1; index >= 0; index--)
+        {
+            var candidate = words[index];
+            if (string.IsNullOrWhiteSpace(candidate))
+            {
+                break;
+            }
+
+            if (HasSentenceEndingPunctuation(candidate))
+            {
+                break;
+            }
+
+            startIndex = index;
+        }
+
+        return startIndex;
+    }
+
+    private static int FindSentenceEndIndex(IReadOnlyList<string> words, int currentWordIndex)
+    {
+        var endIndex = currentWordIndex;
+
+        for (var index = currentWordIndex + 1; index < words.Count; index++)
+        {
+            var candidate = words[index];
+            if (string.IsNullOrWhiteSpace(candidate))
+            {
+                break;
+            }
+
+            endIndex = index;
+            if (HasSentenceEndingPunctuation(candidate))
+            {
+                break;
+            }
+        }
+
+        return endIndex;
+    }
+
+    private static bool HasSentenceEndingPunctuation(string word) => word.IndexOfAny(['.', '!', '?']) >= 0;
 
     private static string ResolveEmotion(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
     {

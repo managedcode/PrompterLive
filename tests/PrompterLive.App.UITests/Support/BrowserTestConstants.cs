@@ -33,12 +33,42 @@ internal static partial class BrowserTestConstants
     {
         public const string DemoProbeWord = "believe";
         public const int DemoProbeStepLimit = 12;
+        public const string DemoContextLayoutProbeWord = "solution";
+        public const int DemoContextLayoutProbeStepLimit = 80;
+        public const string DemoFocusStackProbeWord = "introducing";
+        public const int DemoFocusStackProbeStepLimit = 80;
+        public const string DemoLeftContextFirstWord = "introducing";
+        public const string DemoLeftContextSecondWord = "a";
+        public const string DemoRightContextFirstWord = "that";
+        public const string DemoRightContextSecondWord = "will";
         public const int DemoViewportHeight = 899;
         public const int DemoViewportWidth = 1598;
         public const string EndOfScriptText = "End of script.";
+        public const string FasterPlaybackSpeedText = "450";
+        public const string LeadershipCurrentSentencePreviewText =
+            "It begins with the moment you decide that someone else's progress matters as much as your own";
+        public const string LeadershipCleanSentencePreviewText =
+            "In uncertain times teams do not need louder instructions";
+        public const string LeadershipCleanSentenceProbeWord = "uncertain";
+        public const int LeadershipCleanSentenceProbeStepLimit = 40;
+        public const string LeadershipLeftContextWord = "In";
+        public const string LeadershipPreviewProbeWord = "that";
+        public const int LeadershipPreviewProbeStepLimit = 16;
+        public const string LeadershipRightContextFirstWord = "times";
+        public const string LeadershipRightContextSecondWord = "teams";
+        public const int LeadershipViewportHeight = 768;
+        public const int LeadershipViewportWidth = 1366;
+        public const int MaxLeadershipVisibleContextWordGapPx = 120;
+        public const string LongWordProbeWord = "transformative";
+        public const int LongWordProbeStepLimit = 20;
         public const int MaxDemoVisibleContextWordGapPx = 72;
+        public const double MaxFocusWordSlackPx = 4;
+        public const double MaxFocusWordOverflowPx = 0.5;
+        public const double MaxRailClipPx = 0.5;
         public const string MidFlowWord = "this";
+        public const int MinimumPlaybackAdvanceDeltaWords = 1;
         public const string NextPhraseFragment = "our monitoring systems detected unauthorized";
+        public const int PlaybackSpeedIncreaseClicks = 15;
         public const string QuantumProbeWord = "intuition";
         public const int QuantumProbeStepLimit = 12;
         public const int QuantumViewportHeight = 882;
@@ -389,6 +419,7 @@ internal static partial class BrowserTestConstants
         public const int NewDraftPersistSettleDelayMs = 2_200;
         public const int FloatingToolbarSettleDelayMs = 500;
         public const int LearnPlaybackDelayMs = 900;
+        public const int LearnPlaybackProbeWindowMs = 2_200;
         public const int ReaderPlaybackDelayMs = 2_500;
         public const int ReaderPlaybackReadyTimeoutMs = 8_000;
         public const int ReaderPlaybackStartTimeoutMs = 5_000;
@@ -405,6 +436,7 @@ internal static partial class BrowserTestConstants
     {
         public static Regex ActiveClass { get; } = new(@"\bactive\b", RegexOptions.Compiled);
         public static Regex GoLiveHeaderClass { get; } = new(@"btn-golive-header", RegexOptions.Compiled);
+        public static Regex SettingsAboutVersion { get; } = new(@"^Version 0\.1\.\d+ · Build \d+$", RegexOptions.Compiled);
         public static Regex ToggleOnClass { get; } = new(@"\bon\b", RegexOptions.Compiled);
         public static Regex NonZeroWidth { get; } = new(@"width:\s*0%", RegexOptions.Compiled);
         public static Regex ReaderTimeNotZero { get; } = new(@"^0:00 /", RegexOptions.Compiled);

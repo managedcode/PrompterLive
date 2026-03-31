@@ -59,10 +59,13 @@ public sealed class ScreenShellContractTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Page));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Display));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Word));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.WordShell));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.OrpLine));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextLeft));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextRight));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ProgressLabel));
             Assert.Equal("0", cut.FindByTestId(UiTestIds.Learn.Page).GetAttribute("tabindex"));
         });
     }

@@ -299,6 +299,8 @@ Repo-specific design rules:
 - Repo-owned manifests, scripts, workflows, and project files that track third-party runtime JavaScript SDKs MUST point to concrete GitHub release versions and asset URLs, never floating references.
 - Any vendored runtime JavaScript SDK that tracks an upstream GitHub repo MUST have an automated watcher job that checks new GitHub releases and opens a repo issue describing the required update when a newer release appears.
 - Build quality gates must stay green under `-warnaserror`.
+- GitHub Pages is the expected CI publish target for the standalone WebAssembly app; publish automation must keep the app browser-only and Pages-compatible.
+- Version text shown in the app must come from automated build or release metadata, never from manually edited About copy.
 - The runtime must negotiate browser language from supported cultures and default to English.
 - Supported runtime cultures are English, Ukrainian, French, Spanish, Portuguese, and Italian.
 - Russian must never be added as a supported runtime culture.
@@ -342,6 +344,7 @@ Ask first:
 - backend creep in the standalone runtime
 - random-port local startup
 - brittle selectors without `data-testid`
+- mixed-language root README or public entry docs; keep them English-only unless the user explicitly asks otherwise
 - design drift from `new-design`
 - any visible typing latency in the editor; plain input must feel immediate with no observable delay
 - editor keystroke paths that persist, compile, or rebuild shared session state; keep plain typing in memory and move heavier local sync to debounce or autosave

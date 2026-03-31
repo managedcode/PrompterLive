@@ -40,9 +40,11 @@ public static class UiDomIds
         public const string ContextRight = "rsvp-ctx-r";
         public const string NextPhrase = "rsvp-next-phrase";
         public const string PauseFill = "rsvp-pause-fill";
+        public const string ProgressLabel = "rsvp-progress-label";
         public const string ProgressFill = "rsvp-progress-fill";
         public const string Speed = "rsvp-speed";
         public const string Word = "rsvp-word";
+        public const string WordShell = "rsvp-word-shell";
     }
 
     public static class Teleprompter

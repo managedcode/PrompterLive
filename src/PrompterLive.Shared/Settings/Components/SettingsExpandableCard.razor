@@ -12,7 +12,7 @@
         </div>
         <div class="set-dest-info">
             <span class="set-dest-name">@Title</span>
-            <span class="set-dest-account">@Subtitle</span>
+            <span class="set-dest-account" @attributes="SubtitleAttributes">@Subtitle</span>
         </div>
         @if (!string.IsNullOrWhiteSpace(StatusLabel))
         {
@@ -48,6 +48,19 @@
             ? "set-dest-status"
             : $"set-dest-status {StatusClass}";
 
+    private IReadOnlyDictionary<string, object> SubtitleAttributes =>
+        string.IsNullOrWhiteSpace(SubtitleTestId)
+            ? EmptyAttributes
+            : new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                [DataTestIdAttributeName] = SubtitleTestId
+            };
+
+    private static IReadOnlyDictionary<string, object> EmptyAttributes { get; } =
+        new Dictionary<string, object>(StringComparer.Ordinal);
+
+    private const string DataTestIdAttributeName = "data-testid";
+
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     [Parameter] public RenderFragment? Icon { get; set; }
@@ -67,6 +80,8 @@
     [Parameter] public string StatusLabel { get; set; } = string.Empty;
 
     [Parameter] public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter] public string SubtitleTestId { get; set; } = string.Empty;
 
     [Parameter] public string TestId { get; set; } = string.Empty;
 

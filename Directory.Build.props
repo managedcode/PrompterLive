@@ -1,9 +1,12 @@
 <Project>
   <PropertyGroup>
     <PrompterLiveTargetFramework>net10.0</PrompterLiveTargetFramework>
-    <PrompterLiveVersionPrefix>0.1.0</PrompterLiveVersionPrefix>
+    <PrompterLiveVersionMajorMinor>0.1</PrompterLiveVersionMajorMinor>
+    <PrompterLiveBuildNumber Condition="'$(PrompterLiveBuildNumber)' == '' and '$(GITHUB_RUN_NUMBER)' != ''">$(GITHUB_RUN_NUMBER)</PrompterLiveBuildNumber>
+    <PrompterLiveBuildNumber Condition="'$(PrompterLiveBuildNumber)' == ''">0</PrompterLiveBuildNumber>
+    <PrompterLiveVersionPrefix>$(PrompterLiveVersionMajorMinor).$(PrompterLiveBuildNumber)</PrompterLiveVersionPrefix>
     <PrompterLiveAssemblyVersion>0.1.0.0</PrompterLiveAssemblyVersion>
-    <PrompterLiveFileVersion>0.1.0.0</PrompterLiveFileVersion>
+    <PrompterLiveFileVersion>$(PrompterLiveVersionPrefix).0</PrompterLiveFileVersion>
 
     <TargetFramework Condition="'$(TargetFramework)' == ''">$(PrompterLiveTargetFramework)</TargetFramework>
     <Nullable>enable</Nullable>
