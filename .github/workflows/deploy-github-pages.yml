@@ -1,47 +1,99 @@
-name: Deploy GitHub Pages
+name: Release Pipeline
 
 on:
   push:
     branches:
       - main
-  release:
-    types:
-      - published
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
-  group: github-pages
+  group: release-pipeline
   cancel-in-progress: true
 
 env:
   APP_PROJECT: src/PrompterLive.App/PrompterLive.App.csproj
   PAGES_ARTIFACT_ROOT: .artifacts/prompterlive-pages
-  PAGES_BASE_PATH: /${{ github.event.repository.name }}/
+  PAGES_BASE_PATH: /
+  PAGES_CNAME: prompter.managed-code.com
   PUBLISH_ROOT: .artifacts/prompterlive-publish
+  RELEASE_ARCHIVE_NAME: prompterlive-pages.zip
+  RELEASE_ARTIFACT_NAME: prompterlive-release-package
+  RELEASE_ARTIFACT_ROOT: .artifacts/release-artifact
+  SOLUTION_FILE: PrompterLive.slnx
 
 jobs:
-  deploy:
+  validate_release:
+    name: Build And Test
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Build solution
+        run: dotnet build "$SOLUTION_FILE" -warnaserror
+
+      - name: Test solution
+        run: dotnet test "$SOLUTION_FILE" --no-build
+
+  prepare_release:
+    name: Resolve Release Version
+    needs: validate_release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      release_tag: ${{ steps.release_version.outputs.release_tag }}
+      release_version: ${{ steps.release_version.outputs.release_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Resolve release version
+        id: release_version
+        run: |
+          release_version="$(dotnet msbuild "$APP_PROJECT" -getProperty:VersionPrefix -p:PrompterLiveBuildNumber=${{ github.run_number }} | tr -d '\r')"
+          release_tag="v${release_version}"
+          echo "release_version=$release_version" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+
+  publish_release_build:
+    name: Publish Release Build
+    needs: prepare_release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
 
       - name: Publish standalone WASM app
         run: >
@@ -57,13 +109,78 @@ jobs:
           cp -R "$PUBLISH_ROOT/wwwroot/." "$PAGES_ARTIFACT_ROOT/"
           sed -i "s#<base href=\"/\" />#<base href=\"${PAGES_BASE_PATH}\" />#g" "$PAGES_ARTIFACT_ROOT/index.html"
           cp "$PAGES_ARTIFACT_ROOT/index.html" "$PAGES_ARTIFACT_ROOT/404.html"
+          printf '%s\n' "$PAGES_CNAME" > "$PAGES_ARTIFACT_ROOT/CNAME"
           touch "$PAGES_ARTIFACT_ROOT/.nojekyll"
 
+      - name: Archive release bundle
+        run: |
+          mkdir -p "$RELEASE_ARTIFACT_ROOT"
+          cd "$PAGES_ARTIFACT_ROOT"
+          zip -r "$GITHUB_WORKSPACE/$RELEASE_ARTIFACT_ROOT/$RELEASE_ARCHIVE_NAME" .
+
+      - name: Upload GitHub release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.RELEASE_ARTIFACT_NAME }}
+          path: ${{ env.RELEASE_ARTIFACT_ROOT }}/${{ env.RELEASE_ARCHIVE_NAME }}
+
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ env.PAGES_ARTIFACT_ROOT }}
 
+  publish_github_release:
+    name: Publish GitHub Release
+    needs:
+      - prepare_release
+      - publish_release_build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.RELEASE_ARTIFACT_NAME }}
+          path: ${{ env.RELEASE_ARTIFACT_ROOT }}
+
+      - name: Create or update release tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.prepare_release.outputs.release_tag }}
+          RELEASE_TITLE: PrompterLive ${{ needs.prepare_release.outputs.release_version }}
+        run: |
+          release_asset="$RELEASE_ARTIFACT_ROOT/$RELEASE_ARCHIVE_NAME"
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$release_asset" --clobber
+            gh release edit "$RELEASE_TAG" --title "$RELEASE_TITLE"
+          else
+            gh release create "$RELEASE_TAG" "$release_asset" \
+              --title "$RELEASE_TITLE" \
+              --generate-notes \
+              --target "$GITHUB_SHA"
+          fi
+
+  deploy_github_pages:
+    name: Deploy GitHub Pages
+    needs:
+      - publish_release_build
+      - publish_github_release
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

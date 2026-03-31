@@ -1,4 +1,4 @@
-name: sync-vendored-streaming-sdks
+name: Sync Vendored Streaming SDKs
 
 on:
   workflow_dispatch:
@@ -12,15 +12,15 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -33,7 +33,7 @@ jobs:
         run: python scripts/vendored_streaming_sdks.py verify
 
       - name: Upload vendored SDK artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vendored-streaming-sdks
           path: |

@@ -109,7 +109,8 @@ flowchart LR
 - `Directory.Packages.props` is the canonical source for NuGet package versions.
 - `Directory.Build.props` is the canonical source for shared target framework, analyzer policy, and assembly/app version settings.
 - `global.json` pins the expected .NET SDK for local and CI builds.
-- `.github/workflows/deploy-github-pages.yml` is the canonical GitHub Pages publish flow for the standalone WASM app, including CI run-number version injection and Pages artifact base-href rewriting.
+- `.github/workflows/pr-validation.yml` is the canonical pull-request validation flow for repo build and test gates.
+- `.github/workflows/deploy-github-pages.yml` is the canonical release pipeline for the standalone WASM app: build and test, resolve the release version from `Directory.Build.props`, publish the release artifact, publish the GitHub Release, and deploy GitHub Pages on the custom-domain root.
 - Vendored browser SDK release pins live in `vendored-streaming-sdks.json`, and the exact release sync or watch flow is documented in `docs/Features/VendoredStreamingSdkReleases.md`.
 
 ## Runtime Boundaries

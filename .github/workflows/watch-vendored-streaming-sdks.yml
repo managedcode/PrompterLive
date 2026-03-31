@@ -1,4 +1,4 @@
-name: watch-vendored-streaming-sdks
+name: Watch Vendored Streaming SDK Releases
 
 on:
   workflow_dispatch:
@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -45,7 +45,7 @@ jobs:
 
       - name: Create or update tracking issue
         if: steps.summary.outputs.has_updates == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

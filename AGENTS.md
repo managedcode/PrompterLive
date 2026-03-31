@@ -300,6 +300,12 @@ Repo-specific design rules:
 - Any vendored runtime JavaScript SDK that tracks an upstream GitHub repo MUST have an automated watcher job that checks new GitHub releases and opens a repo issue describing the required update when a newer release appears.
 - Build quality gates must stay green under `-warnaserror`.
 - GitHub Pages is the expected CI publish target for the standalone WebAssembly app; publish automation must keep the app browser-only and Pages-compatible.
+- GitHub Actions MUST keep separate, clearly named workflows for pull-request validation and release automation; vague workflow names are forbidden.
+- Pull requests MUST have a dedicated validation workflow that runs the repo build and test gates before merge.
+- Releases MUST have a dedicated workflow that produces the release build, creates or updates the release tag, and publishes a GitHub Release with the release artifacts/notes.
+- The release workflow MUST be a full staged pipeline: build and tests first, then release publishing, and only then GitHub Pages deployment.
+- CI or deployment work is not done when GitHub Actions is merely green; the deployed GitHub Pages app MUST be opened and verified to boot without shell errors.
+- GitHub Pages deployment for `prompter.managed-code.com` MUST serve from the custom-domain root with `<base href="/">`; repo-name path prefixes are forbidden.
 - Version text shown in the app must come from automated build or release metadata, never from manually edited About copy.
 - The runtime must negotiate browser language from supported cultures and default to English.
 - Supported runtime cultures are English, Ukrainian, French, Spanish, Portuguese, and Italian.
