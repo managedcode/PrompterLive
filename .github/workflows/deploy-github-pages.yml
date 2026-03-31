@@ -20,9 +20,9 @@ concurrency:
 
 env:
   APP_PROJECT: src/PrompterLive.App/PrompterLive.App.csproj
-  PAGES_ARTIFACT_ROOT: ${{ runner.temp }}/prompterlive-pages
+  PAGES_ARTIFACT_ROOT: .artifacts/prompterlive-pages
   PAGES_BASE_PATH: /${{ github.event.repository.name }}/
-  PUBLISH_ROOT: ${{ runner.temp }}/prompterlive-publish
+  PUBLISH_ROOT: .artifacts/prompterlive-publish
 
 jobs:
   deploy:
