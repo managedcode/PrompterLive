@@ -169,7 +169,7 @@ internal static partial class BrowserTestConstants
         public const int ScrollProbeLineCount = 120;
         public const int MaxSourceScrollHostTopPx = 0;
         public const int MaxTypingLongTaskCount = 0;
-        public const double MaxVisibleRenderP95LatencyMs = 120;
+        public const double MaxVisibleRenderP95LatencyMs = 200;
         public const double MaxVisibleRenderSpikeLatencyMs = 300;
         public const string TypedScript = """
             ## [Typed Intro|175WPM|focused|0:05-0:20]

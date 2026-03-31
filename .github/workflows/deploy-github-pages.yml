@@ -159,6 +159,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Download release artifact
         uses: actions/download-artifact@v8
         with:
@@ -179,6 +182,7 @@ jobs:
       - name: Create or update release tag and GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ needs.prepare_release.outputs.release_tag }}
           RELEASE_TITLE: PrompterLive ${{ needs.prepare_release.outputs.release_version }}
         run: |
