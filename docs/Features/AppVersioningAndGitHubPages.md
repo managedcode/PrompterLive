@@ -55,12 +55,15 @@ flowchart LR
 - The workflow copies `index.html` to `404.html` so client-side routes keep working on repository Pages hosting.
 - `.nojekyll` must be present in the Pages artifact so framework and `_content` assets are served as-is.
 - The release workflow must run build and tests before it publishes the release asset, GitHub Release, and GitHub Pages deployment.
+- The Playwright browser suite must run in its own `dotnet test` step after the supporting test projects, not inside a solution-wide parallel test invocation, because the suite self-hosts shared WASM assets on a dynamic loopback origin.
 
 ## Verification
 
 - `actionlint .github/workflows/*.yml`
 - `.github/workflows/pr-validation.yml` runs `dotnet build PrompterLive.slnx -warnaserror`
-- `.github/workflows/pr-validation.yml` runs `dotnet test PrompterLive.slnx --no-build`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj --no-build`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj --no-build`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj --no-build`
 - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata"`
 - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj --filter "FullyQualifiedName~TeleprompterSettingsFlowTests.TeleprompterAndSettingsScreens_RespondToCoreControls"`
 - `.github/workflows/deploy-github-pages.yml` publish step passes `-p:PrompterLiveBuildNumber=${{ github.run_number }}`

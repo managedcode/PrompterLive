@@ -17,6 +17,8 @@ concurrency:
 
 env:
   APP_PROJECT: src/PrompterLive.App/PrompterLive.App.csproj
+  APP_TEST_PROJECT: tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj
+  CORE_TEST_PROJECT: tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj
   PAGES_ARTIFACT_ROOT: .artifacts/prompterlive-pages
   PAGES_BASE_PATH: /
   PAGES_CNAME: prompter.managed-code.com
@@ -26,6 +28,7 @@ env:
   RELEASE_ARTIFACT_NAME: prompterlive-release-package
   RELEASE_ARTIFACT_ROOT: .artifacts/release-artifact
   SOLUTION_FILE: PrompterLive.slnx
+  UI_TEST_PROJECT: tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj
 
 jobs:
   validate_release:
@@ -50,8 +53,13 @@ jobs:
       - name: Install Playwright browser
         run: node "$PLAYWRIGHT_CLI" install chromium
 
-      - name: Test solution
-        run: dotnet test "$SOLUTION_FILE" --no-build
+      - name: Test supporting suites
+        run: |
+          dotnet test "$CORE_TEST_PROJECT" --no-build
+          dotnet test "$APP_TEST_PROJECT" --no-build
+
+      - name: Test browser suite
+        run: dotnet test "$UI_TEST_PROJECT" --no-build
 
   prepare_release:
     name: Resolve Release Version

@@ -30,6 +30,7 @@ Reshape the repository CI/CD so `PrompterLive` has:
 - A dedicated PR validation workflow has been added locally but not pushed yet.
 - The release workflow has been expanded locally into build/test -> publish -> GitHub Release -> GitHub Pages stages, but GitHub has not run that shape yet.
 - Workflow naming is being normalized across repository automation.
+- GitHub run `23814159539` proved that `dotnet test PrompterLive.slnx --no-build` is not a safe CI test shape for this repo because it launches the UI browser suite alongside the supporting test assemblies.
 
 ## Constraints
 
@@ -80,6 +81,48 @@ Quality bar:
   - Root cause note: the workflow still assumed repository Pages path hosting while the repo is configured for a custom-domain root deployment.
   - Intended fix path: keep `PAGES_BASE_PATH` at `/`, preserve root-relative asset loading, and ship `CNAME` in the Pages artifact.
   - Fix status: implemented locally, pending GitHub deploy verification
+
+- [ ] `CI browser-suite contention`: GitHub run `23814159539` failed while `dotnet test PrompterLive.slnx --no-build` launched the browser suite in parallel with the supporting test assemblies.
+  - Root cause note: `PrompterLive.App.UITests` self-hosts shared WASM build assets and the repo rules require it to own those assets inside a dedicated `dotnet test` process.
+  - Intended fix path: split CI validation into sequential project-scoped `dotnet test` steps and keep the browser suite isolated after the supporting suites pass.
+  - Fix status: implemented locally, pending GitHub verification
+
+## GitHub Run 23814159539 Failing Tests
+
+- [ ] `PrompterLive.App.UITests.EditorFloatingToolbarLayoutTests.EditorScreen_FloatingToolbarKeepsFullHeightWhenSelectionIsActive`
+- [ ] `PrompterLive.App.UITests.EditorFloatingToolbarLayoutTests.EditorScreen_FloatingToolbarStaysAboveMultiLineSelection`
+- [ ] `PrompterLive.App.UITests.EditorFloatingToolbarLayoutTests.EditorScreen_FloatingToolbarStaysPinnedAfterFloatingFormatAction`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_ClickableMenusAndAiButtonsApplyCommands`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_FloatingEmotionMenuAppliesSelectedEmotion`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_FloatingToolbarShowsAiAndPersistsSelectionFormatting`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_FullToolbarSurfaceSupportsExtendedCommands`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_HidesFrontMatterFromVisibleEditorBody`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_MetadataDurationPersistsAfterReload`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_ShowsFloatingBarAndAppliesFormattingToSelectedSourceText`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_ToolbarDropdownsCloseCentrallyAcrossCommandsAndOutsideClicks`
+- [ ] `PrompterLive.App.UITests.EditorInteractionTests.EditorScreen_UndoAndRedoWorkFromToolbarAndKeyboard`
+- [ ] `PrompterLive.App.UITests.EditorLayoutTests.EditorScreen_MetadataRailStaysDockedToRightOfMainPanel`
+- [ ] `PrompterLive.App.UITests.EditorOverlayInteractionTests.EditorScreen_HidesFloatingBarWhileToolbarDropdownIsOpen`
+- [ ] `PrompterLive.App.UITests.EditorSourceSyncTests.EditorScreen_DirectSourceHeaderEditsRefreshStructureTree`
+- [ ] `PrompterLive.App.UITests.EditorTypingTests.EditorScreen_QuantumTypingKeepsStyledOverlayVisibleResponsive`
+- [ ] `PrompterLive.App.UITests.EditorTypingTests.EditorScreen_RapidTypingUpdatesStructureAndPersistsAfterReload`
+- [ ] `PrompterLive.App.UITests.EditorTypingTests.EditorScreen_SequentialTypingIntoSourceInputCompletesWithoutTimeout`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_ArmsDestinationsAndPersistsValuesInBrowserStorage`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_ShowsEmptyPreviewStateWhenSceneHasNoCamera`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_ShowsLiveCameraPreviewForProgramFeed`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_StartStream_WithLiveKitArmed_PublishesProgramVideoAndAudio`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_StartStream_WithObsArmed_RoutesMicrophoneAudioForObsBrowserSource`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_SwitchesStudioTabsAndCreatesRemoteRoom`
+- [ ] `PrompterLive.App.UITests.GoLiveFlowTests.GoLivePage_TogglesSceneCameraMembershipAndLinksBackToRead`
+- [ ] `PrompterLive.App.UITests.MediaRuntimeIntegrationTests.TeleprompterCameraToggle_AttachesSyntheticBackgroundVideoStream`
+- [ ] `PrompterLive.App.UITests.NavigationFlowTests.ScreenNavigation_UsesSpaRoutingWithoutReloadingBrowserContext`
+- [ ] `PrompterLive.App.UITests.StudioWorkflowScenarioTests.StudioWorkflow_LearnAndTeleprompterReader_CapturesArtifacts`
+- [ ] `PrompterLive.App.UITests.StudioWorkflowScenarioTests.StudioWorkflow_LibraryToEditorAuthoring_CapturesArtifacts`
+- [ ] `PrompterLive.App.UITests.StudioWorkflowScenarioTests.StudioWorkflow_NewScriptStartsEmpty_CapturesArtifacts`
+- [ ] `PrompterLive.App.UITests.TeleprompterSettingsFlowTests.TeleprompterAndSettingsScreens_RespondToCoreControls`
+
+Root-cause note:
+- The failing list spans library, editor, teleprompter, navigation, media, and go-live flows, which points to shared browser-harness contention rather than a single routed feature regression.
 
 ## Ordered Implementation Plan
 
@@ -160,6 +203,19 @@ Quality bar:
   - `actionlint .github/workflows/*.yml`
   - `dotnet build /Users/ksemenenko/Developer/PrompterLive/PrompterLive.slnx -warnaserror`
   - `dotnet test /Users/ksemenenko/Developer/PrompterLive/PrompterLive.slnx`
+  - `dotnet format /Users/ksemenenko/Developer/PrompterLive/PrompterLive.slnx`
+- GitHub run `23814159539` failed in `Build And Test` because solution-level `dotnet test` launched `PrompterLive.App.UITests` alongside the supporting test assemblies; the next fix is to split CI test execution into sequential project-scoped steps.
+- Updated `.github/workflows/pr-validation.yml` and `.github/workflows/deploy-github-pages.yml` so CI now runs:
+  - `dotnet test tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj --no-build`
+  - `dotnet test tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj --no-build`
+  - `dotnet test tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj --no-build`
+- Local validation for the split test shape passed:
+  - `actionlint .github/workflows/*.yml`
+  - `dotnet build /Users/ksemenenko/Developer/PrompterLive/PrompterLive.slnx -warnaserror`
+  - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj --no-build`
+  - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj --no-build`
+  - `node /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
+  - `dotnet test /Users/ksemenenko/Developer/PrompterLive/tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj --no-build`
   - `dotnet format /Users/ksemenenko/Developer/PrompterLive/PrompterLive.slnx`
 
 ## Final Validation Skills And Commands

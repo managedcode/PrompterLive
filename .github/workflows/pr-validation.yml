@@ -14,8 +14,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  APP_TEST_PROJECT: tests/PrompterLive.App.Tests/PrompterLive.App.Tests.csproj
+  CORE_TEST_PROJECT: tests/PrompterLive.Core.Tests/PrompterLive.Core.Tests.csproj
   PLAYWRIGHT_CLI: tests/PrompterLive.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js
   SOLUTION_FILE: PrompterLive.slnx
+  UI_TEST_PROJECT: tests/PrompterLive.App.UITests/PrompterLive.App.UITests.csproj
 
 jobs:
   build_and_test:
@@ -37,5 +40,10 @@ jobs:
       - name: Install Playwright browser
         run: node "$PLAYWRIGHT_CLI" install chromium
 
-      - name: Test solution
-        run: dotnet test "$SOLUTION_FILE" --no-build
+      - name: Test supporting suites
+        run: |
+          dotnet test "$CORE_TEST_PROJECT" --no-build
+          dotnet test "$APP_TEST_PROJECT" --no-build
+
+      - name: Test browser suite
+        run: dotnet test "$UI_TEST_PROJECT" --no-build
