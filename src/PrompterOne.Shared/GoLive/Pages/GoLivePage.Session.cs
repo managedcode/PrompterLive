@@ -1,47 +1,27 @@
 using System.Globalization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Shared.GoLive.Models;
 
 namespace PrompterOne.Shared.Pages;
 
 public partial class GoLivePage
 {
-    private const string CameraFallbackLabel = "No camera selected";
-    private const string DefaultProgramTimerLabel = "00:00:00";
-    private const string GoLiveStartRecordingMessage = "Unable to start recording right now.";
-    private const string GoLiveStartRecordingOperation = "Go Live start recording";
-    private const string GoLiveStopRecordingMessage = "Unable to stop recording right now.";
-    private const string GoLiveStopRecordingOperation = "Go Live stop recording";
-    private const string ProgramBadgeIdleLabel = "Ready";
-    private const string ProgramBadgeLiveLabel = "Live";
-    private const string ProgramBadgeRecordingLabel = "Rec";
-    private const string ProgramBadgeStreamingRecordingLabel = "Live + Rec";
-    private const string RecordingIndicatorLabel = "REC";
-    private const string SessionIdleLabel = "Ready";
     private const string SessionBadgeIdleCssClass = "gl-badge-idle";
     private const string SessionBadgeLiveCssClass = "gl-badge-live";
     private const string SessionBadgeRecordingCssClass = "gl-badge-rec";
-    private const string SessionRecordingLabel = "Recording";
-    private const string SessionStreamingLabel = "Streaming";
-    private const string SessionStreamingRecordingLabel = "Streaming + Recording";
-    private const string StageFrameRate30Label = "30 FPS";
-    private const string StageFrameRate60Label = "60 FPS";
-    private const string StreamButtonLabel = "Start Stream";
-    private const string StreamStopLabel = "Stop Stream";
-    private const string SwitchButtonDisabledLabel = "On Program";
-    private const string SwitchButtonLabel = "Switch";
 
     private SceneCameraSource? ActiveCamera => ResolveSessionSource(GoLiveSession.State.ActiveSourceId) ?? PreviewCamera;
 
     private string ActiveSessionLabel => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
-        (true, true) => SessionStreamingRecordingLabel,
-        (true, false) => SessionStreamingLabel,
-        (false, true) => SessionRecordingLabel,
-        _ => SessionIdleLabel
+        (true, true) => GoLiveText.Session.SessionStreamingRecordingLabel,
+        (true, false) => GoLiveText.Session.SessionStreamingLabel,
+        (false, true) => GoLiveText.Session.SessionRecordingLabel,
+        _ => GoLiveText.Session.SessionIdleLabel
     };
 
-    private string ActiveSourceLabel => ActiveCamera?.Label ?? CameraFallbackLabel;
+    private string ActiveSourceLabel => ActiveCamera?.Label ?? GoLiveText.Session.CameraFallbackLabel;
 
     private bool CanControlProgram => SelectedCamera is not null;
 
@@ -49,14 +29,22 @@ public partial class GoLivePage
         && SelectedCamera.Transform.Visible
         && !string.Equals(SelectedCamera.SourceId, ActiveCamera?.SourceId, StringComparison.Ordinal);
 
-    private bool IsLiveSessionActive => GoLiveSession.State.IsStreamActive || GoLiveSession.State.IsRecordingActive;
+    private bool IsLiveSessionActive => !string.Equals(SessionIndicatorState, GoLiveText.Session.IdleStateValue, StringComparison.Ordinal);
+
+    private string SessionIndicatorState => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
+    {
+        (true, true) => GoLiveText.Session.RecordingStateValue,
+        (true, false) => GoLiveText.Session.StreamingStateValue,
+        (false, true) => GoLiveText.Session.RecordingStateValue,
+        _ => GoLiveText.Session.IdleStateValue
+    };
 
     private string PrimarySessionBadge => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
-        (true, true) => ProgramBadgeStreamingRecordingLabel,
-        (true, false) => ProgramBadgeLiveLabel,
-        (false, true) => ProgramBadgeRecordingLabel,
-        _ => ProgramBadgeIdleLabel
+        (true, true) => GoLiveText.Session.ProgramBadgeStreamingRecordingLabel,
+        (true, false) => GoLiveText.Session.ProgramBadgeLiveLabel,
+        (false, true) => GoLiveText.Session.ProgramBadgeRecordingLabel,
+        _ => GoLiveText.Session.ProgramBadgeIdleLabel
     };
 
     private string ProgramResolutionLabel => $"{ResolveResolutionDimensions(_studioSettings.Streaming.OutputResolution)} • {ActiveSourceLabel}";
@@ -70,17 +58,21 @@ public partial class GoLivePage
         _ => SessionBadgeIdleCssClass
     };
 
-    private string SelectedSourceLabel => SelectedCamera?.Label ?? CameraFallbackLabel;
+    private string SelectedSourceLabel => SelectedCamera?.Label ?? GoLiveText.Session.CameraFallbackLabel;
 
     private SceneCameraSource? SelectedCamera => ResolveSessionSource(GoLiveSession.State.SelectedSourceId) ?? ActiveCamera;
 
     private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.OutputResolution);
 
-    private string StreamActionLabel => GoLiveSession.State.IsStreamActive ? StreamStopLabel : StreamButtonLabel;
+    private string StreamActionLabel => GoLiveSession.State.IsStreamActive
+        ? GoLiveText.Session.StreamStopLabel
+        : GoLiveText.Session.StreamButtonLabel;
 
     private string StreamButtonDisplayText => StreamActionLabel.ToUpperInvariant();
 
-    private string SwitchActionLabel => CanSwitchProgram ? SwitchButtonLabel : SwitchButtonDisabledLabel;
+    private string SwitchActionLabel => CanSwitchProgram
+        ? GoLiveText.Session.SwitchButtonLabel
+        : GoLiveText.Session.SwitchButtonDisabledLabel;
 
     private string BitrateTelemetry => $"{_studioSettings.Streaming.BitrateKbps} kbps";
 
@@ -115,8 +107,8 @@ public partial class GoLivePage
         await EnsurePageReadyAsync();
         await EnsureSelectedCameraReadyForProgramAsync();
         await Diagnostics.RunAsync(
-            GoLiveSwitchProgramOperation,
-            GoLiveSwitchProgramMessage,
+            GoLiveText.Session.SwitchProgramOperation,
+            GoLiveText.Session.SwitchProgramMessage,
             async () =>
             {
                 var nextCamera = SelectedCamera;
@@ -136,24 +128,34 @@ public partial class GoLivePage
             if (GoLiveSession.State.IsStreamActive)
             {
                 await Diagnostics.RunAsync(
-                    GoLiveStopStreamOperation,
-                    GoLiveStopStreamMessage,
+                    GoLiveText.Session.StopStreamOperation,
+                    GoLiveText.Session.StopStreamMessage,
                     async () =>
                     {
                         await GoLiveOutputRuntime.StopStreamAsync();
-                        GoLiveSession.ToggleStream(SceneCameras);
+                        GoLiveSession.StopStream();
                     });
                 return;
             }
 
             await EnsureSelectedCameraReadyForProgramAsync();
             await Diagnostics.RunAsync(
-                GoLiveStartStreamOperation,
-                GoLiveStartStreamMessage,
+                GoLiveText.Session.StartStreamOperation,
+                GoLiveText.Session.StartStreamMessage,
                 async () =>
                 {
                     await GoLiveOutputRuntime.StartStreamAsync(BuildRuntimeRequest(SelectedCamera));
-                    GoLiveSession.ToggleStream(SceneCameras);
+
+                    if (!GoLiveOutputRuntime.State.HasLiveOutputs)
+                    {
+                        Diagnostics.ReportRecoverable(
+                            GoLiveText.Session.StreamPrerequisiteOperation,
+                            GoLiveText.Session.StreamPrerequisiteMessage,
+                            GoLiveText.Session.StreamPrerequisiteDetail);
+                        return;
+                    }
+
+                    GoLiveSession.StartStream(SceneCameras);
                 });
         });
     }
@@ -165,12 +167,12 @@ public partial class GoLivePage
             if (GoLiveSession.State.IsRecordingActive)
             {
                 await Diagnostics.RunAsync(
-                    GoLiveStopRecordingOperation,
-                    GoLiveStopRecordingMessage,
-                    async () =>
+                        GoLiveText.Session.StopRecordingOperation,
+                        GoLiveText.Session.StopRecordingMessage,
+                        async () =>
                     {
                         await GoLiveOutputRuntime.StopRecordingAsync();
-                        GoLiveSession.ToggleRecording(SceneCameras);
+                        GoLiveSession.StopRecording();
                     });
                 return;
             }
@@ -178,12 +180,12 @@ public partial class GoLivePage
             await EnsureSelectedCameraReadyForProgramAsync();
             await EnsureRecordingOutputEnabledAsync();
             await Diagnostics.RunAsync(
-                GoLiveStartRecordingOperation,
-                GoLiveStartRecordingMessage,
-                async () =>
+                    GoLiveText.Session.StartRecordingOperation,
+                    GoLiveText.Session.StartRecordingMessage,
+                    async () =>
                 {
                     await GoLiveOutputRuntime.StartRecordingAsync(BuildRuntimeRequest(SelectedCamera));
-                    GoLiveSession.ToggleRecording(SceneCameras);
+                    GoLiveSession.StartRecording(SceneCameras);
                 });
         });
     }
@@ -197,10 +199,10 @@ public partial class GoLivePage
     {
         return resolution switch
         {
-            StreamingResolutionPreset.FullHd1080p60 => "1080p60",
-            StreamingResolutionPreset.Hd720p30 => "720p30",
-            StreamingResolutionPreset.UltraHd2160p30 => "2160p30",
-            _ => "1080p30"
+            StreamingResolutionPreset.FullHd1080p60 => GoLiveText.Surface.StreamFormatFullHd60,
+            StreamingResolutionPreset.Hd720p30 => GoLiveText.Surface.StreamFormatHd30,
+            StreamingResolutionPreset.UltraHd2160p30 => GoLiveText.Surface.StreamFormatUltraHd30,
+            _ => GoLiveText.Surface.StreamFormatFullHd30
         };
     }
 
@@ -208,24 +210,24 @@ public partial class GoLivePage
     {
         return resolution switch
         {
-            StreamingResolutionPreset.FullHd1080p60 => "1920 × 1080",
-            StreamingResolutionPreset.Hd720p30 => "1280 × 720",
-            StreamingResolutionPreset.UltraHd2160p30 => "3840 × 2160",
-            _ => "1920 × 1080"
+            StreamingResolutionPreset.FullHd1080p60 => GoLiveText.Surface.ResolutionDimensionsFullHd,
+            StreamingResolutionPreset.Hd720p30 => GoLiveText.Surface.ResolutionDimensionsHd,
+            StreamingResolutionPreset.UltraHd2160p30 => GoLiveText.Surface.ResolutionDimensionsUltraHd,
+            _ => GoLiveText.Surface.ResolutionDimensionsFullHd
         };
     }
 
     private static string BuildStageFrameRateLabel(StreamingResolutionPreset resolution) => resolution switch
     {
-        StreamingResolutionPreset.FullHd1080p60 => StageFrameRate60Label,
-        _ => StageFrameRate30Label
+        StreamingResolutionPreset.FullHd1080p60 => GoLiveText.Session.StageFrameRate60Label,
+        _ => GoLiveText.Session.StageFrameRate30Label
     };
 
     private static string FormatSessionElapsed(DateTimeOffset? startedAt)
     {
         if (startedAt is null)
         {
-            return DefaultProgramTimerLabel;
+            return GoLiveText.Session.DefaultProgramTimerLabel;
         }
 
         var elapsed = DateTimeOffset.UtcNow - startedAt.Value;

@@ -117,6 +117,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
         var purpleWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchPurpleWord);
         var teleprompterWord = await GetWordProbeAsync(page, ClosingCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWord);
 
+        Assert.DoesNotContain("tps-neutral", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-warm", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-focused", neutralWord.Classes, StringComparison.Ordinal);
 

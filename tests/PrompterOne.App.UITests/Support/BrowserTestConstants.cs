@@ -29,11 +29,13 @@ internal static partial class BrowserTestConstants
         public const string DemoId = "test-product-launch-script";
         public const string LeadershipId = "test-ted-leadership-script";
         public const string QuantumId = "test-quantum-computing-script";
+        public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
         public const string ProductLaunchTitle = "Product Launch";
         public const string LeadershipTitle = "TED: Leadership";
         public const string QuantumTitle = "Quantum Computing";
+        public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
         public const string SpeedOffsetsTitle = "TPS Speed Offsets";
     }
@@ -418,6 +420,39 @@ internal static partial class BrowserTestConstants
                         BitrateKbps: 6000,
                         ShowTextOverlay: true,
                         IncludeCameraInOutput: true,
+                        ExternalDestinations: [
+                            {
+                                Id: 'livekit',
+                                Name: 'LiveKit',
+                                ProviderKind: 0,
+                                PlatformKind: 0,
+                                IsEnabled: true,
+                                ServerUrl: liveKitServer,
+                                RoomName: liveKitRoom,
+                                Token: liveKitToken,
+                                PublishUrl: null,
+                                Destinations: []
+                            },
+                            {
+                                Id: 'youtube-live',
+                                Name: 'YouTube Live',
+                                ProviderKind: 2,
+                                PlatformKind: 2,
+                                IsEnabled: true,
+                                ServerUrl: null,
+                                RoomName: null,
+                                Token: null,
+                                PublishUrl: null,
+                                Destinations: [
+                                    {
+                                        Name: 'YouTube Live',
+                                        Url: youtubeUrl,
+                                        StreamKey: youtubeKey,
+                                        IsEnabled: true
+                                    }
+                                ]
+                            }
+                        ],
                         DestinationSourceSelections: [
                             { TargetId: 'obs-studio', SourceIds: [primarySourceId] },
                             { TargetId: 'local-recording', SourceIds: [primarySourceId] },
@@ -429,16 +464,16 @@ internal static partial class BrowserTestConstants
                         ObsVirtualCameraEnabled: true,
                         NdiOutputEnabled: false,
                         LocalRecordingEnabled: true,
-                        LiveKitEnabled: true,
-                        LiveKitServerUrl: liveKitServer,
-                        LiveKitRoomName: liveKitRoom,
-                        LiveKitToken: liveKitToken,
+                        LiveKitEnabled: false,
+                        LiveKitServerUrl: '',
+                        LiveKitRoomName: '',
+                        LiveKitToken: '',
                         VdoNinjaEnabled: false,
                         VdoNinjaRoomName: '',
                         VdoNinjaPublishUrl: '',
-                        YoutubeEnabled: true,
-                        YoutubeRtmpUrl: youtubeUrl,
-                        YoutubeStreamKey: youtubeKey,
+                        YoutubeEnabled: false,
+                        YoutubeRtmpUrl: '',
+                        YoutubeStreamKey: '',
                         TwitchEnabled: false,
                         TwitchRtmpUrl: '',
                         TwitchStreamKey: '',
@@ -459,11 +494,18 @@ internal static partial class BrowserTestConstants
 
                 const parsed = JSON.parse(raw);
                 const streaming = parsed?.Streaming;
+                const destinations = Array.isArray(streaming?.ExternalDestinations)
+                    ? streaming.ExternalDestinations
+                    : [];
+
+                const hasEnabledDestination = (id) =>
+                    destinations.some(destination => destination?.Id === id && destination?.IsEnabled === true);
+
                 return Boolean(
                     streaming?.ObsVirtualCameraEnabled === true &&
                     streaming?.LocalRecordingEnabled === true &&
-                    streaming?.LiveKitEnabled === true &&
-                    streaming?.YoutubeEnabled === true);
+                    hasEnabledDestination('livekit') &&
+                    hasEnabledDestination('youtube-live'));
             }
             """;
         public const string PreviewReadyScript = "(element) => Boolean(element && element.srcObject && element.readyState >= 2)";
@@ -553,12 +595,14 @@ internal static partial class BrowserTestConstants
         public static string LearnDemo => AppRoutes.LearnWithId(Scripts.DemoId);
         public static string LearnLeadership => AppRoutes.LearnWithId(Scripts.LeadershipId);
         public static string LearnQuantum => AppRoutes.LearnWithId(Scripts.QuantumId);
+        public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
         public static string LearnSecurityIncident => AppRoutes.LearnWithId(Scripts.SecurityIncidentId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
         public static string TeleprompterLeadership => AppRoutes.TeleprompterWithId(Scripts.LeadershipId);
         public static string TeleprompterSecurityIncident => AppRoutes.TeleprompterWithId(Scripts.SecurityIncidentId);
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
+        public static string TeleprompterReaderTiming => AppRoutes.TeleprompterWithId(Scripts.ReaderTimingId);
         public static string TeleprompterSpeedOffsets => AppRoutes.TeleprompterWithId(Scripts.SpeedOffsetsId);
 
         public static string Pattern(string route) => string.Concat("**", route);

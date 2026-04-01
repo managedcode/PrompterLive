@@ -16,7 +16,11 @@ internal static partial class BrowserTestConstants
         public const int ExpectedVideoTrackCount = 1;
         public const int ExpectedAudioTrackCount = 1;
         public const int LiveLevelThreshold = 5;
+        public const string FabricatedCameraLabel = "Camera 1";
+        public const string FabricatedMicrophoneLabel = "Microphone 1";
+        public const string FabricatedUnnamedDeviceLabel = "Unnamed device";
         public const string ListDevicesScript = "() => window.__prompterOneMediaHarness.listDevices()";
+        public const string ClearDeviceLabelsScript = "() => window.__prompterOneMediaHarness.clearDeviceLabels()";
         public const string ClearRequestLogScript = "() => window.__prompterOneMediaHarness.clearRequestLog()";
         public const string GetRequestLogScript = "() => window.__prompterOneMediaHarness.getRequestLog()";
         public const string GetElementStateScript = "elementId => window.__prompterOneMediaHarness.getElementState(elementId)";

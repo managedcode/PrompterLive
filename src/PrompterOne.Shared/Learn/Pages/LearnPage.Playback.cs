@@ -58,7 +58,11 @@ public partial class LearnPage
     private async Task ChangeRsvpSpeedAsync(int delta)
     {
         _speed = Math.Clamp(_speed + delta, RsvpMinSpeed, RsvpMaxSpeed);
-        await PersistCurrentLearnSettingsAsync();
+        await PersistLearnSettingsAsync(settings => settings with
+        {
+            HasCustomizedWordsPerMinute = true,
+            WordsPerMinute = _speed
+        });
 
         UpdateDisplayedState();
         UpdateShellState();

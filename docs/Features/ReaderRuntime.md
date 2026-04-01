@@ -16,6 +16,7 @@ The important contracts are:
 - Teleprompter pre-centers the next card before it slides in, so block transitions do not jump at the focal line.
 - Teleprompter block transitions always move in one upward direction: the outgoing card exits up and the incoming card rises from below.
 - Teleprompter controls stay readable at rest; they must not fade until they become unusable.
+- Teleprompter route styles must already be present on first paint from the app host document; a late style attach during route entry is a regression.
 - Teleprompter user-adjusted font size, text width, focal position, and camera preference survive reloads through the shared user-settings contract.
 
 ## Flow
@@ -54,10 +55,13 @@ flowchart LR
 - `teleprompter` forwards TPS pronunciation metadata to word-level `title` / `data-pronunciation` attributes.
 - `teleprompter` derives word-level pacing from the compiled TPS duration and carries effective WPM into the DOM for testable parity.
 - `teleprompter` preserves TPS front-matter speed offsets and `[normal]` resets when rebuilding reader blocks, so relative speed tags keep both their timing math and subtle word-level spacing cues.
+- `teleprompter` applies TPS inline emotion colors only when a word is explicitly tagged; untagged reader words must stay on the base reader palette instead of inheriting an implicit `neutral` word class.
 - `teleprompter` keeps TPS inline colors visible even when a phrase group is active or the active word is highlighted.
+- `teleprompter` keeps the active focus word calm: the active word may be brighter than its neighbors, but upcoming and read words stay gently dimmed and active-word glow stays restrained enough to avoid a bright moving patch.
 - `teleprompter` persists font scale, text width, focal point, and camera auto-start changes through `IUserSettingsStore` and restores them from stored `ReaderSettings` during bootstrap.
 - `teleprompter` prepositions the next card below the focal line before activation, so forward and backward block jumps both animate upward instead of alternating direction.
 - `teleprompter` uses one smooth paragraph realignment while words advance inside a card, but the first word of a newly entered card is already pre-centered so block changes do not trigger a second correction pass.
+- `teleprompter` loads its feature stylesheet from the initial host `<head>` instead of relying on route-time `HeadContent`, so direct opens and route transitions share the same first-paint styling.
 
 ## Verification
 
@@ -73,5 +77,7 @@ flowchart LR
 - Playwright verifies there is no teleprompter overlay camera box and that phrase groups do not overflow.
 - Playwright verifies the teleprompter camera button attaches and detaches a real synthetic `MediaStream` on the background video layer.
 - Playwright verifies the full `Product Launch` teleprompter scenario, including visible controls, TPS formatting parity, screenshot artifacts, and aligned post-transition playback.
+- Playwright verifies a dedicated reader-timing probe for both `learn` and `teleprompter`, recording emitted words in the browser and checking that sequence order and elapsed delays match the rendered timing contract word by word.
+- Playwright verifies the teleprompter stylesheet is already registered in `document.styleSheets` before the app navigates into the teleprompter route.
 - Playwright verifies custom TPS speed offsets change computed teleprompter `letter-spacing` while `[normal]` words reset back to neutral spacing and timing.
 - Playwright verifies teleprompter width and focal settings survive a real browser reload and that backward block jumps keep the outgoing card on the upward exit path during the transition.

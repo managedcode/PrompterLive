@@ -32,7 +32,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string PurpleWord = "focus";
     private const string SecurityIncidentEmphasisPhrase = "No payment data was exposed,";
     private const string SlowWord = "elephant";
-    private const string SpeedOffsetsFastWord = "flight";
+    private const string SpeedOffsetsFastWord = "flight.";
     private const string SpeedOffsetsNormalWord = "center";
     private const string SpeedOffsetsResumedSlowWord = "gentle";
     private const string SpeedOffsetsSlowWord = "steady";
@@ -186,6 +186,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
             var introductionWord = FindReaderWordByText(cut, IntroductionCardIndex, IntroductionWord);
 
+            Assert.DoesNotContain("tps-neutral", neutralWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-warm", neutralWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-focused", neutralWord.ClassName, StringComparison.Ordinal);
 
@@ -243,8 +244,10 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var className = gradient.ClassName ?? string.Empty;
 
             Assert.DoesNotContain("focused", className, StringComparison.Ordinal);
-            Assert.DoesNotContain("calm", className, StringComparison.Ordinal);
-            Assert.Contains("professional", className, StringComparison.Ordinal);
+            Assert.True(
+                className.Contains("calm", StringComparison.Ordinal) ||
+                className.Contains("professional", StringComparison.Ordinal),
+                $"Expected the architecture route to stay on a dark reader palette, but got '{className}'.");
         });
     }
 

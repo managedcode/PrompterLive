@@ -1,28 +1,28 @@
 @namespace PrompterOne.Shared.Components.Settings
-@using PrompterOne.Core.Models.Media
+@using PrompterOne.Core.Models.Streaming
 @using PrompterOne.Core.Models.Workspace
-@using PrompterOne.Core.Services.Streaming
 @using PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Settings.Models
 
 <div class="set-subsection">
-    <h4 class="set-sub-title">Output Defaults</h4>
+    <h4 class="set-sub-title">@SettingsStreamingText.OutputDefaultsTitle</h4>
     <div class="set-devices">
         <div class="set-field">
-            <label>Output Mode</label>
+            <label>@SettingsStreamingText.OutputModeLabel</label>
             <SettingsSelect Value="@SelectedOutputModeValue"
                            Options="@OutputModeOptions"
                            OnChange="OutputModeChanged"
                            TestId="@UiTestIds.Settings.StreamingOutputMode" />
         </div>
         <div class="set-field">
-            <label>Output Resolution</label>
+            <label>@SettingsStreamingText.OutputResolutionLabel</label>
             <SettingsSelect Value="@Settings.OutputResolution.ToString()"
                            Options="@OutputResolutionOptions"
                            OnChange="OutputResolutionChanged"
                            TestId="@UiTestIds.Settings.StreamingOutputResolution" />
         </div>
         <div class="set-field">
-            <label>Bitrate (kbps)</label>
+            <label>@SettingsStreamingText.BitrateLabel</label>
             <input type="number"
                    class="set-input"
                    value="@Settings.BitrateKbps"
@@ -30,7 +30,7 @@
                    data-testid="@UiTestIds.Settings.StreamingBitrate" />
         </div>
         <div class="set-field set-field-toggle">
-            <label>Show Text Overlay</label>
+            <label>@SettingsStreamingText.ShowTextOverlayLabel</label>
             <div class="set-toggle @(Settings.ShowTextOverlay ? OnCssClass : null)"
                  @onclick="ToggleTextOverlay"
                  data-testid="@UiTestIds.Settings.StreamingTextOverlay">
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="set-field set-field-toggle">
-            <label>Include Camera in Output</label>
+            <label>@SettingsStreamingText.IncludeCameraInOutputLabel</label>
             <div class="set-toggle @(Settings.IncludeCameraInOutput ? OnCssClass : null)"
                  @onclick="ToggleIncludeCamera"
                  data-testid="@UiTestIds.Settings.StreamingIncludeCamera">
@@ -49,425 +49,66 @@
 </div>
 
 <div class="set-sub-header" style="margin-bottom:14px">
-    <h4 class="set-sub-title">Destinations</h4>
+    <h4 class="set-sub-title">@SettingsStreamingText.DestinationsTitle</h4>
     <button class="set-btn-outline set-btn-sm"
             type="button"
+            data-testid="@UiTestIds.Settings.StreamingDestinationAdd"
             @onclick="ToggleDestinationMenu">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        Add Destination
+        @SettingsStreamingText.AddDestinationButtonLabel
     </button>
 </div>
 
 <div class="@AddDestinationMenuCssClass">
-    <button class="set-add-source-opt" type="button" @onclick="@(() => OpenDestinationCardAsync(YoutubeCardId))">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z" />
-            <polygon points="9.75,15.02 15.5,11.75 9.75,8.48" />
-        </svg>
-        YouTube Live
-    </button>
-    <button class="set-add-source-opt" type="button" @onclick="@(() => OpenDestinationCardAsync(TwitchCardId))">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 2H3v16h5v4l4-4h5l4-4V2z" />
-            <path d="M11 11V7" />
-            <path d="M16 11V7" />
-        </svg>
-        Twitch
-    </button>
-    <button class="set-add-source-opt" type="button" @onclick="@(() => OpenDestinationCardAsync(CustomRtmpCardId))">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
-            <line x1="2" y1="20" x2="2.01" y2="20" />
-        </svg>
-        Custom RTMP
-    </button>
+    @foreach (var platform in StreamingPlatformCatalog.All)
+    {
+        <button class="set-add-source-opt"
+                type="button"
+                data-testid="@UiTestIds.Settings.StreamingDestinationAddOption(platform.IdPrefix)"
+                @onclick="@(() => AddDestinationAndOpenCardAsync(platform.Kind))">
+            @platform.DisplayName
+        </button>
+    }
 </div>
 
 <div class="set-device-list">
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.Obs"
-                                 Account="OBS Virtual Camera · Local browser output"
-                                 Description="Keep the browser program available to OBS Virtual Camera without touching the live runtime screen."
-                                 Summary="@BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Obs)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.ObsVirtualCameraEnabled, GoLiveTargetCatalog.TargetIds.Obs)"
-                                 StatusClass="@BuildStatusClass(Settings.ObsVirtualCameraEnabled, GoLiveTargetCatalog.TargetIds.Obs)"
-                                 IsEnabled="@Settings.ObsVirtualCameraEnabled"
-                                 IsOpen="@IsCardOpen(ObsCardId)"
-                                 IsReady="@BuildIsReady(Settings.ObsVirtualCameraEnabled, GoLiveTargetCatalog.TargetIds.Obs)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingObsToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Obs)"
-                                 ToggleEnabled="ToggleObs"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(ObsCardId))">
-        <div class="set-field set-field-toggle">
-            <label>Available in program routing</label>
-            <span class="set-dest-status @(BuildIsReady(Settings.ObsVirtualCameraEnabled, GoLiveTargetCatalog.TargetIds.Obs) ? SelectedStatusClass : string.Empty)">
-                @BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Obs)
-            </span>
-        </div>
-    </SettingsStreamingTargetCard>
+    @foreach (var localTarget in LocalTargetCards)
+        {
+            <SettingsStreamingTargetCard Title="@localTarget.Name"
+                                     Account="@localTarget.AccountLabel"
+                                     Description="@localTarget.Description"
+                                     Summary="@BuildLocalSummary(localTarget.TargetId)"
+                                     StatusLabel="@BuildLocalTargetStatusLabel(localTarget.TargetId)"
+                                     StatusClass="@BuildLocalTargetStatusClass(localTarget.TargetId)"
+                                     IsEnabled="@IsLocalTargetEnabled(localTarget.TargetId)"
+                                     IsOpen="@IsCardOpen(localTarget.CardId)"
+                                     IsReady="@BuildLocalTargetIsReady(localTarget.TargetId)"
+                                     ToggleTestId="@localTarget.ToggleTestId"
+                                     CardTestId="@UiTestIds.Settings.StreamingProviderCard(localTarget.TargetId)"
+                                     ToggleEnabled="@(() => ToggleLocalTargetAsync(localTarget.TargetId))"
+                                     OnCardToggle="@(() => ToggleStreamingCardAsync(localTarget.CardId))">
+            <div class="set-field set-field-toggle">
+                <label>@SettingsStreamingText.AvailableInProgramRoutingLabel</label>
+                <span class="set-dest-status @(BuildLocalTargetIsReady(localTarget.TargetId) ? SelectedStatusClass : string.Empty)">
+                    @BuildLocalSummary(localTarget.TargetId)
+                </span>
+            </div>
+        </SettingsStreamingTargetCard>
+    }
 
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.Ndi"
-                                 Account="NDI Output · Local network"
-                                 Description="Publish the browser program as an NDI output target configured in local browser storage."
-                                 Summary="@BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Ndi)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.NdiOutputEnabled, GoLiveTargetCatalog.TargetIds.Ndi)"
-                                 StatusClass="@BuildStatusClass(Settings.NdiOutputEnabled, GoLiveTargetCatalog.TargetIds.Ndi)"
-                                 IsEnabled="@Settings.NdiOutputEnabled"
-                                 IsOpen="@IsCardOpen(NdiCardId)"
-                                 IsReady="@BuildIsReady(Settings.NdiOutputEnabled, GoLiveTargetCatalog.TargetIds.Ndi)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingNdiToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Ndi)"
-                                 ToggleEnabled="ToggleNdi"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(NdiCardId))">
-        <div class="set-field set-field-toggle">
-            <label>Available in program routing</label>
-            <span class="set-dest-status @(BuildIsReady(Settings.NdiOutputEnabled, GoLiveTargetCatalog.TargetIds.Ndi) ? SelectedStatusClass : string.Empty)">
-                @BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Ndi)
-            </span>
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.Recording"
-                                 Account="Local Recording · Browser workspace"
-                                 Description="Arm local recording before going live, then control recording from the dedicated live runtime."
-                                 Summary="@BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Recording)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.LocalRecordingEnabled, GoLiveTargetCatalog.TargetIds.Recording)"
-                                 StatusClass="@BuildStatusClass(Settings.LocalRecordingEnabled, GoLiveTargetCatalog.TargetIds.Recording)"
-                                 IsEnabled="@Settings.LocalRecordingEnabled"
-                                 IsOpen="@IsCardOpen(RecordingCardId)"
-                                 IsReady="@BuildIsReady(Settings.LocalRecordingEnabled, GoLiveTargetCatalog.TargetIds.Recording)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingRecordingToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Recording)"
-                                 ToggleEnabled="ToggleRecording"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(RecordingCardId))">
-        <div class="set-field set-field-toggle">
-            <label>Available in program routing</label>
-            <span class="set-dest-status @(BuildIsReady(Settings.LocalRecordingEnabled, GoLiveTargetCatalog.TargetIds.Recording) ? SelectedStatusClass : string.Empty)">
-                @BuildLocalSummary(GoLiveTargetCatalog.TargetIds.Recording)
-            </span>
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.LiveKit"
-                                 Account="LiveKit · Browser publish"
-                                 Description="Store LiveKit browser publishing settings here so Go Live stays operational-only."
-                                 Summary="@BuildRemoteSummary(Settings.LiveKitEnabled, GoLiveTargetCatalog.TargetIds.LiveKit, Settings.LiveKitServerUrl, Settings.LiveKitRoomName, Settings.LiveKitToken)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.LiveKitEnabled, GoLiveTargetCatalog.TargetIds.LiveKit, Settings.LiveKitServerUrl, Settings.LiveKitRoomName, Settings.LiveKitToken)"
-                                 StatusClass="@BuildStatusClass(Settings.LiveKitEnabled, GoLiveTargetCatalog.TargetIds.LiveKit, Settings.LiveKitServerUrl, Settings.LiveKitRoomName, Settings.LiveKitToken)"
-                                 IsEnabled="@Settings.LiveKitEnabled"
-                                 IsOpen="@IsCardOpen(LiveKitCardId)"
-                                 IsReady="@BuildIsReady(Settings.LiveKitEnabled, GoLiveTargetCatalog.TargetIds.LiveKit, Settings.LiveKitServerUrl, Settings.LiveKitRoomName, Settings.LiveKitToken)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingLiveKitToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)"
-                                 ToggleEnabled="ToggleLiveKit"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(LiveKitCardId))"
-                                 IconClass="set-dest-rtmp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 7h16v10H4z" />
-            <path d="M9 17v3h6v-3" />
-            <path d="M8 10h8" />
-        </svg>
-        <SettingsStreamingSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.LiveKit"
-                                       Sources="@Sources"
-                                       SelectedSourceIds="@GetSelectedSourceIds(GoLiveTargetCatalog.TargetIds.LiveKit)"
-                                       ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((GoLiveTargetCatalog.TargetIds.LiveKit, sourceId)))" />
-        <div class="set-field">
-            <label>Server URL</label>
-            <input type="text" class="set-input" value="@Settings.LiveKitServerUrl" @oninput="LiveKitServerChanged" data-testid="@UiTestIds.Settings.StreamingLiveKitServer" />
-        </div>
-        <div class="set-field">
-            <label>Room Name</label>
-            <input type="text" class="set-input" value="@Settings.LiveKitRoomName" @oninput="LiveKitRoomChanged" data-testid="@UiTestIds.Settings.StreamingLiveKitRoom" />
-        </div>
-        <div class="set-field">
-            <label>Access Token</label>
-            <input type="password" class="set-input" value="@Settings.LiveKitToken" @oninput="LiveKitTokenChanged" data-testid="@UiTestIds.Settings.StreamingLiveKitToken" />
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.VdoNinja"
-                                 Account="VDO.Ninja · Browser room"
-                                 Description="Keep VDO.Ninja room and publish URL setup in Settings and launch from Go Live only when ready."
-                                 Summary="@BuildRemoteSummary(Settings.VdoNinjaEnabled, GoLiveTargetCatalog.TargetIds.VdoNinja, Settings.VdoNinjaRoomName, Settings.VdoNinjaPublishUrl)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.VdoNinjaEnabled, GoLiveTargetCatalog.TargetIds.VdoNinja, Settings.VdoNinjaRoomName, Settings.VdoNinjaPublishUrl)"
-                                 StatusClass="@BuildStatusClass(Settings.VdoNinjaEnabled, GoLiveTargetCatalog.TargetIds.VdoNinja, Settings.VdoNinjaRoomName, Settings.VdoNinjaPublishUrl)"
-                                 IsEnabled="@Settings.VdoNinjaEnabled"
-                                 IsOpen="@IsCardOpen(VdoCardId)"
-                                 IsReady="@BuildIsReady(Settings.VdoNinjaEnabled, GoLiveTargetCatalog.TargetIds.VdoNinja, Settings.VdoNinjaRoomName, Settings.VdoNinjaPublishUrl)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingVdoToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.VdoNinja)"
-                                 ToggleEnabled="ToggleVdo"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(VdoCardId))"
-                                 IconClass="set-dest-rtmp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 5h18v14H3z" />
-            <path d="M9 9h6v6H9z" />
-        </svg>
-        <SettingsStreamingSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.VdoNinja"
-                                       Sources="@Sources"
-                                       SelectedSourceIds="@GetSelectedSourceIds(GoLiveTargetCatalog.TargetIds.VdoNinja)"
-                                       ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((GoLiveTargetCatalog.TargetIds.VdoNinja, sourceId)))" />
-        <div class="set-field">
-            <label>Room Name</label>
-            <input type="text" class="set-input" value="@Settings.VdoNinjaRoomName" @oninput="VdoRoomChanged" data-testid="@UiTestIds.Settings.StreamingVdoRoom" />
-        </div>
-        <div class="set-field">
-            <label>Publish URL</label>
-            <input type="text" class="set-input" value="@Settings.VdoNinjaPublishUrl" @oninput="VdoPublishUrlChanged" data-testid="@UiTestIds.Settings.StreamingVdoPublishUrl" />
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.Youtube"
-                                 Account="YouTube Live · RTMP / RTMPS"
-                                 Description="Store YouTube RTMP credentials here and use Go Live only to start or stop the armed session."
-                                 Summary="@BuildRemoteSummary(Settings.YoutubeEnabled, GoLiveTargetCatalog.TargetIds.Youtube, Settings.YoutubeRtmpUrl, Settings.YoutubeStreamKey)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.YoutubeEnabled, GoLiveTargetCatalog.TargetIds.Youtube, Settings.YoutubeRtmpUrl, Settings.YoutubeStreamKey)"
-                                 StatusClass="@BuildStatusClass(Settings.YoutubeEnabled, GoLiveTargetCatalog.TargetIds.Youtube, Settings.YoutubeRtmpUrl, Settings.YoutubeStreamKey)"
-                                 IsEnabled="@Settings.YoutubeEnabled"
-                                 IsOpen="@IsCardOpen(YoutubeCardId)"
-                                 IsReady="@BuildIsReady(Settings.YoutubeEnabled, GoLiveTargetCatalog.TargetIds.Youtube, Settings.YoutubeRtmpUrl, Settings.YoutubeStreamKey)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingYoutubeToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)"
-                                 ToggleEnabled="ToggleYoutube"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(YoutubeCardId))"
-                                 IconClass="set-dest-yt">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z" />
-            <polygon points="9.75,15.02 15.5,11.75 9.75,8.48" />
-        </svg>
-        <SettingsStreamingSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.Youtube"
-                                       Sources="@Sources"
-                                       SelectedSourceIds="@GetSelectedSourceIds(GoLiveTargetCatalog.TargetIds.Youtube)"
-                                       ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((GoLiveTargetCatalog.TargetIds.Youtube, sourceId)))" />
-        <div class="set-field">
-            <label>RTMP / RTMPS URL</label>
-            <input type="text" class="set-input" value="@Settings.YoutubeRtmpUrl" @oninput="YoutubeUrlChanged" data-testid="@UiTestIds.Settings.StreamingYoutubeUrl" />
-        </div>
-        <div class="set-field">
-            <label>Stream Key</label>
-            <input type="password" class="set-input" value="@Settings.YoutubeStreamKey" @oninput="YoutubeKeyChanged" data-testid="@UiTestIds.Settings.StreamingYoutubeKey" />
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@GoLiveTargetCatalog.TargetNames.Twitch"
-                                 Account="Twitch · RTMP"
-                                 Description="Persist Twitch endpoint and key here so the runtime surface stays focused on program switching."
-                                 Summary="@BuildRemoteSummary(Settings.TwitchEnabled, GoLiveTargetCatalog.TargetIds.Twitch, Settings.TwitchRtmpUrl, Settings.TwitchStreamKey)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.TwitchEnabled, GoLiveTargetCatalog.TargetIds.Twitch, Settings.TwitchRtmpUrl, Settings.TwitchStreamKey)"
-                                 StatusClass="@BuildStatusClass(Settings.TwitchEnabled, GoLiveTargetCatalog.TargetIds.Twitch, Settings.TwitchRtmpUrl, Settings.TwitchStreamKey)"
-                                 IsEnabled="@Settings.TwitchEnabled"
-                                 IsOpen="@IsCardOpen(TwitchCardId)"
-                                 IsReady="@BuildIsReady(Settings.TwitchEnabled, GoLiveTargetCatalog.TargetIds.Twitch, Settings.TwitchRtmpUrl, Settings.TwitchStreamKey)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingTwitchToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)"
-                                 ToggleEnabled="ToggleTwitch"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(TwitchCardId))"
-                                 IconClass="set-dest-tw">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 2H3v16h5v4l4-4h5l4-4V2z" />
-            <path d="M11 11V7" />
-            <path d="M16 11V7" />
-        </svg>
-        <SettingsStreamingSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.Twitch"
-                                       Sources="@Sources"
-                                       SelectedSourceIds="@GetSelectedSourceIds(GoLiveTargetCatalog.TargetIds.Twitch)"
-                                       ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((GoLiveTargetCatalog.TargetIds.Twitch, sourceId)))" />
-        <div class="set-field">
-            <label>RTMP URL</label>
-            <input type="text" class="set-input" value="@Settings.TwitchRtmpUrl" @oninput="TwitchUrlChanged" data-testid="@UiTestIds.Settings.StreamingTwitchUrl" />
-        </div>
-        <div class="set-field">
-            <label>Stream Key</label>
-            <input type="password" class="set-input" value="@Settings.TwitchStreamKey" @oninput="TwitchKeyChanged" data-testid="@UiTestIds.Settings.StreamingTwitchKey" />
-        </div>
-    </SettingsStreamingTargetCard>
-
-    <SettingsStreamingTargetCard Title="@Settings.CustomRtmpName"
-                                 Account="Custom RTMP · Private ingest"
-                                 Description="Use a private ingest endpoint or CDN and keep the credentials out of the live runtime surface."
-                                 Summary="@BuildRemoteSummary(Settings.CustomRtmpEnabled, GoLiveTargetCatalog.TargetIds.CustomRtmp, Settings.CustomRtmpName, Settings.CustomRtmpUrl, Settings.CustomRtmpStreamKey)"
-                                 StatusLabel="@BuildTargetStatusLabel(Settings.CustomRtmpEnabled, GoLiveTargetCatalog.TargetIds.CustomRtmp, Settings.CustomRtmpName, Settings.CustomRtmpUrl, Settings.CustomRtmpStreamKey)"
-                                 StatusClass="@BuildStatusClass(Settings.CustomRtmpEnabled, GoLiveTargetCatalog.TargetIds.CustomRtmp, Settings.CustomRtmpName, Settings.CustomRtmpUrl, Settings.CustomRtmpStreamKey)"
-                                 IsEnabled="@Settings.CustomRtmpEnabled"
-                                 IsOpen="@IsCardOpen(CustomRtmpCardId)"
-                                 IsReady="@BuildIsReady(Settings.CustomRtmpEnabled, GoLiveTargetCatalog.TargetIds.CustomRtmp, Settings.CustomRtmpName, Settings.CustomRtmpUrl, Settings.CustomRtmpStreamKey)"
-                                 ToggleTestId="@UiTestIds.Settings.StreamingCustomRtmpToggle"
-                                 CardTestId="@UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.CustomRtmp)"
-                                 ToggleEnabled="ToggleCustomRtmp"
-                                 OnCardToggle="@(() => ToggleStreamingCardAsync(CustomRtmpCardId))"
-                                 IconClass="set-dest-rtmp">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
-            <line x1="2" y1="20" x2="2.01" y2="20" />
-        </svg>
-        <SettingsStreamingSourcePicker TargetId="@GoLiveTargetCatalog.TargetIds.CustomRtmp"
-                                       Sources="@Sources"
-                                       SelectedSourceIds="@GetSelectedSourceIds(GoLiveTargetCatalog.TargetIds.CustomRtmp)"
-                                       ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((GoLiveTargetCatalog.TargetIds.CustomRtmp, sourceId)))" />
-        <div class="set-field">
-            <label>Target Name</label>
-            <input type="text" class="set-input" value="@Settings.CustomRtmpName" @oninput="CustomRtmpNameChanged" data-testid="@UiTestIds.Settings.StreamingCustomRtmpName" />
-        </div>
-        <div class="set-field">
-            <label>RTMP / RTMPS URL</label>
-            <input type="text" class="set-input" value="@Settings.CustomRtmpUrl" @oninput="CustomRtmpUrlChanged" data-testid="@UiTestIds.Settings.StreamingCustomRtmpUrl" />
-        </div>
-        <div class="set-field">
-            <label>Stream Key</label>
-            <input type="password" class="set-input" value="@Settings.CustomRtmpStreamKey" @oninput="CustomRtmpKeyChanged" data-testid="@UiTestIds.Settings.StreamingCustomRtmpKey" />
-        </div>
-    </SettingsStreamingTargetCard>
+    @foreach (var destination in ExternalDestinations)
+    {
+        <SettingsStreamingExternalDestinationCard Settings="@Settings"
+                                                 Destination="@destination"
+                                                 Sources="@Sources"
+                                                 IsCardOpen="IsCardOpen"
+                                                 ToggleCard="ToggleCard"
+                                                 ToggleDestination="ToggleExternalDestination"
+                                                 RemoveDestination="RemoveExternalDestination"
+                                                 ToggleDestinationSource="ToggleDestinationSource"
+                                                 UpdateField="UpdateExternalDestinationField" />
+    }
 </div>
-
-@code {
-    private static readonly IReadOnlyList<SettingsSelectOption> OutputModeOptions =
-    [
-        new(VirtualCameraOutputModeValue, "Virtual Camera"),
-        new(NdiOutputModeValue, "NDI Output"),
-        new(DirectRtmpOutputModeValue, "Direct RTMP"),
-        new(LocalRecordingOutputModeValue, "Local Recording"),
-    ];
-
-    private static readonly IReadOnlyList<SettingsSelectOption> OutputResolutionOptions =
-    [
-        new(nameof(StreamingResolutionPreset.FullHd1080p30), "1920 x 1080 @ 30fps"),
-        new(nameof(StreamingResolutionPreset.FullHd1080p60), "1920 x 1080 @ 60fps"),
-        new(nameof(StreamingResolutionPreset.Hd720p30), "1280 x 720 @ 30fps"),
-        new(nameof(StreamingResolutionPreset.UltraHd2160p30), "3840 x 2160 @ 30fps"),
-    ];
-
-    private const string CustomRtmpCardId = "streaming-custom-rtmp";
-    private const string DirectRtmpOutputModeValue = "direct-rtmp";
-    private const string DisabledSummary = "Disabled until you arm this destination.";
-    private const string DisabledStatusLabel = "Disabled";
-    private const string EnabledStatusLabel = "Ready";
-    private const string LiveKitCardId = "streaming-livekit";
-    private const string LocalRecordingOutputModeValue = "local-recording";
-    private const string NdiCardId = "streaming-ndi";
-    private const string NdiOutputModeValue = "ndi-output";
-    private const string NeedsSetupStatusLabel = "Needs setup";
-    private const string NoSourceSummary = "Select at least one scene camera for this destination.";
-    private const string ObsCardId = "streaming-obs";
-    private const string OnCssClass = "on";
-    private const string RecordingCardId = "streaming-recording";
-    private const string SelectedStatusClass = "set-dest-ok";
-    private const string TwitchCardId = "streaming-twitch";
-    private const string VdoCardId = "streaming-vdo";
-    private const string VirtualCameraOutputModeValue = "virtual-camera";
-    private const string YoutubeCardId = "streaming-youtube";
-
-    private bool _isAddDestinationMenuOpen;
-
-    [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
-    [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
-    [Parameter] public string SelectedOutputModeValue { get; set; } = VirtualCameraOutputModeValue;
-    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
-    [Parameter] public EventCallback<ChangeEventArgs> BitrateChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> CustomRtmpKeyChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> CustomRtmpNameChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> CustomRtmpUrlChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> LiveKitRoomChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> LiveKitServerChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> LiveKitTokenChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> OutputModeChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> OutputResolutionChanged { get; set; }
-    [Parameter] public EventCallback<string> ToggleCard { get; set; }
-    [Parameter] public EventCallback ToggleCustomRtmp { get; set; }
-    [Parameter] public EventCallback ToggleIncludeCamera { get; set; }
-    [Parameter] public EventCallback ToggleLiveKit { get; set; }
-    [Parameter] public EventCallback ToggleNdi { get; set; }
-    [Parameter] public EventCallback ToggleObs { get; set; }
-    [Parameter] public EventCallback ToggleRecording { get; set; }
-    [Parameter] public EventCallback<(string TargetId, string SourceId)> ToggleDestinationSource { get; set; }
-    [Parameter] public EventCallback ToggleTextOverlay { get; set; }
-    [Parameter] public EventCallback ToggleTwitch { get; set; }
-    [Parameter] public EventCallback ToggleVdo { get; set; }
-    [Parameter] public EventCallback ToggleYoutube { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> TwitchKeyChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> TwitchUrlChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> VdoPublishUrlChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> VdoRoomChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> YoutubeKeyChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> YoutubeUrlChanged { get; set; }
-
-    private string AddDestinationMenuCssClass =>
-        _isAddDestinationMenuOpen ? "set-add-source-menu open" : "set-add-source-menu";
-
-    private IReadOnlyList<string> GetSelectedSourceIds(string targetId) =>
-        GoLiveDestinationRouting.GetSelectedSourceIds(Settings, targetId, Sources);
-
-    private bool BuildIsReady(bool isEnabled, string targetId, params string[] requiredValues)
-    {
-        if (!isEnabled)
-        {
-            return false;
-        }
-
-        if (GetSelectedSourceIds(targetId).Count == 0)
-        {
-            return false;
-        }
-
-        return requiredValues.All(value => !string.IsNullOrWhiteSpace(value));
-    }
-
-    private string BuildLocalSummary(string targetId)
-    {
-        var selectedSources = GetSelectedSourceIds(targetId);
-        return selectedSources.Count == 0
-            ? NoSourceSummary
-            : $"{selectedSources.Count} camera source(s) armed from Settings.";
-    }
-
-    private string BuildRemoteSummary(bool isEnabled, string targetId, params string[] requiredValues)
-    {
-        if (!isEnabled)
-        {
-            return DisabledSummary;
-        }
-
-        if (GetSelectedSourceIds(targetId).Count == 0)
-        {
-            return NoSourceSummary;
-        }
-
-        return requiredValues.All(value => !string.IsNullOrWhiteSpace(value))
-            ? "Credentials and source routing are stored in browser settings."
-            : "Complete the destination fields and source routing before going live.";
-    }
-
-    private string BuildStatusClass(bool isEnabled, string targetId, params string[] requiredValues) =>
-        BuildIsReady(isEnabled, targetId, requiredValues) ? SelectedStatusClass : string.Empty;
-
-    private string BuildTargetStatusLabel(bool isEnabled, string targetId, params string[] requiredValues)
-    {
-        if (!isEnabled)
-        {
-            return DisabledStatusLabel;
-        }
-
-        return BuildIsReady(isEnabled, targetId, requiredValues)
-            ? EnabledStatusLabel
-            : NeedsSetupStatusLabel;
-    }
-
-    private async Task OpenDestinationCardAsync(string cardId)
-    {
-        _isAddDestinationMenuOpen = false;
-
-        if (!IsCardOpen(cardId))
-        {
-            await ToggleCard.InvokeAsync(cardId);
-        }
-    }
-
-    private void ToggleDestinationMenu() => _isAddDestinationMenuOpen = !_isAddDestinationMenuOpen;
-
-    private async Task ToggleStreamingCardAsync(string cardId)
-    {
-        _isAddDestinationMenuOpen = false;
-        await ToggleCard.InvokeAsync(cardId);
-    }
-}

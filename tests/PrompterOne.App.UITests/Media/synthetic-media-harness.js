@@ -19,7 +19,8 @@
     const primaryMicrophoneLabel = "Browser Microphone";
     const primaryCameraColor = "#4fe6cf";
     const secondaryCameraColor = "#f2b866";
-    const fallbackDeviceId = "default";
+    const defaultDeviceId = "default";
+    const emptyDeviceLabel = "";
     const exactConstraint = "exact";
     const idealConstraint = "ideal";
     const defaultGroupId = "prompterone-browser-group";
@@ -58,6 +59,7 @@
             tone: 220
         })
     ]);
+    const deviceLabelOverrides = new Map();
     const requestLog = [];
     let requestId = 0;
 
@@ -75,20 +77,35 @@
     }
 
     function toDeviceDescriptor(device) {
+        const label = resolveDeviceLabel(device);
         return {
             deviceId: device.deviceId,
             kind: device.kind,
-            label: device.label,
+            label,
             groupId: device.groupId || defaultGroupId,
             toJSON() {
                 return {
                     deviceId: device.deviceId,
                     kind: device.kind,
-                    label: device.label,
+                    label,
                     groupId: device.groupId || defaultGroupId
                 };
             }
         };
+    }
+
+    function resolveDeviceLabel(device) {
+        if (!device || typeof device !== "object") {
+            return emptyDeviceLabel;
+        }
+
+        if (deviceLabelOverrides.has(device.deviceId)) {
+            return deviceLabelOverrides.get(device.deviceId) ?? emptyDeviceLabel;
+        }
+
+        return typeof device.label === "string"
+            ? device.label
+            : emptyDeviceLabel;
     }
 
     function readRequestedDeviceId(kindConstraint) {
@@ -126,7 +143,7 @@
             throw new DOMException(`No ${kind} device is available.`, "NotFoundError");
         }
 
-        if (!requestedDeviceId || requestedDeviceId === fallbackDeviceId) {
+        if (!requestedDeviceId || requestedDeviceId === defaultDeviceId) {
             return matchingDevices.find(device => device.isDefault) ?? matchingDevices[0];
         }
 
@@ -149,6 +166,7 @@
     }
 
     function createVideoStream(device) {
+        const label = resolveDeviceLabel(device);
         const canvas = document.createElement("canvas");
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
@@ -170,7 +188,7 @@
             context.fillRect(24, 24, canvasWidth - 48, canvasHeight - 48);
             context.fillStyle = "#f3e6ca";
             context.font = "bold 32px monospace";
-            context.fillText(device.label, 40, 72);
+            context.fillText(label, 40, 72);
             context.font = "20px monospace";
             context.fillText(`Frame ${tick}`, 40, 112);
         }
@@ -193,7 +211,7 @@
             streamMetadataVersion,
             videoDeviceId: device.deviceId,
             audioDeviceId: null,
-            videoLabel: device.label,
+            videoLabel: label,
             audioLabel: null
         };
 
@@ -217,6 +235,7 @@
     }
 
     function createAudioStream(device) {
+        const label = resolveDeviceLabel(device);
         const audioContext = new AudioContext();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
@@ -251,7 +270,7 @@
             videoDeviceId: null,
             audioDeviceId: device.deviceId,
             videoLabel: null,
-            audioLabel: device.label
+            audioLabel: label
         };
 
         attachMetadata(stream, trackMetadata);
@@ -296,8 +315,8 @@
             streamMetadataVersion,
             videoDeviceId: videoDevice?.deviceId ?? null,
             audioDeviceId: audioDevice?.deviceId ?? null,
-            videoLabel: videoDevice?.label ?? null,
-            audioLabel: audioDevice?.label ?? null
+            videoLabel: videoDevice ? resolveDeviceLabel(videoDevice) : null,
+            audioLabel: audioDevice ? resolveDeviceLabel(audioDevice) : null
         };
 
         attachMetadata(stream, metadata);
@@ -330,10 +349,19 @@
         listDevices() {
             return devices.map(device => ({
                 deviceId: device.deviceId,
-                label: device.label,
+                label: resolveDeviceLabel(device),
                 kind: device.kind,
                 isDefault: device.isDefault
             }));
+        },
+        clearDeviceLabels() {
+            deviceLabelOverrides.clear();
+            devices.forEach(device => {
+                deviceLabelOverrides.set(device.deviceId, emptyDeviceLabel);
+            });
+        },
+        restoreDeviceLabels() {
+            deviceLabelOverrides.clear();
         },
         clearRequestLog() {
             requestLog.length = 0;

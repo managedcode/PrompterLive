@@ -1,3 +1,5 @@
+using PrompterOne.Shared.Contracts;
+
 namespace PrompterOne.App.Tests;
 
 public sealed class ReaderStylesheetContractTests
@@ -47,7 +49,7 @@ public sealed class ReaderStylesheetContractTests
     }
 
     [Fact]
-    public void LearnAndTeleprompterPages_LoadOwnFeatureStylesheets()
+    public void LearnPage_UsesRouteOwnedStylesheet_AndTeleprompterUsesHostLoadedStylesheet()
     {
         var learnPage = File.ReadAllText(LearnPagePath);
         var teleprompterPage = File.ReadAllText(TeleprompterPagePath);
@@ -56,12 +58,12 @@ public sealed class ReaderStylesheetContractTests
         Assert.Contains("<HeadContent>", learnPage, StringComparison.Ordinal);
         Assert.Contains("DesignStylesheetPaths.Learn", learnPage, StringComparison.Ordinal);
 
-        Assert.Contains("<HeadContent>", teleprompterPage, StringComparison.Ordinal);
-        Assert.Contains("DesignStylesheetPaths.Teleprompter", teleprompterPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("DesignStylesheetPaths.Teleprompter", teleprompterPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("<HeadContent>", teleprompterPage, StringComparison.Ordinal);
 
         Assert.Contains("_content/PrompterOne.Shared/design/styles.css", hostIndex, StringComparison.Ordinal);
-        Assert.DoesNotContain("_content/PrompterOne.Shared/design/learn.css", hostIndex, StringComparison.Ordinal);
-        Assert.DoesNotContain("_content/PrompterOne.Shared/design/teleprompter.css", hostIndex, StringComparison.Ordinal);
+        Assert.DoesNotContain(DesignStylesheetPaths.Learn, hostIndex, StringComparison.Ordinal);
+        Assert.Contains(DesignStylesheetPaths.Teleprompter, hostIndex, StringComparison.Ordinal);
     }
 
     private static string ResolvePath(string relativePath) =>

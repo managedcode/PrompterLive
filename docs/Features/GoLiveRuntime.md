@@ -7,19 +7,20 @@
 The current page layout is a production-style studio surface:
 
 - the routed `Go Live` page owns its own studio chrome and suppresses the shared app header while the route is active, so `design/golive.html` remains the only topbar on that screen
-- top session bar follows `design/golive.html`: back to Read, script title + session badge, centered session timer, panel toggles, mode switch, settings shortcut, REC, and the main stream action on the far right
+- top session bar follows `design/golive.html`: back to Library, script title + session badge, centered session timer, panel toggles, mode switch, settings shortcut, REC, and the main stream action on the far right
 - the studio shell follows the same three-column grid as `design/golive.html`: a compact left input rail, a dominant center canvas/program stage, and a dedicated right operational rail
 - left input rail for scene cameras, add-camera action, utility sources, and microphone route status
 - center program stage for the selected program source and current script/session state
 - scene controls bar for scene chips, layout controls, transitions, and the primary `Take To Air` action
 - right rail for the current live preview plus compact stream, audio, and room/runtime panels
+- source-card `ON AIR` badges and the preview red live dot only turn on when recording or streaming is actually active; idle routing and armed sources stay visually non-live
 - full-program mode collapses both side rails so the center canvas follows the design's focused monitor state
-- destination cards that arm OBS, recording, LiveKit, and YouTube from persisted settings instead of editing credentials inline
+- destination cards are built from persisted local outputs plus a dynamic browser-stored `ExternalDestinations` list; seeded fake provider rows are forbidden
 
 The runtime now owns real browser media outputs for the composed program scene and the current audio bus:
 
 - `Go Live` auto-seeds the first available browser camera into the scene when the scene is empty and the browser exposes a real camera list
-- the center program stage always shows the currently selected scene camera, while the right preview rail shows the currently on-air camera until the operator takes the selected source live
+- the center program stage always shows the currently selected scene camera, while the right preview rail shows the current program source and only marks it live once recording or streaming is active
 - `Go Live` builds one browser-side program stream from the scene camera cards by drawing the selected primary camera full-frame and then layering additional included cameras as positioned overlays on a canvas
 - the scene `AudioBus` is mixed into one program audio track through `AudioContext`, delay, and gain nodes before the final program stream is published or recorded
 - OBS browser output stays browser-only and exposes the composed program audio inside an OBS Browser Source environment
@@ -34,7 +35,7 @@ Relay-only destinations stay configuration surfaces:
 - YouTube, Twitch, custom RTMP, and similar RTMP-style targets still persist credentials and routing in browser storage
 - `Go Live` only exposes quick arm/disarm toggles and readiness summaries for those targets
 - detailed destination credentials, ingest URLs, and provider-specific configuration live in `Settings`
-- these targets do not publish directly from the browser runtime; they require an external relay or ingest layer outside this standalone WASM app
+- these targets do not publish directly from the browser runtime; they require an external relay or ingest layer outside this standalone WASM app, and `Go Live` must not mark the session live unless a direct browser live output actually starts
 
 It is separate from:
 
@@ -62,8 +63,8 @@ sequenceDiagram
     User->>Settings: Configure camera, FPS, mic, sync
     Settings->>Studio: Persist device preferences
     Settings->>Scene: Persist scene cameras and audio bus
-    User->>Settings: Configure LiveKit / YouTube / recording settings
-    Settings->>Studio: Persist provider credentials and destinations
+    User->>Settings: Add external destinations and configure provider credentials
+    Settings->>Studio: Persist local outputs and external destination list
     User->>GoLive: Open Go Live
     GoLive->>Studio: Load live routing settings
     GoLive->>Scene: Load current scene sources
@@ -181,14 +182,16 @@ flowchart LR
 - `Settings` must expose a visible CTA into `Go Live` so device setup and live routing stay discoverable as separate flows.
 - the shared header shell must keep `Go Live` reachable from every non-`Go Live` routed page because it is a primary studio action
 - `Go Live` may arm multiple destinations at the same time.
+- hardcoded destination instances are forbidden; the external destination list must come from persisted browser settings and may contain zero, one, or many platform entries
 - `Go Live` must reuse the browser-composed scene and not invent a separate media graph.
 - `Go Live` must auto-seed the first available browser camera into the scene when the scene is empty and devices are available.
 - `Go Live` must show the selected program source in the center monitor and the currently on-air source in the right preview rail until the operator explicitly takes the selected source live.
+- `Go Live` must not render `ON AIR` source badges or red preview live dots while the session is idle; those indicators only represent active recording or streaming.
 - `Go Live` must show a stable empty preview state instead of mounting camera interop when the current scene has no cameras.
 - the routed `Go Live` page must not stack the shared app header above the studio topbar; the studio topbar is the only route chrome on that screen
 - any shared `Go Live` localized copy must come from `PrompterOne.Shared.Localization.UiTextCatalog`, so supported browser cultures localize the studio surface without feature-local string copies.
 - quick destination cards must only expose honest readiness summaries and arm/disarm toggles; fake in-page credential editors are forbidden on the operational studio surface
-- legacy streaming settings must normalize to the current included program cameras so existing browser storage keeps working
+- legacy streaming settings must normalize to the current included program cameras and migrate legacy provider fields into the canonical external destination list so existing browser storage keeps working
 - `VirtualCamera` mode normalizes to OBS armed by default, so browser sessions keep the legacy desktop-capture workflow unless the user explicitly turns OBS off
 - Camera source inclusion is persisted through `MediaSceneState`.
 - Destination credentials and endpoints are persisted only in browser storage for this standalone runtime.

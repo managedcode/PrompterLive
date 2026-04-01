@@ -74,6 +74,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<GoLiveSessionService>();
         services.AddScoped<GoLiveOutputInterop>();
         services.AddScoped<GoLiveOutputRuntimeService>();
+        services.AddScoped<StreamingPublishDescriptorResolver>();
         services.AddScoped<UiDiagnosticsService>();
 
         services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();

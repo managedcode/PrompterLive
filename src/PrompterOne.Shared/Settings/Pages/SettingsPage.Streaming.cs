@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Streaming;
 
@@ -19,135 +20,84 @@ public partial class SettingsPage
         _ => VirtualCameraOutputModeValue
     };
 
-    private async Task ToggleObsOutputAsync()
-    {
-        _studioSettings = _studioSettings with
+    private Task ToggleObsOutputAsync() =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            Streaming = _studioSettings.Streaming with
-            {
-                ObsVirtualCameraEnabled = !_studioSettings.Streaming.ObsVirtualCameraEnabled,
-                OutputMode = StreamingOutputMode.VirtualCamera
-            }
+            ObsVirtualCameraEnabled = !streaming.ObsVirtualCameraEnabled,
+            OutputMode = StreamingOutputMode.VirtualCamera
+        });
+
+    private Task ToggleNdiOutputAsync() =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            NdiOutputEnabled = !streaming.NdiOutputEnabled,
+            OutputMode = StreamingOutputMode.NdiOutput
+        });
+
+    private Task ToggleRecordingOutputAsync() =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            LocalRecordingEnabled = !streaming.LocalRecordingEnabled,
+            OutputMode = StreamingOutputMode.LocalRecording
+        });
+
+    private async Task AddExternalDestinationAsync(StreamingPlatformKind kind)
+    {
+        var existingIds = (_studioSettings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
+            .Select(destination => destination.Id);
+        var destination = StreamingPlatformCatalog.CreateProfile(kind, existingIds);
+        destination = destination with
+        {
+            Name = BuildDestinationDisplayName(kind, destination.Id)
         };
 
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleNdiOutputAsync()
-    {
-        _studioSettings = _studioSettings with
+        if (destination.ProviderKind == StreamingProviderKind.Rtmp)
         {
-            Streaming = _studioSettings.Streaming with
-            {
-                NdiOutputEnabled = !_studioSettings.Streaming.NdiOutputEnabled,
-                OutputMode = StreamingOutputMode.NdiOutput
-            }
-        };
+            destination = destination.SetPrimaryDestination(
+                destination.Name,
+                destination.GetPrimaryDestinationUrl(),
+                destination.GetPrimaryDestinationStreamKey());
+        }
 
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleRecordingOutputAsync()
-    {
-        _studioSettings = _studioSettings with
+        await UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            Streaming = _studioSettings.Streaming with
-            {
-                LocalRecordingEnabled = !_studioSettings.Streaming.LocalRecordingEnabled,
-                OutputMode = StreamingOutputMode.LocalRecording
-            }
-        };
-
-        await PersistStudioSettingsAsync();
+            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
+                .Append(destination)
+                .ToArray()
+        });
     }
 
-    private async Task ToggleLiveKitSettingsAsync()
-    {
-        _studioSettings = _studioSettings with
+    private Task ToggleExternalDestinationAsync(string destinationId) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateExternalDestination(
+                streaming,
+                destinationId,
+                destination => destination with { IsEnabled = !destination.IsEnabled }));
+
+    private Task RemoveExternalDestinationAsync(string destinationId) =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            Streaming = _studioSettings.Streaming with
-            {
-                LiveKitEnabled = !_studioSettings.Streaming.LiveKitEnabled
-            }
-        };
+            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
+                .Where(destination => !string.Equals(destination.Id, destinationId, StringComparison.Ordinal))
+                .ToArray()
+        });
 
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleVdoSettingsAsync()
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                VdoNinjaEnabled = !_studioSettings.Streaming.VdoNinjaEnabled
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleYoutubeSettingsAsync()
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                YoutubeEnabled = !_studioSettings.Streaming.YoutubeEnabled,
-                OutputMode = StreamingOutputMode.DirectRtmp
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleTwitchSettingsAsync()
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                TwitchEnabled = !_studioSettings.Streaming.TwitchEnabled,
-                OutputMode = StreamingOutputMode.DirectRtmp
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task ToggleCustomRtmpSettingsAsync()
-    {
-        var customName = string.IsNullOrWhiteSpace(_studioSettings.Streaming.CustomRtmpName)
-            ? StreamingDefaults.CustomTargetName
-            : _studioSettings.Streaming.CustomRtmpName;
-
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                CustomRtmpEnabled = !_studioSettings.Streaming.CustomRtmpEnabled,
-                CustomRtmpName = customName,
-                OutputMode = StreamingOutputMode.DirectRtmp,
-                RtmpUrl = _studioSettings.Streaming.CustomRtmpUrl,
-                StreamKey = _studioSettings.Streaming.CustomRtmpStreamKey
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
+    private Task UpdateExternalDestinationFieldAsync((string DestinationId, string FieldId, string Value) update) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateExternalDestination(
+                streaming,
+                update.DestinationId,
+                destination => ApplyExternalDestinationField(destination, update.FieldId, update.Value)));
 
     private async Task ToggleStreamingDestinationSourceAsync((string TargetId, string SourceId) update)
     {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = GoLiveDestinationRouting.ToggleSource(
-                _studioSettings.Streaming,
+        await UpdateStreamingSettingsAsync(
+            streaming => GoLiveDestinationRouting.ToggleSource(
+                streaming,
                 update.TargetId,
                 update.SourceId,
-                _sceneCameras)
-        };
-
-        await PersistStudioSettingsAsync();
+                _sceneCameras),
+            normalizeSources: false);
     }
 
     private async Task OnStreamingOutputResolutionChanged(ChangeEventArgs args)
@@ -157,12 +107,7 @@ public partial class SettingsPage
             return;
         }
 
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { OutputResolution = outputResolution }
-        };
-
-        await PersistStudioSettingsAsync();
+        await UpdateStreamingSettingsAsync(streaming => streaming with { OutputResolution = outputResolution });
     }
 
     private async Task OnStreamingOutputModeChanged(ChangeEventArgs args)
@@ -175,12 +120,7 @@ public partial class SettingsPage
             _ => StreamingOutputMode.VirtualCamera
         };
 
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { OutputMode = nextMode }
-        };
-
-        await PersistStudioSettingsAsync();
+        await UpdateStreamingSettingsAsync(streaming => streaming with { OutputMode = nextMode });
     }
 
     private async Task UpdateStreamingBitrateAsync(ChangeEventArgs args)
@@ -190,181 +130,104 @@ public partial class SettingsPage
             return;
         }
 
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { BitrateKbps = Math.Max(250, bitrate) }
-        };
-
-        await PersistStudioSettingsAsync();
+        await UpdateStreamingSettingsAsync(streaming => streaming with { BitrateKbps = Math.Max(250, bitrate) });
     }
 
-    private async Task ToggleSettingsTextOverlayAsync()
-    {
-        _studioSettings = _studioSettings with
+    private Task ToggleSettingsTextOverlayAsync() =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            Streaming = _studioSettings.Streaming with
-            {
-                ShowTextOverlay = !_studioSettings.Streaming.ShowTextOverlay
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
+            ShowTextOverlay = !streaming.ShowTextOverlay
+        });
 
     private async Task ToggleSettingsIncludeCameraAsync()
     {
         var nextValue = !_studioSettings.Streaming.IncludeCameraInOutput;
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { IncludeCameraInOutput = nextValue }
-        };
-
         foreach (var camera in _sceneCameras)
         {
             MediaSceneService.SetIncludeInOutput(camera.SourceId, nextValue);
         }
 
         await PersistSceneAsync();
-        _studioSettings = _studioSettings with
-        {
-            Streaming = GoLiveDestinationRouting.Normalize(_studioSettings.Streaming, _sceneCameras)
-        };
-        await PersistStudioSettingsAsync();
+        await UpdateStreamingSettingsAsync(streaming => streaming with { IncludeCameraInOutput = nextValue });
     }
 
-    private async Task UpdateLiveKitServerSettingAsync(ChangeEventArgs args)
+    private async Task UpdateStreamingSettingsAsync(
+        Func<StreamStudioSettings, StreamStudioSettings> update,
+        bool normalizeSources = true)
     {
-        _studioSettings = _studioSettings with
+        var nextStreaming = update(_studioSettings.Streaming);
+        if (normalizeSources)
         {
-            Streaming = _studioSettings.Streaming with { LiveKitServerUrl = GetInputValue(args) }
-        };
+            nextStreaming = GoLiveDestinationRouting.Normalize(nextStreaming, _sceneCameras);
+        }
 
+        _studioSettings = _studioSettings with { Streaming = nextStreaming };
         await PersistStudioSettingsAsync();
     }
 
-    private async Task UpdateLiveKitRoomSettingAsync(ChangeEventArgs args)
+    private static StreamStudioSettings UpdateExternalDestination(
+        StreamStudioSettings streaming,
+        string destinationId,
+        Func<StreamingProfile, StreamingProfile> update)
     {
-        _studioSettings = _studioSettings with
+        return streaming with
         {
-            Streaming = _studioSettings.Streaming with { LiveKitRoomName = GetInputValue(args) }
+            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
+                .Select(destination => string.Equals(destination.Id, destinationId, StringComparison.Ordinal)
+                    ? update(destination)
+                    : destination)
+                .ToArray()
         };
-
-        await PersistStudioSettingsAsync();
     }
 
-    private async Task UpdateLiveKitTokenSettingAsync(ChangeEventArgs args)
+    private static StreamingProfile ApplyExternalDestinationField(
+        StreamingProfile destination,
+        string fieldId,
+        string value)
     {
-        _studioSettings = _studioSettings with
+        return fieldId switch
         {
-            Streaming = _studioSettings.Streaming with { LiveKitToken = GetInputValue(args) }
+            StreamingDestinationFieldIds.Name => ApplyDestinationName(destination, value),
+            StreamingDestinationFieldIds.ServerUrl => destination with { ServerUrl = value },
+            StreamingDestinationFieldIds.RoomName => destination with { RoomName = value },
+            StreamingDestinationFieldIds.Token => destination with { Token = value },
+            StreamingDestinationFieldIds.PublishUrl => destination with { PublishUrl = value },
+            StreamingDestinationFieldIds.RtmpUrl => destination.SetPrimaryDestination(
+                destination.Name,
+                value,
+                destination.GetPrimaryDestinationStreamKey()),
+            StreamingDestinationFieldIds.StreamKey => destination.SetPrimaryDestination(
+                destination.Name,
+                destination.GetPrimaryDestinationUrl(),
+                value),
+            _ => destination
         };
-
-        await PersistStudioSettingsAsync();
     }
 
-    private async Task UpdateVdoRoomSettingAsync(ChangeEventArgs args)
+    private static StreamingProfile ApplyDestinationName(StreamingProfile destination, string value)
     {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { VdoNinjaRoomName = GetInputValue(args) }
-        };
+        var definition = StreamingPlatformCatalog.Get(destination.PlatformKind);
+        var name = string.IsNullOrWhiteSpace(value)
+            ? definition.DefaultProfileName
+            : value;
 
-        await PersistStudioSettingsAsync();
+        return destination.ProviderKind == StreamingProviderKind.Rtmp
+            ? destination.SetPrimaryDestination(
+                name,
+                destination.GetPrimaryDestinationUrl(),
+                destination.GetPrimaryDestinationStreamKey())
+            : destination with { Name = name };
     }
 
-    private async Task UpdateVdoPublishUrlSettingAsync(ChangeEventArgs args)
+    private static string BuildDestinationDisplayName(StreamingPlatformKind kind, string destinationId)
     {
-        _studioSettings = _studioSettings with
+        var definition = StreamingPlatformCatalog.Get(kind);
+        if (string.Equals(destinationId, definition.IdPrefix, StringComparison.Ordinal))
         {
-            Streaming = _studioSettings.Streaming with { VdoNinjaPublishUrl = GetInputValue(args) }
-        };
+            return definition.DefaultProfileName;
+        }
 
-        await PersistStudioSettingsAsync();
+        var suffix = destinationId[(definition.IdPrefix.Length + 1)..];
+        return $"{definition.DefaultProfileName} {suffix}";
     }
-
-    private async Task UpdateYoutubeUrlSettingAsync(ChangeEventArgs args)
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { YoutubeRtmpUrl = GetInputValue(args) }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateYoutubeKeySettingAsync(ChangeEventArgs args)
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { YoutubeStreamKey = GetInputValue(args) }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateTwitchUrlSettingAsync(ChangeEventArgs args)
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { TwitchRtmpUrl = GetInputValue(args) }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateTwitchKeySettingAsync(ChangeEventArgs args)
-    {
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { TwitchStreamKey = GetInputValue(args) }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateCustomRtmpNameSettingAsync(ChangeEventArgs args)
-    {
-        var nextName = string.IsNullOrWhiteSpace(GetInputValue(args))
-            ? StreamingDefaults.CustomTargetName
-            : GetInputValue(args);
-
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with { CustomRtmpName = nextName }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateCustomRtmpUrlSettingAsync(ChangeEventArgs args)
-    {
-        var nextValue = GetInputValue(args);
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                CustomRtmpUrl = nextValue,
-                RtmpUrl = nextValue
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private async Task UpdateCustomRtmpKeySettingAsync(ChangeEventArgs args)
-    {
-        var nextValue = GetInputValue(args);
-        _studioSettings = _studioSettings with
-        {
-            Streaming = _studioSettings.Streaming with
-            {
-                CustomRtmpStreamKey = nextValue,
-                StreamKey = nextValue
-            }
-        };
-
-        await PersistStudioSettingsAsync();
-    }
-
-    private static string GetInputValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
 }

@@ -7,7 +7,6 @@ namespace PrompterOne.Shared.Services;
 
 public sealed partial class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDeviceService
 {
-    private const string UnnamedDeviceLabel = "Unnamed device";
     private readonly IJSRuntime _jsRuntime = jsRuntime;
 
     public async Task<IReadOnlyList<MediaDeviceInfo>> GetDevicesAsync(CancellationToken cancellationToken = default)
@@ -33,15 +32,15 @@ public sealed partial class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IM
     {
         if (string.IsNullOrWhiteSpace(rawLabel))
         {
-            return UnnamedDeviceLabel;
+            return string.Empty;
         }
 
         var cleaned = VendorIdPattern().Replace(rawLabel, string.Empty).Trim();
-        return string.IsNullOrWhiteSpace(cleaned) ? UnnamedDeviceLabel : cleaned;
+        return string.IsNullOrWhiteSpace(cleaned) ? string.Empty : cleaned;
     }
 
     [GeneratedRegex(@"\s*\([0-9a-fA-F]{4}:[0-9a-fA-F]{4}\)")]
     private static partial Regex VendorIdPattern();
 
-    private sealed record BrowserMediaDeviceDto(string DeviceId, string Label, string Kind, bool IsDefault);
+    private sealed record BrowserMediaDeviceDto(string DeviceId, string? Label, string Kind, bool IsDefault);
 }

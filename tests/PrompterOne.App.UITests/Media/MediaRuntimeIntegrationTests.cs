@@ -132,6 +132,53 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
     }
 
     [Fact]
+    public async Task SettingsScreen_BlankBrowserDeviceLabels_DoNotRenderFabricatedFallbackNames()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await page.EvaluateAsync(BrowserTestConstants.Media.ClearDeviceLabelsScript);
+
+            await page.GetByTestId(UiTestIds.Settings.NavCameras).ClickAsync();
+            var camerasPanel = page.GetByTestId(UiTestIds.Settings.CamerasPanel);
+            await Expect(camerasPanel).ToBeVisibleAsync();
+            var requestMediaButton = camerasPanel.GetByTestId(UiTestIds.Settings.RequestMedia);
+            await requestMediaButton.ScrollIntoViewIfNeededAsync();
+            await requestMediaButton.ClickAsync();
+
+            var primaryCameraCard = page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.PrimaryCameraId));
+            await Expect(primaryCameraCard).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel)).ToBeVisibleAsync();
+
+            var primaryCameraCardText = await primaryCameraCard.TextContentAsync() ?? string.Empty;
+            Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryCameraLabel, primaryCameraCardText, StringComparison.Ordinal);
+            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedCameraLabel, primaryCameraCardText, StringComparison.Ordinal);
+            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel, primaryCameraCardText, StringComparison.Ordinal);
+            Assert.True(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel).TextContentAsync()));
+
+            await page.GetByTestId(UiTestIds.Settings.NavMics).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicsPanel)).ToBeVisibleAsync();
+
+            var primaryMicrophoneCard = page.GetByTestId(UiTestIds.Settings.MicDevice(BrowserTestConstants.Media.PrimaryMicrophoneId));
+            await Expect(primaryMicrophoneCard).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicPreviewLabel)).ToBeVisibleAsync();
+
+            var primaryMicrophoneCardText = await primaryMicrophoneCard.TextContentAsync() ?? string.Empty;
+            Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryMicrophoneLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
+            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedMicrophoneLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
+            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
+            Assert.True(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.MicPreviewLabel).TextContentAsync()));
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task GoLivePreview_SwitchesBetweenSyntheticSceneCameras()
     {
         var page = await _fixture.NewPageAsync();

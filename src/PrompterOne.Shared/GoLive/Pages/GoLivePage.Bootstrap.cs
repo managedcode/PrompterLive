@@ -1,5 +1,6 @@
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Storage;
@@ -23,8 +24,8 @@ public partial class GoLivePage
     private async Task BootstrapPageAsync()
     {
         await Diagnostics.RunAsync(
-            GoLiveLoadOperation,
-            GoLiveLoadMessage,
+            GoLiveText.Load.LoadOperation,
+            GoLiveText.Load.LoadMessage,
             async () =>
             {
                 await Bootstrapper.EnsureReadyAsync();
@@ -148,7 +149,7 @@ public partial class GoLivePage
         _screenTitle = SessionService.State.Title;
         _screenSubtitle = SessionService.State.PreviewSegments.Count > 0
             ? SessionService.State.PreviewSegments[0].Title
-            : StreamingSubtitle;
+            : GoLiveText.Chrome.StreamingSubtitle;
         SyncGoLiveSessionState();
         EnsureStudioSurfaceState();
         Shell.ShowGoLive(_screenTitle, _screenSubtitle, SessionService.State.ScriptId);
@@ -157,8 +158,8 @@ public partial class GoLivePage
     private async Task PersistSceneAsync()
     {
         await Diagnostics.RunAsync(
-            GoLiveSceneOperation,
-            GoLiveSceneMessage,
+            GoLiveText.Load.SaveSceneOperation,
+            GoLiveText.Load.SaveSceneMessage,
             () => SettingsStore.SaveAsync(BrowserAppSettingsKeys.SceneSettings, MediaSceneService.State));
         SyncGoLiveSessionState();
     }
@@ -166,8 +167,8 @@ public partial class GoLivePage
     private async Task PersistStudioSettingsAsync()
     {
         await Diagnostics.RunAsync(
-            GoLiveStudioOperation,
-            GoLiveStudioMessage,
+            GoLiveText.Load.SaveStudioOperation,
+            GoLiveText.Load.SaveStudioMessage,
             () => StudioSettingsStore.SaveAsync(_studioSettings));
         SyncGoLiveSessionState();
     }

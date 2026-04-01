@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
@@ -9,7 +10,7 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage : IAsyncDisposable
 {
-    private const int DefaultContextWordCount = 3;
+    private const int DefaultContextWordCount = LearnSettingsDefaults.ContextWords;
     private const string EndOfScriptPhrase = "End of script.";
     private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
     private const string LoadLearnOperation = "Learn load";
@@ -39,7 +40,9 @@ public partial class LearnPage : IAsyncDisposable
     public string? ScriptId { get; set; }
 
     private CancellationTokenSource? _playbackCts;
+    private ElementReference _focusOrp;
     private ElementReference _focusRow;
+    private ElementReference _focusWord;
     private ElementReference _screenRoot;
     private string _nextPhrase = string.Empty;
     private string _progressFillWidth = "0%";
@@ -48,7 +51,7 @@ public partial class LearnPage : IAsyncDisposable
     private string _screenTitle = string.Empty;
     private int _contextWordCount = DefaultContextWordCount;
     private int _currentIndex;
-    private int _speed = 300;
+    private int _speed = LearnSettingsDefaults.WordsPerMinute;
     private bool _isPlaying;
     private bool _isLoopEnabled;
     private bool _loadState = true;
@@ -97,7 +100,7 @@ public partial class LearnPage : IAsyncDisposable
         if (_syncFocusLayoutAfterRender)
         {
             _syncFocusLayoutAfterRender = false;
-            await LearnRsvpLayoutInterop.SyncLayoutAsync(_focusRow);
+            await LearnRsvpLayoutInterop.SyncLayoutAsync(_focusRow, _focusWord, _focusOrp);
         }
 
         if (_startPlaybackAfterLayoutSync)

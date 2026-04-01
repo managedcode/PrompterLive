@@ -2,6 +2,7 @@
 @namespace PrompterOne.Shared.Pages
 @using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Components.GoLive
+@using PrompterOne.Shared.GoLive.Models
 
 <div id="screen-go-live"
      class="screen active"
@@ -22,7 +23,7 @@
                          aria-hidden="true">
                         <polyline points="15,18 9,12 15,6" />
                     </svg>
-                    <span>Back</span>
+                    <span>@GoLiveText.Chrome.BackLabel</span>
                 </a>
                 <span class="gl-title">@_screenTitle</span>
                 <span class="gl-badge @SessionBadgeCssClass">@PrimarySessionBadge</span>
@@ -96,7 +97,7 @@
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
-                        <span>Director</span>
+                        <span>@GoLiveText.Chrome.DirectorModeLabel</span>
                     </button>
                     <button type="button"
                             class="gl-mode-btn gl-mode-studio @(_activeStudioMode == GoLiveStudioMode.Studio ? "active" : null)"
@@ -113,7 +114,7 @@
                             <line x1="8" y1="21" x2="16" y2="21" />
                             <line x1="12" y1="17" x2="12" y2="21" />
                         </svg>
-                        <span>Studio</span>
+                        <span>@GoLiveText.Chrome.StudioModeLabel</span>
                     </button>
                 </div>
                 <a class="gl-settings-btn"
@@ -136,7 +137,7 @@
                         data-testid="@UiTestIds.GoLive.StartRecording"
                         @onclick="ToggleRecordingSessionAsync">
                     <span class="gl-rec-dot"></span>
-                    <span>@RecordingIndicatorLabel</span>
+                    <span>@GoLiveText.Session.RecordingIndicatorLabel</span>
                 </button>
                 <button type="button"
                         class="gl-stream-btn @(GoLiveSession.State.IsStreamActive ? "active" : null)"
@@ -170,12 +171,13 @@
                        data-testid="@UiTestIds.GoLive.SourceRail">
                     <GoLiveSourcesCard Sources="@VisibleSceneCameras"
                                        ActiveSourceId="@ActiveCamera?.SourceId"
+                                       LiveState="@SessionIndicatorState"
                                        SelectedSourceId="@SelectedCamera?.SourceId"
                                        Title="@SourcesHeaderTitle"
                                        UtilitySources="@UtilitySources"
                                        HasPrimaryMicrophone="@HasPrimaryMicrophone"
                                        MicrophoneName="@PrimaryMicrophoneLabel"
-                                       MicrophoneRouteLabel="@(HasPrimaryMicrophone ? PrimaryMicrophoneRoute : NoMicrophoneLabel)"
+                                       MicrophoneRouteLabel="@(HasPrimaryMicrophone ? PrimaryMicrophoneRoute : GoLiveText.Audio.NoMicrophoneLabel)"
                                        CanAddCamera="@CanAddSceneCamera"
                                        AddCamera="AddAvailableCameraAsync"
                                        SelectSource="SelectSourceAsync"
@@ -212,7 +214,8 @@
                        data-testid="@UiTestIds.GoLive.PreviewRail">
                     <GoLiveCameraPreviewCard Camera="@ActiveCamera"
                                              Description="@ActiveSessionLabel"
-                                             Title="Live" />
+                                             LiveState="@SessionIndicatorState"
+                                             Title="@GoLiveText.Chrome.LivePreviewTitle" />
                     <GoLiveStudioSidebar ActiveTab="@_activeStudioTab"
                                          AudioChannels="@AudioChannels"
                                          CreateRoom="CreateRoomAsync"

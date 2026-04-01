@@ -73,7 +73,7 @@ function updateAppHeader(screenId) {
             break;
         case 'rsvp':
             center.innerHTML = `${backBtn}<span class="top-bar-title">Product Launch</span><span style="color:var(--text-4);font-size:12px">Intro / Opening Block</span>`;
-            right.innerHTML = `<span class="top-bar-title" style="font-size:13px">300 WPM</span>${goLiveBtn}`;
+            right.innerHTML = `<span class="top-bar-title" style="font-size:13px">250 WPM</span>${goLiveBtn}`;
             break;
         case 'teleprompter':
             center.innerHTML = `${backBtn}<span class="top-bar-title">Product Launch</span><span style="color:var(--text-4);font-size:12px" id="rd-header-segment">Intro · Opening Block</span>`;
@@ -93,7 +93,7 @@ function updateAppHeader(screenId) {
 // RSVP (Learn mode — simple word-by-word)
 // ============================================
 
-let rsvpSpeed = 300;
+let rsvpSpeed = 250;
 let rsvpPlaying = true;
 
 function changeRsvpSpeed(delta) {

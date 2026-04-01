@@ -18,6 +18,7 @@ public partial class TeleprompterPage
     private const int MinimumReaderBaseWpm = 80;
     private const int MinimumReaderWordDurationMilliseconds = 120;
     private const int MinimumPauseDurationMilliseconds = 250;
+    private const string NeutralEmotionKey = "neutral";
     private const string ReaderPauseCssClass = "rd-pause";
     private const string ReaderPauseLongCssClass = "rd-pause rd-pause-long";
     private const string ReaderPauseMediumCssClass = "rd-pause rd-pause-med";
@@ -342,10 +343,10 @@ public partial class TeleprompterPage
             _ => emotionKey
         };
 
-    private static string ResolveEmotionKey(string? emotion)
+    private static string ResolveEmotionKey(string? emotion, string fallbackEmotionKey = NeutralEmotionKey)
     {
         var normalized = string.IsNullOrWhiteSpace(emotion)
-            ? "neutral"
+            ? fallbackEmotionKey
             : emotion.Trim().ToLowerInvariant();
 
         return normalized switch
@@ -358,9 +359,9 @@ public partial class TeleprompterPage
             "grateful" => "warm",
             _ => normalized switch
             {
-                "warm" or "concerned" or "focused" or "motivational" or "neutral" or "urgent" or
+                "warm" or "concerned" or "focused" or "motivational" or NeutralEmotionKey or "urgent" or
                 "happy" or "excited" or "sad" or "calm" or "energetic" or "professional" => normalized,
-                _ => "neutral"
+                _ => fallbackEmotionKey
             }
         };
     }
@@ -394,7 +395,7 @@ public partial class TeleprompterPage
 
     private static string ResolveEmotionWordClass(string? emotion, string prefix)
     {
-        var emotionKey = ResolveEmotionKey(emotion);
+        var emotionKey = ResolveEmotionKey(emotion, string.Empty);
         return string.IsNullOrWhiteSpace(emotionKey) ? string.Empty : $"{prefix}-{emotionKey}";
     }
 

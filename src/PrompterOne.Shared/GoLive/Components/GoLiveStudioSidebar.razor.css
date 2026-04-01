@@ -113,12 +113,20 @@
     background: #ff4444;
 }
 
+.gl-dest-platform-dot.twitch {
+    background: #9146ff;
+}
+
 .gl-dest-platform-dot.livekit {
     background: #60a5fa;
 }
 
 .gl-dest-platform-dot.local {
     background: #8b96a6;
+}
+
+.gl-dest-platform-dot.relay {
+    background: #c4a060;
 }
 
 .gl-dest-platform-dot.recording {

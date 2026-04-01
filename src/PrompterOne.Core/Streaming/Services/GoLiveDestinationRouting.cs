@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 
 namespace PrompterOne.Core.Services.Streaming;
@@ -71,12 +72,24 @@ public static class GoLiveDestinationRouting
         var existingSelections = (streaming.DestinationSourceSelections ?? Array.Empty<GoLiveDestinationSourceSelection>())
             .ToDictionary(selection => selection.TargetId, selection => selection.SourceIds, StringComparer.Ordinal);
 
-        return GoLiveTargetCatalog.AllTargetIds
+        return BuildAllTargetIds(streaming)
             .Select(targetId => new GoLiveDestinationSourceSelection(
                 targetId,
                 existingSelections.TryGetValue(targetId, out var existingSourceIds)
                     ? FilterValidSourceIds(existingSourceIds, sceneCameras)
                     : fallbackSourceIds))
+            .ToArray();
+    }
+
+    private static IReadOnlyList<string> BuildAllTargetIds(StreamStudioSettings streaming)
+    {
+        var externalTargetIds = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
+            .Select(destination => destination.Id)
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Distinct(StringComparer.Ordinal);
+
+        return GoLiveTargetCatalog.LocalTargetIds
+            .Concat(externalTargetIds)
             .ToArray();
     }
 

@@ -1,0 +1,221 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Core.Models.Media
+@using PrompterOne.Core.Models.Streaming
+@using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Core.Services.Streaming
+@using PrompterOne.Shared.Services
+@using PrompterOne.Shared.Settings.Models
+@inject StreamingPublishDescriptorResolver DescriptorResolver
+
+<SettingsStreamingTargetCard Title="@Destination.Name"
+                             Account="@Presentation.SettingsAccountLabel"
+                             Description="@Presentation.SettingsDescription"
+                             Summary="@Summary"
+                             StatusLabel="@StatusLabel"
+                             StatusClass="@StatusClass"
+                             IsEnabled="@Destination.IsEnabled"
+                             IsOpen="@IsCardOpen(CardId)"
+                             IsReady="@IsReady"
+                             ToggleTestId="@UiTestIds.Settings.StreamingDestinationToggle(Destination.Id)"
+                             CardTestId="@UiTestIds.Settings.StreamingProviderCard(Destination.Id)"
+                             ToggleEnabled="@(() => ToggleDestination.InvokeAsync(Destination.Id))"
+                             OnCardToggle="@(() => ToggleCard.InvokeAsync(CardId))"
+                             IconClass="@Presentation.IconCssClass">
+    @switch (Destination.PlatformKind)
+    {
+        case StreamingPlatformKind.LiveKit:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7h16v10H4z" />
+                <path d="M9 17v3h6v-3" />
+                <path d="M8 10h8" />
+            </svg>
+            break;
+        case StreamingPlatformKind.VdoNinja:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 5h18v14H3z" />
+                <path d="M9 9h6v6H9z" />
+            </svg>
+            break;
+        case StreamingPlatformKind.Youtube:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z" />
+                <polygon points="9.75,15.02 15.5,11.75 9.75,8.48" />
+            </svg>
+            break;
+        case StreamingPlatformKind.Twitch:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 2H3v16h5v4l4-4h5l4-4V2z" />
+                <path d="M11 11V7" />
+                <path d="M16 11V7" />
+            </svg>
+            break;
+        default:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
+                <line x1="2" y1="20" x2="2.01" y2="20" />
+            </svg>
+            break;
+    }
+
+    <SettingsStreamingSourcePicker TargetId="@Destination.Id"
+                                   Sources="@Sources"
+                                   SelectedSourceIds="@SelectedSourceIds"
+                                   ToggleSource="@(sourceId => ToggleDestinationSource.InvokeAsync((Destination.Id, sourceId)))" />
+
+    @switch (Destination.PlatformKind)
+    {
+        case StreamingPlatformKind.LiveKit:
+            <div class="set-field">
+                <label>@SettingsStreamingText.ServerUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.ServerUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.ServerUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.ServerUrl)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.RoomName"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.RoomName)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.TokenLabel</label>
+                <input type="password"
+                       class="set-input"
+                       value="@Destination.Token"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.Token, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.Token)" />
+            </div>
+            break;
+        case StreamingPlatformKind.VdoNinja:
+            <div class="set-field">
+                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.RoomName"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.RoomName)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.PublishUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.PublishUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.PublishUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.PublishUrl)" />
+            </div>
+            break;
+        case StreamingPlatformKind.CustomRtmp:
+            <div class="set-field">
+                <label>@SettingsStreamingText.TargetNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.Name"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.Name, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.Name)" />
+            </div>
+            goto default;
+        default:
+            <div class="set-field">
+                <label>@SettingsStreamingText.RtmpUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Destination.GetPrimaryDestinationUrl()"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.RtmpUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.RtmpUrl)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.StreamKeyLabel</label>
+                <input type="password"
+                       class="set-input"
+                       value="@Destination.GetPrimaryDestinationStreamKey()"
+                       @oninput="@(args => UpdateField.InvokeAsync((Destination.Id, StreamingDestinationFieldIds.StreamKey, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingDestinationField(Destination.Id, StreamingDestinationFieldIds.StreamKey)" />
+            </div>
+            break;
+    }
+
+    <div class="set-field">
+        <button type="button"
+                class="set-btn-outline set-btn-sm"
+                data-testid="@UiTestIds.Settings.StreamingDestinationRemove(Destination.Id)"
+                @onclick="@(() => RemoveDestination.InvokeAsync(Destination.Id))">
+            @SettingsStreamingText.RemoveDestinationLabel
+        </button>
+    </div>
+</SettingsStreamingTargetCard>
+
+@code {
+    private const string SelectedStatusClass = "set-dest-ok";
+
+    [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
+    [Parameter, EditorRequired] public StreamingProfile Destination { get; set; } = default!;
+    [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
+    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
+    [Parameter] public EventCallback<string> RemoveDestination { get; set; }
+    [Parameter] public EventCallback<string> ToggleCard { get; set; }
+    [Parameter] public EventCallback<string> ToggleDestination { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string SourceId)> ToggleDestinationSource { get; set; }
+    [Parameter] public EventCallback<(string DestinationId, string FieldId, string Value)> UpdateField { get; set; }
+
+    private string CardId => SettingsStreamingCardIds.ExternalDestination(Destination.Id);
+
+    private StreamingPublishDescriptor Descriptor => DescriptorResolver.Describe(Destination);
+
+    private bool IsReady => Destination.IsEnabled
+        && SelectedSourceIds.Count > 0
+        && Descriptor.IsReady;
+
+    private StreamingPlatformPresentation Presentation => StreamingPlatformPresentationCatalog.Get(Destination.PlatformKind);
+
+    private IReadOnlyList<string> SelectedSourceIds =>
+        GoLiveDestinationRouting.GetSelectedSourceIds(
+            Settings,
+            Destination.Id,
+            Sources);
+
+    private string StatusClass => IsReady ? SelectedStatusClass : string.Empty;
+
+    private string StatusLabel
+    {
+        get
+        {
+            if (!Destination.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledStatusLabel;
+            }
+
+            if (SelectedSourceIds.Count == 0 || !Descriptor.IsReady)
+            {
+                return SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+            }
+
+            return Descriptor.RequiresExternalRelay
+                ? SettingsStreamingText.DestinationRelayStatusLabel
+                : SettingsStreamingText.DestinationReadyStatusLabel;
+        }
+    }
+
+    private string Summary
+    {
+        get
+        {
+            if (!Destination.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledSummary;
+            }
+
+            if (SelectedSourceIds.Count == 0)
+            {
+                return SettingsStreamingText.DestinationNoSourceSummary;
+            }
+
+            return Descriptor.Summary;
+        }
+    }
+
+    private static string GetValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
+}

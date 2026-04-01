@@ -194,6 +194,33 @@ public sealed class SettingsInteractionTests : BunitContext
     }
 
     [Fact]
+    public void StreamingPanel_RendersOnlyPersistedExternalDestinations()
+    {
+        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateLiveKitDestination()
+                ]
+            }
+        };
+
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.StreamingPanel, cut.Markup, StringComparison.Ordinal));
+        cut.FindByTestId(UiTestIds.Settings.NavStreaming).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)}']"));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)}']"));
+        });
+    }
+
+    [Fact]
     public void AppearanceThemeChoice_PersistsAndCallsBrowserThemeInterop()
     {
         var cut = Render<SettingsPage>();

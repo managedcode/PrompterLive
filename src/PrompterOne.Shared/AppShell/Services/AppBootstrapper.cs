@@ -57,8 +57,15 @@ public sealed class AppBootstrapper(
             var learnSettings = await _settingsStore.LoadAsync<LearnSettings>(BrowserAppSettingsKeys.LearnSettings, cancellationToken);
             if (learnSettings is not null)
             {
+                var normalizedLearnSettings = NormalizeLearnSettings(learnSettings);
+                if (normalizedLearnSettings != learnSettings)
+                {
+                    _logger.LogInformation("Normalizing legacy learn settings from browser storage.");
+                    await _settingsStore.SaveAsync(BrowserAppSettingsKeys.LearnSettings, normalizedLearnSettings, cancellationToken);
+                }
+
                 _logger.LogInformation("Restoring learn settings from browser storage.");
-                await _sessionService.UpdateLearnSettingsAsync(learnSettings);
+                await _sessionService.UpdateLearnSettingsAsync(normalizedLearnSettings);
             }
 
             var mediaScene = await _settingsStore.LoadAsync<MediaSceneState>(BrowserAppSettingsKeys.SceneSettings, cancellationToken);
@@ -75,5 +82,29 @@ public sealed class AppBootstrapper(
         {
             _gate.Release();
         }
+    }
+
+    private static LearnSettings NormalizeLearnSettings(LearnSettings settings)
+    {
+        var normalizedWordsPerMinute = settings.HasCustomizedWordsPerMinute
+            ? NormalizeLearnWordsPerMinute(settings.WordsPerMinute, migrateLegacyDefault: false)
+            : NormalizeLearnWordsPerMinute(settings.WordsPerMinute, migrateLegacyDefault: true);
+
+        return settings with { WordsPerMinute = normalizedWordsPerMinute };
+    }
+
+    private static int NormalizeLearnWordsPerMinute(int wordsPerMinute, bool migrateLegacyDefault)
+    {
+        if (wordsPerMinute <= 0)
+        {
+            return LearnSettingsDefaults.WordsPerMinute;
+        }
+
+        if (migrateLegacyDefault && wordsPerMinute == LearnSettingsDefaults.LegacyWordsPerMinute)
+        {
+            return LearnSettingsDefaults.WordsPerMinute;
+        }
+
+        return wordsPerMinute;
     }
 }

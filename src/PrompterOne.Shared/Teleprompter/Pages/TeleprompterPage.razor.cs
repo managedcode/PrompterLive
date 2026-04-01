@@ -152,7 +152,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         var nextCards = await BuildReaderCardsAsync();
         ResetReaderAlignmentState();
         ResetReaderCardTransitionState();
-        _cards = nextCards.Count > 0 ? nextCards : [ReaderCardViewModel.Empty];
+        _cards = nextCards;
         _screenTitle = SessionService.State.Title;
         _readerFontSize = NormalizeReaderFontSize(SessionService.State.ReaderSettings.FontScale);
         _readerFocalPointPercent = NormalizeReaderFocalPointPercent(SessionService.State.ReaderSettings.FocalPointPercent);

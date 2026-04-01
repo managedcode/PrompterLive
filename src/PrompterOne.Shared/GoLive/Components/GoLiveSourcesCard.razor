@@ -42,7 +42,9 @@
                                              VideoClass="gl-source-feed"
                                              VideoTestId="@UiTestIds.GoLive.SourceVideo(source.SourceId)">
                             <OverlayContent>
-                                <span class="@GetSourceBadgeCssClass(source)">@GetSourceBadge(source)</span>
+                                <span class="@GetSourceBadgeCssClass(source)"
+                                      data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
+                                      data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
                             </OverlayContent>
                         </GoLiveCameraSurface>
 
@@ -96,6 +98,7 @@
     private const string PrompterUtilitySourceId = "prompter-display";
     private const string RemoveLabel = "Remove";
     private const string ScreenShareUtilitySourceId = "screen-share";
+    private const string IdleStateValue = "idle";
     private const string SourceIncludedLabel = "Armed for output";
     private const string SourceLiveLabel = "Ready for canvas";
     private const string SourceOnAirLabel = "On air";
@@ -105,6 +108,7 @@
     [Parameter] public string? ActiveSourceId { get; set; }
     [Parameter] public bool CanAddCamera { get; set; }
     [Parameter] public bool HasPrimaryMicrophone { get; set; }
+    [Parameter] public string LiveState { get; set; } = IdleStateValue;
     [Parameter] public string MicrophoneName { get; set; } = string.Empty;
     [Parameter] public string MicrophoneRouteLabel { get; set; } = string.Empty;
     [Parameter] public EventCallback<string> SelectSource { get; set; }
@@ -116,6 +120,12 @@
 
     private bool IsActive(SceneCameraSource source) =>
         string.Equals(source.SourceId, ActiveSourceId, StringComparison.Ordinal);
+
+    private bool IsLiveSessionActive =>
+        !string.Equals(LiveState, IdleStateValue, StringComparison.Ordinal);
+
+    private bool IsOnAir(SceneCameraSource source) =>
+        IsLiveSessionActive && IsActive(source);
 
     private bool IsSelected(SceneCameraSource source) =>
         string.Equals(source.SourceId, SelectedSourceId, StringComparison.Ordinal);
@@ -134,7 +144,7 @@
 
     private string GetSourceBadge(SceneCameraSource source)
     {
-        if (IsActive(source))
+        if (IsOnAir(source))
         {
             return SourceOnAirLabel;
         }
@@ -146,10 +156,15 @@
                 : SourceSceneOnlyLabel;
     }
 
+    private string GetSourceIndicatorState(SceneCameraSource source) =>
+        IsOnAir(source)
+            ? LiveState
+            : IdleStateValue;
+
     private string GetSourceCardCssClass(SceneCameraSource source)
     {
         var classes = new List<string> { "gl-cam-card" };
-        if (IsActive(source))
+        if (IsOnAir(source))
         {
             classes.Add("gl-cam-onair");
         }
@@ -164,7 +179,7 @@
     private string GetSourceBadgeCssClass(SceneCameraSource source)
     {
         var classes = new List<string> { "gl-cam-status-badge" };
-        classes.Add(IsActive(source) ? "gl-badge-onair" : "gl-badge-idle");
+        classes.Add(IsOnAir(source) ? "gl-badge-onair" : "gl-badge-idle");
         return string.Join(' ', classes);
     }
 

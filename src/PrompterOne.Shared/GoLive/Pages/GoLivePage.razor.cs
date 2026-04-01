@@ -3,6 +3,7 @@ using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Settings.Models;
@@ -11,22 +12,13 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class GoLivePage : ComponentBase
 {
-    private const string DefaultMicRouteLabel = "Monitor + Stream";
-    private const string GoLiveLoadMessage = "Unable to prepare live routing right now.";
-    private const string GoLiveLoadOperation = "Go Live load";
-    private const string NoScriptProgressLabel = "No script loaded";
-    private const string GoLiveSceneMessage = "Unable to save the current live scene.";
-    private const string GoLiveSceneOperation = "Go Live save scene";
-    private const string GoLiveStudioMessage = "Unable to save live routing settings.";
-    private const string GoLiveStudioOperation = "Go Live save studio";
     private const string HomeRoute = AppRoutes.Library;
-    private const string NoMicrophoneLabel = "No microphone";
-    private const string StreamingSubtitle = "Program routing";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private GoLiveOutputRuntimeService GoLiveOutputRuntime { get; set; } = null!;
+    [Inject] private StreamingPublishDescriptorResolver StreamingDescriptorResolver { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private IMediaDeviceService MediaDeviceService { get; set; } = null!;
     [Inject] private IMediaSceneService MediaSceneService { get; set; } = null!;
@@ -43,7 +35,7 @@ public partial class GoLivePage : ComponentBase
     private IReadOnlyList<MediaDeviceInfo> _mediaDevices = [];
     private bool _loadState = true;
     private SettingsPagePreferences _recordingPreferences = SettingsPagePreferences.Default;
-    private string _screenSubtitle = StreamingSubtitle;
+    private string _screenSubtitle = GoLiveText.Chrome.StreamingSubtitle;
     private string _screenTitle = ScriptWorkspaceState.UntitledScriptTitle;
     private StudioSettings _studioSettings = StudioSettings.Default;
 
@@ -53,14 +45,14 @@ public partial class GoLivePage : ComponentBase
 
     private string CurrentScriptProgressLabel => HasScriptContext
         ? _screenSubtitle
-        : NoScriptProgressLabel;
+        : GoLiveText.Surface.NoScriptProgressLabel;
 
     private SceneCameraSource? PreviewCamera =>
         SceneCameras.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)
         ?? SceneCameras.FirstOrDefault(camera => camera.Transform.Visible)
         ?? (SceneCameras.Count > 0 ? SceneCameras[0] : null);
 
-    private string PrimaryMicrophoneLabel => MediaSceneService.State.PrimaryMicrophoneLabel ?? NoMicrophoneLabel;
+    private string PrimaryMicrophoneLabel => MediaSceneService.State.PrimaryMicrophoneLabel ?? GoLiveText.Audio.NoMicrophoneLabel;
 
     private string PrimaryMicrophoneRoute
     {
@@ -71,7 +63,7 @@ public partial class GoLivePage : ComponentBase
                 ?.RouteTarget;
 
             return route is null
-                ? DefaultMicRouteLabel
+                ? GoLiveText.Audio.DefaultMicrophoneRouteLabel
                 : FormatRouteTarget(route.Value);
         }
     }

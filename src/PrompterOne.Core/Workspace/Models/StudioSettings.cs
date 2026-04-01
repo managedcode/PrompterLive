@@ -1,3 +1,5 @@
+using PrompterOne.Core.Models.Streaming;
+
 namespace PrompterOne.Core.Models.Workspace;
 
 public enum CameraResolutionPreset
@@ -50,6 +52,7 @@ public sealed record StreamStudioSettings(
     int BitrateKbps = 6000,
     bool ShowTextOverlay = true,
     bool IncludeCameraInOutput = true,
+    IReadOnlyList<StreamingProfile>? ExternalDestinations = null,
     IReadOnlyList<GoLiveDestinationSourceSelection>? DestinationSourceSelections = null,
     string RtmpUrl = "",
     string StreamKey = "",

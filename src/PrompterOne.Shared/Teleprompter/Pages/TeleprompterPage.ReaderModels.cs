@@ -31,23 +31,7 @@ public partial class TeleprompterPage
         string WidthPercentString,
         string EdgeColor,
         IReadOnlyList<ReaderChunkViewModel> Chunks,
-        string TestId)
-    {
-        public static ReaderCardViewModel Empty { get; } = new(
-            SectionName: string.Empty,
-            DisplayName: string.Empty,
-            EmotionKey: "warm",
-            EmotionLabel: string.Empty,
-            BackgroundClass: "warm",
-            AccentColor: "#E97F00",
-            TargetWpm: 0,
-            WordCount: 0,
-            DurationMilliseconds: 0,
-            WidthPercentString: "0%",
-            EdgeColor: "rgba(233, 127, 0, 0.35)",
-            Chunks: [],
-            TestId: UiTestIds.Teleprompter.Card(999));
-    }
+        string TestId);
 
     private abstract record ReaderChunkViewModel;
 

@@ -42,9 +42,12 @@
                 <div class="rsvp-focus-shell"
                      id="@UiDomIds.Learn.WordShell"
                      data-testid="@UiTestIds.Learn.WordShell">
-                    <div class="rsvp-focus" id="@UiDomIds.Learn.Word" data-testid="@UiTestIds.Learn.Word">
+                    <div class="rsvp-focus"
+                         id="@UiDomIds.Learn.Word"
+                         @ref="_focusWord"
+                         data-testid="@UiTestIds.Learn.Word">
                         <span class="rsvp-focus-segment rsvp-focus-leading">@_currentWordLeading</span>
-                        <span class="rsvp-focus-segment rsvp-focus-orp orp">@_currentWordOrp</span>
+                        <span class="rsvp-focus-segment rsvp-focus-orp orp" @ref="_focusOrp">@_currentWordOrp</span>
                         <span class="rsvp-focus-segment rsvp-focus-trailing">@_currentWordTrailing</span>
                     </div>
                 </div>

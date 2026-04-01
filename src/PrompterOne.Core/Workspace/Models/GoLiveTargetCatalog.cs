@@ -1,17 +1,23 @@
 namespace PrompterOne.Core.Models.Workspace;
 
+public sealed record GoLiveLocalTargetDefinition(
+    string Id,
+    string Name);
+
 public static class GoLiveTargetCatalog
 {
-    public static IReadOnlyList<string> AllTargetIds { get; } =
+    public static IReadOnlyList<string> LocalTargetIds { get; } =
     [
         TargetIds.Obs,
         TargetIds.Ndi,
-        TargetIds.Recording,
-        TargetIds.LiveKit,
-        TargetIds.VdoNinja,
-        TargetIds.Youtube,
-        TargetIds.Twitch,
-        TargetIds.CustomRtmp
+        TargetIds.Recording
+    ];
+
+    public static IReadOnlyList<GoLiveLocalTargetDefinition> LocalTargets { get; } =
+    [
+        new(TargetIds.Obs, TargetNames.Obs),
+        new(TargetIds.Ndi, TargetNames.Ndi),
+        new(TargetIds.Recording, TargetNames.Recording)
     ];
 
     public static class TargetIds

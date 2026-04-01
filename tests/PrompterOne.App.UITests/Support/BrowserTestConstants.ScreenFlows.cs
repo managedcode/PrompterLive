@@ -13,7 +13,7 @@ internal static partial class BrowserTestConstants
         public const string OpeningBlock = "Opening Block";
         public const string PurposeBlock = "Purpose Block";
         public const string BenefitsBlock = "Benefits Block";
-        public const string LearnSpeedAfterIncrease = "310";
+        public const string LearnSpeedAfterIncrease = "260";
         public const int BenefitsSegmentIndex = 2;
         public const int BenefitsBlockIndex = 1;
     }
@@ -60,7 +60,7 @@ internal static partial class BrowserTestConstants
         public const string ProductLaunchVisionPronunciation = "ˈviʒən";
         public const string ProductLaunchVisionWord = "vision";
         public const string ProductLaunchWarmWord = "Let";
-        public const string SpeedOffsetsFastWord = "flight";
+        public const string SpeedOffsetsFastWord = "flight.";
         public const string SpeedOffsetsFastWpm = "154";
         public const string SpeedOffsetsNormalWord = "center";
         public const string SpeedOffsetsNormalWpm = "140";
@@ -180,5 +180,31 @@ internal static partial class BrowserTestConstants
                 }));
             }
             """;
+    }
+
+    public static class ReaderTiming
+    {
+        public const int CapturePollIntervalMs = 20;
+        public const int LearnTimingToleranceMs = 200;
+        public const int SampleCaptureTimeoutMs = 12000;
+        public const int TeleprompterTimingToleranceMs = 180;
+        public const int WordCount = 5;
+        public const string FirstWord = "alpha";
+        public const string SecondWord = "bravo";
+        public const string ThirdWord = "charlie";
+        public const string FourthWord = "delta";
+        public const string FifthWord = "echo";
+        public const int BaseWpm = 250;
+        public const int SlowWpm = 190;
+        public const int FastWpm = 310;
+
+        public static IReadOnlyList<string> ExpectedWords =>
+        [
+            FirstWord,
+            SecondWord,
+            ThirdWord,
+            FourthWord,
+            FifthWord
+        ];
     }
 }

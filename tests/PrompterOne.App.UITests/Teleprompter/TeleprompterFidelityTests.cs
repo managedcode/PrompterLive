@@ -192,7 +192,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(MaximumReaderWidthValue);
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(MaximumReaderWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0)))
-                .ToHaveClassAsync(new($@"\b{ContinuousEmphasisCssClass}\b"));
+                .ToHaveClassAsync(new Regex($@"\b{ContinuousEmphasisCssClass}\b"));
 
             var clusterWrapWidth = await page.Locator($"#{UiDomIds.Teleprompter.ClusterWrap}")
                 .EvaluateAsync<string>("element => getComputedStyle(element).maxWidth");

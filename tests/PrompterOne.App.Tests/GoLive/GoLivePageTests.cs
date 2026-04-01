@@ -3,6 +3,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
@@ -47,9 +48,13 @@ public sealed class GoLivePageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
-            Assert.True(settings.Streaming.LiveKitEnabled);
-            Assert.True(settings.Streaming.YoutubeEnabled);
             Assert.True(settings.Streaming.LocalRecordingEnabled);
+            Assert.Contains(
+                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
+                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.LiveKit, StringComparison.Ordinal) && destination.IsEnabled);
+            Assert.Contains(
+                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
+                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.Youtube, StringComparison.Ordinal) && destination.IsEnabled);
         });
     }
 
@@ -121,19 +126,17 @@ public sealed class GoLivePageTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LiveKitEnabled = true,
-                LiveKitServerUrl = AppTestData.GoLive.LiveKitServer,
-                LiveKitRoomName = AppTestData.GoLive.LiveKitRoom,
-                LiveKitToken = AppTestData.GoLive.LiveKitToken,
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateLiveKitDestination(),
+                    AppTestData.GoLive.CreateYoutubeDestination()
+                ],
                 DestinationSourceSelections =
                 [
                     new GoLiveDestinationSourceSelection(
                         GoLiveTargetCatalog.TargetIds.LiveKit,
                         [AppTestData.Camera.SecondSourceId])
                 ],
-                YoutubeEnabled = true,
-                YoutubeRtmpUrl = AppTestData.GoLive.YoutubeUrl,
-                YoutubeStreamKey = AppTestData.GoLive.YoutubeKey,
                 BitrateKbps = AppTestData.Streaming.BitrateKbps
             }
         };
@@ -161,6 +164,43 @@ public sealed class GoLivePageTests : BunitContext
                 "Credentials and source routing are ready in Settings.",
                 cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)).TextContent,
                 StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
+    public void GoLivePage_Load_MigratesLegacyStreamingDestinationsIntoExternalDestinationList()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                LiveKitEnabled = true,
+                LiveKitServerUrl = AppTestData.GoLive.LiveKitServer,
+                LiveKitRoomName = AppTestData.GoLive.LiveKitRoom,
+                LiveKitToken = AppTestData.GoLive.LiveKitToken,
+                YoutubeEnabled = true,
+                YoutubeRtmpUrl = AppTestData.GoLive.YoutubeUrl,
+                YoutubeStreamKey = AppTestData.GoLive.YoutubeKey
+            }
+        };
+
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.GoLiveDemo);
+
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
+            Assert.Contains(
+                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
+                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.LiveKit, StringComparison.Ordinal));
+            Assert.Contains(
+                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
+                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.Youtube, StringComparison.Ordinal));
+            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.LiveKitToggle).ClassName, StringComparison.Ordinal);
+            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.YoutubeToggle).ClassName, StringComparison.Ordinal);
         });
     }
 

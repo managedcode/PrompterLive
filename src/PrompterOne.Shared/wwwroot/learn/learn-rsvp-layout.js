@@ -1,10 +1,5 @@
 (function () {
     const interopNamespace = "LearnRsvpLayoutInterop";
-    const focusSelector = ".rsvp-focus";
-    const orpSelector = ".rsvp-focus-orp";
-    const focusLeftExtentPropertyName = "--rsvp-focus-left-extent";
-    const focusRightExtentPropertyName = "--rsvp-focus-right-extent";
-    const fontSyncReadyAttributeName = "data-rsvp-layout-font-sync-ready";
     const pixelUnitSuffix = "px";
     const zeroPixels = "0px";
 
@@ -13,21 +8,18 @@
         target.style.setProperty(propertyName, `${roundedValue}${pixelUnitSuffix}`);
     }
 
-    function applyDefaultLayout(rowElement) {
+    function applyDefaultLayout(rowElement, focusLeftExtentPropertyName, focusRightExtentPropertyName) {
         rowElement.style.setProperty(focusLeftExtentPropertyName, zeroPixels);
         rowElement.style.setProperty(focusRightExtentPropertyName, zeroPixels);
     }
 
-    function syncLayoutNow(rowElement) {
-        const focusElement = rowElement.querySelector(focusSelector);
-        const orpElement = focusElement?.querySelector(orpSelector);
-
+    function syncLayoutNow(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName) {
         if (!(focusElement instanceof HTMLElement) || !(orpElement instanceof HTMLElement)) {
-            applyDefaultLayout(rowElement);
+            applyDefaultLayout(rowElement, focusLeftExtentPropertyName, focusRightExtentPropertyName);
             return;
         }
 
-        applyDefaultLayout(rowElement);
+        applyDefaultLayout(rowElement, focusLeftExtentPropertyName, focusRightExtentPropertyName);
         void rowElement.offsetWidth;
 
         const focusRect = focusElement.getBoundingClientRect();
@@ -40,7 +32,7 @@
         setPixelProperty(rowElement, focusRightExtentPropertyName, focusRightExtentPx);
     }
 
-    function scheduleFontReadySync(rowElement) {
+    function scheduleFontReadySync(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName, fontSyncReadyAttributeName) {
         if (rowElement.getAttribute(fontSyncReadyAttributeName) === "true") {
             return;
         }
@@ -53,19 +45,19 @@
 
         void document.fonts.ready.then(() => {
             if (rowElement.isConnected) {
-                syncLayoutNow(rowElement);
+                syncLayoutNow(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName);
             }
         });
     }
 
     window[interopNamespace] = {
-        syncLayout(rowElement) {
+        syncLayout(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName, fontSyncReadyAttributeName) {
             if (!(rowElement instanceof HTMLElement)) {
                 return;
             }
 
-            syncLayoutNow(rowElement);
-            scheduleFontReadySync(rowElement);
+            syncLayoutNow(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName);
+            scheduleFontReadySync(rowElement, focusElement, orpElement, focusLeftExtentPropertyName, focusRightExtentPropertyName, fontSyncReadyAttributeName);
         }
     };
 })();
