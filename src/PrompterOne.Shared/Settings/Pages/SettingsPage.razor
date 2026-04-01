@@ -5,10 +5,11 @@
 @using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Components.Settings
 @using PrompterOne.Shared.Services.Diagnostics
+@using PrompterOne.Shared.Storage
 
 @inject AppBootstrapper Bootstrapper
 @inject AppShellService Shell
-@inject BrowserSettingsStore SettingsStore
+@inject IUserSettingsStore SettingsStore
 @inject StudioSettingsStore StudioSettingsStore
 @inject UiDiagnosticsService Diagnostics
 @inject IMediaPermissionService MediaPermissionService
@@ -911,7 +912,7 @@
         var current = SessionService.State.ReaderSettings;
         var next = current with { ShowCameraScene = !current.ShowCameraScene };
         await SessionService.UpdateReaderSettingsAsync(next);
-        await SettingsStore.SaveAsync("prompterone.reader", next);
+        await SettingsStore.SaveAsync(BrowserAppSettingsKeys.ReaderSettings, next);
 
         _studioSettings = _studioSettings with
         {
@@ -1094,7 +1095,7 @@
         await Diagnostics.RunAsync(
             PersistSceneOperation,
             PersistSceneMessage,
-            () => SettingsStore.SaveAsync("prompterone.scene", MediaSceneService.State));
+            () => SettingsStore.SaveAsync(BrowserAppSettingsKeys.SceneSettings, MediaSceneService.State));
     }
 
     private Task PersistStudioSettingsAsync() =>

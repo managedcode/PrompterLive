@@ -42,10 +42,12 @@ public partial class TeleprompterPage : IAsyncDisposable
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private IMediaDeviceService MediaDeviceService { get; set; } = null!;
     [Inject] private IMediaSceneService MediaSceneService { get; set; } = null!;
+    [Inject] private TpsParser Parser { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;
     [Inject] private TeleprompterReaderInterop ReaderInterop { get; set; } = null!;
+    [Inject] private IUserSettingsStore UserSettingsStore { get; set; } = null!;
 
     [SupplyParameterFromQuery(Name = AppRoutes.ScriptIdQueryKey)]
     public string? ScriptId { get; set; }
@@ -84,6 +86,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     {
         StopReaderPlaybackLoop();
         ResetReaderAlignmentState();
+        ResetReaderCardTransitionState();
         _loadState = true;
         _focusScreenAfterRender = true;
         return Task.CompletedTask;
@@ -147,9 +150,11 @@ public partial class TeleprompterPage : IAsyncDisposable
     {
         var nextCards = await BuildReaderCardsAsync();
         ResetReaderAlignmentState();
+        ResetReaderCardTransitionState();
         _cards = nextCards.Count > 0 ? nextCards : [ReaderCardViewModel.Empty];
         _screenTitle = SessionService.State.Title;
         _readerFontSize = NormalizeReaderFontSize(SessionService.State.ReaderSettings.FontScale);
+        _readerFocalPointPercent = NormalizeReaderFocalPointPercent(SessionService.State.ReaderSettings.FocalPointPercent);
         _readerTextWidth = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
         _activeReaderCardIndex = 0;
         _activeReaderWordIndex = -1;
@@ -247,6 +252,12 @@ public partial class TeleprompterPage : IAsyncDisposable
     {
         var safeRatio = textWidthRatio > 0 ? textWidthRatio : (double)DefaultReaderTextWidth / ReaderMaxTextWidth;
         return Math.Clamp((int)Math.Round(ReaderMaxTextWidth * safeRatio), ReaderMinTextWidth, ReaderMaxTextWidth);
+    }
+
+    private static int NormalizeReaderFocalPointPercent(int focalPointPercent)
+    {
+        var safePercent = focalPointPercent > 0 ? focalPointPercent : DefaultReaderFocalPointPercent;
+        return Math.Clamp(safePercent, ReaderMinFocalPointPercent, ReaderMaxFocalPointPercent);
     }
 
     private static int ParseReaderControlValue(object? rawValue, int min, int max, int fallback)

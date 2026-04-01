@@ -29,6 +29,12 @@ internal static class AppTestLibrarySeedData
             new DateTimeOffset(2026, 3, 24, 8, 30, 0, TimeSpan.Zero),
             AppTestData.Folders.NewsReportsId),
         CreateDocument(
+            AppTestData.Scripts.SpeedOffsetsId,
+            AppTestData.Scripts.SpeedOffsetsTitle,
+            "test-tps-speed-offsets.tps",
+            new DateTimeOffset(2026, 3, 27, 11, 15, 0, TimeSpan.Zero),
+            AppTestData.Folders.InternalId),
+        CreateDocument(
             AppTestData.Scripts.ArchitectureId,
             AppTestData.Scripts.GreenArchitectureTitle,
             "test-green-architecture.tps",

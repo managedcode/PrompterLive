@@ -100,6 +100,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<RsvpEmotionAnalyzer>();
         context.Services.AddSingleton<RsvpPlaybackEngine>();
         context.Services.AddSingleton(settingsStore);
+        context.Services.AddSingleton<IUserSettingsStore>(settingsStore);
         context.Services.AddSingleton<BrowserCloudStorageStore>();
         context.Services.AddSingleton<BrowserThemeService>();
         context.Services.AddSingleton<CloudStorageProviderFactory>();

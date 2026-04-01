@@ -373,14 +373,37 @@ public partial class TpsParser
             content = tpsContent[(frontMatterMatch[1].Index + frontMatterMatch[1].Length)..].Trim();
 
             // Parse YAML-like front matter
+            string? currentSection = null;
             var lines = frontMatterText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
+            foreach (var rawLine in lines)
             {
-                var colonIndex = line.IndexOf(':');
+                var line = rawLine.TrimEnd();
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed))
+                {
+                    continue;
+                }
+
+                var colonIndex = trimmed.IndexOf(':');
                 if (colonIndex > 0)
                 {
-                    var key = line[..colonIndex].Trim();
-                    var value = line[(colonIndex + 1)..].Trim().Trim('"', '\'');
+                    var key = trimmed[..colonIndex].Trim();
+                    var value = trimmed[(colonIndex + 1)..].Trim().Trim('"', '\'');
+                    var isNestedLine = line.Length != line.TrimStart().Length;
+
+                    if (isNestedLine && !string.IsNullOrWhiteSpace(currentSection))
+                    {
+                        frontMatter[$"{currentSection}.{key}"] = value;
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        currentSection = key;
+                        continue;
+                    }
+
+                    currentSection = null;
                     frontMatter[key] = value;
                 }
             }

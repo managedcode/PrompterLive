@@ -72,6 +72,12 @@ internal static class BrowserTestLibrarySeedData
             new DateTimeOffset(2026, 3, 24, 8, 30, 0, TimeSpan.Zero),
             "test-news-reports"),
         CreateDocument(
+            BrowserTestConstants.Scripts.SpeedOffsetsId,
+            BrowserTestConstants.Scripts.SpeedOffsetsTitle,
+            "test-tps-speed-offsets.tps",
+            new DateTimeOffset(2026, 3, 27, 11, 15, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
             BrowserTestConstants.Scripts.QuantumId,
             BrowserTestConstants.Scripts.QuantumTitle,
             "test-quantum-computing.tps",

@@ -24,10 +24,12 @@ internal static partial class BrowserTestConstants
         public const string LeadershipId = "test-ted-leadership-script";
         public const string QuantumId = "test-quantum-computing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
+        public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
         public const string ProductLaunchTitle = "Product Launch";
         public const string LeadershipTitle = "TED: Leadership";
         public const string QuantumTitle = "Quantum Computing";
         public const string SecurityIncidentTitle = "Security Incident";
+        public const string SpeedOffsetsTitle = "TPS Speed Offsets";
     }
 
     public static class Learn
@@ -199,7 +201,7 @@ internal static partial class BrowserTestConstants
         public const string FrontCameraLabel = "Front camera";
         public const string HostParticipantName = "Host";
         public const string LegacyNetworkUploadMetric = "8.2 Mbps";
-        public const string LiveKitHarnessGlobal = "__prompterLiveKitHarness";
+        public const string LiveKitHarnessGlobal = "__prompterOneLiveKitHarness";
         public const string LiveKitRoom = "launch-room";
         public const string LiveKitServer = "wss://livekit.example.com";
         public const string LiveKitToken = "lk-test-token";
@@ -250,7 +252,7 @@ internal static partial class BrowserTestConstants
                     }
                 }
 
-                window.__prompterLiveKitHarness = harness;
+                window.__prompterOneLiveKitHarness = harness;
                 window.LivekitClient = {
                     Room: FakeRoom,
                     Track: {
@@ -262,9 +264,9 @@ internal static partial class BrowserTestConstants
                 };
             }
             """;
-        public const string GetLiveKitHarnessScript = "() => window.__prompterLiveKitHarness";
+        public const string GetLiveKitHarnessScript = "() => window.__prompterOneLiveKitHarness";
         public const string LiveKitHarnessReadyScript =
-            "() => Boolean(window.__prompterLiveKitHarness && window.__prompterLiveKitHarness.connectCalls.length === 1 && window.__prompterLiveKitHarness.publishCalls.length >= 2)";
+            "() => Boolean(window.__prompterOneLiveKitHarness && window.__prompterOneLiveKitHarness.connectCalls.length === 1 && window.__prompterOneLiveKitHarness.publishCalls.length >= 2)";
         public const string EnableObsStudioScript = "() => { window.obsstudio = {}; }";
         public const string GetRuntimeStateScript = "sessionId => window.PrompterOneGoLiveOutput.getSessionState(sessionId)";
         public const string RecordingRuntimeActiveScript =
@@ -528,6 +530,7 @@ internal static partial class BrowserTestConstants
         public static string TeleprompterLeadership => AppRoutes.TeleprompterWithId(Scripts.LeadershipId);
         public static string TeleprompterSecurityIncident => AppRoutes.TeleprompterWithId(Scripts.SecurityIncidentId);
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
+        public static string TeleprompterSpeedOffsets => AppRoutes.TeleprompterWithId(Scripts.SpeedOffsetsId);
 
         public static string Pattern(string route) => string.Concat("**", route);
     }

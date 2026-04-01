@@ -34,7 +34,7 @@ public partial class LibraryPage : ComponentBase, IDisposable
     private const string FolderCreatedLogTemplate = "Created library folder {FolderId} under {ParentId}.";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
-    [Inject] private BrowserSettingsStore SettingsStore { get; set; } = null!;
+    [Inject] private IUserSettingsStore SettingsStore { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private ILogger<LibraryPage> Logger { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;

@@ -1,12 +1,13 @@
+using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Workspace;
 
 namespace PrompterOne.Shared.Services;
 
-public sealed class StudioSettingsStore(BrowserSettingsStore settingsStore)
+public sealed class StudioSettingsStore(IUserSettingsStore settingsStore)
 {
     public const string StorageKey = "prompterone.studio";
 
-    private readonly BrowserSettingsStore _settingsStore = settingsStore;
+    private readonly IUserSettingsStore _settingsStore = settingsStore;
 
     public async Task<StudioSettings> LoadAsync(CancellationToken cancellationToken = default)
     {

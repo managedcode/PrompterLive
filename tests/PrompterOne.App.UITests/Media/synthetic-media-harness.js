@@ -1,9 +1,9 @@
 (() => {
-    const harnessGlobalName = "__prompterLiveMediaHarness";
+    const harnessGlobalName = "__prompterOneMediaHarness";
     const mediaDevicesProperty = "mediaDevices";
     const enumerateDevicesMethod = "enumerateDevices";
     const getUserMediaMethod = "getUserMedia";
-    const syntheticProperty = "__prompterLiveSyntheticMedia";
+    const syntheticProperty = "__prompterOneSyntheticMedia";
     const videoKind = "videoinput";
     const audioKind = "audioinput";
     const defaultVideoFrameRate = 24;

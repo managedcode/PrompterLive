@@ -53,6 +53,13 @@ internal static partial class BrowserTestConstants
         public const string ProductLaunchTeleprompterWpm = "180";
         public const string ProductLaunchVisionPronunciation = "ˈviʒən";
         public const string ProductLaunchVisionWord = "vision";
+        public const string SpeedOffsetsFastWord = "flight";
+        public const string SpeedOffsetsFastWpm = "154";
+        public const string SpeedOffsetsNormalWord = "center";
+        public const string SpeedOffsetsNormalWpm = "140";
+        public const string SpeedOffsetsResumedSlowWord = "gentle";
+        public const string SpeedOffsetsSlowWord = "steady";
+        public const string SpeedOffsetsSlowWpm = "126";
         public const double SlidersMinimumOpacity = 0.6;
         public const string CameraRoleAttribute = "data-camera-role";
         public const string CameraDeviceIdAttribute = "data-camera-device-id";

@@ -172,7 +172,7 @@ flowchart LR
     Settings["SettingsCloudSection"]
     BrowserStore["BrowserCloudStorageStore"]
     Preferences["CloudStoragePreferences"]
-    BrowserKeys["BrowserSettingsStore<br/>localStorage keys only"]
+    UserSettings["IUserSettingsStore<br/>BrowserSettingsStore localStorage implementation"]
     Transfer["CloudStorageTransferService"]
     ProviderFactory["CloudStorageProviderFactory"]
     LocalRepo["BrowserScriptRepository + BrowserLibraryFolderRepository"]
@@ -185,7 +185,7 @@ flowchart LR
     Settings --> BrowserStore
     Settings --> Transfer
     BrowserStore --> Preferences
-    BrowserStore --> BrowserKeys
+    BrowserStore --> UserSettings
     Transfer --> ProviderFactory
     Transfer --> LocalVfs
     ScriptRepo --> LocalRepo
@@ -196,6 +196,7 @@ flowchart LR
 
 - Scripts and folders persist through authoritative browser repositories backed by versioned JSON/localStorage materialization.
 - Browser `localStorage` is reserved for provider credentials, provider metadata, and lightweight settings values that must survive reloads.
+- Routed pages and browser services should depend on `IUserSettingsStore` for persisted user preferences; `BrowserSettingsStore` is the browser-only implementation detail behind that contract.
 - Browser storage plus VFS stay registered for cloud import/export and future stream-export work, but they are not the primary editor/library persistence path today.
 - Cloud import/export currently moves one scripts-and-settings snapshot at a time; it is not a live sync engine and does not own recorded video upload.
 
@@ -236,14 +237,14 @@ flowchart LR
     Connectivity["BrowserConnectivityService"]
     Diagnostics["UiDiagnosticsService"]
     Pages["Library / Editor / Learn / Teleprompter / Go Live / Settings"]
-    Browser["BrowserSettingsStore"]
+    UserSettings["IUserSettingsStore"]
     Session["ScriptSessionService"]
 
     WasmHost --> Bootstrap
     WasmHost --> Diagnostics
     Pages --> Diagnostics
     Pages --> Connectivity
-    Browser --> WasmHost
+    UserSettings --> WasmHost
     Session --> WasmHost
     Diagnostics --> Layout
     Connectivity --> Layout
@@ -332,11 +333,13 @@ If a native embedded browser host returns later, media access must not rely on s
 - exact design shell and imported `new-design` assets
 - shared UI localization catalog for supported browser cultures
 - browser interop and app DI wiring
+- browser-backed `IUserSettingsStore` wiring for persisted reader, theme, scene, and studio preferences
 - dynamic library folder components and folder/document browser storage adapters
 - UI diagnostics banner and global error boundary
 - debounced editor autosave and body-only TPS source authoring
 - centered RSVP ORP playback in `learn`
 - single background camera layer under text in `teleprompter`
+- teleprompter reader preferences persist through `IUserSettingsStore`, including font scale, text width, focal position, and camera auto-start preference
 - dedicated `go-live` routing surface that arms multiple live destinations while reusing the same browser-composed scene
 - settings split between device setup (`settings`) and destination routing (`go-live`)
 

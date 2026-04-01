@@ -56,6 +56,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<IMediaDeviceService, BrowserMediaDeviceService>();
         services.AddScoped<IMediaSceneService, MediaSceneService>();
         services.AddScoped<BrowserSettingsStore>();
+        services.AddScoped<IUserSettingsStore>(serviceProvider => serviceProvider.GetRequiredService<BrowserSettingsStore>());
         services.AddScoped<BrowserCloudStorageStore>();
         services.AddScoped<BrowserThemeService>();
         services.AddScoped<CloudStorageProviderFactory>();

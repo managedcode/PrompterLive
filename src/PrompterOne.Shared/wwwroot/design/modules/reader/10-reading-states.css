@@ -18,6 +18,9 @@
     will-change: transform, opacity;
     overflow: visible;
 }
+.rd-card-static {
+    transition: none;
+}
 .rd-card-active {
     transform: translateY(0);
     opacity: 1;
@@ -313,4 +316,3 @@ span.rd-pause.rd-pause-long {
     color: var(--accent);
     text-shadow: 0 0 50px rgba(232,130,92,.3);
 }
-

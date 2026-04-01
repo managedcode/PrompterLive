@@ -1,11 +1,12 @@
 namespace PrompterOne.Core.Models.Workspace;
 
 public sealed record ReaderSettings(
-    int CountdownSeconds = 3,
-    double FontScale = 1.0,
-    double TextWidth = 0.72,
-    double ScrollSpeed = 1.0,
-    bool MirrorText = false,
-    bool ShowFocusLine = true,
-    bool ShowProgress = true,
-    bool ShowCameraScene = true);
+    int CountdownSeconds = ReaderSettingsDefaults.CountdownSeconds,
+    double FontScale = ReaderSettingsDefaults.FontScale,
+    double TextWidth = ReaderSettingsDefaults.TextWidth,
+    double ScrollSpeed = ReaderSettingsDefaults.ScrollSpeed,
+    bool MirrorText = ReaderSettingsDefaults.MirrorText,
+    bool ShowFocusLine = ReaderSettingsDefaults.ShowFocusLine,
+    bool ShowProgress = ReaderSettingsDefaults.ShowProgress,
+    bool ShowCameraScene = ReaderSettingsDefaults.ShowCameraScene,
+    int FocalPointPercent = ReaderSettingsDefaults.FocalPointPercent);

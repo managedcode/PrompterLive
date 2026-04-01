@@ -5,6 +5,7 @@ using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
+using PrompterOne.Shared.Storage;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -25,10 +26,8 @@ public partial class LearnPage : IAsyncDisposable
     private const int RsvpStepLarge = 5;
     private const int RsvpStepSmall = 1;
     private const string WpmSuffix = " WPM";
-    private const string LearnSettingsKey = "prompterone.learn";
-
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
-    [Inject] private BrowserSettingsStore BrowserSettingsStore { get; set; } = null!;
+    [Inject] private IUserSettingsStore UserSettingsStore { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private RsvpPlaybackEngine PlaybackEngine { get; set; } = null!;
@@ -330,7 +329,7 @@ public partial class LearnPage : IAsyncDisposable
         var currentSettings = SessionService.State.LearnSettings;
         var nextSettings = update(currentSettings);
         await SessionService.UpdateLearnSettingsAsync(nextSettings);
-        await BrowserSettingsStore.SaveAsync(LearnSettingsKey, nextSettings);
+        await UserSettingsStore.SaveAsync(BrowserAppSettingsKeys.LearnSettings, nextSettings);
     }
 
     private void UpdateShellState() =>

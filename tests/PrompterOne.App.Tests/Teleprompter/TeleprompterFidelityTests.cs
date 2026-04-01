@@ -13,10 +13,17 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const int BenefitsCardIndex = 5;
     private const int ClosingCardIndex = 7;
     private const int InspirationCardIndex = 6;
+    private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const string FastWord = "Full";
     private const string PurpleWord = "focus";
     private const string SlowWord = "elephant";
+    private const string SpeedOffsetsFastWord = "flight";
+    private const string SpeedOffsetsNormalWord = "center";
+    private const string SpeedOffsetsResumedSlowWord = "gentle";
+    private const string SpeedOffsetsSlowWord = "steady";
+    private const string SpeedOffsetsSlowWpm = "126";
+    private const string SpeedOffsetsFastWpm = "154";
     private const string TeleprompterWord = "teleprompter";
     private const string VisionWord = "vision";
 
@@ -82,6 +89,46 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Equal("TELE-promp-ter", teleprompterWord.GetAttribute("data-pronunciation"));
             Assert.Equal("180", teleprompterWord.GetAttribute("data-effective-wpm"));
             Assert.Contains("Speed: 180 WPM", teleprompterWord.GetAttribute("title"), StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
+    public void TeleprompterPage_UsesCustomFrontMatterSpeedOffsetsAndNormalReset()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterSpeedOffsets);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var slowWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsSlowWord);
+            var normalWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsNormalWord);
+            var resumedSlowWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsResumedSlowWord);
+            var fastWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsFastWord);
+            var normalWordClassName = normalWord.ClassName ?? string.Empty;
+
+            Assert.Contains("tps-slow", slowWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute("data-effective-wpm"));
+            Assert.Contains("Speed: 126 WPM", slowWord.GetAttribute("title"), StringComparison.Ordinal);
+            Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
+
+            Assert.Equal("140", normalWord.GetAttribute("data-effective-wpm"));
+            Assert.False(normalWordClassName.Contains("tps-slow", StringComparison.Ordinal));
+            Assert.False(normalWordClassName.Contains("tps-fast", StringComparison.Ordinal));
+            Assert.Null(normalWord.GetAttribute("style"));
+            Assert.Null(normalWord.GetAttribute("title"));
+
+            Assert.Contains("tps-slow", resumedSlowWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal(SpeedOffsetsSlowWpm, resumedSlowWord.GetAttribute("data-effective-wpm"));
+
+            Assert.Contains("tps-fast", fastWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal(SpeedOffsetsFastWpm, fastWord.GetAttribute("data-effective-wpm"));
+            Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
+
+            Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(normalWord));
+            Assert.True(GetWordDurationMilliseconds(resumedSlowWord) > GetWordDurationMilliseconds(normalWord));
+            Assert.True(GetWordDurationMilliseconds(normalWord) > GetWordDurationMilliseconds(fastWord));
         });
     }
 

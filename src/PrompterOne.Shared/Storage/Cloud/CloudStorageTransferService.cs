@@ -12,7 +12,7 @@ using PrompterOne.Shared.Settings.Models;
 namespace PrompterOne.Shared.Storage.Cloud;
 
 public sealed class CloudStorageTransferService(
-    BrowserSettingsStore settingsStore,
+    IUserSettingsStore settingsStore,
     BrowserThemeService themeService,
     CloudStorageProviderFactory providerFactory,
     ILibraryFolderRepository libraryFolderRepository,
@@ -32,7 +32,7 @@ public sealed class CloudStorageTransferService(
     private readonly CloudStorageProviderFactory _providerFactory = providerFactory;
     private readonly IScriptRepository _scriptRepository = scriptRepository;
     private readonly IScriptSessionService _scriptSessionService = scriptSessionService;
-    private readonly BrowserSettingsStore _settingsStore = settingsStore;
+    private readonly IUserSettingsStore _settingsStore = settingsStore;
     private readonly StudioSettingsStore _studioSettingsStore = studioSettingsStore;
     private readonly BrowserThemeService _themeService = themeService;
 

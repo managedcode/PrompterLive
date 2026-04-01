@@ -1,10 +1,10 @@
-using PrompterOne.Shared.Services;
+using PrompterOne.Core.Abstractions;
 
 namespace PrompterOne.Shared.Storage.Cloud;
 
-public sealed class BrowserCloudStorageStore(BrowserSettingsStore settingsStore)
+public sealed class BrowserCloudStorageStore(IUserSettingsStore settingsStore)
 {
-    private readonly BrowserSettingsStore _settingsStore = settingsStore;
+    private readonly IUserSettingsStore _settingsStore = settingsStore;
 
     public async Task<CloudStoragePreferences> LoadPreferencesAsync(CancellationToken cancellationToken = default)
     {

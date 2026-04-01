@@ -12,8 +12,8 @@
     const liveKitClientGlobal = "LivekitClient";
     const microphoneMonitorLevelMultiplier = 2800;
     const monitorMap = new Map();
-    const syntheticHarnessGlobal = "__prompterLiveMediaHarness";
-    const syntheticMetadataProperty = "__prompterLiveSyntheticMedia";
+    const syntheticHarnessGlobal = "__prompterOneMediaHarness";
+    const syntheticMetadataProperty = "__prompterOneSyntheticMedia";
     const videoInputKind = "videoinput";
 
     function copySyntheticMetadata(source, target) {

@@ -98,11 +98,18 @@ public partial class TeleprompterPage
     {
         var stateClass = index == _activeReaderCardIndex
             ? ReaderCardActiveCssClass
-            : index < _activeReaderCardIndex
+            : index == _readerTransitionSourceCardIndex
                 ? ReaderCardPreviousCssClass
-                : ReaderCardNextCssClass;
+                : index == _preparedReaderCardIndex
+                    ? ReaderCardNextCssClass
+                    : index < _activeReaderCardIndex
+                        ? ReaderCardPreviousCssClass
+                        : ReaderCardNextCssClass;
+        var transitionClass = _readerCardsWithoutMotionTransition.Contains(index)
+            ? ReaderCardNoTransitionCssClass
+            : null;
 
-        return BuildClassList(ReaderCardCssClass, stateClass);
+        return BuildClassList(ReaderCardCssClass, stateClass, transitionClass);
     }
 
     private string BuildReaderGroupCssClass(int cardIndex, int chunkIndex)

@@ -2,10 +2,11 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
+using PrompterOne.Core.Abstractions;
 
 namespace PrompterOne.Shared.Services;
 
-public sealed class BrowserSettingsStore(IJSRuntime jsRuntime, ILogger<BrowserSettingsStore>? logger = null)
+public sealed class BrowserSettingsStore(IJSRuntime jsRuntime, ILogger<BrowserSettingsStore>? logger = null) : IUserSettingsStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

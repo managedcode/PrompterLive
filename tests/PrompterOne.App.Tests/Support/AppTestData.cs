@@ -11,11 +11,13 @@ internal static class AppTestData
         public const string ArchitectureId = "test-green-architecture-script";
         public const string QuantumId = "test-quantum-computing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
+        public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
         public const string DemoTitle = "Product Launch";
         public const string TedLeadershipTitle = "TED: Leadership";
         public const string GreenArchitectureTitle = "Green Architecture";
         public const string QuantumTitle = "Quantum Computing";
         public const string SecurityIncidentTitle = "Security Incident";
+        public const string SpeedOffsetsTitle = "TPS Speed Offsets";
         public const string BroadcastMic = "Broadcast mic";
     }
 
@@ -46,6 +48,7 @@ internal static class AppTestData
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
         public static string TeleprompterSecurityIncident => AppRoutes.TeleprompterWithId(Scripts.SecurityIncidentId);
+        public static string TeleprompterSpeedOffsets => AppRoutes.TeleprompterWithId(Scripts.SpeedOffsetsId);
         public const string Settings = AppRoutes.Settings;
     }
 
@@ -72,7 +75,7 @@ internal static class AppTestData
 
     public static class Theme
     {
-        public const string ApplySettingsInvocation = "prompterLiveTheme.applySettingsTheme";
+        public const string ApplySettingsInvocation = "prompterOneTheme.applySettingsTheme";
         public const string LightColorScheme = "light";
     }
 

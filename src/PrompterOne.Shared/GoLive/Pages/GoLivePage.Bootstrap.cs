@@ -2,6 +2,7 @@ using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
+using PrompterOne.Shared.Storage;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -158,7 +159,7 @@ public partial class GoLivePage
         await Diagnostics.RunAsync(
             GoLiveSceneOperation,
             GoLiveSceneMessage,
-            () => SettingsStore.SaveAsync(SceneSettingsKey, MediaSceneService.State));
+            () => SettingsStore.SaveAsync(BrowserAppSettingsKeys.SceneSettings, MediaSceneService.State));
         SyncGoLiveSessionState();
     }
 

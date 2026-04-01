@@ -74,4 +74,54 @@ public sealed class TpsRoundTripTests
         Assert.Equal(180, compiledWord.Metadata.SpeedOverride);
         Assert.Equal("TELE-promp-ter", compiledWord.Metadata.PronunciationGuide);
     }
+
+    [Fact]
+    public async Task CompileAsync_AppliesNestedFrontMatterSpeedOffsetsAndNormalReset()
+    {
+        var parser = new TpsParser();
+        var compiler = new ScriptCompiler();
+        const string source = """
+        ---
+        title: "Custom speed offsets"
+        base_wpm: 140
+        speed_offsets:
+          xslow: -30
+          slow: -10
+          fast: 10
+          xfast: 35
+        ---
+
+        ## [Offsets|140WPM|neutral]
+
+        ### [Reader Block|140WPM]
+
+        [xslow]alpha[/xslow] [slow]bravo [normal]charm[/normal] delta[/slow] [fast]eagle[/fast] [xfast]fable[/xfast]
+        """;
+
+        var document = await parser.ParseAsync(source);
+        var compiled = await compiler.CompileAsync(document);
+        var words = compiled.Segments
+            .SelectMany(segment => segment.Blocks)
+            .SelectMany(block => block.Words)
+            .Where(word => !string.IsNullOrWhiteSpace(word.CleanText))
+            .ToDictionary(word => word.CleanText, StringComparer.Ordinal);
+
+        Assert.Equal("-30", document.Metadata["speed_offsets.xslow"]);
+        Assert.Equal("-10", document.Metadata["speed_offsets.slow"]);
+        Assert.Equal("10", document.Metadata["speed_offsets.fast"]);
+        Assert.Equal("35", document.Metadata["speed_offsets.xfast"]);
+
+        Assert.Equal(0.7f, words["alpha"].Metadata.SpeedMultiplier);
+        Assert.Equal(0.9f, words["bravo"].Metadata.SpeedMultiplier);
+        Assert.Null(words["charm"].Metadata.SpeedMultiplier);
+        Assert.Equal(0.9f, words["delta"].Metadata.SpeedMultiplier);
+        Assert.Equal(1.1f, words["eagle"].Metadata.SpeedMultiplier);
+        Assert.Equal(1.35f, words["fable"].Metadata.SpeedMultiplier);
+
+        Assert.True(words["alpha"].DisplayDuration > words["bravo"].DisplayDuration);
+        Assert.True(words["bravo"].DisplayDuration > words["charm"].DisplayDuration);
+        Assert.Equal(words["bravo"].DisplayDuration, words["delta"].DisplayDuration);
+        Assert.True(words["charm"].DisplayDuration > words["eagle"].DisplayDuration);
+        Assert.True(words["eagle"].DisplayDuration > words["fable"].DisplayDuration);
+    }
 }

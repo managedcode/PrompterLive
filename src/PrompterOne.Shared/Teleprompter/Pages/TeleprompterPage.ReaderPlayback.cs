@@ -30,11 +30,16 @@ public partial class TeleprompterPage
         await Task.CompletedTask;
     }
 
-    private Task ChangeReaderFontSizeAsync(int delta)
+    private async Task ChangeReaderFontSizeAsync(int delta)
     {
-        _readerFontSize = Math.Clamp(_readerFontSize + delta, ReaderMinFontSize, ReaderMaxFontSize);
+        var nextFontSize = Math.Clamp(_readerFontSize + delta, ReaderMinFontSize, ReaderMaxFontSize);
+        if (nextFontSize == _readerFontSize)
+        {
+            return;
+        }
+        _readerFontSize = nextFontSize;
         RequestReaderAlignment(instant: true);
-        return Task.CompletedTask;
+        await PersistCurrentReaderLayoutAsync();
     }
 
     private async Task HandleReaderFocalPointInputAsync(ChangeEventArgs args)
@@ -45,6 +50,7 @@ public partial class TeleprompterPage
             ReaderMaxFocalPointPercent,
             _readerFocalPointPercent);
         RequestReaderAlignment();
+        await PersistCurrentReaderLayoutAsync();
         _isFocalGuideActive = true;
         _focalGuideVersion++;
         var guideVersion = _focalGuideVersion;
@@ -65,6 +71,7 @@ public partial class TeleprompterPage
             ReaderMaxTextWidth,
             _readerTextWidth);
         RequestReaderAlignment();
+        await PersistCurrentReaderLayoutAsync();
         _areWidthGuidesActive = true;
         _widthGuideVersion++;
         var widthGuideVersion = _widthGuideVersion;
@@ -190,7 +197,6 @@ public partial class TeleprompterPage
 
         var resumePlayback = _isReaderPlaying;
         StopReaderPlaybackLoop(keepPlaybackState: true);
-
         if (direction < 0 && _activeReaderWordIndex > 1)
         {
             await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
@@ -227,6 +233,7 @@ public partial class TeleprompterPage
     private async Task ToggleReaderCameraAsync()
     {
         _isReaderCameraActive = !_isReaderCameraActive;
+        _cameraLayer = _cameraLayer with { AutoStart = _isReaderCameraActive };
 
         if (_isReaderCameraActive)
         {
@@ -236,6 +243,8 @@ public partial class TeleprompterPage
         {
             await DetachReaderCameraAsync();
         }
+
+        await PersistReaderCameraPreferenceAsync();
     }
 
     private async Task AttachReaderCameraAsync()
@@ -327,22 +336,32 @@ public partial class TeleprompterPage
 
     private async Task AdvanceToCardAsync(int nextCardIndex, CancellationToken cancellationToken)
     {
+        var previousCardIndex = _activeReaderCardIndex;
+        await PrepareReaderCardTransitionAsync(nextCardIndex);
         await PrepareReaderCardAlignmentAsync(nextCardIndex, 0);
+        _readerTransitionSourceCardIndex = previousCardIndex;
         _activeReaderCardIndex = nextCardIndex;
         _activeReaderWordIndex = -1;
+        _preparedReaderCardIndex = null;
         UpdateReaderDisplayState();
         await InvokeAsync(StateHasChanged);
 
-        await Task.Delay(ReaderCardTransitionMilliseconds, cancellationToken);
-
-        if (cancellationToken.IsCancellationRequested)
+        try
         {
-            return;
-        }
+            await Task.Delay(ReaderCardTransitionMilliseconds, cancellationToken);
 
-        _activeReaderWordIndex = 0;
-        UpdateReaderDisplayState();
-        await InvokeAsync(StateHasChanged);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            _activeReaderWordIndex = 0;
+            UpdateReaderDisplayState();
+            await InvokeAsync(StateHasChanged);
+        }
+        finally
+        {
+            await FinalizeReaderCardTransitionAsync(previousCardIndex);
+        }
     }
 
     private int GetCurrentWordDelayMilliseconds()

@@ -20,7 +20,6 @@ public partial class GoLivePage : ComponentBase
     private const string GoLiveStudioMessage = "Unable to save live routing settings.";
     private const string GoLiveStudioOperation = "Go Live save studio";
     private const string NoMicrophoneLabel = "No microphone";
-    private const string SceneSettingsKey = "prompterone.scene";
     private const string StreamingSubtitle = "Program routing";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
@@ -32,7 +31,7 @@ public partial class GoLivePage : ComponentBase
     [Inject] private IMediaSceneService MediaSceneService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
-    [Inject] private BrowserSettingsStore SettingsStore { get; set; } = null!;
+    [Inject] private IUserSettingsStore SettingsStore { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;
 
     [SupplyParameterFromQuery(Name = "id")]

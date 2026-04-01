@@ -1,13 +1,14 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
+using PrompterOne.Core.Abstractions;
 using PrompterOne.Shared.Settings.Models;
 
 namespace PrompterOne.Shared.Services;
 
 public sealed class BrowserThemeService(
     IJSRuntime jsRuntime,
-    BrowserSettingsStore settingsStore,
+    IUserSettingsStore settingsStore,
     ILogger<BrowserThemeService>? logger = null)
 {
     private const string ApplyThemeFailureMessage = "Failed to apply browser theme settings.";
@@ -15,7 +16,7 @@ public sealed class BrowserThemeService(
 
     private readonly IJSRuntime _jsRuntime = jsRuntime;
     private readonly ILogger<BrowserThemeService> _logger = logger ?? NullLogger<BrowserThemeService>.Instance;
-    private readonly BrowserSettingsStore _settingsStore = settingsStore;
+    private readonly IUserSettingsStore _settingsStore = settingsStore;
 
     private bool _initialized;
 

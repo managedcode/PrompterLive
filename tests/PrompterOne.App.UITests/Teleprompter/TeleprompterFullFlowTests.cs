@@ -9,6 +9,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
     private const int BenefitsCardIndex = 5;
     private const int ClosingCardIndex = 7;
     private const int OpeningCardIndex = 0;
+    private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const int InspirationCardIndex = 6;
 
@@ -49,6 +50,52 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
                 page,
                 BrowserTestConstants.TeleprompterFullFlow.Name,
                 BrowserTestConstants.TeleprompterFullFlow.TransitionStep);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task TeleprompterSpeedOffsets_UsesCustomFrontMatterSpeedOffsetsAndNormalResetSpacing()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterSpeedOffsets);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var slowWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWord);
+            var normalWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsNormalWord);
+            var resumedSlowWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsResumedSlowWord);
+            var fastWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsFastWord);
+
+            Assert.Contains("tps-slow", slowWord.Classes, StringComparison.Ordinal);
+            Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm, slowWord.EffectiveWpm);
+            Assert.Contains(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm, slowWord.Title, StringComparison.Ordinal);
+
+            Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsNormalWpm, normalWord.EffectiveWpm);
+            Assert.DoesNotContain("tps-slow", normalWord.Classes, StringComparison.Ordinal);
+            Assert.DoesNotContain("tps-fast", normalWord.Classes, StringComparison.Ordinal);
+            Assert.Equal(string.Empty, normalWord.Style);
+            Assert.Equal(string.Empty, normalWord.Title);
+
+            Assert.Contains("tps-slow", resumedSlowWord.Classes, StringComparison.Ordinal);
+            Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm, resumedSlowWord.EffectiveWpm);
+
+            Assert.Contains("tps-fast", fastWord.Classes, StringComparison.Ordinal);
+            Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsFastWpm, fastWord.EffectiveWpm);
+
+            Assert.True(ParseMilliseconds(slowWord.DurationMs) > ParseMilliseconds(normalWord.DurationMs));
+            Assert.True(ParseMilliseconds(resumedSlowWord.DurationMs) > ParseMilliseconds(normalWord.DurationMs));
+            Assert.True(ParseMilliseconds(normalWord.DurationMs) > ParseMilliseconds(fastWord.DurationMs));
+
+            Assert.True(ParsePixels(slowWord.LetterSpacing) > ParsePixels(normalWord.LetterSpacing));
+            Assert.True(ParsePixels(resumedSlowWord.LetterSpacing) > ParsePixels(normalWord.LetterSpacing));
+            Assert.True(ParsePixels(fastWord.LetterSpacing) < ParsePixels(normalWord.LetterSpacing));
         }
         finally
         {

@@ -9,11 +9,13 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class TeleprompterPage
 {
+    private const string BaseWpmMetadataKey = "base_wpm";
     private const string DefaultReaderBlockName = "Reader Block";
     private const string DefaultReaderSectionName = "Section";
     private const string DefaultReaderSegmentName = "Reader Segment";
     private const int LongPauseThresholdMilliseconds = 1500;
     private const int MediumPauseThresholdMilliseconds = 600;
+    private const int MinimumReaderBaseWpm = 80;
     private const int MinimumReaderWordDurationMilliseconds = 120;
     private const int MinimumPauseDurationMilliseconds = 250;
     private const string ReaderPauseCssClass = "rd-pause";
@@ -30,6 +32,7 @@ public partial class TeleprompterPage
         }
 
         var seeds = new List<ReaderCardSeed>();
+        var runtimeMetadata = await BuildReaderRuntimeMetadataAsync(scriptData.TargetWpm);
 
         foreach (var segment in scriptData.Segments)
         {
@@ -47,7 +50,7 @@ public partial class TeleprompterPage
 
             foreach (var block in blocks)
             {
-                var words = await CompileBlockWordsAsync(scriptData.TargetWpm, segment, block);
+                var words = await CompileBlockWordsAsync(scriptData.TargetWpm, segment, block, runtimeMetadata);
                 var wordCount = CountReadableWords(words);
                 if (wordCount == 0)
                 {
@@ -101,14 +104,28 @@ public partial class TeleprompterPage
             .ToList();
     }
 
-    private async Task<IReadOnlyList<CompiledWord>> CompileBlockWordsAsync(int baseWpm, ScriptSegment segment, ScriptBlock block)
+    private async Task<Dictionary<string, string>> BuildReaderRuntimeMetadataAsync(int baseWpm)
+    {
+        var sourceText = SessionService.State.Text;
+        var runtimeMetadata = string.IsNullOrWhiteSpace(sourceText)
+            ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, string>(
+                (await Parser.ParseAsync(sourceText)).Metadata,
+                StringComparer.OrdinalIgnoreCase);
+
+        runtimeMetadata[BaseWpmMetadataKey] = Math.Max(MinimumReaderBaseWpm, baseWpm).ToString(CultureInfo.InvariantCulture);
+        return runtimeMetadata;
+    }
+
+    private async Task<IReadOnlyList<CompiledWord>> CompileBlockWordsAsync(
+        int baseWpm,
+        ScriptSegment segment,
+        ScriptBlock block,
+        IReadOnlyDictionary<string, string> runtimeMetadata)
     {
         var document = new TpsDocument
         {
-            Metadata = new Dictionary<string, string>
-            {
-                ["base_wpm"] = Math.Max(80, baseWpm).ToString(CultureInfo.InvariantCulture)
-            },
+            Metadata = new Dictionary<string, string>(runtimeMetadata, StringComparer.OrdinalIgnoreCase),
             Segments =
             [
                 new TpsSegment

@@ -4,7 +4,7 @@ internal static partial class BrowserTestConstants
 {
     public static class Media
     {
-        public const string HarnessGlobal = "__prompterLiveMediaHarness";
+        public const string HarnessGlobal = "__prompterOneMediaHarness";
         public const string PrimaryCameraId = "browser-cam-primary";
         public const string SecondaryCameraId = "browser-cam-secondary";
         public const string PrimaryCameraLabel = "Browser Camera A";
@@ -16,23 +16,23 @@ internal static partial class BrowserTestConstants
         public const int ExpectedVideoTrackCount = 1;
         public const int ExpectedAudioTrackCount = 1;
         public const int LiveLevelThreshold = 5;
-        public const string ListDevicesScript = "() => window.__prompterLiveMediaHarness.listDevices()";
-        public const string ClearRequestLogScript = "() => window.__prompterLiveMediaHarness.clearRequestLog()";
-        public const string GetRequestLogScript = "() => window.__prompterLiveMediaHarness.getRequestLog()";
-        public const string GetElementStateScript = "elementId => window.__prompterLiveMediaHarness.getElementState(elementId)";
+        public const string ListDevicesScript = "() => window.__prompterOneMediaHarness.listDevices()";
+        public const string ClearRequestLogScript = "() => window.__prompterOneMediaHarness.clearRequestLog()";
+        public const string GetRequestLogScript = "() => window.__prompterOneMediaHarness.getRequestLog()";
+        public const string GetElementStateScript = "elementId => window.__prompterOneMediaHarness.getElementState(elementId)";
         public const string ElementHasVideoStreamScript =
-            "elementId => { const state = window.__prompterLiveMediaHarness.getElementState(elementId); return Boolean(state?.hasStream && state.videoTrackCount >= 1 && state.metadata?.isSynthetic === true); }";
+            "elementId => { const state = window.__prompterOneMediaHarness.getElementState(elementId); return Boolean(state?.hasStream && state.videoTrackCount >= 1 && state.metadata?.isSynthetic === true); }";
         public const string ElementHasNoStreamScript =
-            "elementId => { const state = window.__prompterLiveMediaHarness.getElementState(elementId); return Boolean(state && !state.hasStream); }";
+            "elementId => { const state = window.__prompterOneMediaHarness.getElementState(elementId); return Boolean(state && !state.hasStream); }";
         public const string ElementHasLiveAudioLevelScript =
             "([elementId, minimumLevel]) => Number(document.getElementById(elementId)?.dataset.liveLevel ?? '0') >= minimumLevel";
         public const string ElementUsesVideoDeviceScript =
-            "([elementId, deviceId]) => { const state = window.__prompterLiveMediaHarness.getElementState(elementId); return Boolean(state?.hasStream && state.metadata?.videoDeviceId === deviceId); }";
+            "([elementId, deviceId]) => { const state = window.__prompterOneMediaHarness.getElementState(elementId); return Boolean(state?.hasStream && state.metadata?.videoDeviceId === deviceId); }";
         public const string HasAudioOnlyRequestScript =
-            "([audioId]) => window.__prompterLiveMediaHarness.getRequestLog().some(request => request.hasVideo === false && request.hasAudio === true && request.resolvedAudioDeviceId === audioId)";
+            "([audioId]) => window.__prompterOneMediaHarness.getRequestLog().some(request => request.hasVideo === false && request.hasAudio === true && request.resolvedAudioDeviceId === audioId)";
         public const string HasAudioVideoRequestScript =
-            "([videoId, audioId]) => window.__prompterLiveMediaHarness.getRequestLog().some(request => request.hasVideo === true && request.hasAudio === true && request.resolvedVideoDeviceId === videoId && request.resolvedAudioDeviceId === audioId)";
+            "([videoId, audioId]) => window.__prompterOneMediaHarness.getRequestLog().some(request => request.hasVideo === true && request.hasAudio === true && request.resolvedVideoDeviceId === videoId && request.resolvedAudioDeviceId === audioId)";
         public const string HasVideoOnlyRequestScript =
-            "([videoId]) => window.__prompterLiveMediaHarness.getRequestLog().some(request => request.hasVideo === true && request.hasAudio === false && request.resolvedVideoDeviceId === videoId)";
+            "([videoId]) => window.__prompterOneMediaHarness.getRequestLog().some(request => request.hasVideo === true && request.hasAudio === false && request.resolvedVideoDeviceId === videoId)";
     }
 }

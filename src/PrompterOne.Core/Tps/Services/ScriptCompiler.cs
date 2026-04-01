@@ -9,12 +9,20 @@ namespace PrompterOne.Core.Services;
 public class ScriptCompiler
 {
     private const int DefaultWpm = 120;
+    private const string FastOffsetMetadataKey = "fast_offset";
+    private const string FastSpeedMetadataKey = "speed_offsets.fast";
     private const int MinWpm = 60;
     private const int MaxWpm = 600;
-    private const float XSlowFactor = 0.6f;
-    private const float SlowFactor = 0.8f;
-    private const float FastFactor = 1.25f;
-    private const float XFastFactor = 1.5f;
+    private const string SlowOffsetMetadataKey = "slow_offset";
+    private const string SlowSpeedMetadataKey = "speed_offsets.slow";
+    private const float DefaultXSlowFactor = 0.6f;
+    private const float DefaultSlowFactor = 0.8f;
+    private const float DefaultFastFactor = 1.25f;
+    private const float DefaultXFastFactor = 1.5f;
+    private const string XFastOffsetMetadataKey = "xfast_offset";
+    private const string XFastSpeedMetadataKey = "speed_offsets.xfast";
+    private const string XSlowOffsetMetadataKey = "xslow_offset";
+    private const string XSlowSpeedMetadataKey = "speed_offsets.xslow";
     private const string DefaultHighlightColor = "#FFEB3B";
     private const string DefaultEmphasisColor = "#FFD700";
 
@@ -64,16 +72,17 @@ public class ScriptCompiler
             Metadata = document.Metadata ?? new Dictionary<string, string>(),
             Segments = new List<CompiledSegment>()
         };
+        var speedProfile = ResolveSpeedProfile(document.Metadata);
 
         foreach (var segment in document.Segments)
         {
-            compiledScript.Segments.Add(CompileSegment(segment));
+            compiledScript.Segments.Add(CompileSegment(segment, speedProfile));
         }
 
         return Task.FromResult(compiledScript);
     }
 
-    private static CompiledSegment CompileSegment(TpsSegment segment)
+    private static CompiledSegment CompileSegment(TpsSegment segment, SpeedProfile speedProfile)
     {
         var emotion = NormalizeEmotion(segment.Emotion);
         var targetWpm = ClampWpm(segment.TargetWPM ?? DefaultWpm);
@@ -93,7 +102,7 @@ public class ScriptCompiler
             Words = new List<CompiledWord>()
         };
 
-        var baseState = CreateBaseState(targetWpm, emotion);
+        var baseState = CreateBaseState(targetWpm, emotion, speedProfile);
 
         var blocks = segment.Blocks ?? [];
         var hasBlocks = blocks.Count > 0;
@@ -197,7 +206,7 @@ public class ScriptCompiler
 
         if (phrase.IsSlow)
         {
-            phraseState.SpeedMultiplier = SlowFactor;
+            phraseState.SpeedMultiplier = parentState.SlowFactor;
             phraseState.SpeedOverride = null;
         }
 
@@ -381,25 +390,25 @@ public class ScriptCompiler
 
         if (lowered == "xslow")
         {
-            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= XSlowFactor);
+            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= state.XSlowFactor);
             return true;
         }
 
         if (lowered == "slow")
         {
-            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= SlowFactor);
+            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= state.SlowFactor);
             return true;
         }
 
         if (lowered == "fast")
         {
-            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= FastFactor);
+            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= state.FastFactor);
             return true;
         }
 
         if (lowered == "xfast")
         {
-            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= XFastFactor);
+            PushScope(scopeStack, lowered, state => state.SpeedMultiplier *= state.XFastFactor);
             return true;
         }
 
@@ -710,16 +719,71 @@ public class ScriptCompiler
         return normalized;
     }
 
-    private static FormattingState CreateBaseState(int baseWpm, string? emotion)
+    private static FormattingState CreateBaseState(int baseWpm, string? emotion, SpeedProfile speedProfile)
     {
         var state = new FormattingState
         {
             BaseWpm = ClampWpm(baseWpm),
-            SpeedMultiplier = 1f
+            SpeedMultiplier = 1f,
+            XSlowFactor = speedProfile.XSlowFactor,
+            SlowFactor = speedProfile.SlowFactor,
+            FastFactor = speedProfile.FastFactor,
+            XFastFactor = speedProfile.XFastFactor
         };
 
         SetEmotion(state, emotion);
         return state;
+    }
+
+    private static SpeedProfile ResolveSpeedProfile(IReadOnlyDictionary<string, string>? metadata)
+    {
+        return new SpeedProfile(
+            XSlowFactor: ResolveSpeedFactor(metadata, XSlowOffsetMetadataKey, XSlowSpeedMetadataKey, DefaultXSlowFactor),
+            SlowFactor: ResolveSpeedFactor(metadata, SlowOffsetMetadataKey, SlowSpeedMetadataKey, DefaultSlowFactor),
+            FastFactor: ResolveSpeedFactor(metadata, FastOffsetMetadataKey, FastSpeedMetadataKey, DefaultFastFactor),
+            XFastFactor: ResolveSpeedFactor(metadata, XFastOffsetMetadataKey, XFastSpeedMetadataKey, DefaultXFastFactor));
+    }
+
+    private static float ResolveSpeedFactor(
+        IReadOnlyDictionary<string, string>? metadata,
+        string legacyKey,
+        string specKey,
+        float defaultFactor)
+    {
+        if (TryParseSpeedFactor(metadata, legacyKey, out var factor) ||
+            TryParseSpeedFactor(metadata, specKey, out factor))
+        {
+            return factor;
+        }
+
+        return defaultFactor;
+    }
+
+    private static bool TryParseSpeedFactor(
+        IReadOnlyDictionary<string, string>? metadata,
+        string key,
+        out float factor)
+    {
+        factor = 0f;
+        if (metadata is null)
+        {
+            return false;
+        }
+
+        if (!metadata.TryGetValue(key, out var rawValue) ||
+            !int.TryParse(rawValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out var offset))
+        {
+            return false;
+        }
+
+        var computedFactor = 1f + (offset / 100f);
+        if (computedFactor <= 0f)
+        {
+            return false;
+        }
+
+        factor = computedFactor;
+        return true;
     }
 
     private static void SetEmotion(FormattingState state, string? emotion)
@@ -814,6 +878,12 @@ public class ScriptCompiler
 
     private sealed record EmotionColorSet(string Background, string Text, string Accent);
 
+    private sealed record SpeedProfile(
+        float XSlowFactor,
+        float SlowFactor,
+        float FastFactor,
+        float XFastFactor);
+
     private sealed class ScopeFrame(string tag, ScriptCompiler.FormattingState state)
     {
         public string Tag { get; } = tag.ToLowerInvariant();
@@ -828,6 +898,10 @@ public class ScriptCompiler
         public bool IsEmphasis { get; set; }
         public int? SpeedOverride { get; set; }
         public float SpeedMultiplier { get; set; } = 1f;
+        public float XSlowFactor { get; set; } = DefaultXSlowFactor;
+        public float SlowFactor { get; set; } = DefaultSlowFactor;
+        public float FastFactor { get; set; } = DefaultFastFactor;
+        public float XFastFactor { get; set; } = DefaultXFastFactor;
         public string? Pronunciation { get; set; }
         public string? HeadCueId { get; set; }
 
@@ -841,6 +915,10 @@ public class ScriptCompiler
                 IsEmphasis = IsEmphasis,
                 SpeedOverride = SpeedOverride,
                 SpeedMultiplier = SpeedMultiplier,
+                XSlowFactor = XSlowFactor,
+                SlowFactor = SlowFactor,
+                FastFactor = FastFactor,
+                XFastFactor = XFastFactor,
                 Pronunciation = Pronunciation,
                 HeadCueId = HeadCueId
             };

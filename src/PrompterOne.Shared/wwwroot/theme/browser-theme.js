@@ -155,7 +155,7 @@
         });
     }
 
-    window.prompterLiveTheme = {
+    window.prompterOneTheme = {
         applySettingsTheme
     };
 

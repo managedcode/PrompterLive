@@ -12,14 +12,14 @@ public sealed class AppBootstrapper(
     IScriptRepository scriptRepository,
     ILibraryFolderRepository libraryFolderRepository,
     IMediaSceneService mediaSceneService,
-    BrowserSettingsStore settingsStore,
+    IUserSettingsStore settingsStore,
     ILogger<AppBootstrapper>? logger = null)
 {
     private readonly IScriptSessionService _sessionService = sessionService;
     private readonly IScriptRepository _scriptRepository = scriptRepository;
     private readonly ILibraryFolderRepository _libraryFolderRepository = libraryFolderRepository;
     private readonly IMediaSceneService _mediaSceneService = mediaSceneService;
-    private readonly BrowserSettingsStore _settingsStore = settingsStore;
+    private readonly IUserSettingsStore _settingsStore = settingsStore;
     private readonly ILogger<AppBootstrapper> _logger = logger ?? NullLogger<AppBootstrapper>.Instance;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private bool _initialized;
