@@ -34,6 +34,8 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private bool IsLibraryScreen => ShellState.Screen == AppShellScreen.Library;
 
+    private bool ShowAppHeader => ShellState.Screen != AppShellScreen.GoLive;
+
     private bool ShowBackButton => ShellState.Screen != AppShellScreen.Library;
 
     private bool ShowLibraryActions => ShellState.Screen == AppShellScreen.Library;

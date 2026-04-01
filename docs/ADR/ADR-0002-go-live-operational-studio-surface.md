@@ -6,7 +6,7 @@ Related Features: [Go Live Runtime](/Users/ksemenenko/Developer/PrompterOne/docs
 
 ## Implementation plan (step-by-step)
 
-- [x] Audit the existing routed `Go Live` page against `new-design/golive.html`.
+- [x] Audit the existing routed `Go Live` page against `design/golive.html`.
 - [x] Replace the design drifted routing form layout with a studio shell that matches the design rails and canvas.
 - [x] Bind the studio shell to real browser media state, real scene cameras, and honest destination readiness summaries.
 - [x] Keep detailed provider setup in `Settings` and reduce `Go Live` to operational toggles plus links back to setup.
@@ -16,13 +16,13 @@ Related Features: [Go Live Runtime](/Users/ksemenenko/Developer/PrompterOne/docs
 ## Context
 
 - The prior `Go Live` page mixed an operational studio surface with a large lower deck of inline provider forms.
-- That shape diverged from `new-design/golive.html`, pushed the most important controls below the fold, and encouraged duplicate ownership of provider credentials between `Go Live` and `Settings`.
+- That shape diverged from `design/golive.html`, pushed the most important controls below the fold, and encouraged duplicate ownership of provider credentials between `Go Live` and `Settings`.
 - The product already has browser media services, scene state, output runtime services, and persisted provider settings. The problem was not missing capability; it was a blurred page contract.
 - The user explicitly asked for a real `Go Live` studio with camera switching, live preview, honest data, and design fidelity instead of a fake or placeholder surface.
 
 Goals:
 
-- Keep `Go Live` visually faithful to `new-design/golive.html`.
+- Keep `Go Live` visually faithful to `design/golive.html`.
 - Make `Go Live` operational, not administrative.
 - Keep live status, room state, and destination readiness truthful to what the browser runtime actually knows.
 - Cover the main studio flow with automated component and browser tests.
@@ -157,6 +157,6 @@ flowchart LR
 
 ## References
 
-- [new-design/golive.html](/Users/ksemenenko/Developer/PrompterOne/new-design/golive.html)
+- [design/golive.html](/Users/ksemenenko/Developer/PrompterOne/design/golive.html)
 - [docs/Features/GoLiveRuntime.md](/Users/ksemenenko/Developer/PrompterOne/docs/Features/GoLiveRuntime.md)
 - [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)

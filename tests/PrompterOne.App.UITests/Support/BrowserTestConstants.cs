@@ -95,6 +95,17 @@ internal static partial class BrowserTestConstants
         public const int MidFlowStepLarge = 5;
         public const int MidFlowStepSmall = 2;
         public const int ContextWordCount = 2;
+        public const string PauseBoundaryProbeWord = "will";
+        public const int PauseBoundaryProbeStepLimit = 20;
+        public const string PauseBoundaryLeftContextFirstWord = "I";
+        public const string PauseBoundaryLeftContextSecondWord = "believe";
+        public const string PauseBoundaryRightContextFirstWord = "be";
+        public const string PauseBoundaryRightContextSecondWord = "a";
+        public const string StopAtEndScenarioName = "learn-stop-at-end";
+        public const string StopAtEndStep = "01-stop-at-end";
+        public const string LoopWrapScenarioName = "learn-loop-wrap";
+        public const string LoopWrapStep = "01-loop-wrap";
+        public const int StepForwardLargeWordCount = 5;
     }
 
     public static class Teleprompter

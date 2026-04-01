@@ -81,7 +81,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Fact]
-    public Task LibraryScreen_KeepsOnlyOneCardMenuOpen_AndCardClickDismissesDropdown() =>
+    public Task LibraryScreen_KeepsOnlyOneCardMenuOpen_AndOutsideClickDismissesDropdown() =>
         RunPageAsync(async page =>
         {
             await page.GotoAsync(BrowserTestConstants.Routes.Library);
@@ -95,7 +95,10 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)).ClickAsync();
             await Expect(demoDropdown).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Library.SortLabel).ClickAsync();
+            await Expect(demoDropdown).ToBeHiddenAsync();
 
+            await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)).ClickAsync();
             await page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)).ClickAsync();
             await Expect(leadershipDropdown).ToBeVisibleAsync();
             await Expect(demoDropdown).ToBeHiddenAsync();

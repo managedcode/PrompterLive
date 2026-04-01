@@ -183,6 +183,16 @@
             ? CardMenuWrapOpenClass
             : CardMenuWrapClass;
 
+    public void DismissOpenCardMenu()
+    {
+        if (!ClearOpenCardMenu())
+        {
+            return;
+        }
+
+        StateHasChanged();
+    }
+
     private void ToggleCardMenu(string cardId)
     {
         _openCardMenuId = string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
@@ -192,9 +202,8 @@
 
     private async Task HandleCardClickAsync(string cardId)
     {
-        if (!string.IsNullOrWhiteSpace(_openCardMenuId))
+        if (ClearOpenCardMenu())
         {
-            _openCardMenuId = null;
             return;
         }
 
@@ -207,25 +216,36 @@
 
     private async Task HandleOpenScriptAsync(string cardId)
     {
-        _openCardMenuId = null;
+        ClearOpenCardMenu();
         await OnOpenScript.InvokeAsync(cardId);
     }
 
     private async Task HandleDuplicateScriptAsync(string cardId)
     {
-        _openCardMenuId = null;
+        ClearOpenCardMenu();
         await OnDuplicateScript.InvokeAsync(cardId);
     }
 
     private async Task HandleMoveScriptAsync(string cardId, string? folderId)
     {
-        _openCardMenuId = null;
+        ClearOpenCardMenu();
         await OnMoveScript.InvokeAsync(new LibraryMoveRequest(cardId, folderId));
     }
 
     private async Task HandleDeleteScriptAsync(string cardId)
     {
-        _openCardMenuId = null;
+        ClearOpenCardMenu();
         await OnDeleteScript.InvokeAsync(cardId);
+    }
+
+    private bool ClearOpenCardMenu()
+    {
+        if (string.IsNullOrWhiteSpace(_openCardMenuId))
+        {
+            return false;
+        }
+
+        _openCardMenuId = null;
+        return true;
     }
 }

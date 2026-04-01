@@ -63,7 +63,7 @@ public partial class TeleprompterPage
         _readerCardTextStyles.Clear();
         _readerCardsWithoutTransition.Clear();
         _pendingReaderAlignment = true;
-        _pendingReaderAlignmentInstant = false;
+        _pendingReaderAlignmentInstant = true;
     }
 
     private Task PrepareReaderCardAlignmentAsync(int cardIndex, int wordOrdinal) =>

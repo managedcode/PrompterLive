@@ -24,9 +24,9 @@
 
 ## Boundaries
 
-- Keep markup aligned with `new-design`.
-- Use `new-design` only as a static HTML/CSS reference. Final routed UI must be authored as Blazor components and C#-owned state in this project.
-- When a screen has a `new-design/*.html` counterpart, parity work must port the whole screen structure and intended interactions into Blazor instead of approximating only selected sections.
+- Keep markup aligned with `design`.
+- Use `design` only as a static HTML/CSS reference. Final routed UI must be authored as Blazor components and C#-owned state in this project.
+- When a screen has a `design/*.html` counterpart, parity work must port the whole screen structure and intended interactions into Blazor instead of approximating only selected sections.
 - Keep routed pages, feature components, renderers, and feature-local services inside their owning slice folders.
 - Keep app-specific UI logic here, but keep business rules in `PrompterOne.Core`.
 - Keep feature styles owned by their routed screen; `Learn` and `Teleprompter` must not share one feature stylesheet manifest.
@@ -47,7 +47,7 @@
 
 ## Local Risks Or Protected Areas
 
-- Small class-name changes can break design fidelity badly because the CSS comes from `new-design`.
+- Small class-name changes can break design fidelity badly because the CSS comes from `design`.
 - `AppShell`, `Contracts`, `Localization`, and `wwwroot` are cross-cutting; do not turn them back into dumping grounds for feature code.
 - Routed shell and page navigation belong in Blazor; keep remaining `wwwroot` JavaScript limited to browser/runtime interop.
 - JS interop and saved browser state are part of the real runtime contract; do not treat them as decorative.

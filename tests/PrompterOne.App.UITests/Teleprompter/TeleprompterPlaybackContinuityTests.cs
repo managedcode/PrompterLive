@@ -1,6 +1,6 @@
+using System.Globalization;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
-using System.Globalization;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.App.UITests;

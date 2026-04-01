@@ -27,7 +27,7 @@ Architecture map: [docs/Architecture.md](docs/Architecture.md)
 ## Key Properties
 
 - standalone Blazor WebAssembly runtime with no server backend
-- UI ported from [`new-design/`](new-design/) as the design source of truth
+- UI ported from [`design/`](design/) as the design source of truth
 - TPS-focused editor for prompt-ready scripts
 - RSVP/Learn mode with ORP-style word rendering
 - browser-side media scene, device setup, and live preview
@@ -54,7 +54,7 @@ Canonical inspiration: [cameron/squirt](https://github.com/cameron/squirt)
 - routed UI, CSS, browser interop: [`src/PrompterOne.Shared`](src/PrompterOne.Shared)
 - reusable domain logic: [`src/PrompterOne.Core`](src/PrompterOne.Core)
 - automated tests: [`tests/`](tests/)
-- visual reference: [`new-design/`](new-design/)
+- visual reference: [`design/`](design/)
 
 Further reading:
 

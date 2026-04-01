@@ -98,7 +98,7 @@ public partial class LearnPage
     }
 
     private static bool HasSentenceBoundaryAfter(RsvpTimelineEntry entry) =>
-        entry.PauseAfterMs > 0 || HasSentenceEndingPunctuation(entry.Word);
+        HasSentenceEndingPunctuation(entry.Word);
 
     private static bool IsDisplayBoundaryPunctuation(char character) =>
         char.IsPunctuation(character) && character is not '\'' and not '’';

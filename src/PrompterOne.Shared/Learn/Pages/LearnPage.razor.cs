@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
-using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
-using PrompterOne.Shared.Storage;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -52,6 +50,7 @@ public partial class LearnPage : IAsyncDisposable
     private int _currentIndex;
     private int _speed = 300;
     private bool _isPlaying;
+    private bool _isLoopEnabled;
     private bool _loadState = true;
     private bool _focusScreenAfterRender = true;
     private bool _syncFocusLayoutAfterRender;
@@ -129,6 +128,7 @@ public partial class LearnPage : IAsyncDisposable
         _timeline = BuildTimeline(processed, _speed);
         _currentIndex = 0;
         _isPlaying = learnSettings.AutoPlay;
+        _isLoopEnabled = learnSettings.LoopPlayback;
         UpdateDisplayedState();
         UpdateShellState();
         _startPlaybackAfterLayoutSync = _isPlaying;
@@ -146,54 +146,6 @@ public partial class LearnPage : IAsyncDisposable
 
     private Task StepRsvpForwardLargeAsync() => StepRsvpWordAsync(RsvpStepLarge);
 
-    private async Task ToggleRsvpPlaybackAsync()
-    {
-        _isPlaying = !_isPlaying;
-        await PersistLearnSettingsAsync(settings => settings with
-        {
-            AutoPlay = _isPlaying,
-            WordsPerMinute = _speed,
-            ContextWords = _contextWordCount
-        });
-
-        if (_isPlaying)
-        {
-            RestartPlaybackLoop();
-        }
-        else
-        {
-            StopPlaybackLoop();
-        }
-    }
-
-    private async Task ChangeRsvpSpeedAsync(int delta)
-    {
-        _speed = Math.Clamp(_speed + delta, RsvpMinSpeed, RsvpMaxSpeed);
-        await PersistLearnSettingsAsync(settings => settings with
-        {
-            AutoPlay = _isPlaying,
-            WordsPerMinute = _speed,
-            ContextWords = _contextWordCount
-        });
-
-        UpdateDisplayedState();
-        UpdateShellState();
-        RestartPlaybackLoopIfActive();
-    }
-
-    private async Task StepRsvpWordAsync(int delta)
-    {
-        if (_timeline.Count == 0)
-        {
-            return;
-        }
-
-        _currentIndex = NormalizeRsvpIndex(_currentIndex + delta);
-        UpdateDisplayedState();
-        RestartPlaybackLoopIfActive();
-        await InvokeAsync(StateHasChanged);
-    }
-
     private async Task NavigateBackToEditorAsync()
     {
         var route = string.IsNullOrWhiteSpace(SessionService.State.ScriptId)
@@ -201,70 +153,6 @@ public partial class LearnPage : IAsyncDisposable
             : AppRoutes.EditorWithId(SessionService.State.ScriptId);
         Navigation.NavigateTo(route);
         await Task.CompletedTask;
-    }
-
-    private void RestartPlaybackLoopIfActive()
-    {
-        if (_isPlaying)
-        {
-            RestartPlaybackLoop();
-        }
-    }
-
-    private void RestartPlaybackLoop()
-    {
-        StopPlaybackLoop();
-        if (!_isPlaying || _timeline.Count == 0)
-        {
-            return;
-        }
-
-        _playbackCts = new CancellationTokenSource();
-        _ = RunPlaybackLoopAsync(_playbackCts.Token);
-    }
-
-    private void StopPlaybackLoop()
-    {
-        if (_playbackCts is null)
-        {
-            return;
-        }
-
-        _playbackCts.Cancel();
-        _playbackCts.Dispose();
-        _playbackCts = null;
-    }
-
-    private async Task RunPlaybackLoopAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            while (!cancellationToken.IsCancellationRequested && _timeline.Count > 0)
-            {
-                var currentEntry = _timeline[_currentIndex];
-                var delayMilliseconds = Math.Max(
-                    MinimumLoopDelayMilliseconds,
-                    GetScaledDuration(currentEntry.DurationMs, currentEntry.BaseWpm) +
-                    GetScaledDuration(currentEntry.PauseAfterMs, currentEntry.BaseWpm, allowZero: true));
-
-                await Task.Delay(delayMilliseconds, cancellationToken);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                await InvokeAsync(() =>
-                {
-                    _currentIndex = NormalizeRsvpIndex(_currentIndex + 1);
-                    UpdateDisplayedState();
-                    StateHasChanged();
-                });
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
     }
 
     private void UpdateDisplayedState()
@@ -324,29 +212,8 @@ public partial class LearnPage : IAsyncDisposable
 
     }
 
-    private async Task PersistLearnSettingsAsync(Func<LearnSettings, LearnSettings> update)
-    {
-        var currentSettings = SessionService.State.LearnSettings;
-        var nextSettings = update(currentSettings);
-        await SessionService.UpdateLearnSettingsAsync(nextSettings);
-        await UserSettingsStore.SaveAsync(BrowserAppSettingsKeys.LearnSettings, nextSettings);
-    }
-
     private void UpdateShellState() =>
         Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
-
-    private int NormalizeRsvpIndex(int index)
-    {
-        if (_timeline.Count == 0)
-        {
-            return 0;
-        }
-
-        var normalizedIndex = index % _timeline.Count;
-        return normalizedIndex < 0
-            ? normalizedIndex + _timeline.Count
-            : normalizedIndex;
-    }
 
     private int GetScaledDuration(int sourceMilliseconds, int baseWpm, bool allowZero = false)
     {

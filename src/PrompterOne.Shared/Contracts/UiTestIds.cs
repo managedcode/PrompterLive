@@ -152,6 +152,7 @@ public static class UiTestIds
         public const string ContextLeft = "learn-context-left";
         public const string ContextRight = "learn-context-right";
         public const string Display = "learn-display";
+        public const string LoopToggle = "learn-loop-toggle";
         public const string NextPhrase = "learn-next-phrase";
         public const string OrpLine = "learn-orp-line";
         public const string Page = "learn-page";

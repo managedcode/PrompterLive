@@ -5,4 +5,5 @@ public sealed record LearnSettings(
     int ContextWords = 2,
     bool IgnoreScriptSpeeds = false,
     bool AutoPlay = false,
+    bool LoopPlayback = false,
     bool ShowPhrasePreview = true);

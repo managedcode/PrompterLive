@@ -4,7 +4,10 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div id="screen-library" class="screen active" data-testid="@UiTestIds.Library.Page">
+<div id="screen-library"
+     class="screen active"
+     data-testid="@UiTestIds.Library.Page"
+     @onclick="HandleLibrarySurfaceClick">
     <LibrarySidebar Folders="_folderNodes"
                     AllScriptCount="_allCards.Count"
                     IsAllSelected="IsAllSelected"
@@ -30,6 +33,7 @@
             </div>
 
             <LibraryCardsGrid Cards="_cards"
+                              @ref="_cardsGrid"
                               FolderOptions="_folderOptions"
                               OnOpenScript="OpenScriptAsync"
                               OnDuplicateScript="DuplicateScriptAsync"

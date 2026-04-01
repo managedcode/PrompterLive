@@ -333,22 +333,6 @@
     min-width: 36px;
 }
 
-/* ── Card previews (mini snippets above/below) ── */
-.rd-card-prev {
-    transform: translateY(-85%) scale(.55);
-    opacity: .08;
-    z-index: 1;
-    pointer-events: none;
-    filter: blur(1px);
-}
-.rd-card-next {
-    transform: translateY(85%) scale(.55);
-    opacity: .08;
-    z-index: 1;
-    pointer-events: none;
-    filter: blur(1px);
-}
-
 /* Subtle noise texture on body */
 body::before {
     content: '';

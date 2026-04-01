@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using Bunit;
 using PrompterOne.Shared.Components.Library;
 using PrompterOne.Shared.Contracts;
@@ -9,6 +10,7 @@ namespace PrompterOne.App.Tests;
 
 public sealed class LibraryFolderInteractionTests : BunitContext
 {
+    private const string OpenClassName = "open";
     private readonly AppHarness _harness;
 
     public LibraryFolderInteractionTests()
@@ -97,6 +99,24 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Fact]
+    public void LibraryPage_ClickingSurface_DismissesOpenCardMenu()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup));
+
+        cut.FindByTestId(UiTestIds.Library.CardMenu(AppTestData.Scripts.DemoId)).Click();
+
+        cut.WaitForAssertion(() =>
+            Assert.True(GetCardMenuWrap(cut, AppTestData.Scripts.DemoId).ClassList.Contains(OpenClassName)));
+
+        cut.FindByTestId(UiTestIds.Library.Page).Click();
+
+        cut.WaitForAssertion(() =>
+            Assert.False(GetCardMenuWrap(cut, AppTestData.Scripts.DemoId).ClassList.Contains(OpenClassName)));
+    }
+
+    [Fact]
     public void LibraryPage_SelectsSidebarFolder_AndFiltersCards()
     {
         var cut = Render<LibraryPage>();
@@ -171,4 +191,8 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.Contains("active", cut.FindByTestId(UiTestIds.Library.SortDate).ClassName);
         });
     }
+
+    private static IElement GetCardMenuWrap(IRenderedComponent<LibraryPage> cut, string scriptId) =>
+        cut.FindByTestId(UiTestIds.Library.CardMenu(scriptId)).ParentElement
+        ?? throw new InvalidOperationException("Library card menu wrapper was not rendered.");
 }

@@ -20,7 +20,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
-            await page.GetByTestId(UiTestIds.Header.Back).ClickAsync();
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidget)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
@@ -38,7 +38,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
     }
 
     [Fact]
-    public async Task GoLivePage_StartRecording_MarksHeaderIndicatorAsRecording()
+    public async Task GoLivePage_StartRecording_MarksHeaderIndicatorAsRecordingOutsideStudioRoute()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -53,6 +53,8 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
                 BrowserTestConstants.GoLive.RuntimeSessionId,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
+            await Expect(page.GetByTestId(UiTestIds.Header.GoLive)).ToHaveCountAsync(0);
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
         }

@@ -8,10 +8,10 @@ Stack: `.NET 10`, Blazor WebAssembly, Razor Class Library, xUnit, bUnit, Playwri
 `PrompterOne` is a standalone browser-first WebAssembly app.
 
 - `src/PrompterOne.App` is the only runnable host.
-- `src/PrompterOne.Shared` contains routed Razor UI, exact `new-design` styling, and browser interop.
+- `src/PrompterOne.Shared` contains routed Razor UI, exact `design` styling, and browser interop.
 - `src/PrompterOne.Core` contains TPS, RSVP, preview, workspace, media-scene, and streaming domain logic.
 - `tests/` contains all automated test projects.
-- `new-design/` is the visual and interaction source of truth.
+- `design/` is the visual and interaction source of truth.
 
 There is no backend in the runtime shape. The app must boot directly in the browser from the WebAssembly host.
 
@@ -289,10 +289,10 @@ Repo-specific design rules:
 - Keep shared build settings in `Directory.Build.props`.
 - Keep shared package versions in `Directory.Packages.props`.
 - Keep the pinned SDK version in `global.json`.
-- Treat `new-design/index.html`, `new-design/tokens.css`, `new-design/components.css`, `new-design/styles.css`, and `new-design/app.js` as the exact design reference.
-- Treat every file under `new-design/` as a static design/prototype reference only. Production UI must be implemented as Blazor components in `src/PrompterOne.Shared`; do not ship raw `new-design` HTML as runtime UI.
-- Do not re-invent the UI when the answer should be “port the markup and classes from `new-design`”.
-- For parity tasks, port the full routed screen from its matching `new-design/*.html` reference, not just isolated high-signal blocks. Settings, Editor, Learn, Teleprompter, and Go Live must match the reference screen in layout and intended interaction while staying Blazor/C# owned.
+- Treat `design/index.html`, `design/tokens.css`, `design/components.css`, `design/styles.css`, and `design/app.js` as the exact design reference.
+- Treat every file under `design/` as a static design/prototype reference only. Production UI must be implemented as Blazor components in `src/PrompterOne.Shared`; do not ship raw `design` HTML as runtime UI.
+- Do not re-invent the UI when the answer should be “port the markup and classes from `design`”.
+- For parity tasks, port the full routed screen from its matching `design/*.html` reference, not just isolated high-signal blocks. Settings, Editor, Learn, Teleprompter, and Go Live must match the reference screen in layout and intended interaction while staying Blazor/C# owned.
 - About content must stay factual and current: do not invent team members or contributor names; use Managed Code attribution and official company links only.
 - Do not introduce a server host for the app runtime.
 - Preserve stable `data-testid` selectors on core flows because the Playwright suite depends on them.
@@ -305,7 +305,7 @@ Repo-specific design rules:
 - Any vendored runtime JavaScript SDK that tracks an upstream GitHub repo MUST have an automated watcher job that checks new GitHub releases and opens a repo issue describing the required update when a newer release appears.
 - Teleprompter TPS speed modifiers MUST affect both playback timing and subtle word- or phrase-level letter spacing, so slower spans open up slightly and faster spans tighten slightly without hurting readability.
 - Teleprompter reader word styling MUST mirror TPS/editor inline semantics: explicit inline TPS tags control per-word emphasis and color, while section or block emotion sets card context and must not recolor every reader word.
-- Teleprompter block transitions MUST stay visually consistent: outgoing cards move upward and incoming cards rise from below in the same direction every time; alternating up/down travel is forbidden.
+- Teleprompter block transitions MUST stay visually consistent: outgoing cards move upward and incoming cards rise from below in the same direction every time; alternating up/down travel is forbidden, and extra settling, bounce, or intermediate card states are forbidden.
 - Learn and Teleprompter are separate screens with separate style ownership; do not bundle RSVP and teleprompter reader feature styles into one shared screen stylesheet or let one page inherit the other page's visual treatment.
 - User preferences persistence MUST sit behind a platform-agnostic user-settings abstraction, with browser storage implemented via local storage and room for other platform-specific implementations; theme, teleprompter layout preferences, camera/scene preferences, and similar saved settings belong there instead of ad-hoc feature stores.
 - Build quality gates must stay green under `-warnaserror`.
@@ -351,7 +351,7 @@ Ask first:
 
 ### Likes
 
-- exact fidelity with `new-design`
+- exact fidelity with `design`
 - thin WASM host boundaries
 - browser-realistic UI verification
 - domain logic that stays reusable and serializable
@@ -364,13 +364,14 @@ Ask first:
 - progress updates that imply a fix is done before there is concrete implementation and verification evidence; keep status factual and let the user verify final behavior personally
 - automated test or coverage runs for UI-behavior fixes before the user has manually checked the change locally; wait for the user's confirmation before resuming automation
 - mixed-language root README or public entry docs; keep them English-only unless the user explicitly asks otherwise
-- design drift from `new-design`
+- design drift from `design`
 - made-up About/team content or stale attribution; About must point to real Managed Code ownership and official links
 - any visible typing latency in the editor; plain input must feel immediate with no observable delay
 - teleprompter controls that fade so much they become hard to see during real reading
-- teleprompter paragraph repositioning or per-word vertical transform updates that make the text jump; `new-design/teleprompter.html` motion is the required reference
+- teleprompter paragraph repositioning, line hopping, or per-word vertical transform updates that make the text jump; `design/teleprompter.html` motion is the required reference, with steady bottom-to-top movement and no extra animation layers beyond the reference
 - any green teleprompter shell or background treatment; Teleprompter must stay on its dark reader palette and use emotion only for accents, not green screen-wide fills
 - Learn and Teleprompter style boundaries bleeding through a shared feature stylesheet; their visuals must stay isolated by page-owned style manifests
+- Learn RSVP compositions that shift when shorter or longer words render; changing word length must not move the overall RSVP component or its anchored centerline
 - teleprompter camera starting enabled by default; default reader startup should keep the camera off until the user explicitly enables it
 - editor keystroke paths that persist, compile, or rebuild shared session state; keep plain typing in memory and move heavier local sync to debounce or autosave
 - murky JavaScript or interop layers that keep product UI behavior in JS when Blazor can own it cleanly

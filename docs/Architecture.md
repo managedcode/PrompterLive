@@ -6,7 +6,7 @@
 
 The acceptance target is a browser-only runtime that:
 
-- matches the local `new-design/` UI closely
+- matches the local `design/` UI closely
 - parses and exports TPS content
 - supports RSVP learn mode and teleprompter reading mode
 - keeps media, scene, and streaming state client-side
@@ -49,7 +49,7 @@ flowchart LR
     App["src/PrompterOne.App<br/>Standalone WASM host"]
     Shared["src/PrompterOne.Shared<br/>Razor pages, layout, CSS, JS interop"]
     Core["src/PrompterOne.Core<br/>TPS, RSVP, workspace, media, streaming"]
-    NewDesign["new-design/<br/>HTML/CSS/JS reference + parser sources"]
+    NewDesign["design/<br/>HTML/CSS/JS reference + parser sources"]
     Tests["tests/*<br/>xUnit + bUnit + Playwright"]
 
     App --> Shared
@@ -71,8 +71,8 @@ flowchart LR
 
 ### UI Design Principles
 
-- `new-design/` is the visual source of truth for layout, hierarchy, spacing, controls, color direction, and interaction tone.
-- UI work should port markup, structure, and class intent from `new-design/` instead of inventing a parallel design language.
+- `design/` is the visual source of truth for layout, hierarchy, spacing, controls, color direction, and interaction tone.
+- UI work should port markup, structure, and class intent from `design/` instead of inventing a parallel design language.
 - Routed screens should keep strong visual identities while still using the shared shell and contracts from `AppShell`.
 - Stable `data-testid` hooks are part of the UI contract, not optional test-only extras.
 - Browser-first behavior matters more than server assumptions. Media, storage, and stream state stay client-side.
@@ -366,7 +366,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - routed Razor screens: `library`, `editor`, `learn`, `teleprompter`, `go-live`, `settings`
 - vertical slices own their routed pages, components, renderers, and feature-local services under folders such as `Editor/`, `Library/`, `Teleprompter/`, and `GoLive/`
 - only true cross-cutting UI assets stay outside feature slices: `Contracts/`, `Localization/`, `wwwroot/`, root bootstrap files, and `AppShell/`
-- exact design shell and imported `new-design` assets
+- exact design shell and imported `design` assets
 - shared UI localization catalog for supported browser cultures
 - browser interop and app DI wiring
 - browser-backed `IUserSettingsStore` wiring for persisted reader, theme, scene, and studio preferences
@@ -381,7 +381,7 @@ If a native embedded browser host returns later, media access must not rely on s
 
 Rules:
 
-- keep markup aligned with `new-design`
+- keep markup aligned with `design`
 - do not move business logic here if it belongs in `Core`
 - preserve `data-testid` selectors for browser tests
 

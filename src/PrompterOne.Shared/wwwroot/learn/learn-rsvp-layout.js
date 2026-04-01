@@ -3,10 +3,7 @@
     const focusSelector = ".rsvp-focus";
     const orpSelector = ".rsvp-focus-orp";
     const focusShiftPropertyName = "--rsvp-focus-shift";
-    const leftOffsetPropertyName = "--rsvp-context-left-offset";
-    const rightOffsetPropertyName = "--rsvp-context-right-offset";
-    const defaultContextOffsetPx = 220;
-    const railGapPx = 28;
+    const fontSyncReadyAttributeName = "data-rsvp-layout-font-sync-ready";
     const pixelUnitSuffix = "px";
     const zeroPixels = "0px";
 
@@ -21,8 +18,43 @@
 
     function applyDefaultLayout(rowElement) {
         rowElement.style.setProperty(focusShiftPropertyName, zeroPixels);
-        setPixelProperty(rowElement, leftOffsetPropertyName, defaultContextOffsetPx);
-        setPixelProperty(rowElement, rightOffsetPropertyName, defaultContextOffsetPx);
+    }
+
+    function syncLayoutNow(rowElement) {
+        const focusElement = rowElement.querySelector(focusSelector);
+        const orpElement = focusElement?.querySelector(orpSelector);
+
+        if (!(focusElement instanceof HTMLElement) || !(orpElement instanceof HTMLElement)) {
+            applyDefaultLayout(rowElement);
+            return;
+        }
+
+        applyDefaultLayout(rowElement);
+        void rowElement.offsetWidth;
+
+        const focusRect = focusElement.getBoundingClientRect();
+        const orpRect = orpElement.getBoundingClientRect();
+        const focusShiftPx = readCenter(focusRect) - readCenter(orpRect);
+
+        setPixelProperty(rowElement, focusShiftPropertyName, focusShiftPx);
+    }
+
+    function scheduleFontReadySync(rowElement) {
+        if (rowElement.getAttribute(fontSyncReadyAttributeName) === "true") {
+            return;
+        }
+
+        rowElement.setAttribute(fontSyncReadyAttributeName, "true");
+
+        if (!document.fonts?.ready) {
+            return;
+        }
+
+        void document.fonts.ready.then(() => {
+            if (rowElement.isConnected) {
+                syncLayoutNow(rowElement);
+            }
+        });
     }
 
     window[interopNamespace] = {
@@ -31,32 +63,8 @@
                 return;
             }
 
-            const focusElement = rowElement.querySelector(focusSelector);
-            const orpElement = focusElement?.querySelector(orpSelector);
-
-            if (!(focusElement instanceof HTMLElement) || !(orpElement instanceof HTMLElement)) {
-                applyDefaultLayout(rowElement);
-                return;
-            }
-
-            applyDefaultLayout(rowElement);
-            void rowElement.offsetWidth;
-
-            const rowRect = rowElement.getBoundingClientRect();
-            const focusRect = focusElement.getBoundingClientRect();
-            const orpRect = orpElement.getBoundingClientRect();
-            const focusShiftPx = readCenter(focusRect) - readCenter(orpRect);
-
-            setPixelProperty(rowElement, focusShiftPropertyName, focusShiftPx);
-            void rowElement.offsetWidth;
-
-            const shiftedFocusRect = focusElement.getBoundingClientRect();
-            const rowCenterPx = readCenter(rowRect);
-            const leftOffsetPx = Math.max(rowCenterPx - shiftedFocusRect.left + railGapPx, railGapPx);
-            const rightOffsetPx = Math.max(shiftedFocusRect.right - rowCenterPx + railGapPx, railGapPx);
-
-            setPixelProperty(rowElement, leftOffsetPropertyName, leftOffsetPx);
-            setPixelProperty(rowElement, rightOffsetPropertyName, rightOffsetPx);
+            syncLayoutNow(rowElement);
+            scheduleFontReadySync(rowElement);
         }
     };
 })();

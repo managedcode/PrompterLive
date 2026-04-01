@@ -2,156 +2,159 @@
 @inherits LayoutComponentBase
 @using PrompterOne.Shared.Localization
 
-<header class="app-header">
-    <button type="button"
-            class="app-header-left app-header-home"
-            @onclick="HandleHomeClickAsync"
-            data-testid="@UiTestIds.Header.Home">
-        <div class="logo-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M4 6h16M4 12h12M4 18h14" stroke="url(#glogo)" stroke-width="2.5" stroke-linecap="round" />
-                <defs>
-                    <linearGradient id="glogo" x1="4" y1="6" x2="20" y2="18">
-                        <stop stop-color="#F5E6D0" />
-                        <stop offset="1" stop-color="#C4A882" />
-                    </linearGradient>
-                </defs>
-            </svg>
-        </div>
-        <span class="app-logo-text">PrompterOne</span>
-    </button>
-    <div class="app-header-center" data-testid="@UiTestIds.Header.Center">
-        @if (IsLibraryScreen)
-        {
-            <div class="lib-breadcrumb">
-                <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
-                <span class="bc-sep">/</span>
-                <span class="bc-item bc-current"
-                      data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@ShellState.BreadcrumbLabel</span>
+@if (ShowAppHeader)
+{
+    <header class="app-header">
+        <button type="button"
+                class="app-header-left app-header-home"
+                @onclick="HandleHomeClickAsync"
+                data-testid="@UiTestIds.Header.Home">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 6h16M4 12h12M4 18h14" stroke="url(#glogo)" stroke-width="2.5" stroke-linecap="round" />
+                    <defs>
+                        <linearGradient id="glogo" x1="4" y1="6" x2="20" y2="18">
+                            <stop stop-color="#F5E6D0" />
+                            <stop offset="1" stop-color="#C4A882" />
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
-        }
-        else
-        {
-            @if (ShowBackButton)
+            <span class="app-logo-text">PrompterOne</span>
+        </button>
+        <div class="app-header-center" data-testid="@UiTestIds.Header.Center">
+            @if (IsLibraryScreen)
+            {
+                <div class="lib-breadcrumb">
+                    <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
+                    <span class="bc-sep">/</span>
+                    <span class="bc-item bc-current"
+                          data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@ShellState.BreadcrumbLabel</span>
+                </div>
+            }
+            else
+            {
+                @if (ShowBackButton)
+                {
+                    <button type="button"
+                            class="btn-back"
+                            @onclick="HandleBackClickAsync"
+                            data-testid="@UiTestIds.Header.Back">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15,18 9,12 15,6" />
+                        </svg>
+                    </button>
+                }
+
+                <span class="top-bar-title" data-testid="@UiTestIds.Header.Title">@HeaderTitle</span>
+
+                @if (ShowHeaderSubtitle)
+                {
+                    <span id="@(ShellState.Screen == AppShellScreen.Teleprompter ? UiDomIds.Teleprompter.HeaderSegment : null)"
+                          class="app-header-subtitle"
+                          data-testid="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
+                }
+            }
+        </div>
+        <div class="app-header-right">
+            @if (ShowLibraryActions)
+            {
+                <div class="lib-search">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text"
+                           value="@ShellState.SearchText"
+                           placeholder="@Text(UiTextKey.HeaderSearchPlaceholder)"
+                           @oninput="HandleLibrarySearchInputAsync"
+                           data-testid="@UiTestIds.Header.LibrarySearch" />
+                </div>
+                <button type="button"
+                        class="btn-golive-header"
+                        @onclick="HandleOpenGoLiveClickAsync"
+                        data-live-state="@GoLiveIndicatorState"
+                        data-testid="@UiTestIds.Header.GoLive">
+                    <span class="btn-golive-dot" aria-hidden="true"></span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="23,7 16,12 23,17" />
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                    </svg>
+                    @Text(UiTextKey.HeaderGoLive)
+                </button>
+                <button type="button"
+                        class="btn-create"
+                        @onclick="HandleCreateScriptClickAsync"
+                        data-testid="@UiTestIds.Header.LibraryNewScript">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    @Text(UiTextKey.HeaderNewScript)
+                </button>
+            }
+            else
             {
                 <button type="button"
-                        class="btn-back"
-                        @onclick="HandleBackClickAsync"
-                        data-testid="@UiTestIds.Header.Back">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15,18 9,12 15,6" />
-                    </svg>
+                        class="btn-live-shell"
+                        @onclick="HandleOpenGoLiveClickAsync"
+                        data-live-state="@GoLiveIndicatorState"
+                        data-testid="@UiTestIds.Header.GoLive">
+                    <span class="btn-live-shell-icon" aria-hidden="true">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12a8 8 0 0 1 8-8" />
+                            <path d="M20 12a8 8 0 0 0-8-8" />
+                            <path d="M4 12a8 8 0 0 0 8 8" />
+                            <path d="M20 12a8 8 0 0 1-8 8" />
+                            <circle cx="12" cy="12" r="2.5" />
+                        </svg>
+                    </span>
+                    <span class="btn-live-shell-copy">
+                        <span class="btn-live-shell-label">@Text(UiTextKey.HeaderGoLive)</span>
+                        @if (GoLiveSessionState.HasActiveSession)
+                        {
+                            <span class="btn-live-shell-status">@GoLiveIndicatorCopy</span>
+                        }
+                    </span>
                 </button>
             }
 
-            <span class="top-bar-title" data-testid="@UiTestIds.Header.Title">@HeaderTitle</span>
-
-            @if (ShowHeaderSubtitle)
+            @if (ShowLearnAction)
             {
-                <span id="@(ShellState.Screen == AppShellScreen.Teleprompter ? UiDomIds.Teleprompter.HeaderSegment : null)"
-                      class="app-header-subtitle"
-                      data-testid="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
-            }
-        }
-    </div>
-    <div class="app-header-right">
-        @if (ShowLibraryActions)
-        {
-            <div class="lib-search">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.35-4.35" />
-                </svg>
-                <input type="text"
-                       value="@ShellState.SearchText"
-                       placeholder="@Text(UiTextKey.HeaderSearchPlaceholder)"
-                       @oninput="HandleLibrarySearchInputAsync"
-                       data-testid="@UiTestIds.Header.LibrarySearch" />
-            </div>
-            <button type="button"
-                    class="btn-golive-header"
-                    @onclick="HandleOpenGoLiveClickAsync"
-                    data-live-state="@GoLiveIndicatorState"
-                    data-testid="@UiTestIds.Header.GoLive">
-                <span class="btn-golive-dot" aria-hidden="true"></span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="23,7 16,12 23,17" />
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                </svg>
-                @Text(UiTextKey.HeaderGoLive)
-            </button>
-            <button type="button"
-                    class="btn-create"
-                    @onclick="HandleCreateScriptClickAsync"
-                    data-testid="@UiTestIds.Header.LibraryNewScript">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                @Text(UiTextKey.HeaderNewScript)
-            </button>
-        }
-        else
-        {
-            <button type="button"
-                    class="btn-live-shell"
-                    @onclick="HandleOpenGoLiveClickAsync"
-                    data-live-state="@GoLiveIndicatorState"
-                    data-testid="@UiTestIds.Header.GoLive">
-                <span class="btn-live-shell-icon" aria-hidden="true">
+                <button type="button"
+                        class="btn-ghost"
+                        @onclick="HandleOpenLearnClickAsync"
+                        data-testid="@UiTestIds.Header.EditorLearn">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 12a8 8 0 0 1 8-8" />
-                        <path d="M20 12a8 8 0 0 0-8-8" />
-                        <path d="M4 12a8 8 0 0 0 8 8" />
-                        <path d="M20 12a8 8 0 0 1-8 8" />
-                        <circle cx="12" cy="12" r="2.5" />
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
-                </span>
-                <span class="btn-live-shell-copy">
-                    <span class="btn-live-shell-label">@Text(UiTextKey.HeaderGoLive)</span>
-                    @if (GoLiveSessionState.HasActiveSession)
-                    {
-                        <span class="btn-live-shell-status">@GoLiveIndicatorCopy</span>
-                    }
-                </span>
-            </button>
-        }
+                    @Text(UiTextKey.HeaderLearn)
+                </button>
+            }
 
-        @if (ShowLearnAction)
-        {
-            <button type="button"
-                    class="btn-ghost"
-                    @onclick="HandleOpenLearnClickAsync"
-                    data-testid="@UiTestIds.Header.EditorLearn">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
-                @Text(UiTextKey.HeaderLearn)
-            </button>
-        }
+            @if (ShowLearnWpmBadge)
+            {
+                <span id="@UiDomIds.Learn.HeaderWpmBadge"
+                      class="top-bar-title app-header-wpm"
+                      data-testid="@UiTestIds.Header.Wpm">@ShellState.WpmLabel</span>
+            }
 
-        @if (ShowLearnWpmBadge)
-        {
-            <span id="@UiDomIds.Learn.HeaderWpmBadge"
-                  class="top-bar-title app-header-wpm"
-                  data-testid="@UiTestIds.Header.Wpm">@ShellState.WpmLabel</span>
-        }
-
-        @if (ShowReadAction)
-        {
-            <button type="button"
-                    class="btn-gold"
-                    @onclick="HandleOpenReadClickAsync"
-                    data-testid="@UiTestIds.Header.EditorRead">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5,3 19,12 5,21" />
-                </svg>
-                @Text(UiTextKey.HeaderRead)
-            </button>
-        }
-    </div>
-</header>
+            @if (ShowReadAction)
+            {
+                <button type="button"
+                        class="btn-gold"
+                        @onclick="HandleOpenReadClickAsync"
+                        data-testid="@UiTestIds.Header.EditorRead">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21" />
+                    </svg>
+                    @Text(UiTextKey.HeaderRead)
+                </button>
+            }
+        </div>
+    </header>
+}
 
 <PrompterOne.Shared.Components.Diagnostics.DiagnosticsBanner />
 <PrompterOne.Shared.Components.Diagnostics.ConnectivityOverlay />

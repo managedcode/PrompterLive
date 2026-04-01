@@ -6,8 +6,9 @@
 
 The current page layout is a production-style studio surface:
 
-- top session bar follows `new-design/golive.html`: back to Read, script title + session badge, centered session timer, panel toggles, mode switch, settings shortcut, REC, and the main stream action on the far right
-- the studio shell follows the same three-column grid as `new-design/golive.html`: a compact left input rail, a dominant center canvas/program stage, and a dedicated right operational rail
+- the routed `Go Live` page owns its own studio chrome and suppresses the shared app header while the route is active, so `design/golive.html` remains the only topbar on that screen
+- top session bar follows `design/golive.html`: back to Read, script title + session badge, centered session timer, panel toggles, mode switch, settings shortcut, REC, and the main stream action on the far right
+- the studio shell follows the same three-column grid as `design/golive.html`: a compact left input rail, a dominant center canvas/program stage, and a dedicated right operational rail
 - left input rail for scene cameras, add-camera action, utility sources, and microphone route status
 - center program stage for the selected program source and current script/session state
 - scene controls bar for scene chips, layout controls, transitions, and the primary `Take To Air` action
@@ -184,6 +185,7 @@ flowchart LR
 - `Go Live` must auto-seed the first available browser camera into the scene when the scene is empty and devices are available.
 - `Go Live` must show the selected program source in the center monitor and the currently on-air source in the right preview rail until the operator explicitly takes the selected source live.
 - `Go Live` must show a stable empty preview state instead of mounting camera interop when the current scene has no cameras.
+- the routed `Go Live` page must not stack the shared app header above the studio topbar; the studio topbar is the only route chrome on that screen
 - any shared `Go Live` localized copy must come from `PrompterOne.Shared.Localization.UiTextCatalog`, so supported browser cultures localize the studio surface without feature-local string copies.
 - quick destination cards must only expose honest readiness summaries and arm/disarm toggles; fake in-page credential editors are forbidden on the operational studio surface
 - legacy streaming settings must normalize to the current included program cameras so existing browser storage keeps working

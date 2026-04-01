@@ -11,11 +11,10 @@ namespace PrompterOne.App.Tests;
 
 public sealed class MainLayoutGoLiveSessionTests : BunitContext
 {
-    private const string IdleStateValue = "idle";
     private const string StreamingStateValue = "streaming";
 
     [Fact]
-    public void MainLayout_RendersGoLiveIndicator_OnGoLiveScreenToo()
+    public void MainLayout_HidesSharedHeader_OnGoLiveScreen()
     {
         _ = TestHarnessFactory.Create(this);
         Services.GetRequiredService<NavigationManager>().NavigateTo(AppRoutes.GoLive);
@@ -24,9 +23,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var indicator = cut.FindByTestId(UiTestIds.Header.GoLive);
-            Assert.NotNull(indicator);
-            Assert.Equal(IdleStateValue, indicator.GetAttribute("data-live-state"));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Header.GoLive}']"));
         });
     }
 

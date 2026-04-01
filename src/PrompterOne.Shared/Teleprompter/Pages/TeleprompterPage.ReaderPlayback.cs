@@ -133,11 +133,9 @@ public partial class TeleprompterPage
 
             await Task.Delay(ReaderFirstWordDelayMilliseconds, cancellationToken);
 
-            await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
-            _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState(instantAlignment: true);
+            await AlignReaderCardTextAsync(_activeReaderCardIndex, 0, neutralizeCard: true, rerender: true, instantTransition: true);
             _isReaderPlaying = true;
-            await InvokeAsync(StateHasChanged);
+            await ActivatePreparedReaderWordAsync(0);
             _ = RunReaderPlaybackLoopAsync(GetCurrentWordDelayMilliseconds(), cancellationToken);
         }
         catch (OperationCanceledException)
@@ -160,13 +158,13 @@ public partial class TeleprompterPage
             if (_activeReaderWordIndex > 0)
             {
                 _activeReaderWordIndex--;
-                UpdateReaderDisplayState(instantAlignment: true);
+                UpdateReaderDisplayState();
             }
         }
         else if (_activeReaderWordIndex < 0)
         {
             _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState(instantAlignment: true);
+            UpdateReaderDisplayState();
         }
         else
         {
@@ -174,7 +172,7 @@ public partial class TeleprompterPage
             if (_activeReaderWordIndex < wordCount - 1)
             {
                 _activeReaderWordIndex++;
-                UpdateReaderDisplayState(instantAlignment: true);
+                UpdateReaderDisplayState();
             }
             else
             {
@@ -200,8 +198,7 @@ public partial class TeleprompterPage
         if (direction < 0 && _activeReaderWordIndex > 1)
         {
             await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
-            _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState(instantAlignment: true);
+            await ActivatePreparedReaderWordAsync(0);
 
             if (resumePlayback)
             {
@@ -325,7 +322,7 @@ public partial class TeleprompterPage
         if (_activeReaderWordIndex < cardWordCount - 1)
         {
             _activeReaderWordIndex++;
-            UpdateReaderDisplayState(instantAlignment: true);
+            UpdateReaderDisplayState();
             await InvokeAsync(StateHasChanged);
             return GetCurrentWordDelayMilliseconds();
         }
@@ -354,9 +351,7 @@ public partial class TeleprompterPage
             {
                 return;
             }
-            _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState(instantAlignment: true);
-            await InvokeAsync(StateHasChanged);
+            await ActivatePreparedReaderWordAsync(0);
         }
         finally
         {
@@ -391,6 +386,13 @@ public partial class TeleprompterPage
         }
 
         return MinimumReaderLoopDelayMilliseconds;
+    }
+
+    private async Task ActivatePreparedReaderWordAsync(int wordIndex)
+    {
+        _activeReaderWordIndex = wordIndex;
+        UpdateReaderDisplayState(requestAlignment: false);
+        await InvokeAsync(StateHasChanged);
     }
 
     private int GetNextPlaybackCardIndex() =>

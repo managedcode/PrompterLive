@@ -54,13 +54,13 @@
             return callback();
         }
 
-        const previousCardOpacity = card.style.opacity;
         const previousCardTransform = card.style.transform;
         const previousCardTransition = card.style.transition;
+        const previousCardVisibility = card.style.visibility;
         const previousTextTransform = text.style.transform;
         const previousTextTransition = text.style.transition;
 
-        card.style.opacity = "0";
+        card.style.visibility = "hidden";
         card.style.transition = "none";
         card.style.transform = "translateY(0)";
         text.style.transition = "none";
@@ -74,7 +74,7 @@
             text.style.transition = previousTextTransition;
             card.style.transform = previousCardTransform;
             card.style.transition = previousCardTransition;
-            card.style.opacity = previousCardOpacity;
+            card.style.visibility = previousCardVisibility;
             void card.offsetHeight;
         }
     }

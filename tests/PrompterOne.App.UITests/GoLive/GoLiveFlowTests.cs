@@ -15,7 +15,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     private const double MinProgramAspectRatio = 1.55d;
     private const double MinSourcesRailWidth = 170d;
     private const string GoLiveLayoutParityScenario = "go-live-layout-parity";
-    private const string GoLiveLayoutParityStep = "01-new-design-shell";
+    private const string GoLiveLayoutParityStep = "01-design-shell";
     private const string IncludeActionLabel = "Include";
     private const string RemoveActionLabel = "Remove";
     private const double TimerCenterTolerancePixels = 48d;
@@ -165,6 +165,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await Expect(programCard).ToBeVisibleAsync();
             await Expect(programVideo).ToBeVisibleAsync();
             await Expect(previewRail).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.GoLive)).ToHaveCountAsync(0);
 
             var sessionBarBox = await GetRequiredBoxAsync(sessionBar);
             var sourceRailBox = await GetRequiredBoxAsync(sourceRail);

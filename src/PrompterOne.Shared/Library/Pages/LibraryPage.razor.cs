@@ -56,7 +56,10 @@ public partial class LibraryPage : ComponentBase, IDisposable
     private IReadOnlyList<LibraryCardViewModel> _cards = [];
     private IReadOnlyList<LibraryFolderNodeViewModel> _folderNodes = [];
     private IReadOnlyList<LibraryFolderOptionViewModel> _folderOptions = [];
+    private LibraryCardsGrid? _cardsGrid;
     private HashSet<string> _expandedFolderIds = new(StringComparer.Ordinal);
 
     private bool IsAllSelected => string.Equals(_selectedFolderId, LibrarySelectionKeys.All, StringComparison.Ordinal);
+
+    private void HandleLibrarySurfaceClick() => _cardsGrid?.DismissOpenCardMenu();
 }

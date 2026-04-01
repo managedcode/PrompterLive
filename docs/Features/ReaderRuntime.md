@@ -2,13 +2,14 @@
 
 ## Intent
 
-`learn` and `teleprompter` must follow `/Users/ksemenenko/Developer/PrompterOne/new-design/index.html` closely at runtime, not only in static markup.
+`learn` and `teleprompter` must follow the checked-in design references in `/Users/ksemenenko/Developer/PrompterOne/design/` closely at runtime, not only in static markup.
 
 The important contracts are:
 
 - RSVP keeps the ORP letter centered on the vertical guide.
 - RSVP builds phrase-aware timing from TPS scripts, not only from flat word lists.
-- RSVP keeps a five-word context rail on each side, matching `new-design/app.js`.
+- RSVP keeps the nearest two visible context words on each side when they are available, without dropping left context only because a phrase pause ended.
+- RSVP stops on the last word by default and only wraps when the Learn loop toggle is explicitly enabled.
 - Teleprompter camera stays behind the text as one background layer.
 - Teleprompter word groups stay short enough to avoid run-on lines.
 - Teleprompter preserves TPS word presentation details such as pronunciation guides, inline colors, emotion styling, and speed-derived spacing/timing.
@@ -25,7 +26,7 @@ flowchart LR
     UserSettings["IUserSettingsStore"]
     Learn["LearnPage"]
     Reader["TeleprompterPage"]
-    Js["design/app.js"]
+    Js["Learn / Teleprompter DOM bridges"]
     Browser["DOM + media APIs"]
 
     Session --> Learn
@@ -41,8 +42,12 @@ flowchart LR
 
 - `learn` uses the shared RSVP timeline from `RsvpTextProcessor` and `RsvpPlaybackEngine`.
 - `learn` must finalize TPS phrase groups before building the runtime timeline, or the `Next` phrase preview becomes incorrect.
-- `learn` centers the ORP by measuring against the full horizontal word row, matching `new-design/app.js`.
-- `learn` shows five context words on the left and right rails when enough words are available.
+- `learn` centers the ORP inside a fixed focus lane, so shorter or longer words do not shift the overall RSVP composition.
+- `learn` shows the nearest two context words on the left and right rails when enough words are available.
+- `learn` treats sentence-ending punctuation as a hard context boundary, but plain phrase pauses must not blank the left context rail.
+- `learn` stops playback on the final timeline entry when loop mode is off.
+- `learn` exposes a loop toggle in the playback controls; loop mode is opt-in and persisted with other Learn settings.
+- `learn` must not run a second per-word rail-reflow pass after each word change; word-length changes only move the focus word inside the fixed lane.
 - `teleprompter` selects one primary camera device for `#rd-camera`.
 - `teleprompter` does not render overlay camera elements such as `#rd-camera-overlay-*`.
 - `teleprompter` groups words by pauses, sentence endings, clause endings, and short phrase limits.
@@ -52,7 +57,7 @@ flowchart LR
 - `teleprompter` keeps TPS inline colors visible even when a phrase group is active or the active word is highlighted.
 - `teleprompter` persists font scale, text width, focal point, and camera auto-start changes through `IUserSettingsStore` and restores them from stored `ReaderSettings` during bootstrap.
 - `teleprompter` prepositions the next card below the focal line before activation, so forward and backward block jumps both animate upward instead of alternating direction.
-- `teleprompter` realigns the active paragraph instantly when words advance, so autoplay and manual next-word steps do not leave a second follow-up glide after the word change.
+- `teleprompter` uses one smooth paragraph realignment while words advance inside a card, but the first word of a newly entered card is already pre-centered so block changes do not trigger a second correction pass.
 
 ## Verification
 
@@ -64,7 +69,7 @@ flowchart LR
 - Core tests verify shorthand inline WPM scopes such as `[180WPM]...[/180WPM]` survive nested tags.
 - Core tests verify nested `speed_offsets:` front matter is parsed and applied to `xslow` / `slow` / `fast` / `xfast` scope math.
 - Core tests verify legacy reader-settings payloads without `FocalPointPercent` deserialize with the default focal-point value.
-- Playwright verifies ORP centering and the `security-incident` phrase-aware flow in `learn`.
+- Playwright verifies ORP centering, pause-boundary left-context continuity, fixed-lane stability across short and long words, and stop-at-end versus loop-enabled playback in `learn`.
 - Playwright verifies there is no teleprompter overlay camera box and that phrase groups do not overflow.
 - Playwright verifies the teleprompter camera button attaches and detaches a real synthetic `MediaStream` on the background video layer.
 - Playwright verifies the full `Product Launch` teleprompter scenario, including visible controls, TPS formatting parity, screenshot artifacts, and aligned post-transition playback.
