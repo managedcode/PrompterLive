@@ -1,80 +1,119 @@
-.go-live-preview-shell {
+.gl-preview-section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    border: 1px solid rgba(255, 255, 255, .06);
-    border-radius: 18px;
-    background: rgba(8, 11, 18, .78);
+    gap: 0;
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
 }
 
-.go-live-preview-heading {
+.gl-monitor {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: var(--radius-md);
+    background: #050508;
+}
+
+.gl-monitor-preview .gl-monitor-feed {
+    aspect-ratio: 16 / 9;
+}
+
+.gl-preview-feed {
+    position: relative;
+    overflow: hidden;
+    background: #050508;
+}
+
+.gl-preview-video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    background: #050508;
+}
+
+.gl-air-dot-wrap {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    pointer-events: none;
+}
+
+.gl-air-dot {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, .2);
+    transition: background .3s;
+}
+
+.gl-air-dot.gl-air-dot-live {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, .7);
+}
+
+.gl-preview-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    padding: 20px;
+    color: rgba(255, 255, 255, .16);
+    text-align: center;
+}
+
+.gl-preview-empty-title {
+    color: rgba(255, 245, 224, .82);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.gl-preview-empty-copy {
+    color: rgba(248, 241, 226, .42);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.gl-monitor-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding: 6px 12px;
+    border-top: 1px solid rgba(239, 68, 68, .15);
+    background: rgba(239, 68, 68, .04);
 }
 
-.go-live-preview-stage {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    border-radius: 14px;
-    background: rgba(3, 6, 12, 1);
-}
-
-.go-live-preview-stage::after {
-    content: "";
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: #ff5c5c;
-    box-shadow: 0 0 10px rgba(255, 92, 92, .45);
-}
-
-.go-live-preview-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    background: rgba(3, 6, 12, 1);
-}
-
-.go-live-preview-empty {
-    min-height: 160px;
+.gl-preview-copy {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 2px;
+    min-width: 0;
 }
 
-.go-live-preview-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.go-live-preview-footer .set-account-name {
-    color: rgba(255, 245, 224, .9);
-    font-size: 13px;
-}
-
-.go-live-preview-switch {
-    min-height: 30px;
-    padding: 0 12px;
-    border: 1px solid rgba(16, 185, 129, .22);
-    border-radius: 10px;
-    background: rgba(16, 185, 129, .12);
-    color: #59d8a7;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .08em;
+.gl-preview-label {
+    color: rgba(248, 241, 226, .34);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
     text-transform: uppercase;
 }
 
-.go-live-preview-switch:disabled {
-    opacity: .42;
+.gl-preview-copy strong {
+    color: rgba(255, 245, 224, .9);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.gl-preview-status {
+    color: rgba(248, 241, 226, .4);
+    font-size: 10px;
+    text-align: right;
 }

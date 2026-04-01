@@ -1,69 +1,79 @@
 @namespace PrompterOne.Shared.Components.GoLive
 @using PrompterOne.Core.Models.Workspace
 
-<section class="go-live-sources-shell"
-         data-testid="@UiTestIds.GoLive.SourceRail">
-    <div class="go-live-sidebar-header">
-        <span class="go-live-sidebar-title">@Title</span>
-        <div class="go-live-sources-actions">
-            <button type="button"
-                    class="go-live-sidebar-action"
-                    disabled="@(!CanAddCamera)"
-                    data-testid="@UiTestIds.GoLive.AddSource"
-                    @onclick="AddCamera">+</button>
-        </div>
+<section class="gl-sources-panel">
+    <div class="gl-sources-header">
+        <span class="section-label">@Title</span>
+        <button type="button"
+                class="gl-add-src-btn"
+                disabled="@(!CanAddCamera)"
+                data-testid="@UiTestIds.GoLive.AddSource"
+                @onclick="AddCamera">
+            <svg width="14"
+                 height="14"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        </button>
     </div>
 
-    <div class="go-live-sources-stack"
+    <div class="gl-src-list"
          data-testid="@UiTestIds.GoLive.SourcesCard">
         @if (Sources.Count == 0)
         {
-            <div class="set-empty-card">@EmptyStateMessage</div>
+            <div class="gl-empty-panel">@EmptyStateMessage</div>
         }
         else
         {
             @foreach (var source in Sources)
             {
-                <article class="go-live-source-tile"
-                         data-active="@IsActive(source)"
-                         data-selected="@IsSelected(source)"
+                <article class="@GetSourceCardCssClass(source)"
                          data-testid="@UiTestIds.GoLive.SourceCamera(source.SourceId)">
                     <button type="button"
-                            class="go-live-source-select"
+                            class="gl-cam-main"
                             data-testid="@UiTestIds.GoLive.SourceCameraSelect(source.SourceId)"
                             @onclick="() => SelectSource.InvokeAsync(source.SourceId)">
                         <GoLiveCameraSurface Camera="@source"
-                                             ContainerClass="go-live-source-video-shell"
-                                             VideoClass="go-live-source-video"
+                                             ContainerClass="gl-cam-thumb"
+                                             VideoClass="gl-source-feed"
                                              VideoTestId="@UiTestIds.GoLive.SourceVideo(source.SourceId)">
                             <OverlayContent>
-                                <span class="go-live-source-badge">@GetSourceBadge(source)</span>
+                                <span class="@GetSourceBadgeCssClass(source)">@GetSourceBadge(source)</span>
                             </OverlayContent>
                         </GoLiveCameraSurface>
 
-                        <span class="go-live-source-copy">
-                            <strong>@source.Label</strong>
-                            <span>@GetSourceStatus(source)</span>
-                        </span>
+                        <div class="gl-cam-meta">
+                            <div class="gl-cam-top">
+                                <span class="gl-cam-name">@source.Label</span>
+                                <span class="gl-cam-hw">@GetSourceStatus(source)</span>
+                            </div>
+
+                            <div class="gl-cam-script-tag @(IsSelected(source) ? "gl-script-active" : null)">
+                                <span>@CurrentScriptTitle</span>
+                                <span class="gl-script-progress">@CurrentScriptProgressLabel</span>
+                            </div>
+                        </div>
                     </button>
 
-                    <div class="go-live-source-crops">
-                        @foreach (var crop in CropOptions)
-                        {
-                            var cropIsActive = GetCropSelection(source.SourceId) == crop;
-                            <button type="button"
-                                    class="go-live-source-crop @(cropIsActive ? "active" : null)"
-                                    @onclick="() => SetCropSelection(source.SourceId, crop)">@GetCropLabel(crop)</button>
-                        }
-                    </div>
-
-                    <div class="go-live-source-script">
-                        <strong>@CurrentScriptTitle</strong>
-                        <span>@CurrentScriptProgressLabel</span>
+                    <div class="gl-cam-row2">
+                        <div class="gl-crop-btns">
+                            @foreach (var crop in CropOptions)
+                            {
+                                var cropIsActive = GetCropSelection(source.SourceId) == crop;
+                                <button type="button"
+                                        class="gl-crop-btn @(cropIsActive ? "active" : null)"
+                                        @onclick="() => SetCropSelection(source.SourceId, crop)">@GetCropLabel(crop)</button>
+                            }
+                        </div>
                     </div>
 
                     <button type="button"
-                            class="go-live-source-action"
+                            class="gl-cam-action"
                             @onclick="() => ToggleSource.InvokeAsync(source.SourceId)"
                             data-testid="@UiTestIds.GoLive.SourceCameraAction(source.DeviceId)">
                         @(source.Transform.IncludeInOutput ? RemoveLabel : AddLabel)
@@ -71,24 +81,26 @@
                 </article>
             }
         }
-    </div>
 
-    <div class="go-live-utility-stack">
         @foreach (var utilitySource in UtilitySources)
         {
-            <article class="go-live-utility-tile"
+            <article class="@GetUtilityCardCssClass(utilitySource)"
                      data-testid="@UiTestIds.GoLive.UtilitySource(utilitySource.Id)">
-                <div class="go-live-utility-copy">
-                    <strong>@utilitySource.Title</strong>
-                    <span>@utilitySource.Subtitle</span>
+                <div class="gl-cam-thumb gl-cam-thumb-utility">
+                    <span class="gl-utility-badge">@utilitySource.BadgeLabel</span>
                 </div>
-                <span class="go-live-utility-badge">@utilitySource.BadgeLabel</span>
+                <div class="gl-cam-meta">
+                    <div class="gl-cam-top">
+                        <span class="gl-cam-name">@utilitySource.Title</span>
+                        <span class="gl-cam-hw">@utilitySource.Subtitle</span>
+                    </div>
+                </div>
             </article>
         }
     </div>
 
-    <div class="go-live-mic-card">
-        <span class="go-live-sidebar-title">@MicrophoneTitle</span>
+    <div class="gl-mic-card">
+        <span class="section-label">@MicrophoneTitle</span>
         <strong>@MicrophoneName</strong>
         <span>@MicrophoneRouteLabel</span>
     </div>
@@ -99,7 +111,9 @@
     private const string DefaultTitle = "Inputs";
     private const string EmptyStateMessage = "No scene cameras are configured yet. Add them in Settings first.";
     private const string MicrophoneTitle = "Microphone";
+    private const string PrompterUtilitySourceId = "prompter-display";
     private const string RemoveLabel = "Remove";
+    private const string ScreenShareUtilitySourceId = "screen-share";
     private const string ScriptProgressDefaultLabel = "No script loaded";
     private const string SourceIncludedLabel = "Armed for output";
     private const string SourceLiveLabel = "Ready for canvas";
@@ -177,5 +191,37 @@
     private void SetCropSelection(string sourceId, GoLiveCropPreset crop)
     {
         _cropSelections[sourceId] = crop;
+    }
+
+    private string GetSourceCardCssClass(SceneCameraSource source)
+    {
+        var classes = new List<string> { "gl-cam-card" };
+        if (IsActive(source))
+        {
+            classes.Add("gl-cam-onair");
+        }
+        else if (IsSelected(source))
+        {
+            classes.Add("gl-cam-inpreview");
+        }
+
+        return string.Join(' ', classes);
+    }
+
+    private string GetSourceBadgeCssClass(SceneCameraSource source)
+    {
+        var classes = new List<string> { "gl-cam-status-badge" };
+        classes.Add(IsActive(source) ? "gl-badge-onair" : "gl-badge-idle");
+        return string.Join(' ', classes);
+    }
+
+    private static string GetUtilityCardCssClass(GoLiveUtilitySourceViewModel utilitySource)
+    {
+        return utilitySource.Id switch
+        {
+            PrompterUtilitySourceId => "gl-cam-card gl-cam-prompter",
+            ScreenShareUtilitySourceId => "gl-cam-card gl-src-screen",
+            _ => "gl-cam-card"
+        };
     }
 }

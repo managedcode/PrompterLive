@@ -1,162 +1,170 @@
 @namespace PrompterOne.Shared.Components.GoLive
 @using PrompterOne.Core.Models.Workspace
 
-<section class="go-live-sidebar-shell">
-    <div class="go-live-sidebar-tabs">
+<section class="gl-sidebar-shell">
+    <div class="gl-tab-bar">
         <button type="button"
-                class="go-live-sidebar-tab @(ActiveTab == GoLiveStudioTab.Stream ? "active" : null)"
+                class="gl-tab @(ActiveTab == GoLiveStudioTab.Stream ? "active" : null)"
                 data-testid="@UiTestIds.GoLive.StreamTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Stream)">Stream</button>
         <button type="button"
-                class="go-live-sidebar-tab @(ActiveTab == GoLiveStudioTab.Audio ? "active" : null)"
+                class="gl-tab @(ActiveTab == GoLiveStudioTab.Audio ? "active" : null)"
                 data-testid="@UiTestIds.GoLive.AudioTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Audio)">Audio</button>
         <button type="button"
-                class="go-live-sidebar-tab @(ActiveTab == GoLiveStudioTab.Room ? "active" : null)"
+                class="gl-tab @(ActiveTab == GoLiveStudioTab.Room ? "active" : null)"
                 data-testid="@UiTestIds.GoLive.RoomTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Room)">Room</button>
     </div>
 
-    @if (ActiveTab == GoLiveStudioTab.Stream)
-    {
-        <div class="go-live-sidebar-panel">
-            <div class="go-live-sidebar-section">
-                <div class="go-live-sidebar-section-header">
-                    <span class="go-live-sidebar-label">@DestinationsLabel</span>
-                    <a class="go-live-sidebar-link" href="@SettingsRoute">Settings</a>
-                </div>
-                <div class="go-live-destination-list">
-                    @foreach (var destination in Destinations)
-                    {
-                        <article class="go-live-destination-card"
-                                 data-testid="@UiTestIds.GoLive.ProviderCard(destination.Id)">
-                            <button type="button"
-                                    class="go-live-destination-row @(destination.IsEnabled ? "on" : null)"
-                                    data-testid="@GetToggleTestId(destination.Id)"
-                                    @onclick="() => ToggleDestination.InvokeAsync(destination.Id)">
-                                <span class="go-live-destination-dot @destination.Tone"></span>
-                                <span class="go-live-destination-copy">
-                                    <strong>@destination.Name</strong>
-                                    <span>@destination.PlatformLabel</span>
-                                </span>
-                                <span class="go-live-destination-toggle @(destination.IsEnabled ? "on" : null)">
-                                    <span></span>
-                                </span>
-                            </button>
-                            <div class="go-live-destination-meta">
-                                <span>@destination.Summary</span>
-                                <strong>@destination.StatusLabel</strong>
-                            </div>
-                        </article>
-                    }
-                </div>
-            </div>
-
-            <div class="go-live-sidebar-section">
-                <span class="go-live-sidebar-label">@StatusLabel</span>
-                <div class="go-live-sidebar-metrics">
-                    @foreach (var metric in StatusMetrics)
-                    {
-                        <div>
-                            <strong>@metric.Value</strong>
-                            <span>@metric.Label</span>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div class="go-live-sidebar-section">
-                <span class="go-live-sidebar-label">@RuntimeLabel</span>
-                <div class="go-live-sidebar-metrics">
-                    @foreach (var metric in RuntimeMetrics)
-                    {
-                        <div>
-                            <strong>@metric.Value</strong>
-                            <span>@metric.Label</span>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    }
-    else if (ActiveTab == GoLiveStudioTab.Audio)
-    {
-        <div class="go-live-sidebar-panel"
-             data-testid="@UiTestIds.GoLive.AudioMixer">
-            @foreach (var channel in AudioChannels)
-            {
-                <div class="go-live-audio-row"
-                     data-testid="@UiTestIds.GoLive.AudioChannel(channel.Id)">
-                    <div class="go-live-audio-copy">
-                        <strong>@channel.Name</strong>
-                        <span>@channel.DetailLabel</span>
-                    </div>
-                    <div class="go-live-audio-meter">
-                        <span class="go-live-audio-meter-fill" style="@($"width:{channel.LevelPercent}%")"></span>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="go-live-sidebar-panel">
-            @if (!IsRoomActive)
-            {
-                <div class="go-live-room-empty"
-                     data-testid="@UiTestIds.GoLive.RoomEmpty">
-                    <strong>@RoomTitle</strong>
-                    <p>@RoomDescription</p>
-                    <button type="button"
-                            class="go-live-room-create"
-                            data-testid="@UiTestIds.GoLive.CreateRoom"
-                            @onclick="CreateRoom">@CreateRoomLabel</button>
-                </div>
-            }
-            else
-            {
-                <div class="go-live-room-active"
-                     data-testid="@UiTestIds.GoLive.RoomActive">
-                    <div class="go-live-room-header">
-                        <span class="go-live-room-code">@RoomCode</span>
-                        <button type="button"
-                                class="go-live-room-invite"
-                                data-testid="@UiTestIds.GoLive.RoomInvite">@InviteLabel</button>
-                    </div>
-
-                    <div class="go-live-room-toolbar">
-                        <button type="button"
-                                class="go-live-room-action @(_muteAllGuests ? "active" : null)"
-                                @onclick="ToggleMuteAllGuests">@MuteAllLabel</button>
-                        <button type="button"
-                                class="go-live-room-action @(_talkbackEnabled ? "active" : null)"
-                                @onclick="ToggleTalkback">@TalkLabel</button>
-                        <button type="button"
-                                class="go-live-room-action @(_cueArmed ? "active cue" : null)"
-                                @onclick="SendCue">@CueLabel</button>
-                    </div>
-
-                    <div class="go-live-room-participants">
-                        @foreach (var participant in Participants)
+    <div class="gl-tab-panels">
+        @if (ActiveTab == GoLiveStudioTab.Stream)
+        {
+            <div class="gl-tab-content active">
+                <div class="gl-info-section">
+                    <span class="gl-info-label">@DestinationsLabel</span>
+                    <div class="gl-dest-list">
+                        @foreach (var destination in Destinations)
                         {
-                            <article class="go-live-room-participant"
-                                     data-testid="@UiTestIds.GoLive.RoomParticipant(participant.Id)">
-                                <span class="go-live-room-avatar">@participant.Initial</span>
-                                <div class="go-live-room-copy">
-                                    <strong>@participant.Name</strong>
-                                    <span>@participant.Role</span>
+                            <article class="gl-destination-card"
+                                     data-testid="@UiTestIds.GoLive.ProviderCard(destination.Id)">
+                                <button type="button"
+                                        class="gl-dest-row @(destination.IsEnabled ? "on" : null)"
+                                        data-testid="@GetToggleTestId(destination.Id)"
+                                        @onclick="() => ToggleDestination.InvokeAsync(destination.Id)">
+                                    <span class="gl-dest-platform-dot @destination.Tone"></span>
+                                    <span class="gl-dest-info">
+                                        <strong>@destination.Name</strong>
+                                        <span>@destination.PlatformLabel</span>
+                                    </span>
+                                    <span class="gl-toggle-track @(destination.IsEnabled ? "on" : null)">
+                                        <span class="gl-toggle-thumb"></span>
+                                    </span>
+                                </button>
+                                <div class="gl-dest-meta">
+                                    <span>@destination.Summary</span>
+                                    <strong>@destination.StatusLabel</strong>
                                 </div>
-                                <div class="go-live-room-meter">
-                                    <span class="go-live-room-meter-fill" style="@($"width:{participant.LevelPercent}%")"></span>
-                                </div>
-                                <span class="go-live-room-dot @(participant.IsOnline ? "online" : null)"></span>
                             </article>
                         }
                     </div>
                 </div>
-            }
-        </div>
-    }
+
+                <div class="gl-info-section">
+                    <span class="gl-info-label">@StatusLabel</span>
+                    <div class="gl-stats-compact">
+                        @foreach (var metric in StatusMetrics)
+                        {
+                            <div class="gl-stat-item">
+                                <span class="gl-stat-val">@metric.Value</span>
+                                <span class="gl-stat-lbl">@metric.Label</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="gl-info-section">
+                    <span class="gl-info-label">@RuntimeLabel</span>
+                    <div class="gl-stats-compact">
+                        @foreach (var metric in RuntimeMetrics)
+                        {
+                            <div class="gl-stat-item">
+                                <span class="gl-stat-val">@metric.Value</span>
+                                <span class="gl-stat-lbl">@metric.Label</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        else if (ActiveTab == GoLiveStudioTab.Audio)
+        {
+            <div class="gl-tab-content active"
+                 data-testid="@UiTestIds.GoLive.AudioMixer">
+                <div class="gl-audio-mixer">
+                    @foreach (var channel in AudioChannels)
+                    {
+                        <div class="gl-mix-ch"
+                             data-testid="@UiTestIds.GoLive.AudioChannel(channel.Id)">
+                            <div class="gl-mix-ch-top">
+                                <span class="gl-mix-name">@channel.Name</span>
+                                <span class="gl-mix-db-val">@channel.DetailLabel</span>
+                            </div>
+                            <div class="gl-mix-track">
+                                <div class="gl-mix-meter-bg"></div>
+                                <div class="gl-mix-level" style="@($"width:{channel.LevelPercent}%")"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="gl-tab-content active">
+                @if (!IsRoomActive)
+                {
+                    <div class="gl-room-empty"
+                         data-testid="@UiTestIds.GoLive.RoomEmpty">
+                        <strong>@RoomTitle</strong>
+                        <p>@RoomDescription</p>
+                        <button type="button"
+                                class="gl-room-create-btn"
+                                data-testid="@UiTestIds.GoLive.CreateRoom"
+                                @onclick="CreateRoom">@CreateRoomLabel</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="gl-room-active"
+                         data-testid="@UiTestIds.GoLive.RoomActive">
+                        <div class="gl-room-header-bar">
+                            <div class="gl-room-live-badge">Live</div>
+                            <span class="gl-room-code-val">@RoomCode</span>
+                            <button type="button"
+                                    class="gl-room-invite-btn"
+                                    data-testid="@UiTestIds.GoLive.RoomInvite">@InviteLabel</button>
+                        </div>
+
+                        <div class="gl-dir-toolbar">
+                            <button type="button"
+                                    class="gl-dir-btn @(_muteAllGuests ? "active" : null)"
+                                    @onclick="ToggleMuteAllGuests">@MuteAllLabel</button>
+                            <button type="button"
+                                    class="gl-dir-btn @(_talkbackEnabled ? "active" : null)"
+                                    @onclick="ToggleTalkback">@TalkLabel</button>
+                            <button type="button"
+                                    class="gl-dir-btn gl-dir-btn-cue @(_cueArmed ? "active" : null)"
+                                    @onclick="SendCue">@CueLabel</button>
+                        </div>
+
+                        <div class="gl-room-participants">
+                            <div class="gl-room-part-header">
+                                <span>Guests</span>
+                                <span class="gl-part-count">@Participants.Count</span>
+                            </div>
+
+                            <div class="gl-participants-list">
+                                @foreach (var participant in Participants)
+                                {
+                                    <article class="gl-part-row"
+                                             data-testid="@UiTestIds.GoLive.RoomParticipant(participant.Id)">
+                                        <div class="gl-part-avatar">@participant.Initial</div>
+                                        <span class="gl-part-name">@participant.Name</span>
+                                        <span class="gl-part-role">@participant.Role</span>
+                                        <div class="gl-part-meter">
+                                            <div class="gl-part-meter-fill" style="@($"width:{participant.LevelPercent}%")"></div>
+                                        </div>
+                                        <span class="gl-part-dot @(participant.IsOnline ? "gl-online" : null)"></span>
+                                    </article>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </section>
 
 @code {
@@ -183,7 +191,6 @@
     [Parameter] public IReadOnlyList<GoLiveMetricViewModel> RuntimeMetrics { get; set; } = [];
     [Parameter] public EventCallback<GoLiveStudioTab> SelectTab { get; set; }
     [Parameter] public EventCallback SendCue { get; set; }
-    [Parameter] public string SettingsRoute { get; set; } = AppRoutes.Settings;
     [Parameter] public IReadOnlyList<GoLiveMetricViewModel> StatusMetrics { get; set; } = [];
     [Parameter] public EventCallback<string> ToggleDestination { get; set; }
     [Parameter] public EventCallback ToggleMuteAllGuests { get; set; }

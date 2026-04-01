@@ -46,16 +46,6 @@ public partial class GoLivePage : ComponentBase
     private string _screenTitle = ScriptWorkspaceState.UntitledScriptTitle;
     private StudioSettings _studioSettings = StudioSettings.Default;
 
-    private bool HasAnyLiveOutput =>
-        _studioSettings.Streaming.ObsVirtualCameraEnabled
-        || _studioSettings.Streaming.NdiOutputEnabled
-        || _studioSettings.Streaming.LocalRecordingEnabled
-        || _studioSettings.Streaming.LiveKitEnabled
-        || _studioSettings.Streaming.VdoNinjaEnabled
-        || _studioSettings.Streaming.YoutubeEnabled
-        || _studioSettings.Streaming.TwitchEnabled
-        || _studioSettings.Streaming.CustomRtmpEnabled;
-
     private bool HasPrimaryMicrophone => !string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneId);
 
     private bool HasScriptContext => !string.IsNullOrWhiteSpace(SessionService.State.ScriptId);
@@ -63,10 +53,6 @@ public partial class GoLivePage : ComponentBase
     private string CurrentScriptProgressLabel => HasScriptContext
         ? _screenSubtitle
         : NoScriptProgressLabel;
-
-    private string LearnRoute => HasScriptContext
-        ? AppRoutes.LearnWithId(SessionService.State.ScriptId)
-        : AppRoutes.Learn;
 
     private SceneCameraSource? PreviewCamera =>
         SceneCameras.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)

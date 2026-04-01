@@ -1,48 +1,35 @@
 @namespace PrompterOne.Shared.Components.GoLive
 
 <section id="@UiDomIds.GoLive.PreviewCard"
-         class="go-live-preview-shell"
+         class="gl-preview-section"
          data-testid="@UiTestIds.GoLive.PreviewCard">
-    <div class="go-live-preview-heading">
-        <div>
-            <span class="go-live-sidebar-title">@Title</span>
-            <div class="set-account-name">@Description</div>
+    <div class="gl-monitor gl-monitor-preview">
+        <GoLiveCameraSurface Camera="@Camera"
+                             ContainerClass="gl-monitor-feed gl-preview-feed"
+                             ContainerDomId="@UiDomIds.GoLive.PreviewStage"
+                             VideoClass="gl-preview-video"
+                             VideoDomId="@UiDomIds.GoLive.PreviewVideo"
+                             VideoTestId="@UiTestIds.GoLive.PreviewVideo">
+            <EmptyContent>
+                <div id="@UiDomIds.GoLive.PreviewEmpty"
+                     class="gl-preview-empty"
+                     data-testid="@UiTestIds.GoLive.PreviewEmpty">
+                    <div class="gl-preview-empty-title">@EmptyTitle</div>
+                    <div class="gl-preview-empty-copy">@EmptyDescription</div>
+                </div>
+            </EmptyContent>
+        </GoLiveCameraSurface>
+        <div class="gl-air-dot-wrap">
+            <span class="gl-air-dot @(HasCamera ? LiveDotCssClass : null)"></span>
         </div>
-        <span class="live-status @(HasCamera ? ReadyStatusCssClass : PendingStatusCssClass)">
-            @(HasCamera ? LiveStatusLabel : EmptyStatusLabel)
-        </span>
     </div>
 
-    <GoLiveCameraSurface Camera="@Camera"
-                         ContainerClass="go-live-preview-stage"
-                         ContainerDomId="@UiDomIds.GoLive.PreviewStage"
-                         VideoClass="go-live-preview-video"
-                         VideoDomId="@UiDomIds.GoLive.PreviewVideo"
-                         VideoTestId="@UiTestIds.GoLive.PreviewVideo">
-        <EmptyContent>
-            <div id="@UiDomIds.GoLive.PreviewEmpty"
-                 class="set-empty-card go-live-preview-empty"
-                 data-testid="@UiTestIds.GoLive.PreviewEmpty">
-                <div class="set-account-name">@EmptyTitle</div>
-                <div class="live-card-desc">@EmptyDescription</div>
-            </div>
-        </EmptyContent>
-    </GoLiveCameraSurface>
-
-    <div class="go-live-preview-footer">
-        <div>
-            <span class="set-section-label">Program camera</span>
-            <div class="set-account-name" data-testid="@UiTestIds.GoLive.PreviewSourceLabel">@(Camera?.Label ?? EmptyTitle)</div>
+    <div class="gl-monitor-bottom">
+        <div class="gl-preview-copy">
+            <span class="gl-preview-label">@Title</span>
+            <strong data-testid="@UiTestIds.GoLive.PreviewSourceLabel">@(Camera?.Label ?? EmptyTitle)</strong>
         </div>
-
-        @if (ShowSwitchAction)
-        {
-            <button type="button"
-                    class="go-live-preview-switch"
-                    @onclick="SwitchSelectedSource"
-                    disabled="@(!CanSwitchProgram)"
-                    data-testid="@UiTestIds.GoLive.SwitchSelectedSource">@SwitchActionLabel</button>
-        }
+        <span class="gl-preview-status">@Description</span>
     </div>
 </section>
 
@@ -50,11 +37,8 @@
     private const string DefaultDescription = "Preview the current live scene camera before arming or switching destinations.";
     private const string DefaultTitle = "Preview";
     private const string EmptyDescription = "Add a scene camera in Settings or include one in the live output to preview it here.";
-    private const string EmptyStatusLabel = "Idle";
     private const string EmptyTitle = "No camera";
-    private const string LiveStatusLabel = "Live Preview";
-    private const string PendingStatusCssClass = "pending";
-    private const string ReadyStatusCssClass = "ready";
+    private const string LiveDotCssClass = "gl-air-dot-live";
 
     [Parameter] public SceneCameraSource? Camera { get; set; }
     [Parameter] public bool CanSwitchProgram { get; set; }

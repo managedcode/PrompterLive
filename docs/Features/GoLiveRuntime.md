@@ -6,11 +6,13 @@
 
 The current page layout is a production-style studio surface:
 
-- top session bar for back, title, timer, record, and stream controls
+- top session bar follows `new-design/golive.html`: back to Read, script title + session badge, centered session timer, panel toggles, mode switch, settings shortcut, REC, and the main stream action on the far right
+- the studio shell follows the same three-column grid as `new-design/golive.html`: a compact left input rail, a dominant center canvas/program stage, and a dedicated right operational rail
 - left input rail for scene cameras, add-camera action, utility sources, and microphone route status
 - center program stage for the selected program source and current script/session state
-- scene controls bar for selecting the active studio mode and taking the selected source to air
+- scene controls bar for scene chips, layout controls, transitions, and the primary `Take To Air` action
 - right rail for the current live preview plus compact stream, audio, and room/runtime panels
+- full-program mode collapses both side rails so the center canvas follows the design's focused monitor state
 - destination cards that arm OBS, recording, LiveKit, and YouTube from persisted settings instead of editing credentials inline
 
 The runtime now owns real browser media outputs for the composed program scene and the current audio bus:

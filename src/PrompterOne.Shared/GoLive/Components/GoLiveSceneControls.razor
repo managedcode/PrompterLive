@@ -1,64 +1,118 @@
 @namespace PrompterOne.Shared.Components.GoLive
 
-<section class="go-live-scenes-shell"
+<section class="gl-program-tools"
          data-testid="@UiTestIds.GoLive.SceneControls">
-    <div class="go-live-scenes-bar"
+    <div class="gl-scenes-bar"
          data-testid="@UiTestIds.GoLive.SceneBar">
-        <div class="go-live-scenes-list">
+        <div class="gl-scenes-list">
             @foreach (var scene in Scenes)
             {
                 var isActive = string.Equals(scene.Id, ActiveSceneId, StringComparison.Ordinal);
                 <button type="button"
-                        class="go-live-scene-chip @(isActive ? "active" : null)"
+                        class="gl-scene-chip @(isActive ? "active" : null)"
                         data-testid="@UiTestIds.GoLive.SceneChip(scene.Id)"
                         @onclick="() => SelectScene.InvokeAsync(scene.Id)">
-                    <span class="go-live-scene-chip-icon">@GetSceneIcon(scene.Kind)</span>
-                    <span class="go-live-scene-chip-name">@scene.Name</span>
+                    <span class="gl-scene-chip-icon">@GetSceneIcon(scene.Kind)</span>
+                    <span class="gl-scene-chip-name">@scene.Name</span>
                 </button>
             }
         </div>
 
         <button type="button"
-                class="go-live-scene-add"
-                @onclick="AddScene">+</button>
+                class="gl-scene-add-btn"
+                @onclick="AddScene">
+            <svg width="12"
+                 height="12"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2.5"
+                 aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        </button>
     </div>
 
-    <div class="go-live-scene-toolbar">
-        <div class="go-live-toolbar-group">
-            <span class="go-live-toolbar-label">Layout</span>
+    <div class="gl-controls-bar">
+        <div class="gl-scene-tools">
+            <span class="gl-tools-label">Layout</span>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveLayout == GoLiveSceneLayout.Full ? "active" : null)"
-                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Full)">Full</button>
+                    class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Full ? "active" : null)"
+                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Full)">
+                <svg width="14"
+                     height="14"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                </svg>
+            </button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveLayout == GoLiveSceneLayout.Split ? "active" : null)"
-                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Split)">Split</button>
+                    class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Split ? "active" : null)"
+                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Split)">
+                <svg width="14"
+                     height="14"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="12" y1="3" x2="12" y2="21" />
+                </svg>
+            </button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveLayout == GoLiveSceneLayout.PictureInPicture ? "active" : null)"
-                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.PictureInPicture)">PiP</button>
+                    class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.PictureInPicture ? "active" : null)"
+                    @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.PictureInPicture)">
+                <svg width="14"
+                     height="14"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <rect x="13" y="13" width="7" height="5" rx="1" />
+                </svg>
+            </button>
         </div>
 
-        <div class="go-live-toolbar-group go-live-toolbar-group-transition">
+        <div class="gl-trans-bar">
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionKind == GoLiveTransitionKind.Cut ? "active" : null)"
+                    class="gl-trans-btn @(ActiveTransitionKind == GoLiveTransitionKind.Cut ? "active" : null)"
                     @onclick="() => SelectTransitionKind.InvokeAsync(GoLiveTransitionKind.Cut)">Cut</button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionKind == GoLiveTransitionKind.Fade ? "active" : null)"
+                    class="gl-trans-btn @(ActiveTransitionKind == GoLiveTransitionKind.Fade ? "active" : null)"
                     @onclick="() => SelectTransitionKind.InvokeAsync(GoLiveTransitionKind.Fade)">Fade</button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionKind == GoLiveTransitionKind.Wipe ? "active" : null)"
+                    class="gl-trans-btn @(ActiveTransitionKind == GoLiveTransitionKind.Wipe ? "active" : null)"
                     @onclick="() => SelectTransitionKind.InvokeAsync(GoLiveTransitionKind.Wipe)">Wipe</button>
             <button type="button"
-                    class="go-live-take-to-air"
+                    class="gl-take-btn"
                     data-testid="@UiTestIds.GoLive.TakeToAir"
-                    @onclick="TakeToAir">@TakeToAirLabel</button>
+                    @onclick="TakeToAir">
+                <svg width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2.5"
+                     aria-hidden="true">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                <span>@TakeToAirLabel.ToUpperInvariant()</span>
+            </button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionDuration == GoLiveTransitionDuration.Quick ? "active" : null)"
+                    class="gl-dur-btn @(ActiveTransitionDuration == GoLiveTransitionDuration.Quick ? "active" : null)"
                     @onclick="() => SelectTransitionDuration.InvokeAsync(GoLiveTransitionDuration.Quick)">0.5s</button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionDuration == GoLiveTransitionDuration.Standard ? "active" : null)"
+                    class="gl-dur-btn @(ActiveTransitionDuration == GoLiveTransitionDuration.Standard ? "active" : null)"
                     @onclick="() => SelectTransitionDuration.InvokeAsync(GoLiveTransitionDuration.Standard)">1s</button>
             <button type="button"
-                    class="go-live-toolbar-button @(ActiveTransitionDuration == GoLiveTransitionDuration.Extended ? "active" : null)"
+                    class="gl-dur-btn @(ActiveTransitionDuration == GoLiveTransitionDuration.Extended ? "active" : null)"
                     @onclick="() => SelectTransitionDuration.InvokeAsync(GoLiveTransitionDuration.Extended)">2s</button>
         </div>
     </div>

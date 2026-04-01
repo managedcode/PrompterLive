@@ -1,52 +1,51 @@
 @namespace PrompterOne.Shared.Components.GoLive
 @using PrompterOne.Core.Models.Media
 
-<section class="go-live-stage-shell"
-         data-live-state="@LiveState"
-         data-testid="@UiTestIds.GoLive.ProgramCard">
-    <div class="go-live-stage-header">
-        <div>
-            <span class="go-live-monitor-label">@Title</span>
-            <h2 class="go-live-stage-title"
-                data-testid="@UiTestIds.GoLive.Stage">@SelectedSourceLabel</h2>
-        </div>
-
-        <span class="live-status @(IsArmed ? ReadyCssClass : PendingCssClass)">@ActiveSessionLabel</span>
+<section class="gl-program-monitor-shell"
+         data-live-state="@LiveState">
+    <div class="gl-monitor-label-top gl-label-canvas">
+        <span>@Title</span>
+        <span class="gl-program-session-copy">@ActiveSessionLabel</span>
     </div>
 
-    <GoLiveCameraSurface Camera="@Camera"
-                         ContainerClass="go-live-stage-viewport"
-                         ContainerDomId="@UiDomIds.GoLive.ProgramStage"
-                         VideoClass="go-live-stage-video"
-                         VideoDomId="@UiDomIds.GoLive.ProgramVideo"
-                         VideoTestId="@UiTestIds.GoLive.ProgramVideo">
-        <OverlayContent>
-            <div class="go-live-stage-overlay">
-                <span class="go-live-stage-chip">@SelectedLabel</span>
-                <div class="go-live-stage-footer">
-                    <span>@ProgramResolutionLabel</span>
-                    <span>@StageFrameRateLabel</span>
+    <div class="gl-monitor gl-monitor-program"
+         data-testid="@UiTestIds.GoLive.ProgramCard">
+        <GoLiveCameraSurface Camera="@Camera"
+                             ContainerClass="gl-monitor-feed"
+                             ContainerDomId="@UiDomIds.GoLive.ProgramStage"
+                             VideoClass="gl-program-video"
+                             VideoDomId="@UiDomIds.GoLive.ProgramVideo"
+                             VideoTestId="@UiTestIds.GoLive.ProgramVideo">
+            <OverlayContent>
+                <div class="gl-program-overlay">
+                    <span class="gl-program-reader-tag">@SelectedLabel</span>
                 </div>
-            </div>
-        </OverlayContent>
-        <EmptyContent>
-            <div class="set-empty-card go-live-stage-empty"
-                 data-testid="@UiTestIds.GoLive.ProgramEmpty">
-                <div class="set-account-name">@NoCameraTitle</div>
-                <div class="live-card-desc">@NoCameraDescription</div>
-            </div>
-        </EmptyContent>
-    </GoLiveCameraSurface>
+            </OverlayContent>
+            <EmptyContent>
+                <div class="gl-preview-empty"
+                     data-testid="@UiTestIds.GoLive.ProgramEmpty">
+                    <div class="gl-empty-title">@NoCameraTitle</div>
+                    <div class="gl-empty-copy">@NoCameraDescription</div>
+                </div>
+            </EmptyContent>
+        </GoLiveCameraSurface>
 
-    <div class="go-live-stage-meta">
-        <article class="go-live-stage-meta-card">
-            <span class="set-section-label">@LiveLabel</span>
-            <strong data-testid="@UiTestIds.GoLive.ActiveSourceLabel">@ActiveSourceLabel</strong>
-        </article>
-        <article class="go-live-stage-meta-card">
-            <span class="set-section-label">@CanvasLabel</span>
-            <strong data-testid="@UiTestIds.GoLive.SelectedSourceLabel">@SelectedSourceLabel</strong>
-        </article>
+        <div class="gl-monitor-bottom">
+            <span class="gl-monitor-res">@ProgramResolutionLabel</span>
+            <span class="gl-monitor-source"
+                  data-testid="@UiTestIds.GoLive.Stage">
+                <span data-testid="@UiTestIds.GoLive.SelectedSourceLabel">@SelectedSourceLabel</span>
+            </span>
+            <span class="gl-monitor-fps">@StageFrameRateLabel</span>
+        </div>
+    </div>
+
+    <div class="gl-monitor-info">
+        <span class="gl-monitor-info-label">@LiveLabel</span>
+        <strong data-testid="@UiTestIds.GoLive.ActiveSourceLabel">@ActiveSourceLabel</strong>
+        <span class="gl-monitor-info-sep"></span>
+        <span class="gl-monitor-info-label">@CanvasLabel</span>
+        <strong>@SelectedSourceLabel</strong>
     </div>
 </section>
 
@@ -57,8 +56,6 @@
     private const string LiveLabel = "On Air";
     private const string NoCameraDescription = "Select or add a camera source to build the live canvas.";
     private const string NoCameraTitle = "No canvas source";
-    private const string PendingCssClass = "pending";
-    private const string ReadyCssClass = "ready";
     private const string RecordingStateCss = "recording";
     private const string SelectedLabel = "Selected";
     private const string StreamingStateCss = "streaming";
@@ -66,7 +63,6 @@
     [Parameter] public string ActiveSessionLabel { get; set; } = string.Empty;
     [Parameter] public string ActiveSourceLabel { get; set; } = string.Empty;
     [Parameter] public SceneCameraSource? Camera { get; set; }
-    [Parameter] public bool IsArmed { get; set; }
     [Parameter] public bool IsRecordingActive { get; set; }
     [Parameter] public bool IsStreamActive { get; set; }
     [Parameter] public string ProgramResolutionLabel { get; set; } = string.Empty;

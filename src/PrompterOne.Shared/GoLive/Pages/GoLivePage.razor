@@ -6,149 +6,235 @@
 <div id="screen-go-live"
      class="screen active"
      data-testid="@UiTestIds.GoLive.Page">
-    <div class="go-live-page-shell"
-         data-left-open="@_showLeftRail"
-         data-right-open="@_showRightRail"
-         data-full-program="@_fullProgramView"
-         data-studio-mode="@_activeStudioMode">
-        <section class="go-live-session-bar"
-                 data-testid="@UiTestIds.GoLive.SessionBar">
-            <div class="go-live-session-bar-left">
-                <a class="go-live-back-link" href="@ReadRoute">Back</a>
-                <strong>@_screenTitle</strong>
-                <span class="go-live-live-badge">@PrimarySessionBadge</span>
-                <button type="button"
-                        class="go-live-panel-toggle @(_showLeftRail ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.LeftPanelToggle"
-                        @onclick="ToggleLeftRailAsync">Inputs</button>
-            </div>
-
-            <div class="go-live-session-timer"
-                 data-testid="@UiTestIds.GoLive.SessionTimer">@ProgramTimerLabel</div>
-
-            <div class="go-live-session-actions">
-                <button type="button"
-                        class="go-live-panel-toggle @(_fullProgramView ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.FullProgramToggle"
-                        @onclick="ToggleFullProgramViewAsync">Canvas</button>
-                <button type="button"
-                        class="go-live-panel-toggle @(_showRightRail ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.RightPanelToggle"
-                        @onclick="ToggleRightRailAsync">Info</button>
-                <div class="go-live-mode-switch">
+    <div class="gl-page-shell">
+        <div class="gl-studio">
+            <section class="gl-topbar"
+                     data-testid="@UiTestIds.GoLive.SessionBar">
+                <div class="gl-topbar-left">
+                    <a class="gl-back-btn"
+                       href="@ReadRoute"
+                       data-testid="@UiTestIds.GoLive.OpenRead">
+                        <svg width="16"
+                             height="16"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <polyline points="15,18 9,12 15,6" />
+                        </svg>
+                        <span>Back</span>
+                    </a>
+                    <span class="gl-title">@_screenTitle</span>
+                    <span class="gl-badge @SessionBadgeCssClass">@PrimarySessionBadge</span>
                     <button type="button"
-                            class="go-live-mode-button @(_activeStudioMode == GoLiveStudioMode.Director ? "active" : null)"
-                            data-testid="@UiTestIds.GoLive.ModeDirector"
-                            @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Director)">Director</button>
-                    <button type="button"
-                            class="go-live-mode-button @(_activeStudioMode == GoLiveStudioMode.Studio ? "active" : null)"
-                            data-testid="@UiTestIds.GoLive.ModeStudio"
-                            @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Studio)">Studio</button>
+                            class="gl-panel-toggle @(ShowLeftRail ? "active" : null)"
+                            data-testid="@UiTestIds.GoLive.LeftPanelToggle"
+                            @onclick="ToggleLeftRailAsync">
+                        <svg width="14"
+                             height="14"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <line x1="9" y1="3" x2="9" y2="21" />
+                        </svg>
+                    </button>
                 </div>
-                <a class="go-live-settings-shortcut"
-                   href="@AppRoutes.Settings"
-                   data-testid="@UiTestIds.GoLive.OpenSettings">Settings</a>
-                <button type="button"
-                        class="go-live-record-pill"
-                        @onclick="ToggleRecordingSessionAsync"
-                        disabled="@(!CanControlProgram)"
-                        data-testid="@UiTestIds.GoLive.StartRecording">@RecordingBadgeText</button>
-                <button type="button"
-                        class="go-live-stream-pill"
-                        @onclick="ToggleStreamSessionAsync"
-                        disabled="@(!CanControlProgram)"
-                        data-testid="@UiTestIds.GoLive.StartStream">@StreamActionLabel</button>
-            </div>
-        </section>
 
-        <section class="go-live-studio-shell">
-            @if (_showLeftRail)
-            {
-                <aside class="go-live-left-rail">
-                    <GoLiveSourcesCard Sources="@SceneCameras"
-                                       ActiveSourceId="@ActiveCamera?.SourceId"
-                                       SelectedSourceId="@SelectedCamera?.SourceId"
-                                       CurrentScriptTitle="@_screenTitle"
-                                       CurrentScriptProgressLabel="@CurrentScriptProgressLabel"
-                                       UtilitySources="@UtilitySources"
-                                       HasPrimaryMicrophone="@HasPrimaryMicrophone"
-                                       MicrophoneName="@PrimaryMicrophoneLabel"
-                                       MicrophoneRouteLabel="@(HasPrimaryMicrophone ? PrimaryMicrophoneRoute : NoMicrophoneLabel)"
-                                       CanAddCamera="@CanAddSceneCamera"
-                                       AddCamera="AddAvailableCameraAsync"
-                                       SelectSource="SelectSourceAsync"
-                                       ToggleSource="ToggleSceneOutputAsync" />
-                </aside>
-            }
+                <div class="gl-topbar-center">
+                    <div class="gl-timer @(IsLiveSessionActive ? "active" : null)"
+                         data-testid="@UiTestIds.GoLive.SessionTimer">@ProgramTimerLabel</div>
+                </div>
 
-            <div class="go-live-center-stage">
-                <GoLiveProgramFeedCard ActiveSourceLabel="@ActiveSourceLabel"
-                                       ActiveSessionLabel="@ActiveSessionLabel"
-                                       Camera="@SelectedCamera"
-                                       IsArmed="@HasAnyLiveOutput"
-                                       IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
-                                       IsStreamActive="@GoLiveSession.State.IsStreamActive"
-                                       ProgramResolutionLabel="@ProgramResolutionLabel"
-                                       SelectedSourceLabel="@SelectedSourceLabel"
-                                       StageFrameRateLabel="@StageFrameRateLabel" />
-                <GoLiveSceneControls Scenes="@SceneChips"
-                                     ActiveSceneId="@_activeSceneId"
-                                     AddScene="AddSceneAsync"
-                                     SelectScene="SelectSceneAsync"
-                                     ActiveLayout="@_activeSceneLayout"
-                                     SelectLayout="SelectSceneLayoutAsync"
-                                     ActiveTransitionKind="@_activeTransitionKind"
-                                     SelectTransitionKind="SelectTransitionKindAsync"
-                                     ActiveTransitionDuration="@_activeTransitionDuration"
-                                     SelectTransitionDuration="SelectTransitionDurationAsync"
-                                     TakeToAir="SwitchSelectedSourceAsync"
-                                     TakeToAirLabel="@SwitchActionLabel" />
-            </div>
+                <div class="gl-topbar-right">
+                    <button type="button"
+                            class="gl-panel-toggle @(_fullProgramView ? "active" : null)"
+                            data-testid="@UiTestIds.GoLive.FullProgramToggle"
+                            @onclick="ToggleFullProgramViewAsync">
+                        <svg width="14"
+                             height="14"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                        </svg>
+                    </button>
+                    <button type="button"
+                            class="gl-panel-toggle @(ShowRightRail ? "active" : null)"
+                            data-testid="@UiTestIds.GoLive.RightPanelToggle"
+                            @onclick="ToggleRightRailAsync">
+                        <svg width="14"
+                             height="14"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <line x1="15" y1="3" x2="15" y2="21" />
+                        </svg>
+                    </button>
+                    <div class="gl-topbar-sep"></div>
+                    <div class="gl-mode-switch">
+                        <button type="button"
+                                class="gl-mode-btn gl-mode-director @(_activeStudioMode == GoLiveStudioMode.Director ? "active" : null)"
+                                data-testid="@UiTestIds.GoLive.ModeDirector"
+                                @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Director)">
+                            <svg width="12"
+                                 height="12"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 aria-hidden="true">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                            <span>Director</span>
+                        </button>
+                        <button type="button"
+                                class="gl-mode-btn gl-mode-studio @(_activeStudioMode == GoLiveStudioMode.Studio ? "active" : null)"
+                                data-testid="@UiTestIds.GoLive.ModeStudio"
+                                @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Studio)">
+                            <svg width="12"
+                                 height="12"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 aria-hidden="true">
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                            <span>Studio</span>
+                        </button>
+                    </div>
+                    <a class="gl-settings-btn"
+                       href="@AppRoutes.Settings"
+                       data-testid="@UiTestIds.GoLive.OpenSettings">
+                        <svg width="16"
+                             height="16"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                    </a>
+                    <button type="button"
+                            class="gl-rec-btn @(GoLiveSession.State.IsRecordingActive ? "active" : null)"
+                            disabled="@(!CanControlProgram)"
+                            data-testid="@UiTestIds.GoLive.StartRecording"
+                            @onclick="ToggleRecordingSessionAsync">
+                        <span class="gl-rec-dot"></span>
+                        <span>@RecordingIndicatorLabel</span>
+                    </button>
+                    <button type="button"
+                            class="gl-stream-btn @(GoLiveSession.State.IsStreamActive ? "active" : null)"
+                            disabled="@(!CanControlProgram)"
+                            data-testid="@UiTestIds.GoLive.StartStream"
+                            @onclick="ToggleStreamSessionAsync">
+                        <span class="gl-stream-icon">
+                            <svg width="16"
+                                 height="16"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 aria-hidden="true">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M16.24 7.76a6 6 0 0 1 0 8.49" />
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                <path d="M7.76 16.24a6 6 0 0 1 0-8.49" />
+                                <path d="M4.93 19.07a10 10 0 0 1 0-14.14" />
+                            </svg>
+                        </span>
+                        <span>@StreamButtonDisplayText</span>
+                    </button>
+                </div>
+            </section>
 
-            @if (_showRightRail && !_fullProgramView)
-            {
-                <aside class="go-live-right-rail"
-                       data-testid="@UiTestIds.GoLive.PreviewRail">
-                    <GoLiveCameraPreviewCard Camera="@ActiveCamera"
-                                             CanSwitchProgram="@CanSwitchProgram"
-                                             Description="@ActiveSessionLabel"
-                                             ShowSwitchAction="true"
-                                             SwitchActionLabel="@SwitchActionLabel"
-                                             SwitchSelectedSource="SwitchSelectedSourceAsync"
-                                             Title="Live" />
+            <section class="@GoLiveContentClass">
+                @if (ShowLeftRail)
+                {
+                    <aside class="gl-sources"
+                           data-testid="@UiTestIds.GoLive.SourceRail">
+                        <GoLiveSourcesCard Sources="@SceneCameras"
+                                           ActiveSourceId="@ActiveCamera?.SourceId"
+                                           SelectedSourceId="@SelectedCamera?.SourceId"
+                                           CurrentScriptTitle="@_screenTitle"
+                                           CurrentScriptProgressLabel="@CurrentScriptProgressLabel"
+                                           UtilitySources="@UtilitySources"
+                                           HasPrimaryMicrophone="@HasPrimaryMicrophone"
+                                           MicrophoneName="@PrimaryMicrophoneLabel"
+                                           MicrophoneRouteLabel="@(HasPrimaryMicrophone ? PrimaryMicrophoneRoute : NoMicrophoneLabel)"
+                                           CanAddCamera="@CanAddSceneCamera"
+                                           AddCamera="AddAvailableCameraAsync"
+                                           SelectSource="SelectSourceAsync"
+                                           ToggleSource="ToggleSceneOutputAsync" />
+                    </aside>
+                }
 
-                    <GoLiveStudioSidebar ActiveTab="@_activeStudioTab"
-                                         AudioChannels="@AudioChannels"
-                                         CreateRoom="CreateRoomAsync"
-                                         CueArmed="@_cueArmed"
-                                         Destinations="@DestinationSummary"
-                                         IsRoomActive="@IsRoomActive"
-                                         MuteAllGuests="@_muteAllGuests"
-                                         Participants="@Participants"
-                                         RoomCode="@RoomCode"
-                                         RuntimeMetrics="@RuntimeMetrics"
-                                         SelectTab="SelectStudioTabAsync"
-                                         SendCue="SendCueAsync"
-                                         SettingsRoute="@AppRoutes.Settings"
-                                         StatusMetrics="@StatusMetrics"
-                                         TalkbackEnabled="@_talkbackEnabled"
-                                         ToggleDestination="ToggleDestinationSummaryAsync"
-                                         ToggleMuteAllGuests="ToggleMuteAllGuestsAsync"
-                                         ToggleTalkback="ToggleTalkbackAsync" />
+                <div class="gl-program">
+                    <GoLiveProgramFeedCard ActiveSourceLabel="@ActiveSourceLabel"
+                                           ActiveSessionLabel="@ActiveSessionLabel"
+                                           Camera="@SelectedCamera"
+                                           IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
+                                           IsStreamActive="@GoLiveSession.State.IsStreamActive"
+                                           ProgramResolutionLabel="@ProgramResolutionLabel"
+                                           SelectedSourceLabel="@SelectedSourceLabel"
+                                           StageFrameRateLabel="@StageFrameRateLabel" />
+                    <GoLiveSceneControls Scenes="@SceneChips"
+                                         ActiveSceneId="@_activeSceneId"
+                                         AddScene="AddSceneAsync"
+                                         SelectScene="SelectSceneAsync"
+                                         ActiveLayout="@_activeSceneLayout"
+                                         SelectLayout="SelectSceneLayoutAsync"
+                                         ActiveTransitionKind="@_activeTransitionKind"
+                                         SelectTransitionKind="SelectTransitionKindAsync"
+                                         ActiveTransitionDuration="@_activeTransitionDuration"
+                                         SelectTransitionDuration="SelectTransitionDurationAsync"
+                                         TakeToAir="SwitchSelectedSourceAsync"
+                                         TakeToAirLabel="@SwitchActionLabel" />
+                </div>
 
-                    @if (HasScriptContext)
-                    {
-                        <div class="live-session-links">
-                            <a class="set-btn-outline"
-                               href="@LearnRoute"
-                               data-testid="@UiTestIds.GoLive.OpenLearn">Open Learn</a>
-                            <a class="set-btn-golden"
-                               href="@ReadRoute"
-                               data-testid="@UiTestIds.GoLive.OpenRead">Open Read</a>
-                        </div>
-                    }
-                </aside>
-            }
-        </section>
+                @if (ShowRightRail)
+                {
+                    <aside class="gl-sidebar-right"
+                           data-testid="@UiTestIds.GoLive.PreviewRail">
+                        <GoLiveCameraPreviewCard Camera="@ActiveCamera"
+                                                 Description="@ActiveSessionLabel"
+                                                 Title="Live" />
+                        <GoLiveStudioSidebar ActiveTab="@_activeStudioTab"
+                                             AudioChannels="@AudioChannels"
+                                             CreateRoom="CreateRoomAsync"
+                                             CueArmed="@_cueArmed"
+                                             Destinations="@DestinationSummary"
+                                             IsRoomActive="@IsRoomActive"
+                                             MuteAllGuests="@_muteAllGuests"
+                                             Participants="@Participants"
+                                             RoomCode="@RoomCode"
+                                             RuntimeMetrics="@RuntimeMetrics"
+                                             SelectTab="SelectStudioTabAsync"
+                                             SendCue="SendCueAsync"
+                                             StatusMetrics="@StatusMetrics"
+                                             TalkbackEnabled="@_talkbackEnabled"
+                                             ToggleDestination="ToggleDestinationSummaryAsync"
+                                             ToggleMuteAllGuests="ToggleMuteAllGuestsAsync"
+                                             ToggleTalkback="ToggleTalkbackAsync" />
+                    </aside>
+                }
+            </section>
+        </div>
     </div>
 </div>

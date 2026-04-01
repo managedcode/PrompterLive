@@ -13,6 +13,12 @@ namespace PrompterOne.App.Tests;
 
 public sealed class GoLivePageTests : BunitContext
 {
+    private const string ProgramMonitorClass = "gl-monitor-program";
+    private const string SessionBarClass = "gl-topbar";
+    private const string SettingsButtonClass = "gl-settings-btn";
+    private const string SourcesRailClass = "gl-sources";
+    private const string PreviewRailClass = "gl-sidebar-right";
+    private const string SceneBarClass = "gl-scenes-bar";
     private const string SceneSettingsStorageKey = "prompterone.scene";
 
     private readonly AppHarness _harness;
@@ -59,10 +65,13 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SessionBar));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SourceRail));
+            Assert.Contains(SessionBarClass, cut.FindByTestId(UiTestIds.GoLive.SessionBar).ClassName, StringComparison.Ordinal);
+            Assert.Contains(SourcesRailClass, cut.FindByTestId(UiTestIds.GoLive.SourceRail).ClassName, StringComparison.Ordinal);
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Stage));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.PreviewRail));
+            Assert.Contains(PreviewRailClass, cut.FindByTestId(UiTestIds.GoLive.PreviewRail).ClassName, StringComparison.Ordinal);
+            Assert.Contains(ProgramMonitorClass, cut.FindByTestId(UiTestIds.GoLive.ProgramCard).ClassName, StringComparison.Ordinal);
+            Assert.Contains(SceneBarClass, cut.FindByTestId(UiTestIds.GoLive.SceneBar).ClassName, StringComparison.Ordinal);
+            Assert.Contains(SettingsButtonClass, cut.FindByTestId(UiTestIds.GoLive.OpenSettings).ClassName, StringComparison.Ordinal);
         });
     }
 

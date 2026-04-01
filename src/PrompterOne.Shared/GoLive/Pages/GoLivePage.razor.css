@@ -1,242 +1,450 @@
-.go-live-page-shell {
-    display: flex;
-    flex-direction: column;
+.gl-page-shell {
     min-height: 100%;
-    background:
-        radial-gradient(circle at top right, rgba(96, 165, 250, .12), transparent 30%),
-        linear-gradient(180deg, rgba(4, 8, 15, .98), rgba(5, 8, 16, 1));
     border: 1px solid rgba(255, 255, 255, .06);
     border-radius: 24px;
     overflow: hidden;
+    background:
+        radial-gradient(circle at top right, rgba(96, 165, 250, .10), transparent 28%),
+        linear-gradient(180deg, rgba(4, 8, 15, .98), rgba(5, 8, 16, 1));
 }
 
-.go-live-session-bar {
+.gl-studio {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    width: 100%;
+    background: var(--bg-deep);
+}
+
+.gl-topbar {
     position: relative;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
-    gap: 18px;
-    min-height: 56px;
+    height: 52px;
     padding: 0 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
-    background: rgba(8, 11, 18, .78);
-    backdrop-filter: blur(16px);
+    gap: 16px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
 }
 
-.go-live-session-bar-left,
-.go-live-session-actions {
-    display: inline-flex;
+.gl-topbar-left,
+.gl-topbar-right {
+    display: flex;
     align-items: center;
     gap: 10px;
     min-width: 0;
+    z-index: 1;
 }
 
-.go-live-session-actions {
-    justify-self: end;
-    flex-wrap: wrap;
+.gl-topbar-left {
+    gap: 12px;
+    flex-shrink: 0;
 }
 
-.go-live-session-bar-left strong {
-    color: rgba(255, 245, 224, .92);
+.gl-topbar-right {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.gl-topbar-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.gl-back-btn,
+.gl-settings-btn,
+.gl-panel-toggle,
+.gl-rec-btn,
+.gl-stream-btn,
+.gl-mode-btn {
+    text-decoration: none;
+}
+
+.gl-back-btn,
+.gl-settings-btn,
+.gl-panel-toggle,
+.gl-rec-btn,
+.gl-stream-btn,
+.gl-mode-btn,
+.gl-topbar button {
+    appearance: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+}
+
+.gl-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px 6px 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gold-08);
+    background: var(--gold-06);
+    color: var(--text-3);
+    font-size: 12px;
+    font-weight: 600;
+    transition: all .2s;
+}
+
+.gl-back-btn:hover {
+    color: var(--text-1);
+    background: var(--gold-10);
+    border-color: var(--gold-14);
+}
+
+.gl-title {
+    min-width: 0;
+    color: var(--text-1);
     font-size: 14px;
     font-weight: 700;
-    letter-spacing: -.02em;
+    letter-spacing: -.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gl-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
-.go-live-back-link,
-.go-live-panel-toggle,
-.go-live-settings-shortcut,
-.go-live-live-badge,
-.go-live-record-pill,
-.go-live-stream-pill {
+.gl-badge-idle {
+    color: var(--text-4);
+    background: var(--gold-06);
+    border: 1px solid var(--gold-10);
+}
+
+.gl-badge-live {
+    color: #ff4444;
+    background: rgba(255, 68, 68, .12);
+    border: 1px solid rgba(255, 68, 68, .25);
+    animation: gl-session-pulse 2s ease-in-out infinite;
+}
+
+.gl-badge-rec {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, .10);
+    border: 1px solid rgba(255, 107, 107, .20);
+}
+
+.gl-panel-toggle,
+.gl-settings-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 32px;
-    padding: 0 12px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
-.go-live-back-link,
-.go-live-panel-toggle,
-.go-live-settings-shortcut {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, .08);
-    background: rgba(255, 255, 255, .03);
-    color: rgba(248, 241, 226, .64);
+    background: rgba(255, 255, 255, .04);
+    color: var(--text-4);
+    transition: all .15s;
 }
 
-.go-live-panel-toggle.active,
-.go-live-settings-shortcut:hover,
-.go-live-back-link:hover {
-    color: rgba(255, 245, 224, .94);
-    border-color: rgba(196, 160, 96, .28);
-    background: rgba(196, 160, 96, .12);
+.gl-settings-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .05);
 }
 
-.go-live-live-badge,
-.go-live-record-pill {
-    border: 1px solid rgba(255, 107, 107, .22);
-    background: rgba(255, 68, 68, .1);
-    color: #ff8d8d;
+.gl-panel-toggle:hover,
+.gl-settings-btn:hover {
+    background: rgba(255, 255, 255, .10);
+    color: var(--text-2);
 }
 
-.go-live-stream-pill {
-    border: 1px solid rgba(16, 185, 129, .28);
-    background: rgba(16, 185, 129, .1);
-    color: #59d8a7;
+.gl-panel-toggle.active {
+    background: var(--gold-10);
+    border-color: var(--gold-20);
+    color: var(--gold-text);
 }
 
-.go-live-record-pill:disabled,
-.go-live-stream-pill:disabled {
-    opacity: .45;
-}
-
-.go-live-session-timer {
-    justify-self: center;
-    color: #ff8d8d;
-    font-family: var(--font-mono);
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: .2em;
-}
-
-.go-live-mode-switch {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, .3);
-    border: 1px solid rgba(255, 255, 255, .06);
-}
-
-.go-live-mode-button {
-    min-height: 30px;
-    padding: 0 12px;
-    border: 1px solid transparent;
-    border-radius: 9px;
-    background: transparent;
-    color: rgba(248, 241, 226, .42);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-.go-live-mode-button.active {
-    color: rgba(255, 245, 224, .96);
-    border-color: rgba(255, 255, 255, .08);
+.gl-topbar-sep {
+    width: 1px;
+    height: 18px;
     background: rgba(255, 255, 255, .08);
 }
 
-.go-live-studio-shell {
-    flex: 1;
-    display: grid;
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(290px, 340px);
-    min-height: 720px;
+.gl-timer {
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
 }
 
-.go-live-left-rail,
-.go-live-center-stage,
-.go-live-right-rail {
-    min-width: 0;
-    min-height: 0;
+.gl-timer.active {
+    color: #ff6b6b;
 }
 
-.go-live-left-rail {
-    padding: 12px;
-    border-right: 1px solid rgba(255, 255, 255, .05);
-    background: rgba(255, 255, 255, .01);
-}
-
-.go-live-center-stage {
+.gl-mode-switch {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-    min-height: 0;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, .25);
 }
 
-.go-live-right-rail {
+.gl-mode-btn {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-    border-left: 1px solid rgba(255, 255, 255, .05);
-    background: rgba(255, 255, 255, .01);
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-4);
+    font-size: 11px;
+    font-weight: 600;
+    transition: all .15s;
 }
 
-.go-live-page-shell[data-left-open="False"][data-right-open="True"][data-full-program="False"] .go-live-studio-shell {
-    grid-template-columns: minmax(0, 1fr) minmax(290px, 340px);
+.gl-mode-btn:hover {
+    color: var(--text-2);
 }
 
-.go-live-page-shell[data-left-open="True"][data-right-open="False"][data-full-program="False"] .go-live-studio-shell {
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+.gl-mode-btn.active {
+    color: var(--text-1);
+    background: rgba(255, 255, 255, .10);
+    border-color: rgba(255, 255, 255, .08);
 }
 
-.go-live-page-shell[data-left-open="False"][data-right-open="False"][data-full-program="False"] .go-live-studio-shell,
-.go-live-page-shell[data-full-program="True"] .go-live-studio-shell {
-    grid-template-columns: minmax(0, 1fr);
+.gl-mode-btn.gl-mode-director.active {
+    color: #c4b5fd;
+    background: rgba(167, 139, 250, .15);
+    border-color: rgba(167, 139, 250, .25);
 }
 
-.live-session-links {
+.gl-mode-btn.gl-mode-studio.active {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, .12);
+    border-color: rgba(96, 165, 250, .20);
+}
+
+.gl-rec-btn,
+.gl-stream-btn {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-md);
+    transition: all .2s;
 }
 
-.live-session-links > a {
-    flex: 1;
+.gl-rec-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--gold-10);
+    background: var(--gold-06);
+    color: var(--text-3);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.gl-rec-btn:hover {
+    background: var(--gold-10);
+    color: var(--text-1);
+}
+
+.gl-rec-btn.active {
+    color: #ff4444;
+    background: rgba(255, 68, 68, .10);
+    border-color: rgba(255, 68, 68, .25);
+}
+
+.gl-rec-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-4);
+    transition: background .2s;
+}
+
+.gl-rec-btn.active .gl-rec-dot {
+    background: #ff4444;
+    animation: gl-session-pulse 1.5s ease-in-out infinite;
+}
+
+.gl-stream-btn {
+    padding: 8px 20px;
+    border: 1px solid rgba(16, 185, 129, .20);
+    background: rgba(16, 185, 129, .08);
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.gl-stream-btn:hover {
+    background: rgba(16, 185, 129, .14);
+    border-color: rgba(16, 185, 129, .35);
+    box-shadow: 0 0 20px rgba(16, 185, 129, .1);
+}
+
+.gl-stream-btn.active {
+    color: #ff6b6b;
+    background: rgba(255, 68, 68, .08);
+    border-color: rgba(255, 68, 68, .25);
+}
+
+.gl-stream-btn.active:hover {
+    background: rgba(255, 68, 68, .14);
+    border-color: rgba(255, 68, 68, .35);
+    box-shadow: 0 0 20px rgba(255, 68, 68, .1);
+}
+
+.gl-stream-icon {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
 }
 
-@media (max-width: 1320px) {
-    .go-live-studio-shell {
-        grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) minmax(260px, 300px);
+.gl-rec-btn:disabled,
+.gl-stream-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.gl-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(180px, 240px) 1fr minmax(280px, 340px);
+    gap: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.gl-sources {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 12px;
+    background: rgba(6, 8, 16, .25);
+    border-right: 1px solid var(--border-subtle);
+    overflow: hidden;
+}
+
+.gl-program {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 12px;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.gl-sidebar-right {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+    background: rgba(6, 8, 16, .35);
+    border-left: 1px solid var(--border-subtle);
+    overflow: hidden;
+}
+
+.gl-content.gl-layout-fullpgm {
+    grid-template-columns: 0 1fr 0;
+}
+
+.gl-content.gl-hide-left {
+    grid-template-columns: 0 1fr minmax(280px, 340px);
+}
+
+.gl-content.gl-hide-right {
+    grid-template-columns: minmax(180px, 240px) 1fr 0;
+}
+
+.gl-content.gl-hide-left.gl-hide-right,
+.gl-content.gl-layout-fullpgm.gl-hide-left.gl-hide-right {
+    grid-template-columns: 0 1fr 0;
+}
+
+@keyframes gl-session-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .65;
     }
 }
 
-@media (max-width: 1120px) {
-    .go-live-session-bar {
-        grid-template-columns: 1fr;
-        justify-items: stretch;
-        padding: 12px;
+@media (max-width: 1360px) {
+    .gl-content {
+        grid-template-columns: minmax(172px, 220px) 1fr minmax(260px, 300px);
     }
 
-    .go-live-session-timer {
-        justify-self: start;
-    }
-
-    .go-live-studio-shell,
-    .go-live-page-shell[data-left-open="False"][data-right-open="True"][data-full-program="False"] .go-live-studio-shell,
-    .go-live-page-shell[data-left-open="True"][data-right-open="False"][data-full-program="False"] .go-live-studio-shell {
-        grid-template-columns: 1fr;
-    }
-
-    .go-live-left-rail,
-    .go-live-right-rail {
-        border: none;
-        border-top: 1px solid rgba(255, 255, 255, .05);
+    .gl-content.gl-hide-left {
+        grid-template-columns: 0 1fr minmax(260px, 300px);
     }
 }
 
-@media (max-width: 720px) {
-    .go-live-session-actions,
-    .go-live-session-bar-left {
+@media (max-width: 1180px) {
+    .gl-topbar {
+        height: auto;
+        min-height: 52px;
+        padding: 10px 12px;
         flex-wrap: wrap;
     }
 
-    .go-live-session-timer {
-        font-size: 15px;
-        letter-spacing: .12em;
+    .gl-topbar-center {
+        position: static;
+        transform: none;
+        order: 3;
+        width: 100%;
+        pointer-events: auto;
     }
 
-    .live-session-links {
-        flex-direction: column;
+    .gl-topbar-right {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .gl-content,
+    .gl-content.gl-hide-left,
+    .gl-content.gl-hide-right {
+        grid-template-columns: 1fr;
+    }
+
+    .gl-sources,
+    .gl-sidebar-right {
+        border: none;
+        border-top: 1px solid var(--border-subtle);
+    }
+}
+
+@media (max-width: 760px) {
+    .gl-topbar-left,
+    .gl-topbar-right {
+        flex-wrap: wrap;
+    }
+
+    .gl-title {
+        width: 100%;
+    }
+
+    .gl-stream-btn {
+        width: 100%;
     }
 }

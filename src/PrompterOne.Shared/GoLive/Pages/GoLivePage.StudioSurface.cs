@@ -66,6 +66,10 @@ public partial class GoLivePage
     private const string UtilitySourceSlidesBadge = "Slides";
     private const string UtilitySourceSlidesLabel = "Keynote";
     private const string UtilitySourceTalentFacingLabel = "Talent-facing only";
+    private const string GoLiveContentBaseClass = "gl-content";
+    private const string GoLiveFullProgramClass = "gl-layout-fullpgm";
+    private const string GoLiveHideLeftClass = "gl-hide-left";
+    private const string GoLiveHideRightClass = "gl-hide-right";
 
     private static readonly IReadOnlyList<GoLiveUtilitySourceViewModel> StudioUtilitySources =
     [
@@ -110,6 +114,34 @@ public partial class GoLivePage
     private IReadOnlyList<GoLiveMetricViewModel> StatusMetrics => BuildStatusMetrics();
 
     private static IReadOnlyList<GoLiveUtilitySourceViewModel> UtilitySources => StudioUtilitySources;
+
+    private string GoLiveContentClass
+    {
+        get
+        {
+            var classes = new List<string> { GoLiveContentBaseClass };
+            if (_fullProgramView)
+            {
+                classes.Add(GoLiveFullProgramClass);
+            }
+
+            if (!ShowLeftRail)
+            {
+                classes.Add(GoLiveHideLeftClass);
+            }
+
+            if (!ShowRightRail)
+            {
+                classes.Add(GoLiveHideRightClass);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+
+    private bool ShowLeftRail => _showLeftRail && !_fullProgramView;
+
+    private bool ShowRightRail => _showRightRail && !_fullProgramView;
 
     private bool CanAddSceneCamera =>
         _mediaDevices.Any(device =>

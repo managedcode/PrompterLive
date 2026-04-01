@@ -6,6 +6,18 @@ namespace PrompterOne.App.UITests;
 
 public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
+    private const double MaxPreviewRailWidth = 360d;
+    private const double MaxProgramAspectRatio = 1.95d;
+    private const double MaxSourcesRailWidth = 260d;
+    private const double MinPreviewRailWidth = 260d;
+    private const double MinProgramAspectRatio = 1.55d;
+    private const double MinSourcesRailWidth = 170d;
+    private const string GoLiveLayoutParityScenario = "go-live-layout-parity";
+    private const string GoLiveLayoutParityStep = "01-new-design-shell";
+    private const string IncludeActionLabel = "Include";
+    private const string RemoveActionLabel = "Remove";
+    private const double TimerCenterTolerancePixels = 48d;
+
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
@@ -55,11 +67,11 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
 
             var sourceButton = page.GetByTestId(UiTestIds.GoLive.SourceCameraAction(BrowserTestConstants.Media.PrimaryCameraId));
-            await Expect(sourceButton).ToContainTextAsync("Remove");
+            await Expect(sourceButton).ToContainTextAsync(RemoveActionLabel);
             await sourceButton.ClickAsync();
-            await Expect(sourceButton).ToContainTextAsync("Include");
+            await Expect(sourceButton).ToContainTextAsync(IncludeActionLabel);
             await sourceButton.ClickAsync();
-            await Expect(sourceButton).ToContainTextAsync("Remove");
+            await Expect(sourceButton).ToContainTextAsync(RemoveActionLabel);
 
             await page.GetByTestId(UiTestIds.GoLive.OpenRead).ClickAsync();
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.TeleprompterDemo));
@@ -126,6 +138,65 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     }
 
     [Fact]
+    public async Task GoLivePage_UsesNewDesignStudioGridAndTopbarLayout()
+    {
+        UiScenarioArtifacts.ResetScenario(GoLiveLayoutParityScenario);
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await SeedGoLiveSceneForReuseAsync(page);
+            await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            var sessionBar = page.GetByTestId(UiTestIds.GoLive.SessionBar);
+            var sourceRail = page.GetByTestId(UiTestIds.GoLive.SourceRail);
+            var programCard = page.GetByTestId(UiTestIds.GoLive.ProgramCard);
+            var programVideo = page.GetByTestId(UiTestIds.GoLive.ProgramVideo);
+            var previewRail = page.GetByTestId(UiTestIds.GoLive.PreviewRail);
+            var settingsButton = page.GetByTestId(UiTestIds.GoLive.OpenSettings);
+            var streamButton = page.GetByTestId(UiTestIds.GoLive.StartStream);
+            var timer = page.GetByTestId(UiTestIds.GoLive.SessionTimer);
+
+            await Expect(sourceRail).ToBeVisibleAsync();
+            await Expect(programCard).ToBeVisibleAsync();
+            await Expect(programVideo).ToBeVisibleAsync();
+            await Expect(previewRail).ToBeVisibleAsync();
+
+            var sessionBarBox = await GetRequiredBoxAsync(sessionBar);
+            var sourceRailBox = await GetRequiredBoxAsync(sourceRail);
+            var programCardBox = await GetRequiredBoxAsync(programCard);
+            var programVideoBox = await GetRequiredBoxAsync(programVideo);
+            var previewRailBox = await GetRequiredBoxAsync(previewRail);
+            var settingsButtonBox = await GetRequiredBoxAsync(settingsButton);
+            var streamButtonBox = await GetRequiredBoxAsync(streamButton);
+            var timerBox = await GetRequiredBoxAsync(timer);
+
+            Assert.InRange(sourceRailBox.Width, MinSourcesRailWidth, MaxSourcesRailWidth);
+            Assert.InRange(previewRailBox.Width, MinPreviewRailWidth, MaxPreviewRailWidth);
+            Assert.True(programCardBox.Width > sourceRailBox.Width);
+            Assert.True(programCardBox.Width > previewRailBox.Width);
+
+            var programAspectRatio = programVideoBox.Width / programVideoBox.Height;
+            Assert.InRange(programAspectRatio, MinProgramAspectRatio, MaxProgramAspectRatio);
+            Assert.True(streamButtonBox.X > settingsButtonBox.X);
+
+            var sessionCenter = sessionBarBox.X + (sessionBarBox.Width / 2d);
+            var timerCenter = timerBox.X + (timerBox.Width / 2d);
+            Assert.InRange(Math.Abs(timerCenter - sessionCenter), 0d, TimerCenterTolerancePixels);
+
+            await UiScenarioArtifacts.CapturePageAsync(
+                page,
+                GoLiveLayoutParityScenario,
+                GoLiveLayoutParityStep);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task GoLivePage_WithEmptyScene_AutoSeedsDefaultDevicesAndShowsStudioShell()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.GoLive.AutoSeedScenario);
@@ -161,6 +232,20 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await page.Context.CloseAsync();
         }
     }
+
+    private static async Task<LayoutBounds> GetRequiredBoxAsync(Microsoft.Playwright.ILocator locator) =>
+        await locator.EvaluateAsync<LayoutBounds>(
+            """
+            element => {
+                const rect = element.getBoundingClientRect();
+                return {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height
+                };
+            }
+            """);
 
     [Fact]
     public async Task GoLivePage_SelectsSecondaryCameraAndTakesItToAir()
@@ -382,6 +467,8 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                 BrowserTestConstants.GoLive.YoutubeKey,
                 BrowserTestConstants.GoLive.FirstSourceId
             });
+
+    private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 
     [Fact]
     public async Task SettingsPage_LinksIntoGoLiveRoutingAndGoLiveLinksBackToSettings()

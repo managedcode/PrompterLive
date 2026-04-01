@@ -16,9 +16,11 @@ public partial class GoLivePage
     private const string ProgramBadgeLiveLabel = "Live";
     private const string ProgramBadgeRecordingLabel = "Rec";
     private const string ProgramBadgeStreamingRecordingLabel = "Live + Rec";
-    private const string RecordingButtonLabel = "Start Recording";
-    private const string RecordingStopLabel = "Stop Recording";
+    private const string RecordingIndicatorLabel = "REC";
     private const string SessionIdleLabel = "Ready";
+    private const string SessionBadgeIdleCssClass = "gl-badge-idle";
+    private const string SessionBadgeLiveCssClass = "gl-badge-live";
+    private const string SessionBadgeRecordingCssClass = "gl-badge-rec";
     private const string SessionRecordingLabel = "Recording";
     private const string SessionStreamingLabel = "Streaming";
     private const string SessionStreamingRecordingLabel = "Streaming + Recording";
@@ -47,6 +49,8 @@ public partial class GoLivePage
         && SelectedCamera.Transform.Visible
         && !string.Equals(SelectedCamera.SourceId, ActiveCamera?.SourceId, StringComparison.Ordinal);
 
+    private bool IsLiveSessionActive => GoLiveSession.State.IsStreamActive || GoLiveSession.State.IsRecordingActive;
+
     private string PrimarySessionBadge => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
         (true, true) => ProgramBadgeStreamingRecordingLabel,
@@ -59,7 +63,12 @@ public partial class GoLivePage
 
     private string ProgramTimerLabel => FormatSessionElapsed(SessionStartedAt);
 
-    private string RecordingBadgeText => GoLiveSession.State.IsRecordingActive ? RecordingStopLabel : RecordingButtonLabel;
+    private string SessionBadgeCssClass => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
+    {
+        (true, _) => SessionBadgeLiveCssClass,
+        (false, true) => SessionBadgeRecordingCssClass,
+        _ => SessionBadgeIdleCssClass
+    };
 
     private string SelectedSourceLabel => SelectedCamera?.Label ?? CameraFallbackLabel;
 
@@ -68,6 +77,8 @@ public partial class GoLivePage
     private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.OutputResolution);
 
     private string StreamActionLabel => GoLiveSession.State.IsStreamActive ? StreamStopLabel : StreamButtonLabel;
+
+    private string StreamButtonDisplayText => StreamActionLabel.ToUpperInvariant();
 
     private string SwitchActionLabel => CanSwitchProgram ? SwitchButtonLabel : SwitchButtonDisabledLabel;
 

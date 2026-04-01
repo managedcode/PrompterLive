@@ -1,80 +1,86 @@
-.go-live-stage-shell {
+.gl-program-monitor-shell {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     min-width: 0;
     min-height: 0;
+    flex: 1;
 }
 
-.go-live-stage-header {
+.gl-monitor-label-top {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-.go-live-monitor-label {
-    display: inline-flex;
     align-items: center;
-    min-height: 24px;
-    padding: 0 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(96, 165, 250, .2);
-    background: rgba(96, 165, 250, .08);
-    color: #8ebcf8;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: .14em;
+    letter-spacing: 1.2px;
+}
+
+.gl-label-canvas {
+    color: rgba(196, 160, 96, .6);
+}
+
+.gl-program-session-copy {
+    color: rgba(248, 241, 226, .38);
+    font-size: 10px;
+    letter-spacing: .08em;
     text-transform: uppercase;
 }
 
-.go-live-stage-title {
-    margin: 8px 0 0;
-    color: rgba(255, 245, 224, .96);
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-}
-
-.go-live-stage-viewport {
+.gl-monitor {
     position: relative;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-    flex: 1;
-    min-height: 520px;
-    border: 1px solid rgba(255, 255, 255, .08);
-    border-radius: 22px;
-    background:
-        radial-gradient(circle at center, rgba(255, 255, 255, .03), transparent 55%),
-        rgba(3, 6, 12, 1);
+    min-height: 0;
+    border: 1px solid var(--gold-08);
+    border-radius: var(--radius-lg);
+    background: #050508;
 }
 
-.go-live-stage-video {
+.gl-monitor-program {
+    flex: 1;
+    min-height: 0;
+    border-color: var(--gold-14);
+    box-shadow: 0 0 40px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--gold-06);
+}
+
+.gl-monitor-feed {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #050508;
+}
+
+.gl-program-video {
     width: 100%;
     height: 100%;
-    min-height: 520px;
-    object-fit: cover;
     display: block;
-    background: rgba(3, 6, 12, 1);
+    object-fit: cover;
+    background: #050508;
 }
 
-.go-live-stage-overlay {
+.gl-program-overlay {
     position: absolute;
     inset: 0;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 16px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 12px;
     pointer-events: none;
 }
 
-.go-live-stage-chip {
-    align-self: flex-start;
+.gl-program-reader-tag {
     display: inline-flex;
     align-items: center;
     min-height: 24px;
     padding: 0 10px;
-    border-radius: 999px;
     border: 1px solid rgba(196, 160, 96, .24);
+    border-radius: 999px;
     background: rgba(196, 160, 96, .12);
     color: rgba(255, 245, 224, .92);
     font-size: 10px;
@@ -83,73 +89,99 @@
     text-transform: uppercase;
 }
 
-.go-live-stage-empty {
-    min-height: 520px;
+.gl-preview-empty {
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    padding: 24px;
+    color: rgba(255, 255, 255, .16);
+    text-align: center;
 }
 
-.go-live-stage-footer {
+.gl-empty-title {
+    color: rgba(255, 245, 224, .82);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.gl-empty-copy {
+    max-width: 40ch;
+    color: rgba(248, 241, 226, .42);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.gl-monitor-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    color: rgba(248, 241, 226, .5);
-    font-size: 11px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+    padding: 6px 12px;
+    border-top: 1px solid var(--gold-06);
+    background: rgba(6, 8, 16, .6);
 }
 
-.go-live-stage-meta {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+.gl-monitor-res,
+.gl-monitor-fps {
+    color: var(--text-4);
+    font-size: 9px;
+    font-family: var(--font-mono);
+    letter-spacing: .5px;
 }
 
-.go-live-stage-meta-card {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.gl-monitor-source {
     min-width: 0;
-    padding: 14px 16px;
-    border: 1px solid rgba(255, 255, 255, .06);
-    border-radius: 16px;
-    background: rgba(8, 11, 18, .78);
+    color: rgba(255, 245, 224, .88);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.go-live-stage-meta-card strong {
-    color: rgba(255, 245, 224, .92);
-    font-size: 14px;
-    line-height: 1.35;
+.gl-monitor-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 2px 4px 0;
+    color: var(--text-4);
+    font-size: 10px;
 }
 
-.go-live-stage-shell[data-live-state="recording"] .go-live-stage-viewport {
-    border-color: rgba(255, 107, 107, .28);
+.gl-monitor-info strong {
+    color: rgba(255, 245, 224, .88);
+    font-size: 11px;
+    font-weight: 700;
 }
 
-.go-live-stage-shell[data-live-state="streaming"] .go-live-stage-viewport {
+.gl-monitor-info-label {
+    color: rgba(248, 241, 226, .36);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.gl-monitor-info-sep {
+    width: 1px;
+    height: 12px;
+    background: rgba(255, 255, 255, .08);
+}
+
+.gl-program-monitor-shell[data-live-state="recording"] .gl-monitor-program {
+    border-color: rgba(255, 107, 107, .32);
+}
+
+.gl-program-monitor-shell[data-live-state="streaming"] .gl-monitor-program {
     border-color: rgba(16, 185, 129, .26);
 }
 
-@media (max-width: 1120px) {
-    .go-live-stage-viewport,
-    .go-live-stage-video,
-    .go-live-stage-empty {
-        min-height: 440px;
-    }
-}
-
-@media (max-width: 720px) {
-    .go-live-stage-header {
-        flex-direction: column;
-    }
-
-    .go-live-stage-title {
-        font-size: 17px;
-    }
-
-    .go-live-stage-meta {
-        grid-template-columns: 1fr;
+@media (max-width: 920px) {
+    .gl-monitor-info {
+        flex-wrap: wrap;
     }
 }

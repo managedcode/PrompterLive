@@ -1,100 +1,180 @@
-.go-live-scenes-shell {
+.gl-program-tools {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, .06);
-    border-radius: 18px;
-    background: rgba(8, 11, 18, .78);
+    gap: 0;
+    flex-shrink: 0;
 }
 
-.go-live-scenes-bar,
-.go-live-scene-toolbar,
-.go-live-toolbar-group {
+.gl-scenes-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
 }
 
-.go-live-scenes-bar {
-    justify-content: space-between;
-}
-
-.go-live-scenes-list {
+.gl-scenes-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 
-.go-live-scene-chip,
-.go-live-scene-add,
-.go-live-toolbar-button,
-.go-live-take-to-air {
+.gl-scenes-list::-webkit-scrollbar {
+    display: none;
+}
+
+.gl-scene-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .04);
+    color: var(--text-4);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all .12s;
+}
+
+.gl-scene-chip:hover {
+    background: rgba(255, 255, 255, .07);
+}
+
+.gl-scene-chip.active {
+    background: rgba(196, 160, 96, .10);
+    border-color: rgba(196, 160, 96, .25);
+}
+
+.gl-scene-chip-icon {
+    color: var(--text-4);
+    flex-shrink: 0;
+}
+
+.gl-scene-chip.active .gl-scene-chip-icon {
+    color: var(--gold);
+}
+
+.gl-scene-chip-name {
+    color: var(--text-3);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.gl-scene-chip.active .gl-scene-chip-name {
+    color: var(--gold);
+}
+
+.gl-scene-add-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 36px;
-    padding: 0 12px;
-    border: 1px solid rgba(255, 255, 255, .08);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .03);
-    color: rgba(248, 241, 226, .72);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
+    border: 1px dashed rgba(255, 255, 255, .10);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .04);
+    color: var(--text-4);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all .15s;
 }
 
-.go-live-scene-chip.active,
-.go-live-toolbar-button.active {
-    border-color: rgba(196, 160, 96, .28);
-    background: rgba(196, 160, 96, .14);
-    color: rgba(255, 245, 224, .96);
+.gl-scene-add-btn:hover {
+    background: rgba(255, 255, 255, .08);
+    color: var(--text-1);
+    border-style: solid;
 }
 
-.go-live-scene-chip-name {
-    text-transform: none;
-    letter-spacing: 0;
-}
-
-.go-live-scene-add {
-    min-width: 36px;
-    padding: 0;
-    font-size: 18px;
-}
-
-.go-live-scene-toolbar {
-    justify-content: space-between;
+.gl-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 0;
     flex-wrap: wrap;
 }
 
-.go-live-toolbar-label {
-    color: rgba(248, 241, 226, .34);
+.gl-scene-tools,
+.gl-trans-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.gl-tools-label {
+    margin-right: 4px;
+    color: var(--text-4);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+}
+
+.gl-scene-btn,
+.gl-trans-btn,
+.gl-dur-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-4);
+    cursor: pointer;
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .16em;
-    text-transform: uppercase;
+    font-weight: 600;
+    transition: all .15s;
 }
 
-.go-live-toolbar-group-transition {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+.gl-scene-btn:hover,
+.gl-trans-btn:hover,
+.gl-dur-btn:hover {
+    background: rgba(255, 255, 255, .08);
+    color: var(--text-2);
 }
 
-.go-live-take-to-air {
-    border-color: rgba(16, 185, 129, .26);
-    background: rgba(16, 185, 129, .12);
-    color: #59d8a7;
+.gl-scene-btn.active,
+.gl-trans-btn.active,
+.gl-dur-btn.active {
+    background: rgba(196, 160, 96, .12);
+    border-color: rgba(196, 160, 96, .25);
+    color: var(--gold-text);
 }
 
-@media (max-width: 960px) {
-    .go-live-scene-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
+.gl-take-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 24px;
+    border: 2px solid rgba(239, 68, 68, .5);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(239, 68, 68, .2), rgba(220, 38, 38, .12));
+    color: #f87171;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    transition: all .15s;
+}
 
-    .go-live-toolbar-group-transition {
-        justify-content: flex-start;
-    }
+.gl-take-btn:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, .3), rgba(220, 38, 38, .2));
+    border-color: rgba(239, 68, 68, .7);
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(239, 68, 68, .15);
+}
+
+.gl-take-btn:active {
+    transform: scale(.98);
 }

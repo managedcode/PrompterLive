@@ -139,7 +139,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         var invocationCountBeforeSwitch = _harness.JsRuntime.Invocations.Count;
 
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
-        cut.FindByTestId(UiTestIds.GoLive.SwitchSelectedSource).Click();
+        cut.FindByTestId(UiTestIds.GoLive.TakeToAir).Click();
 
         Assert.Contains(
             _harness.JsRuntime.Invocations.Skip(invocationCountBeforeSwitch),
