@@ -8,18 +8,19 @@
 }
 
 .gl-monitor-label-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 0 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    z-index: 5;
+    pointer-events: none;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .gl-label-canvas {
-    color: rgba(196, 160, 96, .6);
+    color: rgba(196, 160, 96, .35);
 }
 
 .gl-monitor {
@@ -40,26 +41,20 @@
     box-shadow: 0 0 40px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--gold-06);
 }
 
-.gl-monitor-feed {
-    position: relative;
+::deep .gl-monitor-feed {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     min-height: 0;
-    aspect-ratio: 16 / 9;
     overflow: hidden;
-    background:
-        radial-gradient(circle at top right, rgba(96, 165, 250, .08), transparent 32%),
-        #050508;
+    background: #050508;
 }
 
-.gl-program-video {
+::deep .gl-program-video {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     display: block;
-    max-width: 100%;
-    max-height: 100%;
     object-fit: contain;
     object-position: center;
     background: #050508;
@@ -91,13 +86,13 @@
 }
 
 .gl-preview-empty {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: 100%;
-    height: 100%;
     padding: 24px;
     color: rgba(255, 255, 255, .16);
     text-align: center;

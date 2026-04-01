@@ -9,7 +9,7 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage : IAsyncDisposable
 {
-    private const int DefaultContextWordCount = 2;
+    private const int DefaultContextWordCount = 3;
     private const string EndOfScriptPhrase = "End of script.";
     private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
     private const string LoadLearnOperation = "Learn load";

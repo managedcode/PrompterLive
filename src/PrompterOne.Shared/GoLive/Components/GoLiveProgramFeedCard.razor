@@ -3,12 +3,11 @@
 
 <section class="gl-program-monitor-shell"
          data-live-state="@LiveState">
-    <div class="gl-monitor-label-top gl-label-canvas">
-        <span>@Title</span>
-    </div>
-
     <div class="gl-monitor gl-monitor-program"
          data-testid="@UiTestIds.GoLive.ProgramCard">
+        <div class="gl-monitor-label-top gl-label-canvas">
+            <span>@Title</span>
+        </div>
         <GoLiveCameraSurface Camera="@Camera"
                              ContainerClass="gl-monitor-feed"
                              ContainerDomId="@UiDomIds.GoLive.ProgramStage"

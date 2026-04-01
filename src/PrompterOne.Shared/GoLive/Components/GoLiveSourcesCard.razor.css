@@ -94,7 +94,7 @@
     cursor: pointer;
 }
 
-.gl-cam-thumb {
+::deep .gl-cam-thumb {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -109,7 +109,9 @@
     background: rgba(255, 255, 255, .04);
 }
 
-.gl-source-feed {
+::deep .gl-source-feed {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     display: block;

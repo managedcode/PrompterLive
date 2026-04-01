@@ -101,12 +101,12 @@
     display: flex;
     align-items: baseline;
     gap: 14px;
-    font-size: clamp(30px, 2.4vw, 35px);
+    font-size: clamp(26px, 2vw, 30px);
     font-weight: 400;
-    color: rgba(232,213,176,.4);
+    color: rgba(232,213,176,.35);
     line-height: 1;
     white-space: nowrap;
-    overflow: visible;
+    overflow: clip;
     flex: 1 1 0;
     min-width: 0;
     pointer-events: none;
@@ -114,11 +114,11 @@
 }
 .rsvp-ctx-left {
     justify-content: flex-end;
-    padding-right: 24px;
+    padding-right: 60px;
 }
 .rsvp-ctx-right {
     justify-content: flex-start;
-    padding-left: 24px;
+    padding-left: 60px;
 }
 
 .rsvp-focus-shell {
