@@ -135,7 +135,7 @@ public partial class TeleprompterPage
 
             await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
             _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState();
+            UpdateReaderDisplayState(instantAlignment: true);
             _isReaderPlaying = true;
             await InvokeAsync(StateHasChanged);
             _ = RunReaderPlaybackLoopAsync(GetCurrentWordDelayMilliseconds(), cancellationToken);
@@ -160,13 +160,13 @@ public partial class TeleprompterPage
             if (_activeReaderWordIndex > 0)
             {
                 _activeReaderWordIndex--;
-                UpdateReaderDisplayState();
+                UpdateReaderDisplayState(instantAlignment: true);
             }
         }
         else if (_activeReaderWordIndex < 0)
         {
             _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState();
+            UpdateReaderDisplayState(instantAlignment: true);
         }
         else
         {
@@ -174,7 +174,7 @@ public partial class TeleprompterPage
             if (_activeReaderWordIndex < wordCount - 1)
             {
                 _activeReaderWordIndex++;
-                UpdateReaderDisplayState();
+                UpdateReaderDisplayState(instantAlignment: true);
             }
             else
             {
@@ -201,7 +201,7 @@ public partial class TeleprompterPage
         {
             await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
             _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState();
+            UpdateReaderDisplayState(instantAlignment: true);
 
             if (resumePlayback)
             {
@@ -325,7 +325,7 @@ public partial class TeleprompterPage
         if (_activeReaderWordIndex < cardWordCount - 1)
         {
             _activeReaderWordIndex++;
-            UpdateReaderDisplayState();
+            UpdateReaderDisplayState(instantAlignment: true);
             await InvokeAsync(StateHasChanged);
             return GetCurrentWordDelayMilliseconds();
         }
@@ -343,7 +343,7 @@ public partial class TeleprompterPage
         _activeReaderCardIndex = nextCardIndex;
         _activeReaderWordIndex = -1;
         _preparedReaderCardIndex = null;
-        UpdateReaderDisplayState();
+        UpdateReaderDisplayState(instantAlignment: true);
         await InvokeAsync(StateHasChanged);
 
         try
@@ -355,7 +355,7 @@ public partial class TeleprompterPage
                 return;
             }
             _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState();
+            UpdateReaderDisplayState(instantAlignment: true);
             await InvokeAsync(StateHasChanged);
         }
         finally

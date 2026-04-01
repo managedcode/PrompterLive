@@ -1,0 +1,60 @@
+{
+  "issueTitle": "Vendored streaming SDK updates available",
+  "sdks": [
+    {
+      "id": "livekit-client",
+      "displayName": "LiveKit Client SDK JS",
+      "repository": "livekit/client-sdk-js",
+      "releaseTag": "v2.18.0",
+      "releaseUrl": "https://github.com/livekit/client-sdk-js/releases/tag/v2.18.0",
+      "sourceTarballUrl": "https://github.com/livekit/client-sdk-js/archive/refs/tags/v2.18.0.tar.gz",
+      "syncStrategy": "livekit-build-from-release-source",
+      "pnpmVersion": "10.22.0",
+      "vendorDirectory": "src/PrompterOne.Shared/wwwroot/vendor/livekit-client/v2.18.0",
+      "licenseFiles": [
+        "LICENSE"
+      ],
+      "artifacts": [
+        "dist/livekit-client.umd.js",
+        "dist/livekit-client.umd.js.map",
+        "dist/livekit-client.esm.mjs",
+        "dist/livekit-client.esm.mjs.map",
+        "dist/livekit-client.e2ee.worker.js",
+        "dist/livekit-client.e2ee.worker.js.map",
+        "dist/livekit-client.e2ee.worker.mjs",
+        "dist/livekit-client.e2ee.worker.mjs.map"
+      ]
+    },
+    {
+      "id": "vdo-ninja",
+      "displayName": "VDO.Ninja",
+      "repository": "steveseguin/vdo.ninja",
+      "releaseTag": "v29.0",
+      "releaseUrl": "https://github.com/steveseguin/vdo.ninja/releases/tag/v29.0",
+      "sourceTarballUrl": "https://github.com/steveseguin/vdo.ninja/archive/refs/tags/v29.0.tar.gz",
+      "syncStrategy": "copy-release-runtime-js-tree",
+      "vendorDirectory": "src/PrompterOne.Shared/wwwroot/vendor/vdo.ninja/v29.0",
+      "licenseFiles": [
+        "AGPLv3.md",
+        "LICENCE.md"
+      ],
+      "rootFiles": [
+        "auth-client.js",
+        "iframe-examples.js",
+        "insertableStreamWorker.js",
+        "lib.js",
+        "main.js",
+        "serviceWorker.js",
+        "webrtc.js"
+      ],
+      "runtimeDirectories": [
+        "core",
+        "filters",
+        "notifications",
+        "podcast",
+        "recorder",
+        "thirdparty"
+      ]
+    }
+  ]
+}

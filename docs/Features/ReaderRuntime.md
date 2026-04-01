@@ -52,6 +52,7 @@ flowchart LR
 - `teleprompter` keeps TPS inline colors visible even when a phrase group is active or the active word is highlighted.
 - `teleprompter` persists font scale, text width, focal point, and camera auto-start changes through `IUserSettingsStore` and restores them from stored `ReaderSettings` during bootstrap.
 - `teleprompter` prepositions the next card below the focal line before activation, so forward and backward block jumps both animate upward instead of alternating direction.
+- `teleprompter` realigns the active paragraph instantly when words advance, so autoplay and manual next-word steps do not leave a second follow-up glide after the word change.
 
 ## Verification
 
