@@ -10,6 +10,7 @@ public partial class SettingsPage
     private const string PersistPreferencesMessage = "Unable to save general settings.";
     private const string ActiveCssClass = "active";
     private const string OnCssClass = "on";
+    private const string SetToggleCssClass = "set-toggle";
 
     private readonly HashSet<string> _openCards = new(StringComparer.Ordinal)
     {
@@ -23,10 +24,6 @@ public partial class SettingsPage
     };
 
     private SettingsPagePreferences _pagePreferences = SettingsPagePreferences.Default;
-
-    private string FileAutoSaveToggleCssClass => BuildToggleCssClass(_pagePreferences.FileAutoSaveEnabled);
-
-    private string FileBackupCopiesToggleCssClass => BuildToggleCssClass(_pagePreferences.FileBackupCopiesEnabled);
 
     [Inject] private BrowserThemeService ThemeService { get; set; } = null!;
 
@@ -51,24 +48,6 @@ public partial class SettingsPage
             PersistPreferencesMessage,
             () => SettingsStore.SaveAsync(SettingsPagePreferences.StorageKey, _pagePreferences));
 
-    private async Task SelectAiProviderAsync(string providerId)
-    {
-        _pagePreferences = _pagePreferences with { SelectedAiProviderId = providerId };
-        await PersistPreferencesAsync();
-    }
-
-    private async Task ToggleAutoSaveAsync()
-    {
-        _pagePreferences = _pagePreferences with { FileAutoSaveEnabled = !_pagePreferences.FileAutoSaveEnabled };
-        await PersistPreferencesAsync();
-    }
-
-    private async Task ToggleBackupCopiesAsync()
-    {
-        _pagePreferences = _pagePreferences with { FileBackupCopiesEnabled = !_pagePreferences.FileBackupCopiesEnabled };
-        await PersistPreferencesAsync();
-    }
-
     private async Task TogglePreferenceCardAsync(string cardId)
     {
         if (!_openCards.Add(cardId))
@@ -77,18 +56,6 @@ public partial class SettingsPage
         }
 
         await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task UpdateExportFormatAsync(string value)
-    {
-        _pagePreferences = _pagePreferences with { ExportFormat = value };
-        await PersistPreferencesAsync();
-    }
-
-    private async Task UpdateRecordingsStorageLimitAsync(string value)
-    {
-        _pagePreferences = _pagePreferences with { RecordingsStorageLimit = value };
-        await PersistPreferencesAsync();
     }
 
     private async Task ToggleAutoRecordWhenStreamingAsync()

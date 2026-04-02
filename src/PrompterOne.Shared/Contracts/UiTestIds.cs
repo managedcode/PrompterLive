@@ -297,6 +297,12 @@ public static class UiTestIds
 
         public static string AiProvider(string providerId) => $"settings-ai-provider-{providerId}";
 
+        public static string AiProviderClear(string providerId) => $"settings-ai-provider-{providerId}-clear";
+
+        public static string AiProviderMessage(string providerId) => $"settings-ai-provider-{providerId}-message";
+
+        public static string AiProviderSave(string providerId) => $"settings-ai-provider-{providerId}-save";
+
         public static string CameraDevice(string deviceId) => $"settings-camera-device-{deviceId}";
 
         public static string CameraDeviceAction(string deviceId) => $"settings-camera-device-action-{deviceId}";
@@ -462,6 +468,8 @@ public static class UiTestIds
         public static string ProviderCard(string providerId) => $"go-live-provider-{providerId}";
         public static string ProviderSourcePicker(string providerId) => $"go-live-provider-sources-{providerId}";
         public static string ProviderSourceSummary(string providerId) => $"go-live-provider-source-summary-{providerId}";
+        public static string RuntimeMetric(string metricId) => $"go-live-runtime-metric-{metricId}";
+        public static string StatusMetric(string metricId) => $"go-live-status-metric-{metricId}";
         public static string ProviderSourceToggle(string providerId, string sourceId) => $"go-live-provider-source-{providerId}-{sourceId}";
 
         public static string SourceCamera(string sourceId) => $"go-live-source-camera-{sourceId}";

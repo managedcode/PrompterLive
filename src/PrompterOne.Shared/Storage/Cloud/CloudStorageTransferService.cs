@@ -8,6 +8,7 @@ using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
+using PrompterOne.Shared.Settings.Services;
 
 namespace PrompterOne.Shared.Storage.Cloud;
 
@@ -19,8 +20,12 @@ public sealed class CloudStorageTransferService(
     IScriptRepository scriptRepository,
     IScriptSessionService scriptSessionService,
     IMediaSceneService mediaSceneService,
-    StudioSettingsStore studioSettingsStore)
+    StudioSettingsStore studioSettingsStore,
+    AiProviderSettingsStore aiProviderSettingsStore,
+    BrowserFileStorageStore browserFileStorageStore)
 {
+    private readonly AiProviderSettingsStore _aiProviderSettingsStore = aiProviderSettingsStore;
+    private readonly BrowserFileStorageStore _browserFileStorageStore = browserFileStorageStore;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -142,6 +147,8 @@ public sealed class CloudStorageTransferService(
     {
         return new CloudStorageSettingsBundle
         {
+            AiProviderSettings = await _aiProviderSettingsStore.LoadAsync(cancellationToken),
+            FileStorageSettings = await _browserFileStorageStore.LoadSettingsAsync(cancellationToken),
             LearnSettings = await _settingsStore.LoadAsync<LearnSettings>(BrowserAppSettingsKeys.LearnSettings, cancellationToken) ?? new LearnSettings(),
             ReaderSettings = await _settingsStore.LoadAsync<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings, cancellationToken) ?? new ReaderSettings(),
             SceneState = await _settingsStore.LoadAsync<MediaSceneState>(BrowserAppSettingsKeys.SceneSettings, cancellationToken) ?? MediaSceneState.Empty,
@@ -230,6 +237,8 @@ public sealed class CloudStorageTransferService(
     {
         var bundle = settings ?? new CloudStorageSettingsBundle();
 
+        await _aiProviderSettingsStore.SaveAsync(bundle.AiProviderSettings, cancellationToken);
+        await _browserFileStorageStore.SaveSettingsAsync(bundle.FileStorageSettings, cancellationToken);
         await _settingsStore.SaveAsync(SettingsPagePreferences.StorageKey, bundle.SettingsPagePreferences, cancellationToken);
         await _settingsStore.SaveAsync(BrowserAppSettingsKeys.ReaderSettings, bundle.ReaderSettings, cancellationToken);
         await _settingsStore.SaveAsync(BrowserAppSettingsKeys.LearnSettings, bundle.LearnSettings, cancellationToken);

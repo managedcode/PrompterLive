@@ -1,18 +1,6 @@
-using PrompterOne.Shared.Pages;
-
 namespace PrompterOne.Shared.Settings.Models;
 
 public sealed record SettingsPagePreferences(
-    string OneDriveSyncFolder,
-    bool CloudAutoSyncOnSave,
-    bool CloudSyncOnStartup,
-    string ScriptsLocation,
-    string RecordingsLocation,
-    string ExportsLocation,
-    string ExportFormat,
-    string RecordingsStorageLimit,
-    bool FileAutoSaveEnabled,
-    bool FileBackupCopiesEnabled,
     bool AutoRecordWhenStreaming,
     bool SplitRecordingHourly,
     string RecordingFolder,
@@ -26,7 +14,6 @@ public sealed record SettingsPagePreferences(
     string RecordingAudioSampleRate,
     int RecordingAudioBitrateKbps,
     string RecordingAudioChannels,
-    string SelectedAiProviderId,
     string ColorScheme,
     string AccentColor,
     string TeleprompterFont,
@@ -43,19 +30,9 @@ public sealed record SettingsPagePreferences(
     public const string StorageKey = "prompterone.settings-page";
 
     public static SettingsPagePreferences Default { get; } = new(
-        OneDriveSyncFolder: "/OneDrive/Prompter",
-        CloudAutoSyncOnSave: true,
-        CloudSyncOnStartup: true,
-        ScriptsLocation: "/Users/you/Documents/Prompter/Scripts",
-        RecordingsLocation: "/Users/you/Documents/Prompter/Recordings",
-        ExportsLocation: "/Users/you/Downloads",
-        ExportFormat: "TPS (Native)",
-        RecordingsStorageLimit: "No limit",
-        FileAutoSaveEnabled: true,
-        FileBackupCopiesEnabled: true,
         AutoRecordWhenStreaming: true,
         SplitRecordingHourly: false,
-        RecordingFolder: "/Users/you/Documents/Prompter/Recordings",
+        RecordingFolder: "Browser-local recording store",
         RecordingNamingPattern: "Script Name + Date",
         RecordingContainer: "MP4",
         RecordingVideoCodec: "H.264 (AVC)",
@@ -66,7 +43,6 @@ public sealed record SettingsPagePreferences(
         RecordingAudioSampleRate: "48 kHz",
         RecordingAudioBitrateKbps: 320,
         RecordingAudioChannels: "Stereo",
-        SelectedAiProviderId: SettingsAiProviderIds.ClaudeApi,
         ColorScheme: SettingsAppearanceValues.DarkColorScheme,
         AccentColor: SettingsAppearanceValues.DefaultAccentColor,
         TeleprompterFont: "Inter (Default)",

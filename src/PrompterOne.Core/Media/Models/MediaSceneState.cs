@@ -6,7 +6,7 @@ public sealed record MediaSourceTransform(
     double Width = 0.32,
     double Height = 0.32,
     double Rotation = 0,
-    bool MirrorHorizontal = true,
+    bool MirrorHorizontal = false,
     bool MirrorVertical = false,
     bool Visible = true,
     bool IncludeInOutput = true,

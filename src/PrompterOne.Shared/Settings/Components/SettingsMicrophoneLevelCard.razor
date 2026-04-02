@@ -6,10 +6,10 @@
 @inject Microsoft.Extensions.Logging.ILogger<SettingsMicrophoneLevelCard> Logger
 @inject MicrophoneLevelInterop MicrophoneLevelInterop
 
-<section class="set-device-card active"
-         data-testid="@UiTestIds.Settings.MicPreviewCard">
+<section class="@CardCssClass"
+         data-testid="@CardTestId">
     <div class="set-device-header">
-        <div class="set-device-preview set-mic-preview @(CanRenderMonitor ? string.Empty : "set-mic-off")">
+        <div class="set-device-preview set-mic-preview @(CanRenderMonitor && IsEnabled ? string.Empty : "set-mic-off")">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
@@ -17,14 +17,14 @@
                 <line x1="8" y1="23" x2="16" y2="23" />
             </svg>
             <div class="set-mic-level-indicator">
-                <div class="set-mic-bar" style="@BuildMicBarStyle(0.90)"></div>
-                <div class="set-mic-bar" style="@BuildMicBarStyle(0.65)"></div>
-                <div class="set-mic-bar" style="@BuildMicBarStyle(0.80)"></div>
+                <div class="set-mic-bar" style="@BuildHeaderBarStyle(0.18)"></div>
+                <div class="set-mic-bar" style="@BuildHeaderBarStyle(0.00)"></div>
+                <div class="set-mic-bar" style="@BuildHeaderBarStyle(-0.12)"></div>
             </div>
         </div>
         <div class="set-device-info">
             <span class="set-device-name"
-                  data-testid="@UiTestIds.Settings.MicPreviewLabel">
+                  data-testid="@LabelTestId">
                 @(CanRenderMonitor ? MicrophoneLabel : EmptyTitle)
             </span>
             <span class="set-device-meta">@MonitorDescription</span>
@@ -43,11 +43,11 @@
 
     @if (CanRenderMonitor)
     {
-        <div id="@UiDomIds.Settings.MicrophoneLevelMonitor"
+        <div id="@ResolvedMonitorElementId"
              class="set-vu-meter"
              data-live-level="@_levelPercent"
              data-live-state="@MonitorState"
-             data-testid="@UiTestIds.Settings.MicPreviewMeter">
+             data-testid="@MeterTestId">
             <div class="set-vu-track">
                 <div class="set-vu-fill" style="@MonitorFillStyle"></div>
                 <div class="set-vu-peak" style="@MonitorPeakStyle"></div>
@@ -58,7 +58,7 @@
     else
     {
         <div class="set-empty-card"
-             data-testid="@UiTestIds.Settings.MicPreviewEmpty">
+             data-testid="@EmptyTestId">
             <div>
                 <div class="set-account-name">@EmptyTitle</div>
                 <div class="live-card-desc">@EmptyDescription</div>
@@ -93,7 +93,11 @@
 
     [Parameter] public bool AccessGranted { get; set; }
 
+    [Parameter] public string? CardTestId { get; set; } = UiTestIds.Settings.MicPreviewCard;
+
     [Parameter] public bool IsActive { get; set; }
+
+    [Parameter] public bool IsEnabled { get; set; } = true;
 
     [Parameter] public MediaDeviceInfo? Microphone { get; set; }
 
@@ -103,11 +107,22 @@
 
     [Parameter] public RenderFragment? HeaderAction { get; set; }
 
+    [Parameter] public string? EmptyTestId { get; set; } = UiTestIds.Settings.MicPreviewEmpty;
+
+    [Parameter] public string? LabelTestId { get; set; } = UiTestIds.Settings.MicPreviewLabel;
+
     [Parameter] public string MetaText { get; set; } = string.Empty;
+
+    [Parameter] public string? MeterTestId { get; set; } = UiTestIds.Settings.MicPreviewMeter;
+
+    [Parameter] public string? MonitorElementId { get; set; }
 
     [Parameter] public string Title { get; set; } = DefaultTitle;
 
-    private bool CanMonitor => AccessGranted && IsActive && !string.IsNullOrWhiteSpace(Microphone?.DeviceId);
+    private string CardCssClass =>
+        IsEnabled ? "set-device-card active" : "set-device-card";
+
+    private bool CanMonitor => AccessGranted && IsActive && IsEnabled && !string.IsNullOrWhiteSpace(Microphone?.DeviceId);
 
     private bool CanRenderMonitor => AccessGranted && !string.IsNullOrWhiteSpace(Microphone?.DeviceId);
 
@@ -134,10 +149,15 @@
     private string MonitorPeakStyle =>
         string.Format(CultureInfo.InvariantCulture, "left: {0}%;", Math.Clamp(_levelPercent, 2, 100));
 
-    private string MonitorState => _levelPercent > 0 ? ActiveStateValue : IdleStateValue;
+    private string MonitorState => _levelPercent > 0 && IsEnabled ? ActiveStateValue : IdleStateValue;
 
     private string MonitorValueText =>
         string.Concat(ConvertLevelToDb(_levelPercent).ToString(CultureInfo.InvariantCulture), " dB");
+
+    private string ResolvedMonitorElementId =>
+        string.IsNullOrWhiteSpace(MonitorElementId)
+            ? UiDomIds.Settings.MicrophoneLevelMonitor
+            : MonitorElementId;
 
     private string? _attachedDeviceId;
     private DotNetObjectReference<MicrophoneLevelObserver>? _observerReference;
@@ -162,10 +182,7 @@
             await StopMonitoringAsync();
             _attachedDeviceId = nextDeviceId;
             _observerReference ??= DotNetObjectReference.Create(new MicrophoneLevelObserver(HandleLevelChangedAsync));
-            await MicrophoneLevelInterop.StartAsync(
-                UiDomIds.Settings.MicrophoneLevelMonitor,
-                nextDeviceId,
-                _observerReference);
+            await MicrophoneLevelInterop.StartAsync(ResolvedMonitorElementId, nextDeviceId, _observerReference);
         }
         catch (Exception exception)
         {
@@ -181,11 +198,11 @@
         _observerReference?.Dispose();
     }
 
-    private static string BuildMicBarStyle(double ratio) =>
-        string.Format(
-            CultureInfo.InvariantCulture,
-            "height:{0}%",
-            Math.Round(ratio * 100, MidpointRounding.AwayFromZero));
+    private string BuildHeaderBarStyle(double offset)
+    {
+        var adjustedPercent = Math.Clamp((int)Math.Round((_levelPercent * (0.65d + offset)) + 18d, MidpointRounding.AwayFromZero), 18, 100);
+        return string.Format(CultureInfo.InvariantCulture, "height:{0}%", adjustedPercent);
+    }
 
     private static int ConvertLevelToDb(int levelPercent) =>
         levelPercent switch
@@ -218,7 +235,7 @@
 
         try
         {
-            await MicrophoneLevelInterop.StopAsync(UiDomIds.Settings.MicrophoneLevelMonitor);
+            await MicrophoneLevelInterop.StopAsync(ResolvedMonitorElementId);
         }
         catch (Exception exception)
         {

@@ -169,8 +169,8 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         var openAiProvider = page.GetByTestId(UiTestIds.Settings.AiProvider(BrowserTestConstants.SettingsFlow.OpenAiProviderId));
         await openAiProvider.ClickAsync();
-        await Expect(openAiProvider).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
-        await Expect(page.GetByTestId(UiTestIds.Settings.TestConnection)).ToBeVisibleAsync();
+        await Expect(openAiProvider).ToHaveClassAsync(new Regex(@"\bopen\b"));
+        await Expect(page.GetByTestId(UiTestIds.Settings.AiProviderSave(BrowserTestConstants.SettingsFlow.OpenAiProviderId))).ToBeVisibleAsync();
 
         await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();

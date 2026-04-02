@@ -5,6 +5,7 @@ using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Storage.Cloud;
 using PrompterOne.Shared.Tests;
 
@@ -54,7 +55,6 @@ public sealed class SettingsInteractionTests : BunitContext
         cut.FindByTestId(UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel))
             .Change(DropboxLabel);
         cut.SelectSettingsOption(UiTestIds.Settings.CloudDefaultProvider, CloudStorageProviderIds.Dropbox);
-        cut.FindByTestId(UiTestIds.Settings.CloudAutoSyncOnSave).Click();
         cut.FindByTestId(UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.Dropbox)).Click();
 
         var preferences = _harness.JsRuntime.GetSavedValue<CloudStoragePreferences>(CloudStorageStoreKeys.Preferences);
@@ -181,6 +181,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.CameraResolution, cut.Markup, StringComparison.Ordinal));
 
+        var initialMirrorState = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey).Camera.MirrorCamera;
         cut.SelectSettingsOption(UiTestIds.Settings.CameraResolution, CameraResolutionPreset.Hd720.ToString());
         cut.FindByTestId(UiTestIds.Settings.CameraMirrorToggle).Click();
         cut.FindByTestId(UiTestIds.Settings.MicLevel).Input(82);
@@ -188,9 +189,43 @@ public sealed class SettingsInteractionTests : BunitContext
 
         var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
         Assert.Equal(CameraResolutionPreset.Hd720, settings.Camera.Resolution);
-        Assert.False(settings.Camera.MirrorCamera);
+        Assert.Equal(!initialMirrorState, settings.Camera.MirrorCamera);
         Assert.Equal(82, settings.Microphone.InputLevelPercent);
         Assert.False(settings.Microphone.NoiseSuppression);
+    }
+
+    [Fact]
+    public void FileStorageSection_RendersBrowserLocalStorageLabels_InsteadOfDesktopPaths()
+    {
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.FilesPanel, cut.Markup, StringComparison.Ordinal));
+
+        var markup = cut.Markup;
+        Assert.DoesNotContain("/Users/you/", markup, StringComparison.Ordinal);
+        Assert.Contains(BrowserStorageKeys.DocumentLibrary, markup, StringComparison.Ordinal);
+        Assert.Contains(PrompterStorageDefaults.BrowserContainerDisplayPrefix, markup, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AiSection_SaveOpenAiDraft_PersistsLocalConfiguration_AndShowsLocalOnlyMessage()
+    {
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.AiPanel, cut.Markup, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Settings.NavAi).Click();
+        cut.FindByTestId(UiTestIds.Settings.AiProvider(SettingsAiProviderIds.OpenAi)).Click();
+        cut.FindAll("input")
+            .First(input => string.Equals(input.GetAttribute("placeholder"), "sk-...", StringComparison.Ordinal))
+            .Change("sk-live-openai");
+        cut.FindByTestId(UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.OpenAi)).Click();
+
+        var savedSettings = _harness.JsRuntime.GetSavedValue<AiProviderSettings>(AiProviderSettings.StorageKey);
+        Assert.Equal("sk-live-openai", savedSettings.OpenAi.ApiKey);
+        Assert.Equal(
+            "Saved locally in this browser. Runtime connection testing is not available yet.",
+            cut.FindByTestId(UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
     }
 
     [Fact]

@@ -1,0 +1,206 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Core.Models.Media
+@using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Shared.Services
+@using PrompterOne.Shared.Settings.Components
+
+<section class="set-section set-panel"
+         id="set-cameras"
+         style="@DisplayStyle"
+         data-testid="@UiTestIds.Settings.CamerasPanel">
+    <h3 class="set-section-title">Cameras</h3>
+    <p class="set-section-desc">Choose which cameras are available in GO LIVE and select the primary stream camera.</p>
+
+    <div class="set-sub-header">
+        <h4 class="set-sub-title">Device Access</h4>
+        <button class="set-btn-outline set-btn-sm"
+                @onclick="RequestMediaAccess"
+                data-testid="@UiTestIds.Settings.RequestMedia">
+            @MediaAccessActionLabel
+        </button>
+    </div>
+
+    <div class="set-cameras-layout">
+        <div class="set-cameras-list">
+            @if (Cameras.Count == 0)
+            {
+                <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoCameras">
+                    No camera devices are currently visible to the browser.
+                </div>
+            }
+            else
+            {
+                @foreach (var camera in Cameras)
+                {
+                    var sceneCamera = ResolveSceneCamera(camera.DeviceId);
+                    var isEnabled = sceneCamera is not null;
+                    var isPrimary = IsPrimaryCamera(camera);
+                    var isPreview = IsPreviewCamera(camera);
+                    <article class="@BuildCameraCardCssClass(isEnabled, isPreview)"
+                             @onclick="() => SelectCameraPreview.InvokeAsync(camera)"
+                             data-testid="@UiTestIds.Settings.CameraDevice(camera.DeviceId)">
+                        <div class="set-device-header">
+                            <div class="set-device-preview set-cam-preview">
+                                <div class="@BuildCameraFeedCssClass(isEnabled)"></div>
+                                @if (isPrimary)
+                                {
+                                    <span class="set-device-badge set-badge-primary">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                        Primary
+                                    </span>
+                                }
+                            </div>
+                            <div class="set-device-info">
+                                <span class="set-device-name">@MediaDeviceLabelSanitizer.Sanitize(camera.Label)</span>
+                                <span class="set-device-meta">@BuildCameraMeta(camera, isPrimary)</span>
+                            </div>
+                            <div class="set-device-actions" @onclick:stopPropagation="true">
+                                <div class="@BuildToggleCssClass(isEnabled)"
+                                     @onclick="() => ToggleCameraSelection.InvokeAsync(camera)"
+                                     data-testid="@UiTestIds.Settings.CameraDeviceAction(camera.DeviceId)">
+                                    <div class="set-toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (isEnabled && sceneCamera is not null)
+                        {
+                            <div class="set-device-body" @onclick:stopPropagation="true">
+                                <div class="set-device-fields">
+                                    <div class="set-field">
+                                        <label>Resolution</label>
+                                        <SettingsSelect Value="@StudioSettings.Camera.Resolution.ToString()"
+                                                       Options="@CameraResolutionOptions"
+                                                       OnChange="CameraResolutionChanged"
+                                                       TestId="@(isPrimary ? UiTestIds.Settings.CameraResolution : null)" />
+                                    </div>
+                                    <div class="set-field set-field-toggle">
+                                        <label>Mirror (Flip Horizontal)</label>
+                                        <div class="@BuildToggleCssClass(sceneCamera.Transform.MirrorHorizontal)"
+                                             @onclick="() => ToggleSceneMirror.InvokeAsync(sceneCamera.SourceId)"
+                                             data-testid="@BuildMirrorTestId(isPrimary, sceneCamera.SourceId)">
+                                            <div class="set-toggle-thumb"></div>
+                                        </div>
+                                    </div>
+                                    <div class="set-field set-field-toggle">
+                                        <label>Auto-start on Read</label>
+                                        <div class="@BuildToggleCssClass(ReaderCameraEnabled)"
+                                             @onclick="ToggleReaderCameraScene"
+                                             data-testid="@(isPrimary ? UiTestIds.Settings.ReaderCameraToggle : null)">
+                                            <div class="set-toggle-thumb"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="@BuildPrimaryCameraButtonCssClass(isPrimary)"
+                                        type="button"
+                                        disabled="@isPrimary"
+                                        @onclick="() => SetPrimaryCamera.InvokeAsync(camera)"
+                                        @onclick:stopPropagation="true"
+                                        data-testid="@UiTestIds.Settings.CameraPrimaryAction(camera.DeviceId)">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    @(isPrimary ? PrimaryCameraLabel : SetPrimaryCameraLabel)
+                                </button>
+                            </div>
+                        }
+                    </article>
+                }
+            }
+
+            <div class="set-subsection" style="margin-top:12px">
+                <h4 class="set-sub-title">General</h4>
+                <div class="set-devices">
+                    <div class="set-field set-field-toggle">
+                        <label>Auto-start all enabled cameras on GO LIVE</label>
+                        <div class="@BuildToggleCssClass(AllSceneCamerasIncludedInOutput)"
+                             @onclick="ToggleAllSceneOutputs">
+                            <div class="set-toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <SettingsCameraPreviewCard AccessGranted="@CameraAccessGranted"
+                                   Camera="@PreviewCamera"
+                                   IsActive="@IsSectionActive"
+                                   MirrorHorizontal="@(PreviewSceneCamera?.Transform.MirrorHorizontal ?? StudioSettings.Camera.MirrorCamera)"
+                                   MirrorVertical="@(PreviewSceneCamera?.Transform.MirrorVertical ?? false)"
+                                   Description="@CameraPreviewDescription" />
+    </div>
+</section>
+
+@code {
+    private const string PrimaryCameraButtonActiveCssClass = "set-btn-golden set-btn-sm set-btn-primary-cam active";
+    private const string PrimaryCameraButtonCssClass = "set-btn-outline set-btn-sm set-btn-primary-cam";
+    private const string PrimaryCameraLabel = "Primary Camera";
+    private const string SetPrimaryCameraLabel = "Set as Primary";
+
+    [Parameter] public bool AllSceneCamerasIncludedInOutput { get; set; }
+
+    [Parameter] public IReadOnlyList<SettingsSelectOption> CameraResolutionOptions { get; set; } = [];
+
+    [Parameter] public string CameraPreviewDescription { get; set; } = string.Empty;
+
+    [Parameter] public EventCallback<ChangeEventArgs> CameraResolutionChanged { get; set; }
+
+    [Parameter] public bool CameraAccessGranted { get; set; }
+
+    [Parameter] public IReadOnlyList<MediaDeviceInfo> Cameras { get; set; } = [];
+
+    [Parameter] public string DisplayStyle { get; set; } = string.Empty;
+
+    [Parameter] public EventCallback RequestMediaAccess { get; set; }
+
+    [Parameter] public bool IsSectionActive { get; set; }
+
+    [Parameter] public string MediaAccessActionLabel { get; set; } = string.Empty;
+
+    [Parameter] public MediaDeviceInfo? PreviewCamera { get; set; }
+
+    [Parameter] public SceneCameraSource? PreviewSceneCamera { get; set; }
+
+    [Parameter] public Func<bool, string> BuildCameraFeedCssClass { get; set; } = _ => string.Empty;
+
+    [Parameter] public Func<bool, bool, string> BuildCameraCardCssClass { get; set; } = (_, _) => string.Empty;
+
+    [Parameter] public Func<MediaDeviceInfo, bool, string> BuildCameraMeta { get; set; } = (_, _) => string.Empty;
+
+    [Parameter] public Func<bool, string> BuildToggleCssClass { get; set; } = _ => string.Empty;
+
+    [Parameter] public EventCallback<MediaDeviceInfo> SelectCameraPreview { get; set; }
+
+    [Parameter] public string SelectedCameraId { get; set; } = string.Empty;
+
+    [Parameter] public Func<string?, SceneCameraSource?> ResolveSceneCamera { get; set; } = _ => null;
+
+    [Parameter] public EventCallback<MediaDeviceInfo> SetPrimaryCamera { get; set; }
+
+    [Parameter] public StudioSettings StudioSettings { get; set; } = StudioSettings.Default;
+
+    [Parameter] public EventCallback<MediaDeviceInfo> ToggleCameraSelection { get; set; }
+
+    [Parameter] public EventCallback ToggleAllSceneOutputs { get; set; }
+
+    [Parameter] public EventCallback ToggleReaderCameraScene { get; set; }
+
+    [Parameter] public EventCallback<string> ToggleSceneMirror { get; set; }
+
+    [Parameter] public bool ReaderCameraEnabled { get; set; }
+
+    private string BuildMirrorTestId(bool isPrimary, string sourceId) =>
+        isPrimary ? UiTestIds.Settings.CameraMirrorToggle : UiTestIds.Settings.SceneMirror(sourceId);
+
+    private static string BuildPrimaryCameraButtonCssClass(bool isPrimary) =>
+        isPrimary ? PrimaryCameraButtonActiveCssClass : PrimaryCameraButtonCssClass;
+
+    private bool IsPrimaryCamera(MediaDeviceInfo camera) =>
+        string.Equals(SelectedCameraId, camera.DeviceId, StringComparison.Ordinal);
+
+    private bool IsPreviewCamera(MediaDeviceInfo camera) =>
+        string.Equals(PreviewCamera?.DeviceId, camera.DeviceId, StringComparison.Ordinal);
+}

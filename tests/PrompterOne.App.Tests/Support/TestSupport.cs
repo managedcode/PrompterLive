@@ -107,7 +107,9 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton(settingsStore);
         context.Services.AddSingleton<IUserSettingsStore>(settingsStore);
         context.Services.AddSingleton<IBrowserSettingsChangeNotifier>(settingsStore);
+        context.Services.AddSingleton<AiProviderSettingsStore>();
         context.Services.AddSingleton<BrowserCloudStorageStore>();
+        context.Services.AddSingleton<BrowserFileStorageStore>();
         context.Services.AddSingleton<BrowserThemeService>();
         context.Services.AddSingleton<CloudStorageProviderFactory>();
         context.Services.AddSingleton<CloudStorageTransferService>();

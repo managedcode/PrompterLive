@@ -1,0 +1,257 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Core.Models.Media
+@using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Contracts
+
+<section class="set-section set-panel"
+         id="set-mics"
+         style="@DisplayStyle"
+         data-testid="@UiTestIds.Settings.MicsPanel">
+    <h3 class="set-section-title">Microphones</h3>
+    <p class="set-section-desc">Choose which microphones are used in GO LIVE. Add audio delay to sync with video if needed.</p>
+
+    @if (ShouldShowMediaAccessAction)
+    {
+        <div class="set-sub-header">
+            <h4 class="set-sub-title">Device Access</h4>
+            <button class="set-btn-outline set-btn-sm"
+                    @onclick="RequestMediaAccess">
+                @MediaAccessActionLabel
+            </button>
+        </div>
+    }
+
+    <div class="set-device-list">
+        @if (Microphones.Count == 0)
+        {
+            <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoMics">
+                No microphones are currently visible to the browser.
+            </div>
+        }
+        else
+        {
+            @if (SelectedMicrophone is not null)
+            {
+                var primaryAudioInput = GetAudioInput(SelectedMicrophone);
+                var primaryEnabled = IsMicrophoneEnabled(SelectedMicrophone);
+                <div data-testid="@UiTestIds.Settings.MicDevice(SelectedMicrophone.DeviceId)">
+                    <SettingsMicrophoneLevelCard AccessGranted="@MicrophoneAccessGranted"
+                                                 IsActive="@IsSectionActive"
+                                                 IsEnabled="@primaryEnabled"
+                                                 Microphone="@SelectedMicrophone"
+                                                 MetaText="@BuildMicrophoneMeta(SelectedMicrophone)">
+                        <HeaderAction>
+                            <div class="set-device-actions">
+                                <div class="@BuildToggleCssClass(primaryEnabled)"
+                                     @onclick="() => ToggleMicrophoneSelection.InvokeAsync(SelectedMicrophone)"
+                                     @onclick:stopPropagation="true">
+                                    <div class="set-toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </HeaderAction>
+                        <ChildContent>
+                            <div class="set-device-fields">
+                                <div class="set-field">
+                                    <label>Input Level</label>
+                                    <div class="set-level-bar">
+                                        <div class="set-level-fill" style="@BuildLevelFillStyle(MicrophoneSettings.InputLevelPercent)"></div>
+                                        <div class="set-level-thumb" style="@BuildLevelThumbStyle(MicrophoneSettings.InputLevelPercent)"></div>
+                                        <input type="range"
+                                               class="set-level-range"
+                                               min="0"
+                                               max="100"
+                                               step="1"
+                                               value="@MicrophoneSettings.InputLevelPercent"
+                                               @oninput="UpdatePrimaryMicLevel"
+                                               data-testid="@UiTestIds.Settings.MicLevel" />
+                                    </div>
+                                </div>
+                                <div class="set-field">
+                                    <label>Audio Delay (ms)</label>
+                                    <div class="set-delay-row">
+                                        <input type="number"
+                                               class="set-input set-input-sm"
+                                               min="0"
+                                               max="5000"
+                                               step="10"
+                                               value="@primaryAudioInput.DelayMs"
+                                               @oninput="args => UpdateAudioDelayAsync(SelectedMicrophone, args)"
+                                               data-testid="@UiTestIds.Settings.MicDelay(SelectedMicrophone.DeviceId)" />
+                                        <span class="set-delay-hint">0 - 5000 ms</span>
+                                    </div>
+                                </div>
+                                <div class="set-field set-field-toggle">
+                                    <label>Noise Suppression</label>
+                                    <div class="@BuildToggleCssClass(MicrophoneSettings.NoiseSuppression)"
+                                         @onclick="ToggleNoiseSuppression"
+                                         data-testid="@UiTestIds.Settings.NoiseSuppression">
+                                        <div class="set-toggle-thumb"></div>
+                                    </div>
+                                </div>
+                                <div class="set-field set-field-toggle">
+                                    <label>Echo Cancellation</label>
+                                    <div class="@BuildToggleCssClass(MicrophoneSettings.EchoCancellation)"
+                                         @onclick="ToggleEchoCancellation"
+                                         data-testid="@UiTestIds.Settings.EchoCancellation">
+                                        <div class="set-toggle-thumb"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ChildContent>
+                    </SettingsMicrophoneLevelCard>
+                </div>
+            }
+
+            @foreach (var microphone in Microphones.Where(device => !string.Equals(device.DeviceId, SelectedMicrophoneId, StringComparison.Ordinal)))
+            {
+                var inputState = GetAudioInput(microphone);
+                var isEnabled = IsMicrophoneEnabled(microphone);
+                <div @onclick="() => SelectPrimaryMicrophone.InvokeAsync(microphone)"
+                     data-testid="@UiTestIds.Settings.MicDevice(microphone.DeviceId)">
+                    <SettingsMicrophoneLevelCard AccessGranted="@MicrophoneAccessGranted"
+                                                 IsActive="@(IsSectionActive && isEnabled)"
+                                                 IsEnabled="@isEnabled"
+                                                 CardTestId="@null"
+                                                 EmptyTestId="@null"
+                                                 LabelTestId="@null"
+                                                 MeterTestId="@null"
+                                                 MonitorElementId="@UiDomIds.Settings.MicrophoneLevelMonitorForDevice(microphone.DeviceId)"
+                                                 Microphone="@microphone"
+                                                 MetaText="@BuildMicrophoneMeta(microphone)">
+                        <HeaderAction>
+                            <div class="set-device-actions" @onclick:stopPropagation="true">
+                                <div class="@BuildToggleCssClass(isEnabled)"
+                                     @onclick="() => ToggleMicrophoneSelection.InvokeAsync(microphone)">
+                                    <div class="set-toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </HeaderAction>
+                        <ChildContent>
+                            @if (isEnabled)
+                            {
+                                <div class="set-device-fields">
+                                    <div class="set-field">
+                                        <label>Input Level</label>
+                                        <div class="set-level-bar">
+                                            <div class="set-level-fill" style="@BuildLevelFillStyle(ConvertGainToPercent(inputState.Gain))"></div>
+                                            <div class="set-level-thumb" style="@BuildLevelThumbStyle(ConvertGainToPercent(inputState.Gain))"></div>
+                                            <input type="range"
+                                                   class="set-level-range"
+                                                   min="0"
+                                                   max="200"
+                                                   step="5"
+                                                   value="@ConvertGainToPercent(inputState.Gain)"
+                                                   @oninput="args => UpdateAudioGainAsync(microphone, args)" />
+                                        </div>
+                                    </div>
+                                    <div class="set-field">
+                                        <label>Audio Delay (ms)</label>
+                                        <div class="set-delay-row">
+                                            <input type="number"
+                                                   class="set-input set-input-sm"
+                                                   min="0"
+                                                   max="5000"
+                                                   step="10"
+                                                   value="@inputState.DelayMs"
+                                                   @oninput="args => UpdateAudioDelayAsync(microphone, args)"
+                                                   data-testid="@UiTestIds.Settings.MicDelay(microphone.DeviceId)" />
+                                            <span class="set-delay-hint">0 - 5000 ms</span>
+                                        </div>
+                                    </div>
+                                    <div class="set-field set-field-toggle">
+                                        <label>Noise Suppression</label>
+                                        <div class="@BuildToggleCssClass(MicrophoneSettings.NoiseSuppression)"
+                                             @onclick="ToggleNoiseSuppression">
+                                            <div class="set-toggle-thumb"></div>
+                                        </div>
+                                    </div>
+                                    <div class="set-field set-field-toggle">
+                                        <label>Echo Cancellation</label>
+                                        <div class="@BuildToggleCssClass(MicrophoneSettings.EchoCancellation)"
+                                             @onclick="ToggleEchoCancellation">
+                                            <div class="set-toggle-thumb"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </ChildContent>
+                    </SettingsMicrophoneLevelCard>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="set-subsection" style="margin-top:28px">
+        <h4 class="set-sub-title">General</h4>
+        <div class="set-devices">
+            <div class="set-field set-field-toggle">
+                <label>Mute all microphones when not in GO LIVE</label>
+                <div class="@BuildToggleCssClass(AllMicrophonesMutedOutsideGoLive)"
+                     @onclick="ToggleMuteAllMicrophones">
+                    <div class="set-toggle-thumb"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public bool AllMicrophonesMutedOutsideGoLive { get; set; }
+
+    [Parameter] public Func<int, string> BuildLevelFillStyle { get; set; } = _ => string.Empty;
+
+    [Parameter] public Func<int, string> BuildLevelThumbStyle { get; set; } = _ => string.Empty;
+
+    [Parameter] public Func<MediaDeviceInfo, string> BuildMicrophoneMeta { get; set; } = _ => string.Empty;
+
+    [Parameter] public Func<bool, string> BuildToggleCssClass { get; set; } = _ => string.Empty;
+
+    [Parameter] public Func<double, int> ConvertGainToPercent { get; set; } = _ => 0;
+
+    [Parameter] public string DisplayStyle { get; set; } = string.Empty;
+
+    [Parameter] public Func<MediaDeviceInfo, AudioInputState> GetAudioInput { get; set; } = microphone => new AudioInputState(microphone.DeviceId, microphone.Label);
+
+    [Parameter] public bool IsSectionActive { get; set; }
+
+    [Parameter] public Func<MediaDeviceInfo, bool> IsMicrophoneEnabled { get; set; } = _ => false;
+
+    [Parameter] public string MediaAccessActionLabel { get; set; } = string.Empty;
+
+    [Parameter] public bool MicrophoneAccessGranted { get; set; }
+
+    [Parameter] public MicrophoneStudioSettings MicrophoneSettings { get; set; } = new();
+
+    [Parameter] public IReadOnlyList<MediaDeviceInfo> Microphones { get; set; } = [];
+
+    [Parameter] public EventCallback RequestMediaAccess { get; set; }
+
+    [Parameter] public EventCallback<MediaDeviceInfo> SelectPrimaryMicrophone { get; set; }
+
+    [Parameter] public MediaDeviceInfo? SelectedMicrophone { get; set; }
+
+    [Parameter] public string SelectedMicrophoneId { get; set; } = string.Empty;
+
+    [Parameter] public bool ShouldShowMediaAccessAction { get; set; }
+
+    [Parameter] public EventCallback ToggleEchoCancellation { get; set; }
+
+    [Parameter] public EventCallback ToggleMuteAllMicrophones { get; set; }
+
+    [Parameter] public EventCallback<MediaDeviceInfo> ToggleMicrophoneSelection { get; set; }
+
+    [Parameter] public EventCallback ToggleNoiseSuppression { get; set; }
+
+    [Parameter] public Func<MediaDeviceInfo, ChangeEventArgs, Task>? UpdateAudioDelay { get; set; }
+
+    [Parameter] public Func<MediaDeviceInfo, ChangeEventArgs, Task>? UpdateAudioGain { get; set; }
+
+    [Parameter] public EventCallback<ChangeEventArgs> UpdatePrimaryMicLevel { get; set; }
+
+    private Task UpdateAudioDelayAsync(MediaDeviceInfo microphone, ChangeEventArgs args) =>
+        UpdateAudioDelay?.Invoke(microphone, args) ?? Task.CompletedTask;
+
+    private Task UpdateAudioGainAsync(MediaDeviceInfo microphone, ChangeEventArgs args) =>
+        UpdateAudioGain?.Invoke(microphone, args) ?? Task.CompletedTask;
+}

@@ -78,7 +78,7 @@ public sealed class CloudKitStorageProfile
 
 public sealed class CloudStoragePreferences
 {
-    public bool AutoSyncOnSave { get; set; } = true;
+    public bool AutoSyncOnSave { get; set; }
 
     public CloudKitStorageProfile CloudKit { get; set; } = new();
 
@@ -92,7 +92,7 @@ public sealed class CloudStoragePreferences
 
     public string PrimaryProviderId { get; set; } = CloudStorageProviderIds.OneDrive;
 
-    public bool SyncOnStartup { get; set; } = true;
+    public bool SyncOnStartup { get; set; }
 
     public static CloudStoragePreferences CreateDefault() => new();
 
@@ -151,6 +151,10 @@ public sealed class CloudKitStorageCredentials
 
 public sealed class CloudStorageSettingsBundle
 {
+    public AiProviderSettings AiProviderSettings { get; set; } = AiProviderSettings.CreateDefault();
+
+    public BrowserFileStorageSettings FileStorageSettings { get; set; } = BrowserFileStorageSettings.Default;
+
     public LearnSettings LearnSettings { get; set; } = new();
 
     public ReaderSettings ReaderSettings { get; set; } = new();

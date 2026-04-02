@@ -11,6 +11,7 @@ public partial class SettingsCloudSection : ComponentBase
 {
     private const string ConnectedStatusClass = "set-dest-ok";
     private const string ConnectedStatusLabel = "Connected";
+    private const string DisconnectedStatusClass = "set-dest-idle";
     private const string DisconnectedSubtitle = "Not connected";
     private const string DisconnectedStatusLabel = "Disconnected";
     private const string OnCssClass = "on";
@@ -240,7 +241,7 @@ public partial class SettingsCloudSection : ComponentBase
         isOn ? $"{SetToggleCssClass} {OnCssClass}" : SetToggleCssClass;
 
     private static string GetStatusClass(CloudStorageConnectionState connection) =>
-        connection.IsConnected ? ConnectedStatusClass : string.Empty;
+        connection.IsConnected ? ConnectedStatusClass : DisconnectedStatusClass;
 
     private static string GetStatusLabel(CloudStorageConnectionState connection) =>
         connection.IsConnected ? ConnectedStatusLabel : DisconnectedStatusLabel;

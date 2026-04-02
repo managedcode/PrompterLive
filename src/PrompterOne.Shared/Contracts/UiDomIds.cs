@@ -21,6 +21,9 @@ public static class UiDomIds
     {
         public const string CameraPreviewVideo = "settings-camera-preview-video";
         public const string MicrophoneLevelMonitor = "settings-microphone-level-monitor";
+
+        public static string MicrophoneLevelMonitorForDevice(string deviceId) =>
+            $"{MicrophoneLevelMonitor}-{deviceId}";
     }
 
     public static class GoLive

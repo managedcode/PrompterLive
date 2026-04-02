@@ -37,7 +37,7 @@ public sealed record CameraStudioSettings(
     string? DefaultCameraId = null,
     CameraResolutionPreset Resolution = CameraResolutionPreset.FullHd1080,
     CameraFrameRatePreset FrameRate = CameraFrameRatePreset.Fps30,
-    bool MirrorCamera = true,
+    bool MirrorCamera = false,
     bool AutoStartOnRead = true);
 
 public sealed record MicrophoneStudioSettings(

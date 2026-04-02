@@ -3,6 +3,7 @@ namespace PrompterOne.Shared.Pages;
 public partial class SettingsPage
 {
     private const string DisplayNoneStyle = "display:none";
+    private const string SetNavItemCssClass = "set-nav-item";
 
     private SettingsSection _activeSection = SettingsSection.Cloud;
 

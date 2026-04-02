@@ -221,7 +221,9 @@ internal static partial class BrowserTestConstants
     {
         public const string AutoSeedScenario = "go-live-auto-seed";
         public const string AutoSeedStudioStep = "01-default-studio-shell";
+        public const string ActiveStateValue = "active";
         public const string IdleDotColorChannel = "239, 68, 68";
+        public const string LiveStateAttributeName = "data-live-state";
         public const string ScreenTitle = "Go Live";
         public const string CameraSwitchScenario = "go-live-camera-switch";
         public const string CameraSwitchStep = "01-secondary-on-air";
@@ -237,16 +239,24 @@ internal static partial class BrowserTestConstants
         public const string LiveKitRoom = "launch-room";
         public const string LiveKitServer = "wss://livekit.example.com";
         public const string LiveKitToken = "lk-test-token";
+        public const string LiveLevelAttributeName = "data-live-level";
         public const string MicChannelId = "mic";
+        public const string Mp4ContainerLabel = "MP4";
+        public const string Mp4MimeFragment = "mp4";
+        public const string OutputWidthLabel = "1920";
         public const string PrimaryParticipantId = "host";
         public const string PrompterUtilitySourceId = "prompter-display";
+        public const string ProgramChannelId = "program";
         public const string RecordingStateValue = "recording";
+        public const string RecordingChannelId = "recording";
         public const int SharedContextPageCount = 2;
         public const string RuntimeSessionId = "go-live-program";
         public const string SceneStorageKey = "prompterone.settings.prompterone.scene";
         public const string SecondSourceId = "scene-cam-b";
         public const string SideCameraLabel = "Side camera";
         public const string StreamingStateValue = "streaming";
+        public const string ByteSuffix = "B";
+        public const string WebmContainerLabel = "WEBM";
         public const string WidgetReturnScreenshotPath = "output/playwright/go-live-widget-return.png";
         public const string InstallLiveKitHarnessScript = """
             () => {
@@ -305,8 +315,14 @@ internal static partial class BrowserTestConstants
         public const string GetRuntimeStateScript = "sessionId => window.PrompterOneGoLiveOutput.getSessionState(sessionId)";
         public const string RecordingRuntimeActiveScript =
             "sessionId => Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.recording?.active)";
+        public const string RecordingRuntimeMetadataReadyScript =
+            "sessionId => { const state = window.PrompterOneGoLiveOutput.getSessionState(sessionId); return Boolean(state?.recording?.active && state?.recording?.fileName && state?.recording?.mimeType && (state?.recording?.sizeBytes ?? 0) > 0); }";
         public const string RecordingRuntimeInactiveScript =
             "sessionId => !Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.recording?.active)";
+        public const string RecordingRuntimeUsesProgramSourceScript =
+            "([sessionId, sourceId]) => window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.program?.primarySourceId === sourceId";
+        public static string RecordingRuntimeAudioLevelsReadyScript { get; } =
+            "([sessionId, minimumLevel]) => { const state = window.PrompterOneGoLiveOutput.getSessionState(sessionId); return (state?.audio?.programLevelPercent ?? 0) >= minimumLevel && (state?.audio?.recordingLevelPercent ?? 0) >= minimumLevel; }";
         public const string ObsRuntimeAudioAttachedScript =
             "sessionId => Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.obs?.audioAttached)";
         public const string ResolveCameraDeviceScript = """
@@ -574,6 +590,7 @@ internal static partial class BrowserTestConstants
         public static Regex SettingsAboutVersion { get; } = new(@"^Version 0\.1\.\d+ · Build \d+$", RegexOptions.Compiled);
         public static Regex ToggleOnClass { get; } = new(@"\bon\b", RegexOptions.Compiled);
         public static Regex NonZeroWidth { get; } = new(@"width:\s*0%", RegexOptions.Compiled);
+        public static Regex ReaderFirstBlockIndicator { get; } = new(@"^1 / \d+$", RegexOptions.Compiled);
         public static Regex ReaderTimeNotZero { get; } = new(@"^0:00 /", RegexOptions.Compiled);
         public static Regex ReaderSecondBlockIndicator { get; } = new(@"^2 / \d+$", RegexOptions.Compiled);
         public static Regex CameraAutoStart { get; } = new(@"true|false", RegexOptions.Compiled);

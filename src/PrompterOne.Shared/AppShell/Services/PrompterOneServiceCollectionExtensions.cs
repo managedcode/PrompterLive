@@ -12,6 +12,7 @@ using PrompterOne.Core.Services.Streaming;
 using PrompterOne.Core.Services.Workspace;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Services.Editor;
+using PrompterOne.Shared.Settings.Services;
 using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Storage.Cloud;
 
@@ -59,7 +60,9 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<BrowserSettingsStore>();
         services.AddScoped<IUserSettingsStore>(serviceProvider => serviceProvider.GetRequiredService<BrowserSettingsStore>());
         services.AddScoped<IBrowserSettingsChangeNotifier>(serviceProvider => serviceProvider.GetRequiredService<BrowserSettingsStore>());
+        services.AddScoped<AiProviderSettingsStore>();
         services.AddScoped<BrowserCloudStorageStore>();
+        services.AddScoped<BrowserFileStorageStore>();
         services.AddScoped<BrowserThemeService>();
         services.AddScoped<CloudStorageProviderFactory>();
         services.AddScoped<CloudStorageTransferService>();

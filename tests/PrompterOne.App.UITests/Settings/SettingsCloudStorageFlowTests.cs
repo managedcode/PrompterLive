@@ -20,12 +20,14 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudPanel)).ToBeVisibleAsync(
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await EnsureToggleOffAsync(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave));
 
             await SettingsSelectDriver.SelectByValueAsync(
                 page,
                 UiTestIds.Settings.CloudDefaultProvider,
                 CloudStorageProviderIds.Dropbox);
-            await ToggleSettingsButtonAsync(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave));
+            await Expect(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave))
+                .Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             var accountLabelField = page.GetByTestId(
                 UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel));
             await Expect(accountLabelField).ToBeVisibleAsync();
@@ -58,23 +60,19 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
                 BrowserTestConstants.SettingsFlow.CloudStorageReloadedStep);
         });
 
-    private static async Task ToggleSettingsButtonAsync(ILocator locator)
+    private static async Task EnsureToggleOffAsync(ILocator locator)
     {
-        var wasOn = await HasOnClassAsync(locator);
-        await locator.ClickAsync();
-
-        if (wasOn)
+        if (await HasOnClassAsync(locator))
         {
+            await locator.ClickAsync();
             await Expect(locator).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-        }
-        else
-        {
-            await Expect(locator).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
         }
     }
 
-    private static async Task<bool> HasOnClassAsync(ILocator locator) =>
-        (await locator.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty)
-        .Split(BrowserTestConstants.Html.ClassSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Contains(BrowserTestConstants.Css.OnClass, StringComparer.Ordinal);
+    private static async Task<bool> HasOnClassAsync(ILocator locator)
+    {
+        var classes = await locator.GetAttributeAsync("class");
+        return (classes ?? string.Empty).Contains("on", StringComparison.Ordinal);
+    }
+
 }

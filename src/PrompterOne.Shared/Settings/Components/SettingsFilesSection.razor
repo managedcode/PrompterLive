@@ -7,12 +7,12 @@
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.FilesPanel">
     <h3 class="set-section-title">@SettingsNavigationText.FileStorageLabel</h3>
-    <p class="set-section-desc">Where scripts, recordings, and exports are saved locally.</p>
+    <p class="set-section-desc">PrompterOne is browser-only. Scripts stay in the browser library store, while recordings and exports use the browser-local storage container instead of fake desktop folders.</p>
 
     <div class="set-device-list">
         <SettingsExpandableCard Title="Scripts"
-                                Subtitle="@ScriptsLocation"
-                                IconStyle="background:rgba(196,160,96,.10); color:var(--gold);"
+                                Subtitle="@_viewState.Scripts.Subtitle"
+                                IconStyle="background:rgba(196,160,96,.14); color:var(--gold);"
                                 IsOpen="@IsCardOpen(ScriptsCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(ScriptsCardId))">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,26 +23,28 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Location</label>
-                    <div class="set-path-field">
-                        <input type="text" class="set-input" value="@ScriptsLocation" readonly />
-                        <button class="set-btn-outline set-btn-sm" type="button">Browse</button>
-                    </div>
+                    <label>Storage Mode</label>
+                    <input type="text" class="set-input" value="@_viewState.Scripts.ScopeLabel" readonly />
                 </div>
+                <div class="set-field">
+                    <label>Browser Keys</label>
+                    <input type="text" class="set-input" value="@_viewState.Scripts.LocationLabel" readonly />
+                </div>
+                <p class="set-card-copy">@_viewState.Scripts.DetailLabel</p>
                 <div class="set-field set-field-toggle">
                     <label>Auto-save every 30 seconds</label>
-                    <div class="@FileAutoSaveToggleCssClass"
+                    <div class="@BuildToggleCssClass(_settings.FileAutoSaveEnabled)"
                          data-testid="@UiTestIds.Settings.FileAutoSave"
-                         @onclick="ToggleAutoSave"
+                         @onclick="ToggleAutoSaveAsync"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
                     <label>Keep backup copies</label>
-                    <div class="@FileBackupCopiesToggleCssClass"
+                    <div class="@BuildToggleCssClass(_settings.FileBackupCopiesEnabled)"
                          data-testid="@UiTestIds.Settings.FileBackupCopies"
-                         @onclick="ToggleBackupCopies"
+                         @onclick="ToggleBackupCopiesAsync"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>
                     </div>
@@ -51,8 +53,8 @@
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="Recordings"
-                                Subtitle="@RecordingsLocation"
-                                IconStyle="background:rgba(239,68,68,.10); color:#F87171;"
+                                Subtitle="@_viewState.Recordings.Subtitle"
+                                IconStyle="background:rgba(239,68,68,.14); color:#F87171;"
                                 IsOpen="@IsCardOpen(RecordingsCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(RecordingsCardId))">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -61,24 +63,26 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Location</label>
-                    <div class="set-path-field">
-                        <input type="text" class="set-input" value="@RecordingsLocation" readonly />
-                        <button class="set-btn-outline set-btn-sm" type="button">Browse</button>
-                    </div>
+                    <label>Storage Scope</label>
+                    <input type="text" class="set-input" value="@_viewState.Recordings.ScopeLabel" readonly />
+                </div>
+                <div class="set-field">
+                    <label>Browser Container Path</label>
+                    <input type="text" class="set-input" value="@_viewState.Recordings.LocationLabel" readonly />
                 </div>
                 <div class="set-field">
                     <label>Max Storage</label>
-                    <SettingsSelect Value="@RecordingsStorageLimit"
+                    <SettingsSelect Value="@_settings.RecordingsStorageLimit"
                                    Options="@StorageLimitOptions"
                                    OnChange="OnStorageLimitChanged" />
                 </div>
+                <p class="set-card-copy">@_viewState.Recordings.DetailLabel</p>
             </div>
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="Exports"
-                                Subtitle="TPS (Native) · PDF · Markdown"
-                                IconStyle="background:rgba(99,102,241,.10); color:#818CF8;"
+                                Subtitle="@_viewState.Exports.Subtitle"
+                                IconStyle="background:rgba(99,102,241,.16); color:#A5B4FC;"
                                 IsOpen="@IsCardOpen(ExportsCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(ExportsCardId))">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,74 +93,20 @@
             <div class="set-device-fields">
                 <div class="set-field">
                     <label>Default Export Format</label>
-                    <SettingsSelect Value="@ExportFormat"
+                    <SettingsSelect Value="@_settings.ExportFormat"
                                    Options="@ExportFormatOptions"
                                    OnChange="OnExportFormatChanged" />
                 </div>
                 <div class="set-field">
-                    <label>Export Location</label>
-                    <div class="set-path-field">
-                        <input type="text" class="set-input" value="@ExportsLocation" readonly />
-                        <button class="set-btn-outline set-btn-sm" type="button">Browse</button>
-                    </div>
+                    <label>Browser Container Path</label>
+                    <input type="text" class="set-input" value="@_viewState.Exports.LocationLabel" readonly />
                 </div>
+                <div class="set-field">
+                    <label>Storage Scope</label>
+                    <input type="text" class="set-input" value="@_viewState.Exports.ScopeLabel" readonly />
+                </div>
+                <p class="set-card-copy">@_viewState.Exports.DetailLabel</p>
             </div>
         </SettingsExpandableCard>
     </div>
 </section>
-
-@code {
-    private static readonly IReadOnlyList<SettingsSelectOption> ExportFormatOptions =
-    [
-        new("TPS (Native)", "TPS (Native)"),
-        new("Markdown", "Markdown"),
-        new("Plain Text", "Plain Text"),
-        new("PDF", "PDF"),
-    ];
-
-    private static readonly IReadOnlyList<SettingsSelectOption> StorageLimitOptions =
-    [
-        new("No limit", "No limit"),
-        new("10 GB", "10 GB"),
-        new("50 GB", "50 GB"),
-        new("100 GB", "100 GB"),
-    ];
-
-    private const string ExportsCardId = "files-exports";
-    private const string RecordingsCardId = "files-recordings";
-    private const string ScriptsCardId = "files-scripts";
-
-    [Parameter] public string DisplayStyle { get; set; } = string.Empty;
-
-    [Parameter] public string ExportFormat { get; set; } = string.Empty;
-
-    [Parameter] public string ExportsLocation { get; set; } = string.Empty;
-
-    [Parameter] public string FileAutoSaveToggleCssClass { get; set; } = string.Empty;
-
-    [Parameter] public string FileBackupCopiesToggleCssClass { get; set; } = string.Empty;
-
-    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
-
-    [Parameter] public string RecordingsLocation { get; set; } = string.Empty;
-
-    [Parameter] public string RecordingsStorageLimit { get; set; } = string.Empty;
-
-    [Parameter] public string ScriptsLocation { get; set; } = string.Empty;
-
-    [Parameter] public EventCallback<string> ToggleCard { get; set; }
-
-    [Parameter] public EventCallback ToggleAutoSave { get; set; }
-
-    [Parameter] public EventCallback ToggleBackupCopies { get; set; }
-
-    [Parameter] public EventCallback<string> UpdateExportFormat { get; set; }
-
-    [Parameter] public EventCallback<string> UpdateRecordingsStorageLimit { get; set; }
-
-    private Task OnExportFormatChanged(ChangeEventArgs args) =>
-        UpdateExportFormat.InvokeAsync(args.Value?.ToString() ?? string.Empty);
-
-    private Task OnStorageLimitChanged(ChangeEventArgs args) =>
-        UpdateRecordingsStorageLimit.InvokeAsync(args.Value?.ToString() ?? string.Empty);
-}
