@@ -118,12 +118,32 @@
     }
 
     async function waitForNextVideoFrame(videoElement) {
-        if (typeof videoElement.requestVideoFrameCallback === "function") {
-            await new Promise(resolve => videoElement.requestVideoFrameCallback(() => resolve()));
-            return;
-        }
+        await new Promise(resolve => {
+            let completed = false;
 
-        await new Promise(resolve => window.setTimeout(resolve, visibleVideoPollDelayMs));
+            const finish = () => {
+                if (completed) {
+                    return;
+                }
+
+                completed = true;
+                resolve();
+            };
+
+            const timeoutId = window.setTimeout(finish, visibleVideoPollDelayMs);
+            const canAwaitVideoFrame = typeof videoElement.requestVideoFrameCallback === "function"
+                && !videoElement.paused
+                && !videoElement.ended;
+
+            if (!canAwaitVideoFrame) {
+                return;
+            }
+
+            videoElement.requestVideoFrameCallback(() => {
+                window.clearTimeout(timeoutId);
+                finish();
+            });
+        });
     }
 
     async function detectVisibleVideoAcrossFrames(videoElement) {

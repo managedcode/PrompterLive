@@ -101,13 +101,13 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
 
                 let animationFramePasses = 0;
                 const captureOnAnimationFrame = () => {
+                    animationFramePasses += 1;
                     capture();
 
                     if (window.__learnStartupTrace.length >= maxSamples || animationFramePasses >= maxAnimationFramePasses) {
                         return;
                     }
 
-                    animationFramePasses += 1;
                     window.requestAnimationFrame(captureOnAnimationFrame);
                 };
 

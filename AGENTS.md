@@ -427,6 +427,7 @@ Ask first:
 - progress updates that talk about internal skill routing instead of the concrete repo change
 - long exploratory work before producing the concrete vendored files the user explicitly asked for
 - unexpected browser debugger pause hooks in the default dev launch profile; browser debugging must stay explicit opt-in
+- temporary worktrees or throwaway repo copies for normal repo tasks when the current workspace branch is available; work in the active workspace unless the user explicitly asks for isolation
 
 ## Preferred Skills
 
