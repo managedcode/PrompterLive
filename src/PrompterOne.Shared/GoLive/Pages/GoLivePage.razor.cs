@@ -15,6 +15,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private GoLiveOutputRuntimeService GoLiveOutputRuntime { get; set; } = null!;
+    [Inject] private GoLiveRemoteSourceRuntimeService GoLiveRemoteSourceRuntime { get; set; } = null!;
     [Inject] private MicrophoneLevelInterop MicrophoneLevelInterop { get; set; } = null!;
     [Inject] private StreamingPublishDescriptorResolver StreamingDescriptorResolver { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
@@ -40,9 +41,9 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     private bool HasPrimaryMicrophone => !string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneId);
 
     private SceneCameraSource? PreviewCamera =>
-        SceneCameras.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)
-        ?? SceneCameras.FirstOrDefault(camera => camera.Transform.Visible)
-        ?? (SceneCameras.Count > 0 ? SceneCameras[0] : null);
+        AvailableSceneSources.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)
+        ?? AvailableSceneSources.FirstOrDefault(camera => camera.Transform.Visible)
+        ?? (AvailableSceneSources.Count > 0 ? AvailableSceneSources[0] : null);
 
     private string PrimaryMicrophoneLabel => string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneLabel)
         ? GoLiveText.Audio.NoMicrophoneLabel

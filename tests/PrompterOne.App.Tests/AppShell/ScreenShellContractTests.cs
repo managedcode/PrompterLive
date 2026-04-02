@@ -118,8 +118,6 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProgramCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SourcesCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.OpenSettings));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs)}']"));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Ndi)}']"));
             Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
         });
     }

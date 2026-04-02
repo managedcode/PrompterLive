@@ -50,7 +50,7 @@ public partial class GoLivePage
         _ => GoLiveText.Session.ProgramBadgeIdleLabel
     };
 
-    private string ProgramResolutionLabel => $"{ResolveResolutionDimensions(_studioSettings.Streaming.OutputResolution)} • {ActiveSourceLabel}";
+    private string ProgramResolutionLabel => $"{ResolveResolutionDimensions(_studioSettings.Streaming.ProgramCaptureSettings.ResolutionPreset)} • {ActiveSourceLabel}";
 
     private string ProgramTimerLabel => FormatSessionElapsed(SessionStartedAt);
 
@@ -67,7 +67,7 @@ public partial class GoLivePage
 
     private SceneCameraSource? SelectedCamera => ResolveSessionSource(GoLiveSession.State.SelectedSourceId) ?? ActiveCamera;
 
-    private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.OutputResolution);
+    private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.ProgramCaptureSettings.ResolutionPreset);
 
     private string StreamActionLabel => GoLiveSession.State.IsStreamActive
         ? GoLiveText.Session.StreamStopLabel
@@ -91,7 +91,7 @@ public partial class GoLivePage
             _sessionSubtitle,
             PrimaryMicrophoneLabel,
             _studioSettings.Streaming,
-            SceneCameras);
+            AvailableSceneSources);
     }
 
     private Task SelectSourceAsync(string sourceId)
@@ -102,7 +102,7 @@ public partial class GoLivePage
     private async Task SelectSourceAfterReadyAsync(string sourceId)
     {
         await EnsurePageReadyAsync();
-        GoLiveSession.SelectSource(SceneCameras, sourceId);
+        GoLiveSession.SelectSource(AvailableSceneSources, sourceId);
     }
 
     private async Task SwitchSelectedSourceAsync()
@@ -120,7 +120,7 @@ public partial class GoLivePage
                     await GoLiveOutputRuntime.UpdateProgramSourceAsync(BuildRuntimeRequest(nextCamera));
                 }
 
-                GoLiveSession.SwitchToSelectedSource(SceneCameras);
+                GoLiveSession.SwitchToSelectedSource(AvailableSceneSources);
             });
     }
 
@@ -158,7 +158,7 @@ public partial class GoLivePage
                         return;
                     }
 
-                    GoLiveSession.StartStream(SceneCameras);
+                    GoLiveSession.StartStream(AvailableSceneSources);
                 });
         });
     }
@@ -188,14 +188,14 @@ public partial class GoLivePage
                     async () =>
                 {
                     await GoLiveOutputRuntime.StartRecordingAsync(BuildRuntimeRequest(SelectedCamera));
-                    GoLiveSession.StartRecording(SceneCameras);
+                    GoLiveSession.StartRecording(AvailableSceneSources);
                 });
         });
     }
 
     private SceneCameraSource? ResolveSessionSource(string sourceId)
     {
-        return SceneCameras.FirstOrDefault(camera => string.Equals(camera.SourceId, sourceId, StringComparison.Ordinal));
+        return AvailableSceneSources.FirstOrDefault(camera => string.Equals(camera.SourceId, sourceId, StringComparison.Ordinal));
     }
 
     private static string ResolveResolutionDimensions(StreamingResolutionPreset resolution)
@@ -242,13 +242,19 @@ public partial class GoLivePage
             return;
         }
 
+        if (IsRemoteSource(SelectedCamera.SourceId))
+        {
+            SetRemoteSourceIncludeInOutput(SelectedCamera.SourceId, true);
+            return;
+        }
+
         MediaSceneService.SetIncludeInOutput(SelectedCamera.SourceId, true);
         await PersistSceneAsync();
     }
 
     private async Task EnsureRecordingOutputEnabledAsync()
     {
-        if (_studioSettings.Streaming.LocalRecordingEnabled)
+        if (_studioSettings.Streaming.RecordingSettings.IsEnabled)
         {
             return;
         }
@@ -257,8 +263,10 @@ public partial class GoLivePage
         {
             Streaming = _studioSettings.Streaming with
             {
-                LocalRecordingEnabled = true,
-                OutputMode = StreamingOutputMode.LocalRecording
+                Recording = _studioSettings.Streaming.RecordingSettings with
+                {
+                    IsEnabled = true
+                }
             }
         };
 

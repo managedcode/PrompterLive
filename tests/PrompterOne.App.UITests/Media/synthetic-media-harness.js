@@ -29,6 +29,9 @@
     const primaryMicrophoneGroupId = "prompterone-mic-a";
     const streamMetadataVersion = 1;
     const concealIdentitySessionFlag = "__prompterOneConcealDeviceIdentityUntilMediaRequest";
+    const remoteSourceColors = ["#5fd2ff", "#f98f6f", "#8fd56e", "#f1c75c"];
+    const remoteSourceToneBase = 310;
+    const remoteSourceSeedGlobal = "__prompterOneRemoteSourceSeed";
 
     if (typeof window[harnessGlobalName] === "object" && window[harnessGlobalName] !== null) {
         return;
@@ -62,6 +65,7 @@
     ]);
     const deviceLabelOverrides = new Map();
     const requestLog = [];
+    const remoteSourcesByConnection = new Map();
     let requestId = 0;
     let concealDeviceIdentityUntilMediaRequest =
         window.sessionStorage?.getItem(concealIdentitySessionFlag) === "true";
@@ -346,6 +350,61 @@
         return stream;
     }
 
+    function disposeRemoteSources(items) {
+        items.forEach(item => {
+            item.stream?.getTracks?.().forEach(track => track.stop());
+        });
+    }
+
+    function buildRemoteSourceStream(source, index) {
+        const sourceId = typeof source?.sourceId === "string" && source.sourceId
+            ? source.sourceId
+            : `remote-source-${index + 1}`;
+        const label = typeof source?.label === "string" && source.label
+            ? source.label
+            : `Remote Source ${index + 1}`;
+        const color = typeof source?.color === "string" && source.color
+            ? source.color
+            : remoteSourceColors[index % remoteSourceColors.length];
+        const tone = Number.isFinite(source?.tone)
+            ? source.tone
+            : remoteSourceToneBase + (index * 40);
+        const videoStream = createVideoStream({
+            color,
+            deviceId: sourceId,
+            kind: videoKind,
+            label
+        });
+        const audioStream = createAudioStream({
+            deviceId: sourceId,
+            kind: audioKind,
+            label,
+            tone
+        });
+        const stream = new MediaStream([
+            ...videoStream.getVideoTracks(),
+            ...audioStream.getAudioTracks()
+        ]);
+        const metadata = {
+            audioDeviceId: sourceId,
+            audioLabel: label,
+            isSynthetic: true,
+            remoteSourceId: sourceId,
+            streamMetadataVersion,
+            videoDeviceId: sourceId,
+            videoLabel: label
+        };
+
+        attachMetadata(stream, metadata);
+        stream.getTracks().forEach(track => attachMetadata(track, metadata));
+
+        return {
+            label,
+            sourceId,
+            stream
+        };
+    }
+
     Object.defineProperty(mediaDevices, enumerateDevicesMethod, {
         configurable: true,
         enumerable: true,
@@ -387,6 +446,16 @@
         getRequestLog() {
             return cloneJson(requestLog);
         },
+        getRemoteSources(connectionId) {
+            if (!remoteSourcesByConnection.has(connectionId)) {
+                const seededSources = window[remoteSourceSeedGlobal]?.[connectionId];
+                if (Array.isArray(seededSources) && seededSources.length > 0) {
+                    this.setRemoteSources(connectionId, seededSources);
+                }
+            }
+
+            return remoteSourcesByConnection.get(connectionId) ?? [];
+        },
         getElementState(elementId) {
             const element = document.getElementById(elementId);
             const stream = element?.srcObject;
@@ -401,6 +470,24 @@
                 audioTrackCount: stream instanceof MediaStream ? stream.getAudioTracks().length : 0,
                 metadata
             };
+        },
+        setRemoteSources(connectionId, sources) {
+            const existing = remoteSourcesByConnection.get(connectionId) ?? [];
+            disposeRemoteSources(existing);
+            remoteSourcesByConnection.set(
+                connectionId,
+                (Array.isArray(sources) ? sources : []).map(buildRemoteSourceStream));
+        },
+        clearRemoteSources(connectionId) {
+            if (typeof connectionId === "string" && connectionId) {
+                const existing = remoteSourcesByConnection.get(connectionId) ?? [];
+                disposeRemoteSources(existing);
+                remoteSourcesByConnection.delete(connectionId);
+                return;
+            }
+
+            Array.from(remoteSourcesByConnection.values()).forEach(disposeRemoteSources);
+            remoteSourcesByConnection.clear();
         },
         restoreDeviceIdentity() {
             concealDeviceIdentityUntilMediaRequest = false;

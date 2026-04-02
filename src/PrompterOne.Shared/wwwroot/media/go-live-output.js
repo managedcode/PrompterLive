@@ -8,13 +8,12 @@
     const supportNamespace = "PrompterOneGoLiveOutputSupport";
     const vdoNinjaNamespace = "PrompterOneGoLiveOutputVdoNinja";
     const outputSessions = new Map();
-    const browserEnvironment = "browser";
     const liveKitAudioSource = "microphone";
     const liveKitAudioTrackName = "prompterone-program-audio";
     const liveKitVideoSource = "camera";
     const liveKitVideoTrackName = "prompterone-program-video";
-    const obsStudioEnvironment = "obsstudio";
-    const primaryAudioElementPrefix = "prompterone-go-live-obs-audio-";
+    const streamingPlatformLiveKit = 0;
+    const streamingPlatformVdoNinja = 1;
 
     function getComposer() {
         const composer = window[composerNamespace];
@@ -52,12 +51,6 @@
         return client;
     }
 
-    function getObsEnvironment() {
-        return typeof window.obsstudio === "object" && window.obsstudio !== null
-            ? obsStudioEnvironment
-            : browserEnvironment;
-    }
-
     function clampLevelPercent(value) {
         return Math.max(0, Math.min(100, Math.round(value)));
     }
@@ -73,11 +66,9 @@
                 liveKitRoom: null,
                 liveKitRoomName: "",
                 liveKitServerUrl: "",
+                liveKitConnectionId: "",
                 mediaRecorder: null,
                 mediaStream: null,
-                obsActive: false,
-                obsAudioElementId: "",
-                obsEnvironment: browserEnvironment,
                 programAudioMeter: null,
                 programLevelPercent: 0,
                 recordingActive: false,
@@ -207,48 +198,16 @@
         }
     }
 
-    async function detachObsAudio(session) {
-        if (!session.obsAudioElementId) {
-            return;
-        }
-
-        const element = document.getElementById(session.obsAudioElementId);
-        if (element) {
-            element.pause?.();
-            element.srcObject = null;
-            element.remove();
-        }
-
-        session.obsAudioElementId = "";
-    }
-
-    async function attachObsAudio(sessionId, session) {
-        await detachObsAudio(session);
-        session.obsEnvironment = getObsEnvironment();
-
-        if (!session.mediaStream?.getAudioTracks()?.length || session.obsEnvironment !== obsStudioEnvironment) {
-            return;
-        }
-
-        const elementId = `${primaryAudioElementPrefix}${sessionId}`;
-        const audioElement = document.createElement("audio");
-        audioElement.id = elementId;
-        audioElement.autoplay = true;
-        audioElement.hidden = true;
-        audioElement.muted = false;
-        audioElement.playsInline = true;
-        audioElement.srcObject = session.mediaStream;
-        document.body.appendChild(audioElement);
-        await audioElement.play().catch(() => {});
-        session.obsAudioElementId = elementId;
+    function findTransportConnection(request, platformKind) {
+        return request.transportConnections.find(connection =>
+            connection.platformKind === platformKind && connection.canPublishProgram) || null;
     }
 
     async function cleanupSessionIfIdle(sessionId, session) {
-        if (session.liveKitActive || session.obsActive || session.recordingActive || session.vdoNinjaActive) {
+        if (session.liveKitActive || session.recordingActive || session.vdoNinjaActive) {
             return;
         }
 
-        await detachObsAudio(session);
         await releaseProgramAudioMeter(session);
         await getComposer().cleanupProgramSession(session);
         outputSessions.delete(sessionId);
@@ -276,16 +235,8 @@
             liveKit: {
                 active: session.liveKitActive,
                 connected: session.liveKitConnected,
-                publishedAudio: Boolean(session.liveKitPublishedAudioTrack),
-                publishedVideo: Boolean(session.liveKitPublishedVideoTrack),
                 roomName: session.liveKitRoomName,
                 serverUrl: session.liveKitServerUrl
-            },
-            obs: {
-                active: session.obsActive,
-                audioAttached: Boolean(session.obsAudioElementId),
-                audioElementId: session.obsAudioElementId,
-                environment: session.obsEnvironment
             },
             program: {
                 audioInputCount: programState.audioInputCount,
@@ -317,17 +268,23 @@
             const session = ensureSession(sessionId);
             const request = await ensureProgramSession(session, rawRequest);
             const liveKitClient = getLiveKitClient();
+            const connection = findTransportConnection(request, streamingPlatformLiveKit);
+            if (!connection) {
+                return;
+            }
 
             if (!session.liveKitRoom
                 || !session.liveKitConnected
-                || session.liveKitServerUrl !== request.liveKitServerUrl
-                || session.liveKitRoomName !== request.liveKitRoomName) {
+                || session.liveKitServerUrl !== connection.serverUrl
+                || session.liveKitRoomName !== connection.roomName
+                || session.liveKitConnectionId !== connection.connectionId) {
                 session.liveKitRoom?.disconnect?.();
                 session.liveKitRoom = new liveKitClient.Room();
-                await session.liveKitRoom.connect(request.liveKitServerUrl, request.liveKitToken);
+                await session.liveKitRoom.connect(connection.serverUrl, connection.token);
                 session.liveKitConnected = true;
-                session.liveKitServerUrl = request.liveKitServerUrl;
-                session.liveKitRoomName = request.liveKitRoomName;
+                session.liveKitServerUrl = connection.serverUrl;
+                session.liveKitRoomName = connection.roomName;
+                session.liveKitConnectionId = connection.connectionId;
             }
 
             await republishLiveKitTracks(session, liveKitClient);
@@ -355,7 +312,12 @@
         async startVdoNinjaSession(sessionId, rawRequest) {
             const session = ensureSession(sessionId);
             const request = await ensureProgramSession(session, rawRequest);
-            await getVdoNinjaRuntime().startSession(session, sessionId, request);
+            const connection = findTransportConnection(request, streamingPlatformVdoNinja);
+            if (!connection) {
+                return;
+            }
+
+            await getVdoNinjaRuntime().startSession(session, connection);
         },
 
         async stopLiveKitSession(sessionId) {
@@ -376,6 +338,7 @@
             session.liveKitPublishedAudioTrack = null;
             session.liveKitActive = false;
             session.liveKitConnected = false;
+            session.liveKitConnectionId = "";
             session.liveKitServerUrl = "";
             session.liveKitRoomName = "";
             session.liveKitRoom?.disconnect?.();
@@ -418,25 +381,6 @@
             await cleanupSessionIfIdle(sessionId, session);
         },
 
-        async startObsBrowserOutput(sessionId, rawRequest) {
-            const session = ensureSession(sessionId);
-            await ensureProgramSession(session, rawRequest);
-            session.obsActive = true;
-            await attachObsAudio(sessionId, session);
-        },
-
-        async stopObsBrowserOutput(sessionId) {
-            const session = outputSessions.get(sessionId);
-            if (!session) {
-                return;
-            }
-
-            session.obsActive = false;
-            await detachObsAudio(session);
-            session.obsEnvironment = browserEnvironment;
-            await cleanupSessionIfIdle(sessionId, session);
-        },
-
         async updateSessionDevices(sessionId, rawRequest) {
             const session = outputSessions.get(sessionId);
             if (!session) {
@@ -450,11 +394,10 @@
             }
 
             if (session.vdoNinjaActive) {
-                await getVdoNinjaRuntime().startSession(session, sessionId, session.requestSnapshot);
-            }
-
-            if (session.obsActive) {
-                await attachObsAudio(sessionId, session);
+                const connection = findTransportConnection(session.requestSnapshot, streamingPlatformVdoNinja);
+                if (connection) {
+                    await getVdoNinjaRuntime().startSession(session, connection);
+                }
             }
         },
 

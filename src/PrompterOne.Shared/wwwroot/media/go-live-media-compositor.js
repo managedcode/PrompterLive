@@ -23,6 +23,7 @@
         session.audioContext ??= null;
         session.audioDestination ??= null;
         session.audioMasterGain ??= null;
+        session.primarySourceAudioBinding ??= null;
     }
 
     function getBrowserMedia() {
@@ -117,6 +118,7 @@
         return {
             captureKey: capture.captureKey,
             element,
+            stream: capture.stream ?? element.srcObject,
             track: capture.track
         };
     }
@@ -243,6 +245,56 @@
             await ensureAudioBinding(session, input);
             syncAudioBinding(session, input);
         }
+    }
+
+    function cleanupPrimarySourceAudioBinding(session) {
+        const binding = session.primarySourceAudioBinding;
+        if (!binding) {
+            return;
+        }
+
+        binding.gainNode.disconnect();
+        binding.sourceNode.disconnect();
+        binding.track.stop?.();
+        session.primarySourceAudioBinding = null;
+    }
+
+    function syncPrimarySourceAudioBinding(session, request) {
+        const primarySource = request.videoSources.find(source => source.isPrimary)
+            ?? request.videoSources.find(source => source.isRenderable)
+            ?? null;
+        const binding = primarySource
+            ? session.videoBindings.get(primarySource.deviceId)
+            : null;
+        const audioTrack = binding?.stream?.getAudioTracks?.()?.[0] ?? null;
+
+        if (!primarySource || !audioTrack) {
+            cleanupPrimarySourceAudioBinding(session);
+            return;
+        }
+
+        if (session.primarySourceAudioBinding?.sourceId === primarySource.sourceId
+            && session.primarySourceAudioBinding?.trackId === audioTrack.id) {
+            return;
+        }
+
+        cleanupPrimarySourceAudioBinding(session);
+
+        const track = audioTrack.clone();
+        const sourceNode = session.audioContext.createMediaStreamSource(new MediaStream([track]));
+        const gainNode = session.audioContext.createGain();
+
+        gainNode.gain.value = primaryScale;
+        sourceNode.connect(gainNode);
+        gainNode.connect(session.audioMasterGain);
+
+        session.primarySourceAudioBinding = {
+            gainNode,
+            sourceId: primarySource.sourceId,
+            sourceNode,
+            track,
+            trackId: audioTrack.id
+        };
     }
 
     function ensureProgramMediaStream(session) {
@@ -411,6 +463,7 @@
         session.programCanvas?.remove?.();
         session.programCanvas = null;
         session.programContext = null;
+        cleanupPrimarySourceAudioBinding(session);
 
         if (session.audioMasterGain) {
             session.audioMasterGain.disconnect();
@@ -434,6 +487,7 @@
         await ensureAudioInfrastructure(session);
         await ensureVideoBindings(session, request);
         await ensureAudioBindings(session, request);
+        syncPrimarySourceAudioBinding(session, request);
         ensureProgramMediaStream(session);
         renderProgramFrame(session);
         startRenderLoop(session);

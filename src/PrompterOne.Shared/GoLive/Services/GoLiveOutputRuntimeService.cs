@@ -1,3 +1,5 @@
+using PrompterOne.Core.Models.Streaming;
+
 namespace PrompterOne.Shared.Services;
 
 public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
@@ -63,11 +65,6 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
             await _interop.StopLiveKitAsync(GoLiveOutputRuntimeContract.SessionId);
         }
 
-        if (State.ObsActive)
-        {
-            await _interop.StopObsBrowserOutputAsync(GoLiveOutputRuntimeContract.SessionId);
-        }
-
         await RefreshStateAsync();
     }
 
@@ -84,8 +81,8 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
 
     private async Task SyncLiveOutputsAsync(GoLiveOutputRuntimeRequest request)
     {
-        var shouldStartVdoNinja = request.CanStartVdoNinja;
-        var shouldStartLiveKit = !shouldStartVdoNinja && request.CanStartLiveKit;
+        var shouldStartVdoNinja = request.GetPublishableConnections(StreamingPlatformKind.VdoNinja).Count > 0;
+        var shouldStartLiveKit = request.GetPublishableConnections(StreamingPlatformKind.LiveKit).Count > 0;
 
         if (shouldStartVdoNinja)
         {
@@ -107,17 +104,6 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
         else if (State.LiveKitActive)
         {
             await _interop.StopLiveKitAsync(GoLiveOutputRuntimeContract.SessionId);
-        }
-
-        if (request.CanStartObs)
-        {
-            await _interop.StartObsBrowserOutputAsync(
-                GoLiveOutputRuntimeContract.SessionId,
-                request);
-        }
-        else if (State.ObsActive)
-        {
-            await _interop.StopObsBrowserOutputAsync(GoLiveOutputRuntimeContract.SessionId);
         }
 
         await RefreshStateAsync();

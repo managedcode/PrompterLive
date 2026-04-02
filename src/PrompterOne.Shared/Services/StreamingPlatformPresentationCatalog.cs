@@ -15,32 +15,32 @@ public static class StreamingPlatformPresentationCatalog
         kind switch
         {
             StreamingPlatformKind.LiveKit => new(
-                SettingsAccountLabel: "LiveKit · Browser publish",
-                SettingsDescription: "Store LiveKit browser publishing settings here so Go Live stays operational-only.",
-                GoLivePlatformLabel: "Guest room",
+                SettingsAccountLabel: "LiveKit · Transport connection",
+                SettingsDescription: "Configure the LiveKit room transport here so the browser can publish the program feed and optionally ingest remote guests.",
+                GoLivePlatformLabel: "Transport",
                 Tone: "livekit",
                 IconCssClass: "set-dest-rtmp"),
             StreamingPlatformKind.VdoNinja => new(
-                SettingsAccountLabel: "VDO.Ninja · Browser room",
-                SettingsDescription: "Keep VDO.Ninja room and publish URL setup in Settings and launch from Go Live only when ready.",
-                GoLivePlatformLabel: "Browser room",
-                Tone: "relay",
+                SettingsAccountLabel: "VDO.Ninja · Transport connection",
+                SettingsDescription: "Store hosted or self-hosted VDO.Ninja base, room, publish, and view URLs here for browser-side publishing and guest intake.",
+                GoLivePlatformLabel: "Transport",
+                Tone: "vdoninja",
                 IconCssClass: "set-dest-rtmp"),
             StreamingPlatformKind.Youtube => new(
                 SettingsAccountLabel: "YouTube Live · RTMP / RTMPS",
-                SettingsDescription: "Store YouTube RTMP credentials here and use Go Live only to arm and inspect the destination.",
+                SettingsDescription: "Bind YouTube to a relay-capable transport connection and keep the downstream RTMP credentials out of the live runtime surface.",
                 GoLivePlatformLabel: "Relay target",
                 Tone: "youtube",
                 IconCssClass: "set-dest-yt"),
             StreamingPlatformKind.Twitch => new(
                 SettingsAccountLabel: "Twitch · RTMP",
-                SettingsDescription: "Persist Twitch endpoint and key here so the runtime surface stays focused on program switching.",
+                SettingsDescription: "Bind Twitch to a relay-capable transport connection and keep the downstream endpoint out of the live runtime surface.",
                 GoLivePlatformLabel: "Relay target",
                 Tone: "twitch",
                 IconCssClass: "set-dest-tw"),
             _ => new(
                 SettingsAccountLabel: "Custom RTMP · Private ingest",
-                SettingsDescription: "Use a private ingest endpoint or CDN and keep the credentials out of the live runtime surface.",
+                SettingsDescription: "Use a private ingest endpoint or CDN through a relay-capable transport connection instead of faking direct browser RTMP.",
                 GoLivePlatformLabel: "Relay target",
                 Tone: "relay",
                 IconCssClass: "set-dest-rtmp")

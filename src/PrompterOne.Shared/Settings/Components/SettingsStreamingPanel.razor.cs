@@ -10,14 +10,6 @@ namespace PrompterOne.Shared.Components.Settings;
 
 public partial class SettingsStreamingPanel
 {
-    private static readonly IReadOnlyList<SettingsSelectOption> OutputModeOptions =
-    [
-        new(VirtualCameraOutputModeValue, SettingsStreamingText.VirtualCameraOutputModeLabel),
-        new(NdiOutputModeValue, SettingsStreamingText.NdiOutputModeLabel),
-        new(DirectRtmpOutputModeValue, SettingsStreamingText.DirectRtmpOutputModeLabel),
-        new(LocalRecordingOutputModeValue, SettingsStreamingText.LocalRecordingOutputModeLabel),
-    ];
-
     private static readonly IReadOnlyList<SettingsSelectOption> OutputResolutionOptions =
     [
         new(nameof(StreamingResolutionPreset.FullHd1080p30), SettingsStreamingText.FullHd1080p30Label),
@@ -26,49 +18,73 @@ public partial class SettingsStreamingPanel
         new(nameof(StreamingResolutionPreset.UltraHd2160p30), SettingsStreamingText.UltraHd2160p30Label),
     ];
 
-    private const string DirectRtmpOutputModeValue = "direct-rtmp";
-    private const string LocalRecordingOutputModeValue = "local-recording";
-    private const string NdiOutputModeValue = "ndi-output";
     private const string OnCssClass = "on";
     private const string SelectedStatusClass = "set-dest-ok";
-    private const string VirtualCameraOutputModeValue = "virtual-camera";
 
-    private bool _isAddDestinationMenuOpen;
+    private bool _isAddDistributionTargetMenuOpen;
+    private bool _isAddTransportConnectionMenuOpen;
 
     [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
     [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
-    [Parameter] public string SelectedOutputModeValue { get; set; } = VirtualCameraOutputModeValue;
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
-    [Parameter] public EventCallback<StreamingPlatformKind> AddExternalDestination { get; set; }
+    [Parameter] public EventCallback<StreamingPlatformKind> AddDistributionTarget { get; set; }
+    [Parameter] public EventCallback<StreamingPlatformKind> AddTransportConnection { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> BitrateChanged { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> OutputModeChanged { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OutputResolutionChanged { get; set; }
-    [Parameter] public EventCallback<string> RemoveExternalDestination { get; set; }
+    [Parameter] public EventCallback<string> RemoveDistributionTarget { get; set; }
+    [Parameter] public EventCallback<string> RemoveTransportConnection { get; set; }
     [Parameter] public EventCallback<string> ToggleCard { get; set; }
-    [Parameter] public EventCallback<string> ToggleExternalDestination { get; set; }
+    [Parameter] public EventCallback<string> ToggleDistributionTarget { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string ConnectionId)> ToggleDistributionTargetTransport { get; set; }
     [Parameter] public EventCallback ToggleIncludeCamera { get; set; }
-    [Parameter] public EventCallback ToggleNdi { get; set; }
-    [Parameter] public EventCallback ToggleObs { get; set; }
     [Parameter] public EventCallback ToggleRecording { get; set; }
-    [Parameter] public EventCallback<(string TargetId, string SourceId)> ToggleDestinationSource { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string SourceId)> ToggleTransportConnectionSource { get; set; }
+    [Parameter] public EventCallback<string> ToggleTransportConnection { get; set; }
     [Parameter] public EventCallback ToggleTextOverlay { get; set; }
-    [Parameter] public EventCallback<(string DestinationId, string FieldId, string Value)> UpdateExternalDestinationField { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string FieldId, string Value)> UpdateDistributionTargetField { get; set; }
+    [Parameter] public EventCallback<(string ConnectionId, string FieldId, string Value)> UpdateTransportConnectionField { get; set; }
+    [Parameter] public EventCallback<(string ConnectionId, string Value)> UpdateTransportConnectionRole { get; set; }
 
-    private string AddDestinationMenuCssClass =>
-        _isAddDestinationMenuOpen ? "set-add-source-menu open" : "set-add-source-menu";
+    private string AddDistributionTargetMenuCssClass =>
+        _isAddDistributionTargetMenuOpen ? "set-add-source-menu open" : "set-add-source-menu";
 
-    private IReadOnlyList<StreamingProfile> ExternalDestinations => Settings.ExternalDestinations ?? Array.Empty<StreamingProfile>();
+    private string AddTransportConnectionMenuCssClass =>
+        _isAddTransportConnectionMenuOpen ? "set-add-source-menu open" : "set-add-source-menu";
 
-    private static IReadOnlyList<SettingsStreamingLocalTargetDefinition> LocalTargetCards => SettingsStreamingLocalTargetCatalog.All;
+    private IReadOnlyList<DistributionTargetProfile> DistributionTargets =>
+        Settings.DistributionTargets ?? Array.Empty<DistributionTargetProfile>();
 
-    private async Task AddDestinationAndOpenCardAsync(StreamingPlatformKind kind)
+    private static IReadOnlyList<SettingsStreamingLocalTargetDefinition> LocalTargetCards =>
+        SettingsStreamingLocalTargetCatalog.All;
+
+    private ProgramCaptureProfile ProgramCapture => Settings.ProgramCaptureSettings;
+
+    private RecordingProfile Recording => Settings.RecordingSettings;
+
+    private IReadOnlyList<TransportConnectionProfile> TransportConnections =>
+        Settings.TransportConnections ?? Array.Empty<TransportConnectionProfile>();
+
+    private async Task AddDistributionTargetAndOpenCardAsync(StreamingPlatformKind kind)
     {
-        var existingIds = ExternalDestinations.Select(destination => destination.Id);
-        var nextCardId = SettingsStreamingCardIds.ExternalDestination(
-            StreamingPlatformCatalog.CreateProfile(kind, existingIds).Id);
+        var nextCardId = SettingsStreamingCardIds.DistributionTarget(
+            StreamingPlatformCatalog.CreateDistributionTarget(kind, DistributionTargets.Select(target => target.Id)).Id);
 
-        _isAddDestinationMenuOpen = false;
-        await AddExternalDestination.InvokeAsync(kind);
+        _isAddDistributionTargetMenuOpen = false;
+        await AddDistributionTarget.InvokeAsync(kind);
+
+        if (!IsCardOpen(nextCardId))
+        {
+            await ToggleCard.InvokeAsync(nextCardId);
+        }
+    }
+
+    private async Task AddTransportConnectionAndOpenCardAsync(StreamingPlatformKind kind)
+    {
+        var nextCardId = SettingsStreamingCardIds.TransportConnection(
+            StreamingPlatformCatalog.CreateTransportConnection(kind, TransportConnections.Select(connection => connection.Id)).Id);
+
+        _isAddTransportConnectionMenuOpen = false;
+        await AddTransportConnection.InvokeAsync(kind);
 
         if (!IsCardOpen(nextCardId))
         {
@@ -114,36 +130,37 @@ public partial class SettingsStreamingPanel
 
     private bool IsLocalTargetEnabled(string targetId) => targetId switch
     {
-        GoLiveTargetCatalog.TargetIds.Obs => Settings.ObsVirtualCameraEnabled,
-        GoLiveTargetCatalog.TargetIds.Ndi => Settings.NdiOutputEnabled,
-        GoLiveTargetCatalog.TargetIds.Recording => Settings.LocalRecordingEnabled,
+        GoLiveTargetCatalog.TargetIds.Recording => Recording.IsEnabled,
         _ => false
     };
 
     private async Task ToggleLocalTargetAsync(string targetId)
     {
-        _isAddDestinationMenuOpen = false;
+        _isAddTransportConnectionMenuOpen = false;
+        _isAddDistributionTargetMenuOpen = false;
 
-        if (string.Equals(targetId, GoLiveTargetCatalog.TargetIds.Obs, StringComparison.Ordinal))
+        if (string.Equals(targetId, GoLiveTargetCatalog.TargetIds.Recording, StringComparison.Ordinal))
         {
-            await ToggleObs.InvokeAsync();
-            return;
+            await ToggleRecording.InvokeAsync();
         }
-
-        if (string.Equals(targetId, GoLiveTargetCatalog.TargetIds.Ndi, StringComparison.Ordinal))
-        {
-            await ToggleNdi.InvokeAsync();
-            return;
-        }
-
-        await ToggleRecording.InvokeAsync();
     }
 
-    private void ToggleDestinationMenu() => _isAddDestinationMenuOpen = !_isAddDestinationMenuOpen;
+    private void ToggleDistributionTargetMenu()
+    {
+        _isAddTransportConnectionMenuOpen = false;
+        _isAddDistributionTargetMenuOpen = !_isAddDistributionTargetMenuOpen;
+    }
+
+    private void ToggleTransportConnectionMenu()
+    {
+        _isAddDistributionTargetMenuOpen = false;
+        _isAddTransportConnectionMenuOpen = !_isAddTransportConnectionMenuOpen;
+    }
 
     private async Task ToggleStreamingCardAsync(string cardId)
     {
-        _isAddDestinationMenuOpen = false;
+        _isAddTransportConnectionMenuOpen = false;
+        _isAddDistributionTargetMenuOpen = false;
         await ToggleCard.InvokeAsync(cardId);
     }
 }

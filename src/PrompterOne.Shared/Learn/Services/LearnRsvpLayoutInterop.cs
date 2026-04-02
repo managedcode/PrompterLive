@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace PrompterOne.Shared.Services;
 
-public sealed class LearnRsvpLayoutInterop(IJSRuntime jsRuntime) : IAsyncDisposable
+public sealed class LearnRsvpLayoutInterop(IJSRuntime jsRuntime) : IDisposable, IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime = jsRuntime;
     private Task<IJSObjectReference?>? _moduleTask;
@@ -30,6 +30,10 @@ public sealed class LearnRsvpLayoutInterop(IJSRuntime jsRuntime) : IAsyncDisposa
             LearnRsvpLayoutContract.FocusRightExtentCssCustomProperty,
             LearnRsvpLayoutContract.LayoutReadyAttributeName,
             LearnRsvpLayoutContract.FontSyncReadyAttributeName);
+    }
+
+    public void Dispose()
+    {
     }
 
     public async ValueTask DisposeAsync()

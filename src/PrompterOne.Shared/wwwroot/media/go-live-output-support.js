@@ -14,6 +14,8 @@
     const mimeTypeWebm = "video/webm";
     const recordingDefaultExtension = "webm";
     const recordingFileStemFallback = "go-live-recording";
+    const streamingPlatformLiveKit = 0;
+    const streamingPlatformVdoNinja = 1;
     const recordingMimeFallbackCandidates = [
         "video/webm;codecs=vp9,opus",
         "video/webm;codecs=vp8,opus",
@@ -118,21 +120,42 @@
         };
     }
 
+    function normalizeTransportConnection(rawConnection) {
+        const platformKind = normalizeNumber(readValue(rawConnection, "platformKind", "PlatformKind", -1), -1);
+        const roles = normalizeNumber(readValue(rawConnection, "roles", "Roles", 0), 0);
+        const isEnabled = normalizeBoolean(readValue(rawConnection, "isEnabled", "IsEnabled", false), false);
+        const publishUrl = normalizeString(readValue(rawConnection, "publishUrl", "PublishUrl", ""), "");
+        const roomName = normalizeString(readValue(rawConnection, "roomName", "RoomName", ""), "");
+        const serverUrl = normalizeString(readValue(rawConnection, "serverUrl", "ServerUrl", ""), "");
+        const token = normalizeString(readValue(rawConnection, "token", "Token", ""), "");
+
+        return {
+            baseUrl: normalizeString(readValue(rawConnection, "baseUrl", "BaseUrl", ""), ""),
+            canPublishProgram: isEnabled && (
+                (platformKind === streamingPlatformLiveKit && !!serverUrl && !!roomName && !!token)
+                || (platformKind === streamingPlatformVdoNinja && (!!publishUrl || !!roomName))
+            ),
+            connectionId: normalizeString(readValue(rawConnection, "connectionId", "ConnectionId", ""), ""),
+            isEnabled,
+            name: normalizeString(readValue(rawConnection, "name", "Name", ""), ""),
+            platformKind,
+            publishUrl,
+            roles,
+            roomName,
+            serverUrl,
+            token,
+            viewUrl: normalizeString(readValue(rawConnection, "viewUrl", "ViewUrl", ""), "")
+        };
+    }
+
     function normalizeRequest(rawRequest) {
         const normalized = {
             audioInputs: (readValue(rawRequest, "audioInputs", "AudioInputs", []) ?? []).map(normalizeAudioInput),
-            liveKitEnabled: normalizeBoolean(readValue(rawRequest, "liveKitEnabled", "LiveKitEnabled", false), false),
-            liveKitRoomName: normalizeString(readValue(rawRequest, "liveKitRoomName", "LiveKitRoomName", ""), ""),
-            liveKitServerUrl: normalizeString(readValue(rawRequest, "liveKitServerUrl", "LiveKitServerUrl", ""), ""),
-            liveKitToken: normalizeString(readValue(rawRequest, "liveKitToken", "LiveKitToken", ""), ""),
-            obsEnabled: normalizeBoolean(readValue(rawRequest, "obsEnabled", "ObsEnabled", false), false),
             primarySourceId: normalizeString(readValue(rawRequest, "primarySourceId", "PrimarySourceId", ""), ""),
             programVideo: normalizeProgramVideo(readValue(rawRequest, "programVideo", "ProgramVideo", {})),
             recording: normalizeRecording(readValue(rawRequest, "recording", "Recording", {})),
             recordingEnabled: normalizeBoolean(readValue(rawRequest, "recordingEnabled", "RecordingEnabled", false), false),
-            vdoNinjaEnabled: normalizeBoolean(readValue(rawRequest, "vdoNinjaEnabled", "VdoNinjaEnabled", false), false),
-            vdoNinjaPublishUrl: normalizeString(readValue(rawRequest, "vdoNinjaPublishUrl", "VdoNinjaPublishUrl", ""), ""),
-            vdoNinjaRoomName: normalizeString(readValue(rawRequest, "vdoNinjaRoomName", "VdoNinjaRoomName", ""), ""),
+            transportConnections: (readValue(rawRequest, "transportConnections", "TransportConnections", []) ?? []).map(normalizeTransportConnection),
             videoSources: (readValue(rawRequest, "videoSources", "VideoSources", []) ?? []).map(normalizeVideoSource)
         };
 

@@ -229,15 +229,15 @@ public sealed class SettingsInteractionTests : BunitContext
     }
 
     [Fact]
-    public void StreamingPanel_RendersOnlyPersistedExternalDestinations()
+    public void StreamingPanel_RendersOnlyPersistedTransportConnections()
     {
         _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateLiveKitDestination()
+                    AppTestData.GoLive.CreateLiveKitConnection()
                 ]
             }
         };

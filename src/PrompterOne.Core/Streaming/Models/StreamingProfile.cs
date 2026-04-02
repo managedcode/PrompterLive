@@ -1,4 +1,15 @@
+using PrompterOne.Core.Models.Workspace;
+
 namespace PrompterOne.Core.Models.Streaming;
+
+[Flags]
+public enum StreamingTransportRole
+{
+    None = 0,
+    Source = 1,
+    Publish = 2,
+    Both = Source | Publish
+}
 
 public enum StreamingProviderKind
 {
@@ -16,12 +27,6 @@ public enum StreamingPlatformKind
     CustomRtmp
 }
 
-public sealed record StreamingDestination(
-    string Name,
-    string Url,
-    string? StreamKey = null,
-    bool IsEnabled = true);
-
 public sealed record StreamingPlatformDefinition(
     StreamingPlatformKind Kind,
     string IdPrefix,
@@ -30,33 +35,49 @@ public sealed record StreamingPlatformDefinition(
     string DefaultProfileName,
     string DefaultRtmpUrl = "");
 
-public sealed record StreamingProfile(
+public sealed record ProgramCaptureProfile(
+    StreamingResolutionPreset ResolutionPreset = StreamingResolutionPreset.FullHd1080p30,
+    int BitrateKbps = 6000,
+    bool ShowTextOverlay = true,
+    bool IncludeCameraInOutput = true);
+
+public sealed record RecordingProfile(
+    bool IsEnabled = false,
+    string ContainerLabel = "",
+    string VideoCodecLabel = "",
+    string AudioCodecLabel = "",
+    int VideoBitrateKbps = 0,
+    int AudioBitrateKbps = 0,
+    int AudioSampleRate = 0,
+    int AudioChannelCount = 0);
+
+public sealed record TransportConnectionProfile(
     string Id,
     string Name,
-    StreamingProviderKind ProviderKind,
+    StreamingPlatformKind PlatformKind,
+    StreamingTransportRole Roles = StreamingTransportRole.Both,
+    bool IsEnabled = false,
+    string ServerUrl = "",
+    string BaseUrl = "",
+    string RoomName = "",
+    string Token = "",
+    string PublishUrl = "",
+    string ViewUrl = "");
+
+public sealed record DistributionTargetProfile(
+    string Id,
+    string Name,
     StreamingPlatformKind PlatformKind,
     bool IsEnabled = false,
-    string? ServerUrl = null,
-    string? RoomName = null,
-    string? Token = null,
-    string? PublishUrl = null,
-    IReadOnlyList<StreamingDestination>? Destinations = null,
-    bool MirrorLocalPreview = true)
-{
-    public static StreamingProfile CreateDefault(StreamingProviderKind providerKind) =>
-        StreamingPlatformCatalog.CreateProfile(providerKind switch
-        {
-            StreamingProviderKind.LiveKit => StreamingPlatformKind.LiveKit,
-            StreamingProviderKind.VdoNinja => StreamingPlatformKind.VdoNinja,
-            _ => StreamingPlatformKind.CustomRtmp
-        });
-}
+    string RtmpUrl = "",
+    string StreamKey = "",
+    IReadOnlyList<string>? BoundTransportConnectionIds = null);
 
 public sealed record StreamingPublishDescriptor(
     string ProviderId,
-    StreamingProviderKind ProviderKind,
     string DisplayName,
     bool IsReady,
+    bool IsSupported,
     bool RequiresExternalRelay,
     string Summary,
     IReadOnlyDictionary<string, string> Parameters,
@@ -68,62 +89,112 @@ public static class StreamingPlatformCatalog
     [
         new(
             StreamingPlatformKind.LiveKit,
-            "livekit",
-            "LiveKit",
+            GoLiveTargetCatalog.TargetIds.LiveKit,
+            GoLiveTargetCatalog.TargetNames.LiveKit,
             StreamingProviderKind.LiveKit,
-            "LiveKit"),
+            GoLiveTargetCatalog.TargetNames.LiveKit),
         new(
             StreamingPlatformKind.VdoNinja,
-            "vdoninja",
-            "VDO.Ninja",
+            GoLiveTargetCatalog.TargetIds.VdoNinja,
+            GoLiveTargetCatalog.TargetNames.VdoNinja,
             StreamingProviderKind.VdoNinja,
-            "VDO.Ninja"),
+            GoLiveTargetCatalog.TargetNames.VdoNinja),
         new(
             StreamingPlatformKind.Youtube,
-            "youtube-live",
-            "YouTube Live",
+            GoLiveTargetCatalog.TargetIds.Youtube,
+            GoLiveTargetCatalog.TargetNames.Youtube,
             StreamingProviderKind.Rtmp,
-            "YouTube Live",
+            GoLiveTargetCatalog.TargetNames.Youtube,
             "rtmps://a.rtmp.youtube.com/live2"),
         new(
             StreamingPlatformKind.Twitch,
-            "twitch-live",
-            "Twitch",
+            GoLiveTargetCatalog.TargetIds.Twitch,
+            GoLiveTargetCatalog.TargetNames.Twitch,
             StreamingProviderKind.Rtmp,
-            "Twitch",
+            GoLiveTargetCatalog.TargetNames.Twitch,
             "rtmp://live.twitch.tv/app"),
         new(
             StreamingPlatformKind.CustomRtmp,
-            "custom-rtmp",
-            "Custom RTMP",
+            GoLiveTargetCatalog.TargetIds.CustomRtmp,
+            GoLiveTargetCatalog.TargetNames.CustomRtmp,
             StreamingProviderKind.Rtmp,
-            "Custom RTMP")
+            GoLiveTargetCatalog.TargetNames.CustomRtmp)
     ];
 
-    public static StreamingProfile CreateProfile(
+    public static IReadOnlyList<StreamingPlatformDefinition> TransportModules { get; } =
+        All.Where(definition => definition.Kind is StreamingPlatformKind.LiveKit or StreamingPlatformKind.VdoNinja)
+            .ToArray();
+
+    public static IReadOnlyList<StreamingPlatformDefinition> DistributionTargets { get; } =
+        All.Where(definition => definition.Kind is StreamingPlatformKind.Youtube or StreamingPlatformKind.Twitch or StreamingPlatformKind.CustomRtmp)
+            .ToArray();
+
+    public static TransportConnectionProfile CreateTransportConnection(
         StreamingPlatformKind kind,
         IEnumerable<string>? existingIds = null)
     {
+        EnsureTransportKind(kind);
         var definition = Get(kind);
-        var nextId = BuildNextId(definition.IdPrefix, existingIds ?? Array.Empty<string>());
-        return CreateProfile(kind, nextId);
+        var id = BuildNextId(definition.IdPrefix, existingIds ?? Array.Empty<string>());
+        return new TransportConnectionProfile(
+            Id: id,
+            Name: BuildDisplayName(definition, id),
+            PlatformKind: kind,
+            BaseUrl: kind is StreamingPlatformKind.VdoNinja
+                ? VdoNinjaDefaults.HostedBaseUrl
+                : string.Empty);
     }
 
-    public static StreamingProfile CreateProfile(StreamingPlatformKind kind, string id)
+    public static DistributionTargetProfile CreateDistributionTarget(
+        StreamingPlatformKind kind,
+        IEnumerable<string>? existingIds = null)
     {
+        EnsureDistributionKind(kind);
         var definition = Get(kind);
-        return new StreamingProfile(
+        var id = BuildNextId(definition.IdPrefix, existingIds ?? Array.Empty<string>());
+        return new DistributionTargetProfile(
             Id: id,
-            Name: definition.DefaultProfileName,
-            ProviderKind: definition.ProviderKind,
+            Name: BuildDisplayName(definition, id),
             PlatformKind: kind,
-            Destinations: definition.ProviderKind == StreamingProviderKind.Rtmp
-                ? [new StreamingDestination(definition.DefaultProfileName, definition.DefaultRtmpUrl)]
-                : Array.Empty<StreamingDestination>());
+            RtmpUrl: definition.DefaultRtmpUrl,
+            BoundTransportConnectionIds: Array.Empty<string>());
     }
 
     public static StreamingPlatformDefinition Get(StreamingPlatformKind kind) =>
         All.First(definition => definition.Kind == kind);
+
+    public static bool IsTransportKind(StreamingPlatformKind kind) =>
+        kind is StreamingPlatformKind.LiveKit or StreamingPlatformKind.VdoNinja;
+
+    public static bool IsDistributionKind(StreamingPlatformKind kind) =>
+        kind is StreamingPlatformKind.Youtube or StreamingPlatformKind.Twitch or StreamingPlatformKind.CustomRtmp;
+
+    private static void EnsureTransportKind(StreamingPlatformKind kind)
+    {
+        if (!IsTransportKind(kind))
+        {
+            throw new ArgumentOutOfRangeException(nameof(kind), kind, "Only LiveKit and VDO.Ninja can be created as transport connections.");
+        }
+    }
+
+    private static void EnsureDistributionKind(StreamingPlatformKind kind)
+    {
+        if (!IsDistributionKind(kind))
+        {
+            throw new ArgumentOutOfRangeException(nameof(kind), kind, "Only distribution targets can be created as downstream targets.");
+        }
+    }
+
+    private static string BuildDisplayName(StreamingPlatformDefinition definition, string id)
+    {
+        if (string.Equals(id, definition.IdPrefix, StringComparison.Ordinal))
+        {
+            return definition.DefaultProfileName;
+        }
+
+        var suffix = id[(definition.IdPrefix.Length + 1)..];
+        return string.Concat(definition.DefaultProfileName, " ", suffix);
+    }
 
     private static string BuildNextId(string prefix, IEnumerable<string> existingIds)
     {
@@ -146,40 +217,19 @@ public static class StreamingPlatformCatalog
     }
 }
 
-public static class StreamingProfileExtensions
+public static class TransportConnectionProfileExtensions
 {
-    public static StreamingDestination GetPrimaryDestination(this StreamingProfile profile)
-    {
-        if (profile.Destinations is { Count: > 0 } destinations)
-        {
-            return destinations[0];
-        }
+    public static StreamingProviderKind GetProviderKind(this TransportConnectionProfile connection) =>
+        StreamingPlatformCatalog.Get(connection.PlatformKind).ProviderKind;
+}
 
-        return new StreamingDestination(profile.Name, string.Empty);
-    }
+public static class DistributionTargetProfileExtensions
+{
+    public static IReadOnlyList<string> GetBoundTransportConnectionIds(this DistributionTargetProfile target) =>
+        target.BoundTransportConnectionIds ?? Array.Empty<string>();
+}
 
-    public static string GetPrimaryDestinationUrl(this StreamingProfile profile) =>
-        profile.GetPrimaryDestination().Url;
-
-    public static string GetPrimaryDestinationStreamKey(this StreamingProfile profile) =>
-        profile.GetPrimaryDestination().StreamKey ?? string.Empty;
-
-    public static StreamingProfile SetPrimaryDestination(
-        this StreamingProfile profile,
-        string name,
-        string url,
-        string streamKey)
-    {
-        return profile with
-        {
-            Name = name,
-            Destinations =
-            [
-                new StreamingDestination(
-                    string.IsNullOrWhiteSpace(name) ? profile.Name : name,
-                    url,
-                    streamKey)
-            ]
-        };
-    }
+public static class VdoNinjaDefaults
+{
+    public const string HostedBaseUrl = "https://vdo.ninja/";
 }

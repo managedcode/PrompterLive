@@ -34,6 +34,7 @@ public partial class GoLivePage
                 await EnsureSceneDefaultsAsync();
                 await LoadRecordingPreferencesAsync();
                 await LoadStudioSettingsAsync();
+                await SyncRemoteSourcesAsync();
                 UpdateScreenMetadata();
                 StateHasChanged();
             });

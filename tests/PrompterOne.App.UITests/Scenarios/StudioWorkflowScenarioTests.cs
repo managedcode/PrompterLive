@@ -250,7 +250,6 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
 
     private static async Task ConfigureGoLiveDestinationsAsync(IPage page)
     {
-        await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
         await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveCountAsync(0);
         await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
         await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);

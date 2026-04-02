@@ -5,18 +5,11 @@
 @using PrompterOne.Shared.Settings.Models
 
 <div class="set-subsection">
-    <h4 class="set-sub-title">@SettingsStreamingText.OutputDefaultsTitle</h4>
+    <h4 class="set-sub-title">@SettingsStreamingText.ProgramCaptureTitle</h4>
     <div class="set-devices">
         <div class="set-field">
-            <label>@SettingsStreamingText.OutputModeLabel</label>
-            <SettingsSelect Value="@SelectedOutputModeValue"
-                           Options="@OutputModeOptions"
-                           OnChange="OutputModeChanged"
-                           TestId="@UiTestIds.Settings.StreamingOutputMode" />
-        </div>
-        <div class="set-field">
             <label>@SettingsStreamingText.OutputResolutionLabel</label>
-            <SettingsSelect Value="@Settings.OutputResolution.ToString()"
+            <SettingsSelect Value="@ProgramCapture.ResolutionPreset.ToString()"
                            Options="@OutputResolutionOptions"
                            OnChange="OutputResolutionChanged"
                            TestId="@UiTestIds.Settings.StreamingOutputResolution" />
@@ -25,13 +18,13 @@
             <label>@SettingsStreamingText.BitrateLabel</label>
             <input type="number"
                    class="set-input"
-                   value="@Settings.BitrateKbps"
+                   value="@ProgramCapture.BitrateKbps"
                    @oninput="BitrateChanged"
                    data-testid="@UiTestIds.Settings.StreamingBitrate" />
         </div>
         <div class="set-field set-field-toggle">
             <label>@SettingsStreamingText.ShowTextOverlayLabel</label>
-            <div class="set-toggle @(Settings.ShowTextOverlay ? OnCssClass : null)"
+            <div class="set-toggle @(ProgramCapture.ShowTextOverlay ? OnCssClass : null)"
                  @onclick="ToggleTextOverlay"
                  data-testid="@UiTestIds.Settings.StreamingTextOverlay">
                 <div class="set-toggle-thumb"></div>
@@ -39,7 +32,7 @@
         </div>
         <div class="set-field set-field-toggle">
             <label>@SettingsStreamingText.IncludeCameraInOutputLabel</label>
-            <div class="set-toggle @(Settings.IncludeCameraInOutput ? OnCssClass : null)"
+            <div class="set-toggle @(ProgramCapture.IncludeCameraInOutput ? OnCssClass : null)"
                  @onclick="ToggleIncludeCamera"
                  data-testid="@UiTestIds.Settings.StreamingIncludeCamera">
                 <div class="set-toggle-thumb"></div>
@@ -49,35 +42,13 @@
 </div>
 
 <div class="set-sub-header" style="margin-bottom:14px">
-    <h4 class="set-sub-title">@SettingsStreamingText.DestinationsTitle</h4>
-    <button class="set-btn-outline set-btn-sm"
-            type="button"
-            data-testid="@UiTestIds.Settings.StreamingDestinationAdd"
-            @onclick="ToggleDestinationMenu">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        @SettingsStreamingText.AddDestinationButtonLabel
-    </button>
-</div>
-
-<div class="@AddDestinationMenuCssClass">
-    @foreach (var platform in StreamingPlatformCatalog.All)
-    {
-        <button class="set-add-source-opt"
-                type="button"
-                data-testid="@UiTestIds.Settings.StreamingDestinationAddOption(platform.IdPrefix)"
-                @onclick="@(() => AddDestinationAndOpenCardAsync(platform.Kind))">
-            @platform.DisplayName
-        </button>
-    }
+    <h4 class="set-sub-title">@SettingsStreamingText.LocalRecordingTitle</h4>
 </div>
 
 <div class="set-device-list">
     @foreach (var localTarget in LocalTargetCards)
-        {
-            <SettingsStreamingTargetCard Title="@localTarget.Name"
+    {
+        <SettingsStreamingTargetCard Title="@localTarget.Name"
                                      Account="@localTarget.AccountLabel"
                                      Description="@localTarget.Description"
                                      Summary="@BuildLocalSummary(localTarget.TargetId)"
@@ -98,17 +69,86 @@
             </div>
         </SettingsStreamingTargetCard>
     }
+</div>
 
-    @foreach (var destination in ExternalDestinations)
+<div class="set-sub-header" style="margin:18px 0 14px">
+    <h4 class="set-sub-title">@SettingsStreamingText.TransportConnectionsTitle</h4>
+    <button class="set-btn-outline set-btn-sm"
+            type="button"
+            data-testid="@UiTestIds.Settings.StreamingTransportAdd"
+            @onclick="ToggleTransportConnectionMenu">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        @SettingsStreamingText.AddTransportConnectionButtonLabel
+    </button>
+</div>
+
+<div class="@AddTransportConnectionMenuCssClass">
+    @foreach (var platform in StreamingPlatformCatalog.TransportModules)
     {
-        <SettingsStreamingExternalDestinationCard Settings="@Settings"
-                                                 Destination="@destination"
+        <button class="set-add-source-opt"
+                type="button"
+                data-testid="@UiTestIds.Settings.StreamingTransportAddOption(platform.IdPrefix)"
+                @onclick="@(() => AddTransportConnectionAndOpenCardAsync(platform.Kind))">
+            @platform.DisplayName
+        </button>
+    }
+</div>
+
+<div class="set-device-list">
+    @foreach (var connection in TransportConnections)
+    {
+        <SettingsStreamingTransportConnectionCard Settings="@Settings"
+                                                 Connection="@connection"
                                                  Sources="@Sources"
                                                  IsCardOpen="IsCardOpen"
                                                  ToggleCard="ToggleCard"
-                                                 ToggleDestination="ToggleExternalDestination"
-                                                 RemoveDestination="RemoveExternalDestination"
-                                                 ToggleDestinationSource="ToggleDestinationSource"
-                                                 UpdateField="UpdateExternalDestinationField" />
+                                                 ToggleConnection="ToggleTransportConnection"
+                                                 RemoveConnection="RemoveTransportConnection"
+                                                 ToggleSource="ToggleTransportConnectionSource"
+                                                 UpdateField="UpdateTransportConnectionField"
+                                                 UpdateRole="UpdateTransportConnectionRole" />
+    }
+</div>
+
+<div class="set-sub-header" style="margin:18px 0 14px">
+    <h4 class="set-sub-title">@SettingsStreamingText.DistributionTargetsTitle</h4>
+    <button class="set-btn-outline set-btn-sm"
+            type="button"
+            data-testid="@UiTestIds.Settings.StreamingDistributionAdd"
+            @onclick="ToggleDistributionTargetMenu">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        @SettingsStreamingText.AddDistributionTargetButtonLabel
+    </button>
+</div>
+
+<div class="@AddDistributionTargetMenuCssClass">
+    @foreach (var platform in StreamingPlatformCatalog.DistributionTargets)
+    {
+        <button class="set-add-source-opt"
+                type="button"
+                data-testid="@UiTestIds.Settings.StreamingDistributionAddOption(platform.IdPrefix)"
+                @onclick="@(() => AddDistributionTargetAndOpenCardAsync(platform.Kind))">
+            @platform.DisplayName
+        </button>
+    }
+</div>
+
+<div class="set-device-list">
+    @foreach (var target in DistributionTargets)
+    {
+        <SettingsStreamingDistributionTargetCard Target="@target"
+                                                TransportConnections="@TransportConnections"
+                                                IsCardOpen="IsCardOpen"
+                                                ToggleCard="ToggleCard"
+                                                ToggleTarget="ToggleDistributionTarget"
+                                                ToggleBoundTransport="ToggleDistributionTargetTransport"
+                                                RemoveTarget="RemoveDistributionTarget"
+                                                UpdateField="UpdateDistributionTargetField" />
     }
 </div>

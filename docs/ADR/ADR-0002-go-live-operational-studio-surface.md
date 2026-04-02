@@ -153,7 +153,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | TST-001 | Open `Go Live` with persisted destinations | Component | Ready summaries render from persisted settings without inline provider forms |
 | TST-002 | Select the secondary camera and take it live | UI | Program monitor switches first, live preview switches only after take-to-air |
-| TST-003 | Arm LiveKit, YouTube, OBS, and recording from the studio surface | UI | Quick toggles persist and reload into the operational studio |
+| TST-003 | Arm LiveKit, VDO.Ninja, YouTube, and recording from the studio surface | UI | Quick toggles persist and reload into the operational studio |
 
 ## References
 

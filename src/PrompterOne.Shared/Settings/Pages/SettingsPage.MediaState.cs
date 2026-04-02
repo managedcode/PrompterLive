@@ -177,9 +177,12 @@ public partial class SettingsPage
             },
             Streaming = _studioSettings.Streaming with
             {
-                IncludeCameraInOutput = _sceneCameras.Count == 0
-                    ? _studioSettings.Streaming.IncludeCameraInOutput
-                    : _sceneCameras.Any(camera => camera.Transform.IncludeInOutput)
+                ProgramCapture = _studioSettings.Streaming.ProgramCaptureSettings with
+                {
+                    IncludeCameraInOutput = _sceneCameras.Count == 0
+                        ? _studioSettings.Streaming.ProgramCaptureSettings.IncludeCameraInOutput
+                        : _sceneCameras.Any(camera => camera.Transform.IncludeInOutput)
+                }
             }
         };
 

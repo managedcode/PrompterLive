@@ -1,0 +1,197 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Core.Models.Media
+@using PrompterOne.Core.Models.Streaming
+@using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Core.Services.Streaming
+@using PrompterOne.Shared.Services
+@using PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Settings.Models
+@inject StreamingPublishDescriptorResolver DescriptorResolver
+
+<SettingsStreamingTargetCard Title="@Connection.Name"
+                             Account="@Presentation.SettingsAccountLabel"
+                             Description="@Presentation.SettingsDescription"
+                             Summary="@Summary"
+                             StatusLabel="@StatusLabel"
+                             StatusClass="@StatusClass"
+                             IsEnabled="@Connection.IsEnabled"
+                             IsOpen="@IsCardOpen(CardId)"
+                             IsReady="@IsReady"
+                             ToggleTestId="@UiTestIds.Settings.StreamingTransportToggle(Connection.Id)"
+                             CardTestId="@UiTestIds.Settings.StreamingProviderCard(Connection.Id)"
+                             ToggleEnabled="@(() => ToggleConnection.InvokeAsync(Connection.Id))"
+                             OnCardToggle="@(() => ToggleCard.InvokeAsync(CardId))"
+                             IconClass="@Presentation.IconCssClass">
+    <div class="set-field">
+        <label>@SettingsStreamingText.TargetNameLabel</label>
+        <input type="text"
+               class="set-input"
+               value="@Connection.Name"
+               @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.Name, GetValue(args))))"
+               data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Name)" />
+    </div>
+
+    <div class="set-field">
+        <label>@SettingsStreamingText.ConnectionRoleLabel</label>
+        <SettingsSelect Value="@Connection.Roles.ToString()"
+                       Options="@RoleOptions"
+                       OnChange="OnRoleChanged"
+                       TestId="@UiTestIds.Settings.StreamingTransportRole(Connection.Id)" />
+    </div>
+
+    <SettingsStreamingSourcePicker TargetId="@Connection.Id"
+                                   Sources="@Sources"
+                                   SelectedSourceIds="@SelectedSourceIds"
+                                   ToggleSource="@(sourceId => ToggleSource.InvokeAsync((Connection.Id, sourceId)))" />
+
+    @switch (Connection.PlatformKind)
+    {
+        case StreamingPlatformKind.LiveKit:
+            <div class="set-field">
+                <label>@SettingsStreamingText.ServerUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.ServerUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.ServerUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ServerUrl)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.RoomName"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.TokenLabel</label>
+                <input type="password"
+                       class="set-input"
+                       value="@Connection.Token"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.Token, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Token)" />
+            </div>
+            break;
+        case StreamingPlatformKind.VdoNinja:
+            <div class="set-field">
+                <label>@SettingsStreamingText.BaseUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.BaseUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.BaseUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.BaseUrl)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.RoomName"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.PublishUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.PublishUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.PublishUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.PublishUrl)" />
+            </div>
+            <div class="set-field">
+                <label>@SettingsStreamingText.ViewUrlLabel</label>
+                <input type="text"
+                       class="set-input"
+                       value="@Connection.ViewUrl"
+                       @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.ViewUrl, GetValue(args))))"
+                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ViewUrl)" />
+            </div>
+            break;
+    }
+
+    <div class="set-field">
+        <button type="button"
+                class="set-btn-outline set-btn-sm"
+                data-testid="@UiTestIds.Settings.StreamingTransportRemove(Connection.Id)"
+                @onclick="@(() => RemoveConnection.InvokeAsync(Connection.Id))">
+            @SettingsStreamingText.RemoveDestinationLabel
+        </button>
+    </div>
+</SettingsStreamingTargetCard>
+
+@code {
+    private const string SelectedStatusClass = "set-dest-ok";
+
+    private static readonly IReadOnlyList<SettingsSelectOption> RoleOptions =
+    [
+        new(nameof(StreamingTransportRole.Both), "Source + Publish"),
+        new(nameof(StreamingTransportRole.Publish), "Publish only"),
+        new(nameof(StreamingTransportRole.Source), "Source only")
+    ];
+
+    [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
+    [Parameter, EditorRequired] public TransportConnectionProfile Connection { get; set; } = default!;
+    [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
+    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
+    [Parameter] public EventCallback<string> RemoveConnection { get; set; }
+    [Parameter] public EventCallback<string> ToggleCard { get; set; }
+    [Parameter] public EventCallback<string> ToggleConnection { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string SourceId)> ToggleSource { get; set; }
+    [Parameter] public EventCallback<(string ConnectionId, string FieldId, string Value)> UpdateField { get; set; }
+    [Parameter] public EventCallback<(string ConnectionId, string Value)> UpdateRole { get; set; }
+
+    private string CardId => SettingsStreamingCardIds.TransportConnection(Connection.Id);
+
+    private StreamingPublishDescriptor Descriptor => DescriptorResolver.DescribeTransport(Connection);
+
+    private bool IsReady => Connection.IsEnabled
+        && SelectedSourceIds.Count > 0
+        && Descriptor.IsReady;
+
+    private StreamingPlatformPresentation Presentation => StreamingPlatformPresentationCatalog.Get(Connection.PlatformKind);
+
+    private IReadOnlyList<string> SelectedSourceIds =>
+        GoLiveDestinationRouting.GetSelectedSourceIds(Settings, Connection.Id, Sources);
+
+    private string StatusClass => IsReady ? SelectedStatusClass : string.Empty;
+
+    private string StatusLabel
+    {
+        get
+        {
+            if (!Connection.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledStatusLabel;
+            }
+
+            if (SelectedSourceIds.Count == 0 || !Descriptor.IsReady)
+            {
+                return SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+            }
+
+            return SettingsStreamingText.DestinationReadyStatusLabel;
+        }
+    }
+
+    private string Summary
+    {
+        get
+        {
+            if (!Connection.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledSummary;
+            }
+
+            if (SelectedSourceIds.Count == 0)
+            {
+                return SettingsStreamingText.DestinationNoSourceSummary;
+            }
+
+            return Descriptor.Summary;
+        }
+    }
+
+    private Task OnRoleChanged(ChangeEventArgs args) =>
+        UpdateRole.InvokeAsync((Connection.Id, GetValue(args)));
+
+    private static string GetValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
+}

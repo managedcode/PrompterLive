@@ -23,7 +23,7 @@ public static class GoLiveDestinationRouting
     {
         return streaming with
         {
-            DestinationSourceSelections = NormalizeSelections(streaming, sceneCameras)
+            SourceSelections = NormalizeSelections(streaming, sceneCameras)
         };
     }
 
@@ -61,7 +61,7 @@ public static class GoLiveDestinationRouting
                 : selection)
             .ToArray();
 
-        return streaming with { DestinationSourceSelections = normalizedSelections };
+        return streaming with { SourceSelections = normalizedSelections };
     }
 
     private static IReadOnlyList<GoLiveDestinationSourceSelection> NormalizeSelections(
@@ -69,7 +69,7 @@ public static class GoLiveDestinationRouting
         IReadOnlyList<SceneCameraSource> sceneCameras)
     {
         var fallbackSourceIds = BuildFallbackSourceIds(sceneCameras);
-        var existingSelections = (streaming.DestinationSourceSelections ?? Array.Empty<GoLiveDestinationSourceSelection>())
+        var existingSelections = (streaming.SourceSelections ?? Array.Empty<GoLiveDestinationSourceSelection>())
             .ToDictionary(selection => selection.TargetId, selection => selection.SourceIds, StringComparer.Ordinal);
 
         return BuildAllTargetIds(streaming)
@@ -83,13 +83,13 @@ public static class GoLiveDestinationRouting
 
     private static IReadOnlyList<string> BuildAllTargetIds(StreamStudioSettings streaming)
     {
-        var externalTargetIds = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
-            .Select(destination => destination.Id)
+        var transportConnectionIds = (streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>())
+            .Select(connection => connection.Id)
             .Where(id => !string.IsNullOrWhiteSpace(id))
             .Distinct(StringComparer.Ordinal);
 
         return GoLiveTargetCatalog.LocalTargetIds
-            .Concat(externalTargetIds)
+            .Concat(transportConnectionIds)
             .ToArray();
     }
 

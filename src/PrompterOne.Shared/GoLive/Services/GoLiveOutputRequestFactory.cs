@@ -19,17 +19,18 @@ public static class GoLiveOutputRequestFactory
     public static GoLiveOutputRuntimeRequest Build(
         SceneCameraSource? primaryCamera,
         MediaSceneState scene,
+        IReadOnlyList<SceneCameraSource>? availableSources,
         bool allowOverlaySources,
         StreamStudioSettings streaming,
         SettingsPagePreferences recordingPreferences,
         string recordingFileStem)
     {
-        var liveKitDestination = ResolveLiveKitDestination(streaming);
-        var vdoNinjaDestination = ResolveVdoNinjaDestination(streaming);
-        var programVideo = ResolveProgramVideo(streaming.OutputResolution);
-        var videoSources = BuildVideoSources(primaryCamera, scene.Cameras, allowOverlaySources);
+        var programCapture = streaming.ProgramCaptureSettings;
+        var programVideo = ResolveProgramVideo(programCapture.ResolutionPreset);
+        var videoSources = BuildVideoSources(primaryCamera, availableSources ?? scene.Cameras, allowOverlaySources);
         var audioInputs = BuildAudioInputs(scene);
         var recording = BuildRecordingExport(recordingPreferences, recordingFileStem);
+        var transportConnections = BuildTransportConnections(streaming.TransportConnections);
 
         return new(
             PrimarySourceId: primaryCamera?.SourceId ?? string.Empty,
@@ -37,79 +38,28 @@ public static class GoLiveOutputRequestFactory
             VideoSources: videoSources,
             AudioInputs: audioInputs,
             Recording: recording,
-            ObsEnabled: streaming.ObsVirtualCameraEnabled,
-            RecordingEnabled: streaming.LocalRecordingEnabled,
-            LiveKitEnabled: liveKitDestination?.IsEnabled == true,
-            LiveKitServerUrl: liveKitDestination?.ServerUrl ?? string.Empty,
-            LiveKitRoomName: liveKitDestination?.RoomName ?? string.Empty,
-            LiveKitToken: liveKitDestination?.Token ?? string.Empty,
-            VdoNinjaEnabled: vdoNinjaDestination?.IsEnabled == true,
-            VdoNinjaPublishUrl: vdoNinjaDestination?.PublishUrl ?? string.Empty,
-            VdoNinjaRoomName: vdoNinjaDestination?.RoomName ?? string.Empty);
+            RecordingEnabled: streaming.RecordingSettings.IsEnabled,
+            TransportConnections: transportConnections);
     }
 
-    private static StreamingProfile? ResolveLiveKitDestination(StreamStudioSettings streaming)
+    private static IReadOnlyList<GoLiveOutputTransportConnection> BuildTransportConnections(
+        IReadOnlyList<TransportConnectionProfile>? transportConnections)
     {
-        var destinations = streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>();
-        var configuredDestination = destinations.FirstOrDefault(destination =>
-                destination.ProviderKind == StreamingProviderKind.LiveKit
-                && destination.IsEnabled)
-            ?? destinations.FirstOrDefault(destination =>
-                destination.ProviderKind == StreamingProviderKind.LiveKit);
-
-        if (configuredDestination is not null)
-        {
-            return configuredDestination;
-        }
-
-        if (!streaming.LiveKitEnabled
-            && string.IsNullOrWhiteSpace(streaming.LiveKitServerUrl)
-            && string.IsNullOrWhiteSpace(streaming.LiveKitRoomName)
-            && string.IsNullOrWhiteSpace(streaming.LiveKitToken))
-        {
-            return null;
-        }
-
-        return StreamingPlatformCatalog.CreateProfile(
-            StreamingPlatformKind.LiveKit,
-            GoLiveTargetCatalog.TargetIds.LiveKit) with
-        {
-            IsEnabled = streaming.LiveKitEnabled,
-            ServerUrl = streaming.LiveKitServerUrl,
-            RoomName = streaming.LiveKitRoomName,
-            Token = streaming.LiveKitToken
-        };
-    }
-
-    private static StreamingProfile? ResolveVdoNinjaDestination(StreamStudioSettings streaming)
-    {
-        var destinations = streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>();
-        var configuredDestination = destinations.FirstOrDefault(destination =>
-                destination.ProviderKind == StreamingProviderKind.VdoNinja
-                && destination.IsEnabled)
-            ?? destinations.FirstOrDefault(destination =>
-                destination.ProviderKind == StreamingProviderKind.VdoNinja);
-
-        if (configuredDestination is not null)
-        {
-            return configuredDestination;
-        }
-
-        if (!streaming.VdoNinjaEnabled
-            && string.IsNullOrWhiteSpace(streaming.VdoNinjaRoomName)
-            && string.IsNullOrWhiteSpace(streaming.VdoNinjaPublishUrl))
-        {
-            return null;
-        }
-
-        return StreamingPlatformCatalog.CreateProfile(
-            StreamingPlatformKind.VdoNinja,
-            GoLiveTargetCatalog.TargetIds.VdoNinja) with
-        {
-            IsEnabled = streaming.VdoNinjaEnabled,
-            PublishUrl = streaming.VdoNinjaPublishUrl,
-            RoomName = streaming.VdoNinjaRoomName
-        };
+        return (transportConnections ?? Array.Empty<TransportConnectionProfile>())
+            .Where(connection => StreamingPlatformCatalog.IsTransportKind(connection.PlatformKind))
+            .Select(connection => new GoLiveOutputTransportConnection(
+                ConnectionId: connection.Id,
+                Name: connection.Name,
+                PlatformKind: connection.PlatformKind,
+                Roles: connection.Roles,
+                IsEnabled: connection.IsEnabled,
+                ServerUrl: connection.ServerUrl,
+                BaseUrl: connection.BaseUrl,
+                RoomName: connection.RoomName,
+                Token: connection.Token,
+                PublishUrl: connection.PublishUrl,
+                ViewUrl: connection.ViewUrl))
+            .ToArray();
     }
 
     private static IReadOnlyList<GoLiveOutputAudioInput> BuildAudioInputs(MediaSceneState scene)

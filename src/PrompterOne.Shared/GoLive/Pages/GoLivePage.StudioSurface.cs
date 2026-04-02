@@ -1,5 +1,7 @@
 using System.Globalization;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Components.GoLive;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
@@ -44,6 +46,7 @@ public partial class GoLivePage
         _roomCreated
         || GoLiveOutputRuntime.State.VdoNinjaActive
         || GoLiveOutputRuntime.State.LiveKitActive
+        || GoLiveRemoteSourceRuntime.State.HasActiveConnections
         || ResolvePrimaryRoomDestination() is not null;
 
     private IReadOnlyList<GoLiveRoomParticipantViewModel> Participants => BuildParticipants();
@@ -59,9 +62,9 @@ public partial class GoLivePage
     private static IReadOnlyList<GoLiveUtilitySourceViewModel> UtilitySources => [];
 
     private IReadOnlyList<SceneCameraSource> VisibleSceneCameras =>
-        _activeStudioMode == GoLiveStudioMode.Studio && SceneCameras.Count > 0
-            ? [SceneCameras[0]]
-            : SceneCameras;
+        _activeStudioMode == GoLiveStudioMode.Studio && AvailableSceneSources.Count > 0
+            ? [AvailableSceneSources[0]]
+            : AvailableSceneSources;
 
     private string SourcesHeaderTitle =>
         _activeStudioMode == GoLiveStudioMode.Director
@@ -132,7 +135,7 @@ public partial class GoLivePage
                 GoLiveText.Surface.AudioRecordingChannelLabel,
                 GoLiveOutputRuntime.State.RecordingActive
                     ? GoLiveText.Surface.RecordingActiveMetricValue
-                    : _studioSettings.Streaming.LocalRecordingEnabled
+                    : _studioSettings.Streaming.RecordingSettings.IsEnabled
                         ? GoLiveText.Surface.RecordingReadyDetailLabel
                         : GoLiveText.Surface.AudioIdleDetailLabel,
                 recordingLevel)
@@ -147,8 +150,8 @@ public partial class GoLivePage
         }
 
         var participantLevel = GoLiveSession.State.HasActiveSession ? 100 : 52;
-        return
-        [
+        var participants = new List<GoLiveRoomParticipantViewModel>
+        {
             new(
                 GoLiveText.Surface.HostParticipantId,
                 GoLiveText.Surface.HostParticipantInitial,
@@ -156,7 +159,17 @@ public partial class GoLivePage
                 GoLiveText.Surface.DetailLocalProgramLabel,
                 participantLevel,
                 true)
-        ];
+        };
+
+        participants.AddRange(GoLiveRemoteSourceRuntime.State.Sources.Select(source => new GoLiveRoomParticipantViewModel(
+            source.SourceId,
+            ResolveParticipantInitial(source.Label),
+            source.Label,
+            ResolveParticipantPlatformLabel(source.PlatformKind),
+            source.IsConnected ? participantLevel : 0,
+            false)));
+
+        return participants;
     }
 
     private string BuildRoomCode()
@@ -165,6 +178,14 @@ public partial class GoLivePage
         if (!string.IsNullOrWhiteSpace(roomDestination?.RoomName))
         {
             return roomDestination.RoomName;
+        }
+
+        var remoteRoomName = GoLiveRemoteSourceRuntime.State.Connections
+            .Select(connection => connection.RoomName)
+            .FirstOrDefault(roomName => !string.IsNullOrWhiteSpace(roomName));
+        if (!string.IsNullOrWhiteSpace(remoteRoomName))
+        {
+            return remoteRoomName;
         }
 
         if (!string.IsNullOrWhiteSpace(SessionService.State.ScriptId))
@@ -200,8 +221,8 @@ public partial class GoLivePage
 
     private IReadOnlyList<GoLiveSceneChipViewModel> BuildSceneChips()
     {
-        var primaryCamera = SceneCameras.Count > 0 ? SceneCameras[0] : null;
-        var secondaryCamera = SceneCameras.Count > 1 ? SceneCameras[1] : null;
+        var primaryCamera = AvailableSceneSources.Count > 0 ? AvailableSceneSources[0] : null;
+        var secondaryCamera = AvailableSceneSources.Count > 1 ? AvailableSceneSources[1] : null;
         var scenes = new List<GoLiveSceneChipViewModel>
         {
             new(GoLiveText.Surface.PrimarySceneId, primaryCamera is null ? GoLiveText.Session.CameraFallbackLabel : MediaDeviceLabelSanitizer.Sanitize(primaryCamera.Label), GoLiveSceneChipKind.Camera, primaryCamera?.SourceId),
@@ -254,42 +275,44 @@ public partial class GoLivePage
             return FormatFileSize(recording.SizeBytes);
         }
 
-        return _studioSettings.Streaming.LocalRecordingEnabled
+        return _studioSettings.Streaming.RecordingSettings.IsEnabled
             ? GoLiveText.Surface.RecordingReadyMetricValue
             : GoLiveText.Surface.AudioIdleDetailLabel;
     }
 
     private string BuildRuntimeEngineValue()
     {
+        var activeModules = new List<string>();
         if (GoLiveOutputRuntime.State.RecordingActive)
         {
-            var profileParts = new[]
+            activeModules.Add(string.Join(MetricSeparator, new[]
             {
                 GoLiveText.Surface.RuntimeEngineRecorderValue,
                 ResolveRecordingContainerValue(),
                 ResolveRecordingSaveModeValue()
-            }.Where(value => !string.IsNullOrWhiteSpace(value));
-
-            return string.Join(MetricSeparator, profileParts);
+            }.Where(value => !string.IsNullOrWhiteSpace(value))));
         }
 
-        return (GoLiveOutputRuntime.State.ObsActive, GoLiveOutputRuntime.State.VdoNinjaActive, GoLiveOutputRuntime.State.LiveKitActive, GoLiveOutputRuntime.State.RecordingActive) switch
+        if (GoLiveOutputRuntime.State.LiveKitActive)
         {
-            (true, true, _, _) => GoLiveText.Surface.RuntimeEngineObsVdoNinjaValue,
-            (true, false, true, _) => GoLiveText.Surface.RuntimeEngineObsLiveKitValue,
-            (true, false, false, _) => GoLiveText.Surface.RuntimeEngineObsBrowserValue,
-            (false, true, _, _) => GoLiveText.Surface.RuntimeEngineVdoNinjaValue,
-            (false, false, true, _) => GoLiveText.Surface.RuntimeEngineLiveKitValue,
-            (false, false, false, true) => GoLiveText.Surface.RuntimeEngineRecorderValue,
-            _ => GoLiveText.Surface.RuntimeEngineIdleValue
-        };
+            activeModules.Add(GoLiveText.Surface.RuntimeEngineLiveKitValue);
+        }
+
+        if (GoLiveOutputRuntime.State.VdoNinjaActive)
+        {
+            activeModules.Add(GoLiveText.Surface.RuntimeEngineVdoNinjaValue);
+        }
+
+        return activeModules.Count == 0
+            ? GoLiveText.Surface.RuntimeEngineIdleValue
+            : string.Join(MetricSeparator, activeModules);
     }
 
     private string BuildBitrateMetricValue()
     {
         var videoBitrateKbps = GoLiveOutputRuntime.State.RecordingActive && GoLiveOutputRuntime.State.Recording.VideoBitrateKbps > 0
             ? GoLiveOutputRuntime.State.Recording.VideoBitrateKbps
-            : _studioSettings.Streaming.BitrateKbps;
+            : _studioSettings.Streaming.ProgramCaptureSettings.BitrateKbps;
 
         return string.Concat(videoBitrateKbps.ToString(CultureInfo.InvariantCulture), " kbps");
     }
@@ -305,7 +328,7 @@ public partial class GoLivePage
                 program.Height.ToString(CultureInfo.InvariantCulture));
         }
 
-        return ResolveResolutionDimensions(_studioSettings.Streaming.OutputResolution);
+        return ResolveResolutionDimensions(_studioSettings.Streaming.ProgramCaptureSettings.ResolutionPreset);
     }
 
     private static string FormatFileSize(long sizeBytes)
@@ -393,7 +416,7 @@ public partial class GoLivePage
         var linkedSource = SceneChips.FirstOrDefault(scene => string.Equals(scene.Id, sceneId, StringComparison.Ordinal))?.SourceId;
         if (!string.IsNullOrWhiteSpace(linkedSource))
         {
-            GoLiveSession.SelectSource(SceneCameras, linkedSource);
+            GoLiveSession.SelectSource(AvailableSceneSources, linkedSource);
         }
 
         return Task.CompletedTask;
@@ -460,4 +483,17 @@ public partial class GoLivePage
         _cueArmed = !_cueArmed;
         return Task.CompletedTask;
     }
+
+    private static string ResolveParticipantInitial(string label) =>
+        string.IsNullOrWhiteSpace(label)
+            ? GoLiveText.Surface.HostParticipantInitial
+            : label.Trim()[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
+
+    private static string ResolveParticipantPlatformLabel(StreamingPlatformKind platformKind) =>
+        platformKind switch
+        {
+            StreamingPlatformKind.LiveKit => GoLiveTargetCatalog.TargetNames.LiveKit,
+            StreamingPlatformKind.VdoNinja => GoLiveTargetCatalog.TargetNames.VdoNinja,
+            _ => GoLiveText.Surface.DetailLocalProgramLabel
+        };
 }

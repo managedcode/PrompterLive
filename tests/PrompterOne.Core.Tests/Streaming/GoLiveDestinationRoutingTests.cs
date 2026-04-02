@@ -9,25 +9,30 @@ public sealed class GoLiveDestinationRoutingTests
 {
     private const string FirstSourceId = "scene-cam-a";
     private const string SecondSourceId = "scene-cam-b";
+    private const string LiveKitConnectionId = "livekit-main";
+    private const string VdoConnectionId = "vdo-main";
     private const string UnknownSourceId = "scene-cam-missing";
 
     [Fact]
     public void Normalize_SeedsMissingTargetsFromProgramFeedSources()
     {
         var streaming = new StreamStudioSettings(
-            ExternalDestinations:
+            TransportConnections:
             [
-                StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit)
+                new TransportConnectionProfile(
+                    LiveKitConnectionId,
+                    "LiveKit Main",
+                    StreamingPlatformKind.LiveKit)
             ]);
 
         var normalized = GoLiveDestinationRouting.Normalize(streaming, CreateSceneCameras());
 
         var liveKitSources = GoLiveDestinationRouting.GetSelectedSourceIds(
             normalized,
-            GoLiveTargetCatalog.TargetIds.LiveKit,
+            LiveKitConnectionId,
             CreateSceneCameras());
 
-        Assert.Equal(GoLiveTargetCatalog.LocalTargetIds.Count + 1, normalized.DestinationSourceSelections?.Count);
+        Assert.Equal(GoLiveTargetCatalog.LocalTargetIds.Count + 1, normalized.SourceSelections?.Count);
         Assert.Equal([FirstSourceId], liveKitSources);
     }
 
@@ -36,39 +41,48 @@ public sealed class GoLiveDestinationRoutingTests
     {
         var streaming = GoLiveDestinationRouting.Normalize(
             new StreamStudioSettings(
-                ExternalDestinations:
+                TransportConnections:
                 [
-                    StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit),
-                    StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.Youtube, GoLiveTargetCatalog.TargetIds.Youtube)
+                    new TransportConnectionProfile(
+                        LiveKitConnectionId,
+                        "LiveKit Main",
+                        StreamingPlatformKind.LiveKit),
+                    new TransportConnectionProfile(
+                        VdoConnectionId,
+                        "VDO Main",
+                        StreamingPlatformKind.VdoNinja)
                 ]),
             CreateSceneCameras());
 
         var updated = GoLiveDestinationRouting.ToggleSource(
             streaming,
-            GoLiveTargetCatalog.TargetIds.LiveKit,
+            LiveKitConnectionId,
             SecondSourceId,
             CreateSceneCameras());
 
         Assert.Equal(
             [FirstSourceId, SecondSourceId],
-            GoLiveDestinationRouting.GetSelectedSourceIds(updated, GoLiveTargetCatalog.TargetIds.LiveKit, CreateSceneCameras()));
+            GoLiveDestinationRouting.GetSelectedSourceIds(updated, LiveKitConnectionId, CreateSceneCameras()));
         Assert.Equal(
             [FirstSourceId],
-            GoLiveDestinationRouting.GetSelectedSourceIds(updated, GoLiveTargetCatalog.TargetIds.Youtube, CreateSceneCameras()));
+            GoLiveDestinationRouting.GetSelectedSourceIds(updated, VdoConnectionId, CreateSceneCameras()));
     }
 
     [Fact]
     public void Normalize_RemovesUnknownSourcesFromPersistedSelections()
     {
         var streaming = new StreamStudioSettings(
-            ExternalDestinations:
+            TransportConnections:
             [
-                StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit)
+                new TransportConnectionProfile(
+                    LiveKitConnectionId,
+                    "LiveKit Main",
+                    StreamingPlatformKind.LiveKit)
             ],
-            DestinationSourceSelections:
+            SourceSelections:
             [
                 new GoLiveDestinationSourceSelection(
-                    GoLiveTargetCatalog.TargetIds.LiveKit,
+                    LiveKitConnectionId,
                     [FirstSourceId, UnknownSourceId])
             ]);
 
@@ -76,7 +90,34 @@ public sealed class GoLiveDestinationRoutingTests
 
         Assert.Equal(
             [FirstSourceId],
-            GoLiveDestinationRouting.GetSelectedSourceIds(normalized, GoLiveTargetCatalog.TargetIds.LiveKit, CreateSceneCameras()));
+            GoLiveDestinationRouting.GetSelectedSourceIds(normalized, LiveKitConnectionId, CreateSceneCameras()));
+    }
+
+    [Fact]
+    public void Normalize_DoesNotCreateSourceSelectionsForDistributionTargets()
+    {
+        var streaming = new StreamStudioSettings(
+            TransportConnections:
+            [
+                new TransportConnectionProfile(
+                    LiveKitConnectionId,
+                    "LiveKit Main",
+                    StreamingPlatformKind.LiveKit)
+            ],
+            DistributionTargets:
+            [
+                new DistributionTargetProfile(
+                    "youtube-primary",
+                    "YouTube Primary",
+                    StreamingPlatformKind.Youtube,
+                    BoundTransportConnectionIds: [LiveKitConnectionId])
+            ]);
+
+        var normalized = GoLiveDestinationRouting.Normalize(streaming, CreateSceneCameras());
+
+        Assert.DoesNotContain(
+            normalized.SourceSelections ?? [],
+            selection => string.Equals(selection.TargetId, "youtube-primary", StringComparison.Ordinal));
     }
 
     private static IReadOnlyList<SceneCameraSource> CreateSceneCameras() =>

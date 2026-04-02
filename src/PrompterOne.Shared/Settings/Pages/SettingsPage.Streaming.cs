@@ -7,87 +7,134 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class SettingsPage
 {
-    private const string DirectRtmpOutputModeValue = "direct-rtmp";
-    private const string LocalRecordingOutputModeValue = "local-recording";
-    private const string NdiOutputModeValue = "ndi-output";
-    private const string VirtualCameraOutputModeValue = "virtual-camera";
-
-    private string SelectedStreamingOutputModeValue => _studioSettings.Streaming.OutputMode switch
-    {
-        StreamingOutputMode.DirectRtmp => DirectRtmpOutputModeValue,
-        StreamingOutputMode.LocalRecording => LocalRecordingOutputModeValue,
-        StreamingOutputMode.NdiOutput => NdiOutputModeValue,
-        _ => VirtualCameraOutputModeValue
-    };
-
-    private Task ToggleObsOutputAsync() =>
-        UpdateStreamingSettingsAsync(streaming => streaming with
+    private static readonly IReadOnlyDictionary<string, StreamingTransportRole> TransportRoleValues =
+        new Dictionary<string, StreamingTransportRole>(StringComparer.Ordinal)
         {
-            ObsVirtualCameraEnabled = !streaming.ObsVirtualCameraEnabled,
-            OutputMode = StreamingOutputMode.VirtualCamera
-        });
-
-    private Task ToggleNdiOutputAsync() =>
-        UpdateStreamingSettingsAsync(streaming => streaming with
-        {
-            NdiOutputEnabled = !streaming.NdiOutputEnabled,
-            OutputMode = StreamingOutputMode.NdiOutput
-        });
+            [nameof(StreamingTransportRole.Both)] = StreamingTransportRole.Both,
+            [nameof(StreamingTransportRole.Publish)] = StreamingTransportRole.Publish,
+            [nameof(StreamingTransportRole.Source)] = StreamingTransportRole.Source
+        };
 
     private Task ToggleRecordingOutputAsync() =>
         UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            LocalRecordingEnabled = !streaming.LocalRecordingEnabled,
-            OutputMode = StreamingOutputMode.LocalRecording
+            Recording = streaming.RecordingSettings with
+            {
+                IsEnabled = !streaming.RecordingSettings.IsEnabled
+            }
         });
 
-    private async Task AddExternalDestinationAsync(StreamingPlatformKind kind)
+    private async Task AddTransportConnectionAsync(StreamingPlatformKind kind)
     {
-        var existingIds = (_studioSettings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
-            .Select(destination => destination.Id);
-        var destination = StreamingPlatformCatalog.CreateProfile(kind, existingIds);
-        destination = destination with
-        {
-            Name = BuildDestinationDisplayName(kind, destination.Id)
-        };
-
-        if (destination.ProviderKind == StreamingProviderKind.Rtmp)
-        {
-            destination = destination.SetPrimaryDestination(
-                destination.Name,
-                destination.GetPrimaryDestinationUrl(),
-                destination.GetPrimaryDestinationStreamKey());
-        }
+        var connection = StreamingPlatformCatalog.CreateTransportConnection(
+            kind,
+            (_studioSettings.Streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>())
+                .Select(existingConnection => existingConnection.Id));
 
         await UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
-                .Append(destination)
+            TransportConnections = (streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>())
+                .Append(connection)
                 .ToArray()
         });
     }
 
-    private Task ToggleExternalDestinationAsync(string destinationId) =>
+    private Task ToggleTransportConnectionAsync(string connectionId) =>
         UpdateStreamingSettingsAsync(
-            streaming => UpdateExternalDestination(
+            streaming => UpdateTransportConnection(
                 streaming,
-                destinationId,
-                destination => destination with { IsEnabled = !destination.IsEnabled }));
+                connectionId,
+                connection => connection with { IsEnabled = !connection.IsEnabled }));
 
-    private Task RemoveExternalDestinationAsync(string destinationId) =>
+    private Task RemoveTransportConnectionAsync(string connectionId) =>
         UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
-                .Where(destination => !string.Equals(destination.Id, destinationId, StringComparison.Ordinal))
+            TransportConnections = (streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>())
+                .Where(connection => !string.Equals(connection.Id, connectionId, StringComparison.Ordinal))
+                .ToArray(),
+            DistributionTargets = (streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>())
+                .Select(target => target with
+                {
+                    BoundTransportConnectionIds = target.GetBoundTransportConnectionIds()
+                        .Where(id => !string.Equals(id, connectionId, StringComparison.Ordinal))
+                        .ToArray()
+                })
                 .ToArray()
         });
 
-    private Task UpdateExternalDestinationFieldAsync((string DestinationId, string FieldId, string Value) update) =>
+    private Task UpdateTransportConnectionFieldAsync((string ConnectionId, string FieldId, string Value) update) =>
         UpdateStreamingSettingsAsync(
-            streaming => UpdateExternalDestination(
+            streaming => UpdateTransportConnection(
                 streaming,
-                update.DestinationId,
-                destination => ApplyExternalDestinationField(destination, update.FieldId, update.Value)));
+                update.ConnectionId,
+                connection => ApplyTransportConnectionField(connection, update.FieldId, update.Value)));
+
+    private Task UpdateTransportConnectionRoleAsync((string ConnectionId, string Value) update) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateTransportConnection(
+                streaming,
+                update.ConnectionId,
+                connection => connection with
+                {
+                    Roles = TransportRoleValues.GetValueOrDefault(update.Value, StreamingTransportRole.Both)
+                }));
+
+    private async Task AddDistributionTargetAsync(StreamingPlatformKind kind)
+    {
+        var target = StreamingPlatformCatalog.CreateDistributionTarget(
+            kind,
+            (_studioSettings.Streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>())
+                .Select(existingTarget => existingTarget.Id));
+
+        await UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            DistributionTargets = (streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>())
+                .Append(target)
+                .ToArray()
+        });
+    }
+
+    private Task ToggleDistributionTargetAsync(string targetId) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateDistributionTarget(
+                streaming,
+                targetId,
+                target => target with { IsEnabled = !target.IsEnabled }));
+
+    private Task RemoveDistributionTargetAsync(string targetId) =>
+        UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            DistributionTargets = (streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>())
+                .Where(target => !string.Equals(target.Id, targetId, StringComparison.Ordinal))
+                .ToArray()
+        });
+
+    private Task UpdateDistributionTargetFieldAsync((string TargetId, string FieldId, string Value) update) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateDistributionTarget(
+                streaming,
+                update.TargetId,
+                target => ApplyDistributionTargetField(target, update.FieldId, update.Value)));
+
+    private Task ToggleDistributionTargetTransportAsync((string TargetId, string ConnectionId) update) =>
+        UpdateStreamingSettingsAsync(
+            streaming => UpdateDistributionTarget(
+                streaming,
+                update.TargetId,
+                target =>
+                {
+                    var boundIds = target.GetBoundTransportConnectionIds().ToList();
+                    if (boundIds.Contains(update.ConnectionId, StringComparer.Ordinal))
+                    {
+                        boundIds.RemoveAll(id => string.Equals(id, update.ConnectionId, StringComparison.Ordinal));
+                    }
+                    else
+                    {
+                        boundIds.Add(update.ConnectionId);
+                    }
+
+                    return target with { BoundTransportConnectionIds = boundIds.ToArray() };
+                }));
 
     private async Task ToggleStreamingDestinationSourceAsync((string TargetId, string SourceId) update)
     {
@@ -107,20 +154,10 @@ public partial class SettingsPage
             return;
         }
 
-        await UpdateStreamingSettingsAsync(streaming => streaming with { OutputResolution = outputResolution });
-    }
-
-    private async Task OnStreamingOutputModeChanged(ChangeEventArgs args)
-    {
-        var nextMode = args.Value?.ToString() switch
+        await UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            DirectRtmpOutputModeValue => StreamingOutputMode.DirectRtmp,
-            LocalRecordingOutputModeValue => StreamingOutputMode.LocalRecording,
-            NdiOutputModeValue => StreamingOutputMode.NdiOutput,
-            _ => StreamingOutputMode.VirtualCamera
-        };
-
-        await UpdateStreamingSettingsAsync(streaming => streaming with { OutputMode = nextMode });
+            ProgramCapture = streaming.ProgramCaptureSettings with { ResolutionPreset = outputResolution }
+        });
     }
 
     private async Task UpdateStreamingBitrateAsync(ChangeEventArgs args)
@@ -130,25 +167,40 @@ public partial class SettingsPage
             return;
         }
 
-        await UpdateStreamingSettingsAsync(streaming => streaming with { BitrateKbps = Math.Max(250, bitrate) });
+        await UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            ProgramCapture = streaming.ProgramCaptureSettings with
+            {
+                BitrateKbps = Math.Max(250, bitrate)
+            }
+        });
     }
 
     private Task ToggleSettingsTextOverlayAsync() =>
         UpdateStreamingSettingsAsync(streaming => streaming with
         {
-            ShowTextOverlay = !streaming.ShowTextOverlay
+            ProgramCapture = streaming.ProgramCaptureSettings with
+            {
+                ShowTextOverlay = !streaming.ProgramCaptureSettings.ShowTextOverlay
+            }
         });
 
     private async Task ToggleSettingsIncludeCameraAsync()
     {
-        var nextValue = !_studioSettings.Streaming.IncludeCameraInOutput;
+        var nextValue = !_studioSettings.Streaming.ProgramCaptureSettings.IncludeCameraInOutput;
         foreach (var camera in _sceneCameras)
         {
             MediaSceneService.SetIncludeInOutput(camera.SourceId, nextValue);
         }
 
         await PersistSceneAsync();
-        await UpdateStreamingSettingsAsync(streaming => streaming with { IncludeCameraInOutput = nextValue });
+        await UpdateStreamingSettingsAsync(streaming => streaming with
+        {
+            ProgramCapture = streaming.ProgramCaptureSettings with
+            {
+                IncludeCameraInOutput = nextValue
+            }
+        });
     }
 
     private async Task UpdateStreamingSettingsAsync(
@@ -165,69 +217,65 @@ public partial class SettingsPage
         await PersistStudioSettingsAsync();
     }
 
-    private static StreamStudioSettings UpdateExternalDestination(
+    private static StreamStudioSettings UpdateTransportConnection(
         StreamStudioSettings streaming,
-        string destinationId,
-        Func<StreamingProfile, StreamingProfile> update)
+        string connectionId,
+        Func<TransportConnectionProfile, TransportConnectionProfile> update)
     {
         return streaming with
         {
-            ExternalDestinations = (streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>())
-                .Select(destination => string.Equals(destination.Id, destinationId, StringComparison.Ordinal)
-                    ? update(destination)
-                    : destination)
+            TransportConnections = (streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>())
+                .Select(connection => string.Equals(connection.Id, connectionId, StringComparison.Ordinal)
+                    ? update(connection)
+                    : connection)
                 .ToArray()
         };
     }
 
-    private static StreamingProfile ApplyExternalDestinationField(
-        StreamingProfile destination,
+    private static StreamStudioSettings UpdateDistributionTarget(
+        StreamStudioSettings streaming,
+        string targetId,
+        Func<DistributionTargetProfile, DistributionTargetProfile> update)
+    {
+        return streaming with
+        {
+            DistributionTargets = (streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>())
+                .Select(target => string.Equals(target.Id, targetId, StringComparison.Ordinal)
+                    ? update(target)
+                    : target)
+                .ToArray()
+        };
+    }
+
+    private static TransportConnectionProfile ApplyTransportConnectionField(
+        TransportConnectionProfile connection,
         string fieldId,
         string value)
     {
         return fieldId switch
         {
-            StreamingDestinationFieldIds.Name => ApplyDestinationName(destination, value),
-            StreamingDestinationFieldIds.ServerUrl => destination with { ServerUrl = value },
-            StreamingDestinationFieldIds.RoomName => destination with { RoomName = value },
-            StreamingDestinationFieldIds.Token => destination with { Token = value },
-            StreamingDestinationFieldIds.PublishUrl => destination with { PublishUrl = value },
-            StreamingDestinationFieldIds.RtmpUrl => destination.SetPrimaryDestination(
-                destination.Name,
-                value,
-                destination.GetPrimaryDestinationStreamKey()),
-            StreamingDestinationFieldIds.StreamKey => destination.SetPrimaryDestination(
-                destination.Name,
-                destination.GetPrimaryDestinationUrl(),
-                value),
-            _ => destination
+            StreamingDestinationFieldIds.Name => connection with { Name = value },
+            StreamingDestinationFieldIds.ServerUrl => connection with { ServerUrl = value },
+            StreamingDestinationFieldIds.BaseUrl => connection with { BaseUrl = value },
+            StreamingDestinationFieldIds.RoomName => connection with { RoomName = value },
+            StreamingDestinationFieldIds.Token => connection with { Token = value },
+            StreamingDestinationFieldIds.PublishUrl => connection with { PublishUrl = value },
+            StreamingDestinationFieldIds.ViewUrl => connection with { ViewUrl = value },
+            _ => connection
         };
     }
 
-    private static StreamingProfile ApplyDestinationName(StreamingProfile destination, string value)
+    private static DistributionTargetProfile ApplyDistributionTargetField(
+        DistributionTargetProfile target,
+        string fieldId,
+        string value)
     {
-        var definition = StreamingPlatformCatalog.Get(destination.PlatformKind);
-        var name = string.IsNullOrWhiteSpace(value)
-            ? definition.DefaultProfileName
-            : value;
-
-        return destination.ProviderKind == StreamingProviderKind.Rtmp
-            ? destination.SetPrimaryDestination(
-                name,
-                destination.GetPrimaryDestinationUrl(),
-                destination.GetPrimaryDestinationStreamKey())
-            : destination with { Name = name };
-    }
-
-    private static string BuildDestinationDisplayName(StreamingPlatformKind kind, string destinationId)
-    {
-        var definition = StreamingPlatformCatalog.Get(kind);
-        if (string.Equals(destinationId, definition.IdPrefix, StringComparison.Ordinal))
+        return fieldId switch
         {
-            return definition.DefaultProfileName;
-        }
-
-        var suffix = destinationId[(definition.IdPrefix.Length + 1)..];
-        return $"{definition.DefaultProfileName} {suffix}";
+            StreamingDestinationFieldIds.Name => target with { Name = value },
+            StreamingDestinationFieldIds.RtmpUrl => target with { RtmpUrl = value },
+            StreamingDestinationFieldIds.StreamKey => target with { StreamKey = value },
+            _ => target
+        };
     }
 }
