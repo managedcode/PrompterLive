@@ -8,6 +8,7 @@ using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Documents;
 using PrompterOne.Core.Models.Library;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Services;
 using PrompterOne.Core.Services.Editor;
 using PrompterOne.Core.Services.Media;
@@ -126,13 +127,18 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<TeleprompterReaderInterop>();
         context.Services.AddSingleton<GoLiveOutputInterop>();
         context.Services.AddSingleton<GoLiveOutputRuntimeService>();
+        context.Services.AddSingleton<GoLiveRemoteSourceInterop>();
+        context.Services.AddSingleton<GoLiveRemoteSourceRuntimeService>();
         context.Services.AddSingleton(bootstrapper);
         context.Services.AddSingleton<GoLiveSessionService>();
         context.Services.AddSingleton<BrowserConnectivityService>();
         context.Services.AddSingleton<UiDiagnosticsService>();
-        context.Services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
-        context.Services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
-        context.Services.AddSingleton<IStreamingOutputProvider, RtmpStreamingOutputProvider>();
+        context.Services.AddSingleton<IGoLiveSourceModule, LiveKitSourceModule>();
+        context.Services.AddSingleton<IGoLiveSourceModule, VdoNinjaSourceModule>();
+        context.Services.AddSingleton<IGoLiveOutputModule, LocalRecordingOutputModule>();
+        context.Services.AddSingleton<IGoLiveOutputModule, LiveKitOutputModule>();
+        context.Services.AddSingleton<IGoLiveOutputModule, VdoNinjaOutputModule>();
+        context.Services.AddSingleton<IGoLiveModuleRegistry, GoLiveModuleRegistry>();
         context.Services.AddScoped<StreamingPublishDescriptorResolver>();
 
         return new AppHarness(
@@ -179,11 +185,12 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     private const string GoLiveGetSessionStateIdentifier = GoLiveOutputInteropMethodNames.GetSessionState;
     private const string GoLiveStartLiveKitIdentifier = GoLiveOutputInteropMethodNames.StartLiveKitSession;
     private const string GoLiveStartLocalRecordingIdentifier = GoLiveOutputInteropMethodNames.StartLocalRecording;
-    private const string GoLiveStartObsIdentifier = GoLiveOutputInteropMethodNames.StartObsBrowserOutput;
+    private const string GoLiveRemoteGetSessionStateIdentifier = GoLiveRemoteSourceInteropMethodNames.GetSessionState;
+    private const string GoLiveRemoteStopSessionIdentifier = GoLiveRemoteSourceInteropMethodNames.StopSession;
+    private const string GoLiveRemoteSyncConnectionsIdentifier = GoLiveRemoteSourceInteropMethodNames.SyncConnections;
     private const string GoLiveStartVdoNinjaIdentifier = GoLiveOutputInteropMethodNames.StartVdoNinjaSession;
     private const string GoLiveStopLiveKitIdentifier = GoLiveOutputInteropMethodNames.StopLiveKitSession;
     private const string GoLiveStopLocalRecordingIdentifier = GoLiveOutputInteropMethodNames.StopLocalRecording;
-    private const string GoLiveStopObsIdentifier = GoLiveOutputInteropMethodNames.StopObsBrowserOutput;
     private const string GoLiveStopVdoNinjaIdentifier = GoLiveOutputInteropMethodNames.StopVdoNinjaSession;
     private const string GoLiveUpdateSessionDevicesIdentifier = GoLiveOutputInteropMethodNames.UpdateSessionDevices;
     private const string LoadSettingJsonIdentifier = "localStorage.getItem";
@@ -208,6 +215,37 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     public List<string> Invocations { get; } = [];
     public List<JsInvocationRecord> InvocationRecords { get; } = [];
     private Dictionary<string, GoLiveOutputRuntimeSnapshot> GoLiveSessions { get; } = new(StringComparer.Ordinal);
+    private Dictionary<string, GoLiveRemoteSourceRuntimeSnapshot> GoLiveRemoteSessions { get; } = new(StringComparer.Ordinal);
+
+    public void SeedRemoteSources(
+        string sessionId,
+        params (string ConnectionId, string SourceId, string Label, StreamingPlatformKind PlatformKind, string RoomName, string ServerUrl, bool IsConnected)[] sources)
+    {
+        var connectionSnapshots = sources
+            .GroupBy(source => source.ConnectionId, StringComparer.Ordinal)
+            .Select(group =>
+            {
+                var first = group.First();
+                return new GoLiveRemoteConnectionSnapshot(
+                    ConnectionId: first.ConnectionId,
+                    Connected: first.IsConnected,
+                    RoomName: first.RoomName,
+                    ServerUrl: first.ServerUrl,
+                    PlatformKind: (int)first.PlatformKind,
+                    Sources: group.Select(source => new GoLiveRemoteSourceSnapshot(
+                        ConnectionId: source.ConnectionId,
+                        DeviceId: source.SourceId,
+                        IsConnected: source.IsConnected,
+                        Label: source.Label,
+                        PlatformKind: (int)source.PlatformKind,
+                        SourceId: source.SourceId)).ToArray());
+            })
+            .ToArray();
+
+        GoLiveRemoteSessions[sessionId] = new GoLiveRemoteSourceRuntimeSnapshot(
+            Connections: connectionSnapshots,
+            Sources: connectionSnapshots.SelectMany(connection => connection.Sources ?? []).ToArray());
+    }
 
     public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
         InvokeAsync<TValue>(identifier, CancellationToken.None, args);
@@ -236,6 +274,11 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         if (TryHandleGoLiveOutputInvocation<TValue>(identifier, args, out var goLiveResult))
         {
             return goLiveResult;
+        }
+
+        if (TryHandleGoLiveRemoteInvocation<TValue>(identifier, args, out var goLiveRemoteResult))
+        {
+            return goLiveRemoteResult;
         }
 
         var result = identifier switch
@@ -301,25 +344,12 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             return true;
         }
 
-        if (string.Equals(identifier, GoLiveStartObsIdentifier, StringComparison.Ordinal))
-        {
-            var existingSnapshot = GoLiveSessions.GetValueOrDefault(targetSessionId);
-            GoLiveSessions[targetSessionId] = BuildGoLiveSnapshot(
-                args,
-                liveKitActive: existingSnapshot?.LiveKit?.Active == true,
-                obsActive: true,
-                recordingActive: existingSnapshot?.Recording?.Active == true,
-                vdoNinjaActive: existingSnapshot?.VdoNinja?.Active == true);
-            return true;
-        }
-
         if (string.Equals(identifier, GoLiveStartLocalRecordingIdentifier, StringComparison.Ordinal))
         {
             var existingSnapshot = GoLiveSessions.GetValueOrDefault(targetSessionId);
             GoLiveSessions[targetSessionId] = BuildGoLiveSnapshot(
                 args,
                 liveKitActive: existingSnapshot?.LiveKit?.Active == true,
-                obsActive: existingSnapshot?.Obs?.Active == true,
                 recordingActive: true,
                 vdoNinjaActive: existingSnapshot?.VdoNinja?.Active == true);
             return true;
@@ -331,7 +361,6 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             GoLiveSessions[targetSessionId] = BuildGoLiveSnapshot(
                 args,
                 liveKitActive: existingSnapshot?.LiveKit?.Active == true,
-                obsActive: existingSnapshot?.Obs?.Active == true,
                 recordingActive: existingSnapshot?.Recording?.Active == true,
                 vdoNinjaActive: existingSnapshot?.VdoNinja?.Active == true);
             return true;
@@ -343,9 +372,15 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             {
                 Audio = GetAudioSnapshot(snapshot) with
                 {
-                    ProgramLevelPercent = snapshot.Obs?.Active == true || snapshot.VdoNinja?.Active == true ? ActiveAudioLevelPercent : IdleAudioLevelPercent
+                    ProgramLevelPercent = snapshot.VdoNinja?.Active == true ? ActiveAudioLevelPercent : IdleAudioLevelPercent
                 },
-                LiveKit = GetProviderSnapshot(snapshot.LiveKit) with { Active = false }
+                LiveKit = GetProviderSnapshot(snapshot.LiveKit) with
+                {
+                    Active = false,
+                    Connected = false,
+                    RoomName = string.Empty,
+                    ServerUrl = string.Empty
+                }
             });
             return true;
         }
@@ -356,7 +391,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             {
                 Audio = GetAudioSnapshot(snapshot) with
                 {
-                    ProgramLevelPercent = snapshot.Obs?.Active == true || snapshot.LiveKit?.Active == true ? ActiveAudioLevelPercent : IdleAudioLevelPercent
+                    ProgramLevelPercent = snapshot.LiveKit?.Active == true ? ActiveAudioLevelPercent : IdleAudioLevelPercent
                 },
                 VdoNinja = GetVdoNinjaSnapshot(snapshot) with
                 {
@@ -368,19 +403,6 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
                     RoomName = string.Empty,
                     StreamId = string.Empty
                 }
-            });
-            return true;
-        }
-
-        if (string.Equals(identifier, GoLiveStopObsIdentifier, StringComparison.Ordinal))
-        {
-            UpdateGoLiveSession(targetSessionId, snapshot => snapshot with
-            {
-                Audio = GetAudioSnapshot(snapshot) with
-                {
-                    ProgramLevelPercent = snapshot.LiveKit?.Active == true || snapshot.VdoNinja?.Active == true ? ActiveAudioLevelPercent : IdleAudioLevelPercent
-                },
-                Obs = GetProviderSnapshot(snapshot.Obs) with { Active = false }
             });
             return true;
         }
@@ -411,6 +433,47 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         return false;
     }
 
+    private bool TryHandleGoLiveRemoteInvocation<TValue>(string identifier, object?[]? args, out TValue result)
+    {
+        result = default!;
+
+        if (string.Equals(identifier, GoLiveRemoteGetSessionStateIdentifier, StringComparison.Ordinal))
+        {
+            var sessionId = args?.FirstOrDefault()?.ToString() ?? string.Empty;
+            GoLiveRemoteSessions.TryGetValue(sessionId, out var snapshot);
+            result = snapshot is TValue typedSnapshot
+                ? typedSnapshot
+                : default!;
+            return true;
+        }
+
+        var targetSessionId = args?.FirstOrDefault()?.ToString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(targetSessionId))
+        {
+            return false;
+        }
+
+        if (string.Equals(identifier, GoLiveRemoteStopSessionIdentifier, StringComparison.Ordinal))
+        {
+            GoLiveRemoteSessions.Remove(targetSessionId);
+            return true;
+        }
+
+        if (string.Equals(identifier, GoLiveRemoteSyncConnectionsIdentifier, StringComparison.Ordinal))
+        {
+            if (!GoLiveRemoteSessions.ContainsKey(targetSessionId))
+            {
+                GoLiveRemoteSessions[targetSessionId] = new GoLiveRemoteSourceRuntimeSnapshot(
+                    Connections: [],
+                    Sources: []);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     private void UpdateGoLiveSession(string sessionId, Func<GoLiveOutputRuntimeSnapshot, GoLiveOutputRuntimeSnapshot> update)
     {
         if (!GoLiveSessions.TryGetValue(sessionId, out var snapshot))
@@ -425,7 +488,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         snapshot.Audio ?? new GoLiveOutputAudioSnapshot(IdleAudioLevelPercent, IdleAudioLevelPercent);
 
     private static GoLiveOutputProviderSnapshot GetProviderSnapshot(GoLiveOutputProviderSnapshot? snapshot) =>
-        snapshot ?? new GoLiveOutputProviderSnapshot(false);
+        snapshot ?? new GoLiveOutputProviderSnapshot(false, false, string.Empty, string.Empty);
 
     private static GoLiveOutputRecordingSnapshot GetRecordingSnapshot(GoLiveOutputRuntimeSnapshot snapshot) =>
         snapshot.Recording ?? new GoLiveOutputRecordingSnapshot(
@@ -453,21 +516,27 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     private static GoLiveOutputRuntimeSnapshot BuildGoLiveSnapshot(
         IReadOnlyList<object?>? args,
         bool liveKitActive = false,
-        bool obsActive = false,
         bool recordingActive = false,
         bool vdoNinjaActive = false)
     {
         var request = args?.Skip(1).FirstOrDefault() as GoLiveOutputRuntimeRequest
             ?? throw new InvalidOperationException("Go Live output interop request is required for the fake JS runtime.");
+        var liveKitConnections = request.GetPublishableConnections(StreamingPlatformKind.LiveKit);
+        var vdoNinjaConnections = request.GetPublishableConnections(StreamingPlatformKind.VdoNinja);
+        var liveKitConnection = liveKitConnections.Count > 0 ? liveKitConnections[0] : null;
+        var vdoNinjaConnection = vdoNinjaConnections.Count > 0 ? vdoNinjaConnections[0] : null;
 
         return new(
             AudioDeviceId: request.PrimaryMicrophoneDeviceId,
             Audio: new GoLiveOutputAudioSnapshot(
-                ProgramLevelPercent: liveKitActive || obsActive || vdoNinjaActive ? ActiveAudioLevelPercent : IdleAudioLevelPercent,
+                ProgramLevelPercent: liveKitActive || vdoNinjaActive ? ActiveAudioLevelPercent : IdleAudioLevelPercent,
                 RecordingLevelPercent: recordingActive ? ActiveAudioLevelPercent : IdleAudioLevelPercent),
             HasMediaStream: request.VideoSources.Any(source => source.IsRenderable),
-            LiveKit: new GoLiveOutputProviderSnapshot(liveKitActive),
-            Obs: new GoLiveOutputProviderSnapshot(obsActive),
+            LiveKit: new GoLiveOutputProviderSnapshot(
+                Active: liveKitActive,
+                Connected: liveKitActive,
+                RoomName: liveKitActive ? liveKitConnection?.RoomName ?? string.Empty : string.Empty,
+                ServerUrl: liveKitActive ? liveKitConnection?.ServerUrl ?? string.Empty : string.Empty),
             Program: new GoLiveOutputProgramSnapshot(
                 AudioInputCount: request.AudioInputs.Count,
                 FrameRate: request.ProgramVideo.FrameRate,
@@ -491,8 +560,8 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
                 Connected: vdoNinjaActive,
                 LastPeerLatencyMs: vdoNinjaActive ? 42 : 0,
                 PeerCount: vdoNinjaActive ? 1 : 0,
-                PublishUrl: vdoNinjaActive ? request.VdoNinjaPublishUrl : string.Empty,
-                RoomName: vdoNinjaActive ? request.VdoNinjaRoomName : string.Empty,
+                PublishUrl: vdoNinjaActive ? vdoNinjaConnection?.PublishUrl ?? string.Empty : string.Empty,
+                RoomName: vdoNinjaActive ? vdoNinjaConnection?.RoomName ?? string.Empty : string.Empty,
                 StreamId: vdoNinjaActive ? GoLiveOutputRuntimeContract.SessionId : string.Empty),
             VideoDeviceId: request.PrimaryCameraDeviceId);
     }

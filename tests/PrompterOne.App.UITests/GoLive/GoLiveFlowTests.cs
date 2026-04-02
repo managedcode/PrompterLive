@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Playwright;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -24,7 +25,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
-    public async Task GoLivePage_PersistsExternalDestinationsWithoutRenderingLocalOutputCards()
+    public async Task GoLivePage_PersistsTransportAndDistributionTargetsWithoutRenderingLocalOutputCards()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -50,7 +51,6 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
 
             await page.ReloadAsync(new() { WaitUntil = Microsoft.Playwright.WaitUntilState.NetworkIdle });
 
-            await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveCountAsync(0);
@@ -394,44 +394,63 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     }
 
     [Fact]
-    public async Task GoLivePage_StartStream_WithObsArmed_RoutesMicrophoneAudioForObsBrowserSource()
+    public async Task GoLivePage_RemoteGuestSources_AppearAndDriveConcurrentLiveKitAndVdoOutputs()
     {
         var page = await _fixture.NewPageAsync();
 
         try
         {
+            await page.AddInitScriptAsync(BuildRemoteSourceSeedScript());
             await SeedGoLiveSceneForReuseAsync(page);
             await SeedGoLivePrimaryMicrophoneAsync(page);
-            await SeedGoLiveOperationalSettingsAsync(page);
+            await SeedDualTransportStudioSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallLiveKitHarnessScript);
+            await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallVdoNinjaHarnessScript);
 
-            await page.EvaluateAsync(BrowserTestConstants.GoLive.EnableObsStudioScript);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.RemoteVdoGuestSourceId))).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId)).ClickAsync();
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
+                new object[]
+                {
+                    UiDomIds.GoLive.ProgramVideo,
+                    BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId
+                },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
 
+            await WaitForLiveKitPublishAsync(page);
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.HasVideoOnlyRequestScript,
-                new object[] { BrowserTestConstants.Media.PrimaryCameraId },
+                BrowserTestConstants.GoLive.VdoNinjaHarnessReadyScript,
+                null,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.HasAudioOnlyRequestScript,
-                new object[] { BrowserTestConstants.Media.PrimaryMicrophoneId },
+                BrowserTestConstants.GoLive.RecordingRuntimeUsesProgramSourceScript,
+                new object[] { BrowserTestConstants.GoLive.RuntimeSessionId, BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.GoLive.ObsRuntimeAudioAttachedScript,
-                BrowserTestConstants.GoLive.RuntimeSessionId,
+                BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
+                new object[]
+                {
+                    UiDomIds.GoLive.PreviewVideo,
+                    BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId
+                },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var runtimeState = await page.EvaluateAsync<JsonElement>(
                 BrowserTestConstants.GoLive.GetRuntimeStateScript,
                 BrowserTestConstants.GoLive.RuntimeSessionId);
 
-            Assert.True(runtimeState.GetProperty("obs").GetProperty("active").GetBoolean());
-            Assert.True(runtimeState.GetProperty("obs").GetProperty("audioAttached").GetBoolean());
-            Assert.Equal("obsstudio", runtimeState.GetProperty("obs").GetProperty("environment").GetString());
-            Assert.Equal(BrowserTestConstants.Media.PrimaryCameraId, runtimeState.GetProperty("videoDeviceId").GetString());
-            Assert.Equal(BrowserTestConstants.Media.PrimaryMicrophoneId, runtimeState.GetProperty("audioDeviceId").GetString());
+            Assert.True(runtimeState.GetProperty("liveKit").GetProperty("active").GetBoolean());
+            Assert.True(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean());
+            Assert.Equal(
+                BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId,
+                runtimeState.GetProperty("program").GetProperty("primarySourceId").GetString());
         }
         finally
         {
@@ -450,7 +469,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SceneControls)).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs))).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording))).ToHaveCountAsync(0);
 
             await page.GetByTestId(UiTestIds.GoLive.RoomTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.RoomEmpty)).ToBeVisibleAsync();
@@ -499,7 +518,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                 BrowserTestConstants.Media.PrimaryMicrophoneLabel
             });
 
-    private static Task SeedGoLiveOperationalSettingsAsync(Microsoft.Playwright.IPage page) =>
+    internal static Task SeedGoLiveOperationalSettingsAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync(
             BrowserTestConstants.GoLive.SeedOperationalStudioSettingsScript,
             new object[]
@@ -511,6 +530,128 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                 BrowserTestConstants.GoLive.YoutubeKey,
                 BrowserTestConstants.GoLive.FirstSourceId
             });
+
+    internal static Task SeedDualTransportStudioSettingsAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync(
+            BrowserTestConstants.GoLive.SeedDualTransportStudioSettingsScript,
+            new object[]
+            {
+                BrowserTestConstants.GoLive.StoredStudioSettingsKey,
+                BrowserTestConstants.GoLive.LiveKitServer,
+                BrowserTestConstants.GoLive.LiveKitRoom,
+                BrowserTestConstants.GoLive.LiveKitToken,
+                BrowserTestConstants.GoLive.VdoNinjaRoom,
+                BrowserTestConstants.GoLive.VdoNinjaPublishUrl,
+                BrowserTestConstants.GoLive.FirstSourceId
+            });
+
+    private static string BuildRemoteSourceSeedScript()
+    {
+        var seed = JsonSerializer.Serialize(new Dictionary<string, object[]>
+        {
+            [BrowserTestConstants.GoLive.LiveKitTransportId] =
+            [
+                new
+                {
+                    sourceId = BrowserTestConstants.GoLive.RemoteLiveKitGuestExternalId,
+                    label = BrowserTestConstants.GoLive.RemoteLiveKitGuestLabel
+                }
+            ],
+            [BrowserTestConstants.GoLive.VdoNinjaTransportId] =
+            [
+                new
+                {
+                    sourceId = BrowserTestConstants.GoLive.RemoteVdoGuestExternalId,
+                    label = BrowserTestConstants.GoLive.RemoteVdoGuestLabel
+                }
+            ]
+        });
+
+        return $"window.__prompterOneRemoteSourceSeed = {seed};";
+    }
+
+    private static async Task WaitForLiveKitPublishAsync(IPage page)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddMilliseconds(BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs);
+
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            var runtimeState = await page.EvaluateAsync<JsonElement?>(
+                BrowserTestConstants.GoLive.GetRuntimeStateScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId);
+            var harnessState = await page.EvaluateAsync<JsonElement?>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);
+
+            if (IsLiveKitPublishReady(runtimeState, harnessState))
+            {
+                return;
+            }
+
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.DiagnosticPollDelayMs);
+        }
+
+        var failedRuntimeState = await page.EvaluateAsync<JsonElement?>(
+            BrowserTestConstants.GoLive.GetRuntimeStateScript,
+            BrowserTestConstants.GoLive.RuntimeSessionId);
+        var failedHarnessState = await page.EvaluateAsync<JsonElement?>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);
+
+        Assert.Fail(
+            $"LiveKit publish did not become ready. Runtime={SerializeDiagnosticState(failedRuntimeState)} Harness={SerializeDiagnosticState(failedHarnessState)}");
+    }
+
+    private static bool IsLiveKitPublishReady(JsonElement? runtimeState, JsonElement? harnessState)
+    {
+        var liveKitActive = runtimeState.HasValue
+            && runtimeState.Value.ValueKind is JsonValueKind.Object
+            && runtimeState.Value.TryGetProperty("liveKit", out var liveKitState)
+            && liveKitState.TryGetProperty("active", out var liveKitActiveValue)
+            && liveKitActiveValue.ValueKind is JsonValueKind.True;
+
+        var hasConnected = harnessState.HasValue
+            && harnessState.Value.ValueKind is JsonValueKind.Object
+            && harnessState.Value.TryGetProperty("connectCalls", out var connectCalls)
+            && connectCalls.ValueKind is JsonValueKind.Array
+            && connectCalls.GetArrayLength() >= 1;
+
+        return liveKitActive
+            && hasConnected
+            && HarnessHasPublishedKind(harnessState, "video")
+            && HarnessHasPublishedKind(harnessState, "audio");
+    }
+
+    private static bool HarnessHasPublishedKind(JsonElement? harnessState, string kind)
+    {
+        if (!harnessState.HasValue
+            || harnessState.Value.ValueKind is not JsonValueKind.Object
+            || !harnessState.Value.TryGetProperty("publishCalls", out var publishCalls)
+            || publishCalls.ValueKind is not JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var publishCall in publishCalls.EnumerateArray())
+        {
+            if (publishCall.ValueKind is not JsonValueKind.Object
+                || !publishCall.TryGetProperty("kind", out var publishedKind)
+                || publishedKind.ValueKind is not JsonValueKind.String)
+            {
+                continue;
+            }
+
+            if (string.Equals(publishedKind.GetString(), kind, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static string SerializeDiagnosticState(JsonElement? state)
+    {
+        return state.HasValue
+            ? JsonSerializer.Serialize(state.Value)
+            : "null";
+    }
 
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 

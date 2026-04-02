@@ -29,7 +29,6 @@ internal sealed record GoLiveOutputRuntimeSnapshot(
     GoLiveOutputAudioSnapshot? Audio,
     bool HasMediaStream,
     GoLiveOutputProviderSnapshot? LiveKit,
-    GoLiveOutputProviderSnapshot? Obs,
     GoLiveOutputProgramSnapshot? Program,
     GoLiveOutputRecordingSnapshot? Recording,
     GoLiveOutputVdoNinjaSnapshot? VdoNinja,
@@ -89,8 +88,8 @@ public sealed record GoLiveOutputRecordingState(
 public sealed record GoLiveOutputRuntimeState(
     GoLiveOutputAudioState Audio,
     bool HasMediaStream,
+    GoLiveOutputProviderState LiveKit,
     bool LiveKitActive,
-    bool ObsActive,
     GoLiveOutputProgramState Program,
     GoLiveOutputRecordingState Recording,
     bool RecordingActive,
@@ -102,8 +101,8 @@ public sealed record GoLiveOutputRuntimeState(
     public static GoLiveOutputRuntimeState Default { get; } = new(
         Audio: GoLiveOutputAudioState.Default,
         HasMediaStream: false,
+        LiveKit: GoLiveOutputProviderState.Default,
         LiveKitActive: false,
-        ObsActive: false,
         Program: GoLiveOutputProgramState.Default,
         Recording: GoLiveOutputRecordingState.Default,
         RecordingActive: false,
@@ -114,7 +113,7 @@ public sealed record GoLiveOutputRuntimeState(
 
     public bool HasActiveOutputs => HasLiveOutputs || RecordingActive;
 
-    public bool HasLiveOutputs => LiveKitActive || ObsActive || VdoNinjaActive;
+    public bool HasLiveOutputs => LiveKitActive || VdoNinjaActive;
 
     internal static GoLiveOutputRuntimeState FromSnapshot(GoLiveOutputRuntimeSnapshot? snapshot)
     {
@@ -130,8 +129,14 @@ public sealed record GoLiveOutputRuntimeState(
                     snapshot.Audio.ProgramLevelPercent,
                     snapshot.Audio.RecordingLevelPercent),
             HasMediaStream: snapshot.HasMediaStream,
+            LiveKit: snapshot.LiveKit is null
+                ? GoLiveOutputProviderState.Default
+                : new(
+                    snapshot.LiveKit.Active,
+                    snapshot.LiveKit.Connected,
+                    snapshot.LiveKit.RoomName ?? string.Empty,
+                    snapshot.LiveKit.ServerUrl ?? string.Empty),
             LiveKitActive: snapshot.LiveKit?.Active == true,
-            ObsActive: snapshot.Obs?.Active == true,
             Program: snapshot.Program is null
                 ? GoLiveOutputProgramState.Default
                 : new(

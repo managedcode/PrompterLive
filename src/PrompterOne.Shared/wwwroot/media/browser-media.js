@@ -8,12 +8,22 @@
     const liveKitClientGlobal = "LivekitClient";
     const microphoneMonitorLevelMultiplier = 2800;
     const monitorMap = new Map();
+    const remoteCaptureMap = new Map();
+    const remoteStreamMap = new Map();
     const syntheticHarnessGlobal = "__prompterOneMediaHarness";
     const syntheticMetadataProperty = "__prompterOneSyntheticMedia";
     const videoInputKind = "videoinput";
 
     function copySyntheticMetadata(source, target) {
         const metadata = source?.[syntheticMetadataProperty];
+        if (!metadata || !target || typeof target !== "object") {
+            return;
+        }
+
+        setSyntheticMetadata(target, metadata);
+    }
+
+    function setSyntheticMetadata(target, metadata) {
         if (!metadata || !target || typeof target !== "object") {
             return;
         }
@@ -110,6 +120,43 @@
                     }
                 });
                 attachedElements.clear();
+            }
+        };
+    }
+
+    function createWrappedRemoteVideoTrack(sourceId, stream) {
+        const mediaStream = stream instanceof MediaStream ? stream : new MediaStream();
+        const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+        if (!mediaStreamTrack) {
+            throw new Error(`Remote stream '${sourceId}' does not contain a video track.`);
+        }
+
+        const attachedElements = new Set();
+
+        return {
+            kind: mediaStreamTrack.kind,
+            mediaStream,
+            mediaStreamTrack,
+            attach(element) {
+                const target = element ?? document.createElement("video");
+                target.srcObject = mediaStream;
+                attachedElements.add(target);
+                copySyntheticMetadata(mediaStream, target.srcObject);
+                return target;
+            },
+            detach(element) {
+                const targets = element ? [element] : Array.from(attachedElements);
+                targets.forEach(target => {
+                    if (target?.srcObject === mediaStream) {
+                        target.srcObject = null;
+                    }
+
+                    attachedElements.delete(target);
+                });
+
+                return element ?? targets;
+            },
+            stop() {
             }
         };
     }
@@ -270,7 +317,7 @@
             } catch {
             }
 
-            await releaseCameraCapture(preview.captureKey);
+            await releaseSharedVideoCapture(preview.captureKey);
         }
 
         const element = getVideoElement(elementId);
@@ -296,6 +343,7 @@
 
         return {
             captureKey,
+            stream: new MediaStream([capture.track.mediaStreamTrack]),
             track: capture.track
         };
     }
@@ -317,6 +365,98 @@
             capture.track.stop();
         } catch {
         }
+    }
+
+    function removeAttachedRemoteElements(captureKey) {
+        for (const [elementId, preview] of cameraTrackMap.entries()) {
+            if (preview.captureKey !== captureKey) {
+                continue;
+            }
+
+            preview.track.detach(preview.element);
+            cameraTrackMap.delete(elementId);
+            const element = getVideoElement(elementId);
+            element?.pause?.();
+            if (element) {
+                element.srcObject = null;
+            }
+        }
+    }
+
+    async function acquireRemoteCameraCapture(sourceId) {
+        const captureKey = getCaptureKey(sourceId);
+        let capture = remoteCaptureMap.get(captureKey);
+        if (!capture) {
+            const stream = remoteStreamMap.get(captureKey);
+            if (!(stream instanceof MediaStream)) {
+                throw new Error(`Remote stream '${sourceId}' is not registered.`);
+            }
+
+            capture = {
+                refCount: 0,
+                stream,
+                track: createWrappedRemoteVideoTrack(captureKey, stream)
+            };
+            remoteCaptureMap.set(captureKey, capture);
+        }
+
+        capture.refCount += 1;
+
+        return {
+            captureKey,
+            stream: capture.stream,
+            track: capture.track
+        };
+    }
+
+    async function releaseRemoteCameraCapture(captureKey) {
+        const capture = remoteCaptureMap.get(captureKey);
+        if (!capture) {
+            return;
+        }
+
+        capture.refCount = Math.max(0, capture.refCount - 1);
+        if (capture.refCount > 0) {
+            return;
+        }
+
+        capture.track.detach();
+        remoteCaptureMap.delete(captureKey);
+    }
+
+    async function acquireSharedVideoCapture(sourceIdOrDeviceId) {
+        return remoteStreamMap.has(getCaptureKey(sourceIdOrDeviceId))
+            ? await acquireRemoteCameraCapture(sourceIdOrDeviceId)
+            : await acquireCameraCapture(sourceIdOrDeviceId);
+    }
+
+    async function releaseSharedVideoCapture(captureKey) {
+        if (remoteCaptureMap.has(captureKey)) {
+            await releaseRemoteCameraCapture(captureKey);
+            return;
+        }
+
+        await releaseCameraCapture(captureKey);
+    }
+
+    function registerRemoteStream(sourceId, stream, metadata) {
+        if (!(stream instanceof MediaStream)) {
+            throw new Error(`Remote source '${sourceId}' must provide a MediaStream.`);
+        }
+
+        if (metadata && typeof metadata === "object") {
+            setSyntheticMetadata(stream, metadata);
+            stream.getTracks().forEach(track => setSyntheticMetadata(track, metadata));
+        }
+
+        remoteStreamMap.set(getCaptureKey(sourceId), stream);
+    }
+
+    function unregisterRemoteStream(sourceId) {
+        const captureKey = getCaptureKey(sourceId);
+        remoteStreamMap.delete(captureKey);
+        removeAttachedRemoteElements(captureKey);
+        void releaseRemoteCameraCapture(captureKey);
     }
 
     async function releaseMonitor(elementId) {
@@ -405,12 +545,12 @@
 
             await releaseCameraTrack(elementId);
 
-            const capture = await acquireCameraCapture(deviceId);
+            const capture = await acquireSharedVideoCapture(deviceId);
             element.autoplay = true;
             element.muted = muted !== false;
             element.playsInline = true;
             capture.track.attach(element);
-            copySyntheticMetadata(capture.track.mediaStreamTrack, element.srcObject);
+            copySyntheticMetadata(capture.stream, element.srcObject);
             await element.play().catch(() => {});
 
             cameraTrackMap.set(elementId, { captureKey: capture.captureKey, element, track: capture.track });
@@ -422,7 +562,7 @@
         },
 
         async createSharedCameraTrack(deviceId) {
-            return await acquireCameraCapture(deviceId);
+            return await acquireSharedVideoCapture(deviceId);
         },
 
         async detachCamera(elementId) {
@@ -430,7 +570,19 @@
         },
 
         async releaseSharedCameraTrack(captureKey) {
-            await releaseCameraCapture(captureKey);
+            await releaseSharedVideoCapture(captureKey);
+        },
+
+        hasRegisteredRemoteStream(sourceId) {
+            return remoteStreamMap.has(getCaptureKey(sourceId));
+        },
+
+        registerRemoteStream(sourceId, stream, metadata) {
+            registerRemoteStream(sourceId, stream, metadata);
+        },
+
+        unregisterRemoteStream(sourceId) {
+            unregisterRemoteStream(sourceId);
         },
 
         async startMicrophoneLevelMonitor(elementId, deviceId, observer) {

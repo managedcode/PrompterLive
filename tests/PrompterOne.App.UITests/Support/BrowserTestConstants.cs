@@ -238,6 +238,7 @@ internal static partial class BrowserTestConstants
         public const string LiveKitHarnessGlobal = "__prompterOneLiveKitHarness";
         public const string LiveKitRoom = "launch-room";
         public const string LiveKitServer = "wss://livekit.example.com";
+        public const string LiveKitTransportId = "livekit";
         public const string LiveKitToken = "lk-test-token";
         public const string LiveLevelAttributeName = "data-live-level";
         public const string MicChannelId = "mic";
@@ -248,6 +249,12 @@ internal static partial class BrowserTestConstants
         public const string PrimaryParticipantId = "host";
         public const string PrompterUtilitySourceId = "prompter-display";
         public const string ProgramChannelId = "program";
+        public const string RemoteLiveKitGuestExternalId = "guest-one";
+        public const string RemoteLiveKitGuestLabel = "Guest One";
+        public const string RemoteLiveKitGuestSourceId = "livekit:guest-one";
+        public const string RemoteVdoGuestExternalId = "guest-two";
+        public const string RemoteVdoGuestLabel = "Guest Two";
+        public const string RemoteVdoGuestSourceId = "vdoninja:guest-two";
         public const string RecordingStateValue = "recording";
         public const string RecordingChannelId = "recording";
         public const int SharedContextPageCount = 2;
@@ -258,7 +265,10 @@ internal static partial class BrowserTestConstants
         public const string StreamingStateValue = "streaming";
         public const string ByteSuffix = "B";
         public const int AudioRouteBothValue = 2;
+        public const int PublishOnlyRoleValue = 2;
+        public const int SourceAndPublishRoleValue = 3;
         public const string VdoNinjaHarnessGlobal = "__prompterOneVdoNinjaHarness";
+        public const string VdoNinjaTransportId = "vdoninja";
         public const string VdoNinjaPublishStreamId = "prompterone-program";
         public const string VdoNinjaPublishUrl = "https://vdo.ninja/?room=launch-room&push=prompterone-program";
         public const string VdoNinjaRoom = "launch-room";
@@ -400,8 +410,7 @@ internal static partial class BrowserTestConstants
             """;
         public const string GetLiveKitHarnessScript = "() => window.__prompterOneLiveKitHarness";
         public const string LiveKitHarnessReadyScript =
-            "() => Boolean(window.__prompterOneLiveKitHarness && window.__prompterOneLiveKitHarness.connectCalls.length === 1 && window.__prompterOneLiveKitHarness.publishCalls.length >= 2)";
-        public const string EnableObsStudioScript = "() => { window.obsstudio = {}; }";
+            "() => Boolean(window.__prompterOneLiveKitHarness && window.__prompterOneLiveKitHarness.connectCalls.length >= 1 && window.__prompterOneLiveKitHarness.publishCalls.some(call => call.kind === 'video') && window.__prompterOneLiveKitHarness.publishCalls.some(call => call.kind === 'audio'))";
         public const string GetRuntimeStateScript = "sessionId => window.PrompterOneGoLiveOutput.getSessionState(sessionId)";
         public const string RecordingRuntimeActiveScript =
             "sessionId => Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.recording?.active)";
@@ -413,8 +422,6 @@ internal static partial class BrowserTestConstants
             "([sessionId, sourceId]) => window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.program?.primarySourceId === sourceId";
         public static string RecordingRuntimeAudioLevelsReadyScript { get; } =
             "([sessionId, minimumLevel]) => { const state = window.PrompterOneGoLiveOutput.getSessionState(sessionId); return (state?.audio?.programLevelPercent ?? 0) >= minimumLevel && (state?.audio?.recordingLevelPercent ?? 0) >= minimumLevel; }";
-        public const string ObsRuntimeAudioAttachedScript =
-            "sessionId => Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.obs?.audioAttached)";
         public const string ResolveCameraDeviceScript = """
             async () => {
                 const mediaDevices = navigator.mediaDevices;
@@ -537,7 +544,7 @@ internal static partial class BrowserTestConstants
                 ];
             }
             """;
-        public const string SeedOperationalStudioSettingsScript = """
+        public static string SeedOperationalStudioSettingsScript { get; } = $$"""
             ([storageKey, vdoNinjaRoom, vdoNinjaPublishUrl, youtubeUrl, youtubeKey, primarySourceId]) => {
                 window.localStorage.setItem(storageKey, JSON.stringify({
                     Camera: {
@@ -554,72 +561,108 @@ internal static partial class BrowserTestConstants
                         EchoCancellation: true
                     },
                     Streaming: {
-                        OutputMode: 0,
-                        OutputResolution: 0,
-                        BitrateKbps: 6000,
-                        ShowTextOverlay: true,
-                        IncludeCameraInOutput: true,
-                        ExternalDestinations: [
+                        ProgramCapture: {
+                            ResolutionPreset: 0,
+                            BitrateKbps: 6000,
+                            ShowTextOverlay: true,
+                            IncludeCameraInOutput: true
+                        },
+                        Recording: {
+                            IsEnabled: true
+                        },
+                        TransportConnections: [
                             {
                                 Id: 'vdoninja',
                                 Name: 'VDO.Ninja',
-                                ProviderKind: 1,
                                 PlatformKind: 1,
+                                Roles: {{PublishOnlyRoleValue}},
                                 IsEnabled: true,
-                                ServerUrl: null,
+                                ServerUrl: '',
+                                BaseUrl: 'https://vdo.ninja/',
                                 RoomName: vdoNinjaRoom,
-                                Token: null,
+                                Token: '',
                                 PublishUrl: vdoNinjaPublishUrl,
-                                Destinations: []
-                            },
+                                ViewUrl: ''
+                            }
+                        ],
+                        DistributionTargets: [
                             {
                                 Id: 'youtube-live',
                                 Name: 'YouTube Live',
-                                ProviderKind: 2,
                                 PlatformKind: 2,
                                 IsEnabled: true,
-                                ServerUrl: null,
-                                RoomName: null,
-                                Token: null,
-                                PublishUrl: null,
-                                Destinations: [
-                                    {
-                                        Name: 'YouTube Live',
-                                        Url: youtubeUrl,
-                                        StreamKey: youtubeKey,
-                                        IsEnabled: true
-                                    }
-                                ]
+                                RtmpUrl: youtubeUrl,
+                                StreamKey: youtubeKey,
+                                BoundTransportConnectionIds: ['vdoninja']
                             }
                         ],
-                        DestinationSourceSelections: [
-                            { TargetId: 'obs-studio', SourceIds: [primarySourceId] },
+                        SourceSelections: [
                             { TargetId: 'local-recording', SourceIds: [primarySourceId] },
-                            { TargetId: 'vdoninja', SourceIds: [primarySourceId] },
-                            { TargetId: 'youtube-live', SourceIds: [primarySourceId] }
+                            { TargetId: 'vdoninja', SourceIds: [primarySourceId] }
+                        ]
+                    }
+                }));
+            }
+            """;
+        public static string SeedDualTransportStudioSettingsScript { get; } = $$"""
+            ([storageKey, liveKitServer, liveKitRoom, liveKitToken, vdoNinjaRoom, vdoNinjaPublishUrl, primarySourceId]) => {
+                window.localStorage.setItem(storageKey, JSON.stringify({
+                    Camera: {
+                        DefaultCameraId: null,
+                        Resolution: 0,
+                        FrameRate: 1,
+                        MirrorCamera: true,
+                        AutoStartOnRead: true
+                    },
+                    Microphone: {
+                        DefaultMicrophoneId: null,
+                        InputLevelPercent: 65,
+                        NoiseSuppression: true,
+                        EchoCancellation: true
+                    },
+                    Streaming: {
+                        ProgramCapture: {
+                            ResolutionPreset: 0,
+                            BitrateKbps: 6000,
+                            ShowTextOverlay: true,
+                            IncludeCameraInOutput: true
+                        },
+                        Recording: {
+                            IsEnabled: true
+                        },
+                        TransportConnections: [
+                            {
+                                Id: 'livekit',
+                                Name: 'LiveKit',
+                                PlatformKind: 0,
+                                Roles: {{SourceAndPublishRoleValue}},
+                                IsEnabled: true,
+                                ServerUrl: liveKitServer,
+                                BaseUrl: '',
+                                RoomName: liveKitRoom,
+                                Token: liveKitToken,
+                                PublishUrl: '',
+                                ViewUrl: ''
+                            },
+                            {
+                                Id: 'vdoninja',
+                                Name: 'VDO.Ninja',
+                                PlatformKind: 1,
+                                Roles: {{SourceAndPublishRoleValue}},
+                                IsEnabled: true,
+                                ServerUrl: '',
+                                BaseUrl: 'https://vdo.ninja/',
+                                RoomName: vdoNinjaRoom,
+                                Token: '',
+                                PublishUrl: vdoNinjaPublishUrl,
+                                ViewUrl: ''
+                            }
                         ],
-                        RtmpUrl: '',
-                        StreamKey: '',
-                        ObsVirtualCameraEnabled: true,
-                        NdiOutputEnabled: false,
-                        LocalRecordingEnabled: true,
-                        LiveKitEnabled: false,
-                        LiveKitServerUrl: '',
-                        LiveKitRoomName: '',
-                        LiveKitToken: '',
-                        VdoNinjaEnabled: false,
-                        VdoNinjaRoomName: '',
-                        VdoNinjaPublishUrl: '',
-                        YoutubeEnabled: false,
-                        YoutubeRtmpUrl: '',
-                        YoutubeStreamKey: '',
-                        TwitchEnabled: false,
-                        TwitchRtmpUrl: '',
-                        TwitchStreamKey: '',
-                        CustomRtmpEnabled: false,
-                        CustomRtmpName: 'Custom RTMP',
-                        CustomRtmpUrl: '',
-                        CustomRtmpStreamKey: ''
+                        DistributionTargets: [],
+                        SourceSelections: [
+                            { TargetId: 'livekit', SourceIds: [primarySourceId] },
+                            { TargetId: 'vdoninja', SourceIds: [primarySourceId] }
+                        ]
                     }
                 }));
             }
@@ -633,16 +676,21 @@ internal static partial class BrowserTestConstants
 
                 const parsed = JSON.parse(raw);
                 const streaming = parsed?.Streaming;
-                const destinations = Array.isArray(streaming?.ExternalDestinations)
-                    ? streaming.ExternalDestinations
+                const transportConnections = Array.isArray(streaming?.TransportConnections)
+                    ? streaming.TransportConnections
+                    : [];
+                const distributionTargets = Array.isArray(streaming?.DistributionTargets)
+                    ? streaming.DistributionTargets
                     : [];
 
-                const hasEnabledDestination = (id) =>
-                    destinations.some(destination => destination?.Id === id && destination?.IsEnabled === true);
+                const hasEnabledTransport = (id) =>
+                    transportConnections.some(connection => connection?.Id === id && connection?.IsEnabled === true);
+                const hasEnabledTarget = (id) =>
+                    distributionTargets.some(target => target?.Id === id && target?.IsEnabled === true);
 
                 return Boolean(
-                    hasEnabledDestination('vdoninja') &&
-                    hasEnabledDestination('youtube-live'));
+                    hasEnabledTransport('vdoninja') &&
+                    hasEnabledTarget('youtube-live'));
             }
             """;
         public const string PreviewReadyScript = "(element) => Boolean(element && element.srcObject && element.readyState >= 2)";
@@ -680,6 +728,7 @@ internal static partial class BrowserTestConstants
         public const int DefaultNavigationTimeoutMs = 20_000;
         public const int FastVisibleTimeoutMs = 5_000;
         public const int DefaultVisibleTimeoutMs = 10_000;
+        public const int DiagnosticPollDelayMs = 50;
         public const int ExtendedVisibleTimeoutMs = 15_000;
         public const int NewDraftPersistGraceDelayMs = 700;
         public const int NewDraftPersistSettleDelayMs = 2_200;

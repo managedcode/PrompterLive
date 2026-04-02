@@ -77,12 +77,17 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<GoLiveSessionService>();
         services.AddScoped<GoLiveOutputInterop>();
         services.AddScoped<GoLiveOutputRuntimeService>();
+        services.AddScoped<GoLiveRemoteSourceInterop>();
+        services.AddScoped<GoLiveRemoteSourceRuntimeService>();
         services.AddScoped<StreamingPublishDescriptorResolver>();
         services.AddScoped<UiDiagnosticsService>();
 
-        services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
-        services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
-        services.AddSingleton<IStreamingOutputProvider, RtmpStreamingOutputProvider>();
+        services.AddSingleton<IGoLiveSourceModule, LiveKitSourceModule>();
+        services.AddSingleton<IGoLiveSourceModule, VdoNinjaSourceModule>();
+        services.AddSingleton<IGoLiveOutputModule, LocalRecordingOutputModule>();
+        services.AddSingleton<IGoLiveOutputModule, LiveKitOutputModule>();
+        services.AddSingleton<IGoLiveOutputModule, VdoNinjaOutputModule>();
+        services.AddSingleton<IGoLiveModuleRegistry, GoLiveModuleRegistry>();
 
         return services;
     }

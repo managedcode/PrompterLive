@@ -77,8 +77,8 @@ internal sealed partial class GoLiveSessionService : IDisposable
             ActiveSourceId = activeSource?.SourceId ?? string.Empty,
             ActiveSourceLabel = activeSource?.Label ?? string.Empty,
             PrimaryMicrophoneLabel = primaryMicrophoneLabel ?? string.Empty,
-            OutputResolution = streaming.OutputResolution,
-            BitrateKbps = streaming.BitrateKbps
+            OutputResolution = streaming.ProgramCaptureSettings.ResolutionPreset,
+            BitrateKbps = streaming.ProgramCaptureSettings.BitrateKbps
         }, publishToCrossTab: false);
     }
 

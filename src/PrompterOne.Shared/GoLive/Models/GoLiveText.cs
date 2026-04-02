@@ -54,7 +54,7 @@ public static class GoLiveText
         public const string StreamingStateValue = "streaming";
         public const string StreamButtonLabel = "Start Stream";
         public const string StreamPrerequisiteDetail = "No direct browser live output is armed. RTMP destinations still require an external relay.";
-        public const string StreamPrerequisiteMessage = "Arm OBS browser output or a direct browser publishing destination before starting stream.";
+        public const string StreamPrerequisiteMessage = "Arm at least one direct browser publishing transport before starting the stream.";
         public const string StreamPrerequisiteOperation = "Go Live stream prerequisites";
         public const string StreamStopLabel = "Stop Stream";
         public const string SwitchProgramMessage = "Unable to switch the live program source right now.";
@@ -107,9 +107,6 @@ public static class GoLiveText
         public const string RuntimeEngineIdleValue = "Idle";
         public const string RuntimeEngineLabel = "Runtime";
         public const string RuntimeEngineLiveKitValue = "LiveKit";
-        public const string RuntimeEngineObsBrowserValue = "OBS browser";
-        public const string RuntimeEngineObsLiveKitValue = "OBS + LiveKit";
-        public const string RuntimeEngineObsVdoNinjaValue = "OBS + VDO.Ninja";
         public const string RuntimeEngineRecorderValue = "Recorder";
         public const string RuntimeEngineVdoNinjaValue = "VDO.Ninja";
         public const string SceneSlidesId = "scene-slides";
@@ -127,6 +124,8 @@ public static class GoLiveText
 
     public static class Destination
     {
+        public const string BlockedStatusLabel = "Blocked";
+        public const string BlockedSummary = "This target is bound only to transports that cannot deliver a downstream relay path.";
         public const string DisabledSummary = "Disabled in this live session.";
         public const string DisabledStatusLabel = "Disabled";
         public const string EnabledStatusLabel = "Ready";
@@ -137,6 +136,7 @@ public static class GoLiveText
         public const string RecordingTone = "recording";
         public const string RelayStatusLabel = "Relay";
         public const string SettingsPlatformLabel = "Settings preset";
+        public const string TransportBindingSummary = "Bind this target to at least one armed transport connection.";
         public const string LocalTone = "local";
     }
 

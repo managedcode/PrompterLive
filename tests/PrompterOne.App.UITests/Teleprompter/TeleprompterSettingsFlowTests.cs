@@ -361,13 +361,18 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
                         EchoCancellation: true
                     },
                     Streaming: {
-                        OutputMode: 0,
-                        OutputResolution: 0,
-                        BitrateKbps: 6000,
-                        ShowTextOverlay: true,
-                        IncludeCameraInOutput: true,
-                        RtmpUrl: '',
-                        StreamKey: ''
+                        ProgramCapture: {
+                            ResolutionPreset: 0,
+                            BitrateKbps: 6000,
+                            ShowTextOverlay: true,
+                            IncludeCameraInOutput: true
+                        },
+                        Recording: {
+                            IsEnabled: false
+                        },
+                        TransportConnections: [],
+                        DistributionTargets: [],
+                        SourceSelections: []
                     }
                 }));
             }

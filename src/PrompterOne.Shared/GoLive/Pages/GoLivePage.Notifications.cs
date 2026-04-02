@@ -12,6 +12,7 @@ public partial class GoLivePage
     {
         GoLiveSession.StateChanged += HandleGoLiveSessionChanged;
         GoLiveOutputRuntime.StateChanged += HandleGoLiveOutputRuntimeChanged;
+        GoLiveRemoteSourceRuntime.StateChanged += HandleGoLiveRemoteSourceRuntimeChanged;
         UpdateSessionRefreshLoop();
     }
 
@@ -24,6 +25,7 @@ public partial class GoLivePage
 
         _disposed = true;
         _ = StopPrimaryMicrophoneMonitorAsync();
+        _ = GoLiveRemoteSourceRuntime.StopAsync();
         DisposeCore();
         GC.SuppressFinalize(this);
     }
@@ -37,6 +39,7 @@ public partial class GoLivePage
 
         _disposed = true;
         await StopPrimaryMicrophoneMonitorAsync();
+        await GoLiveRemoteSourceRuntime.StopAsync();
         DisposeCore();
         GC.SuppressFinalize(this);
     }
@@ -52,9 +55,15 @@ public partial class GoLivePage
         _ = InvokeAsync(StateHasChanged);
     }
 
+    private void HandleGoLiveRemoteSourceRuntimeChanged()
+    {
+        ApplyRemoteSourceState();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
     private void UpdateSessionRefreshLoop()
     {
-        if (GoLiveSession.State.HasActiveSession)
+        if (GoLiveSession.State.HasActiveSession || HasSourceIntakeConnections)
         {
             EnsureSessionRefreshLoop();
             return;
@@ -81,7 +90,16 @@ public partial class GoLivePage
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                await InvokeAsync(GoLiveOutputRuntime.RefreshStateAsync);
+                if (HasSourceIntakeConnections)
+                {
+                    await InvokeAsync(SyncRemoteSourcesAsync);
+                }
+
+                if (GoLiveSession.State.HasActiveSession)
+                {
+                    await InvokeAsync(GoLiveOutputRuntime.RefreshStateAsync);
+                }
+
                 await InvokeAsync(StateHasChanged);
             }
         }
@@ -103,6 +121,7 @@ public partial class GoLivePage
     {
         GoLiveSession.StateChanged -= HandleGoLiveSessionChanged;
         GoLiveOutputRuntime.StateChanged -= HandleGoLiveOutputRuntimeChanged;
+        GoLiveRemoteSourceRuntime.StateChanged -= HandleGoLiveRemoteSourceRuntimeChanged;
         StopSessionRefreshLoop();
         DisposePrimaryMicrophoneObserver();
         _interactionGate.Dispose();

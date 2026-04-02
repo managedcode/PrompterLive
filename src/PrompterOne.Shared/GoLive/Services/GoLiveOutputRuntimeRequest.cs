@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 
 namespace PrompterOne.Shared.Services;
 
@@ -55,21 +56,43 @@ public sealed record GoLiveRecordingExportSettings(
     int AudioSampleRate,
     int AudioChannelCount);
 
+public sealed record GoLiveOutputTransportConnection(
+    string ConnectionId,
+    string Name,
+    StreamingPlatformKind PlatformKind,
+    StreamingTransportRole Roles,
+    bool IsEnabled,
+    string ServerUrl,
+    string BaseUrl,
+    string RoomName,
+    string Token,
+    string PublishUrl,
+    string ViewUrl)
+{
+    public bool CanIngestRemoteSources => IsEnabled && Roles.HasFlag(StreamingTransportRole.Source);
+
+    public bool CanPublishProgram =>
+        IsEnabled
+        && Roles.HasFlag(StreamingTransportRole.Publish)
+        && PlatformKind switch
+        {
+            StreamingPlatformKind.LiveKit => !string.IsNullOrWhiteSpace(ServerUrl)
+                && !string.IsNullOrWhiteSpace(RoomName)
+                && !string.IsNullOrWhiteSpace(Token),
+            StreamingPlatformKind.VdoNinja => !string.IsNullOrWhiteSpace(PublishUrl)
+                || !string.IsNullOrWhiteSpace(RoomName),
+            _ => false
+        };
+}
+
 public sealed record GoLiveOutputRuntimeRequest(
     string PrimarySourceId,
     GoLiveProgramVideoSettings ProgramVideo,
     IReadOnlyList<GoLiveOutputVideoSource> VideoSources,
     IReadOnlyList<GoLiveOutputAudioInput> AudioInputs,
     GoLiveRecordingExportSettings Recording,
-    bool ObsEnabled,
     bool RecordingEnabled,
-    bool LiveKitEnabled,
-    string LiveKitServerUrl,
-    string LiveKitRoomName,
-    string LiveKitToken,
-    bool VdoNinjaEnabled,
-    string VdoNinjaPublishUrl,
-    string VdoNinjaRoomName)
+    IReadOnlyList<GoLiveOutputTransportConnection> TransportConnections)
 {
     public string PrimaryCameraDeviceId => ResolvePrimaryVideoSource()?.DeviceId ?? string.Empty;
 
@@ -80,22 +103,12 @@ public sealed record GoLiveOutputRuntimeRequest(
         RecordingEnabled
         && VideoSources.Any(source => source.IsRenderable);
 
-    public bool CanStartLiveKit =>
-        LiveKitEnabled
-        && VideoSources.Any(source => source.IsRenderable)
-        && !string.IsNullOrWhiteSpace(LiveKitServerUrl)
-        && !string.IsNullOrWhiteSpace(LiveKitRoomName)
-        && !string.IsNullOrWhiteSpace(LiveKitToken);
-
-    public bool CanStartVdoNinja =>
-        VdoNinjaEnabled
-        && VideoSources.Any(source => source.IsRenderable)
-        && (!string.IsNullOrWhiteSpace(VdoNinjaPublishUrl)
-            || !string.IsNullOrWhiteSpace(VdoNinjaRoomName));
-
-    public bool CanStartObs =>
-        ObsEnabled
-        && VideoSources.Any(source => source.IsRenderable);
+    public IReadOnlyList<GoLiveOutputTransportConnection> GetPublishableConnections(StreamingPlatformKind kind)
+    {
+        return TransportConnections
+            .Where(connection => connection.PlatformKind == kind && connection.CanPublishProgram)
+            .ToArray();
+    }
 
     private GoLiveOutputVideoSource? ResolvePrimaryVideoSource()
     {

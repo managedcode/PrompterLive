@@ -266,32 +266,27 @@ public static class UiTestIds
         public const string NoCameras = "settings-no-cameras";
         public const string NoMics = "settings-no-mics";
         public const string StreamingBitrate = "settings-streaming-bitrate";
-        public const string StreamingDestinationAdd = "settings-streaming-destination-add";
         public const string StreamingCustomRtmpKey = "settings-streaming-custom-rtmp-key";
         public const string StreamingCustomRtmpName = "settings-streaming-custom-rtmp-name";
-        public const string StreamingCustomRtmpToggle = "settings-streaming-custom-rtmp-toggle";
         public const string StreamingCustomRtmpUrl = "settings-streaming-custom-rtmp-url";
+        public const string StreamingDistributionAdd = "settings-streaming-distribution-add";
         public const string StreamingIncludeCamera = "settings-streaming-include-camera";
         public const string StreamingLiveKitRoom = "settings-streaming-livekit-room";
         public const string StreamingLiveKitServer = "settings-streaming-livekit-server";
-        public const string StreamingLiveKitToggle = "settings-streaming-livekit-toggle";
         public const string StreamingLiveKitToken = "settings-streaming-livekit-token";
-        public const string StreamingNdiToggle = "settings-streaming-ndi-toggle";
-        public const string StreamingObsToggle = "settings-streaming-obs-toggle";
         public const string StreamingOutputResolution = "settings-streaming-output-resolution";
-        public const string StreamingOutputMode = "settings-streaming-output-mode";
         public const string StreamingPanel = "settings-streaming-panel";
         public const string StreamingRecordingToggle = "settings-streaming-recording-toggle";
         public const string StreamingSourcePickerEmpty = "settings-streaming-source-picker-empty";
         public const string StreamingTextOverlay = "settings-streaming-text-overlay";
+        public const string StreamingTransportAdd = "settings-streaming-transport-add";
         public const string StreamingTwitchKey = "settings-streaming-twitch-key";
-        public const string StreamingTwitchToggle = "settings-streaming-twitch-toggle";
         public const string StreamingTwitchUrl = "settings-streaming-twitch-url";
+        public const string StreamingVdoBaseUrl = "settings-streaming-vdo-base-url";
         public const string StreamingVdoPublishUrl = "settings-streaming-vdo-publish-url";
         public const string StreamingVdoRoom = "settings-streaming-vdo-room";
-        public const string StreamingVdoToggle = "settings-streaming-vdo-toggle";
+        public const string StreamingVdoViewUrl = "settings-streaming-vdo-view-url";
         public const string StreamingYoutubeKey = "settings-streaming-youtube-key";
-        public const string StreamingYoutubeToggle = "settings-streaming-youtube-toggle";
         public const string StreamingYoutubeUrl = "settings-streaming-youtube-url";
         public const string TestConnection = "settings-test-connection";
 
@@ -348,15 +343,10 @@ public static class UiTestIds
 
         public static string StreamingProviderSourceToggle(string providerId, string sourceId) => $"settings-streaming-provider-source-{providerId}-{sourceId}";
 
-        public static string StreamingDestinationAddOption(string platformId) => $"settings-streaming-destination-add-{platformId}";
+        public static string StreamingDistributionAddOption(string platformId) => $"settings-streaming-distribution-add-{platformId}";
 
-        public static string StreamingDestinationField(string destinationId, string fieldId) => (destinationId, fieldId) switch
+        public static string StreamingDistributionField(string targetId, string fieldId) => (targetId, fieldId) switch
         {
-            (GoLiveTargetCatalog.TargetIds.LiveKit, "server-url") => StreamingLiveKitServer,
-            (GoLiveTargetCatalog.TargetIds.LiveKit, "room-name") => StreamingLiveKitRoom,
-            (GoLiveTargetCatalog.TargetIds.LiveKit, "token") => StreamingLiveKitToken,
-            (GoLiveTargetCatalog.TargetIds.VdoNinja, "room-name") => StreamingVdoRoom,
-            (GoLiveTargetCatalog.TargetIds.VdoNinja, "publish-url") => StreamingVdoPublishUrl,
             (GoLiveTargetCatalog.TargetIds.Youtube, "rtmp-url") => StreamingYoutubeUrl,
             (GoLiveTargetCatalog.TargetIds.Youtube, "stream-key") => StreamingYoutubeKey,
             (GoLiveTargetCatalog.TargetIds.Twitch, "rtmp-url") => StreamingTwitchUrl,
@@ -364,21 +354,40 @@ public static class UiTestIds
             (GoLiveTargetCatalog.TargetIds.CustomRtmp, "name") => StreamingCustomRtmpName,
             (GoLiveTargetCatalog.TargetIds.CustomRtmp, "rtmp-url") => StreamingCustomRtmpUrl,
             (GoLiveTargetCatalog.TargetIds.CustomRtmp, "stream-key") => StreamingCustomRtmpKey,
-            _ => $"settings-streaming-destination-field-{destinationId}-{fieldId}"
+            _ => $"settings-streaming-distribution-field-{targetId}-{fieldId}"
         };
 
-        public static string StreamingDestinationRemove(string destinationId) =>
-            $"settings-streaming-destination-remove-{destinationId}";
+        public static string StreamingDistributionRemove(string targetId) =>
+            $"settings-streaming-distribution-remove-{targetId}";
 
-        public static string StreamingDestinationToggle(string destinationId) => destinationId switch
+        public static string StreamingDistributionToggle(string targetId) =>
+            $"settings-streaming-distribution-toggle-{targetId}";
+
+        public static string StreamingDistributionTransport(string targetId, string connectionId) =>
+            $"settings-streaming-distribution-transport-{targetId}-{connectionId}";
+
+        public static string StreamingTransportAddOption(string platformId) => $"settings-streaming-transport-add-{platformId}";
+
+        public static string StreamingTransportField(string connectionId, string fieldId) => (connectionId, fieldId) switch
         {
-            GoLiveTargetCatalog.TargetIds.LiveKit => StreamingLiveKitToggle,
-            GoLiveTargetCatalog.TargetIds.VdoNinja => StreamingVdoToggle,
-            GoLiveTargetCatalog.TargetIds.Youtube => StreamingYoutubeToggle,
-            GoLiveTargetCatalog.TargetIds.Twitch => StreamingTwitchToggle,
-            GoLiveTargetCatalog.TargetIds.CustomRtmp => StreamingCustomRtmpToggle,
-            _ => $"settings-streaming-destination-toggle-{destinationId}"
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "server-url") => StreamingLiveKitServer,
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "room-name") => StreamingLiveKitRoom,
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "token") => StreamingLiveKitToken,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "base-url") => StreamingVdoBaseUrl,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "room-name") => StreamingVdoRoom,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "publish-url") => StreamingVdoPublishUrl,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "view-url") => StreamingVdoViewUrl,
+            _ => $"settings-streaming-transport-field-{connectionId}-{fieldId}"
         };
+
+        public static string StreamingTransportRemove(string connectionId) =>
+            $"settings-streaming-transport-remove-{connectionId}";
+
+        public static string StreamingTransportRole(string connectionId) =>
+            $"settings-streaming-transport-role-{connectionId}";
+
+        public static string StreamingTransportToggle(string connectionId) =>
+            $"settings-streaming-transport-toggle-{connectionId}";
     }
 
     public static class GoLive
@@ -401,8 +410,6 @@ public static class UiTestIds
         public const string LiveKitToken = "go-live-livekit-token";
         public const string ModeDirector = "go-live-mode-director";
         public const string ModeStudio = "go-live-mode-studio";
-        public const string NdiToggle = "go-live-ndi-toggle";
-        public const string ObsToggle = "go-live-obs-toggle";
         public const string OpenHome = Back;
         public const string OpenLearn = "go-live-open-learn";
         public const string OpenRead = "go-live-open-read";
@@ -460,8 +467,6 @@ public static class UiTestIds
         public static string SourceCameraSelect(string sourceId) => $"go-live-source-select-{sourceId}";
         public static string DestinationToggle(string destinationId) => destinationId switch
         {
-            GoLiveTargetCatalog.TargetIds.Obs => ObsToggle,
-            GoLiveTargetCatalog.TargetIds.Ndi => NdiToggle,
             GoLiveTargetCatalog.TargetIds.Recording => RecordingToggle,
             GoLiveTargetCatalog.TargetIds.LiveKit => LiveKitToggle,
             GoLiveTargetCatalog.TargetIds.VdoNinja => VdoToggle,

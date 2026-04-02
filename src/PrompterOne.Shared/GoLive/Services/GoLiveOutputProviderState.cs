@@ -1,7 +1,23 @@
 namespace PrompterOne.Shared.Services;
 
 internal sealed record GoLiveOutputProviderSnapshot(
-    bool Active);
+    bool Active,
+    bool Connected,
+    string RoomName,
+    string ServerUrl);
+
+public sealed record GoLiveOutputProviderState(
+    bool Active,
+    bool Connected,
+    string RoomName,
+    string ServerUrl)
+{
+    public static GoLiveOutputProviderState Default { get; } = new(
+        Active: false,
+        Connected: false,
+        RoomName: string.Empty,
+        ServerUrl: string.Empty);
+}
 
 internal sealed record GoLiveOutputVdoNinjaSnapshot(
     bool Active,

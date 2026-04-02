@@ -64,23 +64,6 @@ public sealed class GoLiveOutputInterop(IJSRuntime jsRuntime)
             sessionId).AsTask();
     }
 
-    public Task StartObsBrowserOutputAsync(
-        string sessionId,
-        GoLiveOutputRuntimeRequest request)
-    {
-        return _jsRuntime.InvokeVoidAsync(
-            GoLiveOutputInteropMethodNames.StartObsBrowserOutput,
-            sessionId,
-            request).AsTask();
-    }
-
-    public Task StopObsBrowserOutputAsync(string sessionId)
-    {
-        return _jsRuntime.InvokeVoidAsync(
-            GoLiveOutputInteropMethodNames.StopObsBrowserOutput,
-            sessionId).AsTask();
-    }
-
     public Task UpdateSessionDevicesAsync(
         string sessionId,
         GoLiveOutputRuntimeRequest request)

@@ -1,0 +1,157 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Core.Models.Streaming
+@using PrompterOne.Shared.Services
+@using PrompterOne.Shared.Settings.Models
+@inject StreamingPublishDescriptorResolver DescriptorResolver
+
+<SettingsStreamingTargetCard Title="@Target.Name"
+                             Account="@Presentation.SettingsAccountLabel"
+                             Description="@Presentation.SettingsDescription"
+                             Summary="@Summary"
+                             StatusLabel="@StatusLabel"
+                             StatusClass="@StatusClass"
+                             IsEnabled="@Target.IsEnabled"
+                             IsOpen="@IsCardOpen(CardId)"
+                             IsReady="@IsReady"
+                             ToggleTestId="@UiTestIds.Settings.StreamingDistributionToggle(Target.Id)"
+                             CardTestId="@UiTestIds.Settings.StreamingProviderCard(Target.Id)"
+                             ToggleEnabled="@(() => ToggleTarget.InvokeAsync(Target.Id))"
+                             OnCardToggle="@(() => ToggleCard.InvokeAsync(CardId))"
+                             IconClass="@Presentation.IconCssClass">
+    @if (Target.PlatformKind is StreamingPlatformKind.CustomRtmp)
+    {
+        <div class="set-field">
+            <label>@SettingsStreamingText.TargetNameLabel</label>
+            <input type="text"
+                   class="set-input"
+                   value="@Target.Name"
+                   @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.Name, GetValue(args))))"
+                   data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.Name)" />
+        </div>
+    }
+
+    <div class="set-field">
+        <label>@SettingsStreamingText.BoundTransportConnectionsLabel</label>
+        @if (TransportConnections.Count == 0)
+        {
+            <div class="set-empty-card live-destination-sources-empty">
+                @SettingsStreamingText.BoundTransportConnectionsSummary
+            </div>
+        }
+        else
+        {
+            <div class="live-destination-source-grid">
+                @foreach (var connection in TransportConnections)
+                {
+                    var isSelected = BoundConnectionIds.Contains(connection.Id, StringComparer.Ordinal);
+                    <button type="button"
+                            class="live-destination-source-chip @(isSelected ? "on" : null)"
+                            data-testid="@UiTestIds.Settings.StreamingDistributionTransport(Target.Id, connection.Id)"
+                            @onclick="() => ToggleBoundTransport.InvokeAsync((Target.Id, connection.Id))">
+                        <span class="live-destination-source-name">@connection.Name</span>
+                        <span class="live-destination-source-state">@(isSelected ? "Bound" : "Available")</span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="set-field">
+        <label>@SettingsStreamingText.RtmpUrlLabel</label>
+        <input type="text"
+               class="set-input"
+               value="@Target.RtmpUrl"
+               @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.RtmpUrl, GetValue(args))))"
+               data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.RtmpUrl)" />
+    </div>
+    <div class="set-field">
+        <label>@SettingsStreamingText.StreamKeyLabel</label>
+        <input type="password"
+               class="set-input"
+               value="@Target.StreamKey"
+               @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.StreamKey, GetValue(args))))"
+               data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.StreamKey)" />
+    </div>
+
+    <div class="set-field">
+        <button type="button"
+                class="set-btn-outline set-btn-sm"
+                data-testid="@UiTestIds.Settings.StreamingDistributionRemove(Target.Id)"
+                @onclick="@(() => RemoveTarget.InvokeAsync(Target.Id))">
+            @SettingsStreamingText.RemoveDestinationLabel
+        </button>
+    </div>
+</SettingsStreamingTargetCard>
+
+@code {
+    private const string SelectedStatusClass = "set-dest-ok";
+
+    [Parameter, EditorRequired] public DistributionTargetProfile Target { get; set; } = default!;
+    [Parameter] public IReadOnlyList<TransportConnectionProfile> TransportConnections { get; set; } = [];
+    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
+    [Parameter] public EventCallback<string> RemoveTarget { get; set; }
+    [Parameter] public EventCallback<string> ToggleCard { get; set; }
+    [Parameter] public EventCallback<string> ToggleTarget { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string ConnectionId)> ToggleBoundTransport { get; set; }
+    [Parameter] public EventCallback<(string TargetId, string FieldId, string Value)> UpdateField { get; set; }
+
+    private IReadOnlyList<string> BoundConnectionIds => Target.GetBoundTransportConnectionIds();
+
+    private string CardId => SettingsStreamingCardIds.DistributionTarget(Target.Id);
+
+    private StreamingPublishDescriptor Descriptor => DescriptorResolver.DescribeTarget(Target, TransportConnections);
+
+    private bool IsReady => Target.IsEnabled && Descriptor.IsSupported && Descriptor.IsReady;
+
+    private StreamingPlatformPresentation Presentation => StreamingPlatformPresentationCatalog.Get(Target.PlatformKind);
+
+    private string StatusClass => IsReady ? SelectedStatusClass : string.Empty;
+
+    private string StatusLabel
+    {
+        get
+        {
+            if (!Target.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledStatusLabel;
+            }
+
+            if (!Descriptor.IsSupported)
+            {
+                return SettingsStreamingText.BlockedStatusLabel;
+            }
+
+            if (!Descriptor.IsReady)
+            {
+                return SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+            }
+
+            return SettingsStreamingText.DestinationRelayStatusLabel;
+        }
+    }
+
+    private string Summary
+    {
+        get
+        {
+            if (!Target.IsEnabled)
+            {
+                return SettingsStreamingText.DestinationDisabledSummary;
+            }
+
+            if (BoundConnectionIds.Count == 0)
+            {
+                return SettingsStreamingText.BoundTransportConnectionsSummary;
+            }
+
+            if (!Descriptor.IsSupported)
+            {
+                return SettingsStreamingText.UnsupportedTransportSummary;
+            }
+
+            return Descriptor.Summary;
+        }
+    }
+
+    private static string GetValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
+}

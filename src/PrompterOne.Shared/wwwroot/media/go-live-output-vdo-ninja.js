@@ -22,6 +22,7 @@
     function ensureSessionDefaults(session) {
         session.vdoNinjaActive = Boolean(session.vdoNinjaActive);
         session.vdoNinjaConnected = Boolean(session.vdoNinjaConnected);
+        session.vdoNinjaConnectionId = String(session.vdoNinjaConnectionId || "");
         session.vdoNinjaJoinedRoom = Boolean(session.vdoNinjaJoinedRoom);
         session.vdoNinjaLastPeerLatencyMs = Number.isFinite(session.vdoNinjaLastPeerLatencyMs) ? session.vdoNinjaLastPeerLatencyMs : 0;
         session.vdoNinjaPeerCount = Number.isFinite(session.vdoNinjaPeerCount) ? session.vdoNinjaPeerCount : 0;
@@ -29,18 +30,21 @@
         session.vdoNinjaPublisher = session.vdoNinjaPublisher || null;
         session.vdoNinjaRoomName = String(session.vdoNinjaRoomName || "");
         session.vdoNinjaStreamId = String(session.vdoNinjaStreamId || "");
+        session.vdoNinjaViewUrl = String(session.vdoNinjaViewUrl || "");
     }
 
     function resetSessionState(session) {
         ensureSessionDefaults(session);
         session.vdoNinjaActive = false;
         session.vdoNinjaConnected = false;
+        session.vdoNinjaConnectionId = "";
         session.vdoNinjaJoinedRoom = false;
         session.vdoNinjaLastPeerLatencyMs = 0;
         session.vdoNinjaPeerCount = 0;
         session.vdoNinjaPublishUrl = "";
         session.vdoNinjaRoomName = "";
         session.vdoNinjaStreamId = "";
+        session.vdoNinjaViewUrl = "";
     }
 
     function getSdkConstructor() {
@@ -84,18 +88,35 @@
         }
     }
 
-    function resolveConfig(sessionId, request) {
-        const parsed = parsePublishUrl(request.vdoNinjaPublishUrl);
-        const roomName = request.vdoNinjaRoomName || parsed.roomName;
-        const streamId = parsed.streamId || [sessionId, roomName].filter(Boolean).map(sanitizeStreamSegment).join(streamIdSeparator);
-        const publishUrl = parsed.publishUrl
-            || (roomName ? `https://vdo.ninja/?room=${encodeURIComponent(roomName)}&push=${encodeURIComponent(streamId)}` : "");
+    function resolveConfig(connection) {
+        const parsed = parsePublishUrl(connection.publishUrl);
+        const baseUrl = connection.baseUrl || "https://vdo.ninja/";
+        const roomName = connection.roomName || parsed.roomName;
+        const streamId = parsed.streamId
+            || [connection.connectionId, roomName].filter(Boolean).map(sanitizeStreamSegment).join(streamIdSeparator);
+        let publishUrl = parsed.publishUrl;
+        let viewUrl = connection.viewUrl;
+
+        if (!publishUrl && roomName) {
+            const publishEndpoint = new URL(baseUrl, window.location.origin);
+            publishEndpoint.searchParams.set(roomParam, roomName);
+            publishEndpoint.searchParams.set(publishParam, streamId);
+            publishUrl = publishEndpoint.toString();
+        }
+
+        if (!viewUrl && streamId) {
+            const viewEndpoint = new URL(baseUrl, window.location.origin);
+            viewEndpoint.searchParams.set(viewParam, streamId);
+            viewUrl = viewEndpoint.toString();
+        }
 
         return {
+            connectionId: connection.connectionId,
             label: defaultStreamLabel,
             publishUrl,
             roomName,
-            streamId: streamId || sanitizeStreamSegment(sessionId)
+            streamId: streamId || sanitizeStreamSegment(connection.connectionId),
+            viewUrl
         };
     }
 
@@ -195,10 +216,10 @@
         resetSessionState(session);
     }
 
-    async function startSession(session, sessionId, request) {
+    async function startSession(session, connection) {
         ensureSessionDefaults(session);
 
-        const config = resolveConfig(sessionId, request);
+        const config = resolveConfig(connection);
         const needsNewPublisher = !session.vdoNinjaPublisher || session.vdoNinjaRoomName !== config.roomName;
 
         if (needsNewPublisher) {
@@ -215,9 +236,11 @@
         });
 
         session.vdoNinjaActive = true;
+        session.vdoNinjaConnectionId = config.connectionId;
         session.vdoNinjaPublishUrl = config.publishUrl;
         session.vdoNinjaRoomName = config.roomName;
         session.vdoNinjaStreamId = config.streamId;
+        session.vdoNinjaViewUrl = config.viewUrl;
     }
 
     function buildSnapshot(session) {
@@ -230,7 +253,8 @@
             peerCount: session.vdoNinjaPeerCount,
             publishUrl: session.vdoNinjaPublishUrl,
             roomName: session.vdoNinjaRoomName,
-            streamId: session.vdoNinjaStreamId
+            streamId: session.vdoNinjaStreamId,
+            viewUrl: session.vdoNinjaViewUrl
         };
     }
 

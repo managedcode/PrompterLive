@@ -3,6 +3,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
@@ -32,6 +33,16 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     public void GoLivePage_StartStream_UsesSelectedCameraAsActiveProgramSource()
     {
         SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                TransportConnections =
+                [
+                    AppTestData.GoLive.CreateVdoNinjaConnection()
+                ]
+            }
+        });
         Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
 
         var cut = Render<GoLivePage>();
@@ -56,8 +67,6 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ObsToggle}']"));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.NdiToggle}']"));
             Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.RecordingToggle}']"));
         });
     }
@@ -70,9 +79,9 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination()
+                    AppTestData.GoLive.CreateVdoNinjaConnection()
                 ]
             }
         });
@@ -95,9 +104,9 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateLiveKitDestination()
+                    AppTestData.GoLive.CreateLiveKitConnection()
                 ]
             }
         });
@@ -112,17 +121,17 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Fact]
-    public void GoLivePage_StartStream_WithVdoNinjaAndLiveKitArmed_PrefersVdoNinjaOutputInterop()
+    public void GoLivePage_StartStream_WithVdoNinjaAndLiveKitArmed_StartsBothPublishTransports()
     {
         SeedSceneState(CreateTwoCameraScene());
         SeedStudioSettings(StudioSettings.Default with
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination(),
-                    AppTestData.GoLive.CreateLiveKitDestination()
+                    AppTestData.GoLive.CreateVdoNinjaConnection(),
+                    AppTestData.GoLive.CreateLiveKitConnection()
                 ]
             }
         });
@@ -134,36 +143,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
         Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
-        Assert.DoesNotContain(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
-    }
-
-    [Fact]
-    public void GoLivePage_StartStream_WithObsArmed_CallsObsOutputInteropWithPrimaryMicrophone()
-    {
-        SeedSceneState(CreateTwoCameraScene());
-        SeedStudioSettings(StudioSettings.Default with
-        {
-            Streaming = StudioSettings.Default.Streaming with
-            {
-                ObsVirtualCameraEnabled = true
-            }
-        });
-
-        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
-        var cut = Render<GoLivePage>();
-
-        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
-        cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
-
-        var invocation = Assert.Single(
-            _harness.JsRuntime.InvocationRecords,
-            record => string.Equals(record.Identifier, GoLiveOutputInteropMethodNames.StartObsBrowserOutput, StringComparison.Ordinal));
-        var request = Assert.IsType<GoLiveOutputRuntimeRequest>(invocation.Arguments[1]);
-
-        Assert.Equal(GoLiveOutputRuntimeContract.SessionId, invocation.Arguments[0]);
-        Assert.Equal(AppTestData.Camera.FirstSourceId, request.PrimarySourceId);
-        Assert.Equal(AppTestData.Camera.FirstDeviceId, request.PrimaryCameraDeviceId);
-        Assert.Equal(AppTestData.Microphone.PrimaryDeviceId, request.PrimaryMicrophoneDeviceId);
+        Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
     }
 
     [Fact]
@@ -174,9 +154,9 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination()
+                    AppTestData.GoLive.CreateVdoNinjaConnection()
                 ]
             }
         });
@@ -205,7 +185,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LocalRecordingEnabled = true
+                Recording = new RecordingProfile(IsEnabled: true)
             }
         });
 
@@ -229,10 +209,9 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ObsVirtualCameraEnabled = false,
-                ExternalDestinations =
+                DistributionTargets =
                 [
-                    AppTestData.GoLive.CreateYoutubeDestination()
+                    AppTestData.GoLive.CreateYoutubeTarget()
                 ]
             }
         });
@@ -265,8 +244,8 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LocalRecordingEnabled = true,
-                OutputResolution = StreamingResolutionPreset.FullHd1080p30
+                Recording = new RecordingProfile(IsEnabled: true),
+                ProgramCapture = new ProgramCaptureProfile(ResolutionPreset: StreamingResolutionPreset.FullHd1080p30)
             }
         });
 
@@ -304,8 +283,8 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LocalRecordingEnabled = true,
-                OutputResolution = StreamingResolutionPreset.FullHd1080p30
+                Recording = new RecordingProfile(IsEnabled: true),
+                ProgramCapture = new ProgramCaptureProfile(ResolutionPreset: StreamingResolutionPreset.FullHd1080p30)
             }
         });
 

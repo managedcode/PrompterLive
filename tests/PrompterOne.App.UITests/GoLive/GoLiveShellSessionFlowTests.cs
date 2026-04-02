@@ -18,10 +18,15 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         try
         {
             await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
-            await page.EvaluateAsync(BrowserTestConstants.GoLive.EnableObsStudioScript);
+            await GoLiveFlowTests.SeedGoLiveOperationalSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
+            await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallVdoNinjaHarnessScript);
             await page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.SecondSourceId)).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.VdoNinjaHarnessReadyScript,
+                null,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
             await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();

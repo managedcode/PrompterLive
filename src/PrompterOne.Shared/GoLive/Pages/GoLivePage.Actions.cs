@@ -18,13 +18,25 @@ public partial class GoLivePage
         }
 
         var source = MediaSceneService.AddCamera(nextCamera.DeviceId, nextCamera.Label);
-        GoLiveSession.SelectSource(SceneCameras, source.SourceId);
+        GoLiveSession.SelectSource(AvailableSceneSources, source.SourceId);
         await PersistSceneAsync();
     }
 
     private async Task ToggleSceneOutputAsync(string sourceId)
     {
         await EnsurePageReadyAsync();
+
+        if (IsRemoteSource(sourceId))
+        {
+            var remoteSource = _remoteSceneSources.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.Ordinal));
+            if (remoteSource is null)
+            {
+                return;
+            }
+
+            SetRemoteSourceIncludeInOutput(sourceId, !remoteSource.Transform.IncludeInOutput);
+            return;
+        }
 
         var camera = SceneCameras.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.Ordinal));
         if (camera is null)

@@ -119,6 +119,9 @@ internal static class AppTestData
         public const string LiveKitRoom = "launch-room";
         public const string LiveKitServer = "wss://livekit.example.com";
         public const string LiveKitToken = "lk-test-token";
+        public const string RemoteLiveKitConnectionId = "livekit-guests";
+        public const string RemoteLiveKitSourceId = "livekit-guests:guest-one";
+        public const string RemoteLiveKitSourceLabel = "Guest One";
         public const string MicChannelId = "mic";
         public const string PrimaryParticipantId = "host";
         public const string PrimaryParticipantName = "Host";
@@ -127,48 +130,67 @@ internal static class AppTestData
         public const string SessionTimerPrefix = "00:02:";
         public const string TwitchUrl = "rtmp://live.twitch.tv/app";
         public const string TwitchKey = "live_twitch_key";
+        public const string RemoteVdoConnectionId = "vdo-guests";
+        public const string RemoteVdoSourceId = "vdo-guests:guest-two";
+        public const string RemoteVdoSourceLabel = "Guest Two";
         public const string VdoNinjaRoom = "launch-room";
         public const string VdoNinjaPublishUrl = "https://vdo.ninja/?room=launch-room&push=prompterone-program";
         public const string YoutubeUrl = "rtmps://a.rtmp.youtube.com/live2";
         public const string YoutubeKey = "youtube_stream_key";
 
-        public static StreamingProfile CreateLiveKitDestination(
+        public static TransportConnectionProfile CreateLiveKitConnection(
             bool isEnabled = true,
-            string destinationId = GoLiveTargetCatalog.TargetIds.LiveKit) =>
-            StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, destinationId) with
+            string connectionId = GoLiveTargetCatalog.TargetIds.LiveKit) =>
+            new(
+                Id: connectionId,
+                Name: "LiveKit",
+                PlatformKind: StreamingPlatformKind.LiveKit,
+                IsEnabled: isEnabled,
+                ServerUrl: LiveKitServer,
+                RoomName: LiveKitRoom,
+                Token: LiveKitToken);
+
+        public static TransportConnectionProfile CreateLiveKitSourceConnection(
+            bool isEnabled = true,
+            string connectionId = RemoteLiveKitConnectionId) =>
+            CreateLiveKitConnection(isEnabled, connectionId) with
             {
-                IsEnabled = isEnabled,
-                ServerUrl = LiveKitServer,
-                RoomName = LiveKitRoom,
-                Token = LiveKitToken
+                Roles = StreamingTransportRole.Source
             };
 
-        public static StreamingProfile CreateYoutubeDestination(
+        public static DistributionTargetProfile CreateYoutubeTarget(
             bool isEnabled = true,
-            string destinationId = GoLiveTargetCatalog.TargetIds.Youtube) =>
-            CreateYoutubeDestinationCore(isEnabled, destinationId);
+            string targetId = GoLiveTargetCatalog.TargetIds.Youtube,
+            IReadOnlyList<string>? boundTransportConnectionIds = null) =>
+            new(
+                Id: targetId,
+                Name: "YouTube Live",
+                PlatformKind: StreamingPlatformKind.Youtube,
+                IsEnabled: isEnabled,
+                RtmpUrl: YoutubeUrl,
+                StreamKey: YoutubeKey,
+                BoundTransportConnectionIds: boundTransportConnectionIds ?? Array.Empty<string>());
 
-        public static StreamingProfile CreateVdoNinjaDestination(
+        public static TransportConnectionProfile CreateVdoNinjaConnection(
             bool isEnabled = true,
-            string destinationId = GoLiveTargetCatalog.TargetIds.VdoNinja) =>
-            StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.VdoNinja, destinationId) with
-            {
-                IsEnabled = isEnabled,
-                PublishUrl = VdoNinjaPublishUrl,
-                RoomName = VdoNinjaRoom
-            };
+            string connectionId = GoLiveTargetCatalog.TargetIds.VdoNinja) =>
+            new(
+                Id: connectionId,
+                Name: "VDO.Ninja",
+                PlatformKind: StreamingPlatformKind.VdoNinja,
+                IsEnabled: isEnabled,
+                BaseUrl: VdoNinjaDefaults.HostedBaseUrl,
+                RoomName: VdoNinjaRoom,
+                PublishUrl: VdoNinjaPublishUrl);
 
-        private static StreamingProfile CreateYoutubeDestinationCore(bool isEnabled, string destinationId)
-        {
-            var profile = StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.Youtube, destinationId) with
+        public static TransportConnectionProfile CreateVdoNinjaSourceConnection(
+            bool isEnabled = true,
+            string connectionId = RemoteVdoConnectionId) =>
+            CreateVdoNinjaConnection(isEnabled, connectionId) with
             {
-                IsEnabled = isEnabled
+                Roles = StreamingTransportRole.Source,
+                PublishUrl = string.Empty,
+                ViewUrl = $"https://vdo.ninja/?view={connectionId}"
             };
-
-            return profile.SetPrimaryDestination(
-                StreamingPlatformCatalog.Get(StreamingPlatformKind.Youtube).DefaultProfileName,
-                YoutubeUrl,
-                YoutubeKey);
-        }
     }
 }

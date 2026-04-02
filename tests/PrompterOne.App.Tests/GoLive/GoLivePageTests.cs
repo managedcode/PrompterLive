@@ -38,10 +38,13 @@ public sealed class GoLivePageTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination(isEnabled: false),
-                    AppTestData.GoLive.CreateYoutubeDestination(isEnabled: false)
+                    AppTestData.GoLive.CreateVdoNinjaConnection(isEnabled: false)
+                ],
+                DistributionTargets =
+                [
+                    AppTestData.GoLive.CreateYoutubeTarget(isEnabled: false)
                 ]
             }
         };
@@ -60,13 +63,13 @@ public sealed class GoLivePageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
-            Assert.True(settings.Streaming.LocalRecordingEnabled);
+            Assert.True(settings.Streaming.RecordingSettings.IsEnabled);
             Assert.Contains(
-                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
-                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.VdoNinja, StringComparison.Ordinal) && destination.IsEnabled);
+                settings.Streaming.TransportConnections ?? Array.Empty<TransportConnectionProfile>(),
+                connection => string.Equals(connection.Id, GoLiveTargetCatalog.TargetIds.VdoNinja, StringComparison.Ordinal) && connection.IsEnabled);
             Assert.Contains(
-                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
-                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.Youtube, StringComparison.Ordinal) && destination.IsEnabled);
+                settings.Streaming.DistributionTargets ?? Array.Empty<DistributionTargetProfile>(),
+                target => string.Equals(target.Id, GoLiveTargetCatalog.TargetIds.Youtube, StringComparison.Ordinal) && target.IsEnabled);
         });
     }
 
@@ -180,18 +183,21 @@ public sealed class GoLivePageTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination(),
-                    AppTestData.GoLive.CreateYoutubeDestination()
+                    AppTestData.GoLive.CreateVdoNinjaConnection()
                 ],
-                DestinationSourceSelections =
+                DistributionTargets =
+                [
+                    AppTestData.GoLive.CreateYoutubeTarget()
+                ],
+                SourceSelections =
                 [
                     new GoLiveDestinationSourceSelection(
                         GoLiveTargetCatalog.TargetIds.VdoNinja,
                         [AppTestData.Camera.SecondSourceId])
                 ],
-                BitrateKbps = AppTestData.Streaming.BitrateKbps
+                ProgramCapture = new ProgramCaptureProfile(BitrateKbps: AppTestData.Streaming.BitrateKbps)
             }
         };
 
@@ -223,10 +229,13 @@ public sealed class GoLivePageTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                ExternalDestinations =
+                TransportConnections =
                 [
-                    AppTestData.GoLive.CreateVdoNinjaDestination(),
-                    AppTestData.GoLive.CreateYoutubeDestination()
+                    AppTestData.GoLive.CreateVdoNinjaConnection()
+                ],
+                DistributionTargets =
+                [
+                    AppTestData.GoLive.CreateYoutubeTarget()
                 ]
             }
         };
@@ -240,75 +249,7 @@ public sealed class GoLivePageTests : BunitContext
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.VdoNinja)));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs)}']"));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Ndi)}']"));
             Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
-        });
-    }
-
-    [Fact]
-    public void GoLivePage_Load_MigratesLegacyVdoNinjaDestinationIntoExternalDestinationList()
-    {
-        SeedSceneState(CreateTwoCameraScene());
-        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
-        {
-            Streaming = StudioSettings.Default.Streaming with
-            {
-                VdoNinjaEnabled = true,
-                VdoNinjaRoomName = AppTestData.GoLive.VdoNinjaRoom,
-                VdoNinjaPublishUrl = AppTestData.GoLive.VdoNinjaPublishUrl
-            }
-        };
-
-        Services.GetRequiredService<NavigationManager>()
-            .NavigateTo(AppTestData.Routes.GoLiveDemo);
-
-        var cut = Render<GoLivePage>();
-
-        cut.WaitForAssertion(() =>
-        {
-            var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
-            Assert.Contains(
-                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
-                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.VdoNinja, StringComparison.Ordinal));
-            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.VdoToggle).ClassName, StringComparison.Ordinal);
-        });
-    }
-
-    [Fact]
-    public void GoLivePage_Load_MigratesLegacyStreamingDestinationsIntoExternalDestinationList()
-    {
-        SeedSceneState(CreateTwoCameraScene());
-        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
-        {
-            Streaming = StudioSettings.Default.Streaming with
-            {
-                LiveKitEnabled = true,
-                LiveKitServerUrl = AppTestData.GoLive.LiveKitServer,
-                LiveKitRoomName = AppTestData.GoLive.LiveKitRoom,
-                LiveKitToken = AppTestData.GoLive.LiveKitToken,
-                YoutubeEnabled = true,
-                YoutubeRtmpUrl = AppTestData.GoLive.YoutubeUrl,
-                YoutubeStreamKey = AppTestData.GoLive.YoutubeKey
-            }
-        };
-
-        Services.GetRequiredService<NavigationManager>()
-            .NavigateTo(AppTestData.Routes.GoLiveDemo);
-
-        var cut = Render<GoLivePage>();
-
-        cut.WaitForAssertion(() =>
-        {
-            var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
-            Assert.Contains(
-                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
-                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.LiveKit, StringComparison.Ordinal));
-            Assert.Contains(
-                settings.Streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>(),
-                destination => string.Equals(destination.Id, GoLiveTargetCatalog.TargetIds.Youtube, StringComparison.Ordinal));
-            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.LiveKitToggle).ClassName, StringComparison.Ordinal);
-            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.YoutubeToggle).ClassName, StringComparison.Ordinal);
         });
     }
 
@@ -331,6 +272,53 @@ public sealed class GoLivePageTests : BunitContext
             Assert.Equal(
                 AppTestData.Camera.SideCamera,
                 cut.FindByTestId(UiTestIds.GoLive.SelectedSourceLabel).TextContent.Trim()));
+    }
+
+    [Fact]
+    public void GoLivePage_LoadsRemoteGuestSourcesFromEnabledTransportConnections()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        _harness.JsRuntime.SeedRemoteSources(
+            GoLiveOutputRuntimeContract.SessionId,
+            (
+                AppTestData.GoLive.RemoteLiveKitConnectionId,
+                AppTestData.GoLive.RemoteLiveKitSourceId,
+                AppTestData.GoLive.RemoteLiveKitSourceLabel,
+                StreamingPlatformKind.LiveKit,
+                AppTestData.GoLive.LiveKitRoom,
+                AppTestData.GoLive.LiveKitServer,
+                true));
+        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                TransportConnections =
+                [
+                    AppTestData.GoLive.CreateLiveKitSourceConnection()
+                ]
+            }
+        };
+
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.GoLiveDemo);
+
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() =>
+            Assert.Contains(
+                AppTestData.GoLive.RemoteLiveKitSourceLabel,
+                cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.GoLive.RemoteLiveKitSourceId)).TextContent,
+                StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.GoLive.RoomTab).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(
+                AppTestData.GoLive.RemoteLiveKitSourceLabel,
+                cut.FindByTestId(UiTestIds.GoLive.RoomParticipant(AppTestData.GoLive.RemoteLiveKitSourceId)).TextContent,
+                StringComparison.Ordinal);
+        });
     }
 
     [Fact]
@@ -389,8 +377,6 @@ public sealed class GoLivePageTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ModeDirector));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SceneControls));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.StreamTab));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs)}']"));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Ndi)}']"));
             Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
         });
 

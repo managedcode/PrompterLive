@@ -178,8 +178,7 @@ public partial class SettingsPage
 
     private static string ResolveCameraConnectionLabel(MediaDeviceInfo camera)
     {
-        if (camera.Label.Contains(VirtualConnectionLabel, StringComparison.OrdinalIgnoreCase)
-            || camera.Label.Contains("OBS", StringComparison.OrdinalIgnoreCase))
+        if (camera.Label.Contains(VirtualConnectionLabel, StringComparison.OrdinalIgnoreCase))
         {
             return VirtualConnectionLabel;
         }
