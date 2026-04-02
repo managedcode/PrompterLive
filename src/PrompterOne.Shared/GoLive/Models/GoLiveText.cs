@@ -7,6 +7,7 @@ public static class GoLiveText
         public const string BackLabel = "Back";
         public const string DirectorModeLabel = "Director";
         public const string LivePreviewTitle = "Live";
+        public const string ScreenTitle = "Go Live";
         public const string StreamingSubtitle = "Program routing";
         public const string StudioModeLabel = "Studio";
     }
@@ -84,7 +85,6 @@ public static class GoLiveText
         public const string HostParticipantName = "Host";
         public const string InterviewSceneFallback = "Interview";
         public const string LocalRoomPrefix = "local-";
-        public const string MainSceneFallback = "Camera 1";
         public const string MicrophoneMetricLabel = "Mic";
         public const string NoScriptProgressLabel = "No script loaded";
         public const string PictureInPictureSceneId = "scene-picture-in-picture";

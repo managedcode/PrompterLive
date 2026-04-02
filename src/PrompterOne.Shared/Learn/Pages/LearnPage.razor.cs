@@ -18,6 +18,7 @@ public partial class LearnPage : IAsyncDisposable
     private const int MinimumWordDurationMilliseconds = 60;
     private const string NeutralEmotion = "neutral";
     private const string ReadyWord = "Ready";
+    private const int ReadyWordDurationMilliseconds = 240;
     private const int PreviewWordCount = 10;
     private const int RsvpMaxSpeed = 600;
     private const int RsvpMinSpeed = 100;
@@ -128,7 +129,7 @@ public partial class LearnPage : IAsyncDisposable
         PlaybackEngine.WordsPerMinute = _speed;
         PlaybackEngine.LoadTimeline(processed);
 
-        _timeline = BuildTimeline(processed, _speed);
+        _timeline = BuildTimeline(processed);
         _currentIndex = 0;
         _isPlaying = learnSettings.AutoPlay;
         _isLoopEnabled = learnSettings.LoopPlayback;
@@ -182,20 +183,24 @@ public partial class LearnPage : IAsyncDisposable
         _currentWordLeading = focusWord.Leading;
         _currentWordOrp = focusWord.Orp;
         _currentWordTrailing = focusWord.Trailing;
-        _leftContextWords = BuildDisplayContextWords(
+        _leftContextWords = BuildDisplayContextWindowWords(
             _timeline,
-            Math.Max(sentenceRange.StartIndex, _currentIndex - _contextWordCount),
-            _currentIndex);
-        _rightContextWords = BuildDisplayContextWords(
+            sentenceRange.StartIndex,
+            _currentIndex,
+            _contextWordCount,
+            takeTrailingWords: true);
+        _rightContextWords = BuildDisplayContextWindowWords(
             _timeline,
             _currentIndex + 1,
-            Math.Min(sentenceRange.EndIndex + 1, _currentIndex + 1 + _contextWordCount));
+            sentenceRange.EndIndex + 1,
+            _contextWordCount,
+            takeTrailingWords: false);
         var rawPreviewText = string.IsNullOrWhiteSpace(entry.NextPhrase)
             ? ResolveFallbackNextPhrase(_timeline, _currentIndex)
             : entry.NextPhrase;
         _nextPhrase = BuildDisplayPreviewText(rawPreviewText);
         _progressFillWidth = $"{((_currentIndex + 1) * 100d / _timeline.Count):0.##}%";
-        _progressLabel = BuildProgressLabel(_timeline, _currentIndex, _speed);
+        _progressLabel = BuildProgressLabel(_timeline, _currentIndex);
         _syncFocusLayoutAfterRender = true;
     }
 
@@ -217,19 +222,4 @@ public partial class LearnPage : IAsyncDisposable
 
     private void UpdateShellState() =>
         Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
-
-    private int GetScaledDuration(int sourceMilliseconds, int baseWpm, bool allowZero = false)
-    {
-        if (sourceMilliseconds <= 0)
-        {
-            return allowZero ? 0 : MinimumWordDurationMilliseconds;
-        }
-
-        var effectiveBaseWpm = baseWpm > 0 ? baseWpm : _speed;
-        var scaledDuration = sourceMilliseconds * (effectiveBaseWpm / (double)Math.Max(_speed, 1));
-        var roundedDuration = (int)Math.Round(scaledDuration);
-        return allowZero
-            ? Math.Max(0, roundedDuration)
-            : Math.Max(MinimumWordDurationMilliseconds, roundedDuration);
-    }
 }

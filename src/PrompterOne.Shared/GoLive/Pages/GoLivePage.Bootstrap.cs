@@ -146,13 +146,13 @@ public partial class GoLivePage
 
     private void UpdateScreenMetadata()
     {
-        _screenTitle = SessionService.State.Title;
-        _screenSubtitle = SessionService.State.PreviewSegments.Count > 0
+        _sessionTitle = SessionService.State.Title;
+        _sessionSubtitle = SessionService.State.PreviewSegments.Count > 0
             ? SessionService.State.PreviewSegments[0].Title
             : GoLiveText.Chrome.StreamingSubtitle;
         SyncGoLiveSessionState();
         EnsureStudioSurfaceState();
-        Shell.ShowGoLive(_screenTitle, _screenSubtitle, SessionService.State.ScriptId);
+        Shell.ShowGoLive(SessionService.State.ScriptId);
     }
 
     private async Task PersistSceneAsync()

@@ -131,6 +131,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<IStreamingOutputProvider, LiveKitOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, VdoNinjaOutputProvider>();
         context.Services.AddSingleton<IStreamingOutputProvider, RtmpStreamingOutputProvider>();
+        context.Services.AddScoped<StreamingPublishDescriptorResolver>();
 
         return new AppHarness(
             jsRuntime,

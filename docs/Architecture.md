@@ -173,6 +173,7 @@ flowchart LR
 - `BrowserThemeService` is the first concrete remote consumer and keeps shell appearance aligned across tabs without reload.
 - `GoLiveSessionService` is the current publisher and consumer for active `Go Live` session snapshots, including startup catch-up requests.
 - `MainLayout` consumes `GoLiveSessionService` and renders the global shell `Go Live` status for every screen.
+- `AppShellService` owns the current in-app route and the last valid non-`Go Live` return target so the `Go Live` back control can return to the actual previous screen instead of a hardcoded reader route.
 - The contract must stay message-based; tabs do not share live .NET memory.
 
 ## Library Contracts

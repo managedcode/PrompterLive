@@ -17,6 +17,24 @@ public partial class LearnPage
             .ToArray();
     }
 
+    private static IReadOnlyList<string> BuildDisplayContextWindowWords(
+        IReadOnlyList<RsvpTimelineEntry> timeline,
+        int startIndex,
+        int endIndex,
+        int maximumWordCount,
+        bool takeTrailingWords)
+    {
+        var words = BuildDisplayContextWords(timeline, startIndex, endIndex);
+        if (words.Count <= maximumWordCount)
+        {
+            return words;
+        }
+
+        return takeTrailingWords
+            ? words.Skip(words.Count - maximumWordCount).ToArray()
+            : words.Take(maximumWordCount).ToArray();
+    }
+
     private static string BuildDisplayPreviewText(string previewText)
     {
         if (string.IsNullOrWhiteSpace(previewText) ||
@@ -61,44 +79,19 @@ public partial class LearnPage
             : word[startIndex..(endIndex + 1)];
     }
 
-    private static (int StartIndex, int EndIndex) ResolveSentenceRange(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex) =>
-        (FindSentenceStartIndex(timeline, currentIndex), FindSentenceEndIndex(timeline, currentIndex));
-
-    private static int FindSentenceStartIndex(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
+    private static (int StartIndex, int EndIndex) ResolveSentenceRange(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
     {
-        var startIndex = currentIndex;
-
-        for (var index = currentIndex - 1; index >= 0; index--)
+        if (timeline.Count == 0)
         {
-            if (HasSentenceBoundaryAfter(timeline[index]))
-            {
-                break;
-            }
-
-            startIndex = index;
+            return (0, -1);
         }
 
-        return startIndex;
+        var safeIndex = Math.Clamp(currentIndex, 0, timeline.Count - 1);
+        var entry = timeline[safeIndex];
+        var startIndex = Math.Clamp(entry.SentenceStartIndex, 0, timeline.Count - 1);
+        var endIndex = Math.Clamp(entry.SentenceEndIndex, startIndex, timeline.Count - 1);
+        return (startIndex, endIndex);
     }
-
-    private static int FindSentenceEndIndex(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
-    {
-        var endIndex = currentIndex;
-
-        for (var index = currentIndex + 1; index < timeline.Count; index++)
-        {
-            endIndex = index;
-            if (HasSentenceBoundaryAfter(timeline[index]))
-            {
-                break;
-            }
-        }
-
-        return endIndex;
-    }
-
-    private static bool HasSentenceBoundaryAfter(RsvpTimelineEntry entry) =>
-        HasSentenceEndingPunctuation(entry.Word);
 
     private static bool IsDisplayBoundaryPunctuation(char character) =>
         char.IsPunctuation(character) && character is not '\'' and not '’';

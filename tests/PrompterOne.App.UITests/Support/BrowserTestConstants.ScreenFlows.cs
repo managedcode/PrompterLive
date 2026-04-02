@@ -185,18 +185,32 @@ internal static partial class BrowserTestConstants
     public static class ReaderTiming
     {
         public const int CapturePollIntervalMs = 20;
+        public const int BoundaryTransitionSampleIndex = 4;
         public const int LearnTimingToleranceMs = 200;
+        public const int LearnStartupTimingToleranceMs = 1800;
+        public const int LearnSpeedStep = 10;
+        public const int LearnSlowWpm = 200;
+        public const int LearnFastWpm = 300;
+        public const int LearnSlowWpmAdjustmentClicks = 5;
+        public const int LearnFastWpmAdjustmentClicks = 5;
+        public const int MinimumSpeedProbePlaybackDeltaMs = 140;
+        public const int MinimumBoundaryPlaybackDeltaMs = 400;
+        public const int MinimumBoundaryTransitionDeltaMs = 100;
         public const int SampleCaptureTimeoutMs = 12000;
         public const int TeleprompterTimingToleranceMs = 180;
+        public const int WpmBoundaryWordCount = 8;
         public const int WordCount = 5;
         public const string FirstWord = "alpha";
         public const string SecondWord = "bravo";
         public const string ThirdWord = "charlie";
         public const string FourthWord = "delta";
         public const string FifthWord = "echo";
+        public const string BoundarySixthWord = "foxtrot";
+        public const string BoundarySeventhWord = "golf";
+        public const string BoundaryEighthWord = "hotel";
         public const int BaseWpm = 250;
-        public const int SlowWpm = 190;
-        public const int FastWpm = 310;
+        public const int SlowWpm = 100;
+        public const int FastWpm = 400;
 
         public static IReadOnlyList<string> ExpectedWords =>
         [
@@ -205,6 +219,18 @@ internal static partial class BrowserTestConstants
             ThirdWord,
             FourthWord,
             FifthWord
+        ];
+
+        public static IReadOnlyList<string> ExpectedBoundaryWords =>
+        [
+            FirstWord,
+            SecondWord,
+            ThirdWord,
+            FourthWord,
+            FifthWord,
+            BoundarySixthWord,
+            BoundarySeventhWord,
+            BoundaryEighthWord
         ];
     }
 }

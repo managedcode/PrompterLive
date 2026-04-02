@@ -6,15 +6,18 @@ namespace PrompterOne.App.UITests;
 public sealed class TeleprompterStylesheetFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
 {
     private const string HasTeleprompterStylesheetScript = """
-        teleprompterHref => Array.from(document.styleSheets)
+        teleprompterHref => {
+            const normalizedTargetPath = teleprompterHref.startsWith('/') ? teleprompterHref : `/${teleprompterHref}`;
+            return Array.from(document.styleSheets)
             .map(sheet => sheet.href ?? "")
             .some(href => {
                 if (!href) {
                     return false;
                 }
 
-                return new URL(href).pathname === teleprompterHref;
-            })
+                return new URL(href).pathname === normalizedTargetPath;
+            });
+        }
         """;
 
     [Fact]

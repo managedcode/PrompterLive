@@ -12,8 +12,8 @@
                  data-testid="@UiTestIds.GoLive.SessionBar">
             <div class="gl-topbar-left">
                 <a class="gl-back-btn"
-                   href="@HomeRoute"
-                   data-testid="@UiTestIds.GoLive.OpenHome">
+                   href="@BackRoute"
+                   data-testid="@UiTestIds.GoLive.Back">
                     <svg width="16"
                          height="16"
                          viewBox="0 0 24 24"
@@ -25,7 +25,8 @@
                     </svg>
                     <span>@GoLiveText.Chrome.BackLabel</span>
                 </a>
-                <span class="gl-title">@_screenTitle</span>
+                <span class="gl-title"
+                      data-testid="@UiTestIds.GoLive.ScreenTitle">@ScreenTitle</span>
                 <span class="gl-badge @SessionBadgeCssClass">@PrimarySessionBadge</span>
                 <button type="button"
                         class="gl-panel-toggle @(ShowLeftRail ? "active" : null)"

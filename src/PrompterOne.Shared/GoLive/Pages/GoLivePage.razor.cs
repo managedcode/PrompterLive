@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
-using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
@@ -12,8 +11,6 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class GoLivePage : ComponentBase
 {
-    private const string HomeRoute = AppRoutes.Library;
-
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
@@ -35,17 +32,11 @@ public partial class GoLivePage : ComponentBase
     private IReadOnlyList<MediaDeviceInfo> _mediaDevices = [];
     private bool _loadState = true;
     private SettingsPagePreferences _recordingPreferences = SettingsPagePreferences.Default;
-    private string _screenSubtitle = GoLiveText.Chrome.StreamingSubtitle;
-    private string _screenTitle = ScriptWorkspaceState.UntitledScriptTitle;
+    private string _sessionSubtitle = GoLiveText.Chrome.StreamingSubtitle;
+    private string _sessionTitle = ScriptWorkspaceState.UntitledScriptTitle;
     private StudioSettings _studioSettings = StudioSettings.Default;
 
     private bool HasPrimaryMicrophone => !string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneId);
-
-    private bool HasScriptContext => !string.IsNullOrWhiteSpace(SessionService.State.ScriptId);
-
-    private string CurrentScriptProgressLabel => HasScriptContext
-        ? _screenSubtitle
-        : GoLiveText.Surface.NoScriptProgressLabel;
 
     private SceneCameraSource? PreviewCamera =>
         SceneCameras.FirstOrDefault(camera => camera.Transform.Visible && camera.Transform.IncludeInOutput)
@@ -53,6 +44,10 @@ public partial class GoLivePage : ComponentBase
         ?? (SceneCameras.Count > 0 ? SceneCameras[0] : null);
 
     private string PrimaryMicrophoneLabel => MediaSceneService.State.PrimaryMicrophoneLabel ?? GoLiveText.Audio.NoMicrophoneLabel;
+
+    private string BackRoute => Shell.GetGoLiveBackRoute();
+
+    private static string ScreenTitle => GoLiveText.Chrome.ScreenTitle;
 
     private string PrimaryMicrophoneRoute
     {

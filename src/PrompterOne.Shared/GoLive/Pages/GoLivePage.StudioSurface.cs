@@ -1,6 +1,5 @@
 using System.Globalization;
 using PrompterOne.Core.Models.Media;
-using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Components.GoLive;
 using PrompterOne.Shared.GoLive.Models;
 
@@ -12,7 +11,6 @@ public partial class GoLivePage
     private const string GoLiveFullProgramClass = "gl-layout-fullpgm";
     private const string GoLiveHideLeftClass = "gl-hide-left";
     private const string GoLiveHideRightClass = "gl-hide-right";
-
 
     private string _activeSceneId = GoLiveText.Surface.PrimarySceneId;
     private GoLiveSceneLayout _activeSceneLayout = GoLiveSceneLayout.Full;
@@ -188,7 +186,7 @@ public partial class GoLivePage
         var secondaryCamera = SceneCameras.Count > 1 ? SceneCameras[1] : null;
         var scenes = new List<GoLiveSceneChipViewModel>
         {
-            new(GoLiveText.Surface.PrimarySceneId, primaryCamera?.Label ?? GoLiveText.Surface.MainSceneFallback, GoLiveSceneChipKind.Camera, primaryCamera?.SourceId),
+            new(GoLiveText.Surface.PrimarySceneId, primaryCamera?.Label ?? GoLiveText.Session.CameraFallbackLabel, GoLiveSceneChipKind.Camera, primaryCamera?.SourceId),
             new(GoLiveText.Surface.SecondarySceneId, secondaryCamera?.Label ?? GoLiveText.Surface.InterviewSceneFallback, GoLiveSceneChipKind.Split, secondaryCamera?.SourceId),
             new(GoLiveText.Surface.SceneSlidesId, GoLiveText.Surface.SceneSlidesLabel, GoLiveSceneChipKind.Slides, null),
             new(GoLiveText.Surface.PictureInPictureSceneId, GoLiveText.Surface.PictureInPictureSceneLabel, GoLiveSceneChipKind.PictureInPicture, primaryCamera?.SourceId)

@@ -151,7 +151,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
 
             var primaryCameraCard = page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.PrimaryCameraId));
             await Expect(primaryCameraCard).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.CameraPreviewVideo)).ToBeVisibleAsync();
 
             var primaryCameraCardText = await primaryCameraCard.TextContentAsync() ?? string.Empty;
             Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryCameraLabel, primaryCameraCardText, StringComparison.Ordinal);
@@ -164,7 +164,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
 
             var primaryMicrophoneCard = page.GetByTestId(UiTestIds.Settings.MicDevice(BrowserTestConstants.Media.PrimaryMicrophoneId));
             await Expect(primaryMicrophoneCard).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.Settings.MicPreviewLabel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Settings.MicPreviewMeter)).ToBeVisibleAsync();
 
             var primaryMicrophoneCardText = await primaryMicrophoneCard.TextContentAsync() ?? string.Empty;
             Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryMicrophoneLabel, primaryMicrophoneCardText, StringComparison.Ordinal);

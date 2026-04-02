@@ -11,6 +11,7 @@ internal static class AppTestData
         public const string DemoId = "test-product-launch-script";
         public const string LeadershipId = "test-ted-leadership-script";
         public const string ArchitectureId = "test-green-architecture-script";
+        public const string LearnWpmBoundaryId = "test-learn-wpm-boundary-script";
         public const string QuantumId = "test-quantum-computing-script";
         public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
@@ -18,6 +19,7 @@ internal static class AppTestData
         public const string DemoTitle = "Product Launch";
         public const string TedLeadershipTitle = "TED: Leadership";
         public const string GreenArchitectureTitle = "Green Architecture";
+        public const string LearnWpmBoundaryTitle = "Learn WPM Boundary Probe";
         public const string QuantumTitle = "Quantum Computing";
         public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
@@ -48,6 +50,8 @@ internal static class AppTestData
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);
         public static string EditorQuantum => AppRoutes.EditorWithId(Scripts.QuantumId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
+        public static string GoLiveLeadership => AppRoutes.GoLiveWithId(Scripts.LeadershipId);
+        public static string LearnWpmBoundary => AppRoutes.LearnWithId(Scripts.LearnWpmBoundaryId);
         public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
         public static string LearnQuantum => AppRoutes.LearnWithId(Scripts.QuantumId);
         public static string TeleprompterArchitecture => AppRoutes.TeleprompterWithId(Scripts.ArchitectureId);

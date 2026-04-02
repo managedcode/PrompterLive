@@ -3,7 +3,6 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PrompterOne.Core.Models.Media;
-using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;

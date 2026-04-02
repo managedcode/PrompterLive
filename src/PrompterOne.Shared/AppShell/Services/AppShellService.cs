@@ -1,9 +1,16 @@
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.GoLive.Models;
 
 namespace PrompterOne.Shared.Services;
 
 public sealed class AppShellService
 {
+    private const string EmptyRoute = "";
+    private const string QuerySeparator = "?";
+
+    private string _currentRoute = AppRoutes.Library;
+    private string _goLiveBackRoute = AppRoutes.Library;
+
     public event Action? StateChanged;
     public event Action<string>? LibrarySearchChanged;
 
@@ -34,8 +41,13 @@ public sealed class AppShellService
     public void ShowTeleprompter(string title, string subtitle, string? scriptId) =>
         SetScriptScopedState(AppShellScreen.Teleprompter, title, subtitle, string.Empty, scriptId);
 
-    public void ShowGoLive(string title, string subtitle, string? scriptId) =>
-        SetScriptScopedState(AppShellScreen.GoLive, title, subtitle, string.Empty, scriptId);
+    public void ShowGoLive(string? scriptId) =>
+        SetScriptScopedState(
+            AppShellScreen.GoLive,
+            GoLiveText.Chrome.ScreenTitle,
+            GoLiveText.Chrome.StreamingSubtitle,
+            string.Empty,
+            scriptId);
 
     public void ShowSettings() =>
         SetState(new AppShellState(
@@ -66,6 +78,26 @@ public sealed class AppShellService
     public string GetTeleprompterRoute() => BuildScriptScopedRoute(AppShellScreen.Teleprompter);
 
     public string GetGoLiveRoute() => BuildScriptScopedRoute(AppShellScreen.GoLive);
+
+    public string GetGoLiveBackRoute() => IsValidGoLiveBackTarget(_goLiveBackRoute)
+        ? _goLiveBackRoute
+        : AppRoutes.Library;
+
+    public void TrackNavigation(string uri)
+    {
+        var nextRoute = NormalizeAppRoute(uri);
+        if (string.IsNullOrWhiteSpace(nextRoute) || string.Equals(_currentRoute, nextRoute, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (IsGoLiveRoute(nextRoute) && IsValidGoLiveBackTarget(_currentRoute))
+        {
+            _goLiveBackRoute = _currentRoute;
+        }
+
+        _currentRoute = nextRoute;
+    }
 
     private void SetScriptScopedState(
         AppShellScreen screen,
@@ -107,5 +139,55 @@ public sealed class AppShellService
             AppShellScreen.GoLive => AppRoutes.GoLiveWithId(scriptId),
             _ => AppRoutes.Library
         };
+    }
+
+    private static bool IsGoLiveRoute(string route)
+    {
+        var querySeparatorIndex = route.IndexOf(QuerySeparator, StringComparison.Ordinal);
+        var routeBase = querySeparatorIndex >= 0
+            ? route[..querySeparatorIndex]
+            : route;
+
+        return string.Equals(routeBase, AppRoutes.GoLive, StringComparison.Ordinal);
+    }
+
+    private static bool IsTrackedRoute(string path) => path switch
+    {
+        AppRoutes.Library => true,
+        AppRoutes.Editor => true,
+        AppRoutes.Learn => true,
+        AppRoutes.Teleprompter => true,
+        AppRoutes.GoLive => true,
+        AppRoutes.Settings => true,
+        _ => false
+    };
+
+    private static bool IsValidGoLiveBackTarget(string route) =>
+        !string.IsNullOrWhiteSpace(route) && !IsGoLiveRoute(route);
+
+    private static string NormalizeAppRoute(string uri)
+    {
+        if (!Uri.TryCreate(uri, UriKind.Absolute, out var parsedUri))
+        {
+            return EmptyRoute;
+        }
+
+        var normalizedPath = NormalizePath(parsedUri.AbsolutePath);
+        if (!IsTrackedRoute(normalizedPath))
+        {
+            return EmptyRoute;
+        }
+
+        return string.IsNullOrWhiteSpace(parsedUri.Query)
+            ? normalizedPath
+            : string.Concat(normalizedPath, parsedUri.Query);
+    }
+
+    private static string NormalizePath(string path)
+    {
+        var trimmedPath = path.TrimEnd('/');
+        return string.IsNullOrWhiteSpace(trimmedPath)
+            ? AppRoutes.Library
+            : trimmedPath;
     }
 }

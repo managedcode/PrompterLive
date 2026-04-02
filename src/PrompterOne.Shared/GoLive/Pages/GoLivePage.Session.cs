@@ -84,8 +84,8 @@ public partial class GoLivePage
     {
         GoLiveSession.EnsureSession(
             SessionService.State.ScriptId,
-            _screenTitle,
-            _screenSubtitle,
+            _sessionTitle,
+            _sessionSubtitle,
             PrimaryMicrophoneLabel,
             _studioSettings.Streaming,
             SceneCameras);

@@ -58,6 +58,7 @@ public partial class LearnPage
     private async Task ChangeRsvpSpeedAsync(int delta)
     {
         _speed = Math.Clamp(_speed + delta, RsvpMinSpeed, RsvpMaxSpeed);
+        PlaybackEngine.WordsPerMinute = _speed;
         await PersistLearnSettingsAsync(settings => settings with
         {
             HasCustomizedWordsPerMinute = true,
@@ -121,10 +122,7 @@ public partial class LearnPage
             while (!cancellationToken.IsCancellationRequested && _timeline.Count > 0)
             {
                 var currentEntry = _timeline[_currentIndex];
-                var delayMilliseconds = Math.Max(
-                    MinimumLoopDelayMilliseconds,
-                    GetScaledDuration(currentEntry.DurationMs, currentEntry.BaseWpm) +
-                    GetScaledDuration(currentEntry.PauseAfterMs, currentEntry.BaseWpm, allowZero: true));
+                var delayMilliseconds = GetTimelineEntryDelayMilliseconds(currentEntry);
 
                 await Task.Delay(delayMilliseconds, cancellationToken);
 

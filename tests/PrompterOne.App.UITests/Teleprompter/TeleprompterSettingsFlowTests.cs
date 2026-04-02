@@ -121,8 +121,10 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel)).ToHaveTextAsync(BrowserTestConstants.Media.PrimaryCameraLabel);
         await Expect(page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.PrimaryCameraId))).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.SecondaryCameraId))).ToBeVisibleAsync();
-        await page.GetByTestId(UiTestIds.Settings.CameraResolution).SelectOptionAsync(new[] { BrowserTestConstants.Streaming.ResolutionHd720 });
-        await Expect(page.GetByTestId(UiTestIds.Settings.CameraResolution)).ToHaveValueAsync(BrowserTestConstants.Streaming.ResolutionHd720);
+        await SettingsSelectDriver.SelectByValueAsync(
+            page,
+            UiTestIds.Settings.CameraResolution,
+            BrowserTestConstants.Streaming.ResolutionHd720);
 
         await ToggleSettingsButtonAsync(page.GetByTestId(UiTestIds.Settings.CameraMirrorToggle));
         await page.GetByTestId(UiTestIds.Settings.CameraDeviceAction(BrowserTestConstants.Media.SecondaryCameraId)).ClickAsync();

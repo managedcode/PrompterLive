@@ -21,6 +21,9 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
             await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ScreenTitle)).ToHaveTextAsync(BrowserTestConstants.GoLive.ScreenTitle);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ScreenTitle))
+                .Not.ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
 
             var activeSourceBadge = page.GetByTestId(UiTestIds.GoLive.SourceCameraBadge(BrowserTestConstants.GoLive.FirstSourceId));
             var activeSourceCard = page.GetByTestId(UiTestIds.GoLive.SourceCamera(BrowserTestConstants.GoLive.FirstSourceId));
@@ -40,6 +43,8 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
                 LiveDotCssClass,
                 await previewLiveDot.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty,
                 StringComparison.Ordinal);
+            var previewDotBackground = await previewLiveDot.EvaluateAsync<string>("element => getComputedStyle(element).backgroundColor");
+            Assert.DoesNotContain(BrowserTestConstants.GoLive.IdleDotColorChannel, previewDotBackground, StringComparison.Ordinal);
         }
         finally
         {

@@ -21,8 +21,10 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudPanel)).ToBeVisibleAsync(
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            await page.GetByTestId(UiTestIds.Settings.CloudDefaultProvider)
-                .SelectOptionAsync([CloudStorageProviderIds.Dropbox]);
+            await SettingsSelectDriver.SelectByValueAsync(
+                page,
+                UiTestIds.Settings.CloudDefaultProvider,
+                CloudStorageProviderIds.Dropbox);
             await ToggleSettingsButtonAsync(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave));
             var accountLabelField = page.GetByTestId(
                 UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel));
@@ -42,7 +44,7 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
             await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudDefaultProvider))
-                .ToHaveValueAsync(CloudStorageProviderIds.Dropbox);
+                .ToHaveAttributeAsync(BrowserTestConstants.Html.ValueAttribute, CloudStorageProviderIds.Dropbox);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.Dropbox)))
                 .ToHaveTextAsync(BrowserTestConstants.SettingsFlow.DropboxLabel);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave))

@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Contracts
 
 <div class="ss-wrap"
      tabindex="-1"
@@ -7,6 +8,8 @@
     <button type="button"
             class="ss-trigger set-select"
             data-testid="@TestId"
+            value="@Value"
+            aria-expanded="@_open"
             @onclick="Toggle">
         <span class="ss-label">@SelectedLabel</span>
         <svg class="ss-chevron @(_open ? OpenChevronClass : null)"
@@ -29,6 +32,8 @@
                 var isSelected = string.Equals(option.Value, Value, StringComparison.Ordinal);
                 <button type="button"
                         class="ss-option @(isSelected ? SelectedOptionClass : null)"
+                        data-testid="@GetOptionTestId(option.Value)"
+                        @onmousedown:preventDefault="true"
                         @onclick="() => SelectOption(option.Value)">
                     @if (isSelected)
                     {
@@ -69,6 +74,9 @@
     private string SelectedLabel =>
         Options.FirstOrDefault(o => string.Equals(o.Value, Value, StringComparison.Ordinal))?.Label
         ?? FallbackLabel;
+
+    private string? GetOptionTestId(string optionValue) =>
+        TestId is null ? null : UiTestIds.Settings.SelectOption(TestId, optionValue);
 
     private void Toggle()
     {

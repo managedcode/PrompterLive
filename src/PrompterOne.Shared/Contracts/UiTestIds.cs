@@ -331,6 +331,9 @@ public static class UiTestIds
 
         public static string SceneMirror(string sourceId) => $"settings-scene-mirror-{sourceId}";
 
+        public static string SelectOption(string triggerTestId, string optionValue) =>
+            $"{triggerTestId}-option-{optionValue}";
+
         public static string StreamingProviderCard(string providerId) => $"settings-streaming-provider-{providerId}";
 
         public static string StreamingProviderSourcePicker(string providerId) => $"settings-streaming-provider-sources-{providerId}";
@@ -377,6 +380,7 @@ public static class UiTestIds
         public const string ActiveSourceLabel = "go-live-active-source-label";
         public const string AddSource = "go-live-add-source";
         public const string AudioMixer = "go-live-audio-mixer";
+        public const string Back = "go-live-back";
         public const string Bitrate = "go-live-bitrate";
         public const string CreateRoom = "go-live-create-room";
         public const string CustomRtmpKey = "go-live-custom-rtmp-key";
@@ -393,7 +397,7 @@ public static class UiTestIds
         public const string ModeStudio = "go-live-mode-studio";
         public const string NdiToggle = "go-live-ndi-toggle";
         public const string ObsToggle = "go-live-obs-toggle";
-        public const string OpenHome = "go-live-open-home";
+        public const string OpenHome = Back;
         public const string OpenLearn = "go-live-open-learn";
         public const string OpenRead = "go-live-open-read";
         public const string OpenSettings = "go-live-open-settings";
@@ -418,6 +422,7 @@ public static class UiTestIds
         public const string StreamTab = "go-live-stream-tab";
         public const string SceneBar = "go-live-scene-bar";
         public const string SceneControls = "go-live-scene-controls";
+        public const string ScreenTitle = "go-live-screen-title";
         public const string SessionBar = "go-live-session-bar";
         public const string SessionTimer = "go-live-session-timer";
         public const string SourceRail = "go-live-source-rail";

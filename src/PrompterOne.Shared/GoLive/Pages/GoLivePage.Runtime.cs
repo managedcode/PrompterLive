@@ -11,5 +11,5 @@ public partial class GoLivePage
             MediaSceneService.State,
             _studioSettings.Streaming,
             _recordingPreferences,
-            _screenTitle);
+            _sessionTitle);
 }
