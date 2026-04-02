@@ -398,7 +398,7 @@ Ask first:
 ### Dislikes
 
 - backend creep in the standalone runtime
-- temporary worktrees, throwaway repo copies, or off-branch isolation for normal repo tasks when the active workspace branch is available; do the work in the current repo and current branch unless the user explicitly asks for isolation
+- `git worktree`, temporary worktrees, throwaway repo copies, or off-branch isolation for normal repo tasks when the active workspace branch is available; do the work in the current repo and current branch unless the user explicitly asks for isolation
 - OBS-coupled runtime architecture or UI; `PrompterOne` must be the streaming system itself, not an OBS companion or Browser Source wrapper
 - hardcoded fallback reader/test fixtures such as inline `Ready` chunks, fake word models, or synthetic UI state embedded directly in tests when the same behavior can be exercised through shared script fixtures, builders, or production-owned constants
 - agent-started local servers taking shared user ports or using ports outside the reserved `5050-5070` agent range
@@ -427,7 +427,6 @@ Ask first:
 - progress updates that talk about internal skill routing instead of the concrete repo change
 - long exploratory work before producing the concrete vendored files the user explicitly asked for
 - unexpected browser debugger pause hooks in the default dev launch profile; browser debugging must stay explicit opt-in
-- temporary worktrees or throwaway repo copies for normal repo tasks when the current workspace branch is available; work in the active workspace unless the user explicitly asks for isolation
 
 ## Preferred Skills
 
