@@ -24,7 +24,7 @@
 
 ## Project-Local Commands
 
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
 
 ## Applicable Skills
 

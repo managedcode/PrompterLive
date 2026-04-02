@@ -2,7 +2,7 @@
 
 Status: Implemented  
 Date: 2026-04-01  
-Related Features: [Architecture Overview](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)
+Related Features: [Architecture Overview](../Architecture.md)
 
 ## Implementation plan (step-by-step)
 
@@ -152,7 +152,7 @@ flowchart LR
 
 ### Documentation
 
-- Architecture docs updated in [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md).
+- Architecture docs updated in [docs/Architecture.md](../Architecture.md).
 - This ADR is the source of truth for the storage boundary and credential policy.
 - Root `AGENTS.md` now records the durable rule that standalone cloud credentials live in browser localStorage.
 
@@ -195,10 +195,10 @@ flowchart LR
 
 ### Test commands
 
-- build: `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
-- test: `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
-- format: `dotnet format /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
-- coverage: `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx --collect:"XPlat Code Coverage"`
+- build: `dotnet build ./PrompterOne.slnx -warnaserror`
+- test: `dotnet test ./PrompterOne.slnx`
+- format: `dotnet format ./PrompterOne.slnx`
+- coverage: `dotnet test ./PrompterOne.slnx --collect:"XPlat Code Coverage"`
 
 ### New or changed tests
 
@@ -236,7 +236,7 @@ flowchart LR
 
 - [managedcode/Storage](https://github.com/managedcode/Storage)
 - [ManagedCode Storage docs](https://storage.managed-code.com/)
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)
+- [docs/Architecture.md](../Architecture.md)
 
 ## Filing checklist
 

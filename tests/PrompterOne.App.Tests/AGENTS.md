@@ -30,7 +30,7 @@
 
 ## Project-Local Commands
 
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
 
 ## Applicable Skills
 

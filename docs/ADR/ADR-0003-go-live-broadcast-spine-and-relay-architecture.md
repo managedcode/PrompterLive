@@ -2,7 +2,7 @@
 
 Status: Accepted  
 Date: 2026-04-02  
-Related Features: [Go Live Runtime](/Users/ksemenenko/Developer/PrompterOne/docs/Features/GoLiveRuntime.md), [Architecture Overview](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)
+Related Features: [Go Live Runtime](../Features/GoLiveRuntime.md), [Architecture Overview](../Architecture.md)
 
 ## Context
 
@@ -142,7 +142,7 @@ flowchart LR
 
 ## Verification
 
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~GoLive"`
+- `dotnet build ./PrompterOne.slnx -warnaserror`
+- `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~GoLive"`

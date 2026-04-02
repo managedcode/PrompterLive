@@ -77,15 +77,16 @@ Rule format:
 - remove obsolete rules when a better one replaces them
 
 - Use `PrompterOne` as the canonical product, solution, namespace, and folder name across code, docs, tests, and build paths; do not reintroduce legacy product-name variants after the rename.
+- Repo-owned docs, README, ADRs, and AGENTS files must not contain local usernames, home-directory paths, or personal machine-specific references; use repo-relative paths or neutral wording instead.
 
 ## Rules to Follow (Mandatory)
 
 ### Commands
 
-- `build`: `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
-- `test`: `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
-- `format`: `dotnet format /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
-- `coverage`: `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx --collect:"XPlat Code Coverage"`
+- `build`: `dotnet build ./PrompterOne.slnx -warnaserror`
+- `test`: `dotnet test ./PrompterOne.slnx`
+- `format`: `dotnet format ./PrompterOne.slnx`
+- `coverage`: `dotnet test ./PrompterOne.slnx --collect:"XPlat Code Coverage"`
 
 For this `.NET` repo:
 
@@ -96,11 +97,11 @@ For this `.NET` repo:
 
 Useful focused commands:
 
-- app run: `cd /Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.App && dotnet run`
-- core tests: `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
-- component tests: `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
-- ui tests: `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
-- playwright browser install: `node /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
+- app run: `cd ./src/PrompterOne.App && dotnet run`
+- core tests: `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- component tests: `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
+- ui tests: `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
+- playwright browser install: `node ./tests/PrompterOne.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
 - Build the relevant project immediately before starting a local dev server so `dotnet run` cannot serve stale WASM assets or binaries.
 
 Browser test execution rules:
@@ -146,12 +147,12 @@ Selector and constant rules:
 
 Current local `AGENTS.md` files:
 
-- [src/PrompterOne.App/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.App/AGENTS.md)
-- [src/PrompterOne.Core/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.Core/AGENTS.md)
-- [src/PrompterOne.Shared/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.Shared/AGENTS.md)
-- [tests/PrompterOne.Core.Tests/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/AGENTS.md)
-- [tests/PrompterOne.App.Tests/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/AGENTS.md)
-- [tests/PrompterOne.App.UITests/AGENTS.md](/Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/AGENTS.md)
+- [src/PrompterOne.App/AGENTS.md](./src/PrompterOne.App/AGENTS.md)
+- [src/PrompterOne.Core/AGENTS.md](./src/PrompterOne.Core/AGENTS.md)
+- [src/PrompterOne.Shared/AGENTS.md](./src/PrompterOne.Shared/AGENTS.md)
+- [tests/PrompterOne.Core.Tests/AGENTS.md](./tests/PrompterOne.Core.Tests/AGENTS.md)
+- [tests/PrompterOne.App.Tests/AGENTS.md](./tests/PrompterOne.App.Tests/AGENTS.md)
+- [tests/PrompterOne.App.UITests/AGENTS.md](./tests/PrompterOne.App.UITests/AGENTS.md)
 
 ### Maintainability Limits
 
@@ -165,9 +166,9 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 
 ### Task Delivery
 
-- Start from [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) and the nearest local `AGENTS.md`.
-- Treat [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) as the architecture map for every non-trivial task.
-- Read [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) before implementation to identify the owning component, the allowed boundary, where code should be added, and where related code should be searched first.
+- Start from [docs/Architecture.md](./docs/Architecture.md) and the nearest local `AGENTS.md`.
+- Treat [docs/Architecture.md](./docs/Architecture.md) as the architecture map for every non-trivial task.
+- Read [docs/Architecture.md](./docs/Architecture.md) before implementation to identify the owning component, the allowed boundary, where code should be added, and where related code should be searched first.
 - If the overview is missing, stale, or diagram-free, update it before implementation.
 - Define scope before coding:
   - in scope
@@ -224,10 +225,10 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 ### Documentation
 
 - All durable docs live in `docs/`.
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) is the required global map and the first stop for agents.
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) MUST describe all major components and feature slices with what they are, why they exist, where they live, what they own, and what they must not own.
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) MUST document the app structure, design principles, and code-placement principles clearly enough that contributors can use it to decide where new code belongs and where existing behavior should be found.
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) MUST contain Mermaid diagrams for:
+- [docs/Architecture.md](./docs/Architecture.md) is the required global map and the first stop for agents.
+- [docs/Architecture.md](./docs/Architecture.md) MUST describe all major components and feature slices with what they are, why they exist, where they live, what they own, and what they must not own.
+- [docs/Architecture.md](./docs/Architecture.md) MUST document the app structure, design principles, and code-placement principles clearly enough that contributors can use it to decide where new code belongs and where existing behavior should be found.
+- [docs/Architecture.md](./docs/Architecture.md) MUST contain Mermaid diagrams for:
   - system or module boundaries
   - interfaces or contracts between boundaries
   - key classes or types for the changed area

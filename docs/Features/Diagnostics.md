@@ -31,6 +31,6 @@ flowchart LR
 
 ## Verification
 
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~DiagnosticsTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~DiagnosticsUiTests" --no-build`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~DiagnosticsTests"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~DiagnosticsUiTests" --no-build`
+- `dotnet test ./PrompterOne.slnx`

@@ -2,7 +2,7 @@
 
 ## Intent
 
-`learn` and `teleprompter` must follow the checked-in design references in `/Users/ksemenenko/Developer/PrompterOne/design/` closely at runtime, not only in static markup.
+`learn` and `teleprompter` must follow the checked-in design references in `design/` closely at runtime, not only in static markup.
 
 The important contracts are:
 

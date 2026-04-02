@@ -39,8 +39,8 @@
 
 ## Project-Local Commands
 
-- `node /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
+- `node ./tests/PrompterOne.App.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
 
 ## Applicable Skills
 

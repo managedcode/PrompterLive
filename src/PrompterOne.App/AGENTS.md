@@ -20,8 +20,8 @@
 
 ## Project-Local Commands
 
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.App/PrompterOne.App.csproj`
-- `cd /Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.App && dotnet run`
+- `dotnet build ./src/PrompterOne.App/PrompterOne.App.csproj`
+- `cd ./src/PrompterOne.App && dotnet run`
 - Always run the project build immediately before `dotnet run` so the standalone host cannot boot stale client assets.
 
 ## Applicable Skills

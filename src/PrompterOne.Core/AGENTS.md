@@ -27,8 +27,8 @@ It owns TPS parsing, compilation, export, RSVP helpers, preview and workspace st
 
 ## Project-Local Commands
 
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/src/PrompterOne.Core/PrompterOne.Core.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `dotnet build ./src/PrompterOne.Core/PrompterOne.Core.csproj`
+- `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
 
 ## Applicable Skills
 

@@ -78,10 +78,10 @@ flowchart LR
 
 ## Verification
 
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~GoLiveCrossTabTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~BrowserSettingsCrossTabTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~GoLiveShellSessionFlowTests.GoLivePage_RecordingState_PropagatesAcrossSharedTabsAndReturnsToIdleAfterStop"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~SettingsCrossTabSyncTests"`
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
-- `dotnet format /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~GoLiveCrossTabTests"`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~BrowserSettingsCrossTabTests"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~GoLiveShellSessionFlowTests.GoLivePage_RecordingState_PropagatesAcrossSharedTabsAndReturnsToIdleAfterStop"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~SettingsCrossTabSyncTests"`
+- `dotnet build ./PrompterOne.slnx -warnaserror`
+- `dotnet test ./PrompterOne.slnx`
+- `dotnet format ./PrompterOne.slnx`

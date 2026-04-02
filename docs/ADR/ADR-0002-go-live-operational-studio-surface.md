@@ -2,7 +2,7 @@
 
 Status: Implemented  
 Date: 2026-04-01  
-Related Features: [Go Live Runtime](/Users/ksemenenko/Developer/PrompterOne/docs/Features/GoLiveRuntime.md), [Architecture Overview](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)
+Related Features: [Go Live Runtime](../Features/GoLiveRuntime.md), [Architecture Overview](../Architecture.md)
 
 ## Implementation plan (step-by-step)
 
@@ -129,8 +129,8 @@ flowchart LR
 
 ### Documentation
 
-- [docs/Features/GoLiveRuntime.md](/Users/ksemenenko/Developer/PrompterOne/docs/Features/GoLiveRuntime.md) now documents the operational-studio boundary.
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md) now maps `Go Live` and `Settings` responsibilities more explicitly.
+- [docs/Features/GoLiveRuntime.md](../Features/GoLiveRuntime.md) now documents the operational-studio boundary.
+- [docs/Architecture.md](../Architecture.md) now maps `Go Live` and `Settings` responsibilities more explicitly.
 
 ## Verification
 
@@ -142,10 +142,10 @@ flowchart LR
 
 ### Test commands
 
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~GoLivePageTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~GoLiveFlowTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~StudioWorkflow_SettingsAndGoLiveStudio_CapturesArtifacts"`
+- `dotnet build ./PrompterOne.slnx -warnaserror`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~GoLivePageTests"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~GoLiveFlowTests"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~StudioWorkflow_SettingsAndGoLiveStudio_CapturesArtifacts"`
 
 ### New or changed tests
 
@@ -157,6 +157,6 @@ flowchart LR
 
 ## References
 
-- [design/golive.html](/Users/ksemenenko/Developer/PrompterOne/design/golive.html)
-- [docs/Features/GoLiveRuntime.md](/Users/ksemenenko/Developer/PrompterOne/docs/Features/GoLiveRuntime.md)
-- [docs/Architecture.md](/Users/ksemenenko/Developer/PrompterOne/docs/Architecture.md)
+- [design/golive.html](../../design/golive.html)
+- [docs/Features/GoLiveRuntime.md](../Features/GoLiveRuntime.md)
+- [docs/Architecture.md](../Architecture.md)

@@ -81,11 +81,11 @@ sequenceDiagram
 
 ## Verification
 
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~EditorTypingTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~EditorTypingTests|FullyQualifiedName~EditorSourceSyncTests|FullyQualifiedName~EditorInteractionTests"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~Editor"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~Editor"`
-- `dotnet build /Users/ksemenenko/Developer/PrompterOne/PrompterOne.slnx -warnaserror`
+- `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~EditorTypingTests"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~EditorTypingTests|FullyQualifiedName~EditorSourceSyncTests|FullyQualifiedName~EditorInteractionTests"`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~Editor"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build --filter "FullyQualifiedName~Editor"`
+- `dotnet build ./PrompterOne.slnx -warnaserror`

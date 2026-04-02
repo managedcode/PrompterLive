@@ -65,8 +65,8 @@ flowchart LR
 - `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj --no-build`
 - `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --no-build`
 - `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --no-build`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata_AndOfficialManagedCodeLinks"`
-- `dotnet test /Users/ksemenenko/Developer/PrompterOne/tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~TeleprompterSettingsFlowTests.TeleprompterAndSettingsScreens_RespondToCoreControls"`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata"`
+- `dotnet test ./tests/PrompterOne.App.Tests/PrompterOne.App.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata_AndOfficialManagedCodeLinks"`
+- `dotnet test ./tests/PrompterOne.App.UITests/PrompterOne.App.UITests.csproj --filter "FullyQualifiedName~TeleprompterSettingsFlowTests.TeleprompterAndSettingsScreens_RespondToCoreControls"`
 - `.github/workflows/deploy-github-pages.yml` publish step passes `-p:PrompterOneBuildNumber=${{ github.run_number }}`
 - `.github/workflows/deploy-github-pages.yml` publishes both the GitHub Release asset and the GitHub Pages artifact from the same release build output
