@@ -5,6 +5,8 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class TeleprompterPage
 {
+    private const string AttachReaderCameraMessage = "Unable to enable the teleprompter camera.";
+    private const string AttachReaderCameraOperation = "Teleprompter camera attach";
     private const int MinimumReaderLoopDelayMilliseconds = 120;
     private const int ReaderCardTransitionMilliseconds = 600;
 
@@ -241,13 +243,16 @@ public partial class TeleprompterPage
 
     private async Task AttachReaderCameraAsync()
     {
-        if (string.IsNullOrWhiteSpace(_cameraLayer.DeviceId))
+        var attached = await Diagnostics.RunAsync(
+            AttachReaderCameraOperation,
+            AttachReaderCameraMessage,
+            () => CameraPreviewInterop.AttachCameraAsync(_cameraLayer.ElementId, _cameraLayer.DeviceId));
+
+        if (!attached)
         {
             _isReaderCameraActive = false;
-            return;
+            _cameraLayer = _cameraLayer with { AutoStart = false };
         }
-
-        await CameraPreviewInterop.AttachCameraAsync(_cameraLayer.ElementId, _cameraLayer.DeviceId);
     }
 
     private Task DetachReaderCameraAsync() =>

@@ -53,6 +53,11 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
 
     public async Task StopStreamAsync()
     {
+        if (State.VdoNinjaActive)
+        {
+            await _interop.StopVdoNinjaAsync(GoLiveOutputRuntimeContract.SessionId);
+        }
+
         if (State.LiveKitActive)
         {
             await _interop.StopLiveKitAsync(GoLiveOutputRuntimeContract.SessionId);
@@ -79,7 +84,21 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
 
     private async Task SyncLiveOutputsAsync(GoLiveOutputRuntimeRequest request)
     {
-        if (request.CanStartLiveKit)
+        var shouldStartVdoNinja = request.CanStartVdoNinja;
+        var shouldStartLiveKit = !shouldStartVdoNinja && request.CanStartLiveKit;
+
+        if (shouldStartVdoNinja)
+        {
+            await _interop.StartVdoNinjaAsync(
+                GoLiveOutputRuntimeContract.SessionId,
+                request);
+        }
+        else if (State.VdoNinjaActive)
+        {
+            await _interop.StopVdoNinjaAsync(GoLiveOutputRuntimeContract.SessionId);
+        }
+
+        if (shouldStartLiveKit)
         {
             await _interop.StartLiveKitAsync(
                 GoLiveOutputRuntimeContract.SessionId,

@@ -173,9 +173,6 @@ public partial class SettingsPage
             CameraResolutionPreset.Sd480 => "640×480",
             _ => "1920×1080"
         };
-
-    private bool IsPreviewCamera(MediaDeviceInfo camera) =>
-        string.Equals(PreviewCamera?.DeviceId, camera.DeviceId, StringComparison.Ordinal);
     private bool IsPrimaryCamera(MediaDeviceInfo camera) =>
         string.Equals(SelectedCameraId, camera.DeviceId, StringComparison.Ordinal);
 

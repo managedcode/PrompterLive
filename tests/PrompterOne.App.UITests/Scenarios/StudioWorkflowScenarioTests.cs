@@ -231,9 +231,8 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
             new object[]
             {
                 BrowserTestConstants.GoLive.StoredStudioSettingsKey,
-                BrowserTestConstants.GoLive.LiveKitServer,
-                BrowserTestConstants.GoLive.LiveKitRoom,
-                BrowserTestConstants.GoLive.LiveKitToken,
+                BrowserTestConstants.GoLive.VdoNinjaRoom,
+                BrowserTestConstants.GoLive.VdoNinjaPublishUrl,
                 BrowserTestConstants.GoLive.YoutubeUrl,
                 BrowserTestConstants.GoLive.YoutubeKey,
                 BrowserTestConstants.GoLive.FirstSourceId
@@ -251,9 +250,9 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
 
     private static async Task ConfigureGoLiveDestinationsAsync(IPage page)
     {
-        await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-        await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-        await Expect(page.GetByTestId(UiTestIds.GoLive.LiveKitToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+        await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
+        await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveCountAsync(0);
+        await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
         await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
         await UiScenarioArtifacts.CapturePageAsync(page, BrowserTestConstants.LiveWorkflow.Name, BrowserTestConstants.LiveWorkflow.GoLiveConfiguredStep);
     }

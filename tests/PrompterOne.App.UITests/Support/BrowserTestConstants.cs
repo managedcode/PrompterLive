@@ -257,9 +257,97 @@ internal static partial class BrowserTestConstants
         public const string SideCameraLabel = "Side camera";
         public const string StreamingStateValue = "streaming";
         public const string ByteSuffix = "B";
+        public const int AudioRouteBothValue = 2;
+        public const string VdoNinjaHarnessGlobal = "__prompterOneVdoNinjaHarness";
+        public const string VdoNinjaPublishStreamId = "prompterone-program";
+        public const string VdoNinjaPublishUrl = "https://vdo.ninja/?room=launch-room&push=prompterone-program";
+        public const string VdoNinjaRoom = "launch-room";
         public const string WebmContainerLabel = "WEBM";
         public const string WidgetReturnScreenshotPath = "output/playwright/go-live-widget-return.png";
         public const string ZeroLevelValue = "0";
+        public const string InstallVdoNinjaHarnessScript = """
+            () => {
+                const harness = {
+                    connectCalls: [],
+                    constructorCalls: [],
+                    disconnectCount: 0,
+                    joinRoomCalls: [],
+                    leaveRoomCount: 0,
+                    publishCalls: [],
+                    stopPublishingCount: 0
+                };
+
+                class FakeVdoNinjaSdk extends EventTarget {
+                    constructor(options) {
+                        super();
+                        this.options = options ?? {};
+                        harness.constructorCalls.push({
+                            label: this.options.label ?? null,
+                            room: this.options.room ?? null
+                        });
+                    }
+
+                    async connect() {
+                        harness.connectCalls.push({
+                            label: this.options.label ?? null,
+                            room: this.options.room ?? null
+                        });
+                        this.dispatchEvent(new CustomEvent('connected'));
+                    }
+
+                    async joinRoom(options) {
+                        harness.joinRoomCalls.push({
+                            room: options?.room ?? null
+                        });
+                        this.dispatchEvent(new CustomEvent('roomJoined', {
+                            detail: { room: options?.room ?? null }
+                        }));
+                    }
+
+                    async publish(stream, options) {
+                        const trackKinds = Array.from(stream?.getTracks?.() ?? []).map(track => track?.kind ?? null);
+                        harness.publishCalls.push({
+                            label: options?.label ?? null,
+                            room: options?.room ?? null,
+                            streamId: options?.streamID ?? null,
+                            trackKinds
+                        });
+                        this.dispatchEvent(new CustomEvent('peerListing', {
+                            detail: [{ id: 'viewer-1' }]
+                        }));
+                        this.dispatchEvent(new CustomEvent('peerLatency', {
+                            detail: { latency: 42 }
+                        }));
+                        this.dispatchEvent(new CustomEvent('publishing', {
+                            detail: { streamID: options?.streamID ?? null }
+                        }));
+                        return { streamID: options?.streamID ?? null };
+                    }
+
+                    async stopPublishing() {
+                        harness.stopPublishingCount += 1;
+                        this.dispatchEvent(new CustomEvent('publishingStopped'));
+                    }
+
+                    async leaveRoom() {
+                        harness.leaveRoomCount += 1;
+                        this.dispatchEvent(new CustomEvent('roomLeft'));
+                    }
+
+                    disconnect() {
+                        harness.disconnectCount += 1;
+                        this.dispatchEvent(new CustomEvent('disconnected'));
+                    }
+                }
+
+                window.__prompterOneVdoNinjaHarness = harness;
+                window.VDONinjaSDK = FakeVdoNinjaSdk;
+                window.VDONinja = FakeVdoNinjaSdk;
+            }
+            """;
+        public const string GetVdoNinjaHarnessScript = "() => window.__prompterOneVdoNinjaHarness";
+        public const string VdoNinjaHarnessReadyScript =
+            "() => Boolean(window.__prompterOneVdoNinjaHarness && window.__prompterOneVdoNinjaHarness.connectCalls.length === 1 && window.__prompterOneVdoNinjaHarness.joinRoomCalls.length === 1 && window.__prompterOneVdoNinjaHarness.publishCalls.length === 1 && window.__prompterOneVdoNinjaHarness.publishCalls[0].trackKinds.includes('video') && window.__prompterOneVdoNinjaHarness.publishCalls[0].trackKinds.includes('audio'))";
         public const string InstallLiveKitHarnessScript = """
             () => {
                 const harness = {
@@ -403,6 +491,34 @@ internal static partial class BrowserTestConstants
                 }));
             }
             """;
+        public static string SeedSceneWithPrimaryMicrophoneScript { get; } = $$"""
+            ([sceneStorageKey, microphoneId, microphoneLabel]) => {
+                const raw = window.localStorage.getItem(sceneStorageKey);
+                if (!raw) {
+                    return;
+                }
+
+                const scene = JSON.parse(raw);
+                scene.PrimaryMicrophoneId = microphoneId;
+                scene.PrimaryMicrophoneLabel = microphoneLabel;
+                scene.AudioBus = {
+                    Inputs: [
+                        {
+                            DeviceId: microphoneId,
+                            Label: microphoneLabel,
+                            DelayMs: 0,
+                            Gain: 1,
+                            IsMuted: false,
+                            RouteTarget: {{AudioRouteBothValue}}
+                        }
+                    ],
+                    MasterGain: 1,
+                    MonitorEnabled: true
+                };
+
+                window.localStorage.setItem(sceneStorageKey, JSON.stringify(scene));
+            }
+            """;
         public const string NoCameraDevicesInitScript = """
             () => {
                 const mediaDevices = navigator.mediaDevices;
@@ -422,7 +538,7 @@ internal static partial class BrowserTestConstants
             }
             """;
         public const string SeedOperationalStudioSettingsScript = """
-            ([storageKey, liveKitServer, liveKitRoom, liveKitToken, youtubeUrl, youtubeKey, primarySourceId]) => {
+            ([storageKey, vdoNinjaRoom, vdoNinjaPublishUrl, youtubeUrl, youtubeKey, primarySourceId]) => {
                 window.localStorage.setItem(storageKey, JSON.stringify({
                     Camera: {
                         DefaultCameraId: null,
@@ -445,15 +561,15 @@ internal static partial class BrowserTestConstants
                         IncludeCameraInOutput: true,
                         ExternalDestinations: [
                             {
-                                Id: 'livekit',
-                                Name: 'LiveKit',
-                                ProviderKind: 0,
-                                PlatformKind: 0,
+                                Id: 'vdoninja',
+                                Name: 'VDO.Ninja',
+                                ProviderKind: 1,
+                                PlatformKind: 1,
                                 IsEnabled: true,
-                                ServerUrl: liveKitServer,
-                                RoomName: liveKitRoom,
-                                Token: liveKitToken,
-                                PublishUrl: null,
+                                ServerUrl: null,
+                                RoomName: vdoNinjaRoom,
+                                Token: null,
+                                PublishUrl: vdoNinjaPublishUrl,
                                 Destinations: []
                             },
                             {
@@ -479,7 +595,7 @@ internal static partial class BrowserTestConstants
                         DestinationSourceSelections: [
                             { TargetId: 'obs-studio', SourceIds: [primarySourceId] },
                             { TargetId: 'local-recording', SourceIds: [primarySourceId] },
-                            { TargetId: 'livekit', SourceIds: [primarySourceId] },
+                            { TargetId: 'vdoninja', SourceIds: [primarySourceId] },
                             { TargetId: 'youtube-live', SourceIds: [primarySourceId] }
                         ],
                         RtmpUrl: '',
@@ -525,9 +641,7 @@ internal static partial class BrowserTestConstants
                     destinations.some(destination => destination?.Id === id && destination?.IsEnabled === true);
 
                 return Boolean(
-                    streaming?.ObsVirtualCameraEnabled === true &&
-                    streaming?.LocalRecordingEnabled === true &&
-                    hasEnabledDestination('livekit') &&
+                    hasEnabledDestination('vdoninja') &&
                     hasEnabledDestination('youtube-live'));
             }
             """;

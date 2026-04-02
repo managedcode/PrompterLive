@@ -42,6 +42,7 @@ public partial class GoLivePage
 
     private bool IsRoomActive =>
         _roomCreated
+        || GoLiveOutputRuntime.State.VdoNinjaActive
         || GoLiveOutputRuntime.State.LiveKitActive
         || ResolvePrimaryRoomDestination() is not null;
 
@@ -272,12 +273,14 @@ public partial class GoLivePage
             return string.Join(MetricSeparator, profileParts);
         }
 
-        return (GoLiveOutputRuntime.State.ObsActive, GoLiveOutputRuntime.State.LiveKitActive, GoLiveOutputRuntime.State.RecordingActive) switch
+        return (GoLiveOutputRuntime.State.ObsActive, GoLiveOutputRuntime.State.VdoNinjaActive, GoLiveOutputRuntime.State.LiveKitActive, GoLiveOutputRuntime.State.RecordingActive) switch
         {
-            (true, true, _) => GoLiveText.Surface.RuntimeEngineObsLiveKitValue,
-            (true, false, _) => GoLiveText.Surface.RuntimeEngineObsBrowserValue,
-            (false, true, _) => GoLiveText.Surface.RuntimeEngineLiveKitValue,
-            (false, false, true) => GoLiveText.Surface.RuntimeEngineRecorderValue,
+            (true, true, _, _) => GoLiveText.Surface.RuntimeEngineObsVdoNinjaValue,
+            (true, false, true, _) => GoLiveText.Surface.RuntimeEngineObsLiveKitValue,
+            (true, false, false, _) => GoLiveText.Surface.RuntimeEngineObsBrowserValue,
+            (false, true, _, _) => GoLiveText.Surface.RuntimeEngineVdoNinjaValue,
+            (false, false, true, _) => GoLiveText.Surface.RuntimeEngineLiveKitValue,
+            (false, false, false, true) => GoLiveText.Surface.RuntimeEngineRecorderValue,
             _ => GoLiveText.Surface.RuntimeEngineIdleValue
         };
     }

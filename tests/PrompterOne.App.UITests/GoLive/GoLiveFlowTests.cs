@@ -24,7 +24,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
-    public async Task GoLivePage_ArmsDestinationsAndPersistsOperationalToggles()
+    public async Task GoLivePage_PersistsExternalDestinationsWithoutRenderingLocalOutputCards()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -38,12 +38,10 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await Expect(page.GetByTestId(UiTestIds.GoLive.ProgramCard)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SourcesCard)).ToBeVisibleAsync();
 
-            await page.GetByTestId(UiTestIds.GoLive.LiveKitToggle).ClickAsync();
-            await page.GetByTestId(UiTestIds.GoLive.LiveKitToggle).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.VdoToggle).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.VdoToggle).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.YoutubeToggle).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.YoutubeToggle).ClickAsync();
-            await page.GetByTestId(UiTestIds.GoLive.RecordingToggle).ClickAsync();
-            await page.GetByTestId(UiTestIds.GoLive.RecordingToggle).ClickAsync();
 
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.PersistedToggleTargetsScript,
@@ -52,10 +50,10 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
 
             await page.ReloadAsync(new() { WaitUntil = Microsoft.Playwright.WaitUntilState.NetworkIdle });
 
-            await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.LiveKitToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveCountAsync(0);
         }
         finally
         {
@@ -319,14 +317,6 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                     BrowserTestConstants.Media.SecondaryCameraId
                 },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
-                new object[]
-                {
-                    UiDomIds.GoLive.PreviewVideo,
-                    BrowserTestConstants.Media.PrimaryCameraId
-                },
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await page.GetByTestId(UiTestIds.GoLive.TakeToAir).ClickAsync();
             await page.WaitForFunctionAsync(
@@ -350,42 +340,52 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     }
 
     [Fact]
-    public async Task GoLivePage_StartStream_WithLiveKitArmed_PublishesProgramVideoAndAudio()
+    public async Task GoLivePage_StartStream_WithVdoNinjaArmed_PublishesProgramVideoAndAudio()
     {
         var page = await _fixture.NewPageAsync();
 
         try
         {
             await SeedGoLiveSceneForReuseAsync(page);
+            await SeedGoLivePrimaryMicrophoneAsync(page);
             await SeedGoLiveOperationalSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
 
-            await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallLiveKitHarnessScript);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.LiveKitToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallVdoNinjaHarnessScript);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
 
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.HasAudioVideoRequestScript,
-                new object[]
-                {
-                    BrowserTestConstants.Media.PrimaryCameraId,
-                    BrowserTestConstants.Media.PrimaryMicrophoneId
-                },
+                BrowserTestConstants.Media.HasVideoOnlyRequestScript,
+                new object[] { BrowserTestConstants.Media.PrimaryCameraId },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.GoLive.LiveKitHarnessReadyScript,
+                BrowserTestConstants.Media.HasAudioOnlyRequestScript,
+                new object[] { BrowserTestConstants.Media.PrimaryMicrophoneId },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.VdoNinjaHarnessReadyScript,
                 null,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);
-            Assert.Equal(BrowserTestConstants.GoLive.LiveKitServer, harnessState.GetProperty("connectCalls")[0].GetProperty("url").GetString());
+            var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetVdoNinjaHarnessScript);
+            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, harnessState.GetProperty("joinRoomCalls")[0].GetProperty("room").GetString());
+            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, harnessState.GetProperty("publishCalls")[0].GetProperty("room").GetString());
+            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaPublishStreamId, harnessState.GetProperty("publishCalls")[0].GetProperty("streamId").GetString());
             Assert.Contains(
-                harnessState.GetProperty("publishCalls").EnumerateArray().Select(call => call.GetProperty("kind").GetString()),
+                harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString()),
                 kind => string.Equals(kind, "video", StringComparison.Ordinal));
             Assert.Contains(
-                harnessState.GetProperty("publishCalls").EnumerateArray().Select(call => call.GetProperty("kind").GetString()),
+                harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString()),
                 kind => string.Equals(kind, "audio", StringComparison.Ordinal));
+
+            var runtimeState = await page.EvaluateAsync<JsonElement>(
+                BrowserTestConstants.GoLive.GetRuntimeStateScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId);
+            Assert.True(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean());
+            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, runtimeState.GetProperty("vdoNinja").GetProperty("roomName").GetString());
+            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaPublishUrl, runtimeState.GetProperty("vdoNinja").GetProperty("publishUrl").GetString());
         }
         finally
         {
@@ -401,21 +401,22 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         try
         {
             await SeedGoLiveSceneForReuseAsync(page);
+            await SeedGoLivePrimaryMicrophoneAsync(page);
+            await SeedGoLiveOperationalSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
 
             await page.EvaluateAsync(BrowserTestConstants.GoLive.EnableObsStudioScript);
-            var obsToggle = page.GetByTestId(UiTestIds.GoLive.ObsToggle);
-            await Expect(obsToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ObsToggle)).ToHaveCountAsync(0);
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
 
             await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.HasAudioVideoRequestScript,
-                new object[]
-                {
-                    BrowserTestConstants.Media.PrimaryCameraId,
-                    BrowserTestConstants.Media.PrimaryMicrophoneId
-                },
+                BrowserTestConstants.Media.HasVideoOnlyRequestScript,
+                new object[] { BrowserTestConstants.Media.PrimaryCameraId },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.HasAudioOnlyRequestScript,
+                new object[] { BrowserTestConstants.Media.PrimaryMicrophoneId },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.ObsRuntimeAudioAttachedScript,
@@ -449,7 +450,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SceneControls)).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs))).ToHaveCountAsync(0);
 
             await page.GetByTestId(UiTestIds.GoLive.RoomTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.RoomEmpty)).ToBeVisibleAsync();
@@ -488,15 +489,24 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             });
     }
 
+    internal static Task SeedGoLivePrimaryMicrophoneAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync(
+            BrowserTestConstants.GoLive.SeedSceneWithPrimaryMicrophoneScript,
+            new object[]
+            {
+                BrowserTestConstants.GoLive.SceneStorageKey,
+                BrowserTestConstants.Media.PrimaryMicrophoneId,
+                BrowserTestConstants.Media.PrimaryMicrophoneLabel
+            });
+
     private static Task SeedGoLiveOperationalSettingsAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync(
             BrowserTestConstants.GoLive.SeedOperationalStudioSettingsScript,
             new object[]
             {
                 BrowserTestConstants.GoLive.StoredStudioSettingsKey,
-                BrowserTestConstants.GoLive.LiveKitServer,
-                BrowserTestConstants.GoLive.LiveKitRoom,
-                BrowserTestConstants.GoLive.LiveKitToken,
+                BrowserTestConstants.GoLive.VdoNinjaRoom,
+                BrowserTestConstants.GoLive.VdoNinjaPublishUrl,
                 BrowserTestConstants.GoLive.YoutubeUrl,
                 BrowserTestConstants.GoLive.YoutubeKey,
                 BrowserTestConstants.GoLive.FirstSourceId

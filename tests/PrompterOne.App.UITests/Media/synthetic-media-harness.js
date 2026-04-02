@@ -28,6 +28,7 @@
     const secondaryCameraGroupId = "prompterone-camera-b";
     const primaryMicrophoneGroupId = "prompterone-mic-a";
     const streamMetadataVersion = 1;
+    const concealIdentitySessionFlag = "__prompterOneConcealDeviceIdentityUntilMediaRequest";
 
     if (typeof window[harnessGlobalName] === "object" && window[harnessGlobalName] !== null) {
         return;
@@ -62,6 +63,9 @@
     const deviceLabelOverrides = new Map();
     const requestLog = [];
     let requestId = 0;
+    let concealDeviceIdentityUntilMediaRequest =
+        window.sessionStorage?.getItem(concealIdentitySessionFlag) === "true";
+    let hasResolvedMediaRequest = false;
 
     const mediaDevices = navigator[mediaDevicesProperty] ?? {};
     if (!(mediaDevicesProperty in navigator)) {
@@ -79,13 +83,13 @@
     function toDeviceDescriptor(device) {
         const label = resolveDeviceLabel(device);
         return {
-            deviceId: device.deviceId,
+            deviceId: shouldExposeDeviceIdentity() ? device.deviceId : emptyDeviceLabel,
             kind: device.kind,
             label,
             groupId: device.groupId || defaultGroupId,
             toJSON() {
                 return {
-                    deviceId: device.deviceId,
+                    deviceId: shouldExposeDeviceIdentity() ? device.deviceId : emptyDeviceLabel,
                     kind: device.kind,
                     label,
                     groupId: device.groupId || defaultGroupId
@@ -99,6 +103,10 @@
             return emptyDeviceLabel;
         }
 
+        if (!shouldExposeDeviceIdentity()) {
+            return emptyDeviceLabel;
+        }
+
         if (deviceLabelOverrides.has(device.deviceId)) {
             return deviceLabelOverrides.get(device.deviceId) ?? emptyDeviceLabel;
         }
@@ -106,6 +114,10 @@
         return typeof device.label === "string"
             ? device.label
             : emptyDeviceLabel;
+    }
+
+    function shouldExposeDeviceIdentity() {
+        return !concealDeviceIdentityUntilMediaRequest || hasResolvedMediaRequest;
     }
 
     function readRequestedDeviceId(kindConstraint) {
@@ -329,6 +341,7 @@
             resolvedVideoDeviceId: videoDevice?.deviceId ?? null,
             resolvedAudioDeviceId: audioDevice?.deviceId ?? null
         });
+        hasResolvedMediaRequest = true;
 
         return stream;
     }
@@ -366,6 +379,11 @@
         clearRequestLog() {
             requestLog.length = 0;
         },
+        concealDeviceIdentityUntilRequest() {
+            concealDeviceIdentityUntilMediaRequest = true;
+            hasResolvedMediaRequest = false;
+            window.sessionStorage?.setItem(concealIdentitySessionFlag, "true");
+        },
         getRequestLog() {
             return cloneJson(requestLog);
         },
@@ -383,6 +401,11 @@
                 audioTrackCount: stream instanceof MediaStream ? stream.getAudioTracks().length : 0,
                 metadata
             };
+        },
+        restoreDeviceIdentity() {
+            concealDeviceIdentityUntilMediaRequest = false;
+            hasResolvedMediaRequest = false;
+            window.sessionStorage?.removeItem(concealIdentitySessionFlag);
         }
     });
 })();

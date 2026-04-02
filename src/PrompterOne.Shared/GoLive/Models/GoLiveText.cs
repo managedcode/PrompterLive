@@ -109,7 +109,9 @@ public static class GoLiveText
         public const string RuntimeEngineLiveKitValue = "LiveKit";
         public const string RuntimeEngineObsBrowserValue = "OBS browser";
         public const string RuntimeEngineObsLiveKitValue = "OBS + LiveKit";
+        public const string RuntimeEngineObsVdoNinjaValue = "OBS + VDO.Ninja";
         public const string RuntimeEngineRecorderValue = "Recorder";
+        public const string RuntimeEngineVdoNinjaValue = "VDO.Ninja";
         public const string SceneSlidesId = "scene-slides";
         public const string SceneSlidesLabel = "Slides";
         public const string SecondarySceneId = "scene-secondary";

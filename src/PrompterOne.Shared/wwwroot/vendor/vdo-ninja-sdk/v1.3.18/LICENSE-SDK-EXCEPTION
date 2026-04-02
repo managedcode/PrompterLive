@@ -1,0 +1,55 @@
+VDO.Ninja SDK Unmodified Linking Exception
+=========================================
+
+This document grants an additional permission under Section 7 of the GNU Affero
+General Public License version 3 (AGPL-3.0-only) for the VDO.Ninja SDK.
+
+1. Covered SDK Files
+--------------------
+This exception applies only to the following files (the "Covered SDK Files"):
+
+- vdoninja-sdk.js
+- vdoninja-sdk.min.js
+
+2. Official Distributions
+-------------------------
+An "Official Distribution" of a Covered SDK File means a copy of that file that
+is distributed by Steve Seguin as part of:
+
+- the npm package @vdoninja/sdk@X.Y.Z (a specific published version), and/or
+- a tagged release vX.Y.Z of the GitHub repository https://github.com/steveseguin/ninjasdk
+  (including release assets),
+
+and any byte-for-byte identical mirror of that exact Official Distribution,
+including (but not limited to) unpkg.com and cdn.jsdelivr.net.
+
+3. Unmodified
+-------------
+"Unmodified" means byte-for-byte identical to an Official Distribution of the
+same Covered SDK File, including preservation of any license notices.
+
+4. Additional Permission
+------------------------
+Notwithstanding the other terms of the AGPL-3.0-only, you are granted permission
+to use, copy, combine, bundle, link, and convey the Covered SDK Files in
+Unmodified form as part of a larger work (a "Larger Work"), and to convey that
+Larger Work under terms of your choice (including proprietary terms), without
+requiring that the Larger Work as a whole be licensed under the AGPL.
+
+5. Conditions
+-------------
+This additional permission applies only if:
+
+- the Covered SDK Files are Unmodified; and
+- you comply with the AGPL-3.0-only requirements applicable to conveying verbatim
+  copies of the Covered SDK Files (including preserving notices and providing
+  recipients a copy of the AGPL license).
+
+6. Modified Versions
+--------------------
+If you modify any Covered SDK File, this additional permission does not apply to
+that modified file or to any Larger Work that includes that modified file.
+
+7. No Other Permissions
+-----------------------
+This exception grants no rights beyond those stated above.

@@ -66,7 +66,10 @@ public sealed record GoLiveOutputRuntimeRequest(
     bool LiveKitEnabled,
     string LiveKitServerUrl,
     string LiveKitRoomName,
-    string LiveKitToken)
+    string LiveKitToken,
+    bool VdoNinjaEnabled,
+    string VdoNinjaPublishUrl,
+    string VdoNinjaRoomName)
 {
     public string PrimaryCameraDeviceId => ResolvePrimaryVideoSource()?.DeviceId ?? string.Empty;
 
@@ -83,6 +86,12 @@ public sealed record GoLiveOutputRuntimeRequest(
         && !string.IsNullOrWhiteSpace(LiveKitServerUrl)
         && !string.IsNullOrWhiteSpace(LiveKitRoomName)
         && !string.IsNullOrWhiteSpace(LiveKitToken);
+
+    public bool CanStartVdoNinja =>
+        VdoNinjaEnabled
+        && VideoSources.Any(source => source.IsRenderable)
+        && (!string.IsNullOrWhiteSpace(VdoNinjaPublishUrl)
+            || !string.IsNullOrWhiteSpace(VdoNinjaRoomName));
 
     public bool CanStartObs =>
         ObsEnabled

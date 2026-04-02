@@ -31,7 +31,7 @@ Architecture map: [docs/Architecture.md](docs/Architecture.md)
 - TPS-focused editor for prompt-ready scripts
 - RSVP/Learn mode with ORP-style word rendering
 - browser-side media scene, device setup, and live preview
-- Go Live runtime with LiveKit and VDO.Ninja outputs
+- Go Live runtime with VDO.Ninja-first standalone output plus optional LiveKit mode
 - browser-local document and settings storage
 - browser-realistic acceptance tests through Playwright
 

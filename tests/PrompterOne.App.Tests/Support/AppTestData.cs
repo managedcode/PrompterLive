@@ -127,6 +127,8 @@ internal static class AppTestData
         public const string SessionTimerPrefix = "00:02:";
         public const string TwitchUrl = "rtmp://live.twitch.tv/app";
         public const string TwitchKey = "live_twitch_key";
+        public const string VdoNinjaRoom = "launch-room";
+        public const string VdoNinjaPublishUrl = "https://vdo.ninja/?room=launch-room&push=prompterone-program";
         public const string YoutubeUrl = "rtmps://a.rtmp.youtube.com/live2";
         public const string YoutubeKey = "youtube_stream_key";
 
@@ -145,6 +147,16 @@ internal static class AppTestData
             bool isEnabled = true,
             string destinationId = GoLiveTargetCatalog.TargetIds.Youtube) =>
             CreateYoutubeDestinationCore(isEnabled, destinationId);
+
+        public static StreamingProfile CreateVdoNinjaDestination(
+            bool isEnabled = true,
+            string destinationId = GoLiveTargetCatalog.TargetIds.VdoNinja) =>
+            StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.VdoNinja, destinationId) with
+            {
+                IsEnabled = isEnabled,
+                PublishUrl = VdoNinjaPublishUrl,
+                RoomName = VdoNinjaRoom
+            };
 
         private static StreamingProfile CreateYoutubeDestinationCore(bool isEnabled, string destinationId)
         {

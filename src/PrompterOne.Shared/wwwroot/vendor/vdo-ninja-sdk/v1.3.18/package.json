@@ -1,0 +1,84 @@
+{
+  "name": "@vdoninja/sdk",
+  "version": "1.3.18",
+  "description": "AI-friendly P2P communication SDK for audio, video, and data. Includes WHIP/WHEP clients for publishing to Twitch, Meshcast, Cloudflare Stream",
+  "main": "vdoninja-sdk.js",
+  "browser": "vdoninja-sdk.js",
+  "exports": {
+    ".": {
+      "browser": "./vdoninja-sdk.js",
+      "node": "./vdoninja-sdk-node.js",
+      "default": "./vdoninja-sdk.js"
+    },
+    "./node": "./vdoninja-sdk-node.js",
+    "./browser": "./vdoninja-sdk.js",
+    "./whip": "./whip-client.js",
+    "./whep": "./whep-client.js"
+  },
+  "scripts": {
+    "build": "npm run minify",
+    "minify": "terser vdoninja-sdk.js -o vdoninja-sdk.min.js --compress --mangle --comments \"/VDO.Ninja SDK v/\"",
+    "watch": "npm-watch",
+    "test": "node run-all-tests.js",
+    "test:node": "node demos/node-example.js",
+    "test:all": "node run-all-tests.js",
+    "check:webrtc": "node -e \"console.log(require('./vdoninja-sdk-node.js').checkWebRTCSupport())\"",
+    "ssn:listen": "node demos/socialstreamninja-listener.js",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steveseguin/ninjasdk.git"
+  },
+  "keywords": [
+    "webrtc",
+    "p2p",
+    "peer-to-peer",
+    "video",
+    "audio",
+    "streaming",
+    "vdo.ninja",
+    "ai-friendly",
+    "data-channel",
+    "whip",
+    "whep",
+    "twitch",
+    "meshcast",
+    "cloudflare-stream",
+    "webrtc-http"
+  ],
+  "author": "Steve Seguin",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/steveseguin/ninjasdk/issues"
+  },
+  "homepage": "https://github.com/steveseguin/ninjasdk#readme",
+  "devDependencies": {
+    "npm-watch": "^0.13.0",
+    "terser": "^5.31.0"
+  },
+  "peerDependencies": {
+    "@roamhq/wrtc": ">=0.8.0",
+    "node-datachannel": ">=0.10.0"
+  },
+  "peerDependenciesMeta": {
+    "@roamhq/wrtc": {
+      "optional": true
+    },
+    "node-datachannel": {
+      "optional": true
+    }
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "vdoninja-sdk.js"
+      ],
+      "extensions": "js"
+    }
+  },
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "ws": "^8.18.3"
+  }
+}

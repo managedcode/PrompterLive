@@ -198,17 +198,6 @@ public partial class GoLivePage
         return SceneCameras.FirstOrDefault(camera => string.Equals(camera.SourceId, sourceId, StringComparison.Ordinal));
     }
 
-    private static string FormatOutputResolution(StreamingResolutionPreset resolution)
-    {
-        return resolution switch
-        {
-            StreamingResolutionPreset.FullHd1080p60 => GoLiveText.Surface.StreamFormatFullHd60,
-            StreamingResolutionPreset.Hd720p30 => GoLiveText.Surface.StreamFormatHd30,
-            StreamingResolutionPreset.UltraHd2160p30 => GoLiveText.Surface.StreamFormatUltraHd30,
-            _ => GoLiveText.Surface.StreamFormatFullHd30
-        };
-    }
-
     private static string ResolveResolutionDimensions(StreamingResolutionPreset resolution)
     {
         return resolution switch

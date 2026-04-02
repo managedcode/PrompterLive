@@ -24,6 +24,7 @@ public static class GoLiveOutputRequestFactory
         string recordingFileStem)
     {
         var liveKitDestination = ResolveLiveKitDestination(streaming);
+        var vdoNinjaDestination = ResolveVdoNinjaDestination(streaming);
         var programVideo = ResolveProgramVideo(streaming.OutputResolution);
         var videoSources = BuildVideoSources(primaryCamera, scene.Cameras);
         var audioInputs = BuildAudioInputs(scene);
@@ -40,7 +41,10 @@ public static class GoLiveOutputRequestFactory
             LiveKitEnabled: liveKitDestination?.IsEnabled == true,
             LiveKitServerUrl: liveKitDestination?.ServerUrl ?? string.Empty,
             LiveKitRoomName: liveKitDestination?.RoomName ?? string.Empty,
-            LiveKitToken: liveKitDestination?.Token ?? string.Empty);
+            LiveKitToken: liveKitDestination?.Token ?? string.Empty,
+            VdoNinjaEnabled: vdoNinjaDestination?.IsEnabled == true,
+            VdoNinjaPublishUrl: vdoNinjaDestination?.PublishUrl ?? string.Empty,
+            VdoNinjaRoomName: vdoNinjaDestination?.RoomName ?? string.Empty);
     }
 
     private static StreamingProfile? ResolveLiveKitDestination(StreamStudioSettings streaming)
@@ -73,6 +77,37 @@ public static class GoLiveOutputRequestFactory
             ServerUrl = streaming.LiveKitServerUrl,
             RoomName = streaming.LiveKitRoomName,
             Token = streaming.LiveKitToken
+        };
+    }
+
+    private static StreamingProfile? ResolveVdoNinjaDestination(StreamStudioSettings streaming)
+    {
+        var destinations = streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>();
+        var configuredDestination = destinations.FirstOrDefault(destination =>
+                destination.ProviderKind == StreamingProviderKind.VdoNinja
+                && destination.IsEnabled)
+            ?? destinations.FirstOrDefault(destination =>
+                destination.ProviderKind == StreamingProviderKind.VdoNinja);
+
+        if (configuredDestination is not null)
+        {
+            return configuredDestination;
+        }
+
+        if (!streaming.VdoNinjaEnabled
+            && string.IsNullOrWhiteSpace(streaming.VdoNinjaRoomName)
+            && string.IsNullOrWhiteSpace(streaming.VdoNinjaPublishUrl))
+        {
+            return null;
+        }
+
+        return StreamingPlatformCatalog.CreateProfile(
+            StreamingPlatformKind.VdoNinja,
+            GoLiveTargetCatalog.TargetIds.VdoNinja) with
+        {
+            IsEnabled = streaming.VdoNinjaEnabled,
+            PublishUrl = streaming.VdoNinjaPublishUrl,
+            RoomName = streaming.VdoNinjaRoomName
         };
     }
 

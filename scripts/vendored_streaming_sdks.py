@@ -155,6 +155,23 @@ def sync_vdo_ninja(sdk: dict) -> None:
             copy_js_tree(source_root / runtime_directory, vendor_directory / runtime_directory)
 
 
+def sync_release_assets_with_license_tarball(sdk: dict) -> None:
+    vendor_directory = REPO_ROOT / sdk["vendorDirectory"]
+    reset_directory(vendor_directory)
+
+    with tempfile.TemporaryDirectory(prefix=f"{sdk['id']}-") as temp_dir_name:
+        temp_dir = Path(temp_dir_name)
+        archive_path = temp_dir / "release.tar.gz"
+        download_to(sdk["sourceTarballUrl"], archive_path)
+        source_root = extract_tarball(archive_path, temp_dir)
+
+        for license_file in sdk.get("licenseFiles", []):
+            copy_file(source_root / license_file, vendor_directory / Path(license_file).name)
+
+        for asset in sdk.get("assets", []):
+            download_to(asset["url"], vendor_directory / asset["name"])
+
+
 def sync_sdk(sdk: dict) -> None:
     strategy = sdk["syncStrategy"]
     print(f"Syncing {sdk['id']} from {sdk['releaseTag']} using {strategy}")
@@ -165,6 +182,10 @@ def sync_sdk(sdk: dict) -> None:
 
     if strategy == "copy-release-runtime-js-tree":
         sync_vdo_ninja(sdk)
+        return
+
+    if strategy == "release-assets-with-license-tarball":
+        sync_release_assets_with_license_tarball(sdk)
         return
 
     raise SystemExit(f"Unsupported sync strategy: {strategy}")
@@ -186,6 +207,11 @@ def verify_sdk(sdk: dict) -> list[str]:
         artifact_name = Path(artifact).name
         if not (vendor_directory / artifact_name).exists():
             errors.append(f"{sdk['id']}: missing artifact {artifact_name}")
+
+    for asset in sdk.get("assets", []):
+        asset_name = asset["name"]
+        if not (vendor_directory / asset_name).exists():
+            errors.append(f"{sdk['id']}: missing asset {asset_name}")
 
     for root_file in sdk.get("rootFiles", []):
         if not (vendor_directory / root_file).exists():

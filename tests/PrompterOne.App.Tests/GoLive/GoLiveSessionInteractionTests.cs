@@ -47,7 +47,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Fact]
-    public void GoLivePage_Load_ArmsObsOutputByDefaultForVirtualCameraMode()
+    public void GoLivePage_Load_HidesLocalOutputTogglesFromRuntimeSidebar()
     {
         SeedSceneState(CreateTwoCameraScene());
         Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
@@ -56,14 +56,39 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains("on", cut.FindByTestId(UiTestIds.GoLive.ObsToggle).ClassName, StringComparison.Ordinal);
-            var settings = _harness.JsRuntime.GetSavedValue<StudioSettings>(StudioSettingsStore.StorageKey);
-            Assert.True(settings.Streaming.ObsVirtualCameraEnabled);
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ObsToggle}']"));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.NdiToggle}']"));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.RecordingToggle}']"));
         });
     }
 
     [Fact]
-    public void GoLivePage_StartStream_WithLiveKitArmed_CallsLiveKitOutputInterop()
+    public void GoLivePage_StartStream_WithVdoNinjaArmed_CallsVdoNinjaOutputInterop()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateVdoNinjaDestination()
+                ]
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
+
+        Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
+        Assert.DoesNotContain(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+    }
+
+    [Fact]
+    public void GoLivePage_StartStream_WithLiveKitArmed_CallsLiveKitOutputInterop_WhenVdoNinjaIsNotConfigured()
     {
         SeedSceneState(CreateTwoCameraScene());
         SeedStudioSettings(StudioSettings.Default with
@@ -84,6 +109,32 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
         Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+    }
+
+    [Fact]
+    public void GoLivePage_StartStream_WithVdoNinjaAndLiveKitArmed_PrefersVdoNinjaOutputInterop()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateVdoNinjaDestination(),
+                    AppTestData.GoLive.CreateLiveKitDestination()
+                ]
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
+
+        Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
+        Assert.DoesNotContain(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
     }
 
     [Fact]
@@ -116,7 +167,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Fact]
-    public void GoLivePage_SwitchProgramSource_WhileLiveKitActive_RefreshesOutputSessionDevices()
+    public void GoLivePage_SwitchProgramSource_WhileVdoNinjaActive_RefreshesOutputSessionDevices()
     {
         SeedSceneState(CreateTwoCameraScene());
         SeedStudioSettings(StudioSettings.Default with
@@ -125,7 +176,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
             {
                 ExternalDestinations =
                 [
-                    AppTestData.GoLive.CreateLiveKitDestination()
+                    AppTestData.GoLive.CreateVdoNinjaDestination()
                 ]
             }
         });

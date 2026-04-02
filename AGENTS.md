@@ -324,6 +324,7 @@ Repo-specific design rules:
 - Go Live chrome MUST stay operational and generic; do not surface the loaded script title or script preview subtitle in the Go Live header/session bar just because a script is open.
 - Go Live back navigation MUST return to the actual previous in-app screen when known, and only fall back to library when there is no valid in-app return target; it must never hardcode teleprompter as the back target.
 - Go Live local recording MUST capture the same composed program feed that the active live/record session publishes; recording a black frame or a different source than the current program feed is a regression.
+- Go Live local recording artifacts MUST contain both decodable video and decodable audio from the real program feed, and their saved resolution/quality must match the active source or chosen output profile instead of silently degrading to a lower-quality fallback.
 - Go Live recording status and runtime panels MUST show the real recording details the browser runtime knows, including the resolved output profile and live session/file telemetry when available; blank recording metadata during an active local recording is a regression.
 - Go Live audio meters MUST show real browser audio activity for microphone, program, and recording paths; static placeholder bars or seeded fake levels in the Audio tab are regressions.
 - Go Live MUST have one active browser-side broadcast spine per setup: choose LiveKit or VDO.Ninja for the upstream transport, but do not run both as the same session's primary publish path at once.

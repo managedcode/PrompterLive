@@ -6,8 +6,9 @@
 
 - `livekit/client-sdk-js`
 - `steveseguin/vdo.ninja`
+- `steveseguin/ninjasdk`
 
-The repo pins both SDKs to exact GitHub release tags and exact GitHub release URLs. The vendored files live under `src/PrompterOne.Shared/wwwroot/vendor/` so the browser runtime does not depend on floating CDN or `latest` endpoints.
+The repo pins these runtime artifacts to exact GitHub release tags and exact GitHub release URLs. The vendored files live under `src/PrompterOne.Shared/wwwroot/vendor/` so the browser runtime does not depend on floating CDN or `latest` endpoints.
 
 ## Source Of Truth
 
@@ -20,6 +21,7 @@ The repo pins both SDKs to exact GitHub release tags and exact GitHub release UR
 
 - LiveKit Client SDK JS: `v2.18.0`
 - VDO.Ninja: `v29.0`
+- VDO.Ninja SDK: `v1.3.18`
 
 ## Flow
 
@@ -51,4 +53,5 @@ flowchart LR
 ## Notes
 
 - LiveKit does not ship the built browser bundle as a GitHub release asset in the current release format, so the sync flow builds the exact pinned release tag from the tagged source tarball and copies only the resulting browser artifacts into the repo.
-- VDO.Ninja is vendored as a runtime JS tree from the exact pinned release source tarball because its browser runtime spans multiple JS entrypoints and runtime-loaded dependencies.
+- VDO.Ninja is vendored as a runtime JS tree from the exact pinned release source tarball because its broader browser runtime spans multiple JS entrypoints and runtime-loaded dependencies.
+- The official standalone browser publishing SDK comes from `steveseguin/ninjasdk` and is vendored from exact pinned GitHub release assets plus the matching license files from the release tarball.

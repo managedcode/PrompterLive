@@ -15,7 +15,7 @@ The current page layout is a production-style studio surface:
 - right rail for the current live preview plus a larger stream, audio, and runtime panel that can comfortably show real output telemetry, metadata, and mix controls
 - source-card `ON AIR` badges and the preview red live dot only turn on when recording or streaming is actually active; idle routing and armed sources stay visually non-live
 - full-program mode collapses both side rails so the center canvas follows the design's focused monitor state
-- destination cards are built from persisted local outputs plus a dynamic browser-stored `ExternalDestinations` list; seeded fake provider rows are forbidden
+- destination cards are built only from the persisted browser-stored `ExternalDestinations` list; local recording is controlled from `REC` plus runtime metadata, not rendered as a fake destination row
 
 The runtime now owns real browser media outputs for the composed program scene and the current audio bus:
 
@@ -24,19 +24,22 @@ The runtime now owns real browser media outputs for the composed program scene a
 - `Go Live` builds one browser-side program stream from the scene camera cards by drawing the selected primary camera full-frame and then layering additional included cameras as positioned overlays on a canvas
 - the scene `AudioBus` is mixed into one program audio track through `AudioContext`, delay, and gain nodes before the final program stream is published or recorded
 - OBS browser output stays browser-only and exposes the composed program audio inside an OBS Browser Source environment
-- LiveKit publishing uses the vendored browser SDK and publishes real composed `MediaStreamTrack` objects for video and audio
+- `VDO.Ninja` publishing uses the vendored official browser SDK and publishes the same composed `MediaStream` that powers preview, recording, and OBS
+- `LiveKit` publishing remains available only as an explicit optional managed-transport mode
 - local recording uses the browser `MediaRecorder` API against the same composed program stream and prefers `showSaveFilePicker()` for real local file writing when the browser allows it, with download fallback otherwise
+- saved local recording artifacts must decode into visible program video plus audible program audio; a black frame or silent file is a runtime regression even if metadata looks populated
 - recording export profiles are honest browser probes only: the runtime checks `MediaRecorder.isTypeSupported()` and `MediaCapabilities.encodingInfo()` before choosing the resolved MIME type and falls back to a supported browser codec/container when the requested profile is unavailable
 - stream start, stop, recording start, recording stop, and source switching update the active browser output session instead of only flipping local UI state
 - the session timer and right-rail `Status` / `Runtime` cards are driven from live session/runtime state, not hardcoded demo telemetry
 - active local recording surfaces resolved runtime metadata in the right rail, including the recording profile, save mode, and live captured file size when the browser exposes those details
 
-Relay-only destinations stay configuration surfaces:
+Downstream destinations stay browser-honest configuration surfaces:
 
-- YouTube, Twitch, custom RTMP, and similar RTMP-style targets still persist credentials and routing in browser storage
+- YouTube, Twitch, custom RTMP, and similar targets still persist credentials and routing in browser storage
 - `Go Live` only exposes quick arm/disarm toggles and readiness summaries for those targets
 - detailed destination credentials, ingest URLs, and provider-specific configuration live in `Settings`
-- these targets do not publish directly from the browser runtime; they require an external relay or ingest layer outside this standalone WASM app, and `Go Live` must not mark the session live unless a direct browser live output actually starts
+- direct browser publish is allowed only when the active standalone spine really supports it, with `VDO.Ninja` treated as the primary path for browser-driven `YouTube` / `Twitch` workflows
+- custom RTMP remains visually constrained unless a real browser-compatible publish path is confirmed
 
 ## Broadcast Spine Decision
 
@@ -54,7 +57,8 @@ Current implementation focus:
 
 - browser-local recording from the composed program feed
 - OBS browser output
-- LiveKit publishing in the current code path
+- `VDO.Ninja` publishing in the current code path
+- `LiveKit` kept only as an explicit optional managed mode
 - no shipped universal browser-only path yet for every final platform target
 
 Target rollout after this architecture pass:
@@ -118,13 +122,13 @@ sequenceDiagram
     Settings->>Studio: Persist device preferences
     Settings->>Scene: Persist scene cameras and audio bus
     User->>Settings: Configure the active spine and browser-compatible publish targets
-    Settings->>Studio: Persist local outputs and external destination list
+    Settings->>Studio: Persist external destination list and recording/export preferences
     User->>GoLive: Open Go Live
     GoLive->>Studio: Load live routing settings
     GoLive->>Scene: Load current scene sources
     GoLive->>Sources: Render real scene cameras and mic status
     GoLive->>Preview: Mount the current on-air scene camera
-    GoLive->>Sidebar: Summarize persisted destination readiness
+    GoLive->>Sidebar: Summarize persisted external destination readiness
     User->>GoLive: Arm one or more destinations
     GoLive->>Studio: Persist output targets
     User->>Sources: Select a different scene camera
@@ -219,7 +223,7 @@ flowchart LR
     Vdo["VDO.Ninja publish / WHIP"]
     LiveKit["LiveKit publishTrack(...)"]
     Targets["Browser-compatible publish targets"]
-    Platforms["YouTube / Twitch / RTMP<br/>constrained unless browser path exists"]
+    Platforms["YouTube / Twitch / RTMP<br/>only when the active spine exposes a real browser path"]
     Obs["OBS browser audio bridge"]
 
     Scene --> Factory
@@ -248,7 +252,7 @@ flowchart LR
 - `Settings` must expose a visible CTA into `Go Live` so device setup and live routing stay discoverable as separate flows.
 - the shared header shell must keep `Go Live` reachable from every non-`Go Live` routed page because it is a primary studio action
 - `Go Live` may arm local recording and downstream relay targets at the same time, but only one upstream browser transport spine may be active for a session.
-- hardcoded destination instances are forbidden; the external destination list must come from persisted browser settings and may contain zero, one, or many platform entries
+- hardcoded destination instances are forbidden; the right-rail destination list must come from persisted external destinations only and may contain zero, one, or many platform entries
 - `Go Live` must reuse the browser-composed scene and not invent a separate media graph.
 - `Go Live` must auto-seed the first available browser camera into the scene when the scene is empty and devices are available.
 - `Go Live` must show the selected program source in the center monitor and the currently on-air source in the right preview rail until the operator explicitly takes the selected source live.
@@ -262,13 +266,15 @@ flowchart LR
 - `VirtualCamera` mode normalizes to OBS armed by default, so browser sessions keep the legacy desktop-capture workflow unless the user explicitly turns OBS off
 - Camera source inclusion is persisted through `MediaSceneState`.
 - Destination credentials and endpoints are persisted only in browser storage for this standalone runtime.
+- `VDO.Ninja` browser publishing must use the vendored official SDK shipped in the repo, not a CDN copy.
 - LiveKit browser publishing must use the vendored SDK shipped in the repo, not a CDN copy.
 - `VDO.Ninja` is the default production upstream spine for the strict standalone browser mode; `LiveKit` is reserved for explicit optional managed-transport modes and must not quietly become a second co-equal default publish path.
 - OBS browser integration must stay a thin browser bridge; no server relay or backend media graph is introduced.
-- local recording must stay browser-local and use the same active program media session as OBS / LiveKit so record and source switching stay in sync
+- local recording must stay browser-local and use the same active program media session as OBS / `VDO.Ninja` / optional `LiveKit` so record and source switching stay in sync
 - local recording must prefer real local file writing through the File System Access API when the browser exposes it, but must fall back to browser download instead of pretending save-to-disk is universally available
 - recording codec/container export must never advertise unsupported browser encoders as if they are guaranteed; the runtime must probe support and choose a real fallback profile
 - local recording metadata shown in `Go Live` must come from browser runtime state, including honest file-size/save-mode/profile details when available, instead of placeholder labels or blank cards
+- browser acceptance for local recording must verify the saved artifact itself, not only the in-page runtime metadata, so regressions such as black video or silent audio cannot hide behind populated telemetry
 - the `Audio` tab must project real browser telemetry: the microphone row comes from a direct browser microphone monitor, while `Program` and `Recording` come from the mixed program audio feed and must fall back to idle instead of seeded percentages when no signal is active
 - right-rail telemetry must never show fake packet-loss, jitter, ping, or upload metrics when the browser runtime does not actually own those measurements
 - downstream platforms such as YouTube and Twitch may be shown as first-class live-publish targets when the chosen VDO-driven standalone path supports them; custom RTMP must stay visibly constrained unless a real browser-compatible path is confirmed

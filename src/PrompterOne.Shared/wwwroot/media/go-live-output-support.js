@@ -4,6 +4,8 @@
     const audioCodecAac = "AAC";
     const audioCodecMp3 = "MP3";
     const audioCodecOpus = "Opus";
+    const audioRouteBoth = 2;
+    const audioRouteStream = 1;
     const codecSeparator = ";";
     const fileNameTimestampPattern = /[:.]/g;
     const fileNameUnsafePattern = /[^a-z0-9]+/gi;
@@ -63,24 +65,32 @@
     }
 
     function normalizeVideoSource(rawSource) {
+        const transform = normalizeTransform(readValue(rawSource, "transform", "Transform", {}));
+        const isPrimary = normalizeBoolean(readValue(rawSource, "isPrimary", "IsPrimary", false), false);
+
         return {
             deviceId: normalizeString(readValue(rawSource, "deviceId", "DeviceId", ""), ""),
-            isPrimary: normalizeBoolean(readValue(rawSource, "isPrimary", "IsPrimary", false), false),
+            isPrimary,
+            isRenderable: isPrimary || (transform.visible && transform.includeInOutput),
             label: normalizeString(readValue(rawSource, "label", "Label", ""), ""),
             sourceId: normalizeString(readValue(rawSource, "sourceId", "SourceId", ""), ""),
-            transform: normalizeTransform(readValue(rawSource, "transform", "Transform", {}))
+            transform
         };
     }
 
     function normalizeAudioInput(rawInput) {
+        const isMuted = normalizeBoolean(readValue(rawInput, "isMuted", "IsMuted", false), false);
+        const routeTarget = normalizeNumber(readValue(rawInput, "routeTarget", "RouteTarget", audioRouteBoth), audioRouteBoth);
+
         return {
             delayMs: normalizeNumber(readValue(rawInput, "delayMs", "DelayMs", 0), 0),
             deviceId: normalizeString(readValue(rawInput, "deviceId", "DeviceId", ""), ""),
             gain: normalizeNumber(readValue(rawInput, "gain", "Gain", 1), 1),
-            isMuted: normalizeBoolean(readValue(rawInput, "isMuted", "IsMuted", false), false),
+            isMuted,
             isPrimary: normalizeBoolean(readValue(rawInput, "isPrimary", "IsPrimary", false), false),
+            isRoutedToProgram: !isMuted && (routeTarget === audioRouteStream || routeTarget === audioRouteBoth),
             label: normalizeString(readValue(rawInput, "label", "Label", ""), ""),
-            routeTarget: normalizeNumber(readValue(rawInput, "routeTarget", "RouteTarget", 2), 2)
+            routeTarget
         };
     }
 
@@ -120,6 +130,9 @@
             programVideo: normalizeProgramVideo(readValue(rawRequest, "programVideo", "ProgramVideo", {})),
             recording: normalizeRecording(readValue(rawRequest, "recording", "Recording", {})),
             recordingEnabled: normalizeBoolean(readValue(rawRequest, "recordingEnabled", "RecordingEnabled", false), false),
+            vdoNinjaEnabled: normalizeBoolean(readValue(rawRequest, "vdoNinjaEnabled", "VdoNinjaEnabled", false), false),
+            vdoNinjaPublishUrl: normalizeString(readValue(rawRequest, "vdoNinjaPublishUrl", "VdoNinjaPublishUrl", ""), ""),
+            vdoNinjaRoomName: normalizeString(readValue(rawRequest, "vdoNinjaRoomName", "VdoNinjaRoomName", ""), ""),
             videoSources: (readValue(rawRequest, "videoSources", "VideoSources", []) ?? []).map(normalizeVideoSource)
         };
 

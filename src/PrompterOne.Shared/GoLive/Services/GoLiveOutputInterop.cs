@@ -40,6 +40,23 @@ public sealed class GoLiveOutputInterop(IJSRuntime jsRuntime)
             sessionId).AsTask();
     }
 
+    public Task StartVdoNinjaAsync(
+        string sessionId,
+        GoLiveOutputRuntimeRequest request)
+    {
+        return _jsRuntime.InvokeVoidAsync(
+            GoLiveOutputInteropMethodNames.StartVdoNinjaSession,
+            sessionId,
+            request).AsTask();
+    }
+
+    public Task StopVdoNinjaAsync(string sessionId)
+    {
+        return _jsRuntime.InvokeVoidAsync(
+            GoLiveOutputInteropMethodNames.StopVdoNinjaSession,
+            sessionId).AsTask();
+    }
+
     public Task StopLocalRecordingAsync(string sessionId)
     {
         return _jsRuntime.InvokeVoidAsync(

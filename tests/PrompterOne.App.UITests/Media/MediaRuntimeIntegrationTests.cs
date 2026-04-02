@@ -132,6 +132,40 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
     }
 
     [Fact]
+    public async Task TeleprompterCameraToggle_RequestsAccessWhenDeviceIdentityIsUnavailableOnFirstLoad()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.EvaluateAsync(BrowserTestConstants.Media.ConcealDeviceIdentityUntilRequestScript);
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-device-id", string.Empty);
+
+            await page.EvaluateAsync(BrowserTestConstants.Media.ClearRequestLogScript);
+            await TeleprompterCameraDriver.EnsureEnabledAsync(page);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.HasVideoOnlyRequestScript,
+                new object[] { BrowserTestConstants.Media.PrimaryCameraId },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var state = await page.EvaluateAsync<SyntheticMediaElementState>(
+                BrowserTestConstants.Media.GetElementStateScript,
+                UiDomIds.Teleprompter.Camera);
+
+            Assert.True(state.HasStream);
+            Assert.NotNull(state.Metadata);
+            Assert.Equal(BrowserTestConstants.Media.PrimaryCameraId, state.Metadata!.VideoDeviceId);
+        }
+        finally
+        {
+            await page.EvaluateAsync(BrowserTestConstants.Media.RestoreDeviceIdentityScript);
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task SettingsScreen_BlankBrowserDeviceLabels_DoNotRenderFabricatedFallbackNames()
     {
         var page = await _fixture.NewPageAsync();

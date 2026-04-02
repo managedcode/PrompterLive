@@ -55,6 +55,42 @@
         "recorder",
         "thirdparty"
       ]
+    },
+    {
+      "id": "vdo-ninja-sdk",
+      "displayName": "VDO.Ninja SDK",
+      "repository": "steveseguin/ninjasdk",
+      "releaseTag": "v1.3.18",
+      "releaseUrl": "https://github.com/steveseguin/ninjasdk/releases/tag/v1.3.18",
+      "sourceTarballUrl": "https://api.github.com/repos/steveseguin/ninjasdk/tarball/v1.3.18",
+      "syncStrategy": "release-assets-with-license-tarball",
+      "vendorDirectory": "src/PrompterOne.Shared/wwwroot/vendor/vdo-ninja-sdk/v1.3.18",
+      "licenseFiles": [
+        "LICENSE",
+        "LICENSE-SDK-EXCEPTION"
+      ],
+      "assets": [
+        {
+          "name": "package.json",
+          "url": "https://github.com/steveseguin/ninjasdk/releases/download/v1.3.18/package.json"
+        },
+        {
+          "name": "README.md",
+          "url": "https://github.com/steveseguin/ninjasdk/releases/download/v1.3.18/README.md"
+        },
+        {
+          "name": "vdoninja-sdk.js",
+          "url": "https://github.com/steveseguin/ninjasdk/releases/download/v1.3.18/vdoninja-sdk.js"
+        },
+        {
+          "name": "vdoninja-sdk.min.js",
+          "url": "https://github.com/steveseguin/ninjasdk/releases/download/v1.3.18/vdoninja-sdk.min.js"
+        },
+        {
+          "name": "webrtc-adapter.js",
+          "url": "https://github.com/steveseguin/ninjasdk/releases/download/v1.3.18/webrtc-adapter.js"
+        }
+      ]
     }
   ]
 }

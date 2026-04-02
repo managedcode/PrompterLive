@@ -4,9 +4,6 @@ internal sealed record GoLiveOutputAudioSnapshot(
     int ProgramLevelPercent,
     int RecordingLevelPercent);
 
-internal sealed record GoLiveOutputProviderSnapshot(
-    bool Active);
-
 internal sealed record GoLiveOutputProgramSnapshot(
     int AudioInputCount,
     int FrameRate,
@@ -35,6 +32,7 @@ internal sealed record GoLiveOutputRuntimeSnapshot(
     GoLiveOutputProviderSnapshot? Obs,
     GoLiveOutputProgramSnapshot? Program,
     GoLiveOutputRecordingSnapshot? Recording,
+    GoLiveOutputVdoNinjaSnapshot? VdoNinja,
     string VideoDeviceId);
 
 public sealed record GoLiveOutputAudioState(
@@ -96,6 +94,8 @@ public sealed record GoLiveOutputRuntimeState(
     GoLiveOutputProgramState Program,
     GoLiveOutputRecordingState Recording,
     bool RecordingActive,
+    GoLiveOutputVdoNinjaState VdoNinja,
+    bool VdoNinjaActive,
     string CameraDeviceId,
     string MicrophoneDeviceId)
 {
@@ -107,12 +107,14 @@ public sealed record GoLiveOutputRuntimeState(
         Program: GoLiveOutputProgramState.Default,
         Recording: GoLiveOutputRecordingState.Default,
         RecordingActive: false,
+        VdoNinja: GoLiveOutputVdoNinjaState.Default,
+        VdoNinjaActive: false,
         CameraDeviceId: string.Empty,
         MicrophoneDeviceId: string.Empty);
 
     public bool HasActiveOutputs => HasLiveOutputs || RecordingActive;
 
-    public bool HasLiveOutputs => LiveKitActive || ObsActive;
+    public bool HasLiveOutputs => LiveKitActive || ObsActive || VdoNinjaActive;
 
     internal static GoLiveOutputRuntimeState FromSnapshot(GoLiveOutputRuntimeSnapshot? snapshot)
     {
@@ -153,6 +155,17 @@ public sealed record GoLiveOutputRuntimeState(
                     snapshot.Recording.SizeBytes,
                     snapshot.Recording.VideoBitrateKbps),
             RecordingActive: snapshot.Recording?.Active == true,
+            VdoNinja: snapshot.VdoNinja is null
+                ? GoLiveOutputVdoNinjaState.Default
+                : new(
+                    snapshot.VdoNinja.Active,
+                    snapshot.VdoNinja.Connected,
+                    snapshot.VdoNinja.LastPeerLatencyMs,
+                    snapshot.VdoNinja.PeerCount,
+                    snapshot.VdoNinja.PublishUrl ?? string.Empty,
+                    snapshot.VdoNinja.RoomName ?? string.Empty,
+                    snapshot.VdoNinja.StreamId ?? string.Empty),
+            VdoNinjaActive: snapshot.VdoNinja?.Active == true,
             CameraDeviceId: snapshot.VideoDeviceId ?? string.Empty,
             MicrophoneDeviceId: snapshot.AudioDeviceId ?? string.Empty);
     }

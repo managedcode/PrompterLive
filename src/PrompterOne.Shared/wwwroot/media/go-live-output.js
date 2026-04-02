@@ -6,6 +6,7 @@
     const composerNamespace = "PrompterOneGoLiveMediaComposer";
     const interopNamespace = "PrompterOneGoLiveOutput";
     const supportNamespace = "PrompterOneGoLiveOutputSupport";
+    const vdoNinjaNamespace = "PrompterOneGoLiveOutputVdoNinja";
     const outputSessions = new Map();
     const browserEnvironment = "browser";
     const liveKitAudioSource = "microphone";
@@ -31,6 +32,15 @@
         }
 
         return support;
+    }
+
+    function getVdoNinjaRuntime() {
+        const runtime = window[vdoNinjaNamespace];
+        if (!runtime?.startSession || !runtime?.stopSession || !runtime?.buildSnapshot) {
+            throw new Error("Go Live VDO.Ninja runtime is not available.");
+        }
+
+        return runtime;
     }
 
     function getLiveKitClient() {
@@ -83,7 +93,16 @@
                 recordingWritable: null,
                 recordingWritePromise: Promise.resolve(),
                 requestSnapshot: null,
-                videoDeviceId: ""
+                videoDeviceId: "",
+                vdoNinjaActive: false,
+                vdoNinjaConnected: false,
+                vdoNinjaJoinedRoom: false,
+                vdoNinjaLastPeerLatencyMs: 0,
+                vdoNinjaPeerCount: 0,
+                vdoNinjaPublishUrl: "",
+                vdoNinjaPublisher: null,
+                vdoNinjaRoomName: "",
+                vdoNinjaStreamId: ""
             });
         }
 
@@ -225,7 +244,7 @@
     }
 
     async function cleanupSessionIfIdle(sessionId, session) {
-        if (session.liveKitActive || session.obsActive || session.recordingActive) {
+        if (session.liveKitActive || session.obsActive || session.recordingActive || session.vdoNinjaActive) {
             return;
         }
 
@@ -288,6 +307,7 @@
                 sizeBytes: session.recordingBytes,
                 videoBitrateKbps: session.requestSnapshot?.recording?.videoBitrateKbps ?? 0
             },
+            vdoNinja: getVdoNinjaRuntime().buildSnapshot(session),
             videoDeviceId: session.videoDeviceId
         };
     }
@@ -332,6 +352,12 @@
             session.recordingActive = true;
         },
 
+        async startVdoNinjaSession(sessionId, rawRequest) {
+            const session = ensureSession(sessionId);
+            const request = await ensureProgramSession(session, rawRequest);
+            await getVdoNinjaRuntime().startSession(session, sessionId, request);
+        },
+
         async stopLiveKitSession(sessionId) {
             const session = outputSessions.get(sessionId);
             if (!session) {
@@ -355,6 +381,16 @@
             session.liveKitRoom?.disconnect?.();
             session.liveKitRoom = null;
 
+            await cleanupSessionIfIdle(sessionId, session);
+        },
+
+        async stopVdoNinjaSession(sessionId) {
+            const session = outputSessions.get(sessionId);
+            if (!session) {
+                return;
+            }
+
+            await getVdoNinjaRuntime().stopSession(session);
             await cleanupSessionIfIdle(sessionId, session);
         },
 
@@ -411,6 +447,10 @@
 
             if (session.liveKitActive) {
                 await republishLiveKitTracks(session, getLiveKitClient());
+            }
+
+            if (session.vdoNinjaActive) {
+                await getVdoNinjaRuntime().startSession(session, sessionId, session.requestSnapshot);
             }
 
             if (session.obsActive) {

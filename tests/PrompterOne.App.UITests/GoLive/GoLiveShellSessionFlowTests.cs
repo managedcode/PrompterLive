@@ -193,6 +193,55 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
     }
 
     [Fact]
+    public async Task GoLivePage_StartRecording_FilePickerSave_ProducesDecodableProgramVideoAndAudio()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.AddInitScriptAsync(scriptPath: GetRecordingFileHarnessScriptPath());
+            await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
+            await GoLiveFlowTests.SeedGoLivePrimaryMicrophoneAsync(page);
+            await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.SecondSourceId)).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.StartRecording).ClickAsync();
+
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeMetadataReadyScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await page.GetByTestId(UiTestIds.GoLive.StartRecording).ClickAsync();
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeInactiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.SavedRecordingReadyScript,
+                null,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var savedRecording = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.GetSavedRecordingStateScript);
+            var savedAnalysis = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.AnalyzeSavedRecordingScript);
+
+            Assert.True(savedRecording.GetProperty("pickerCallCount").GetInt32() >= 1);
+            Assert.True(savedRecording.GetProperty("sizeBytes").GetInt64() > 0);
+            Assert.True(savedAnalysis.GetProperty("width").GetInt32() > 0);
+            Assert.True(savedAnalysis.GetProperty("height").GetInt32() > 0);
+            Assert.True(savedAnalysis.GetProperty("hasAudioTrack").GetBoolean());
+            Assert.True(savedAnalysis.GetProperty("hasAudibleAudio").GetBoolean());
+            Assert.True(savedAnalysis.GetProperty("hasVisibleVideo").GetBoolean());
+            Assert.True(savedAnalysis.GetProperty("nonBlackPixelCount").GetInt32() >= BrowserTestConstants.Media.MinimumVisiblePixelCount);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task GoLivePage_AudioTab_ShowsLiveMicrophoneProgramAndRecordingLevels()
     {
         var page = await _fixture.NewPageAsync();
@@ -258,4 +307,9 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         await page.ScreenshotAsync(new() { Path = fullPath, FullPage = true });
     }
+
+    private static string GetRecordingFileHarnessScriptPath() =>
+        Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "../../../../../tests/PrompterOne.App.UITests/Media/recording-file-harness.js"));
 }
