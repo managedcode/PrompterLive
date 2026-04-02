@@ -1,13 +1,16 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-files"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.FilesPanel">
-    <h3 class="set-section-title">@SettingsNavigationText.FileStorageLabel</h3>
-    <p class="set-section-desc">PrompterOne is browser-only. Scripts stay in the browser library store, while recordings and exports use the browser-local storage container instead of fake desktop folders.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsFilesSectionTitle)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsFilesSectionDescription)</p>
 
     <div class="set-device-list">
         <SettingsExpandableCard Title="Scripts"
@@ -110,3 +113,7 @@
         </SettingsExpandableCard>
     </div>
 </section>
+
+@code {
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}

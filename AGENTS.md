@@ -352,8 +352,9 @@ Repo-specific design rules:
 - CI or deployment work is not done when GitHub Actions is merely green; the deployed GitHub Pages app MUST be opened and verified to boot without shell errors.
 - GitHub Pages deployment for `prompter.managed-code.com` MUST serve from the custom-domain root with `<base href="/">`; repo-name path prefixes are forbidden.
 - Version text shown in the app must come from automated build or release metadata, never from manually edited About copy.
-- The runtime must negotiate browser language from supported cultures and default to English.
-- Supported runtime cultures are English, Ukrainian, French, Spanish, Portuguese, and Italian.
+- The runtime must negotiate the initial language from the browser's supported cultures, fall back to English when there is no supported match, and persist the user's explicit language choice in user settings for later sessions.
+- UI localization in Blazor must use resource-based localization with shared catalogs and named culture constants instead of screen-local hardcoded strings.
+- Supported runtime cultures are English, Ukrainian, French, Spanish, Portuguese, Italian, and German.
 - Russian must never be added as a supported runtime culture.
 
 ### Critical

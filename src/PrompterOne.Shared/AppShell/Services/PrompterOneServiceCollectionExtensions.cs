@@ -10,6 +10,7 @@ using PrompterOne.Core.Services.Preview;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Core.Services.Streaming;
 using PrompterOne.Core.Services.Workspace;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Services.Editor;
 using PrompterOne.Shared.Settings.Services;
@@ -64,6 +65,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<BrowserCloudStorageStore>();
         services.AddScoped<BrowserFileStorageStore>();
         services.AddScoped<BrowserThemeService>();
+        services.AddScoped<AppCulturePreferenceService>();
         services.AddScoped<CloudStorageProviderFactory>();
         services.AddScoped<CloudStorageTransferService>();
         services.AddScoped<StudioSettingsStore>();

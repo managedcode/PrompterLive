@@ -111,4 +111,181 @@
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Roadshows</value>
   </data>
+  <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
+    <value>Connexion</value>
+  </data>
+  <data name="DiagnosticsConnectivityRetryNow" xml:space="preserve">
+    <value>Réessayer maintenant</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineTitle" xml:space="preserve">
+    <value>Connexion perdue</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineMessage" xml:space="preserve">
+    <value>PrompterOne est hors ligne. Le routage en direct, la synchronisation cloud et la publication distante reprendront lorsque le navigateur se reconnectera.</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineTitle" xml:space="preserve">
+    <value>Connexion rétablie</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineMessage" xml:space="preserve">
+    <value>La connexion du navigateur est revenue. Continuez à travailler ou rechargez si quelque chose semble encore obsolète.</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorRecording" xml:space="preserve">
+    <value>Enregistrement actif</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorStreaming" xml:space="preserve">
+    <value>Diffusion active</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorReady" xml:space="preserve">
+    <value>Prêt</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLive" xml:space="preserve">
+    <value>En direct</value>
+  </data>
+  <data name="HeaderGoLiveWidgetRecording" xml:space="preserve">
+    <value>REC</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLiveRecording" xml:space="preserve">
+    <value>Direct + REC</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="SettingsNavCloud" xml:space="preserve">
+    <value>Synchronisation cloud</value>
+  </data>
+  <data name="SettingsNavFiles" xml:space="preserve">
+    <value>Stockage des fichiers</value>
+  </data>
+  <data name="SettingsNavCameras" xml:space="preserve">
+    <value>Caméras</value>
+  </data>
+  <data name="SettingsNavMicrophones" xml:space="preserve">
+    <value>Microphones</value>
+  </data>
+  <data name="SettingsNavStreaming" xml:space="preserve">
+    <value>Diffusion</value>
+  </data>
+  <data name="SettingsNavRecording" xml:space="preserve">
+    <value>Enregistrement</value>
+  </data>
+  <data name="SettingsNavAi" xml:space="preserve">
+    <value>Fournisseur IA</value>
+  </data>
+  <data name="SettingsNavAppearance" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="SettingsNavAbout" xml:space="preserve">
+    <value>À propos</value>
+  </data>
+  <data name="SettingsCloudSectionTitle" xml:space="preserve">
+    <value>Stockage cloud</value>
+  </data>
+  <data name="SettingsCloudSectionDescription" xml:space="preserve">
+    <value>Configurez ici des cibles optionnelles de sauvegarde cloud. Les identifiants des fournisseurs restent dans le stockage local de ce navigateur et rien n’est connecté tant que vous n’avez pas enregistré de vrais identifiants valides.</value>
+  </data>
+  <data name="SettingsFilesSectionTitle" xml:space="preserve">
+    <value>Stockage des fichiers</value>
+  </data>
+  <data name="SettingsFilesSectionDescription" xml:space="preserve">
+    <value>PrompterOne fonctionne uniquement dans le navigateur. Les scripts restent dans la bibliothèque du navigateur, tandis que les enregistrements et les exports utilisent le conteneur de stockage local du navigateur au lieu de faux dossiers du bureau.</value>
+  </data>
+  <data name="SettingsAiSectionTitle" xml:space="preserve">
+    <value>Fournisseur IA</value>
+  </data>
+  <data name="SettingsAiSectionDescription" xml:space="preserve">
+    <value>Stockez les brouillons des fournisseurs IA localement dans ce navigateur. Les tests de connexion d’exécution ne sont pas encore implémentés, donc chaque fournisseur reste déconnecté jusqu’à l’arrivée d’une vraie intégration.</value>
+  </data>
+  <data name="SettingsRecordingSectionTitle" xml:space="preserve">
+    <value>Enregistrement</value>
+  </data>
+  <data name="SettingsRecordingSectionDescription" xml:space="preserve">
+    <value>Configurez la manière dont les enregistrements locaux sont sauvegardés pendant les sessions Go Live.</value>
+  </data>
+  <data name="SettingsStreamingSectionTitle" xml:space="preserve">
+    <value>Système de diffusion</value>
+  </data>
+  <data name="SettingsStreamingSectionDescription" xml:space="preserve">
+    <value>Configurez ici la capture programme du navigateur, l’enregistrement local, les connexions de transport et les destinations aval pour que Go Live reste centré sur l’exploitation de la session.</value>
+  </data>
+  <data name="SettingsAppearanceSectionTitle" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
+    <value>Personnalisez l’apparence de l’application et du lecteur du prompteur.</value>
+  </data>
+  <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
+    <value>Thème</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleDark" xml:space="preserve">
+    <value>Sombre · Accent doré</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleLight" xml:space="preserve">
+    <value>Clair · Accent personnalisé</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleSystem" xml:space="preserve">
+    <value>Système · Accent personnalisé</value>
+  </data>
+  <data name="SettingsAppearanceColorSchemeLabel" xml:space="preserve">
+    <value>Mode de couleur</value>
+  </data>
+  <data name="SettingsAppearanceAccentColorLabel" xml:space="preserve">
+    <value>Couleur d’accent</value>
+  </data>
+  <data name="SettingsAppearanceLanguageLabel" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="SettingsAppearanceThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="SettingsAppearanceThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
+  <data name="SettingsAppearanceThemeSystem" xml:space="preserve">
+    <value>Système</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterTitle" xml:space="preserve">
+    <value>Affichage du prompteur</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterSubtitle" xml:space="preserve">
+    <value>Police · Taille · Miroir · Arrière-plan</value>
+  </data>
+  <data name="SettingsAppearanceFontLabel" xml:space="preserve">
+    <value>Police</value>
+  </data>
+  <data name="SettingsAppearanceDefaultFontSizeLabel" xml:space="preserve">
+    <value>Taille de police par défaut</value>
+  </data>
+  <data name="SettingsAppearanceTextColorLabel" xml:space="preserve">
+    <value>Couleur du texte</value>
+  </data>
+  <data name="SettingsAppearanceMirrorTextLabel" xml:space="preserve">
+    <value>Miroir du texte (retournement horizontal)</value>
+  </data>
+  <data name="SettingsAppearanceShowWordHighlightLabel" xml:space="preserve">
+    <value>Afficher la mise en évidence des mots</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceTitle" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceSubtitle" xml:space="preserve">
+    <value>Densité · Animations · Barre latérale</value>
+  </data>
+  <data name="SettingsAppearanceUiDensityLabel" xml:space="preserve">
+    <value>Densité de l’interface</value>
+  </data>
+  <data name="SettingsAppearanceDensityCompact" xml:space="preserve">
+    <value>Compacte</value>
+  </data>
+  <data name="SettingsAppearanceDensityDefault" xml:space="preserve">
+    <value>Par défaut</value>
+  </data>
+  <data name="SettingsAppearanceDensitySpacious" xml:space="preserve">
+    <value>Aérée</value>
+  </data>
+  <data name="SettingsAppearanceReduceMotionLabel" xml:space="preserve">
+    <value>Réduire les animations</value>
+  </data>
+  <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
+    <value>Afficher le panneau des raccourcis clavier</value>
+  </data>
 </root>

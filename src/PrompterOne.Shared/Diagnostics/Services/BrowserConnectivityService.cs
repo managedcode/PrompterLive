@@ -1,19 +1,20 @@
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Services.Diagnostics;
 
-public sealed class BrowserConnectivityService(IJSRuntime jsRuntime) : IDisposable, IAsyncDisposable
+public sealed class BrowserConnectivityService(
+    IJSRuntime jsRuntime,
+    IStringLocalizer<SharedResource> localizer) : IDisposable, IAsyncDisposable
 {
-    private const string ConnectivityOfflineMessage = "PrompterOne is offline. Live routing, cloud sync, and remote publishing will resume when the browser reconnects.";
-    private const string ConnectivityOfflineTitle = "Connection lost";
-    private const string ConnectivityOnlineMessage = "The browser connection is back. Continue working or reload if anything still looks stale.";
-    private const string ConnectivityOnlineTitle = "Connection restored";
     private const string EvaluateMethodName = "eval";
     private const string OnlineExpression = "navigator.onLine";
     private const int OnlineAutoHideDelayMilliseconds = 2400;
     private const int PollIntervalMilliseconds = 1000;
 
     private readonly IJSRuntime _jsRuntime = jsRuntime;
+    private readonly IStringLocalizer<SharedResource> _localizer = localizer;
     private readonly SemaphoreSlim _startGate = new(1, 1);
 
     private CancellationTokenSource? _hideCts;
@@ -131,8 +132,8 @@ public sealed class BrowserConnectivityService(IJSRuntime jsRuntime) : IDisposab
             UpdateState(
                 isVisible: true,
                 state: ConnectivityStateValues.Offline,
-                title: ConnectivityOfflineTitle,
-                message: ConnectivityOfflineMessage);
+                title: Text(UiTextKey.DiagnosticsConnectivityOfflineTitle),
+                message: Text(UiTextKey.DiagnosticsConnectivityOfflineMessage));
 
             return;
         }
@@ -142,8 +143,8 @@ public sealed class BrowserConnectivityService(IJSRuntime jsRuntime) : IDisposab
             UpdateState(
                 isVisible: true,
                 state: ConnectivityStateValues.Online,
-                title: ConnectivityOnlineTitle,
-                message: ConnectivityOnlineMessage);
+                title: Text(UiTextKey.DiagnosticsConnectivityOnlineTitle),
+                message: Text(UiTextKey.DiagnosticsConnectivityOnlineMessage));
 
             ScheduleHide();
         }
@@ -211,6 +212,8 @@ public sealed class BrowserConnectivityService(IJSRuntime jsRuntime) : IDisposab
         Message = message;
         Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    private string Text(UiTextKey key) => _localizer[key.ToString()];
 
     private static class ConnectivityStateValues
     {

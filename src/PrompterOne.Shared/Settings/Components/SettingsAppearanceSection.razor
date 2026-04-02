@@ -1,17 +1,20 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-appearance"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.AppearancePanel">
-    <h3 class="set-section-title">Appearance</h3>
-    <p class="set-section-desc">Customize the look and feel of the app and the teleprompter reader.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsAppearanceSectionTitle)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsAppearanceSectionDescription)</p>
 
     <div class="set-device-list">
-        <SettingsExpandableCard Title="Theme"
+        <SettingsExpandableCard Title="@Text(UiTextKey.SettingsAppearanceThemeTitle)"
                                 Subtitle="@ThemeSubtitle"
                                 IconStyle="background:rgba(196,160,96,.10); color:var(--gold);"
                                 IsOpen="@IsCardOpen(ThemeCardId)"
@@ -29,7 +32,7 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Color Scheme</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceColorSchemeLabel)</label>
                     <div class="set-theme-options">
                         @foreach (var option in ThemeOptions)
                         {
@@ -47,7 +50,7 @@
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>Accent Color</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceAccentColorLabel)</label>
                     <div class="set-accent-options">
                         @foreach (var accent in AccentOptions)
                         {
@@ -60,11 +63,18 @@
                         }
                     </div>
                 </div>
+                <div class="set-field">
+                    <label>@Text(UiTextKey.SettingsAppearanceLanguageLabel)</label>
+                    <SettingsSelect Value="@SelectedLanguageCulture"
+                                   Options="@LanguageOptions"
+                                   OnChange="OnLanguageChanged"
+                                   TestId="@UiTestIds.Settings.LanguageSelect" />
+                </div>
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Teleprompter Display"
-                                Subtitle="Font · Size · Mirror · Background"
+        <SettingsExpandableCard Title="@Text(UiTextKey.SettingsAppearanceTeleprompterTitle)"
+                                Subtitle="@Text(UiTextKey.SettingsAppearanceTeleprompterSubtitle)"
                                 IconStyle="background:rgba(59,130,246,.10); color:#60A5FA;"
                                 IsOpen="@IsCardOpen(TeleprompterCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(TeleprompterCardId))">
@@ -73,13 +83,13 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Font</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceFontLabel)</label>
                     <SettingsSelect Value="@TeleprompterFont"
                                    Options="@TeleprompterFontOptions"
                                    OnChange="OnFontChanged" />
                 </div>
                 <div class="set-field">
-                    <label>Default Font Size</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceDefaultFontSizeLabel)</label>
                     <div class="set-size-row">
                         <span class="set-size-label">A</span>
                         <input type="range"
@@ -93,7 +103,7 @@
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>Text Color</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceTextColorLabel)</label>
                     <div class="set-accent-options">
                         @foreach (var swatch in TextColorOptions)
                         {
@@ -107,7 +117,7 @@
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Mirror Text (Horizontal Flip)</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceMirrorTextLabel)</label>
                     <div class="set-toggle @(MirrorTeleprompterText ? "on" : null)"
                          @onclick="ToggleMirrorTeleprompterText"
                          @onclick:stopPropagation="true">
@@ -115,7 +125,7 @@
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Show Word Highlight</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceShowWordHighlightLabel)</label>
                     <div class="set-toggle @(ShowWordHighlight ? "on" : null)"
                          @onclick="ToggleShowWordHighlight"
                          @onclick:stopPropagation="true">
@@ -125,8 +135,8 @@
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Interface"
-                                Subtitle="Density · Animations · Sidebar"
+        <SettingsExpandableCard Title="@Text(UiTextKey.SettingsAppearanceInterfaceTitle)"
+                                Subtitle="@Text(UiTextKey.SettingsAppearanceInterfaceSubtitle)"
                                 IconStyle="background:rgba(139,92,246,.10); color:#A78BFA;"
                                 IsOpen="@IsCardOpen(InterfaceCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(InterfaceCardId))">
@@ -136,7 +146,7 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>UI Density</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceUiDensityLabel)</label>
                     <div class="set-theme-options">
                         @foreach (var density in DensityOptions)
                         {
@@ -153,7 +163,7 @@
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Reduce Motion</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceReduceMotionLabel)</label>
                     <div class="set-toggle @(ReduceMotion ? "on" : null)"
                          @onclick="ToggleReduceMotion"
                          @onclick:stopPropagation="true">
@@ -161,7 +171,7 @@
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Show keyboard shortcuts overlay</label>
+                    <label>@Text(UiTextKey.SettingsAppearanceShowShortcutOverlayLabel)</label>
                     <div class="set-toggle @(ShowShortcutOverlay ? "on" : null)"
                          @onclick="ToggleShowShortcutOverlay"
                          @onclick:stopPropagation="true">
@@ -197,11 +207,11 @@
         new("Orange", "#FB923C")
     ];
 
-    private static readonly ThemeOption[] DensityOptions =
+    private ThemeOption[] DensityOptions =>
     [
-        new(SettingsAppearanceValues.CompactDensity, "Compact", "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" style=\"color:var(--t3)\"><line x1=\"4\" y1=\"6\" x2=\"20\" y2=\"6\"/><line x1=\"4\" y1=\"12\" x2=\"20\" y2=\"12\"/><line x1=\"4\" y1=\"18\" x2=\"20\" y2=\"18\"/></svg>"),
-        new(SettingsAppearanceValues.DefaultDensity, "Default", "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:var(--gold)\"><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><line x1=\"4\" y1=\"14\" x2=\"20\" y2=\"14\"/></svg>"),
-        new(SettingsAppearanceValues.SpaciousDensity, "Spacious", "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:var(--t3)\"><line x1=\"4\" y1=\"8\" x2=\"20\" y2=\"8\"/><line x1=\"4\" y1=\"16\" x2=\"20\" y2=\"16\"/></svg>")
+        new(SettingsAppearanceValues.CompactDensity, Text(UiTextKey.SettingsAppearanceDensityCompact), "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" style=\"color:var(--t3)\"><line x1=\"4\" y1=\"6\" x2=\"20\" y2=\"6\"/><line x1=\"4\" y1=\"12\" x2=\"20\" y2=\"12\"/><line x1=\"4\" y1=\"18\" x2=\"20\" y2=\"18\"/></svg>"),
+        new(SettingsAppearanceValues.DefaultDensity, Text(UiTextKey.SettingsAppearanceDensityDefault), "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:var(--gold)\"><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><line x1=\"4\" y1=\"14\" x2=\"20\" y2=\"14\"/></svg>"),
+        new(SettingsAppearanceValues.SpaciousDensity, Text(UiTextKey.SettingsAppearanceDensitySpacious), "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:var(--t3)\"><line x1=\"4\" y1=\"8\" x2=\"20\" y2=\"8\"/><line x1=\"4\" y1=\"16\" x2=\"20\" y2=\"16\"/></svg>")
     ];
 
     private static readonly ThemeOption[] TextColorOptions =
@@ -212,25 +222,26 @@
         new("Mint", "#6EE7B7")
     ];
 
-    private static readonly ThemeOption[] ThemeOptions =
+    private ThemeOption[] ThemeOptions =>
     [
-        new(SettingsAppearanceValues.DarkColorScheme, "Dark", "background:linear-gradient(135deg,#0a0e14,#141c28)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:rgba(196,160,96,.7)\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\"/></svg>"),
-        new(SettingsAppearanceValues.LightColorScheme, "Light", "background:linear-gradient(135deg,#f0ebe4,#e0d8cc)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#8B7355\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"5\"/><line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"23\"/></svg>"),
-        new(SettingsAppearanceValues.SystemColorScheme, "System", "background:linear-gradient(135deg,#0a0e14 50%,#f0ebe4 50%)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:rgba(196,160,96,.9)\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"/><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"/></svg>")
+        new(SettingsAppearanceValues.DarkColorScheme, Text(UiTextKey.SettingsAppearanceThemeDark), "background:linear-gradient(135deg,#0a0e14,#141c28)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:rgba(196,160,96,.7)\"><path d=\"M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z\"/></svg>"),
+        new(SettingsAppearanceValues.LightColorScheme, Text(UiTextKey.SettingsAppearanceThemeLight), "background:linear-gradient(135deg,#f0ebe4,#e0d8cc)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#8B7355\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"5\"/><line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"23\"/></svg>"),
+        new(SettingsAppearanceValues.SystemColorScheme, Text(UiTextKey.SettingsAppearanceThemeSystem), "background:linear-gradient(135deg,#0a0e14 50%,#f0ebe4 50%)", "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:rgba(196,160,96,.9)\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"/><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"/></svg>")
     ];
 
     private string ThemeSubtitle =>
         ColorScheme switch
         {
-            SettingsAppearanceValues.LightColorScheme => "Light · Custom accent",
-            SettingsAppearanceValues.SystemColorScheme => "System · Custom accent",
-            _ => "Dark · Gold accent"
+            SettingsAppearanceValues.LightColorScheme => Text(UiTextKey.SettingsAppearanceThemeSubtitleLight),
+            SettingsAppearanceValues.SystemColorScheme => Text(UiTextKey.SettingsAppearanceThemeSubtitleSystem),
+            _ => Text(UiTextKey.SettingsAppearanceThemeSubtitleDark)
         };
 
     [Parameter] public string AccentColor { get; set; } = string.Empty;
     [Parameter] public string ColorScheme { get; set; } = string.Empty;
     [Parameter] public string DisplayStyle { get; set; } = string.Empty;
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
+    [Parameter] public string SelectedLanguageCulture { get; set; } = string.Empty;
     [Parameter] public bool MirrorTeleprompterText { get; set; }
     [Parameter] public bool ReduceMotion { get; set; }
     [Parameter] public bool ShowShortcutOverlay { get; set; }
@@ -246,13 +257,24 @@
     [Parameter] public EventCallback ToggleShowWordHighlight { get; set; }
     [Parameter] public EventCallback<string> UpdateAccentColor { get; set; }
     [Parameter] public EventCallback<string> UpdateColorScheme { get; set; }
+    [Parameter] public EventCallback<string> UpdateLanguageCulture { get; set; }
     [Parameter] public EventCallback<string> UpdateTeleprompterFont { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> UpdateTeleprompterFontSize { get; set; }
     [Parameter] public EventCallback<string> UpdateTeleprompterTextColor { get; set; }
     [Parameter] public EventCallback<string> UpdateUiDensity { get; set; }
 
+    private static readonly IReadOnlyList<SettingsSelectOption> LanguageOptions = PrompterOne.Core.Localization.AppCultureCatalog
+        .SupportedCultureDefinitionsInDisplayOrder
+        .Select(culture => new SettingsSelectOption(culture.CultureName, culture.DisplayName))
+        .ToArray();
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+
     private void OnFontChanged(ChangeEventArgs args) =>
         UpdateTeleprompterFont.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private void OnLanguageChanged(ChangeEventArgs args) =>
+        UpdateLanguageCulture.InvokeAsync(args.Value?.ToString() ?? string.Empty);
 
     private sealed record ThemeOption(string Label, string Value)
     {

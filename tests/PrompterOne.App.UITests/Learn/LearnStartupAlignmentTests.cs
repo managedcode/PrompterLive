@@ -68,6 +68,7 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
                 const learnLineTestId = {{ToJsString(UiTestIds.Learn.OrpLine)}};
                 const learnWordTestId = {{ToJsString(UiTestIds.Learn.Word)}};
                 const maxSamples = 16;
+                const maxAnimationFramePasses = maxSamples;
 
                 window.__learnStartupTrace = [];
 
@@ -98,6 +99,18 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
                     });
                 };
 
+                let animationFramePasses = 0;
+                const captureOnAnimationFrame = () => {
+                    capture();
+
+                    if (window.__learnStartupTrace.length >= maxSamples || animationFramePasses >= maxAnimationFramePasses) {
+                        return;
+                    }
+
+                    animationFramePasses += 1;
+                    window.requestAnimationFrame(captureOnAnimationFrame);
+                };
+
                 new MutationObserver(capture).observe(document, {
                     attributeFilter: ['style', layoutReadyAttributeName],
                     attributes: true,
@@ -105,6 +118,9 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
                     childList: true,
                     subtree: true
                 });
+
+                capture();
+                window.requestAnimationFrame(captureOnAnimationFrame);
             })();
             """;
     }

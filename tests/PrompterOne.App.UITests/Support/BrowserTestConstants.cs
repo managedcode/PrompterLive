@@ -716,11 +716,37 @@ internal static partial class BrowserTestConstants
     public static class Localization
     {
         public const string CultureStorageKey = "prompterone.settings.culture";
+        public const string EnglishSortByLabel = "Sort by";
         public const string FrenchCultureName = "fr";
         public const string FrenchCreateFolderTitle = "Créer un dossier";
+        public const string FrenchLanguageLabel = "Français";
         public const string FrenchFoldersLabel = "Dossiers";
         public const string FrenchSortByLabel = "Trier par";
+        public const string GermanCultureName = "de";
+        public const string GermanSortByLabel = "Sortieren nach";
+        public const string RussianCultureName = "ru";
         public const string SetLocalStorageScript = "([key, value]) => window.localStorage.setItem(key, value)";
+
+        public static string BuildNavigatorLanguagesInitScript(params string[] languages)
+        {
+            var serializedLanguages = string.Join(
+                ", ",
+                languages.Select(language => $"'{language}'"));
+
+            return $$"""
+            (() => {
+                const languages = [{{serializedLanguages}}];
+                Object.defineProperty(window.navigator, 'languages', {
+                    configurable: true,
+                    get: () => languages
+                });
+                Object.defineProperty(window.navigator, 'language', {
+                    configurable: true,
+                    get: () => languages[0]
+                });
+            })();
+            """;
+        }
     }
 
     public static class Timing

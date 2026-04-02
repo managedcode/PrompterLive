@@ -1,7 +1,10 @@
 @implements IDisposable
 @namespace PrompterOne.Shared.Components.Diagnostics
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @inject NavigationManager Navigation
 @inject PrompterOne.Shared.Services.Diagnostics.BrowserConnectivityService Connectivity
+@inject IStringLocalizer<SharedResource> Localizer
 
 @if (Connectivity.IsVisible)
 {
@@ -12,7 +15,7 @@
              data-state="@Connectivity.State"
              data-testid="@UiTestIds.Diagnostics.Connectivity">
         <div class="app-shell-card app-shell-card-status">
-            <span class="app-shell-eyebrow">Connection</span>
+            <span class="app-shell-eyebrow">@Text(UiTextKey.DiagnosticsConnectivityEyebrow)</span>
             <h2 id="@UiDomIds.Diagnostics.ConnectivityTitle">@Connectivity.Title</h2>
             <p id="@UiDomIds.Diagnostics.ConnectivityMessage">@Connectivity.Message</p>
             <div class="app-shell-actions">
@@ -20,12 +23,12 @@
                         id="@UiDomIds.Diagnostics.ConnectivityRetry"
                         class="app-shell-btn app-shell-btn-primary"
                         @onclick="HandleRetry"
-                        data-testid="@UiTestIds.Diagnostics.ConnectivityRetry">Retry Now</button>
+                        data-testid="@UiTestIds.Diagnostics.ConnectivityRetry">@Text(UiTextKey.DiagnosticsConnectivityRetryNow)</button>
                 <button type="button"
                         id="@UiDomIds.Diagnostics.ConnectivityDismiss"
                         class="app-shell-btn"
                         @onclick="HandleDismiss"
-                        data-testid="@UiTestIds.Diagnostics.ConnectivityDismiss">Dismiss</button>
+                        data-testid="@UiTestIds.Diagnostics.ConnectivityDismiss">@Text(UiTextKey.DiagnosticsDismiss)</button>
             </div>
         </div>
     </section>
@@ -47,6 +50,8 @@
 
     private void HandleConnectivityChanged(object? sender, EventArgs args) =>
         InvokeAsync(StateHasChanged);
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 
     public void Dispose()
     {

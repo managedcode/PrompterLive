@@ -5,6 +5,7 @@
 @using PrompterOne.Core.Models.Media
 @using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
 @using PrompterOne.Shared.Services.Diagnostics
 @using PrompterOne.Shared.Settings.Components
@@ -25,44 +26,44 @@
     <div class="set-layout">
         <div class="set-sidebar">
             <div class="set-back-row">
-                <h2 class="set-title">Settings</h2>
+                <h2 class="set-title" data-testid="@UiTestIds.Settings.Title">@Text(UiTextKey.SettingsTitle)</h2>
             </div>
             <nav class="set-nav">
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Cloud)" @onclick="() => ShowSection(SettingsSection.Cloud)" data-testid="@UiTestIds.Settings.NavCloud">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
-                    @SettingsNavigationText.CloudSyncLabel
+                    @Text(UiTextKey.SettingsNavCloud)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Files)" @onclick="() => ShowSection(SettingsSection.Files)" data-testid="@UiTestIds.Settings.NavFiles">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
-                    @SettingsNavigationText.FileStorageLabel
+                    @Text(UiTextKey.SettingsNavFiles)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Cameras)" @onclick="() => ShowSection(SettingsSection.Cameras)" data-testid="@UiTestIds.Settings.NavCameras">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-                    Cameras
+                    @Text(UiTextKey.SettingsNavCameras)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Mics)" @onclick="() => ShowSection(SettingsSection.Mics)" data-testid="@UiTestIds.Settings.NavMics">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>
-                    Microphones
+                    @Text(UiTextKey.SettingsNavMicrophones)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Streaming)" @onclick="() => ShowSection(SettingsSection.Streaming)" data-testid="@UiTestIds.Settings.NavStreaming">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>
-                    Streaming
+                    @Text(UiTextKey.SettingsNavStreaming)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Recording)" @onclick="() => ShowSection(SettingsSection.Recording)" data-testid="@UiTestIds.Settings.NavRecording">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" fill="currentColor" /></svg>
-                    Recording
+                    @Text(UiTextKey.SettingsNavRecording)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Ai)" @onclick="() => ShowSection(SettingsSection.Ai)" data-testid="@UiTestIds.Settings.NavAi">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
-                    @SettingsNavigationText.AiProviderLabel
+                    @Text(UiTextKey.SettingsNavAi)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Appearance)" @onclick="() => ShowSection(SettingsSection.Appearance)" data-testid="@UiTestIds.Settings.NavAppearance">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
-                    Appearance
+                    @Text(UiTextKey.SettingsNavAppearance)
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.About)" @onclick="() => ShowSection(SettingsSection.About)" data-testid="@UiTestIds.Settings.NavAbout">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
-                    About
+                    @Text(UiTextKey.SettingsNavAbout)
                 </button>
             </nav>
         </div>
@@ -136,8 +137,8 @@
                      id="set-streaming"
                      style="@GetSectionDisplayStyle(SettingsSection.Streaming)"
                      data-testid="@UiTestIds.Settings.StreamingPanel">
-                <h3 class="set-section-title">Streaming System</h3>
-                <p class="set-section-desc">Configure browser-owned program capture, local recording, transport connections, and downstream targets here so Go Live stays focused on operating the session.</p>
+                <h3 class="set-section-title">@Text(UiTextKey.SettingsStreamingSectionTitle)</h3>
+                <p class="set-section-desc">@Text(UiTextKey.SettingsStreamingSectionDescription)</p>
 
                 <SettingsStreamingPanel Settings="@_studioSettings.Streaming"
                                         Sources="@_sceneCameras"
@@ -198,6 +199,7 @@
                                        IsCardOpen="IsCardOpen"
                                        ColorScheme="@_pagePreferences.ColorScheme"
                                        AccentColor="@_pagePreferences.AccentColor"
+                                       SelectedLanguageCulture="@SelectedLanguageCulture"
                                        TeleprompterFont="@_pagePreferences.TeleprompterFont"
                                        TeleprompterFontSize="@_pagePreferences.TeleprompterFontSize"
                                        TeleprompterTextColor="@_pagePreferences.TeleprompterTextColor"
@@ -214,6 +216,7 @@
                                        UpdateTeleprompterTextColor="UpdateTeleprompterTextColorAsync"
                                        ToggleMirrorTeleprompterText="ToggleMirrorTeleprompterTextAsync"
                                        ToggleShowWordHighlight="ToggleShowWordHighlightAsync"
+                                       UpdateLanguageCulture="UpdateLanguageCultureAsync"
                                        UpdateUiDensity="UpdateUiDensityAsync"
                                        ToggleReduceMotion="ToggleReduceMotionAsync"
                                        ToggleShowShortcutOverlay="ToggleShowShortcutOverlayAsync" />

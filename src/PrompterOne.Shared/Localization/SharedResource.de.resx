@@ -13,279 +13,279 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DiagnosticsDismiss" xml:space="preserve">
-    <value>Fechar</value>
+    <value>Schließen</value>
   </data>
   <data name="DiagnosticsRetry" xml:space="preserve">
-    <value>Tentar novamente</value>
+    <value>Erneut versuchen</value>
   </data>
   <data name="DiagnosticsLibrary" xml:space="preserve">
-    <value>Biblioteca</value>
+    <value>Bibliothek</value>
   </data>
   <data name="DiagnosticsFatalTitle" xml:space="preserve">
-    <value>Erro inesperado</value>
+    <value>Unerwarteter Fehler</value>
   </data>
   <data name="DiagnosticsFatalMessage" xml:space="preserve">
-    <value>O PrompterOne encontrou um erro inesperado. Tente esta tela novamente ou volte para a biblioteca.</value>
+    <value>PrompterOne hat einen unerwarteten Fehler festgestellt. Versuchen Sie diesen Bildschirm erneut oder kehren Sie zur Bibliothek zurück.</value>
   </data>
   <data name="DiagnosticsRecoverableTitle" xml:space="preserve">
-    <value>Ação falhou</value>
+    <value>Aktion fehlgeschlagen</value>
   </data>
   <data name="LibraryAllScripts" xml:space="preserve">
-    <value>Todos os roteiros</value>
+    <value>Alle Skripte</value>
   </data>
   <data name="LibraryRecent" xml:space="preserve">
-    <value>Recentes</value>
+    <value>Zuletzt verwendet</value>
   </data>
   <data name="LibraryFavorites" xml:space="preserve">
-    <value>Favoritos</value>
+    <value>Favoriten</value>
   </data>
   <data name="LibraryFolders" xml:space="preserve">
-    <value>Pastas</value>
+    <value>Ordner</value>
   </data>
   <data name="LibraryNewFolder" xml:space="preserve">
-    <value>Nova pasta</value>
+    <value>Neuer Ordner</value>
   </data>
   <data name="LibrarySettings" xml:space="preserve">
-    <value>Configurações</value>
+    <value>Einstellungen</value>
   </data>
   <data name="LibrarySortBy" xml:space="preserve">
-    <value>Ordenar por</value>
+    <value>Sortieren nach</value>
   </data>
   <data name="LibrarySortName" xml:space="preserve">
-    <value>Nome</value>
+    <value>Name</value>
   </data>
   <data name="LibrarySortDate" xml:space="preserve">
-    <value>Data</value>
+    <value>Datum</value>
   </data>
   <data name="LibrarySortDuration" xml:space="preserve">
-    <value>Duração</value>
+    <value>Dauer</value>
   </data>
   <data name="LibrarySortWpm" xml:space="preserve">
-    <value>PPM</value>
+    <value>WPM</value>
   </data>
   <data name="LibraryCreateFolderTitle" xml:space="preserve">
-    <value>Criar pasta</value>
+    <value>Ordner erstellen</value>
   </data>
   <data name="LibraryCreateFolderDescription" xml:space="preserve">
-    <value>Organize roteiros em coleções aninhadas sem mexer na grade da biblioteca.</value>
+    <value>Organisieren Sie Skripte in verschachtelten Sammlungen, ohne das Bibliotheksraster zu verändern.</value>
   </data>
   <data name="HeaderSearchPlaceholder" xml:space="preserve">
-    <value>Pesquisar...</value>
+    <value>Suchen...</value>
   </data>
   <data name="HeaderNewScript" xml:space="preserve">
-    <value>Novo roteiro</value>
+    <value>Neues Skript</value>
   </data>
   <data name="HeaderLearn" xml:space="preserve">
-    <value>Estudar</value>
+    <value>Lernen</value>
   </data>
   <data name="HeaderRead" xml:space="preserve">
-    <value>Ler</value>
+    <value>Lesen</value>
   </data>
   <data name="HeaderGoLive" xml:space="preserve">
-    <value>Ao vivo</value>
+    <value>Live gehen</value>
   </data>
   <data name="HeaderSettings" xml:space="preserve">
-    <value>Configurações</value>
+    <value>Einstellungen</value>
   </data>
   <data name="GoLiveHeroEyebrow" xml:space="preserve">
-    <value>ROTEAMENTO AO VIVO</value>
+    <value>LIVE-ROUTING</value>
   </data>
   <data name="GoLiveHeroDescription" xml:space="preserve">
-    <value>Prepare os destinos para o sinal de programa atual, mantendo o teleprompter e o RSVP prontos em abas separadas.</value>
+    <value>Aktivieren Sie Ziele für den aktuellen Program-Feed, während Teleprompter und RSVP in separaten Tabs bereit bleiben.</value>
   </data>
   <data name="CommonName" xml:space="preserve">
-    <value>Nome</value>
+    <value>Name</value>
   </data>
   <data name="CommonParent" xml:space="preserve">
-    <value>Pai</value>
+    <value>Übergeordnet</value>
   </data>
   <data name="CommonTopLevel" xml:space="preserve">
-    <value>Nível superior</value>
+    <value>Oberste Ebene</value>
   </data>
   <data name="CommonCancel" xml:space="preserve">
-    <value>Cancelar</value>
+    <value>Abbrechen</value>
   </data>
   <data name="CommonCreate" xml:space="preserve">
-    <value>Criar</value>
+    <value>Erstellen</value>
   </data>
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Roadshows</value>
   </data>
   <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
-    <value>Conexão</value>
+    <value>Verbindung</value>
   </data>
   <data name="DiagnosticsConnectivityRetryNow" xml:space="preserve">
-    <value>Tentar agora</value>
+    <value>Jetzt erneut versuchen</value>
   </data>
   <data name="DiagnosticsConnectivityOfflineTitle" xml:space="preserve">
-    <value>Conexão perdida</value>
+    <value>Verbindung verloren</value>
   </data>
   <data name="DiagnosticsConnectivityOfflineMessage" xml:space="preserve">
-    <value>O PrompterOne está offline. O roteamento ao vivo, a sincronização na nuvem e a publicação remota serão retomados quando o navegador se reconectar.</value>
+    <value>PrompterOne ist offline. Live-Routing, Cloud-Synchronisierung und Remote-Veröffentlichung werden fortgesetzt, sobald der Browser wieder verbunden ist.</value>
   </data>
   <data name="DiagnosticsConnectivityOnlineTitle" xml:space="preserve">
-    <value>Conexão restaurada</value>
+    <value>Verbindung wiederhergestellt</value>
   </data>
   <data name="DiagnosticsConnectivityOnlineMessage" xml:space="preserve">
-    <value>A conexão do navegador voltou. Continue trabalhando ou recarregue se algo ainda parecer desatualizado.</value>
+    <value>Die Browserverbindung ist wieder da. Arbeiten Sie weiter oder laden Sie neu, falls noch etwas veraltet wirkt.</value>
   </data>
   <data name="HeaderGoLiveIndicatorRecording" xml:space="preserve">
-    <value>Gravação ativa</value>
+    <value>Aufnahme aktiv</value>
   </data>
   <data name="HeaderGoLiveIndicatorStreaming" xml:space="preserve">
-    <value>Transmissão ativa</value>
+    <value>Stream aktiv</value>
   </data>
   <data name="HeaderGoLiveIndicatorReady" xml:space="preserve">
-    <value>Pronto</value>
+    <value>Bereit</value>
   </data>
   <data name="HeaderGoLiveWidgetLive" xml:space="preserve">
-    <value>Ao vivo</value>
+    <value>Live</value>
   </data>
   <data name="HeaderGoLiveWidgetRecording" xml:space="preserve">
     <value>REC</value>
   </data>
   <data name="HeaderGoLiveWidgetLiveRecording" xml:space="preserve">
-    <value>Ao vivo + REC</value>
+    <value>Live + REC</value>
   </data>
   <data name="SettingsTitle" xml:space="preserve">
-    <value>Configurações</value>
+    <value>Einstellungen</value>
   </data>
   <data name="SettingsNavCloud" xml:space="preserve">
-    <value>Sincronização na nuvem</value>
+    <value>Cloud-Sync</value>
   </data>
   <data name="SettingsNavFiles" xml:space="preserve">
-    <value>Armazenamento de arquivos</value>
+    <value>Dateispeicher</value>
   </data>
   <data name="SettingsNavCameras" xml:space="preserve">
-    <value>Câmeras</value>
+    <value>Kameras</value>
   </data>
   <data name="SettingsNavMicrophones" xml:space="preserve">
-    <value>Microfones</value>
+    <value>Mikrofone</value>
   </data>
   <data name="SettingsNavStreaming" xml:space="preserve">
     <value>Streaming</value>
   </data>
   <data name="SettingsNavRecording" xml:space="preserve">
-    <value>Gravação</value>
+    <value>Aufnahme</value>
   </data>
   <data name="SettingsNavAi" xml:space="preserve">
-    <value>Provedor de IA</value>
+    <value>KI-Anbieter</value>
   </data>
   <data name="SettingsNavAppearance" xml:space="preserve">
-    <value>Aparência</value>
+    <value>Erscheinungsbild</value>
   </data>
   <data name="SettingsNavAbout" xml:space="preserve">
-    <value>Sobre</value>
+    <value>Über</value>
   </data>
   <data name="SettingsCloudSectionTitle" xml:space="preserve">
-    <value>Armazenamento em nuvem</value>
+    <value>Cloud-Speicher</value>
   </data>
   <data name="SettingsCloudSectionDescription" xml:space="preserve">
-    <value>Configure aqui destinos opcionais de snapshot em nuvem. As credenciais dos provedores permanecem no armazenamento local deste navegador e nada é conectado até que você salve credenciais reais válidas.</value>
+    <value>Konfigurieren Sie hier optionale Cloud-Snapshot-Ziele. Anbieter-Anmeldedaten bleiben im lokalen Speicher dieses Browsers, und nichts wird verbunden, bis Sie gültige echte Zugangsdaten speichern.</value>
   </data>
   <data name="SettingsFilesSectionTitle" xml:space="preserve">
-    <value>Armazenamento de arquivos</value>
+    <value>Dateispeicher</value>
   </data>
   <data name="SettingsFilesSectionDescription" xml:space="preserve">
-    <value>O PrompterOne funciona apenas no navegador. Os roteiros permanecem na biblioteca do navegador, enquanto gravações e exportações usam o contêiner de armazenamento local do navegador em vez de pastas falsas da área de trabalho.</value>
+    <value>PrompterOne ist browserbasiert. Skripte bleiben im Browser-Bibliotheksspeicher, während Aufnahmen und Exporte den browserlokalen Speichercontainer statt fiktiver Desktop-Ordner verwenden.</value>
   </data>
   <data name="SettingsAiSectionTitle" xml:space="preserve">
-    <value>Provedor de IA</value>
+    <value>KI-Anbieter</value>
   </data>
   <data name="SettingsAiSectionDescription" xml:space="preserve">
-    <value>Armazene rascunhos de provedores de IA localmente neste navegador. O teste de conexão em tempo de execução ainda não foi implementado, então cada provedor permanece desconectado até que exista uma integração real.</value>
+    <value>Speichern Sie KI-Anbieter-Entwürfe lokal in diesem Browser. Laufzeit-Verbindungstests sind noch nicht implementiert, daher bleibt jeder Anbieter getrennt, bis eine echte Integration verfügbar ist.</value>
   </data>
   <data name="SettingsRecordingSectionTitle" xml:space="preserve">
-    <value>Gravação</value>
+    <value>Aufnahme</value>
   </data>
   <data name="SettingsRecordingSectionDescription" xml:space="preserve">
-    <value>Configure como as gravações locais são salvas durante as sessões do Go Live.</value>
+    <value>Konfigurieren Sie, wie lokale Aufnahmen während Go-Live-Sitzungen gespeichert werden.</value>
   </data>
   <data name="SettingsStreamingSectionTitle" xml:space="preserve">
-    <value>Sistema de streaming</value>
+    <value>Streaming-System</value>
   </data>
   <data name="SettingsStreamingSectionDescription" xml:space="preserve">
-    <value>Configure aqui a captura do programa no navegador, a gravação local, as conexões de transporte e os destinos downstream para que o Go Live continue focado em operar a sessão.</value>
+    <value>Konfigurieren Sie hier browserseitige Program-Erfassung, lokale Aufnahme, Transportverbindungen und nachgelagerte Ziele, damit Go Live auf den Betrieb der Sitzung fokussiert bleibt.</value>
   </data>
   <data name="SettingsAppearanceSectionTitle" xml:space="preserve">
-    <value>Aparência</value>
+    <value>Erscheinungsbild</value>
   </data>
   <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
-    <value>Personalize a aparência do aplicativo e do leitor do teleprompter.</value>
+    <value>Passen Sie das Aussehen der App und des Teleprompter-Lesers an.</value>
   </data>
   <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
-    <value>Tema</value>
+    <value>Thema</value>
   </data>
   <data name="SettingsAppearanceThemeSubtitleDark" xml:space="preserve">
-    <value>Escuro · Destaque dourado</value>
+    <value>Dunkel · Goldakzent</value>
   </data>
   <data name="SettingsAppearanceThemeSubtitleLight" xml:space="preserve">
-    <value>Claro · Destaque personalizado</value>
+    <value>Hell · Eigener Akzent</value>
   </data>
   <data name="SettingsAppearanceThemeSubtitleSystem" xml:space="preserve">
-    <value>Sistema · Destaque personalizado</value>
+    <value>System · Eigener Akzent</value>
   </data>
   <data name="SettingsAppearanceColorSchemeLabel" xml:space="preserve">
-    <value>Esquema de cores</value>
+    <value>Farbschema</value>
   </data>
   <data name="SettingsAppearanceAccentColorLabel" xml:space="preserve">
-    <value>Cor de destaque</value>
+    <value>Akzentfarbe</value>
   </data>
   <data name="SettingsAppearanceLanguageLabel" xml:space="preserve">
-    <value>Idioma</value>
+    <value>Sprache</value>
   </data>
   <data name="SettingsAppearanceThemeDark" xml:space="preserve">
-    <value>Escuro</value>
+    <value>Dunkel</value>
   </data>
   <data name="SettingsAppearanceThemeLight" xml:space="preserve">
-    <value>Claro</value>
+    <value>Hell</value>
   </data>
   <data name="SettingsAppearanceThemeSystem" xml:space="preserve">
-    <value>Sistema</value>
+    <value>System</value>
   </data>
   <data name="SettingsAppearanceTeleprompterTitle" xml:space="preserve">
-    <value>Exibição do teleprompter</value>
+    <value>Teleprompter-Anzeige</value>
   </data>
   <data name="SettingsAppearanceTeleprompterSubtitle" xml:space="preserve">
-    <value>Fonte · Tamanho · Espelho · Fundo</value>
+    <value>Schrift · Größe · Spiegeln · Hintergrund</value>
   </data>
   <data name="SettingsAppearanceFontLabel" xml:space="preserve">
-    <value>Fonte</value>
+    <value>Schrift</value>
   </data>
   <data name="SettingsAppearanceDefaultFontSizeLabel" xml:space="preserve">
-    <value>Tamanho de fonte padrão</value>
+    <value>Standard-Schriftgröße</value>
   </data>
   <data name="SettingsAppearanceTextColorLabel" xml:space="preserve">
-    <value>Cor do texto</value>
+    <value>Textfarbe</value>
   </data>
   <data name="SettingsAppearanceMirrorTextLabel" xml:space="preserve">
-    <value>Espelhar texto (virar horizontalmente)</value>
+    <value>Text spiegeln (horizontal)</value>
   </data>
   <data name="SettingsAppearanceShowWordHighlightLabel" xml:space="preserve">
-    <value>Mostrar destaque de palavras</value>
+    <value>Worthervorhebung anzeigen</value>
   </data>
   <data name="SettingsAppearanceInterfaceTitle" xml:space="preserve">
-    <value>Interface</value>
+    <value>Oberfläche</value>
   </data>
   <data name="SettingsAppearanceInterfaceSubtitle" xml:space="preserve">
-    <value>Densidade · Animações · Barra lateral</value>
+    <value>Dichte · Animationen · Seitenleiste</value>
   </data>
   <data name="SettingsAppearanceUiDensityLabel" xml:space="preserve">
-    <value>Densidade da interface</value>
+    <value>UI-Dichte</value>
   </data>
   <data name="SettingsAppearanceDensityCompact" xml:space="preserve">
-    <value>Compacta</value>
+    <value>Kompakt</value>
   </data>
   <data name="SettingsAppearanceDensityDefault" xml:space="preserve">
-    <value>Padrão</value>
+    <value>Standard</value>
   </data>
   <data name="SettingsAppearanceDensitySpacious" xml:space="preserve">
-    <value>Espaçosa</value>
+    <value>Großzügig</value>
   </data>
   <data name="SettingsAppearanceReduceMotionLabel" xml:space="preserve">
-    <value>Reduzir movimento</value>
+    <value>Bewegung reduzieren</value>
   </data>
   <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
-    <value>Mostrar painel de atalhos do teclado</value>
+    <value>Tastenkürzel-Overlay anzeigen</value>
   </data>
 </root>

@@ -20,8 +20,10 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
             var mainPanel = page.GetByTestId(UiTestIds.Editor.MainPanel);
             var metadataRail = page.GetByTestId(UiTestIds.Editor.MetadataRail);
 
-            await Expect(mainPanel).ToBeVisibleAsync();
-            await Expect(metadataRail).ToBeVisibleAsync();
+            await Expect(mainPanel)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(metadataRail)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
             var mainBounds = await GetRequiredBoundingBoxAsync(mainPanel);
             var railBounds = await GetRequiredBoundingBoxAsync(metadataRail);
@@ -59,8 +61,10 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
             var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
             var sourceScrollHost = page.GetByTestId(UiTestIds.Editor.SourceScrollHost);
 
-            await Expect(sourceInput).ToBeVisibleAsync();
-            await Expect(sourceScrollHost).ToBeVisibleAsync();
+            await Expect(sourceInput)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(sourceScrollHost)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
             await sourceInput.EvaluateAsync(
                 """

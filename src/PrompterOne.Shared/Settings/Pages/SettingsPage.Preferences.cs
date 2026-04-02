@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Core.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 
@@ -206,6 +207,14 @@ public partial class SettingsPage
     {
         _pagePreferences = _pagePreferences with { ShowShortcutOverlay = !_pagePreferences.ShowShortcutOverlay };
         await PersistPreferencesAsync();
+    }
+
+    private async Task UpdateLanguageCultureAsync(string value)
+    {
+        var cultureName = AppCultureCatalog.ResolveSupportedCulture(value);
+        _pagePreferences = _pagePreferences with { LanguageCulture = cultureName };
+        await PersistPreferencesAsync();
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 
     private static string BuildToggleCssClass(bool isOn) =>

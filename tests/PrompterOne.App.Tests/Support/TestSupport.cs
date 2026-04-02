@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using PrompterOne.App.Tests;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Documents;
 using PrompterOne.Core.Models.Library;
 using PrompterOne.Core.Models.Media;
@@ -16,6 +17,7 @@ using PrompterOne.Core.Services.Preview;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Core.Services.Streaming;
 using PrompterOne.Core.Services.Workspace;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Services.Editor;
@@ -82,6 +84,7 @@ internal static class TestHarnessFactory
         }
 
         context.Services.AddLocalization();
+        context.Services.AddSingleton(jsRuntime);
         context.Services.AddSingleton<IJSRuntime>(jsRuntime);
         context.Services.AddSingleton<ILoggerFactory>(loggerFactory);
         context.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
@@ -111,6 +114,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<AiProviderSettingsStore>();
         context.Services.AddSingleton<BrowserCloudStorageStore>();
         context.Services.AddSingleton<BrowserFileStorageStore>();
+        context.Services.AddSingleton<AppCulturePreferenceService>();
         context.Services.AddSingleton<BrowserThemeService>();
         context.Services.AddSingleton<CloudStorageProviderFactory>();
         context.Services.AddSingleton<CloudStorageTransferService>();
@@ -178,6 +182,8 @@ internal sealed record JsInvocationRecord(
 
 internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRuntime
 {
+    private const string BrowserCultureGetLanguagesIdentifier = BrowserCultureInteropMethodNames.GetBrowserLanguages;
+    private const string BrowserCultureSetDocumentLanguageIdentifier = BrowserCultureInteropMethodNames.SetDocumentLanguage;
     private const string CrossTabDisposeIdentifier = "PrompterOneCrossTabInterop.dispose";
     private const string CrossTabInitializeIdentifier = "PrompterOneCrossTabInterop.initialize";
     private const string CrossTabPublishIdentifier = "PrompterOneCrossTabInterop.publish";
@@ -210,12 +216,21 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     };
 
     private readonly TimeSpan _invocationDelay = invocationDelay ?? TimeSpan.Zero;
+    public IReadOnlyList<string> BrowserLanguages { get; private set; } = [AppCultureCatalog.EnglishCultureName];
+    public string DocumentLanguage { get; private set; } = AppCultureCatalog.DefaultCultureName;
     public Dictionary<string, object?> SavedValues { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, string> SavedJsonValues { get; } = new(StringComparer.Ordinal);
     public List<string> Invocations { get; } = [];
     public List<JsInvocationRecord> InvocationRecords { get; } = [];
     private Dictionary<string, GoLiveOutputRuntimeSnapshot> GoLiveSessions { get; } = new(StringComparer.Ordinal);
     private Dictionary<string, GoLiveRemoteSourceRuntimeSnapshot> GoLiveRemoteSessions { get; } = new(StringComparer.Ordinal);
+
+    public void SetBrowserLanguages(params string[] languages)
+    {
+        BrowserLanguages = languages
+            .Where(language => !string.IsNullOrWhiteSpace(language))
+            .ToArray();
+    }
 
     public void SeedRemoteSources(
         string sessionId,
@@ -283,6 +298,8 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
 
         var result = identifier switch
         {
+            BrowserCultureGetLanguagesIdentifier => BrowserLanguages.ToArray(),
+            BrowserCultureSetDocumentLanguageIdentifier => SetDocumentLanguage(args),
             CrossTabDisposeIdentifier => null,
             CrossTabInitializeIdentifier => true,
             CrossTabPublishIdentifier => null,
@@ -304,6 +321,12 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         }
 
         return (TValue)result;
+    }
+
+    private object? SetDocumentLanguage(object?[]? args)
+    {
+        DocumentLanguage = args?.FirstOrDefault()?.ToString() ?? AppCultureCatalog.DefaultCultureName;
+        return null;
     }
 
     private bool TryHandleGoLiveOutputInvocation<TValue>(string identifier, object?[]? args, out TValue result)

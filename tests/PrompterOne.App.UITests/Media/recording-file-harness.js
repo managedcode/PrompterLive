@@ -6,6 +6,8 @@
     const minimumAudibleFrequencyValue = 8;
     const minimumVisibleChannelValue = 12;
     const minimumVisiblePixelCount = 16;
+    const visibleVideoProbeTimeoutMs = 1500;
+    const visibleVideoPollDelayMs = 100;
     const readyStateHaveCurrentData = 2;
 
     if (typeof window[harnessGlobalName] === "object" && window[harnessGlobalName] !== null) {
@@ -115,6 +117,36 @@
         };
     }
 
+    async function waitForNextVideoFrame(videoElement) {
+        if (typeof videoElement.requestVideoFrameCallback === "function") {
+            await new Promise(resolve => videoElement.requestVideoFrameCallback(() => resolve()));
+            return;
+        }
+
+        await new Promise(resolve => window.setTimeout(resolve, visibleVideoPollDelayMs));
+    }
+
+    async function detectVisibleVideoAcrossFrames(videoElement) {
+        const deadline = Date.now() + visibleVideoProbeTimeoutMs;
+        let highestVisiblePixelCount = 0;
+
+        while (Date.now() <= deadline) {
+            const sample = detectVisibleVideo(videoElement);
+            highestVisiblePixelCount = Math.max(highestVisiblePixelCount, sample.nonBlackPixelCount);
+
+            if (sample.hasVisibleVideo) {
+                return sample;
+            }
+
+            await waitForNextVideoFrame(videoElement);
+        }
+
+        return {
+            hasVisibleVideo: highestVisiblePixelCount >= minimumVisiblePixelCount,
+            nonBlackPixelCount: highestVisiblePixelCount
+        };
+    }
+
     async function analyzeSavedRecording() {
         if (!(savedBlob instanceof Blob)) {
             return null;
@@ -139,7 +171,7 @@
                 : null;
             const hasAudioTrack = Boolean(captureStream?.getAudioTracks?.().length);
             const hasAudibleAudio = await detectAudibleAudio(captureStream);
-            const visibleVideo = detectVisibleVideo(videoElement);
+            const visibleVideo = await detectVisibleVideoAcrossFrames(videoElement);
 
             captureStream?.getTracks?.().forEach(track => track.stop());
 

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.JSInterop;
 using PrompterOne.App;
 using PrompterOne.App.Services;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Services;
 
@@ -22,5 +22,5 @@ builder.Services.AddSingleton<IAppVersionProvider>(_ => AppVersionProviderFactor
 builder.Services.AddPrompterOneShared();
 
 var host = builder.Build();
-await BrowserCultureRuntime.ApplyPreferredCultureAsync(host.Services.GetRequiredService<IJSRuntime>());
+await host.Services.GetRequiredService<AppCulturePreferenceService>().InitializeAsync();
 await host.RunAsync();

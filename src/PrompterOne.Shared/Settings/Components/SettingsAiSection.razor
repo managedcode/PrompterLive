@@ -1,14 +1,17 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-ai"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.AiPanel">
-    <h3 class="set-section-title">@SettingsNavigationText.AiProviderLabel</h3>
-    <p class="set-section-desc">Store AI provider drafts locally in this browser. Runtime connection testing is not implemented yet, so every provider stays unconnected until a real integration ships.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsAiSectionTitle)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsAiSectionDescription)</p>
 
     <div class="set-device-list">
         <SettingsAiProviderCard Title="Claude API"
@@ -129,3 +132,7 @@
         </SettingsAiProviderCard>
     </div>
 </section>
+
+@code {
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}

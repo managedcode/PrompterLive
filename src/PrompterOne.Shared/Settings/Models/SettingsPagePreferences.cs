@@ -25,7 +25,8 @@ public sealed record SettingsPagePreferences(
     bool ReduceMotion,
     bool ShowShortcutOverlay,
     bool ShowHeaderChrome,
-    bool AmbientGradientMotion)
+    bool AmbientGradientMotion,
+    string? LanguageCulture)
 {
     public const string StorageKey = "prompterone.settings-page";
 
@@ -54,5 +55,6 @@ public sealed record SettingsPagePreferences(
         ReduceMotion: false,
         ShowShortcutOverlay: true,
         ShowHeaderChrome: true,
-        AmbientGradientMotion: true);
+        AmbientGradientMotion: true,
+        LanguageCulture: null);
 }

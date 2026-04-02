@@ -111,4 +111,181 @@
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Роудшоу</value>
   </data>
+  <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
+    <value>З’єднання</value>
+  </data>
+  <data name="DiagnosticsConnectivityRetryNow" xml:space="preserve">
+    <value>Спробувати зараз</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineTitle" xml:space="preserve">
+    <value>З’єднання втрачено</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineMessage" xml:space="preserve">
+    <value>PrompterOne офлайн. Маршрутизація ефіру, хмарна синхронізація та віддалена публікація відновляться, щойно браузер знову підключиться.</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineTitle" xml:space="preserve">
+    <value>З’єднання відновлено</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineMessage" xml:space="preserve">
+    <value>З’єднання браузера повернулося. Продовжуйте роботу або перезавантажте сторінку, якщо щось ще виглядає застарілим.</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorRecording" xml:space="preserve">
+    <value>Запис активний</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorStreaming" xml:space="preserve">
+    <value>Ефір активний</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorReady" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLive" xml:space="preserve">
+    <value>Ефір</value>
+  </data>
+  <data name="HeaderGoLiveWidgetRecording" xml:space="preserve">
+    <value>REC</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLiveRecording" xml:space="preserve">
+    <value>Ефір + REC</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="SettingsNavCloud" xml:space="preserve">
+    <value>Хмарна синхронізація</value>
+  </data>
+  <data name="SettingsNavFiles" xml:space="preserve">
+    <value>Файлове сховище</value>
+  </data>
+  <data name="SettingsNavCameras" xml:space="preserve">
+    <value>Камери</value>
+  </data>
+  <data name="SettingsNavMicrophones" xml:space="preserve">
+    <value>Мікрофони</value>
+  </data>
+  <data name="SettingsNavStreaming" xml:space="preserve">
+    <value>Трансляція</value>
+  </data>
+  <data name="SettingsNavRecording" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="SettingsNavAi" xml:space="preserve">
+    <value>Провайдер ШІ</value>
+  </data>
+  <data name="SettingsNavAppearance" xml:space="preserve">
+    <value>Вигляд</value>
+  </data>
+  <data name="SettingsNavAbout" xml:space="preserve">
+    <value>Про застосунок</value>
+  </data>
+  <data name="SettingsCloudSectionTitle" xml:space="preserve">
+    <value>Хмарне сховище</value>
+  </data>
+  <data name="SettingsCloudSectionDescription" xml:space="preserve">
+    <value>Налаштуйте тут необов’язкові хмарні цілі для знімків. Облікові дані провайдерів залишаються у локальному сховищі цього браузера, і нічого не підключається, доки ви не збережете справжні чинні облікові дані.</value>
+  </data>
+  <data name="SettingsFilesSectionTitle" xml:space="preserve">
+    <value>Файлове сховище</value>
+  </data>
+  <data name="SettingsFilesSectionDescription" xml:space="preserve">
+    <value>PrompterOne працює лише в браузері. Сценарії залишаються у бібліотеці браузера, а записи та експорт використовують локальний контейнер сховища браузера замість фіктивних тек робочого столу.</value>
+  </data>
+  <data name="SettingsAiSectionTitle" xml:space="preserve">
+    <value>Провайдер ШІ</value>
+  </data>
+  <data name="SettingsAiSectionDescription" xml:space="preserve">
+    <value>Зберігайте чернетки провайдерів ШІ локально в цьому браузері. Перевірка з’єднання під час виконання ще не реалізована, тому кожен провайдер залишається від’єднаним, доки не з’явиться справжня інтеграція.</value>
+  </data>
+  <data name="SettingsRecordingSectionTitle" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="SettingsRecordingSectionDescription" xml:space="preserve">
+    <value>Налаштуйте, як локальні записи зберігаються під час сесій Go Live.</value>
+  </data>
+  <data name="SettingsStreamingSectionTitle" xml:space="preserve">
+    <value>Система трансляції</value>
+  </data>
+  <data name="SettingsStreamingSectionDescription" xml:space="preserve">
+    <value>Налаштуйте тут браузерне захоплення програмного сигналу, локальний запис, транспортні з’єднання та кінцеві цілі, щоб Go Live залишався зосередженим на керуванні сесією.</value>
+  </data>
+  <data name="SettingsAppearanceSectionTitle" xml:space="preserve">
+    <value>Вигляд</value>
+  </data>
+  <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
+    <value>Налаштуйте вигляд застосунку та читача телесуфлера.</value>
+  </data>
+  <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleDark" xml:space="preserve">
+    <value>Темна · Золотий акцент</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleLight" xml:space="preserve">
+    <value>Світла · Власний акцент</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleSystem" xml:space="preserve">
+    <value>Системна · Власний акцент</value>
+  </data>
+  <data name="SettingsAppearanceColorSchemeLabel" xml:space="preserve">
+    <value>Колірна схема</value>
+  </data>
+  <data name="SettingsAppearanceAccentColorLabel" xml:space="preserve">
+    <value>Акцентний колір</value>
+  </data>
+  <data name="SettingsAppearanceLanguageLabel" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="SettingsAppearanceThemeDark" xml:space="preserve">
+    <value>Темна</value>
+  </data>
+  <data name="SettingsAppearanceThemeLight" xml:space="preserve">
+    <value>Світла</value>
+  </data>
+  <data name="SettingsAppearanceThemeSystem" xml:space="preserve">
+    <value>Системна</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterTitle" xml:space="preserve">
+    <value>Вигляд телесуфлера</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterSubtitle" xml:space="preserve">
+    <value>Шрифт · Розмір · Дзеркало · Тло</value>
+  </data>
+  <data name="SettingsAppearanceFontLabel" xml:space="preserve">
+    <value>Шрифт</value>
+  </data>
+  <data name="SettingsAppearanceDefaultFontSizeLabel" xml:space="preserve">
+    <value>Розмір шрифту за замовчуванням</value>
+  </data>
+  <data name="SettingsAppearanceTextColorLabel" xml:space="preserve">
+    <value>Колір тексту</value>
+  </data>
+  <data name="SettingsAppearanceMirrorTextLabel" xml:space="preserve">
+    <value>Дзеркалити текст (горизонтально)</value>
+  </data>
+  <data name="SettingsAppearanceShowWordHighlightLabel" xml:space="preserve">
+    <value>Підсвічувати слова</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceTitle" xml:space="preserve">
+    <value>Інтерфейс</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceSubtitle" xml:space="preserve">
+    <value>Щільність · Анімації · Бічна панель</value>
+  </data>
+  <data name="SettingsAppearanceUiDensityLabel" xml:space="preserve">
+    <value>Щільність інтерфейсу</value>
+  </data>
+  <data name="SettingsAppearanceDensityCompact" xml:space="preserve">
+    <value>Щільна</value>
+  </data>
+  <data name="SettingsAppearanceDensityDefault" xml:space="preserve">
+    <value>Стандартна</value>
+  </data>
+  <data name="SettingsAppearanceDensitySpacious" xml:space="preserve">
+    <value>Простора</value>
+  </data>
+  <data name="SettingsAppearanceReduceMotionLabel" xml:space="preserve">
+    <value>Зменшити анімацію</value>
+  </data>
+  <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
+    <value>Показувати панель клавіатурних скорочень</value>
+  </data>
 </root>

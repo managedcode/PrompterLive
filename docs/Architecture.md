@@ -100,7 +100,7 @@ flowchart LR
 | `Storage` | Browser persistence and cloud transfer orchestration | Keeps scripts and settings local-first while exposing provider-backed import/export | `src/PrompterOne.Shared/Storage`, `src/PrompterOne.Shared/Library/Services/Storage` | browser `IStorage` and VFS registration, authoritative browser repositories for scripts/folders, provider credential persistence, scripts/settings snapshot transfer | routed page layout, teleprompter rendering, video-stream upload workflows |
 | `Cross-Tab Messaging` | Same-origin browser runtime coordination | Lets separate WASM tabs coordinate browser-owned state without a backend | `src/PrompterOne.Shared/AppShell/Services`, `src/PrompterOne.Shared/Settings/Services`, `src/PrompterOne.Shared/wwwroot/app` | `BroadcastChannel` bridge, typed envelopes, settings fan-out, same-origin tab sync | server state, cross-origin transport, collaborative editor conflict resolution |
 | `Diagnostics` | Error and operation feedback layer | Makes recoverable and fatal issues visible in the shell | `src/PrompterOne.Shared/Diagnostics` | banners, error boundary reporting, operation status wiring | owning business logic of the failing feature |
-| `Localization` | Culture and UI text contract | Keeps supported runtime languages consistent and browser-driven | `src/PrompterOne.Shared/Localization`, `src/PrompterOne.Core/Localization` | text catalogs, culture bootstrap, supported culture rules | feature behavior or screen-specific layout ownership |
+| `Localization` | Culture and UI text contract | Keeps supported runtime languages consistent, browser-driven, and user-overridable through persisted settings | `src/PrompterOne.Shared/Localization`, `src/PrompterOne.Core/Localization` | shared resource catalogs, startup culture bootstrap, browser-language negotiation, persisted user language override, supported culture rules | feature behavior or screen-specific layout ownership |
 | `Workspace` | Active script/session state model | Gives editor, learn, read, and go-live one shared script context | `src/PrompterOne.Core/Workspace` | loaded script state, previews, estimated duration, active session metadata | feature-specific rendering details |
 | `Media` | Browser media and scene domain | Models cameras, microphones, transforms, and audio bus state | `src/PrompterOne.Core/Media`, `src/PrompterOne.Shared/Media` | media device models, scene state, browser media interop | routed screen layout ownership |
 | `Streaming` | Program capture, transport, and target routing domain | Defines how one composed program feed is described, which source/output modules can attach to it, and which external targets are genuinely reachable without a PrompterOne backend | `src/PrompterOne.Core/Streaming` | program-capture profiles, source/output module contracts, transport connection profiles, downstream target descriptors, routing normalization, standalone transport constraints | Razor UI or page layout concerns |
@@ -397,6 +397,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - standalone Blazor WebAssembly host
 - serves the app shell and static asset references
 - applies browser-language culture selection before the WASM runtime starts rendering routed UI
+- falls back to the persisted user language override from typed settings before browser negotiation, with English as the final fallback
 - must stay free of server-only runtime dependencies
 
 ### `src/PrompterOne.Shared`
@@ -407,7 +408,7 @@ If a native embedded browser host returns later, media access must not rely on s
 - exact design shell and imported `design` assets
 - shared UI localization catalog for supported browser cultures
 - browser interop and app DI wiring
-- browser-backed `IUserSettingsStore` wiring for persisted reader, theme, scene, and studio preferences
+- browser-backed `IUserSettingsStore` wiring for persisted reader, theme, language, scene, and studio preferences
 - dynamic library folder components and folder/document browser storage adapters
 - UI diagnostics banner and global error boundary
 - debounced editor autosave and body-only TPS source authoring
@@ -547,7 +548,7 @@ flowchart LR
 - The runtime must remain backend-free.
 - `Go Live` may operate multiple concurrent browser publish transports when the operator explicitly arms them, but every active transport must still consume the same canonical browser-owned program feed.
 - `Go Live` must not require any PrompterOne-owned backend, relay, ingest layer, or media server; only third-party browser-facing transport infrastructure is allowed.
-- Browser-language localization must default to English and support `en`, `uk`, `fr`, `es`, `pt`, and `it`.
+- Browser-language localization must default to English, must allow a persisted user override, and must support `en`, `uk`, `fr`, `es`, `it`, `de`, and `pt`.
 - Russian is intentionally unsupported and must fall back to English.
 - Visual fidelity should prefer copying the exact design classes and structure over inventing replacements.
 - Browser tests require Playwright Chromium to be installed locally.

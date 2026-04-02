@@ -1,12 +1,15 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-recording"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.RecordingPanel">
-    <h3 class="set-section-title">Recording</h3>
-    <p class="set-section-desc">Configure how local recordings are saved during GO LIVE sessions.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsRecordingSectionTitle)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsRecordingSectionDescription)</p>
 
     <div class="set-device-list">
         <SettingsExpandableCard Title="General"
@@ -142,6 +145,10 @@
         </SettingsExpandableCard>
     </div>
 </section>
+
+@code {
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}
 
 @code {
     private static readonly IReadOnlyList<SettingsSelectOption> AudioChannelsOptions =

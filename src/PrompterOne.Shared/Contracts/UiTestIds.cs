@@ -218,6 +218,7 @@ public static class UiTestIds
         public const string AboutVersion = "settings-about-version";
         public const string AppearancePanel = "settings-appearance-panel";
         public const string AiPanel = "settings-ai-panel";
+        public const string LanguageSelect = "settings-language-select";
         public const string CameraFrameRate = "settings-camera-frame-rate";
         public const string CameraPreviewCard = "settings-camera-preview-card";
         public const string CameraPreviewEmpty = "settings-camera-preview-empty";
@@ -256,6 +257,7 @@ public static class UiTestIds
         public const string NoiseSuppression = "settings-noise-suppression";
         public const string Page = "settings-page";
         public const string PrimaryMic = "settings-primary-mic";
+        public const string Title = "settings-title";
         public const string RecordingAudioBitrate = "settings-recording-audio-bitrate";
         public const string RecordingAutoRecord = "settings-recording-auto-record";
         public const string RecordingPanel = "settings-recording-panel";

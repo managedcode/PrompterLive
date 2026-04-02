@@ -7,7 +7,9 @@ using PrompterOne.Core.Localization;
 using PrompterOne.Shared.Components.Diagnostics;
 using PrompterOne.Shared.Components.GoLive;
 using PrompterOne.Shared.Components.Library;
+using PrompterOne.Shared.Components.Settings;
 using PrompterOne.Shared.Localization;
+using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.App.Tests;
@@ -92,6 +94,40 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.GoLiveHeroDescription), cut.Markup);
         Assert.Contains(Text(UiTextKey.HeaderLearn), cut.Markup);
         Assert.Contains(Text(UiTextKey.HeaderRead), cut.Markup);
+    }
+
+    [Fact]
+    public void SettingsAppearanceSection_RendersGermanLabels_WhenCurrentCultureIsGerman()
+    {
+        using var _ = new CultureScope(AppCultureCatalog.GermanCultureName);
+
+        var cut = Render<SettingsAppearanceSection>(parameters => parameters
+            .Add(component => component.DisplayStyle, string.Empty)
+            .Add(component => component.IsCardOpen, static _ => true)
+            .Add(component => component.ColorScheme, SettingsAppearanceValues.DarkColorScheme)
+            .Add(component => component.AccentColor, SettingsAppearanceValues.DefaultAccentColor)
+            .Add(component => component.SelectedLanguageCulture, AppCultureCatalog.GermanCultureName)
+            .Add(component => component.TeleprompterFont, "Inter (Default)")
+            .Add(component => component.TeleprompterFontSize, 48)
+            .Add(component => component.TeleprompterTextColor, "#FFFFFF")
+            .Add(component => component.UiDensity, SettingsAppearanceValues.DefaultDensity)
+            .Add(component => component.ToggleCard, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateColorScheme, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateAccentColor, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateLanguageCulture, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateTeleprompterFont, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateTeleprompterFontSize, EventCallback.Factory.Create<ChangeEventArgs>(this, _ => Task.CompletedTask))
+            .Add(component => component.UpdateTeleprompterTextColor, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.ToggleMirrorTeleprompterText, EventCallback.Factory.Create(this, () => Task.CompletedTask))
+            .Add(component => component.ToggleShowWordHighlight, EventCallback.Factory.Create(this, () => Task.CompletedTask))
+            .Add(component => component.UpdateUiDensity, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.ToggleReduceMotion, EventCallback.Factory.Create(this, () => Task.CompletedTask))
+            .Add(component => component.ToggleShowShortcutOverlay, EventCallback.Factory.Create(this, () => Task.CompletedTask)));
+
+        Assert.Contains(Text(UiTextKey.SettingsAppearanceSectionTitle), cut.Markup);
+        Assert.Contains(Text(UiTextKey.SettingsAppearanceLanguageLabel), cut.Markup);
+        Assert.Contains(Text(UiTextKey.SettingsAppearanceThemeDark), cut.Markup);
+        Assert.Contains(Text(UiTextKey.SettingsAppearanceUiDensityLabel), cut.Markup);
     }
 
     private string Text(UiTextKey key) =>

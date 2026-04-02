@@ -13,9 +13,6 @@ namespace PrompterOne.Shared.Layout;
 public partial class MainLayout : LayoutComponentBase, IDisposable
 {
     private const string GoLiveWidgetIdleElapsed = "00:00:00";
-    private const string GoLiveWidgetLiveStateLabel = "Live";
-    private const string GoLiveWidgetRecordingStateLabel = "Rec";
-    private const string GoLiveWidgetStreamingRecordingStateLabel = "Live + Rec";
     private const string RouteChangedLogTemplate = "Route changed to {Location}.";
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
@@ -64,9 +61,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private string GoLiveIndicatorCopy => GoLiveIndicatorState switch
     {
-        RecordingStateValue => "Recording active",
-        StreamingStateValue => "Stream active",
-        _ => "Ready"
+        RecordingStateValue => Text(UiTextKey.HeaderGoLiveIndicatorRecording),
+        StreamingStateValue => Text(UiTextKey.HeaderGoLiveIndicatorStreaming),
+        _ => Text(UiTextKey.HeaderGoLiveIndicatorReady)
     };
 
     private string GoLiveIndicatorState => GoLiveSessionState.IsRecordingActive
@@ -87,9 +84,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private string GoLiveWidgetStateLabel => (GoLiveSessionState.IsStreamActive, GoLiveSessionState.IsRecordingActive) switch
     {
-        (true, true) => GoLiveWidgetStreamingRecordingStateLabel,
-        (true, false) => GoLiveWidgetLiveStateLabel,
-        (false, true) => GoLiveWidgetRecordingStateLabel,
+        (true, true) => Text(UiTextKey.HeaderGoLiveWidgetLiveRecording),
+        (true, false) => Text(UiTextKey.HeaderGoLiveWidgetLive),
+        (false, true) => Text(UiTextKey.HeaderGoLiveWidgetRecording),
         _ => GoLiveIndicatorCopy
     };
 

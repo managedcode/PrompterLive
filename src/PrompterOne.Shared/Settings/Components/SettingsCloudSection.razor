@@ -1,14 +1,17 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using ManagedCode.Storage.CloudKit.Options
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Storage.Cloud
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-cloud"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.CloudPanel">
-    <h3 class="set-section-title">Cloud Storage</h3>
-    <p class="set-section-desc">Configure optional cloud snapshot targets here. Provider credentials stay in this browser local storage, and nothing is connected until you save valid real credentials.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsCloudSectionTitle)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsCloudSectionDescription)</p>
 
     <div class="set-subsection" style="margin-bottom:16px">
         <h4 class="set-sub-title">Sync Defaults</h4>
@@ -262,3 +265,7 @@
         </SettingsExpandableCard>
     </div>
 </section>
+
+@code {
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}

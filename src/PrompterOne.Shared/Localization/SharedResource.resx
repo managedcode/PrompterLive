@@ -111,4 +111,181 @@
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Roadshows</value>
   </data>
+  <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
+    <value>Connectivity</value>
+  </data>
+  <data name="DiagnosticsConnectivityRetryNow" xml:space="preserve">
+    <value>Retry Now</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineTitle" xml:space="preserve">
+    <value>Connection lost</value>
+  </data>
+  <data name="DiagnosticsConnectivityOfflineMessage" xml:space="preserve">
+    <value>PrompterOne is offline. Live routing, cloud sync, and remote publishing will resume when the browser reconnects.</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineTitle" xml:space="preserve">
+    <value>Connection restored</value>
+  </data>
+  <data name="DiagnosticsConnectivityOnlineMessage" xml:space="preserve">
+    <value>The browser connection is back. Continue working or reload if anything still looks stale.</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorRecording" xml:space="preserve">
+    <value>Recording active</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorStreaming" xml:space="preserve">
+    <value>Stream active</value>
+  </data>
+  <data name="HeaderGoLiveIndicatorReady" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLive" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="HeaderGoLiveWidgetRecording" xml:space="preserve">
+    <value>Rec</value>
+  </data>
+  <data name="HeaderGoLiveWidgetLiveRecording" xml:space="preserve">
+    <value>Live + Rec</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsNavCloud" xml:space="preserve">
+    <value>Cloud Sync</value>
+  </data>
+  <data name="SettingsNavFiles" xml:space="preserve">
+    <value>File Storage</value>
+  </data>
+  <data name="SettingsNavCameras" xml:space="preserve">
+    <value>Cameras</value>
+  </data>
+  <data name="SettingsNavMicrophones" xml:space="preserve">
+    <value>Microphones</value>
+  </data>
+  <data name="SettingsNavStreaming" xml:space="preserve">
+    <value>Streaming</value>
+  </data>
+  <data name="SettingsNavRecording" xml:space="preserve">
+    <value>Recording</value>
+  </data>
+  <data name="SettingsNavAi" xml:space="preserve">
+    <value>AI Provider</value>
+  </data>
+  <data name="SettingsNavAppearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="SettingsNavAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="SettingsCloudSectionTitle" xml:space="preserve">
+    <value>Cloud Storage</value>
+  </data>
+  <data name="SettingsCloudSectionDescription" xml:space="preserve">
+    <value>Configure optional cloud snapshot targets here. Provider credentials stay in this browser local storage, and nothing is connected until you save valid real credentials.</value>
+  </data>
+  <data name="SettingsFilesSectionTitle" xml:space="preserve">
+    <value>File Storage</value>
+  </data>
+  <data name="SettingsFilesSectionDescription" xml:space="preserve">
+    <value>PrompterOne is browser-only. Scripts stay in the browser library store, while recordings and exports use the browser-local storage container instead of fake desktop folders.</value>
+  </data>
+  <data name="SettingsAiSectionTitle" xml:space="preserve">
+    <value>AI Provider</value>
+  </data>
+  <data name="SettingsAiSectionDescription" xml:space="preserve">
+    <value>Store AI provider drafts locally in this browser. Runtime connection testing is not implemented yet, so every provider stays unconnected until a real integration ships.</value>
+  </data>
+  <data name="SettingsRecordingSectionTitle" xml:space="preserve">
+    <value>Recording</value>
+  </data>
+  <data name="SettingsRecordingSectionDescription" xml:space="preserve">
+    <value>Configure how local recordings are saved during Go Live sessions.</value>
+  </data>
+  <data name="SettingsStreamingSectionTitle" xml:space="preserve">
+    <value>Streaming System</value>
+  </data>
+  <data name="SettingsStreamingSectionDescription" xml:space="preserve">
+    <value>Configure browser-owned program capture, local recording, transport connections, and downstream targets here so Go Live stays focused on operating the session.</value>
+  </data>
+  <data name="SettingsAppearanceSectionTitle" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
+    <value>Customize the look and feel of the app and the teleprompter reader.</value>
+  </data>
+  <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleDark" xml:space="preserve">
+    <value>Dark · Gold accent</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleLight" xml:space="preserve">
+    <value>Light · Custom accent</value>
+  </data>
+  <data name="SettingsAppearanceThemeSubtitleSystem" xml:space="preserve">
+    <value>System · Custom accent</value>
+  </data>
+  <data name="SettingsAppearanceColorSchemeLabel" xml:space="preserve">
+    <value>Color Scheme</value>
+  </data>
+  <data name="SettingsAppearanceAccentColorLabel" xml:space="preserve">
+    <value>Accent Color</value>
+  </data>
+  <data name="SettingsAppearanceLanguageLabel" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingsAppearanceThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="SettingsAppearanceThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="SettingsAppearanceThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterTitle" xml:space="preserve">
+    <value>Teleprompter Display</value>
+  </data>
+  <data name="SettingsAppearanceTeleprompterSubtitle" xml:space="preserve">
+    <value>Font · Size · Mirror · Background</value>
+  </data>
+  <data name="SettingsAppearanceFontLabel" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="SettingsAppearanceDefaultFontSizeLabel" xml:space="preserve">
+    <value>Default Font Size</value>
+  </data>
+  <data name="SettingsAppearanceTextColorLabel" xml:space="preserve">
+    <value>Text Color</value>
+  </data>
+  <data name="SettingsAppearanceMirrorTextLabel" xml:space="preserve">
+    <value>Mirror Text (Horizontal Flip)</value>
+  </data>
+  <data name="SettingsAppearanceShowWordHighlightLabel" xml:space="preserve">
+    <value>Show Word Highlight</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceTitle" xml:space="preserve">
+    <value>Interface</value>
+  </data>
+  <data name="SettingsAppearanceInterfaceSubtitle" xml:space="preserve">
+    <value>Density · Animations · Sidebar</value>
+  </data>
+  <data name="SettingsAppearanceUiDensityLabel" xml:space="preserve">
+    <value>UI Density</value>
+  </data>
+  <data name="SettingsAppearanceDensityCompact" xml:space="preserve">
+    <value>Compact</value>
+  </data>
+  <data name="SettingsAppearanceDensityDefault" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="SettingsAppearanceDensitySpacious" xml:space="preserve">
+    <value>Spacious</value>
+  </data>
+  <data name="SettingsAppearanceReduceMotionLabel" xml:space="preserve">
+    <value>Reduce Motion</value>
+  </data>
+  <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
+    <value>Show keyboard shortcuts overlay</value>
+  </data>
 </root>
