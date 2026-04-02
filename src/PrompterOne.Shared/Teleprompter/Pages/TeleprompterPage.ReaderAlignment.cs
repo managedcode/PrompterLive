@@ -9,6 +9,7 @@ public partial class TeleprompterPage
     private const string ReaderTextNoTransitionStyle = "transition:none;";
 
     private readonly Dictionary<int, string> _readerCardTextStyles = [];
+    private readonly HashSet<int> _readerCardsPendingTransitionRestore = [];
     private readonly HashSet<int> _readerCardsWithoutTransition = [];
     private bool _pendingReaderAlignment;
     private bool _pendingReaderAlignmentInstant;
@@ -61,6 +62,7 @@ public partial class TeleprompterPage
     private void ResetReaderAlignmentState()
     {
         _readerCardTextStyles.Clear();
+        _readerCardsPendingTransitionRestore.Clear();
         _readerCardsWithoutTransition.Clear();
         _pendingReaderAlignment = true;
         _pendingReaderAlignmentInstant = true;
@@ -68,6 +70,31 @@ public partial class TeleprompterPage
 
     private Task PrepareReaderCardAlignmentAsync(int cardIndex, int wordOrdinal) =>
         AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: true, rerender: false, instantTransition: false);
+
+    private Task AlignReaderWordBeforeActivationAsync(int cardIndex, int wordOrdinal) =>
+        AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: false, rerender: false, instantTransition: true);
+
+    private async Task RestorePendingReaderTextTransitionsAsync()
+    {
+        if (_readerCardsPendingTransitionRestore.Count == 0)
+        {
+            return;
+        }
+
+        var cardsToRestore = _readerCardsPendingTransitionRestore.ToArray();
+        _readerCardsPendingTransitionRestore.Clear();
+
+        var changed = false;
+        foreach (var cardIndex in cardsToRestore)
+        {
+            changed |= _readerCardsWithoutTransition.Remove(cardIndex);
+        }
+
+        if (changed)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private async Task AlignReaderCardTextAsync(
         int cardIndex,
@@ -108,23 +135,17 @@ public partial class TeleprompterPage
         if (instantTransition)
         {
             _readerCardsWithoutTransition.Add(cardIndex);
+            _readerCardsPendingTransitionRestore.Add(cardIndex);
         }
         else
         {
             _readerCardsWithoutTransition.Remove(cardIndex);
+            _readerCardsPendingTransitionRestore.Remove(cardIndex);
         }
 
         if (rerender)
         {
             await InvokeAsync(StateHasChanged);
-            if (instantTransition)
-            {
-                await Task.Yield();
-                if (_readerCardsWithoutTransition.Remove(cardIndex))
-                {
-                    await InvokeAsync(StateHasChanged);
-                }
-            }
         }
     }
 

@@ -1,5 +1,7 @@
+using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Tests;
 
@@ -29,16 +31,14 @@ public sealed class ReaderStartupStateTests : Bunit.BunitContext
 
         var cut = Render<TeleprompterPage>();
 
-        Assert.DoesNotContain(ReaderStartupPlaceholderTexts.TeleprompterWord, cut.Markup, StringComparison.Ordinal);
-        Assert.DoesNotContain(ReaderStartupPlaceholderTexts.TeleprompterTitle, cut.Markup, StringComparison.Ordinal);
+        Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Teleprompter.Card(0))));
+        Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Teleprompter.CardText(0))));
     }
 
     private static class ReaderStartupPlaceholderTexts
     {
         public const string LearnFocusWord = "transformative";
         public const string LearnNextPhrase = "Today, we're not just launching a product";
-        public const string TeleprompterTitle = "Product Launch";
-        public const string TeleprompterWord = "Ready";
     }
 
     private static class ReaderStartupTestDelays

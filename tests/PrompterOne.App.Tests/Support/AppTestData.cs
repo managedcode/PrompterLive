@@ -1,3 +1,5 @@
+using PrompterOne.Core.Models.Streaming;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.App.Tests;
@@ -9,13 +11,17 @@ internal static class AppTestData
         public const string DemoId = "test-product-launch-script";
         public const string LeadershipId = "test-ted-leadership-script";
         public const string ArchitectureId = "test-green-architecture-script";
+        public const string LearnWpmBoundaryId = "test-learn-wpm-boundary-script";
         public const string QuantumId = "test-quantum-computing-script";
+        public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
         public const string DemoTitle = "Product Launch";
         public const string TedLeadershipTitle = "TED: Leadership";
         public const string GreenArchitectureTitle = "Green Architecture";
+        public const string LearnWpmBoundaryTitle = "Learn WPM Boundary Probe";
         public const string QuantumTitle = "Quantum Computing";
+        public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
         public const string SpeedOffsetsTitle = "TPS Speed Offsets";
         public const string BroadcastMic = "Broadcast mic";
@@ -44,10 +50,14 @@ internal static class AppTestData
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);
         public static string EditorQuantum => AppRoutes.EditorWithId(Scripts.QuantumId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
+        public static string GoLiveLeadership => AppRoutes.GoLiveWithId(Scripts.LeadershipId);
+        public static string LearnWpmBoundary => AppRoutes.LearnWithId(Scripts.LearnWpmBoundaryId);
+        public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
         public static string LearnQuantum => AppRoutes.LearnWithId(Scripts.QuantumId);
         public static string TeleprompterArchitecture => AppRoutes.TeleprompterWithId(Scripts.ArchitectureId);
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
+        public static string TeleprompterReaderTiming => AppRoutes.TeleprompterWithId(Scripts.ReaderTimingId);
         public static string TeleprompterSecurityIncident => AppRoutes.TeleprompterWithId(Scripts.SecurityIncidentId);
         public static string TeleprompterSpeedOffsets => AppRoutes.TeleprompterWithId(Scripts.SpeedOffsetsId);
         public const string Settings = AppRoutes.Settings;
@@ -119,5 +129,34 @@ internal static class AppTestData
         public const string TwitchKey = "live_twitch_key";
         public const string YoutubeUrl = "rtmps://a.rtmp.youtube.com/live2";
         public const string YoutubeKey = "youtube_stream_key";
+
+        public static StreamingProfile CreateLiveKitDestination(
+            bool isEnabled = true,
+            string destinationId = GoLiveTargetCatalog.TargetIds.LiveKit) =>
+            StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, destinationId) with
+            {
+                IsEnabled = isEnabled,
+                ServerUrl = LiveKitServer,
+                RoomName = LiveKitRoom,
+                Token = LiveKitToken
+            };
+
+        public static StreamingProfile CreateYoutubeDestination(
+            bool isEnabled = true,
+            string destinationId = GoLiveTargetCatalog.TargetIds.Youtube) =>
+            CreateYoutubeDestinationCore(isEnabled, destinationId);
+
+        private static StreamingProfile CreateYoutubeDestinationCore(bool isEnabled, string destinationId)
+        {
+            var profile = StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.Youtube, destinationId) with
+            {
+                IsEnabled = isEnabled
+            };
+
+            return profile.SetPrimaryDestination(
+                StreamingPlatformCatalog.Get(StreamingPlatformKind.Youtube).DefaultProfileName,
+                YoutubeUrl,
+                YoutubeKey);
+        }
     }
 }

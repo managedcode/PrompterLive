@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.GoLive
+@using PrompterOne.Shared.Services
 
 <section id="@UiDomIds.GoLive.PreviewCard"
          class="gl-preview-section"
@@ -14,7 +15,7 @@
                 <div class="gl-preview-overlay">
                     <div class="gl-preview-caption">
                         <span class="gl-preview-label">@Title</span>
-                        <strong data-testid="@UiTestIds.GoLive.PreviewSourceLabel">@Camera?.Label</strong>
+                        <strong data-testid="@UiTestIds.GoLive.PreviewSourceLabel">@CameraLabel</strong>
                     </div>
                 </div>
             </OverlayContent>
@@ -28,7 +29,9 @@
             </EmptyContent>
         </GoLiveCameraSurface>
         <div class="gl-air-dot-wrap">
-            <span class="gl-air-dot @(HasCamera ? LiveDotCssClass : null)"></span>
+            <span class="gl-air-dot @(ShowLiveDot ? LiveDotCssClass : null)"
+                  data-testid="@UiTestIds.GoLive.PreviewLiveDot"
+                  data-live-state="@PreviewIndicatorState"></span>
         </div>
     </div>
 </section>
@@ -38,15 +41,24 @@
     private const string DefaultTitle = "Preview";
     private const string EmptyDescription = "Add a scene camera in Settings or include one in the live output to preview it here.";
     private const string EmptyTitle = "No camera";
+    private const string IdleStateValue = "idle";
     private const string LiveDotCssClass = "gl-air-dot-live";
 
     [Parameter] public SceneCameraSource? Camera { get; set; }
     [Parameter] public bool CanSwitchProgram { get; set; }
     [Parameter] public string Description { get; set; } = DefaultDescription;
+    [Parameter] public string LiveState { get; set; } = IdleStateValue;
     [Parameter] public bool ShowSwitchAction { get; set; }
     [Parameter] public EventCallback SwitchSelectedSource { get; set; }
     [Parameter] public string SwitchActionLabel { get; set; } = string.Empty;
     [Parameter] public string Title { get; set; } = DefaultTitle;
 
     private bool HasCamera => Camera is not null;
+    private string CameraLabel => Camera is null ? string.Empty : MediaDeviceLabelSanitizer.Sanitize(Camera.Label);
+
+    private string PreviewIndicatorState => ShowLiveDot
+        ? LiveState
+        : IdleStateValue;
+
+    private bool ShowLiveDot => HasCamera && !string.Equals(LiveState, IdleStateValue, StringComparison.Ordinal);
 }

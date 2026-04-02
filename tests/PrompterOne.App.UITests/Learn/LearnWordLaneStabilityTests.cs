@@ -9,13 +9,12 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
     private const string LongProbeWord = "hype";
     private const string ShortProbeWord = "It";
     private const int StabilityProbeStepLimit = 120;
-    private const double MaxShellCenterDriftPx = 2;
-    private const double MaxLeftRailEdgeDriftPx = 2;
-    private const double MaxRightRailEdgeDriftPx = 2;
+    private const double MaxOrpCenterDriftPx = 2;
+    private const double MaxVisibleContextGapDriftPx = 2;
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Fact]
-    public async Task LearnScreen_QuantumWordLengthChanges_DoNotShiftTheRsvpLane()
+    public async Task LearnScreen_QuantumWordLengthChanges_KeepTheOrpAnchorAndVisibleContextGapsStable()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -36,17 +35,17 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
             var shortWordLane = await MeasureRsvpLaneAsync(page);
 
             Assert.InRange(
-                Math.Abs(longWordLane.ShellCenterPx - shortWordLane.ShellCenterPx),
+                Math.Abs(longWordLane.OrpCenterPx - shortWordLane.OrpCenterPx),
                 0,
-                MaxShellCenterDriftPx);
+                MaxOrpCenterDriftPx);
             Assert.InRange(
-                Math.Abs(longWordLane.LeftRailRightPx - shortWordLane.LeftRailRightPx),
+                Math.Abs(longWordLane.LeftVisibleGapPx - shortWordLane.LeftVisibleGapPx),
                 0,
-                MaxLeftRailEdgeDriftPx);
+                MaxVisibleContextGapDriftPx);
             Assert.InRange(
-                Math.Abs(longWordLane.RightRailLeftPx - shortWordLane.RightRailLeftPx),
+                Math.Abs(longWordLane.RightVisibleGapPx - shortWordLane.RightVisibleGapPx),
                 0,
-                MaxRightRailEdgeDriftPx);
+                MaxVisibleContextGapDriftPx);
         }
         finally
         {
@@ -58,27 +57,31 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
         page.EvaluateAsync<RsvpLaneMeasurement>(
             """
             ids => {
-                const shell = document.querySelector(`[data-testid="${ids.shell}"]`);
+                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const orp = word?.querySelector('.orp');
                 const leftRail = document.querySelector(`[data-testid="${ids.left}"]`);
                 const rightRail = document.querySelector(`[data-testid="${ids.right}"]`);
-                if (!shell || !leftRail || !rightRail) {
-                    return { shellCenterPx: -999, leftRailRightPx: -999, rightRailLeftPx: -999 };
+                const leftWord = leftRail?.lastElementChild;
+                const rightWord = rightRail?.firstElementChild;
+                if (!word || !orp || !leftWord || !rightWord) {
+                    return { orpCenterPx: -999, leftVisibleGapPx: -999, rightVisibleGapPx: -999 };
                 }
 
-                const shellRect = shell.getBoundingClientRect();
-                const leftRailRect = leftRail.getBoundingClientRect();
-                const rightRailRect = rightRail.getBoundingClientRect();
+                const wordRect = word.getBoundingClientRect();
+                const orpRect = orp.getBoundingClientRect();
+                const leftWordRect = leftWord.getBoundingClientRect();
+                const rightWordRect = rightWord.getBoundingClientRect();
 
                 return {
-                    shellCenterPx: shellRect.left + (shellRect.width / 2),
-                    leftRailRightPx: leftRailRect.right,
-                    rightRailLeftPx: rightRailRect.left
+                    orpCenterPx: orpRect.left + (orpRect.width / 2),
+                    leftVisibleGapPx: wordRect.left - leftWordRect.right,
+                    rightVisibleGapPx: rightWordRect.left - wordRect.right
                 };
             }
             """,
             new
             {
-                shell = UiTestIds.Learn.WordShell,
+                word = UiTestIds.Learn.Word,
                 left = UiTestIds.Learn.ContextLeft,
                 right = UiTestIds.Learn.ContextRight
             });
@@ -115,7 +118,7 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
     }
 
     private readonly record struct RsvpLaneMeasurement(
-        double ShellCenterPx,
-        double LeftRailRightPx,
-        double RightRailLeftPx);
+        double OrpCenterPx,
+        double LeftVisibleGapPx,
+        double RightVisibleGapPx);
 }

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -5,8 +6,15 @@ namespace PrompterOne.App.UITests;
 
 public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
+    private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
+    private const int ImmediateAlignmentFollowUpDelayMilliseconds = 180;
+    private const string MaximumReaderWidthCss = "1100px";
+    private const string MaximumReaderWidthValue = "1100";
     private const int ParagraphMotionSettleDelayMilliseconds = 450;
     private const double ParagraphMotionTolerancePixels = 4d;
+    private const int SecurityIncidentResponseCardIndex = 2;
+    private const string StandaloneCommaWord = ",";
+    private const string TrailingCommaWord = "exposed,";
 
     [Fact]
     public async Task TeleprompterLeadership_RepositionsReadingLineWhenFocalPointChanges()
@@ -121,6 +129,80 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
             await AssertParagraphMotionStableAfterFontSizeChangeAsync(
                 page,
                 page.GetByTestId(UiTestIds.Teleprompter.FontUp));
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task TeleprompterDemo_ActivatesNextWordDirectlyOnFocalGuideWithoutVisibleSettling()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
+
+            var focalGuide = page.GetByTestId(UiTestIds.Teleprompter.FocalGuide);
+            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+
+            var activeWord = page.GetByTestId(UiTestIds.Teleprompter.CardText(0)).Locator(".rd-now");
+            await Expect(activeWord).ToBeVisibleAsync();
+
+            var immediateDelta = await MeasureVerticalCenterDeltaAsync(focalGuide, activeWord);
+            await page.WaitForTimeoutAsync(ImmediateAlignmentFollowUpDelayMilliseconds);
+            var settledDelta = await MeasureVerticalCenterDeltaAsync(focalGuide, activeWord);
+
+            Assert.InRange(
+                Math.Abs(immediateDelta),
+                0d,
+                BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+            Assert.InRange(
+                Math.Abs(settledDelta),
+                0d,
+                BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+            Assert.InRange(
+                Math.Abs(immediateDelta - settledDelta),
+                0d,
+                ParagraphMotionTolerancePixels);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task TeleprompterSecurityIncident_UsesMaximumWidthAndContinuousEmphasisWithoutStandaloneCommaWords()
+    {
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterSecurityIncident);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(MaximumReaderWidthValue);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(MaximumReaderWidthValue);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0)))
+                .ToHaveClassAsync(new Regex($@"\b{ContinuousEmphasisCssClass}\b"));
+
+            var clusterWrapWidth = await page.Locator($"#{UiDomIds.Teleprompter.ClusterWrap}")
+                .EvaluateAsync<string>("element => getComputedStyle(element).maxWidth");
+            var responseWords = await page.GetByTestId(UiTestIds.Teleprompter.CardText(SecurityIncidentResponseCardIndex))
+                .Locator(".rd-w")
+                .AllTextContentsAsync();
+
+            Assert.Equal(MaximumReaderWidthCss, clusterWrapWidth);
+            Assert.Contains(TrailingCommaWord, responseWords);
+            Assert.DoesNotContain(StandaloneCommaWord, responseWords);
         }
         finally
         {

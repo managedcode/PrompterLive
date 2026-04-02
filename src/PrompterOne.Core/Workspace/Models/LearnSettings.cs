@@ -1,9 +1,10 @@
 namespace PrompterOne.Core.Models.Workspace;
 
 public sealed record LearnSettings(
-    int WordsPerMinute = 300,
-    int ContextWords = 2,
-    bool IgnoreScriptSpeeds = false,
-    bool AutoPlay = false,
-    bool LoopPlayback = false,
-    bool ShowPhrasePreview = true);
+    bool HasCustomizedWordsPerMinute = LearnSettingsDefaults.HasCustomizedWordsPerMinute,
+    int WordsPerMinute = LearnSettingsDefaults.WordsPerMinute,
+    int ContextWords = LearnSettingsDefaults.ContextWords,
+    bool IgnoreScriptSpeeds = LearnSettingsDefaults.IgnoreScriptSpeeds,
+    bool AutoPlay = LearnSettingsDefaults.AutoPlay,
+    bool LoopPlayback = LearnSettingsDefaults.LoopPlayback,
+    bool ShowPhrasePreview = LearnSettingsDefaults.ShowPhrasePreview);

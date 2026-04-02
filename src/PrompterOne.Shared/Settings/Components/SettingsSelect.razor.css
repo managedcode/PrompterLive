@@ -1,0 +1,89 @@
+.ss-wrap {
+    position: relative;
+    outline: none;
+}
+
+.ss-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+}
+
+.ss-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ss-chevron {
+    flex-shrink: 0;
+    opacity: .5;
+    transition: transform .15s;
+}
+
+.ss-chevron-open {
+    transform: rotate(180deg);
+}
+
+.ss-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    background: rgba(12, 20, 24, .95);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--gold-14);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.ss-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--t2);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font);
+    text-align: left;
+    cursor: pointer;
+    transition: background .1s, color .1s;
+}
+
+.ss-option:hover {
+    background: var(--gold-07);
+    color: var(--t1);
+}
+
+.ss-option-selected {
+    color: var(--t1);
+    font-weight: 600;
+}
+
+.ss-check {
+    flex-shrink: 0;
+    color: var(--accent);
+}
+
+.ss-check-spacer {
+    display: inline-block;
+    width: 14px;
+    flex-shrink: 0;
+}

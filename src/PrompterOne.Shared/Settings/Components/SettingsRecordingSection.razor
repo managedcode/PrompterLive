@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Settings.Components
 
 <section class="set-section set-panel"
          id="set-recording"
@@ -44,14 +45,9 @@
                 </div>
                 <div class="set-field">
                     <label>File Naming</label>
-                    <select class="set-select"
-                            value="@RecordingNamingPattern"
-                            @onchange="OnNamingChanged"
-                            @onclick:stopPropagation="true">
-                        <option value="Script Name + Date">Script Name + Date</option>
-                        <option value="Date + Time">Date + Time</option>
-                        <option value="Custom Prefix">Custom Prefix</option>
-                    </select>
+                    <SettingsSelect Value="@RecordingNamingPattern"
+                                   Options="@NamingPatternOptions"
+                                   OnChange="OnNamingChanged" />
                 </div>
             </div>
         </SettingsExpandableCard>
@@ -69,41 +65,27 @@
                 <div class="set-rec-grid">
                     <div class="set-field">
                         <label>Container</label>
-                        <select class="set-select" value="@RecordingContainer" @onchange="OnContainerChanged" @onclick:stopPropagation="true">
-                            <option value="MP4">MP4</option>
-                            <option value="MOV">MOV</option>
-                            <option value="MKV">MKV</option>
-                            <option value="WebM">WebM</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingContainer"
+                                       Options="@ContainerOptions"
+                                       OnChange="OnContainerChanged" />
                     </div>
                     <div class="set-field">
                         <label>Codec</label>
-                        <select class="set-select" value="@RecordingVideoCodec" @onchange="OnVideoCodecChanged" @onclick:stopPropagation="true">
-                            <option value="H.264 (AVC)">H.264 (AVC)</option>
-                            <option value="H.265 (HEVC)">H.265 (HEVC)</option>
-                            <option value="ProRes 422">ProRes 422</option>
-                            <option value="ProRes 422 HQ">ProRes 422 HQ</option>
-                            <option value="VP9">VP9</option>
-                            <option value="AV1">AV1</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingVideoCodec"
+                                       Options="@VideoCodecOptions"
+                                       OnChange="OnVideoCodecChanged" />
                     </div>
                     <div class="set-field">
                         <label>Resolution</label>
-                        <select class="set-select" value="@RecordingVideoResolution" @onchange="OnVideoResolutionChanged" @onclick:stopPropagation="true">
-                            <option value="Same as source">Same as source</option>
-                            <option value="3840 × 2160 (4K)">3840 × 2160 (4K)</option>
-                            <option value="1920 × 1080 (FHD)">1920 × 1080 (FHD)</option>
-                            <option value="1280 × 720 (HD)">1280 × 720 (HD)</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingVideoResolution"
+                                       Options="@VideoResolutionOptions"
+                                       OnChange="OnVideoResolutionChanged" />
                     </div>
                     <div class="set-field">
                         <label>Frame Rate</label>
-                        <select class="set-select" value="@RecordingVideoFrameRate" @onchange="OnVideoFrameRateChanged" @onclick:stopPropagation="true">
-                            <option value="30 fps">30 fps</option>
-                            <option value="60 fps">60 fps</option>
-                            <option value="24 fps">24 fps</option>
-                            <option value="Same as source">Same as source</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingVideoFrameRate"
+                                       Options="@VideoFrameRateOptions"
+                                       OnChange="OnVideoFrameRateChanged" />
                     </div>
                 </div>
                 <div class="set-field">
@@ -131,21 +113,15 @@
                 <div class="set-rec-grid">
                     <div class="set-field">
                         <label>Codec</label>
-                        <select class="set-select" value="@RecordingAudioCodec" @onchange="OnAudioCodecChanged" @onclick:stopPropagation="true">
-                            <option value="AAC">AAC</option>
-                            <option value="PCM (Uncompressed)">PCM (Uncompressed)</option>
-                            <option value="FLAC">FLAC</option>
-                            <option value="Opus">Opus</option>
-                            <option value="MP3">MP3</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingAudioCodec"
+                                       Options="@AudioCodecOptions"
+                                       OnChange="OnAudioCodecChanged" />
                     </div>
                     <div class="set-field">
                         <label>Sample Rate</label>
-                        <select class="set-select" value="@RecordingAudioSampleRate" @onchange="OnSampleRateChanged" @onclick:stopPropagation="true">
-                            <option value="48 kHz">48 kHz</option>
-                            <option value="44.1 kHz">44.1 kHz</option>
-                            <option value="96 kHz">96 kHz</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingAudioSampleRate"
+                                       Options="@AudioSampleRateOptions"
+                                       OnChange="OnSampleRateChanged" />
                     </div>
                     <div class="set-field">
                         <label>Bitrate (kbps)</label>
@@ -157,10 +133,9 @@
                     </div>
                     <div class="set-field">
                         <label>Channels</label>
-                        <select class="set-select" value="@RecordingAudioChannels" @onchange="OnAudioChannelsChanged" @onclick:stopPropagation="true">
-                            <option value="Stereo">Stereo</option>
-                            <option value="Mono">Mono</option>
-                        </select>
+                        <SettingsSelect Value="@RecordingAudioChannels"
+                                       Options="@AudioChannelsOptions"
+                                       OnChange="OnAudioChannelsChanged" />
                     </div>
                 </div>
             </div>
@@ -169,6 +144,69 @@
 </section>
 
 @code {
+    private static readonly IReadOnlyList<SettingsSelectOption> AudioChannelsOptions =
+    [
+        new("Stereo", "Stereo"),
+        new("Mono", "Mono"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> AudioCodecOptions =
+    [
+        new("AAC", "AAC"),
+        new("PCM (Uncompressed)", "PCM (Uncompressed)"),
+        new("FLAC", "FLAC"),
+        new("Opus", "Opus"),
+        new("MP3", "MP3"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> AudioSampleRateOptions =
+    [
+        new("48 kHz", "48 kHz"),
+        new("44.1 kHz", "44.1 kHz"),
+        new("96 kHz", "96 kHz"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> ContainerOptions =
+    [
+        new("MP4", "MP4"),
+        new("MOV", "MOV"),
+        new("MKV", "MKV"),
+        new("WebM", "WebM"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> NamingPatternOptions =
+    [
+        new("Script Name + Date", "Script Name + Date"),
+        new("Date + Time", "Date + Time"),
+        new("Custom Prefix", "Custom Prefix"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> VideoCodecOptions =
+    [
+        new("H.264 (AVC)", "H.264 (AVC)"),
+        new("H.265 (HEVC)", "H.265 (HEVC)"),
+        new("ProRes 422", "ProRes 422"),
+        new("ProRes 422 HQ", "ProRes 422 HQ"),
+        new("VP9", "VP9"),
+        new("AV1", "AV1"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> VideoFrameRateOptions =
+    [
+        new("30 fps", "30 fps"),
+        new("60 fps", "60 fps"),
+        new("24 fps", "24 fps"),
+        new("Same as source", "Same as source"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> VideoResolutionOptions =
+    [
+        new("Same as source", "Same as source"),
+        new("3840 \u00d7 2160 (4K)", "3840 \u00d7 2160 (4K)"),
+        new("1920 \u00d7 1080 (FHD)", "1920 \u00d7 1080 (FHD)"),
+        new("1280 \u00d7 720 (HD)", "1280 \u00d7 720 (HD)"),
+    ];
+
     private const string AudioCardId = "recording-audio";
     private const string GeneralCardId = "recording-general";
     private const string VideoCardId = "recording-video";

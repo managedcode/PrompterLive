@@ -1,3 +1,5 @@
+using PrompterOne.Core.Models.Workspace;
+
 namespace PrompterOne.Shared.Contracts;
 
 public static class UiTestIds
@@ -264,6 +266,7 @@ public static class UiTestIds
         public const string NoCameras = "settings-no-cameras";
         public const string NoMics = "settings-no-mics";
         public const string StreamingBitrate = "settings-streaming-bitrate";
+        public const string StreamingDestinationAdd = "settings-streaming-destination-add";
         public const string StreamingCustomRtmpKey = "settings-streaming-custom-rtmp-key";
         public const string StreamingCustomRtmpName = "settings-streaming-custom-rtmp-name";
         public const string StreamingCustomRtmpToggle = "settings-streaming-custom-rtmp-toggle";
@@ -328,6 +331,9 @@ public static class UiTestIds
 
         public static string SceneMirror(string sourceId) => $"settings-scene-mirror-{sourceId}";
 
+        public static string SelectOption(string triggerTestId, string optionValue) =>
+            $"{triggerTestId}-option-{optionValue}";
+
         public static string StreamingProviderCard(string providerId) => $"settings-streaming-provider-{providerId}";
 
         public static string StreamingProviderSourcePicker(string providerId) => $"settings-streaming-provider-sources-{providerId}";
@@ -335,6 +341,38 @@ public static class UiTestIds
         public static string StreamingProviderSourceSummary(string providerId) => $"settings-streaming-provider-source-summary-{providerId}";
 
         public static string StreamingProviderSourceToggle(string providerId, string sourceId) => $"settings-streaming-provider-source-{providerId}-{sourceId}";
+
+        public static string StreamingDestinationAddOption(string platformId) => $"settings-streaming-destination-add-{platformId}";
+
+        public static string StreamingDestinationField(string destinationId, string fieldId) => (destinationId, fieldId) switch
+        {
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "server-url") => StreamingLiveKitServer,
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "room-name") => StreamingLiveKitRoom,
+            (GoLiveTargetCatalog.TargetIds.LiveKit, "token") => StreamingLiveKitToken,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "room-name") => StreamingVdoRoom,
+            (GoLiveTargetCatalog.TargetIds.VdoNinja, "publish-url") => StreamingVdoPublishUrl,
+            (GoLiveTargetCatalog.TargetIds.Youtube, "rtmp-url") => StreamingYoutubeUrl,
+            (GoLiveTargetCatalog.TargetIds.Youtube, "stream-key") => StreamingYoutubeKey,
+            (GoLiveTargetCatalog.TargetIds.Twitch, "rtmp-url") => StreamingTwitchUrl,
+            (GoLiveTargetCatalog.TargetIds.Twitch, "stream-key") => StreamingTwitchKey,
+            (GoLiveTargetCatalog.TargetIds.CustomRtmp, "name") => StreamingCustomRtmpName,
+            (GoLiveTargetCatalog.TargetIds.CustomRtmp, "rtmp-url") => StreamingCustomRtmpUrl,
+            (GoLiveTargetCatalog.TargetIds.CustomRtmp, "stream-key") => StreamingCustomRtmpKey,
+            _ => $"settings-streaming-destination-field-{destinationId}-{fieldId}"
+        };
+
+        public static string StreamingDestinationRemove(string destinationId) =>
+            $"settings-streaming-destination-remove-{destinationId}";
+
+        public static string StreamingDestinationToggle(string destinationId) => destinationId switch
+        {
+            GoLiveTargetCatalog.TargetIds.LiveKit => StreamingLiveKitToggle,
+            GoLiveTargetCatalog.TargetIds.VdoNinja => StreamingVdoToggle,
+            GoLiveTargetCatalog.TargetIds.Youtube => StreamingYoutubeToggle,
+            GoLiveTargetCatalog.TargetIds.Twitch => StreamingTwitchToggle,
+            GoLiveTargetCatalog.TargetIds.CustomRtmp => StreamingCustomRtmpToggle,
+            _ => $"settings-streaming-destination-toggle-{destinationId}"
+        };
     }
 
     public static class GoLive
@@ -342,6 +380,7 @@ public static class UiTestIds
         public const string ActiveSourceLabel = "go-live-active-source-label";
         public const string AddSource = "go-live-add-source";
         public const string AudioMixer = "go-live-audio-mixer";
+        public const string Back = "go-live-back";
         public const string Bitrate = "go-live-bitrate";
         public const string CreateRoom = "go-live-create-room";
         public const string CustomRtmpKey = "go-live-custom-rtmp-key";
@@ -358,6 +397,7 @@ public static class UiTestIds
         public const string ModeStudio = "go-live-mode-studio";
         public const string NdiToggle = "go-live-ndi-toggle";
         public const string ObsToggle = "go-live-obs-toggle";
+        public const string OpenHome = Back;
         public const string OpenLearn = "go-live-open-learn";
         public const string OpenRead = "go-live-open-read";
         public const string OpenSettings = "go-live-open-settings";
@@ -369,6 +409,7 @@ public static class UiTestIds
         public const string PreviewRail = "go-live-preview-rail";
         public const string PreviewCard = "go-live-preview-card";
         public const string PreviewEmpty = "go-live-preview-empty";
+        public const string PreviewLiveDot = "go-live-preview-live-dot";
         public const string PreviewSourceLabel = "go-live-preview-source-label";
         public const string PreviewVideo = "go-live-preview-video";
         public const string RecordingToggle = "go-live-recording-toggle";
@@ -381,6 +422,7 @@ public static class UiTestIds
         public const string StreamTab = "go-live-stream-tab";
         public const string SceneBar = "go-live-scene-bar";
         public const string SceneControls = "go-live-scene-controls";
+        public const string ScreenTitle = "go-live-screen-title";
         public const string SessionBar = "go-live-session-bar";
         public const string SessionTimer = "go-live-session-timer";
         public const string SourceRail = "go-live-source-rail";
@@ -405,6 +447,18 @@ public static class UiTestIds
         public const string YoutubeUrl = "go-live-youtube-url";
 
         public static string SourceCameraSelect(string sourceId) => $"go-live-source-select-{sourceId}";
+        public static string DestinationToggle(string destinationId) => destinationId switch
+        {
+            GoLiveTargetCatalog.TargetIds.Obs => ObsToggle,
+            GoLiveTargetCatalog.TargetIds.Ndi => NdiToggle,
+            GoLiveTargetCatalog.TargetIds.Recording => RecordingToggle,
+            GoLiveTargetCatalog.TargetIds.LiveKit => LiveKitToggle,
+            GoLiveTargetCatalog.TargetIds.VdoNinja => VdoToggle,
+            GoLiveTargetCatalog.TargetIds.Youtube => YoutubeToggle,
+            GoLiveTargetCatalog.TargetIds.Twitch => TwitchToggle,
+            GoLiveTargetCatalog.TargetIds.CustomRtmp => CustomRtmpToggle,
+            _ => $"go-live-destination-toggle-{destinationId}"
+        };
         public static string ProviderCard(string providerId) => $"go-live-provider-{providerId}";
         public static string ProviderSourcePicker(string providerId) => $"go-live-provider-sources-{providerId}";
         public static string ProviderSourceSummary(string providerId) => $"go-live-provider-source-summary-{providerId}";
@@ -413,6 +467,8 @@ public static class UiTestIds
         public static string SourceCamera(string sourceId) => $"go-live-source-camera-{sourceId}";
 
         public static string SourceCameraAction(string deviceId) => $"go-live-source-camera-action-{deviceId}";
+
+        public static string SourceCameraBadge(string sourceId) => $"go-live-source-badge-{sourceId}";
 
         public static string SourceVideo(string sourceId) => $"go-live-source-video-{sourceId}";
 

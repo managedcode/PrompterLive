@@ -1,11 +1,13 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Settings.Models
 
 <section class="set-section set-panel"
          id="set-ai"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.AiPanel">
-    <h3 class="set-section-title">AI Provider</h3>
+    <h3 class="set-section-title">@SettingsNavigationText.AiProviderLabel</h3>
     <p class="set-section-desc">Connect an AI provider to enable rewriting, expanding, and formatting scripts with AI.</p>
 
     <div class="set-device-list">
@@ -28,11 +30,8 @@
                 </div>
                 <div class="set-field">
                     <label>Model</label>
-                    <select class="set-select" @onclick:stopPropagation="true">
-                        <option>claude-sonnet-4-6</option>
-                        <option>claude-opus-4-6</option>
-                        <option>claude-haiku-4-5</option>
-                    </select>
+                    <SettingsSelect Value="claude-sonnet-4-6"
+                                   Options="@ClaudeModelOptions" />
                 </div>
                 <div class="set-field">
                     <label>Base URL (optional)</label>
@@ -79,12 +78,8 @@
                 </div>
                 <div class="set-field">
                     <label>Model</label>
-                    <select class="set-select" @onclick:stopPropagation="true">
-                        <option>gpt-4o</option>
-                        <option>gpt-4o-mini</option>
-                        <option>o1</option>
-                        <option>o3-mini</option>
-                    </select>
+                    <SettingsSelect Value="gpt-4o"
+                                   Options="@OpenAiModelOptions" />
                 </div>
             </div>
             <button class="set-btn-outline set-btn-sm"
@@ -130,6 +125,21 @@
 </section>
 
 @code {
+    private static readonly IReadOnlyList<SettingsSelectOption> ClaudeModelOptions =
+    [
+        new("claude-sonnet-4-6", "claude-sonnet-4-6"),
+        new("claude-opus-4-6", "claude-opus-4-6"),
+        new("claude-haiku-4-5", "claude-haiku-4-5"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> OpenAiModelOptions =
+    [
+        new("gpt-4o", "gpt-4o"),
+        new("gpt-4o-mini", "gpt-4o-mini"),
+        new("o1", "o1"),
+        new("o3-mini", "o3-mini"),
+    ];
+
     private const string ActiveCssClass = "active";
     private const string ClaudeApiCardId = "ai-claude-api";
     private const string DisconnectedStatusClass = "";

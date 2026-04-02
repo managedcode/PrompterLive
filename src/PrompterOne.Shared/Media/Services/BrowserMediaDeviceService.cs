@@ -4,7 +4,7 @@ using PrompterOne.Core.Models.Media;
 
 namespace PrompterOne.Shared.Services;
 
-public sealed class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDeviceService
+public sealed partial class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDeviceService
 {
     private readonly IJSRuntime _jsRuntime = jsRuntime;
 
@@ -16,7 +16,7 @@ public sealed class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDevi
 
         return devices.Select(device => new MediaDeviceInfo(
             device.DeviceId,
-            string.IsNullOrWhiteSpace(device.Label) ? "Unnamed device" : device.Label,
+            MediaDeviceLabelSanitizer.Sanitize(device.Label),
             device.Kind switch
             {
                 "videoinput" => MediaDeviceKind.Camera,
@@ -27,5 +27,5 @@ public sealed class BrowserMediaDeviceService(IJSRuntime jsRuntime) : IMediaDevi
             device.IsDefault)).ToList();
     }
 
-    private sealed record BrowserMediaDeviceDto(string DeviceId, string Label, string Kind, bool IsDefault);
+    private sealed record BrowserMediaDeviceDto(string DeviceId, string? Label, string Kind, bool IsDefault);
 }

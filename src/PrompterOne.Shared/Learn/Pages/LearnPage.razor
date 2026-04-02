@@ -30,28 +30,35 @@
             </div>
 
             <div class="rsvp-h-row" @ref="_focusRow">
-                <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft">
-                    @foreach (var word in _leftContextWords)
-                    {
-                        <span>@word</span>
-                    }
+                <div class="rsvp-lane rsvp-lane-left">
+                    <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft">
+                        @foreach (var word in _leftContextWords)
+                        {
+                            <span>@word</span>
+                        }
+                    </div>
                 </div>
 
                 <div class="rsvp-focus-shell"
                      id="@UiDomIds.Learn.WordShell"
                      data-testid="@UiTestIds.Learn.WordShell">
-                    <div class="rsvp-focus" id="@UiDomIds.Learn.Word" data-testid="@UiTestIds.Learn.Word">
+                    <div class="rsvp-focus"
+                         id="@UiDomIds.Learn.Word"
+                         @ref="_focusWord"
+                         data-testid="@UiTestIds.Learn.Word">
                         <span class="rsvp-focus-segment rsvp-focus-leading">@_currentWordLeading</span>
-                        <span class="rsvp-focus-segment rsvp-focus-orp orp">@_currentWordOrp</span>
+                        <span class="rsvp-focus-segment rsvp-focus-orp orp" @ref="_focusOrp">@_currentWordOrp</span>
                         <span class="rsvp-focus-segment rsvp-focus-trailing">@_currentWordTrailing</span>
                     </div>
                 </div>
 
-                <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight">
-                    @foreach (var word in _rightContextWords)
-                    {
-                        <span>@word</span>
-                    }
+                <div class="rsvp-lane rsvp-lane-right">
+                    <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight">
+                        @foreach (var word in _rightContextWords)
+                        {
+                            <span>@word</span>
+                        }
+                    </div>
                 </div>
             </div>
 

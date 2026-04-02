@@ -12,8 +12,12 @@ public partial class TeleprompterPage
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
     private const string ReaderCountdownCssClass = "rd-countdown";
+    private const string ReaderGradientCssClass = "rd-gradient";
+    private const string ReaderGradientDefaultCssClass = "neutral";
+    private const string ReaderGradientNoTransitionCssClass = "rd-gradient-static";
     private const string ReaderGroupActiveCssClass = "rd-g-active";
     private const string ReaderGroupCssClass = "rd-g";
+    private const string ReaderGroupEmphasisCssClass = "rd-g-emphasis";
     private const string ReaderHorizontalGuideCssClass = "rd-guide-h";
     private const string ReaderVerticalGuideCssClass = "rd-guide-v";
     private const string ReaderVerticalGuideLeftCssClass = "rd-guide-v-l";
@@ -26,7 +30,7 @@ public partial class TeleprompterPage
     {
         if (_cards.Count == 0)
         {
-            _gradientClass = string.Empty;
+            _gradientClass = ReaderGradientDefaultCssClass;
             _edgeSectionLabel = string.Empty;
             _readerProgressFillWidth = "0%";
             _elapsedLabel = "0:00 / 0:00";
@@ -67,6 +71,12 @@ public partial class TeleprompterPage
 
     private string BuildCameraTintCssClass() =>
         BuildClassList(ReaderCameraTintCssClass, _isReaderCameraActive ? ActiveCssClass : null);
+
+    private string BuildReaderGradientCssClass() =>
+        BuildClassList(
+            ReaderGradientCssClass,
+            string.IsNullOrWhiteSpace(_gradientClass) ? ReaderGradientDefaultCssClass : _gradientClass,
+            _isReaderGradientTransitionDisabled ? ReaderGradientNoTransitionCssClass : null);
 
     private string BuildCameraButtonCssClass() =>
         BuildClassList(ReaderControlButtonCssClass, _isReaderCameraActive ? ActiveCssClass : null);
@@ -118,9 +128,12 @@ public partial class TeleprompterPage
 
     private string BuildReaderGroupCssClass(int cardIndex, int chunkIndex)
     {
+        var group = (ReaderGroupViewModel)_cards[cardIndex].Chunks[chunkIndex];
         if (cardIndex != _activeReaderCardIndex || _activeReaderWordIndex < 0)
         {
-            return ReaderGroupCssClass;
+            return BuildClassList(
+                ReaderGroupCssClass,
+                group.IsEmphasis ? ReaderGroupEmphasisCssClass : null);
         }
 
         var groupStartIndex = GetChunkWordStartIndex(cardIndex, chunkIndex);
@@ -128,7 +141,10 @@ public partial class TeleprompterPage
         var isActiveGroup = _activeReaderWordIndex >= groupStartIndex &&
             _activeReaderWordIndex < groupStartIndex + groupWordCount;
 
-        return BuildClassList(ReaderGroupCssClass, isActiveGroup ? ReaderGroupActiveCssClass : null);
+        return BuildClassList(
+            ReaderGroupCssClass,
+            group.IsEmphasis ? ReaderGroupEmphasisCssClass : null,
+            isActiveGroup ? ReaderGroupActiveCssClass : null);
     }
 
     private string BuildReaderWordCssClass(int cardIndex, int chunkIndex, int wordIndex)

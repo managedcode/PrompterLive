@@ -1,10 +1,12 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Settings.Models
 
 <section class="set-section set-panel"
          id="set-files"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.FilesPanel">
-    <h3 class="set-section-title">File Storage</h3>
+    <h3 class="set-section-title">@SettingsNavigationText.FileStorageLabel</h3>
     <p class="set-section-desc">Where scripts, recordings, and exports are saved locally.</p>
 
     <div class="set-device-list">
@@ -67,15 +69,9 @@
                 </div>
                 <div class="set-field">
                     <label>Max Storage</label>
-                    <select class="set-select"
-                            value="@RecordingsStorageLimit"
-                            @onchange="OnStorageLimitChanged"
-                            @onclick:stopPropagation="true">
-                        <option value="No limit">No limit</option>
-                        <option value="10 GB">10 GB</option>
-                        <option value="50 GB">50 GB</option>
-                        <option value="100 GB">100 GB</option>
-                    </select>
+                    <SettingsSelect Value="@RecordingsStorageLimit"
+                                   Options="@StorageLimitOptions"
+                                   OnChange="OnStorageLimitChanged" />
                 </div>
             </div>
         </SettingsExpandableCard>
@@ -93,15 +89,9 @@
             <div class="set-device-fields">
                 <div class="set-field">
                     <label>Default Export Format</label>
-                    <select class="set-select"
-                            value="@ExportFormat"
-                            @onchange="OnExportFormatChanged"
-                            @onclick:stopPropagation="true">
-                        <option value="TPS (Native)">TPS (Native)</option>
-                        <option value="Markdown">Markdown</option>
-                        <option value="Plain Text">Plain Text</option>
-                        <option value="PDF">PDF</option>
-                    </select>
+                    <SettingsSelect Value="@ExportFormat"
+                                   Options="@ExportFormatOptions"
+                                   OnChange="OnExportFormatChanged" />
                 </div>
                 <div class="set-field">
                     <label>Export Location</label>
@@ -116,6 +106,22 @@
 </section>
 
 @code {
+    private static readonly IReadOnlyList<SettingsSelectOption> ExportFormatOptions =
+    [
+        new("TPS (Native)", "TPS (Native)"),
+        new("Markdown", "Markdown"),
+        new("Plain Text", "Plain Text"),
+        new("PDF", "PDF"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> StorageLimitOptions =
+    [
+        new("No limit", "No limit"),
+        new("10 GB", "10 GB"),
+        new("50 GB", "50 GB"),
+        new("100 GB", "100 GB"),
+    ];
+
     private const string ExportsCardId = "files-exports";
     private const string RecordingsCardId = "files-recordings";
     private const string ScriptsCardId = "files-scripts";

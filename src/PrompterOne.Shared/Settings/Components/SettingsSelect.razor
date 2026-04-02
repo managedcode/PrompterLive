@@ -1,0 +1,99 @@
+@namespace PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Contracts
+
+<div class="ss-wrap"
+     tabindex="-1"
+     @onfocusout="OnFocusOut"
+     @onclick:stopPropagation="true">
+    <button type="button"
+            class="ss-trigger set-select"
+            data-testid="@TestId"
+            value="@Value"
+            aria-expanded="@_open"
+            @onclick="Toggle">
+        <span class="ss-label">@SelectedLabel</span>
+        <svg class="ss-chevron @(_open ? OpenChevronClass : null)"
+             width="12"
+             height="12"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             aria-hidden="true">
+            <polyline points="6 9 12 15 18 9" />
+        </svg>
+    </button>
+
+    @if (_open)
+    {
+        <div class="ss-panel">
+            @foreach (var option in Options)
+            {
+                var isSelected = string.Equals(option.Value, Value, StringComparison.Ordinal);
+                <button type="button"
+                        class="ss-option @(isSelected ? SelectedOptionClass : null)"
+                        data-testid="@GetOptionTestId(option.Value)"
+                        @onmousedown:preventDefault="true"
+                        @onclick="() => SelectOption(option.Value)">
+                    @if (isSelected)
+                    {
+                        <svg class="ss-check"
+                             width="14"
+                             height="14"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2.5"
+                             aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                    }
+                    else
+                    {
+                        <span class="ss-check-spacer"></span>
+                    }
+                    <span>@option.Label</span>
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private const string OpenChevronClass = "ss-chevron-open";
+    private const string SelectedOptionClass = "ss-option-selected";
+    private const string FallbackLabel = "—";
+
+    private bool _open;
+
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public IReadOnlyList<SettingsSelectOption> Options { get; set; } = [];
+    [Parameter] public EventCallback<ChangeEventArgs> OnChange { get; set; }
+    [Parameter] public string? TestId { get; set; }
+
+    private string SelectedLabel =>
+        Options.FirstOrDefault(o => string.Equals(o.Value, Value, StringComparison.Ordinal))?.Label
+        ?? FallbackLabel;
+
+    private string? GetOptionTestId(string optionValue) =>
+        TestId is null ? null : UiTestIds.Settings.SelectOption(TestId, optionValue);
+
+    private void Toggle()
+    {
+        _open = !_open;
+    }
+
+    private async Task SelectOption(string value)
+    {
+        _open = false;
+        if (!string.Equals(value, Value, StringComparison.Ordinal))
+        {
+            await OnChange.InvokeAsync(new ChangeEventArgs { Value = value });
+        }
+    }
+
+    private void OnFocusOut()
+    {
+        _open = false;
+    }
+}

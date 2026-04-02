@@ -2,10 +2,6 @@
 @namespace PrompterOne.Shared.Pages
 @using PrompterOne.Shared.Contracts
 
-<HeadContent>
-    <link rel="stylesheet" href="@DesignStylesheetPaths.Teleprompter" />
-</HeadContent>
-
 <div id="@UiDomIds.Design.TeleprompterScreen"
      class="screen active"
      tabindex="0"
@@ -14,7 +10,7 @@
      @onkeydown:preventDefault="true"
      data-testid="@UiTestIds.Teleprompter.Page">
     <div class="rd">
-        <div class="rd-gradient @_gradientClass" id="rd-gradient"></div>
+        <div class="@BuildReaderGradientCssClass()" id="rd-gradient"></div>
         <video class="@BuildCameraCssClass()"
                id="@_cameraLayer.ElementId"
                autoplay

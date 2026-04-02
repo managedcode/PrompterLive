@@ -31,27 +31,11 @@ public partial class TeleprompterPage
         string WidthPercentString,
         string EdgeColor,
         IReadOnlyList<ReaderChunkViewModel> Chunks,
-        string TestId)
-    {
-        public static ReaderCardViewModel Empty { get; } = new(
-            SectionName: "Introduction",
-            DisplayName: "Opening Block",
-            EmotionKey: "warm",
-            EmotionLabel: "Warm",
-            BackgroundClass: "warm",
-            AccentColor: "#E97F00",
-            TargetWpm: 140,
-            WordCount: 1,
-            DurationMilliseconds: 1000,
-            WidthPercentString: "100%",
-            EdgeColor: "rgba(233, 127, 0, 0.35)",
-            Chunks: [new ReaderGroupViewModel([new ReaderWordViewModel("Ready", "tps-warm", 600)])],
-            TestId: UiTestIds.Teleprompter.Card(999));
-    }
+        string TestId);
 
     private abstract record ReaderChunkViewModel;
 
-    private sealed record ReaderGroupViewModel(IReadOnlyList<ReaderWordViewModel> Words) : ReaderChunkViewModel;
+    private sealed record ReaderGroupViewModel(IReadOnlyList<ReaderWordViewModel> Words, bool IsEmphasis) : ReaderChunkViewModel;
 
     private sealed record ReaderPauseViewModel(int DurationMs, string CssClass) : ReaderChunkViewModel;
 

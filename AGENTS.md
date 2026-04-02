@@ -278,6 +278,8 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 - String literals are forbidden in implementation code. Declare them once as named constants, enums, configuration entries, or dedicated value objects, then reuse those symbols.
 - Avoid magic literals. Extract shared values into constants, enums, configuration, or dedicated types.
 - URLs, storage keys, JS interop identifiers, route fragments, and user-visible fallback strings are implementation literals too. They MUST live behind named constants or localized catalogs.
+- JS bridges must not invent repo-owned CSS custom-property names, DOM selectors, or feature data-attribute names inside `.js` files when Blazor/C# can own and pass those contract strings explicitly.
+- Fallback device names, fallback device labels, and other invented media-device placeholders are forbidden in runtime and tests; use real device metadata when it exists, otherwise keep the field empty or assert on explicit no-device state instead of fabricating names.
 - Design boundaries so real behaviour can be tested through public interfaces.
 - The repo-root `.editorconfig` is the source of truth for formatting, naming, style, and analyzer severity. Use nested `.editorconfig` files only when they clearly serve a subtree-specific purpose.
 
@@ -304,10 +306,27 @@ Repo-specific design rules:
 - Repo-owned manifests, scripts, workflows, and project files that track third-party runtime JavaScript SDKs MUST point to concrete GitHub release versions and asset URLs, never floating references.
 - Any vendored runtime JavaScript SDK that tracks an upstream GitHub repo MUST have an automated watcher job that checks new GitHub releases and opens a repo issue describing the required update when a newer release appears.
 - Teleprompter TPS speed modifiers MUST affect both playback timing and subtle word- or phrase-level letter spacing, so slower spans open up slightly and faster spans tighten slightly without hurting readability.
+- Teleprompter default reader width MUST start at the maximum readable width from the design unless the user explicitly narrows it; shipping a visibly narrower default is a regression.
+- Teleprompter speed styling MUST produce a visible but tasteful letter-spacing or kerning change: slower text opens up slightly and faster text tightens slightly, not a no-op.
 - Teleprompter reader word styling MUST mirror TPS/editor inline semantics: explicit inline TPS tags control per-word emphasis and color, while section or block emotion sets card context and must not recolor every reader word.
+- Teleprompter underline or highlight treatments that span a phrase or block MUST render as one continuous block-level treatment; separate per-word underlines inside the same phrase are forbidden.
+- Teleprompter read-state styling MUST mute phrase-level underline or highlight accents once the emphasized text has been read; bright lingering underline accents on already-read text are forbidden.
+- Teleprompter reader text MUST appear on the focal guide immediately when a word or block becomes active; visible post-appearance drift or settling onto the guide is forbidden.
+- Teleprompter route styles MUST be present on the first paint; a flash of unstyled or late-styled reader UI during route entry is a regression.
 - Teleprompter block transitions MUST stay visually consistent: outgoing cards move upward and incoming cards rise from below in the same direction every time; alternating up/down travel is forbidden, and extra settling, bounce, or intermediate card states are forbidden.
+- Teleprompter focus treatment MUST stay visually calm: the active focus word may be emphasized, but surrounding text should be gently dimmed instead of creating a bright moving blot, fake box, or attention-grabbing patch that flies up and down.
+- Teleprompter emotion styling may tint the surface or accents, but reader text itself MUST stay easy to read and must not become harsh, over-bright, or saturated enough to hurt readability.
+- Learn and Teleprompter playback timing MUST align with real word-by-word progression in the browser: WPM, speed modifiers, and word counting must match the emitted words, and timing work is not done until a browser-level word-sequence check proves it.
+- Reader and Learn tokenization MUST treat punctuation-only tokens such as commas, periods, and dashes as punctuation attached to nearby words or pauses, never as standalone counted words.
+- App-shell logo navigation MUST always lead to the main home/library screen; it must not deep-link into Go Live, Teleprompter, or another feature-specific route.
+- Learn rehearsal speed MUST default to about 250 WPM and stay user-adjustable upward from that baseline; shipping a 300 WPM startup default is too aggressive.
+- Go Live `ON AIR` badges and preview live dots MUST appear only while recording or streaming is actually active; idle selected or armed sources must stay visually non-live.
+- Go Live chrome MUST stay operational and generic; do not surface the loaded script title or script preview subtitle in the Go Live header/session bar just because a script is open.
+- Go Live back navigation MUST return to the actual previous in-app screen when known, and only fall back to library when there is no valid in-app return target; it must never hardcode teleprompter as the back target.
 - Learn and Teleprompter are separate screens with separate style ownership; do not bundle RSVP and teleprompter reader feature styles into one shared screen stylesheet or let one page inherit the other page's visual treatment.
 - User preferences persistence MUST sit behind a platform-agnostic user-settings abstraction, with browser storage implemented via local storage and room for other platform-specific implementations; theme, teleprompter layout preferences, camera/scene preferences, and similar saved settings belong there instead of ad-hoc feature stores.
+- Streaming destination/platform configuration MUST be user-defined and persisted in settings; Settings and Go Live must not ship hardcoded platform instances, seeded destination accounts, or fixed fake provider rows beyond real runtime capabilities.
+- Runtime screens must not keep inline seeded operational data, fake demo rows, or screen-local platform/source presets in page/component code; reusable labels and presets belong in shared contracts or catalogs, while rendered rows must come from persisted settings, workspace state, or live session state.
 - Build quality gates must stay green under `-warnaserror`.
 - GitHub Pages is the expected CI publish target for the standalone WebAssembly app; publish automation must keep the app browser-only and Pages-compatible.
 - GitHub Actions MUST keep separate, clearly named workflows for pull-request validation and release automation; vague workflow names are forbidden.
@@ -359,6 +378,7 @@ Ask first:
 ### Dislikes
 
 - backend creep in the standalone runtime
+- hardcoded fallback reader/test fixtures such as inline `Ready` chunks, fake word models, or synthetic UI state embedded directly in tests when the same behavior can be exercised through shared script fixtures, builders, or production-owned constants
 - agent-started local servers taking shared user ports or using ports outside the reserved `5050-5070` agent range
 - brittle selectors without `data-testid`
 - progress updates that imply a fix is done before there is concrete implementation and verification evidence; keep status factual and let the user verify final behavior personally
@@ -368,8 +388,14 @@ Ask first:
 - made-up About/team content or stale attribution; About must point to real Managed Code ownership and official links
 - any visible typing latency in the editor; plain input must feel immediate with no observable delay
 - teleprompter controls that fade so much they become hard to see during real reading
+- teleprompter starting with a narrowed text width instead of the design-max default
 - teleprompter paragraph repositioning, line hopping, or per-word vertical transform updates that make the text jump; `design/teleprompter.html` motion is the required reference, with steady bottom-to-top movement and no extra animation layers beyond the reference
+- teleprompter words or blocks appearing away from the focus line and only then drifting onto it; activation must look immediate
+- teleprompter section changes that introduce odd transition motion instead of the straight reference direction
 - any green teleprompter shell or background treatment; Teleprompter must stay on its dark reader palette and use emotion only for accents, not green screen-wide fills
+- fragmented per-word underline styling where the intended emphasis should read as one continuous block
+- punctuation showing up or being counted as standalone words in Learn or Teleprompter flows
+- app logo clicks landing on a feature route instead of the main home/library screen
 - Learn and Teleprompter style boundaries bleeding through a shared feature stylesheet; their visuals must stay isolated by page-owned style manifests
 - Learn RSVP compositions that shift when shorter or longer words render; changing word length must not move the overall RSVP component or its anchored centerline
 - teleprompter camera starting enabled by default; default reader startup should keep the camera off until the user explicitly enables it

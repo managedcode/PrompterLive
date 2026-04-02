@@ -4,7 +4,7 @@
     gap: 4px;
     min-width: 0;
     min-height: 0;
-    flex: 1;
+    flex: 0 0 auto;
 }
 
 .gl-monitor-label-top {
@@ -35,7 +35,8 @@
 }
 
 .gl-monitor-program {
-    flex: 1;
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 9;
     min-height: 0;
     border-color: var(--gold-14);
     box-shadow: 0 0 40px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--gold-06);
@@ -44,6 +45,7 @@
 ::deep .gl-monitor-feed {
     flex: 1;
     position: relative;
+    aspect-ratio: 16 / 9;
     min-height: 0;
     overflow: hidden;
     background: #050508;

@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Streaming;
 
@@ -13,7 +14,11 @@ public sealed class GoLiveDestinationRoutingTests
     [Fact]
     public void Normalize_SeedsMissingTargetsFromProgramFeedSources()
     {
-        var streaming = new StreamStudioSettings();
+        var streaming = new StreamStudioSettings(
+            ExternalDestinations:
+            [
+                StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit)
+            ]);
 
         var normalized = GoLiveDestinationRouting.Normalize(streaming, CreateSceneCameras());
 
@@ -22,14 +27,21 @@ public sealed class GoLiveDestinationRoutingTests
             GoLiveTargetCatalog.TargetIds.LiveKit,
             CreateSceneCameras());
 
-        Assert.Equal(GoLiveTargetCatalog.AllTargetIds.Count, normalized.DestinationSourceSelections?.Count);
+        Assert.Equal(GoLiveTargetCatalog.LocalTargetIds.Count + 1, normalized.DestinationSourceSelections?.Count);
         Assert.Equal([FirstSourceId], liveKitSources);
     }
 
     [Fact]
     public void ToggleSource_UpdatesOnlyRequestedTarget()
     {
-        var streaming = GoLiveDestinationRouting.Normalize(new StreamStudioSettings(), CreateSceneCameras());
+        var streaming = GoLiveDestinationRouting.Normalize(
+            new StreamStudioSettings(
+                ExternalDestinations:
+                [
+                    StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit),
+                    StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.Youtube, GoLiveTargetCatalog.TargetIds.Youtube)
+                ]),
+            CreateSceneCameras());
 
         var updated = GoLiveDestinationRouting.ToggleSource(
             streaming,
@@ -49,6 +61,10 @@ public sealed class GoLiveDestinationRoutingTests
     public void Normalize_RemovesUnknownSourcesFromPersistedSelections()
     {
         var streaming = new StreamStudioSettings(
+            ExternalDestinations:
+            [
+                StreamingPlatformCatalog.CreateProfile(StreamingPlatformKind.LiveKit, GoLiveTargetCatalog.TargetIds.LiveKit)
+            ],
             DestinationSourceSelections:
             [
                 new GoLiveDestinationSourceSelection(

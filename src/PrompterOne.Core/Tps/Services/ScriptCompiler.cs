@@ -669,6 +669,12 @@ public class ScriptCompiler
             return;
         }
 
+        if (TpsTokenTextRules.IsStandalonePunctuationToken(clean))
+        {
+            AttachStandalonePunctuation(words, clean);
+            return;
+        }
+
         var metadata = new WordMetadata
         {
             IsEmphasis = state.IsEmphasis,
@@ -706,6 +712,20 @@ public class ScriptCompiler
             DisplayDuration = CalculateDisplayDuration(clean, effectiveWpm),
             Metadata = metadata
         });
+    }
+
+    private static void AttachStandalonePunctuation(List<CompiledWord> words, string punctuationToken)
+    {
+        var previousWord = words.LastOrDefault(word =>
+            word.Metadata?.IsPause != true &&
+            !string.IsNullOrWhiteSpace(word.CleanText));
+        if (previousWord is null)
+        {
+            return;
+        }
+
+        previousWord.CleanText += TpsTokenTextRules.BuildStandalonePunctuationSuffix(punctuationToken);
+        previousWord.CharacterCount = previousWord.CleanText.Length;
     }
 
     private static string NormalizeContent(string text)

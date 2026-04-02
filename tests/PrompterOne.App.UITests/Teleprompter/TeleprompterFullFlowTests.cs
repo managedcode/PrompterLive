@@ -10,6 +10,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
     private const int ClosingCardIndex = 7;
     private const int OpeningCardIndex = 0;
     private const int PurposeCardIndex = 1;
+    private const string ReaderNextCardCssClass = "rd-card-next";
     private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const int InspirationCardIndex = 6;
@@ -117,6 +118,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
         var purpleWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchPurpleWord);
         var teleprompterWord = await GetWordProbeAsync(page, ClosingCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWord);
 
+        Assert.DoesNotContain("tps-neutral", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-warm", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-focused", neutralWord.Classes, StringComparison.Ordinal);
 
@@ -124,7 +126,8 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
         Assert.DoesNotContain("tps-warm", greenWord.Classes, StringComparison.Ordinal);
 
         Assert.Contains("tps-highlight", highlightWord.Classes, StringComparison.Ordinal);
-        Assert.NotEqual(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor, highlightWord.BackgroundColor);
+        Assert.Contains(ReaderNextCardCssClass, highlightWord.CardClasses, StringComparison.Ordinal);
+        Assert.Equal(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor, highlightWord.BackgroundColor);
 
         Assert.Contains("tps-xslow", slowWord.Classes, StringComparison.Ordinal);
         Assert.Contains("tps-xfast", fastWord.Classes, StringComparison.Ordinal);
@@ -234,8 +237,10 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
                 }
 
                 const computed = window.getComputedStyle(word);
+                const card = word.closest('.rd-card');
                 return {
                     classes: word.className,
+                    cardClasses: card instanceof HTMLElement ? card.className : '',
                     style: word.getAttribute('style') ?? '',
                     title: word.getAttribute('title') ?? '',
                     pronunciation: word.getAttribute('data-pronunciation') ?? '',
@@ -269,6 +274,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
     private sealed class ReaderWordProbe
     {
         public string Classes { get; set; } = string.Empty;
+        public string CardClasses { get; set; } = string.Empty;
         public string Style { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Pronunciation { get; set; } = string.Empty;

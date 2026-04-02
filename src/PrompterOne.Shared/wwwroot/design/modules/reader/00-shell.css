@@ -19,9 +19,10 @@
     inset: 0;
     opacity: 1;
     z-index: 0;
-    transition: background 3s ease;
-    background: linear-gradient(180deg, #08101C 0%, #0E1A2E 30%, #08101C 70%, #040A10 100%);
+    transition: background 1.15s cubic-bezier(.22,.84,.24,1);
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-deep) 100%);
 }
+.rd-gradient-static { transition: none; }
 /* Warm — golden amber */
 .rd-gradient.warm { background: linear-gradient(180deg, #1C1408 0%, #2E2210 30%, #1C1408 70%, #100E06 100%); }
 /* Concerned — deep red */
@@ -57,8 +58,8 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-    transition: opacity 220ms ease;
+    background: linear-gradient(180deg, var(--bg-3) 0%, var(--bg-2) 38%, var(--bg-deep) 100%);
+    transition: opacity 260ms ease;
     pointer-events: none;
 }
 .rd-camera-off { color: var(--t4); }
@@ -161,7 +162,7 @@
 .rd-cluster-wrap {
     position: relative;
     padding: 0 4%;
-    max-width: 750px;
+    max-width: 1100px;
     margin: 0 auto;
     width: 100%;
     height: 100%;
@@ -180,19 +181,19 @@
 }
 .rd-cluster b { font-weight: 700; }
 
-/* ── TPS Inline Colors (per TPS_FORMAT.md dark-BG spec) ── */
-.tps-red { color: #FF6B6B; }
-.tps-green { color: #51CF66; }
-.tps-blue { color: #74C0FC; }
-.tps-yellow { color: #FFE066; }
-.tps-orange { color: #FFA94D; }
-.tps-purple { color: #CC5DE8; }
-.tps-cyan { color: #66D9E8; }
-.tps-magenta { color: #F783AC; }
-.tps-pink { color: #FAA2C1; }
-.tps-teal { color: #38D9A9; }
-.tps-white { color: #F8F9FA; }
-.tps-gray { color: #ADB5BD; }
+/* ── TPS Inline Colors — keep semantic contrast without neon spill ── */
+.tps-red { color: #F19A9A; }
+.tps-green { color: #9FD7AD; }
+.tps-blue { color: #ACCBE6; }
+.tps-yellow { color: #E8D58E; }
+.tps-orange { color: #E4B07A; }
+.tps-purple { color: #C5A4DD; }
+.tps-cyan { color: #93CDD7; }
+.tps-magenta { color: #D9A5BF; }
+.tps-pink { color: #DEB1C5; }
+.tps-teal { color: #8ECDBE; }
+.tps-white { color: #F2E6CC; }
+.tps-gray { color: #BBB8B0; }
 
 /* ── TPS Highlight — yellow background overlay ── */
 .tps-highlight {
@@ -208,21 +209,21 @@
 .tps-emphasis { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; text-decoration-thickness: 2px; }
 
 /* ── TPS Emotion Inline Colors ── */
-.tps-warm { color: #FFA94D; }
-.tps-concerned { color: #FF6B6B; }
-.tps-focused { color: #51CF66; }
-.tps-motivational { color: #CC5DE8; }
-.tps-neutral { color: #74C0FC; }
-.tps-urgent { color: #FF4444; font-weight: 900; }
-.tps-happy { color: #FFE066; }
-.tps-excited { color: #FAA2C1; }
-.tps-sad { color: #7B68EE; }
-.tps-calm { color: #38D9A9; }
-.tps-energetic { color: #FF6347; }
-.tps-professional { color: #5B7FFF; }
+.tps-warm { color: #E4B07A; }
+.tps-concerned { color: #E49A9A; }
+.tps-focused { color: #9FD7AD; }
+.tps-motivational { color: #C5A4DD; }
+.tps-neutral { color: #ACCBE6; }
+.tps-urgent { color: #E58A8A; font-weight: 800; }
+.tps-happy { color: #E8D58E; }
+.tps-excited { color: #DEB1C5; }
+.tps-sad { color: #A59DDC; }
+.tps-calm { color: #8ECDBE; }
+.tps-energetic { color: #E1A581; }
+.tps-professional { color: #A9BFE7; }
 
 /* ── TPS Speed Indicators (visual cue for speed tags) ── */
-.tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.055em); }
-.tps-slow { letter-spacing: var(--tps-word-letter-spacing, 0.028em); }
-.tps-fast { letter-spacing: var(--tps-word-letter-spacing, -0.015em); }
-.tps-xfast { letter-spacing: var(--tps-word-letter-spacing, -0.028em); opacity: .78; }
+.tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.085em); }
+.tps-slow { letter-spacing: var(--tps-word-letter-spacing, 0.045em); }
+.tps-fast { letter-spacing: var(--tps-word-letter-spacing, -0.024em); }
+.tps-xfast { letter-spacing: var(--tps-word-letter-spacing, -0.05em); opacity: .82; }

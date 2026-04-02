@@ -2,6 +2,7 @@ using ManagedCode.Storage.CloudKit.Options;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Storage.Cloud;
 
 namespace PrompterOne.Shared.Components.Settings;
@@ -37,9 +38,24 @@ public partial class SettingsCloudSection : ComponentBase
 
     [Parameter] public EventCallback<string> ToggleCard { get; set; }
 
-    private static IReadOnlyList<CloudKitDatabase> CloudKitDatabases { get; } = Enum.GetValues<CloudKitDatabase>();
+    private static readonly IReadOnlyList<SettingsSelectOption> DefaultProviderOptions =
+    [
+        new(CloudStorageProviderIds.OneDrive, "OneDrive"),
+        new(CloudStorageProviderIds.GoogleDrive, "Google Drive"),
+        new(CloudStorageProviderIds.Dropbox, "Dropbox"),
+        new(CloudStorageProviderIds.GoogleCloudStorage, "Google Cloud Storage"),
+        new(CloudStorageProviderIds.CloudKit, "CloudKit"),
+    ];
 
-    private static IReadOnlyList<CloudKitEnvironment> CloudKitEnvironments { get; } = Enum.GetValues<CloudKitEnvironment>();
+    private static readonly IReadOnlyList<SettingsSelectOption> CloudKitDatabaseOptions =
+        Enum.GetValues<CloudKitDatabase>()
+            .Select(d => new SettingsSelectOption(d.ToString(), d.ToString()))
+            .ToArray();
+
+    private static readonly IReadOnlyList<SettingsSelectOption> CloudKitEnvironmentOptions =
+        Enum.GetValues<CloudKitEnvironment>()
+            .Select(e => new SettingsSelectOption(e.ToString(), e.ToString()))
+            .ToArray();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -80,6 +96,24 @@ public partial class SettingsCloudSection : ComponentBase
     {
         _preferences.SyncOnStartup = !_preferences.SyncOnStartup;
         await PersistPreferencesAsync();
+    }
+
+    private async Task OnCloudKitDatabaseChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<CloudKitDatabase>(args.Value?.ToString(), out var database))
+        {
+            _preferences.CloudKit.Database = database;
+            await PersistPreferencesAsync();
+        }
+    }
+
+    private async Task OnCloudKitEnvironmentChanged(ChangeEventArgs args)
+    {
+        if (Enum.TryParse<CloudKitEnvironment>(args.Value?.ToString(), out var environment))
+        {
+            _preferences.CloudKit.Environment = environment;
+            await PersistPreferencesAsync();
+        }
     }
 
     private async Task ToggleGoogleDriveAllDrivesAsync()

@@ -5,7 +5,10 @@
 @using PrompterOne.Core.Models.Media
 @using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Services
 @using PrompterOne.Shared.Services.Diagnostics
+@using PrompterOne.Shared.Settings.Components
+@using PrompterOne.Shared.Settings.Models
 @using PrompterOne.Shared.Storage
 
 @inject AppBootstrapper Bootstrapper
@@ -27,11 +30,11 @@
             <nav class="set-nav">
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Cloud)" @onclick="() => ShowSection(SettingsSection.Cloud)" data-testid="@UiTestIds.Settings.NavCloud">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /></svg>
-                    Cloud Sync
+                    @SettingsNavigationText.CloudSyncLabel
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Files)" @onclick="() => ShowSection(SettingsSection.Files)" data-testid="@UiTestIds.Settings.NavFiles">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>
-                    File Storage
+                    @SettingsNavigationText.FileStorageLabel
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Cameras)" @onclick="() => ShowSection(SettingsSection.Cameras)" data-testid="@UiTestIds.Settings.NavCameras">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
@@ -51,7 +54,7 @@
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Ai)" @onclick="() => ShowSection(SettingsSection.Ai)" data-testid="@UiTestIds.Settings.NavAi">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9 2 12l7 3 3 7 3-7 7-3-7-3z" /></svg>
-                    AI Provider
+                    @SettingsNavigationText.AiProviderLabel
                 </button>
                 <button type="button" class="@GetNavItemCssClass(SettingsSection.Appearance)" @onclick="() => ShowSection(SettingsSection.Appearance)" data-testid="@UiTestIds.Settings.NavAppearance">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
@@ -133,7 +136,7 @@
                                             }
                                         </div>
                                         <div class="set-device-info">
-                                            <span class="set-device-name">@camera.Label</span>
+                                            <span class="set-device-name">@MediaDeviceLabelSanitizer.Sanitize(camera.Label)</span>
                                             <span class="set-device-meta">@BuildCameraMeta(camera, isPrimary)</span>
                                         </div>
                                         <div class="set-device-actions" @onclick:stopPropagation="true">
@@ -150,15 +153,10 @@
                                             <div class="set-device-fields">
                                                 <div class="set-field">
                                                     <label>Resolution</label>
-                                                    <select class="set-select"
-                                                            value="@_studioSettings.Camera.Resolution"
-                                                            @onchange="OnCameraResolutionChanged"
-                                                            data-testid="@(isPrimary ? UiTestIds.Settings.CameraResolution : null)">
-                                                        <option value="@CameraResolutionPreset.FullHd1080">1920 x 1080 (Full HD)</option>
-                                                        <option value="@CameraResolutionPreset.Hd720">1280 x 720 (HD)</option>
-                                                        <option value="@CameraResolutionPreset.UltraHd4K">3840 x 2160 (4K)</option>
-                                                        <option value="@CameraResolutionPreset.Sd480">640 x 480 (SD)</option>
-                                                    </select>
+                                                    <SettingsSelect Value="@_studioSettings.Camera.Resolution.ToString()"
+                                                                   Options="@CameraResolutionOptions"
+                                                                   OnChange="OnCameraResolutionChanged"
+                                                                   TestId="@(isPrimary ? UiTestIds.Settings.CameraResolution : null)" />
                                                 </div>
                                                 <div class="set-field set-field-toggle">
                                                     <label>Mirror (Flip Horizontal)</label>
@@ -336,7 +334,7 @@
                                         </div>
                                     </div>
                                     <div class="set-device-info">
-                                        <span class="set-device-name">@microphone.Label</span>
+                                        <span class="set-device-name">@MediaDeviceLabelSanitizer.Sanitize(microphone.Label)</span>
                                         <span class="set-device-meta">@BuildMicrophoneMeta(microphone)</span>
                                     </div>
                                     <div class="set-device-actions" @onclick:stopPropagation="true">
@@ -432,33 +430,20 @@
                                         Sources="@_sceneCameras"
                                         SelectedOutputModeValue="@SelectedStreamingOutputModeValue"
                                         IsCardOpen="IsCardOpen"
+                                        AddExternalDestination="AddExternalDestinationAsync"
                                         ToggleObs="ToggleObsOutputAsync"
                                         ToggleNdi="ToggleNdiOutputAsync"
                                         ToggleRecording="ToggleRecordingOutputAsync"
-                                        ToggleLiveKit="ToggleLiveKitSettingsAsync"
-                                        ToggleVdo="ToggleVdoSettingsAsync"
-                                        ToggleYoutube="ToggleYoutubeSettingsAsync"
-                                        ToggleTwitch="ToggleTwitchSettingsAsync"
-                                        ToggleCustomRtmp="ToggleCustomRtmpSettingsAsync"
+                                        ToggleExternalDestination="ToggleExternalDestinationAsync"
+                                        RemoveExternalDestination="RemoveExternalDestinationAsync"
                                         ToggleCard="TogglePreferenceCardAsync"
                                         ToggleDestinationSource="ToggleStreamingDestinationSourceAsync"
+                                        UpdateExternalDestinationField="UpdateExternalDestinationFieldAsync"
                                         OutputModeChanged="OnStreamingOutputModeChanged"
                                         OutputResolutionChanged="OnStreamingOutputResolutionChanged"
                                         BitrateChanged="UpdateStreamingBitrateAsync"
                                         ToggleTextOverlay="ToggleSettingsTextOverlayAsync"
-                                        ToggleIncludeCamera="ToggleSettingsIncludeCameraAsync"
-                                        LiveKitServerChanged="UpdateLiveKitServerSettingAsync"
-                                        LiveKitRoomChanged="UpdateLiveKitRoomSettingAsync"
-                                        LiveKitTokenChanged="UpdateLiveKitTokenSettingAsync"
-                                        VdoRoomChanged="UpdateVdoRoomSettingAsync"
-                                        VdoPublishUrlChanged="UpdateVdoPublishUrlSettingAsync"
-                                        YoutubeUrlChanged="UpdateYoutubeUrlSettingAsync"
-                                        YoutubeKeyChanged="UpdateYoutubeKeySettingAsync"
-                                        TwitchUrlChanged="UpdateTwitchUrlSettingAsync"
-                                        TwitchKeyChanged="UpdateTwitchKeySettingAsync"
-                                        CustomRtmpNameChanged="UpdateCustomRtmpNameSettingAsync"
-                                        CustomRtmpUrlChanged="UpdateCustomRtmpUrlSettingAsync"
-                                        CustomRtmpKeyChanged="UpdateCustomRtmpKeySettingAsync" />
+                                        ToggleIncludeCamera="ToggleSettingsIncludeCameraAsync" />
             </section>
 
             <SettingsRecordingSection DisplayStyle="@GetSectionDisplayStyle(SettingsSection.Recording)"
@@ -549,6 +534,15 @@
     private const string UsbConnectionLabel = "USB";
     private const string VirtualConnectionLabel = "Virtual";
     private const string WideSampleRateLabel = "48 kHz";
+
+    private static readonly IReadOnlyList<SettingsSelectOption> CameraResolutionOptions =
+    [
+        new(nameof(CameraResolutionPreset.FullHd1080), "1920 x 1080 (Full HD)"),
+        new(nameof(CameraResolutionPreset.Hd720), "1280 x 720 (HD)"),
+        new(nameof(CameraResolutionPreset.UltraHd4K), "3840 x 2160 (4K)"),
+        new(nameof(CameraResolutionPreset.Sd480), "640 x 480 (SD)"),
+    ];
+
     private bool _loadState = true;
     private MediaPermissionsState _permissions = new(false, false);
     private IReadOnlyList<MediaDeviceInfo> _devices = [];

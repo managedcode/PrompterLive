@@ -113,15 +113,10 @@ internal sealed partial class GoLiveSessionService : IDisposable
         }, publishToCrossTab: State.HasActiveSession);
     }
 
-    public void ToggleStream(IReadOnlyList<SceneCameraSource> sceneCameras)
+    public void StartStream(IReadOnlyList<SceneCameraSource> sceneCameras)
     {
         if (State.IsStreamActive)
         {
-            ApplyState(State with
-            {
-                IsStreamActive = false,
-                StreamStartedAt = null
-            }, publishToCrossTab: true);
             return;
         }
 
@@ -133,15 +128,24 @@ internal sealed partial class GoLiveSessionService : IDisposable
         }, publishToCrossTab: true);
     }
 
-    public void ToggleRecording(IReadOnlyList<SceneCameraSource> sceneCameras)
+    public void StopStream()
+    {
+        if (!State.IsStreamActive)
+        {
+            return;
+        }
+
+        ApplyState(State with
+        {
+            IsStreamActive = false,
+            StreamStartedAt = null
+        }, publishToCrossTab: true);
+    }
+
+    public void StartRecording(IReadOnlyList<SceneCameraSource> sceneCameras)
     {
         if (State.IsRecordingActive)
         {
-            ApplyState(State with
-            {
-                IsRecordingActive = false,
-                RecordingStartedAt = null
-            }, publishToCrossTab: true);
             return;
         }
 
@@ -151,6 +155,42 @@ internal sealed partial class GoLiveSessionService : IDisposable
             IsRecordingActive = true,
             RecordingStartedAt = DateTimeOffset.UtcNow
         }, publishToCrossTab: true);
+    }
+
+    public void StopRecording()
+    {
+        if (!State.IsRecordingActive)
+        {
+            return;
+        }
+
+        ApplyState(State with
+        {
+            IsRecordingActive = false,
+            RecordingStartedAt = null
+        }, publishToCrossTab: true);
+    }
+
+    public void ToggleStream(IReadOnlyList<SceneCameraSource> sceneCameras)
+    {
+        if (State.IsStreamActive)
+        {
+            StopStream();
+            return;
+        }
+
+        StartStream(sceneCameras);
+    }
+
+    public void ToggleRecording(IReadOnlyList<SceneCameraSource> sceneCameras)
+    {
+        if (State.IsRecordingActive)
+        {
+            StopRecording();
+            return;
+        }
+
+        StartRecording(sceneCameras);
     }
 
     public void SetState(GoLiveSessionState nextState)

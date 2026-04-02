@@ -13,7 +13,6 @@ public partial class TeleprompterPage : IAsyncDisposable
 {
     private const int DefaultReaderFontSize = 36;
     private const int DefaultReaderFocalPointPercent = 30;
-    private const int DefaultReaderTextWidth = 750;
     private const int MaxReaderGroupCharacterCount = 24;
     private const int MaxReaderGroupWordCount = 5;
     private const string LoadReaderMessage = "Unable to prepare teleprompter playback.";
@@ -33,6 +32,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderMinFontSize = 24;
     private const int ReaderMinTextWidth = 400;
     private const int ReaderMinFocalPointPercent = 15;
+    private const int DefaultReaderTextWidth = ReaderMaxTextWidth;
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private CameraPreviewInterop CameraPreviewInterop { get; set; } = null!;
@@ -60,6 +60,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private bool _activateReaderCameraAfterRender;
     private bool _areWidthGuidesActive;
     private bool _focusScreenAfterRender = true;
+    private bool _isReaderGradientTransitionDisabled = true;
     private bool _isFocalGuideActive;
     private bool _isReaderCameraActive;
     private bool _isReaderCountdownActive;
@@ -77,7 +78,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private long _widthGuideVersion;
     private string _edgeSectionLabel = string.Empty;
     private string _elapsedLabel = "0:00 / 0:01";
-    private string _gradientClass = string.Empty;
+    private string _gradientClass = ReaderGradientDefaultCssClass;
     private string _readerProgressFillWidth = "0%";
     private string _screenSubtitle = string.Empty;
     private string _screenTitle = string.Empty;
@@ -87,6 +88,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         StopReaderPlaybackLoop();
         ResetReaderAlignmentState();
         ResetReaderCardTransitionState();
+        _isReaderGradientTransitionDisabled = true;
         _loadState = true;
         _focusScreenAfterRender = true;
         return Task.CompletedTask;
@@ -124,6 +126,13 @@ public partial class TeleprompterPage : IAsyncDisposable
         }
 
         await AlignActiveReaderTextAsync();
+        await RestorePendingReaderTextTransitionsAsync();
+
+        if (_isReaderGradientTransitionDisabled && _cards.Count > 0)
+        {
+            _isReaderGradientTransitionDisabled = false;
+            StateHasChanged();
+        }
     }
 
     private async Task EnsureSessionLoadedAsync()
@@ -151,7 +160,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         var nextCards = await BuildReaderCardsAsync();
         ResetReaderAlignmentState();
         ResetReaderCardTransitionState();
-        _cards = nextCards.Count > 0 ? nextCards : [ReaderCardViewModel.Empty];
+        _cards = nextCards;
         _screenTitle = SessionService.State.Title;
         _readerFontSize = NormalizeReaderFontSize(SessionService.State.ReaderSettings.FontScale);
         _readerFocalPointPercent = NormalizeReaderFocalPointPercent(SessionService.State.ReaderSettings.FocalPointPercent);

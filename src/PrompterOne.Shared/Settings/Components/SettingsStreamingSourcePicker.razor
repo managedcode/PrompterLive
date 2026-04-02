@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Services
 
 <section class="live-destination-sources"
          data-testid="@UiTestIds.Settings.StreamingProviderSourcePicker(TargetId)">
@@ -27,7 +28,7 @@
                         class="live-destination-source-chip @(isSelected ? ChipEnabledCssClass : null)"
                         data-testid="@UiTestIds.Settings.StreamingProviderSourceToggle(TargetId, source.SourceId)"
                         @onclick="() => ToggleSource.InvokeAsync(source.SourceId)">
-                    <span class="live-destination-source-name">@source.Label</span>
+                    <span class="live-destination-source-name">@FormatSourceLabel(source)</span>
                     <span class="live-destination-source-state">@(isSelected ? SelectedLabel : AvailableLabel)</span>
                 </button>
             }
@@ -55,6 +56,7 @@
     private int SelectedCount => SelectedSourceIdSet.Count;
 
     private HashSet<string> SelectedSourceIdSet => SelectedSourceIds.ToHashSet(StringComparer.Ordinal);
+    private static string FormatSourceLabel(SceneCameraSource source) => MediaDeviceLabelSanitizer.Sanitize(source.Label);
 
     private string SourceSummary =>
         SelectedCount switch

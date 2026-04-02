@@ -1,5 +1,6 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using ManagedCode.Storage.CloudKit.Options
+@using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Storage.Cloud
 
 <section class="set-section set-panel"
@@ -14,16 +15,10 @@
         <div class="set-device-fields">
             <div class="set-field">
                 <label>Default provider</label>
-                <select class="set-select"
-                        value="@_preferences.PrimaryProviderId"
-                        @onchange="OnPrimaryProviderChangedAsync"
-                        data-testid="@UiTestIds.Settings.CloudDefaultProvider">
-                    <option value="@CloudStorageProviderIds.OneDrive">OneDrive</option>
-                    <option value="@CloudStorageProviderIds.GoogleDrive">Google Drive</option>
-                    <option value="@CloudStorageProviderIds.Dropbox">Dropbox</option>
-                    <option value="@CloudStorageProviderIds.GoogleCloudStorage">Google Cloud Storage</option>
-                    <option value="@CloudStorageProviderIds.CloudKit">CloudKit</option>
-                </select>
+                <SettingsSelect Value="@_preferences.PrimaryProviderId"
+                               Options="@DefaultProviderOptions"
+                               OnChange="OnPrimaryProviderChangedAsync"
+                               TestId="@UiTestIds.Settings.CloudDefaultProvider" />
             </div>
             <div class="set-field set-field-toggle">
                 <label>Auto-sync on save</label>
@@ -234,21 +229,17 @@
                 </div>
                 <div class="set-field">
                     <label>Environment</label>
-                    <select class="set-select" @bind="_preferences.CloudKit.Environment" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Environment)">
-                        @foreach (var environment in CloudKitEnvironments)
-                        {
-                            <option value="@environment">@environment</option>
-                        }
-                    </select>
+                    <SettingsSelect Value="@_preferences.CloudKit.Environment.ToString()"
+                                   Options="@CloudKitEnvironmentOptions"
+                                   OnChange="OnCloudKitEnvironmentChanged"
+                                   TestId="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Environment)" />
                 </div>
                 <div class="set-field">
                     <label>Database</label>
-                    <select class="set-select" @bind="_preferences.CloudKit.Database" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Database)">
-                        @foreach (var database in CloudKitDatabases)
-                        {
-                            <option value="@database">@database</option>
-                        }
-                    </select>
+                    <SettingsSelect Value="@_preferences.CloudKit.Database.ToString()"
+                                   Options="@CloudKitDatabaseOptions"
+                                   OnChange="OnCloudKitDatabaseChanged"
+                                   TestId="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Database)" />
                 </div>
                 <div class="set-field">
                     <label>API Token</label>

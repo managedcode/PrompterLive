@@ -1,3 +1,4 @@
+using System.Globalization;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -5,6 +6,7 @@ namespace PrompterOne.App.UITests;
 
 public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
+    private const string LearnPlaybackProbeStartKey = "__prompterOneLearnFidelityPlaybackStartMs";
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
     private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
     private readonly record struct FocusWordSlackMeasurement(double SlackPx);
@@ -370,34 +372,25 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
     [Fact]
     public async Task LearnScreen_WpmIncrease_AcceleratesPlaybackCadence()
     {
-        var page = await fixture.NewPageAsync();
+        var slowPlaybackDuration = await MeasureLearnPlaybackDurationAsync(
+            async page =>
+            {
+                await DecreaseLearnSpeedAsync(page, BrowserTestConstants.ReaderTiming.LearnSlowWpmAdjustmentClicks);
+                await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+                    .ToHaveTextAsync(BrowserTestConstants.ReaderTiming.LearnSlowWpm.ToString(CultureInfo.InvariantCulture));
+            });
 
-        try
-        {
-            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
-            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+        var fastPlaybackDuration = await MeasureLearnPlaybackDurationAsync(
+            async page =>
+            {
+                await IncreaseLearnSpeedAsync(page, BrowserTestConstants.ReaderTiming.LearnFastWpmAdjustmentClicks);
+                await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+                    .ToHaveTextAsync(BrowserTestConstants.ReaderTiming.LearnFastWpm.ToString(CultureInfo.InvariantCulture));
+            });
 
-            var baselineAdvance = await MeasurePlaybackAdvanceAsync(page);
-
-            await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
-            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-
-            await IncreaseLearnSpeedAsync(page, BrowserTestConstants.Learn.PlaybackSpeedIncreaseClicks);
-            await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
-                .ToHaveTextAsync(BrowserTestConstants.Learn.FasterPlaybackSpeedText);
-
-            var fasterAdvance = await MeasurePlaybackAdvanceAsync(page);
-
-            Assert.True(
-                fasterAdvance >= baselineAdvance + BrowserTestConstants.Learn.MinimumPlaybackAdvanceDeltaWords,
-                $"Expected higher WPM to advance more words. Baseline advanced {baselineAdvance}, faster mode advanced {fasterAdvance}.");
-        }
-        finally
-        {
-            await page.Context.CloseAsync();
-        }
+        Assert.True(
+            fastPlaybackDuration <= slowPlaybackDuration - BrowserTestConstants.ReaderTiming.MinimumSpeedProbePlaybackDeltaMs,
+            $"Expected higher WPM to finish faster. Slow mode took {slowPlaybackDuration} ms, faster mode took {fastPlaybackDuration} ms.");
     }
 
     private static Task<double> MeasureOrpDeltaAsync(Microsoft.Playwright.IPage page) =>
@@ -483,25 +476,76 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    private static async Task<int> MeasurePlaybackAdvanceAsync(Microsoft.Playwright.IPage page)
+    private static async Task DecreaseLearnSpeedAsync(Microsoft.Playwright.IPage page, int clickCount)
     {
-        var startWordNumber = await ReadProgressWordNumberAsync(page);
-
-        await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
-        await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackProbeWindowMs);
-        await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
-
-        var endWordNumber = await ReadProgressWordNumberAsync(page);
-        return endWordNumber - startWordNumber;
+        for (var clickIndex = 0; clickIndex < clickCount; clickIndex++)
+        {
+            await page.GetByTestId(UiTestIds.Learn.SpeedDown).ClickAsync();
+        }
     }
 
-    private static async Task<int> ReadProgressWordNumberAsync(Microsoft.Playwright.IPage page)
+    private async Task<int> MeasureLearnPlaybackDurationAsync(Func<Microsoft.Playwright.IPage, Task> configurePageAsync)
     {
-        var progressLabel = await page.GetByTestId(UiTestIds.Learn.ProgressLabel).TextContentAsync() ?? string.Empty;
-        var parts = progressLabel.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return parts.Length >= 2 && int.TryParse(parts[1], out var wordNumber)
-            ? wordNumber
-            : 0;
+        var page = await fixture.NewPageAsync();
+
+        try
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.LearnReaderTiming);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await configurePageAsync(page);
+
+            return await MeasurePlaybackDurationToWordAsync(
+                page,
+                BrowserTestConstants.ReaderTiming.WordCount);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    private static async Task<int> MeasurePlaybackDurationToWordAsync(Microsoft.Playwright.IPage page, int targetWordNumber)
+    {
+        await page.EvaluateAsync(
+            """
+            probe => {
+                window[probe.key] = performance.now();
+            }
+            """,
+            new
+            {
+                key = LearnPlaybackProbeStartKey
+            });
+        await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
+        await page.WaitForFunctionAsync(
+            """
+            probe => {
+                const element = document.querySelector(`[data-testid="${probe.progressLabelTestId}"]`);
+                const text = element?.textContent ?? '';
+                const match = /Word\s+(\d+)/.exec(text);
+                return match !== null && Number(match[1]) >= probe.targetWordNumber;
+            }
+            """,
+            new
+            {
+                progressLabelTestId = UiTestIds.Learn.ProgressLabel,
+                targetWordNumber
+            },
+            new()
+            {
+                Timeout = BrowserTestConstants.ReaderTiming.SampleCaptureTimeoutMs
+            });
+
+        return await page.EvaluateAsync<int>(
+            """
+            probe => Math.round(performance.now() - (window[probe.key] ?? performance.now()))
+            """,
+            new
+            {
+                key = LearnPlaybackProbeStartKey
+            });
     }
 
     private static Task<ContextGapMeasurement> MeasureContextGapsAsync(Microsoft.Playwright.IPage page) =>

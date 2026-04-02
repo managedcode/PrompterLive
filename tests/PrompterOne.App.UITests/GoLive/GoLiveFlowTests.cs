@@ -1,4 +1,5 @@
 using System.Text.Json;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -31,13 +32,17 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         {
             await page.SetViewportSizeAsync(LayoutViewportWidth, LayoutViewportHeight);
             await SeedGoLiveSceneForReuseAsync(page);
+            await SeedGoLiveOperationalSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.ProgramCard)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SourcesCard)).ToBeVisibleAsync();
 
             await page.GetByTestId(UiTestIds.GoLive.LiveKitToggle).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.LiveKitToggle).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.YoutubeToggle).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.YoutubeToggle).ClickAsync();
+            await page.GetByTestId(UiTestIds.GoLive.RecordingToggle).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.RecordingToggle).ClickAsync();
 
             await page.WaitForFunctionAsync(
@@ -59,7 +64,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     }
 
     [Fact]
-    public async Task GoLivePage_TogglesSceneCameraMembershipAndLinksBackToRead()
+    public async Task GoLivePage_TogglesSceneCameraMembershipAndRoutesTopLeftHomeControlToLibrary()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -76,9 +81,34 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await sourceButton.ClickAsync();
             await Expect(sourceButton).ToContainTextAsync(RemoveActionLabel);
 
-            await page.GetByTestId(UiTestIds.GoLive.OpenRead).ClickAsync();
-            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.TeleprompterDemo));
-            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
+    public async Task GoLivePage_BackControl_ReturnsToPreviousInAppScreen_WhenEnteredFromSettings()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await SeedGoLiveSceneForReuseAsync(page);
+            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Header.GoLive).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.GoLive));
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Settings));
+            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
         }
         finally
         {
@@ -419,7 +449,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SceneControls)).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.GoLive.UtilitySource(BrowserTestConstants.GoLive.PrompterUtilitySourceId))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs))).ToBeVisibleAsync();
 
             await page.GetByTestId(UiTestIds.GoLive.RoomTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.RoomEmpty)).ToBeVisibleAsync();

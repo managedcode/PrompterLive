@@ -51,7 +51,6 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private string HeaderSubtitle => ShellState.Screen switch
     {
         AppShellScreen.Teleprompter => ShellState.Subtitle,
-        AppShellScreen.GoLive => ShellState.Title,
         AppShellScreen.Learn => ShellState.Subtitle,
         _ => string.Empty
     };
@@ -131,6 +130,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         Navigation.LocationChanged += HandleLocationChanged;
         Shell.StateChanged += HandleShellStateChanged;
         GoLiveSession.StateChanged += HandleGoLiveSessionChanged;
+        Shell.TrackNavigation(Navigation.Uri);
         SyncShellStateWithCurrentRoute(Navigation.Uri);
     }
 
@@ -154,6 +154,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         Logger.LogInformation(RouteChangedLogTemplate, e.Location);
+        Shell.TrackNavigation(e.Location);
         SyncShellStateWithCurrentRoute(e.Location);
         StateHasChanged();
     }
@@ -182,7 +183,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
                 Shell.ShowTeleprompter(ShellState.Title, ShellState.Subtitle, currentScriptId);
                 break;
             case AppRoutes.GoLive:
-                Shell.ShowGoLive(ShellState.Title, ShellState.Subtitle, currentScriptId);
+                Shell.ShowGoLive(currentScriptId);
                 break;
             case AppRoutes.Settings:
                 Shell.ShowSettings();

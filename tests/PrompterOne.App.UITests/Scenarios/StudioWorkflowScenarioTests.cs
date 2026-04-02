@@ -214,7 +214,10 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
         await requestMediaButton.ScrollIntoViewIfNeededAsync();
         await requestMediaButton.ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.PrimaryCameraId))).ToBeVisibleAsync();
-        await page.GetByTestId(UiTestIds.Settings.CameraResolution).SelectOptionAsync([BrowserTestConstants.Streaming.ResolutionHd720]);
+        await SettingsSelectDriver.SelectByValueAsync(
+            page,
+            UiTestIds.Settings.CameraResolution,
+            BrowserTestConstants.Streaming.ResolutionHd720);
         await page.GetByTestId(UiTestIds.Settings.CameraDeviceAction(BrowserTestConstants.Media.SecondaryCameraId)).ClickAsync();
 
         await page.GetByTestId(UiTestIds.Settings.NavMics).ClickAsync();

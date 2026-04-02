@@ -4,9 +4,10 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage
 {
-    private IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed, int fallbackSpeed)
+    private static IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed)
     {
         var entries = new List<RsvpTimelineEntry>();
+        var timelineIndexByWordIndex = new Dictionary<int, int>();
 
         for (var wordIndex = 0; wordIndex < processed.AllWords.Count; wordIndex++)
         {
@@ -16,34 +17,36 @@ public partial class LearnPage
                 continue;
             }
 
+            var timelineIndex = entries.Count;
+            timelineIndexByWordIndex[wordIndex] = timelineIndex;
             entries.Add(new RsvpTimelineEntry(
+                WordIndex: wordIndex,
                 Word: word,
-                DurationMs: Math.Max(
-                    MinimumWordDurationMilliseconds,
-                    (int)Math.Round(PlaybackEngine.GetWordDisplayTime(wordIndex, word).TotalMilliseconds)),
-                PauseAfterMs: PlaybackEngine.GetPauseAfterMilliseconds(wordIndex) ?? 0,
-                BaseWpm: ResolveBaseWpm(processed, wordIndex, fallbackSpeed),
+                SentenceStartIndex: timelineIndex,
+                SentenceEndIndex: timelineIndex,
                 NextPhrase: ResolveNextPhrase(processed, wordIndex),
                 Emotion: ResolveEmotion(processed, wordIndex)));
         }
 
         return entries.Count == 0
-            ? [new RsvpTimelineEntry(ReadyWord, 240, 0, Math.Max(RsvpMinSpeed, fallbackSpeed), EndOfScriptPhrase, NeutralEmotion)]
-            : entries;
+            ? [new RsvpTimelineEntry(-1, ReadyWord, 0, 0, EndOfScriptPhrase, NeutralEmotion)]
+            : ApplySentenceRanges(entries, processed.AllWords, timelineIndexByWordIndex);
     }
 
-    private string BuildProgressLabel(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex, int wordsPerMinute)
+    private string BuildProgressLabel(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
     {
-        var safeTimeline = timeline.Count == 0
-            ? [new RsvpTimelineEntry(ReadyWord, 240, 0, Math.Max(RsvpMinSpeed, wordsPerMinute), EndOfScriptPhrase, NeutralEmotion)]
-            : timeline;
+        if (timeline.Count == 0)
+        {
+            return string.Empty;
+        }
 
-        var remainingMilliseconds = safeTimeline
-            .Skip(Math.Max(0, currentIndex + 1))
-            .Sum(entry => GetScaledDuration(entry.DurationMs, entry.BaseWpm) + GetScaledDuration(entry.PauseAfterMs, entry.BaseWpm, allowZero: true));
+        var safeCurrentIndex = Math.Clamp(currentIndex, 0, timeline.Count - 1);
+        var remainingMilliseconds = timeline
+            .Skip(safeCurrentIndex + 1)
+            .Sum(GetTimelineEntryPlaybackMilliseconds);
 
         var remainingSeconds = (int)Math.Ceiling(remainingMilliseconds / 1000d);
-        return $"Word {Math.Min(currentIndex + 1, safeTimeline.Count)} / {safeTimeline.Count} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
+        return $"Word {safeCurrentIndex + 1} / {timeline.Count} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
     }
 
     private static string BuildWpmLabel(int speed) => string.Concat(speed, WpmSuffix);
@@ -147,7 +150,12 @@ public partial class LearnPage
             var candidate = words[index];
             if (string.IsNullOrWhiteSpace(candidate))
             {
-                break;
+                if (StartsWithUppercase(words[startIndex]))
+                {
+                    break;
+                }
+
+                continue;
             }
 
             if (HasSentenceEndingPunctuation(candidate))
@@ -170,7 +178,12 @@ public partial class LearnPage
             var candidate = words[index];
             if (string.IsNullOrWhiteSpace(candidate))
             {
-                break;
+                if (HasCapitalizedWordAhead(words, index + 1))
+                {
+                    break;
+                }
+
+                continue;
             }
 
             endIndex = index;
@@ -184,6 +197,28 @@ public partial class LearnPage
     }
 
     private static bool HasSentenceEndingPunctuation(string word) => word.IndexOfAny(['.', '!', '?']) >= 0;
+
+    private static bool StartsWithUppercase(string word)
+    {
+        var firstLetter = word.FirstOrDefault(char.IsLetter);
+        return firstLetter != default && char.IsUpper(firstLetter);
+    }
+
+    private static bool HasCapitalizedWordAhead(IReadOnlyList<string> words, int startIndex)
+    {
+        for (var index = startIndex; index < words.Count; index++)
+        {
+            var candidate = words[index];
+            if (string.IsNullOrWhiteSpace(candidate))
+            {
+                continue;
+            }
+
+            return StartsWithUppercase(candidate);
+        }
+
+        return false;
+    }
 
     private static string ResolveEmotion(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
     {
@@ -203,30 +238,96 @@ public partial class LearnPage
         return NeutralEmotion;
     }
 
-    private static int ResolveBaseWpm(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex, int fallback)
+    private static IReadOnlyList<RsvpTimelineEntry> ApplySentenceRanges(
+        List<RsvpTimelineEntry> entries,
+        IReadOnlyList<string> allWords,
+        IReadOnlyDictionary<int, int> timelineIndexByWordIndex)
     {
-        if (processed.WordSpeedOverrides.TryGetValue(currentWordIndex, out var wordSpeed) && wordSpeed > 0)
+        foreach (var (wordIndex, timelineIndex) in timelineIndexByWordIndex)
         {
-            return wordSpeed;
+            var sentenceStartWordIndex = FindSentenceStartIndex(allWords, wordIndex);
+            var sentenceEndWordIndex = FindSentenceEndIndex(allWords, wordIndex);
+            var sentenceStartIndex = ResolveSentenceBoundaryTimelineIndex(
+                timelineIndexByWordIndex,
+                sentenceStartWordIndex,
+                sentenceEndWordIndex,
+                step: 1);
+            var sentenceEndIndex = ResolveSentenceBoundaryTimelineIndex(
+                timelineIndexByWordIndex,
+                sentenceEndWordIndex,
+                sentenceStartWordIndex,
+                step: -1);
+
+            entries[timelineIndex] = entries[timelineIndex] with
+            {
+                SentenceStartIndex = sentenceStartIndex,
+                SentenceEndIndex = sentenceEndIndex
+            };
         }
 
-        if (processed.WordToSegmentMap.TryGetValue(currentWordIndex, out var segmentIndex) &&
-            segmentIndex >= 0 &&
-            segmentIndex < processed.Segments.Count)
+        return entries;
+    }
+
+    private static int ResolveSentenceBoundaryTimelineIndex(
+        IReadOnlyDictionary<int, int> timelineIndexByWordIndex,
+        int startWordIndex,
+        int endWordIndex,
+        int step)
+    {
+        if (timelineIndexByWordIndex.TryGetValue(startWordIndex, out var directMatch))
         {
-            return processed.Segments[segmentIndex].Speed;
+            return directMatch;
         }
 
-        return fallback;
+        for (var wordIndex = startWordIndex; step > 0 ? wordIndex <= endWordIndex : wordIndex >= endWordIndex; wordIndex += step)
+        {
+            if (timelineIndexByWordIndex.TryGetValue(wordIndex, out var resolvedIndex))
+            {
+                return resolvedIndex;
+            }
+        }
+
+        return 0;
+    }
+
+    private int GetTimelineEntryDelayMilliseconds(RsvpTimelineEntry entry)
+    {
+        var playbackMilliseconds = GetTimelineEntryPlaybackMilliseconds(entry);
+        return Math.Max(MinimumLoopDelayMilliseconds, playbackMilliseconds);
+    }
+
+    private int GetTimelineEntryPlaybackMilliseconds(RsvpTimelineEntry entry) =>
+        GetTimelineEntryWordDurationMilliseconds(entry) + GetTimelineEntryPauseMilliseconds(entry);
+
+    private int GetTimelineEntryWordDurationMilliseconds(RsvpTimelineEntry entry)
+    {
+        if (entry.WordIndex < 0)
+        {
+            return ReadyWordDurationMilliseconds;
+        }
+
+        return Math.Max(
+            MinimumWordDurationMilliseconds,
+            (int)Math.Round(PlaybackEngine.GetWordDisplayTime(entry.WordIndex, entry.Word).TotalMilliseconds));
+    }
+
+    private int GetTimelineEntryPauseMilliseconds(RsvpTimelineEntry entry)
+    {
+        if (entry.WordIndex < 0)
+        {
+            return 0;
+        }
+
+        return PlaybackEngine.GetPauseAfterMilliseconds(entry.WordIndex) ?? 0;
     }
 
     private sealed record RsvpFocusWordViewModel(string Leading, string Orp, string Trailing);
 
     private sealed record RsvpTimelineEntry(
+        int WordIndex,
         string Word,
-        int DurationMs,
-        int PauseAfterMs,
-        int BaseWpm,
+        int SentenceStartIndex,
+        int SentenceEndIndex,
         string NextPhrase,
         string Emotion);
 }

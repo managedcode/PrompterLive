@@ -12,20 +12,27 @@ public sealed class TeleprompterFidelityTests : BunitContext
 {
     private const int BenefitsCardIndex = 5;
     private const int ClosingCardIndex = 7;
+    private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const string GreenWord = "transformative";
     private const string HighlightWord = "solution";
     private const int IntroductionCardIndex = 4;
     private const string IntroductionWord = "comes";
     private const int InspirationCardIndex = 6;
+    private const double MinimumVisibleFastLetterSpacingEm = -0.024d;
+    private const double MinimumVisibleSlowLetterSpacingEm = 0.045d;
+    private const string MaximumReaderWidth = "1100";
     private const string NeutralWord = "Good";
     private const int OpeningCardIndex = 0;
     private const int PurposeCardIndex = 1;
+    private const int SecurityIncidentResponseCardIndex = 2;
+    private const string SecurityIncidentStandaloneComma = ",";
     private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const string FastWord = "Full";
     private const string PurpleWord = "focus";
+    private const string SecurityIncidentEmphasisPhrase = "No payment data was exposed,";
     private const string SlowWord = "elephant";
-    private const string SpeedOffsetsFastWord = "flight";
+    private const string SpeedOffsetsFastWord = "flight.";
     private const string SpeedOffsetsNormalWord = "center";
     private const string SpeedOffsetsResumedSlowWord = "gentle";
     private const string SpeedOffsetsSlowWord = "steady";
@@ -67,6 +74,22 @@ public sealed class TeleprompterFidelityTests : BunitContext
     }
 
     [Fact]
+    public void TeleprompterPage_StartsWithMaximumReaderWidthByDefault()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterDemo);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(MaximumReaderWidth, cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
+            Assert.Equal(MaximumReaderWidth, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
+            Assert.Contains($"max-width:{MaximumReaderWidth}px;", cut.Find($"#{UiDomIds.Teleprompter.ClusterWrap}").GetAttribute("style"), StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
     public void TeleprompterPage_PropagatesTpsWordFormattingTimingAndPronunciationMetadata()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -85,9 +108,11 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Contains("tps-xslow", slowWord.ClassName, StringComparison.Ordinal);
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.Contains("Speed: 90 WPM", slowWord.GetAttribute("title"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
             Assert.Contains("tps-xfast", fastWord.ClassName, StringComparison.Ordinal);
             Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(fastWord));
 
             Assert.Contains("tps-purple", purpleWord.ClassName, StringComparison.Ordinal);
@@ -121,6 +146,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute("data-effective-wpm"));
             Assert.Contains("Speed: 126 WPM", slowWord.GetAttribute("title"), StringComparison.Ordinal);
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
             Assert.Equal("140", normalWord.GetAttribute("data-effective-wpm"));
             Assert.False(normalWordClassName.Contains("tps-slow", StringComparison.Ordinal));
@@ -134,6 +160,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Contains("tps-fast", fastWord.ClassName, StringComparison.Ordinal);
             Assert.Equal(SpeedOffsetsFastWpm, fastWord.GetAttribute("data-effective-wpm"));
             Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
 
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(normalWord));
             Assert.True(GetWordDurationMilliseconds(resumedSlowWord) > GetWordDurationMilliseconds(normalWord));
@@ -159,6 +186,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
             var introductionWord = FindReaderWordByText(cut, IntroductionCardIndex, IntroductionWord);
 
+            Assert.DoesNotContain("tps-neutral", neutralWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-warm", neutralWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-focused", neutralWord.ClassName, StringComparison.Ordinal);
 
@@ -180,6 +208,29 @@ public sealed class TeleprompterFidelityTests : BunitContext
     }
 
     [Fact]
+    public void TeleprompterPage_RendersContinuousEmphasisGroupsAndNoStandalonePunctuationWords()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterSecurityIncident);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var emphasisGroup = cut.FindByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0));
+            var responseWords = cut.FindByTestId(UiTestIds.Teleprompter.CardText(SecurityIncidentResponseCardIndex))
+                .QuerySelectorAll(".rd-w")
+                .Select(element => element.TextContent.Trim())
+                .ToArray();
+
+            Assert.Contains(SecurityIncidentEmphasisPhrase, emphasisGroup.TextContent, StringComparison.Ordinal);
+            Assert.Contains(ContinuousEmphasisCssClass, emphasisGroup.ClassName, StringComparison.Ordinal);
+            Assert.Contains("exposed,", responseWords);
+            Assert.DoesNotContain(SecurityIncidentStandaloneComma, responseWords);
+        });
+    }
+
+    [Fact]
     public void TeleprompterPage_UsesDarkReaderBackgroundForGreenArchitectureRoute()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -193,8 +244,10 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var className = gradient.ClassName ?? string.Empty;
 
             Assert.DoesNotContain("focused", className, StringComparison.Ordinal);
-            Assert.DoesNotContain("calm", className, StringComparison.Ordinal);
-            Assert.Contains("professional", className, StringComparison.Ordinal);
+            Assert.True(
+                className.Contains("calm", StringComparison.Ordinal) ||
+                className.Contains("professional", StringComparison.Ordinal),
+                $"Expected the architecture route to stay on a dark reader palette, but got '{className}'.");
         });
     }
 
@@ -205,4 +258,16 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
     private static int GetWordDurationMilliseconds(AngleSharp.Dom.IElement word) =>
         int.Parse(word.GetAttribute("data-ms")!, CultureInfo.InvariantCulture);
+
+    private static double GetLetterSpacingEm(AngleSharp.Dom.IElement word)
+    {
+        var style = word.GetAttribute("style") ?? string.Empty;
+        var value = style
+            .Split(':', 2, StringSplitOptions.TrimEntries)
+            .LastOrDefault()?
+            .Replace("em;", string.Empty, StringComparison.Ordinal)
+            .Trim();
+
+        return double.Parse(value ?? "0", CultureInfo.InvariantCulture);
+    }
 }

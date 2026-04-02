@@ -53,7 +53,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.FindByTestId(UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel))
             .Change(DropboxLabel);
-        cut.FindByTestId(UiTestIds.Settings.CloudDefaultProvider).Change(CloudStorageProviderIds.Dropbox);
+        cut.SelectSettingsOption(UiTestIds.Settings.CloudDefaultProvider, CloudStorageProviderIds.Dropbox);
         cut.FindByTestId(UiTestIds.Settings.CloudAutoSyncOnSave).Click();
         cut.FindByTestId(UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.Dropbox)).Click();
 
@@ -181,7 +181,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.CameraResolution, cut.Markup, StringComparison.Ordinal));
 
-        cut.FindByTestId(UiTestIds.Settings.CameraResolution).Change(CameraResolutionPreset.Hd720.ToString());
+        cut.SelectSettingsOption(UiTestIds.Settings.CameraResolution, CameraResolutionPreset.Hd720.ToString());
         cut.FindByTestId(UiTestIds.Settings.CameraMirrorToggle).Click();
         cut.FindByTestId(UiTestIds.Settings.MicLevel).Input(82);
         cut.FindByTestId(UiTestIds.Settings.NoiseSuppression).Click();
@@ -191,6 +191,33 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.False(settings.Camera.MirrorCamera);
         Assert.Equal(82, settings.Microphone.InputLevelPercent);
         Assert.False(settings.Microphone.NoiseSuppression);
+    }
+
+    [Fact]
+    public void StreamingPanel_RendersOnlyPersistedExternalDestinations()
+    {
+        _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateLiveKitDestination()
+                ]
+            }
+        };
+
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.StreamingPanel, cut.Markup, StringComparison.Ordinal));
+        cut.FindByTestId(UiTestIds.Settings.NavStreaming).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)}']"));
+            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)}']"));
+        });
     }
 
     [Fact]

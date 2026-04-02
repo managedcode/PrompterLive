@@ -70,10 +70,10 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LiveKitEnabled = true,
-                LiveKitServerUrl = AppTestData.GoLive.LiveKitServer,
-                LiveKitRoomName = AppTestData.GoLive.LiveKitRoom,
-                LiveKitToken = AppTestData.GoLive.LiveKitToken
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateLiveKitDestination()
+                ]
             }
         });
 
@@ -123,10 +123,10 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         {
             Streaming = StudioSettings.Default.Streaming with
             {
-                LiveKitEnabled = true,
-                LiveKitServerUrl = AppTestData.GoLive.LiveKitServer,
-                LiveKitRoomName = AppTestData.GoLive.LiveKitRoom,
-                LiveKitToken = AppTestData.GoLive.LiveKitToken
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateLiveKitDestination()
+                ]
             }
         });
 
@@ -168,6 +168,32 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
             _harness.JsRuntime.Invocations,
             invocation => string.Equals(invocation, StartLocalRecordingInteropMethod, StringComparison.Ordinal));
         Assert.True(Services.GetRequiredService<GoLiveSessionService>().State.IsRecordingActive);
+    }
+
+    [Fact]
+    public void GoLivePage_StartStream_WithRelayOnlyDestination_DoesNotMarkSessionLive()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                ObsVirtualCameraEnabled = false,
+                ExternalDestinations =
+                [
+                    AppTestData.GoLive.CreateYoutubeDestination()
+                ]
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
+
+        var session = Services.GetRequiredService<GoLiveSessionService>().State;
+        Assert.False(session.IsStreamActive);
     }
 
     [Fact]

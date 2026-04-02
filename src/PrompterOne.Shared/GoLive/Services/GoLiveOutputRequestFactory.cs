@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Settings.Models;
 
@@ -22,6 +23,7 @@ public static class GoLiveOutputRequestFactory
         SettingsPagePreferences recordingPreferences,
         string recordingFileStem)
     {
+        var liveKitDestination = ResolveLiveKitDestination(streaming);
         var programVideo = ResolveProgramVideo(streaming.OutputResolution);
         var videoSources = BuildVideoSources(primaryCamera, scene.Cameras);
         var audioInputs = BuildAudioInputs(scene);
@@ -35,10 +37,43 @@ public static class GoLiveOutputRequestFactory
             Recording: recording,
             ObsEnabled: streaming.ObsVirtualCameraEnabled,
             RecordingEnabled: streaming.LocalRecordingEnabled,
-            LiveKitEnabled: streaming.LiveKitEnabled,
-            LiveKitServerUrl: streaming.LiveKitServerUrl,
-            LiveKitRoomName: streaming.LiveKitRoomName,
-            LiveKitToken: streaming.LiveKitToken);
+            LiveKitEnabled: liveKitDestination?.IsEnabled == true,
+            LiveKitServerUrl: liveKitDestination?.ServerUrl ?? string.Empty,
+            LiveKitRoomName: liveKitDestination?.RoomName ?? string.Empty,
+            LiveKitToken: liveKitDestination?.Token ?? string.Empty);
+    }
+
+    private static StreamingProfile? ResolveLiveKitDestination(StreamStudioSettings streaming)
+    {
+        var destinations = streaming.ExternalDestinations ?? Array.Empty<StreamingProfile>();
+        var configuredDestination = destinations.FirstOrDefault(destination =>
+                destination.ProviderKind == StreamingProviderKind.LiveKit
+                && destination.IsEnabled)
+            ?? destinations.FirstOrDefault(destination =>
+                destination.ProviderKind == StreamingProviderKind.LiveKit);
+
+        if (configuredDestination is not null)
+        {
+            return configuredDestination;
+        }
+
+        if (!streaming.LiveKitEnabled
+            && string.IsNullOrWhiteSpace(streaming.LiveKitServerUrl)
+            && string.IsNullOrWhiteSpace(streaming.LiveKitRoomName)
+            && string.IsNullOrWhiteSpace(streaming.LiveKitToken))
+        {
+            return null;
+        }
+
+        return StreamingPlatformCatalog.CreateProfile(
+            StreamingPlatformKind.LiveKit,
+            GoLiveTargetCatalog.TargetIds.LiveKit) with
+        {
+            IsEnabled = streaming.LiveKitEnabled,
+            ServerUrl = streaming.LiveKitServerUrl,
+            RoomName = streaming.LiveKitRoomName,
+            Token = streaming.LiveKitToken
+        };
     }
 
     private static IReadOnlyList<GoLiveOutputAudioInput> BuildAudioInputs(MediaSceneState scene)

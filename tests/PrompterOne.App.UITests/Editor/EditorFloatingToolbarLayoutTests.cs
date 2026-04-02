@@ -18,10 +18,9 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
+            var sourceInput = await GotoEditorAndWaitForSourceAsync(page);
 
-            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
+            await sourceInput.EvaluateAsync(
                 """
                 (element, args) => {
                     element.focus();
@@ -63,10 +62,9 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToBeVisibleAsync();
+            var sourceInput = await GotoEditorAndWaitForSourceAsync(page);
 
-            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
+            await sourceInput.EvaluateAsync(
                 """
                 (element, args) => {
                     element.focus();
@@ -127,9 +125,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
-            await Expect(sourceInput).ToBeVisibleAsync();
+            var sourceInput = await GotoEditorAndWaitForSourceAsync(page);
 
             await sourceInput.EvaluateAsync(
                 """
@@ -205,6 +201,25 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
                 };
             }
             """);
+
+    private static async Task<ILocator> GotoEditorAndWaitForSourceAsync(IPage page)
+    {
+        await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+
+        var editorPage = page.GetByTestId(UiTestIds.Editor.Page);
+        await Expect(editorPage).ToBeVisibleAsync(new()
+        {
+            Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
+        });
+
+        var sourceInput = page.GetByTestId(UiTestIds.Editor.SourceInput);
+        await Expect(sourceInput).ToBeVisibleAsync(new()
+        {
+            Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
+        });
+
+        return sourceInput;
+    }
 
     private readonly record struct SelectionGeometry(double SelectionTop);
 }

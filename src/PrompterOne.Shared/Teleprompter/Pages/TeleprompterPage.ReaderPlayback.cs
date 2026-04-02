@@ -6,7 +6,7 @@ namespace PrompterOne.Shared.Pages;
 public partial class TeleprompterPage
 {
     private const int MinimumReaderLoopDelayMilliseconds = 120;
-    private const int ReaderCardTransitionMilliseconds = 850;
+    private const int ReaderCardTransitionMilliseconds = 600;
 
     private Task DecreaseReaderFontSizeAsync() => ChangeReaderFontSizeAsync(-ReaderFontStep);
 
@@ -133,9 +133,8 @@ public partial class TeleprompterPage
 
             await Task.Delay(ReaderFirstWordDelayMilliseconds, cancellationToken);
 
-            await AlignReaderCardTextAsync(_activeReaderCardIndex, 0, neutralizeCard: true, rerender: true, instantTransition: true);
             _isReaderPlaying = true;
-            await ActivatePreparedReaderWordAsync(0);
+            await ActivateReaderWordAsync(0, alignBeforeActivation: true);
             _ = RunReaderPlaybackLoopAsync(GetCurrentWordDelayMilliseconds(), cancellationToken);
         }
         catch (OperationCanceledException)
@@ -157,22 +156,19 @@ public partial class TeleprompterPage
         {
             if (_activeReaderWordIndex > 0)
             {
-                _activeReaderWordIndex--;
-                UpdateReaderDisplayState();
+                await ActivateReaderWordAsync(_activeReaderWordIndex - 1, alignBeforeActivation: true);
             }
         }
         else if (_activeReaderWordIndex < 0)
         {
-            _activeReaderWordIndex = 0;
-            UpdateReaderDisplayState();
+            await ActivateReaderWordAsync(0, alignBeforeActivation: true);
         }
         else
         {
             var wordCount = GetCardWordCount(_cards[_activeReaderCardIndex]);
             if (_activeReaderWordIndex < wordCount - 1)
             {
-                _activeReaderWordIndex++;
-                UpdateReaderDisplayState();
+                await ActivateReaderWordAsync(_activeReaderWordIndex + 1, alignBeforeActivation: true);
             }
             else
             {
@@ -197,8 +193,7 @@ public partial class TeleprompterPage
         StopReaderPlaybackLoop(keepPlaybackState: true);
         if (direction < 0 && _activeReaderWordIndex > 1)
         {
-            await PrepareReaderCardAlignmentAsync(_activeReaderCardIndex, 0);
-            await ActivatePreparedReaderWordAsync(0);
+            await ActivateReaderWordAsync(0, alignBeforeActivation: true);
 
             if (resumePlayback)
             {
@@ -321,9 +316,7 @@ public partial class TeleprompterPage
 
         if (_activeReaderWordIndex < cardWordCount - 1)
         {
-            _activeReaderWordIndex++;
-            UpdateReaderDisplayState();
-            await InvokeAsync(StateHasChanged);
+            await ActivateReaderWordAsync(_activeReaderWordIndex + 1, alignBeforeActivation: true);
             return GetCurrentWordDelayMilliseconds();
         }
 
@@ -351,7 +344,7 @@ public partial class TeleprompterPage
             {
                 return;
             }
-            await ActivatePreparedReaderWordAsync(0);
+            await ActivateReaderWordAsync(0, alignBeforeActivation: false);
         }
         finally
         {
@@ -388,8 +381,13 @@ public partial class TeleprompterPage
         return MinimumReaderLoopDelayMilliseconds;
     }
 
-    private async Task ActivatePreparedReaderWordAsync(int wordIndex)
+    private async Task ActivateReaderWordAsync(int wordIndex, bool alignBeforeActivation)
     {
+        if (alignBeforeActivation)
+        {
+            await AlignReaderWordBeforeActivationAsync(_activeReaderCardIndex, wordIndex);
+        }
+
         _activeReaderWordIndex = wordIndex;
         UpdateReaderDisplayState(requestAlignment: false);
         await InvokeAsync(StateHasChanged);

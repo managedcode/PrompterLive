@@ -160,4 +160,37 @@ public sealed class TpsRoundTripTests
         Assert.Equal("urgent", words["act"].Metadata.EmotionHint);
         Assert.Equal("urgent", words["act"].Metadata.InlineEmotionHint);
     }
+
+    [Fact]
+    public async Task CompileAsync_AttachesStandalonePunctuationTokensToAdjacentWords()
+    {
+        var parser = new TpsParser();
+        var compiler = new ScriptCompiler();
+        const string source = """
+        ---
+        title: "Attached punctuation"
+        base_wpm: 140
+        ---
+
+        ## [Signal|140WPM|focused]
+
+        ### [Reader Block|140WPM]
+
+        [emphasis]No payment data was exposed[/emphasis], / containment - restored.
+        """;
+
+        var document = await parser.ParseAsync(source);
+        var compiled = await compiler.CompileAsync(document);
+        var words = compiled.Segments
+            .SelectMany(segment => segment.Blocks)
+            .SelectMany(block => block.Words)
+            .Where(word => word.Metadata?.IsPause != true && !string.IsNullOrWhiteSpace(word.CleanText))
+            .Select(word => word.CleanText)
+            .ToArray();
+
+        Assert.Contains("exposed,", words);
+        Assert.Contains("containment -", words);
+        Assert.DoesNotContain(",", words);
+        Assert.DoesNotContain("-", words);
+    }
 }

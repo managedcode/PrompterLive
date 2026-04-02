@@ -15,12 +15,14 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         try
         {
             await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
+            await page.EvaluateAsync(BrowserTestConstants.GoLive.EnableObsStudioScript);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
             await page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.SecondSourceId)).ClickAsync();
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidget)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
@@ -54,7 +56,8 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive)).ToHaveCountAsync(0);
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await page.GetByTestId(UiTestIds.GoLive.OpenSettings).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Settings));
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
         }

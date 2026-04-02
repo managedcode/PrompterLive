@@ -1,5 +1,6 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using Microsoft.AspNetCore.Components
+@using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
 
 <section class="set-section set-panel"
@@ -73,13 +74,9 @@
             <div class="set-device-fields">
                 <div class="set-field">
                     <label>Font</label>
-                    <select class="set-select" value="@TeleprompterFont" @onchange="OnFontChanged" @onclick:stopPropagation="true">
-                        <option value="Inter (Default)">Inter (Default)</option>
-                        <option value="Playfair Display">Playfair Display</option>
-                        <option value="JetBrains Mono">JetBrains Mono</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="System Serif">System Serif</option>
-                    </select>
+                    <SettingsSelect Value="@TeleprompterFont"
+                                   Options="@TeleprompterFontOptions"
+                                   OnChange="OnFontChanged" />
                 </div>
                 <div class="set-field">
                     <label>Default Font Size</label>
@@ -180,6 +177,15 @@
     private const string InterfaceCardId = "appearance-interface";
     private const string TeleprompterCardId = "appearance-teleprompter";
     private const string ThemeCardId = "appearance-theme";
+
+    private static readonly IReadOnlyList<SettingsSelectOption> TeleprompterFontOptions =
+    [
+        new("Inter (Default)", "Inter (Default)"),
+        new("Playfair Display", "Playfair Display"),
+        new("JetBrains Mono", "JetBrains Mono"),
+        new("Georgia", "Georgia"),
+        new("System Serif", "System Serif"),
+    ];
 
     private static readonly ThemeOption[] AccentOptions =
     [

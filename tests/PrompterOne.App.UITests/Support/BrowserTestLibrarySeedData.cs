@@ -78,6 +78,18 @@ internal static class BrowserTestLibrarySeedData
             new DateTimeOffset(2026, 3, 27, 11, 15, 0, TimeSpan.Zero),
             "test-internal"),
         CreateDocument(
+            BrowserTestConstants.Scripts.ReaderTimingId,
+            BrowserTestConstants.Scripts.ReaderTimingTitle,
+            "test-reader-timing.tps",
+            new DateTimeOffset(2026, 4, 1, 19, 0, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
+            BrowserTestConstants.Scripts.LearnWpmBoundaryId,
+            BrowserTestConstants.Scripts.LearnWpmBoundaryTitle,
+            "test-learn-wpm-boundary.tps",
+            new DateTimeOffset(2026, 4, 2, 8, 0, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
             BrowserTestConstants.Scripts.QuantumId,
             BrowserTestConstants.Scripts.QuantumTitle,
             "test-quantum-computing.tps",

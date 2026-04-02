@@ -65,12 +65,14 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: rgba(239, 68, 68, .2);
-    transition: background .3s;
+    background: rgba(255, 245, 224, .18);
+    border: 1px solid rgba(255, 245, 224, .16);
+    transition: background .3s, border-color .3s, box-shadow .3s;
 }
 
 .gl-air-dot.gl-air-dot-live {
     background: #ef4444;
+    border-color: rgba(239, 68, 68, .65);
     box-shadow: 0 0 6px rgba(239, 68, 68, .7);
 }
 

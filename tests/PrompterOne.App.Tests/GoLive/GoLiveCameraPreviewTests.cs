@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Tests;
 
@@ -11,6 +12,7 @@ namespace PrompterOne.App.Tests;
 
 public sealed class GoLiveCameraPreviewTests : BunitContext
 {
+    private const string LegacyPrimarySceneFallbackLabel = "Camera 1";
     private const string SceneSettingsStorageKey = "prompterone.scene";
 
     [Fact]
@@ -59,6 +61,33 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.PreviewCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.PreviewEmpty));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.GoLive.PreviewVideo)));
+        });
+    }
+
+    [Fact]
+    public void GoLivePage_UsesExplicitNoCameraStateForPrimarySceneChipWhenSceneIsEmpty()
+    {
+        TestHarnessFactory.Create(
+            this,
+            devices:
+            [
+                new MediaDeviceInfo(
+                    AppTestData.Camera.MicrophoneOnlyId,
+                    AppTestData.Camera.MicrophoneOnlyLabel,
+                    MediaDeviceKind.Microphone,
+                    true)
+            ]);
+
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.GoLiveDemo);
+
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var primarySceneChip = cut.FindByTestId(UiTestIds.GoLive.SceneChip(GoLiveText.Surface.PrimarySceneId));
+            Assert.Contains(GoLiveText.Session.CameraFallbackLabel, primarySceneChip.TextContent, StringComparison.Ordinal);
+            Assert.DoesNotContain(LegacyPrimarySceneFallbackLabel, primarySceneChip.TextContent, StringComparison.Ordinal);
         });
     }
 

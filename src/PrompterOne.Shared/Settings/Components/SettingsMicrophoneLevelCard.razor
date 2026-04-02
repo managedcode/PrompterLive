@@ -2,6 +2,7 @@
 @namespace PrompterOne.Shared.Components
 @using System.Globalization
 @using Microsoft.JSInterop
+@using PrompterOne.Shared.Services
 @inject Microsoft.Extensions.Logging.ILogger<SettingsMicrophoneLevelCard> Logger
 @inject MicrophoneLevelInterop MicrophoneLevelInterop
 
@@ -120,7 +121,7 @@
             ? PermissionTitle
             : NoMicrophoneTitle;
 
-    private string MicrophoneLabel => Microphone?.Label ?? string.Empty;
+    private string MicrophoneLabel => MediaDeviceLabelSanitizer.Sanitize(Microphone?.Label);
 
     private string MonitorDescription =>
         CanRenderMonitor

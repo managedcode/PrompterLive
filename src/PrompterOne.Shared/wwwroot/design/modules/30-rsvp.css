@@ -85,9 +85,12 @@
 
 /* Horizontal row: left context | focus | right context */
 .rsvp-h-row {
-    --rsvp-focus-shift: 0px;
+    --rsvp-context-gap: clamp(24px, 2vw, 32px);
+    --rsvp-focus-left-extent: 0px;
+    --rsvp-focus-right-extent: 0px;
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: baseline;
     justify-content: center;
     width: min(100%, 1100px);
@@ -95,6 +98,22 @@
     min-height: 144px;
     min-width: 0;
     overflow: visible;
+}
+
+.rsvp-lane {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+}
+
+.rsvp-lane-left {
+    justify-content: flex-end;
+    padding-right: calc(var(--rsvp-focus-left-extent) + var(--rsvp-context-gap));
+}
+
+.rsvp-lane-right {
+    justify-content: flex-start;
+    padding-left: calc(var(--rsvp-focus-right-extent) + var(--rsvp-context-gap));
 }
 
 .rsvp-ctx-left, .rsvp-ctx-right {
@@ -106,29 +125,29 @@
     color: rgba(232,213,176,.35);
     line-height: 1;
     white-space: nowrap;
-    overflow: clip;
-    flex: 1 1 0;
+    overflow: visible;
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: 100%;
     min-width: 0;
     pointer-events: none;
     z-index: 0;
 }
 .rsvp-ctx-left {
     justify-content: flex-end;
-    padding-right: 60px;
 }
 .rsvp-ctx-right {
     justify-content: flex-start;
-    padding-left: 60px;
 }
 
 .rsvp-focus-shell {
+    justify-self: center;
     display: flex;
     align-items: baseline;
-    justify-content: center;
-    flex: 0 0 clamp(360px, 32vw, 520px);
-    width: clamp(360px, 32vw, 520px);
-    min-width: clamp(360px, 32vw, 520px);
-    max-width: clamp(360px, 32vw, 520px);
+    justify-content: flex-start;
+    width: 0;
+    min-width: 0;
+    max-width: none;
     overflow: visible;
     position: relative;
     z-index: 1;
@@ -144,7 +163,7 @@
     white-space: nowrap;
     flex: 0 0 auto;
     line-height: 1;
-    transform: translateX(var(--rsvp-focus-shift));
+    transform: translateX(calc(-1 * var(--rsvp-focus-left-extent)));
 }
 .rsvp-focus-segment {
     color: var(--t1);

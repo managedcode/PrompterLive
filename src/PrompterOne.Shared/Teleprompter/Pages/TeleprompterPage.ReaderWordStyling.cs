@@ -5,18 +5,18 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class TeleprompterPage
 {
-    private const double FastLetterSpacingDeadZoneRatio = 0.05d;
-    private const double FastLetterSpacingFloorEm = -0.015d;
-    private const double MaximumFastLetterSpacingEm = -0.028d;
-    private const double MaximumSlowClassLetterSpacingEm = 0.055d;
+    private const double FastLetterSpacingDeadZoneRatio = 0.03d;
+    private const double FastLetterSpacingFloorEm = -0.024d;
+    private const double MaximumFastLetterSpacingEm = -0.05d;
+    private const double MaximumSlowClassLetterSpacingEm = 0.085d;
     private const int MinimumReaderReferenceWpm = 60;
     private const string PronunciationTitlePrefix = "Pronunciation: ";
     private const string ReaderSpeedTitlePrefix = "Speed: ";
     private const string ReaderWordLetterSpacingVariable = "--tps-word-letter-spacing";
-    private const double SlowLetterSpacingFloorEm = 0.028d;
-    private const double SlowLetterSpacingRangeRatio = 0.4d;
-    private const double FastLetterSpacingRangeRatio = 0.55d;
-    private const double MaximumSlowLetterSpacingEm = 0.058d;
+    private const double SlowLetterSpacingFloorEm = 0.045d;
+    private const double SlowLetterSpacingRangeRatio = 0.32d;
+    private const double FastLetterSpacingRangeRatio = 0.45d;
+    private const double MaximumSlowLetterSpacingEm = 0.09d;
     private const string WpmSuffix = " WPM";
 
     private static string? BuildReaderWordStyle(WordMetadata? metadata, int targetWpm, int effectiveWpm)

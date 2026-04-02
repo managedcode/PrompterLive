@@ -290,7 +290,7 @@
     border: 1px solid var(--gold-06);
     border-radius: var(--r-lg);
     overflow: hidden;
-    opacity: .5;
+    opacity: .75;
     transition: opacity .2s, border-color .2s, box-shadow .2s;
 }
 
@@ -385,7 +385,7 @@
 }
 
 .set-mic-preview.set-mic-off {
-    opacity: .35;
+    opacity: .55;
     color: var(--t4);
     background: rgba(10, 14, 20, .3);
 }

@@ -45,6 +45,18 @@ internal static class AppTestLibrarySeedData
             AppTestData.Scripts.QuantumTitle,
             "test-quantum-computing.tps",
             new DateTimeOffset(2026, 3, 15, 16, 45, 0, TimeSpan.Zero),
+            AppTestData.Folders.InternalId),
+        CreateDocument(
+            AppTestData.Scripts.ReaderTimingId,
+            AppTestData.Scripts.ReaderTimingTitle,
+            "test-reader-timing.tps",
+            new DateTimeOffset(2026, 4, 1, 19, 0, 0, TimeSpan.Zero),
+            AppTestData.Folders.InternalId),
+        CreateDocument(
+            AppTestData.Scripts.LearnWpmBoundaryId,
+            AppTestData.Scripts.LearnWpmBoundaryTitle,
+            "test-learn-wpm-boundary.tps",
+            new DateTimeOffset(2026, 4, 2, 8, 0, 0, TimeSpan.Zero),
             AppTestData.Folders.InternalId)
     ];
 

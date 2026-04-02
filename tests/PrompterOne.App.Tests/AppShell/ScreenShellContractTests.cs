@@ -80,7 +80,8 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.Page));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle));
-            Assert.NotNull(cut.FindByTestId($"{UiTestIds.Teleprompter.Card(0)}-text"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.Stage));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Teleprompter.Controls));
             Assert.DoesNotContain("rd-camera-overlay-", cut.Markup, StringComparison.Ordinal);
             Assert.Contains("data-total-ms=\"", cut.Markup, StringComparison.Ordinal);
         });
@@ -117,8 +118,8 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProgramCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SourcesCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.OpenSettings));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Obs)));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)));
         });
     }
 }

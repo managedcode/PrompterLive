@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
@@ -9,7 +10,7 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage : IAsyncDisposable
 {
-    private const int DefaultContextWordCount = 3;
+    private const int DefaultContextWordCount = LearnSettingsDefaults.ContextWords;
     private const string EndOfScriptPhrase = "End of script.";
     private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
     private const string LoadLearnOperation = "Learn load";
@@ -17,6 +18,7 @@ public partial class LearnPage : IAsyncDisposable
     private const int MinimumWordDurationMilliseconds = 60;
     private const string NeutralEmotion = "neutral";
     private const string ReadyWord = "Ready";
+    private const int ReadyWordDurationMilliseconds = 240;
     private const int PreviewWordCount = 10;
     private const int RsvpMaxSpeed = 600;
     private const int RsvpMinSpeed = 100;
@@ -39,7 +41,9 @@ public partial class LearnPage : IAsyncDisposable
     public string? ScriptId { get; set; }
 
     private CancellationTokenSource? _playbackCts;
+    private ElementReference _focusOrp;
     private ElementReference _focusRow;
+    private ElementReference _focusWord;
     private ElementReference _screenRoot;
     private string _nextPhrase = string.Empty;
     private string _progressFillWidth = "0%";
@@ -48,7 +52,7 @@ public partial class LearnPage : IAsyncDisposable
     private string _screenTitle = string.Empty;
     private int _contextWordCount = DefaultContextWordCount;
     private int _currentIndex;
-    private int _speed = 300;
+    private int _speed = LearnSettingsDefaults.WordsPerMinute;
     private bool _isPlaying;
     private bool _isLoopEnabled;
     private bool _loadState = true;
@@ -97,7 +101,7 @@ public partial class LearnPage : IAsyncDisposable
         if (_syncFocusLayoutAfterRender)
         {
             _syncFocusLayoutAfterRender = false;
-            await LearnRsvpLayoutInterop.SyncLayoutAsync(_focusRow);
+            await LearnRsvpLayoutInterop.SyncLayoutAsync(_focusRow, _focusWord, _focusOrp);
         }
 
         if (_startPlaybackAfterLayoutSync)
@@ -125,7 +129,7 @@ public partial class LearnPage : IAsyncDisposable
         PlaybackEngine.WordsPerMinute = _speed;
         PlaybackEngine.LoadTimeline(processed);
 
-        _timeline = BuildTimeline(processed, _speed);
+        _timeline = BuildTimeline(processed);
         _currentIndex = 0;
         _isPlaying = learnSettings.AutoPlay;
         _isLoopEnabled = learnSettings.LoopPlayback;
@@ -179,20 +183,24 @@ public partial class LearnPage : IAsyncDisposable
         _currentWordLeading = focusWord.Leading;
         _currentWordOrp = focusWord.Orp;
         _currentWordTrailing = focusWord.Trailing;
-        _leftContextWords = BuildDisplayContextWords(
+        _leftContextWords = BuildDisplayContextWindowWords(
             _timeline,
-            Math.Max(sentenceRange.StartIndex, _currentIndex - _contextWordCount),
-            _currentIndex);
-        _rightContextWords = BuildDisplayContextWords(
+            sentenceRange.StartIndex,
+            _currentIndex,
+            _contextWordCount,
+            takeTrailingWords: true);
+        _rightContextWords = BuildDisplayContextWindowWords(
             _timeline,
             _currentIndex + 1,
-            Math.Min(sentenceRange.EndIndex + 1, _currentIndex + 1 + _contextWordCount));
+            sentenceRange.EndIndex + 1,
+            _contextWordCount,
+            takeTrailingWords: false);
         var rawPreviewText = string.IsNullOrWhiteSpace(entry.NextPhrase)
             ? ResolveFallbackNextPhrase(_timeline, _currentIndex)
             : entry.NextPhrase;
         _nextPhrase = BuildDisplayPreviewText(rawPreviewText);
         _progressFillWidth = $"{((_currentIndex + 1) * 100d / _timeline.Count):0.##}%";
-        _progressLabel = BuildProgressLabel(_timeline, _currentIndex, _speed);
+        _progressLabel = BuildProgressLabel(_timeline, _currentIndex);
         _syncFocusLayoutAfterRender = true;
     }
 
@@ -214,19 +222,4 @@ public partial class LearnPage : IAsyncDisposable
 
     private void UpdateShellState() =>
         Shell.ShowLearn(_screenTitle, _screenSubtitle, BuildWpmLabel(_speed), SessionService.State.ScriptId);
-
-    private int GetScaledDuration(int sourceMilliseconds, int baseWpm, bool allowZero = false)
-    {
-        if (sourceMilliseconds <= 0)
-        {
-            return allowZero ? 0 : MinimumWordDurationMilliseconds;
-        }
-
-        var effectiveBaseWpm = baseWpm > 0 ? baseWpm : _speed;
-        var scaledDuration = sourceMilliseconds * (effectiveBaseWpm / (double)Math.Max(_speed, 1));
-        var roundedDuration = (int)Math.Round(scaledDuration);
-        return allowZero
-            ? Math.Max(0, roundedDuration)
-            : Math.Max(MinimumWordDurationMilliseconds, roundedDuration);
-    }
 }

@@ -3,11 +3,6 @@
     const audioOutputKind = "audiooutput";
     const cameraTrackMap = new Map();
     const defaultDeviceId = "default";
-    const fallbackDeviceNames = {
-        [audioInputKind]: "Microphone",
-        [audioOutputKind]: "Speaker",
-        videoinput: "Camera"
-    };
     const interopNamespace = "BrowserMediaInterop";
     const liveKitClientGlobal = "LivekitClient";
     const microphoneMonitorLevelMultiplier = 2800;
@@ -217,14 +212,17 @@
         return element instanceof HTMLVideoElement ? element : null;
     }
 
-    function normalizeDevice(device, index, kind) {
-        const label = device.label && device.label.trim().length > 0
-            ? device.label
-            : `${fallbackDeviceNames[kind] ?? "Device"} ${index + 1}`;
+    function normalizeDevice(device, kind) {
+        const deviceId = typeof device?.deviceId === "string"
+            ? device.deviceId
+            : "";
+        const label = typeof device?.label === "string"
+            ? device.label.trim()
+            : "";
 
         return {
-            deviceId: device.deviceId || defaultDeviceId,
-            isDefault: device.deviceId === defaultDeviceId,
+            deviceId,
+            isDefault: device?.isDefault === true || deviceId === defaultDeviceId,
             kind,
             label
         };
@@ -355,7 +353,7 @@
             const groups = await Promise.all(orderedKinds.map(loadDevicesForKind));
 
             return groups.flatMap((devices, groupIndex) =>
-                devices.map((device, index) => normalizeDevice(device, index, orderedKinds[groupIndex])));
+                devices.map(device => normalizeDevice(device, orderedKinds[groupIndex])));
         },
 
         async attachCamera(elementId, deviceId, muted) {

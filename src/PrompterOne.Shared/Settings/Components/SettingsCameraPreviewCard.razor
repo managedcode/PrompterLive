@@ -1,5 +1,6 @@
 @implements IAsyncDisposable
 @namespace PrompterOne.Shared.Components
+@using PrompterOne.Shared.Services
 @inject CameraPreviewInterop CameraPreviewInterop
 @inject Microsoft.Extensions.Logging.ILogger<SettingsCameraPreviewCard> Logger
 
@@ -72,7 +73,7 @@
 
     private bool CanPreview => AccessGranted && !string.IsNullOrWhiteSpace(Camera?.DeviceId);
 
-    private string CameraLabel => Camera?.Label ?? string.Empty;
+    private string CameraLabel => MediaDeviceLabelSanitizer.Sanitize(Camera?.Label);
 
     private string EmptyDescription =>
         !AccessGranted
