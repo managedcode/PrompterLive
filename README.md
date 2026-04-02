@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/screenshots/readme/library.png" alt="PrompterOne" width="100%" />
-</p>
-
 <h1 align="center">PrompterOne</h1>
 
 <p align="center">
@@ -100,10 +96,12 @@ PrompterOne negotiates the initial language from your browser and remembers your
 
 ## The Full Flow
 
-```
- Library  ───>  Editor  ───>  Learn  ───>  Teleprompter  ───>  Go Live
- browse &       write with     rehearse     read on camera     record &
- organize       TPS markup     at speed     with live feed     stream live
+```mermaid
+graph LR
+    A["Library<br/><sub>browse & organize</sub>"] --> B["Editor<br/><sub>write with TPS markup</sub>"]
+    B --> C["Learn<br/><sub>rehearse at speed</sub>"]
+    C --> D["Teleprompter<br/><sub>read on camera</sub>"]
+    D --> E["Go Live<br/><sub>record & stream</sub>"]
 ```
 
 Every stage works with the same script. Pacing, emphasis, structure, and metadata you add in the editor show up in rehearsal, in the teleprompter, and in the live session. No re-importing, no copy-paste, no format conversion.
@@ -112,33 +110,22 @@ Every stage works with the same script. Pacing, emphasis, structure, and metadat
 
 PrompterOne is in **active alpha** — usable today for real work, with some areas still expanding.
 
-### Ready
-
-| Feature | What works |
-| --- | --- |
-| **Library** | Script browsing, folder organization, script creation, workflow launch |
-| **Editor** | TPS authoring with structure, formatting, pacing, emphasis, metadata, speed offsets, AI-assisted rewriting helpers, and inline syntax highlighting |
-| **Learn** | RSVP rehearsal with ORP focal point, adjustable speed, phrase-aware timing, context rails, loop toggle |
-| **Teleprompter** | Browser reader with focal controls, camera background, mirror toggles, TPS formatting parity, block transitions, persisted preferences |
-| **Settings** | Camera and microphone setup with live feedback, device sync, output profiles, recording defaults, transport configuration, distribution targets |
-| **Local recording** | Browser-side recording of the composed program feed |
-| **Localization** | 7 languages with browser negotiation and persisted user override |
-
-### Working, Still Expanding
-
-| Feature | Current state |
-| --- | --- |
-| **Go Live core** | Browser program feed, source rails, scene controls, runtime telemetry, session bar |
-| **VDO.Ninja** | Transport-aware connection and publish from the browser |
-| **LiveKit** | Transport-aware connection and publish from the browser |
-| **Distribution targets** | Capability-gated routing with honest blocking of unsupported paths |
-| **Cloud storage** | Provider-backed snapshot import/export for scripts and settings |
-
-### Intentional Constraints
-
-- PrompterOne does not claim generic browser RTMP fan-out to every platform. Downstream targets work only when the active transport path genuinely supports them.
-- The live runtime is stricter than most streaming dashboards — unsupported paths stay blocked instead of being faked.
-- There is no PrompterOne backend. Recording, streaming, and media processing are browser-only. If a feature needs server infrastructure, it comes from the chosen third-party transport (LiveKit or VDO.Ninja), not from PrompterOne.
+| Feature | Status | Details |
+| --- | :---: | --- |
+| **Library** | ✅ | Script browsing, folder organization, script creation, workflow launch |
+| **Editor** | ✅ | TPS authoring with structure, formatting, pacing, emphasis, metadata, speed offsets, AI-assisted rewriting, inline syntax highlighting |
+| **Learn** | ✅ | RSVP rehearsal with ORP focal point, adjustable speed, phrase-aware timing, context rails, loop toggle |
+| **Teleprompter** | ✅ | Focal controls, camera background, mirror toggles, TPS formatting parity, block transitions, persisted preferences |
+| **Settings** | ✅ | Camera and microphone setup with live feedback, device sync, output profiles, recording defaults, transport config, distribution targets |
+| **Local recording** | ✅ | Browser-side recording of the composed program feed |
+| **Localization** | ✅ | 7 languages with browser negotiation and persisted user override |
+| **Go Live core** | 🟡 | Browser program feed, source rails, scene controls, runtime telemetry, session bar |
+| **VDO.Ninja** | 🟡 | Transport-aware connection and publish from the browser |
+| **LiveKit** | 🟡 | Transport-aware connection and publish from the browser |
+| **Distribution targets** | 🟡 | Capability-gated routing — unsupported paths are blocked, not faked |
+| **Cloud storage** | 🟡 | Provider-backed snapshot import/export for scripts and settings |
+| **Generic RTMP fan-out** | ❌ | Intentionally not supported — downstream targets require a real transport path |
+| **PrompterOne backend** | ❌ | By design — the browser is the only runtime, no server tier |
 
 ## Roadmap
 
