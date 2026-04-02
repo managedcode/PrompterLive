@@ -48,10 +48,9 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
             Assert.Equal(HiddenOpacity, firstStartupWordSample.RowOpacity);
             Assert.Equal(HiddenVisibility, firstStartupWordSample.RowVisibility);
 
-            var readyStartupWordSample = startupWordSamples
-                .FirstOrDefault(sample => string.Equals(sample.LayoutReady, LayoutReadyTrueValue, StringComparison.Ordinal));
-
-            Assert.NotNull(readyStartupWordSample);
+            await WaitForLearnLayoutReadyAsync(page);
+            var readyStartupWordSample = await ReadCurrentLearnLayoutAsync(page);
+            Assert.Equal(LayoutReadyTrueValue, readyStartupWordSample.LayoutReady);
             Assert.InRange(readyStartupWordSample.OrpDeltaPx, 0, MaxReadyOrpDeltaPx);
         }
         finally
@@ -111,6 +110,53 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
     }
 
     private static string ToJsString(string value) => $"'{value.Replace("\\", "\\\\").Replace("'", "\\'")}'";
+
+    private static Task WaitForLearnLayoutReadyAsync(Microsoft.Playwright.IPage page) =>
+        page.WaitForFunctionAsync(
+            """
+            args => {
+                const display = document.querySelector(`[data-testid="${args.displayTestId}"]`);
+                return display?.getAttribute(args.layoutReadyAttributeName) === args.layoutReadyValue;
+            }
+            """,
+            new
+            {
+                displayTestId = UiTestIds.Learn.Display,
+                layoutReadyAttributeName = LayoutReadyAttributeName,
+                layoutReadyValue = LayoutReadyTrueValue
+            });
+
+    private static Task<LearnStartupTraceSample> ReadCurrentLearnLayoutAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<LearnStartupTraceSample>(
+            """
+            args => {
+                const display = document.querySelector(`[data-testid="${args.displayTestId}"]`);
+                const row = display?.querySelector('.rsvp-h-row');
+                const line = document.querySelector(`[data-testid="${args.lineTestId}"]`);
+                const word = document.querySelector(`[data-testid="${args.wordTestId}"]`);
+                const orp = word?.querySelector('.orp');
+                const rowStyles = row ? getComputedStyle(row) : null;
+                const lineRect = line?.getBoundingClientRect();
+                const orpRect = orp?.getBoundingClientRect();
+
+                return {
+                    layoutReady: display?.getAttribute(args.layoutReadyAttributeName) ?? '',
+                    orpDeltaPx: lineRect && orpRect
+                        ? Math.abs((lineRect.left + (lineRect.width / 2)) - (orpRect.left + (orpRect.width / 2)))
+                        : 999,
+                    rowOpacity: rowStyles?.opacity ?? '',
+                    rowVisibility: rowStyles?.visibility ?? '',
+                    text: word?.textContent?.replace(/\\s+/g, '') ?? ''
+                };
+            }
+            """,
+            new
+            {
+                displayTestId = UiTestIds.Learn.Display,
+                layoutReadyAttributeName = LayoutReadyAttributeName,
+                lineTestId = UiTestIds.Learn.OrpLine,
+                wordTestId = UiTestIds.Learn.Word
+            });
 
     private sealed class LearnStartupTraceSample
     {

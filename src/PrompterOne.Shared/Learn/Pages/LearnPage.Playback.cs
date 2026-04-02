@@ -67,6 +67,8 @@ public partial class LearnPage
 
         UpdateDisplayedState();
         UpdateShellState();
+        await InvokeAsync(StateHasChanged);
+        await AwaitPendingFocusLayoutSyncAsync();
         RestartPlaybackLoopIfActive();
     }
 
@@ -81,6 +83,7 @@ public partial class LearnPage
         UpdateDisplayedState();
         RestartPlaybackLoopIfActive();
         await InvokeAsync(StateHasChanged);
+        await AwaitPendingFocusLayoutSyncAsync();
     }
 
     private void RestartPlaybackLoopIfActive()

@@ -16,11 +16,11 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     private const string PersistedFocalGuideStyle = "top:37%;";
     private const string PersistedTextWidthValue = "980";
     private const string ReaderCardActiveClass = "rd-card-active";
-    private const string ReaderCardPreviousClass = "rd-card-prev";
+    private const string ReaderCardNextClass = "rd-card-next";
     private const string StoredReaderSettingsKey = BrowserStorageKeys.SettingsPrefix + BrowserAppSettingsKeys.ReaderSettings;
     private static readonly Regex ReaderFirstBlockIndicator = new(@"^1 / \d+$", RegexOptions.Compiled);
     private static readonly Regex ReaderCardActiveClassRegex = new(@"\brd-card-active\b", RegexOptions.Compiled);
-    private static readonly Regex ReaderCardPreviousClassRegex = new(@"\brd-card-prev\b", RegexOptions.Compiled);
+    private static readonly Regex ReaderCardNextClassRegex = new(@"\brd-card-next\b", RegexOptions.Compiled);
 
     [Fact]
     public Task Teleprompter_PersistsWidthAndFocalSettingsAcrossReload() =>
@@ -56,7 +56,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
         });
 
     [Fact]
-    public Task Teleprompter_BackwardBlockJump_KeepsOutgoingCardMovingUpward() =>
+    public Task Teleprompter_BackwardBlockJump_ReversesOutgoingCardDirection() =>
         RunPageAsync(async page =>
         {
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
@@ -76,11 +76,11 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
                 .ToHaveTextAsync(ReaderFirstBlockIndicator);
             await Expect(firstCard).ToHaveClassAsync(ReaderCardActiveClassRegex);
             await Expect(secondCard).ToHaveClassAsync(
-                ReaderCardPreviousClassRegex,
+                ReaderCardNextClassRegex,
                 new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
             var secondCardClasses = await secondCard.GetAttributeAsync("class") ?? string.Empty;
-            Assert.Contains(ReaderCardPreviousClass, secondCardClasses, StringComparison.Ordinal);
+            Assert.Contains(ReaderCardNextClass, secondCardClasses, StringComparison.Ordinal);
             Assert.DoesNotContain(ReaderCardActiveClass, secondCardClasses, StringComparison.Ordinal);
         });
 

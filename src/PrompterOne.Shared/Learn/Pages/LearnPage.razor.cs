@@ -72,6 +72,7 @@ public partial class LearnPage : IAsyncDisposable
         StopPlaybackLoop();
         _loadState = true;
         _focusScreenAfterRender = true;
+        MarkFocusLayoutDirty();
         return Task.CompletedTask;
     }
 
@@ -102,7 +103,9 @@ public partial class LearnPage : IAsyncDisposable
         if (_syncFocusLayoutAfterRender)
         {
             _syncFocusLayoutAfterRender = false;
-            await LearnRsvpLayoutInterop.SyncLayoutAsync(_displayRoot, _focusRow, _focusWord, _focusOrp);
+            var didSync = await LearnRsvpLayoutInterop.SyncLayoutAsync(_displayRoot, _focusRow, _focusWord, _focusOrp);
+            CompletePendingFocusLayoutSync(didSync);
+            await InvokeAsync(StateHasChanged);
         }
 
         if (_startPlaybackAfterLayoutSync)
@@ -164,6 +167,7 @@ public partial class LearnPage : IAsyncDisposable
     {
         if (_timeline.Count == 0)
         {
+            MarkFocusLayoutDirty();
             _currentWordLeading = string.Empty;
             _currentWordOrp = ReadyWord;
             _currentWordTrailing = string.Empty;
@@ -178,6 +182,7 @@ public partial class LearnPage : IAsyncDisposable
 
         _currentIndex = Math.Clamp(_currentIndex, 0, _timeline.Count - 1);
         var entry = _timeline[_currentIndex];
+        MarkFocusLayoutDirty();
         var displayWord = NormalizeDisplayWord(entry.Word);
         var focusWord = BuildFocusWord(string.IsNullOrWhiteSpace(displayWord) ? entry.Word : displayWord);
         var sentenceRange = ResolveSentenceRange(_timeline, _currentIndex);

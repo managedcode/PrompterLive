@@ -331,7 +331,9 @@ public partial class TeleprompterPage
 
     private async Task AdvanceToCardAsync(int nextCardIndex, CancellationToken cancellationToken)
     {
+        await CancelPendingReaderCardTransitionAsync();
         var previousCardIndex = _activeReaderCardIndex;
+        var transitionCts = BeginReaderCardTransitionScope(cancellationToken);
         await PrepareReaderCardTransitionAsync(nextCardIndex);
         await PrepareReaderCardAlignmentAsync(nextCardIndex, 0);
         _readerTransitionSourceCardIndex = previousCardIndex;
@@ -343,16 +345,21 @@ public partial class TeleprompterPage
 
         try
         {
-            await Task.Delay(ReaderCardTransitionMilliseconds, cancellationToken);
+            await Task.Delay(ReaderCardTransitionMilliseconds, transitionCts.Token);
 
-            if (cancellationToken.IsCancellationRequested)
+            if (transitionCts.IsCancellationRequested)
             {
                 return;
             }
+
             await ActivateReaderWordAsync(0, alignBeforeActivation: false);
+        }
+        catch (OperationCanceledException) when (transitionCts.IsCancellationRequested)
+        {
         }
         finally
         {
+            CompleteReaderCardTransitionScope(transitionCts);
             await FinalizeReaderCardTransitionAsync(previousCardIndex);
         }
     }

@@ -59,7 +59,7 @@ flowchart LR
 - `teleprompter` keeps TPS inline colors visible even when a phrase group is active or the active word is highlighted.
 - `teleprompter` keeps the active focus word calm: the active word may be brighter than its neighbors, but upcoming and read words stay gently dimmed and active-word glow stays restrained enough to avoid a bright moving patch.
 - `teleprompter` persists font scale, text width, focal point, and camera auto-start changes through `IUserSettingsStore` and restores them from stored `ReaderSettings` during bootstrap.
-- `teleprompter` prepositions the next card below the focal line before activation, so forward and backward block jumps both animate upward instead of alternating direction.
+- `teleprompter` keeps forward block jumps on the straight reference path, but backward block jumps reverse that motion so the returning previous block comes in from above while the outgoing current block drops away.
 - `teleprompter` uses one smooth paragraph realignment while words advance inside a card, but the first word of a newly entered card is already pre-centered so block changes do not trigger a second correction pass.
 - `teleprompter` loads its feature stylesheet from the initial host `<head>` instead of relying on route-time `HeadContent`, so direct opens and route transitions share the same first-paint styling.
 
@@ -80,4 +80,4 @@ flowchart LR
 - Playwright verifies a dedicated reader-timing probe for both `learn` and `teleprompter`, recording emitted words in the browser and checking that sequence order and elapsed delays match the rendered timing contract word by word.
 - Playwright verifies the teleprompter stylesheet is already registered in `document.styleSheets` before the app navigates into the teleprompter route.
 - Playwright verifies custom TPS speed offsets change computed teleprompter `letter-spacing` while `[normal]` words reset back to neutral spacing and timing.
-- Playwright verifies teleprompter width and focal settings survive a real browser reload and that backward block jumps keep the outgoing card on the upward exit path during the transition.
+- Playwright verifies teleprompter width and focal settings survive a real browser reload and that backward block jumps reverse direction instead of reusing the forward upward-only path.

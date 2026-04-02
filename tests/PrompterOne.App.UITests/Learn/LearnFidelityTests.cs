@@ -6,6 +6,9 @@ namespace PrompterOne.App.UITests;
 
 public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
+    private const string LayoutReadyAttributeName = "data-rsvp-layout-ready";
+    private const double MaxLayoutReadyOrpDeltaPx = 6;
+    private const string LayoutReadyTrueValue = "true";
     private const string LearnPlaybackProbeStartKey = "__prompterOneLearnFidelityPlaybackStartMs";
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
     private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
@@ -23,12 +26,14 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Learn.Word).Locator(".orp")).ToBeVisibleAsync();
+            await WaitForLearnLayoutReadyAsync(page);
 
             var initialDelta = await MeasureOrpDeltaAsync(page);
             Assert.InRange(initialDelta, 0, 6);
 
             await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackDelayMs);
+            await WaitForLearnLayoutReadyAsync(page);
 
             var playbackDelta = await MeasureOrpDeltaAsync(page);
             Assert.InRange(playbackDelta, 0, 6);
@@ -88,6 +93,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -138,6 +144,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnLeadership);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(page, BrowserTestConstants.Learn.OverlapProbeWord, BrowserTestConstants.Learn.OverlapProbeStepLimit);
 
@@ -169,6 +176,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnSecurityIncident);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -203,6 +211,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnQuantum);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -237,6 +246,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnLeadership);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -274,6 +284,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnLeadership);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -323,6 +334,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -351,6 +363,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await page.GotoAsync(BrowserTestConstants.Routes.LearnDemo);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
 
             await StepUntilWordAsync(
                 page,
@@ -448,10 +461,38 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             }
 
             await page.GetByTestId(UiTestIds.Learn.StepForward).ClickAsync();
+            await WaitForLearnLayoutReadyAsync(page);
         }
 
         Assert.Fail($"Did not reach the learn probe word '{targetWord}' within {stepLimit} steps.");
     }
+
+    private static Task WaitForLearnLayoutReadyAsync(Microsoft.Playwright.IPage page) =>
+        page.WaitForFunctionAsync(
+            """
+            args => {
+                const display = document.querySelector(`[data-testid="${args.displayTestId}"]`);
+                const line = document.querySelector(`[data-testid="${args.lineTestId}"]`);
+                const orp = document.querySelector(`[data-testid="${args.wordTestId}"] .orp`);
+                if (display?.getAttribute(args.layoutReadyAttributeName) !== args.layoutReadyValue || !line || !orp) {
+                    return false;
+                }
+
+                const lineRect = line.getBoundingClientRect();
+                const orpRect = orp.getBoundingClientRect();
+                const delta = Math.abs((lineRect.left + (lineRect.width / 2)) - (orpRect.left + (orpRect.width / 2)));
+                return delta <= args.maxOrpDeltaPx;
+            }
+            """,
+            new
+            {
+                displayTestId = UiTestIds.Learn.Display,
+                layoutReadyAttributeName = LayoutReadyAttributeName,
+                layoutReadyValue = LayoutReadyTrueValue,
+                lineTestId = UiTestIds.Learn.OrpLine,
+                maxOrpDeltaPx = MaxLayoutReadyOrpDeltaPx,
+                wordTestId = UiTestIds.Learn.Word
+            });
 
     private static async Task ExpectFocusWordAsync(Microsoft.Playwright.IPage page, string expectedWord)
     {

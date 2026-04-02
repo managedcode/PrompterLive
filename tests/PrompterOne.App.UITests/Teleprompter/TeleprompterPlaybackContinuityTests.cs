@@ -46,13 +46,13 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
         RunPageAsync(async page =>
         {
             await OpenLeadershipTeleprompterAsync(page);
-            var outgoingText = page.GetByTestId(UiTestIds.Teleprompter.CardText(0));
-            var incomingText = page.GetByTestId(UiTestIds.Teleprompter.CardText(1));
-            await Expect(outgoingText).ToBeVisibleAsync();
+            var outgoingCard = page.GetByTestId(UiTestIds.Teleprompter.Card(0));
+            var incomingCard = page.GetByTestId(UiTestIds.Teleprompter.Card(1));
+            await Expect(outgoingCard).ToBeVisibleAsync();
 
             var samples = new List<ReaderTransitionSample>
             {
-                await CaptureReaderTransitionSampleAsync(outgoingText, incomingText)
+                await CaptureReaderTransitionSampleAsync(outgoingCard, incomingCard)
             };
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
@@ -60,7 +60,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             for (var sampleIndex = 0; sampleIndex < BrowserTestConstants.Teleprompter.TransitionProbeSampleCount; sampleIndex++)
             {
                 await page.WaitForTimeoutAsync(BrowserTestConstants.Teleprompter.TransitionProbeIntervalMs);
-                samples.Add(await CaptureReaderTransitionSampleAsync(outgoingText, incomingText));
+                samples.Add(await CaptureReaderTransitionSampleAsync(outgoingCard, incomingCard));
             }
 
             AssertMovesUpWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing leadership block");
@@ -77,14 +77,15 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
+            await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderTransitionSettleDelayMs);
 
-            var outgoingText = page.GetByTestId(UiTestIds.Teleprompter.CardText(1));
-            var returningText = page.GetByTestId(UiTestIds.Teleprompter.CardText(0));
-            await Expect(outgoingText).ToBeVisibleAsync();
+            var outgoingCard = page.GetByTestId(UiTestIds.Teleprompter.Card(1));
+            var returningCard = page.GetByTestId(UiTestIds.Teleprompter.Card(0));
+            await Expect(outgoingCard).ToBeVisibleAsync();
 
             var samples = new List<ReaderTransitionSample>
             {
-                await CaptureReaderTransitionSampleAsync(outgoingText, returningText)
+                await CaptureReaderTransitionSampleAsync(outgoingCard, returningCard)
             };
 
             await page.GetByTestId(UiTestIds.Teleprompter.PreviousBlock).ClickAsync();
@@ -92,7 +93,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             for (var sampleIndex = 0; sampleIndex < BrowserTestConstants.Teleprompter.TransitionProbeSampleCount; sampleIndex++)
             {
                 await page.WaitForTimeoutAsync(BrowserTestConstants.Teleprompter.TransitionProbeIntervalMs);
-                samples.Add(await CaptureReaderTransitionSampleAsync(outgoingText, returningText));
+                samples.Add(await CaptureReaderTransitionSampleAsync(outgoingCard, returningCard));
             }
 
             AssertMovesDownWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing current block");

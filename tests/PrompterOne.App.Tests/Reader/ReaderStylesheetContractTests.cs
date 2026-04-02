@@ -5,6 +5,8 @@ namespace PrompterOne.App.Tests;
 public sealed class ReaderStylesheetContractTests
 {
     private const string LearnImport = "@import url(\"./modules/30-rsvp.css\");";
+    private const string LearnPreloadMarkup = "<link rel=\"preload\" href=\"_content/PrompterOne.Shared/design/learn.css\" as=\"style\" />";
+    private const string LearnStylesheetLinkMarkup = "<link rel=\"stylesheet\" href=\"_content/PrompterOne.Shared/design/learn.css\"";
     private const string ReaderShellImport = "@import url(\"./modules/reader/00-shell.css\");";
     private const string ReaderStatesImport = "@import url(\"./modules/reader/10-reading-states.css\");";
     private const string ReaderControlsImport = "@import url(\"./modules/reader/20-controls.css\");";
@@ -62,7 +64,8 @@ public sealed class ReaderStylesheetContractTests
         Assert.DoesNotContain("<HeadContent>", teleprompterPage, StringComparison.Ordinal);
 
         Assert.Contains("_content/PrompterOne.Shared/design/styles.css", hostIndex, StringComparison.Ordinal);
-        Assert.DoesNotContain(DesignStylesheetPaths.Learn, hostIndex, StringComparison.Ordinal);
+        Assert.Contains(LearnPreloadMarkup, hostIndex, StringComparison.Ordinal);
+        Assert.DoesNotContain(LearnStylesheetLinkMarkup, hostIndex, StringComparison.Ordinal);
         Assert.Contains(DesignStylesheetPaths.Teleprompter, hostIndex, StringComparison.Ordinal);
     }
 

@@ -2,7 +2,7 @@ namespace PrompterOne.Shared.Services;
 
 internal static class LearnRsvpLayoutInteropMethodNames
 {
-    private const string NamespacePrefix = "LearnRsvpLayoutInterop";
-
-    public const string SyncLayout = NamespacePrefix + ".syncLayout";
+    public const string JSImportMethodName = "import";
+    public const string ModulePath = "./_content/PrompterOne.Shared/learn/learn-rsvp-layout.js";
+    public const string SyncLayout = "syncLayout";
 }
