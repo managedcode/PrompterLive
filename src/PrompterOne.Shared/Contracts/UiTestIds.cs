@@ -444,6 +444,9 @@ public static class UiTestIds
         public const string StreamIncludeCamera = "go-live-stream-include-camera";
         public const string StreamTextOverlay = "go-live-stream-text-overlay";
         public const string TakeToAir = "go-live-take-to-air";
+        public const string LayoutFull = "go-live-layout-full";
+        public const string LayoutSplit = "go-live-layout-split";
+        public const string LayoutPictureInPicture = "go-live-layout-picture-in-picture";
         public const string TwitchKey = "go-live-twitch-key";
         public const string TwitchToggle = "go-live-twitch-toggle";
         public const string TwitchUrl = "go-live-twitch-url";

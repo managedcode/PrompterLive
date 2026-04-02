@@ -21,7 +21,7 @@ The runtime now owns real browser media outputs for the composed program scene a
 
 - `Go Live` auto-seeds the first available browser camera into the scene when the scene is empty and the browser exposes a real camera list
 - the center program stage always shows the currently selected scene camera, while the right preview rail shows the current program source and only marks it live once recording or streaming is active
-- `Go Live` builds one browser-side program stream from the scene camera cards by drawing the selected primary camera full-frame and then layering additional included cameras as positioned overlays on a canvas
+- `Go Live` builds one browser-side program stream from the scene camera cards by drawing the selected primary camera full-frame; additional included cameras are layered as positioned overlays only when the operator explicitly chooses a multi-source layout instead of the default `Full` layout
 - the scene `AudioBus` is mixed into one program audio track through `AudioContext`, delay, and gain nodes before the final program stream is published or recorded
 - OBS browser output stays browser-only and exposes the composed program audio inside an OBS Browser Source environment
 - `VDO.Ninja` publishing uses the vendored official browser SDK and publishes the same composed `MediaStream` that powers preview, recording, and OBS

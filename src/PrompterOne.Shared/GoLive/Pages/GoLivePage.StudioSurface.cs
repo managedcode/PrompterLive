@@ -406,10 +406,22 @@ public partial class GoLivePage
         return Task.CompletedTask;
     }
 
-    private Task SelectSceneLayoutAsync(GoLiveSceneLayout layout)
+    private async Task SelectSceneLayoutAsync(GoLiveSceneLayout layout)
     {
         _activeSceneLayout = layout;
-        return Task.CompletedTask;
+        if (!GoLiveOutputRuntime.State.HasActiveOutputs)
+        {
+            return;
+        }
+
+        await EnsurePageReadyAsync();
+        var programCamera = ActiveCamera ?? SelectedCamera;
+        if (programCamera is null)
+        {
+            return;
+        }
+
+        await GoLiveOutputRuntime.UpdateProgramSourceAsync(BuildRuntimeRequest(programCamera));
     }
 
     private Task SelectTransitionKindAsync(GoLiveTransitionKind kind)

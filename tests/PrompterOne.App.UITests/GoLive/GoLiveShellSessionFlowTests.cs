@@ -157,6 +157,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             var recordingState = runtimeState.GetProperty("recording");
 
             Assert.Equal(BrowserTestConstants.GoLive.SecondSourceId, programState.GetProperty("primarySourceId").GetString());
+            Assert.Equal(1, programState.GetProperty("videoSourceCount").GetInt32());
             Assert.True(programState.GetProperty("width").GetInt32() > 0);
             Assert.True(programState.GetProperty("height").GetInt32() > 0);
             Assert.False(string.IsNullOrWhiteSpace(recordingState.GetProperty("fileName").GetString()));

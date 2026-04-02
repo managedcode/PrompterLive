@@ -283,6 +283,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
 
         Assert.Equal(AppTestData.Camera.FirstSourceId, request.PrimarySourceId);
         Assert.Equal(2, request.VideoSources.Count);
+        Assert.Equal(1, request.VideoSources.Count(source => source.IsRenderable));
         Assert.Equal(2, request.AudioInputs.Count);
         Assert.Equal(StreamingResolutionLabel, request.ProgramVideo.ResolutionLabel);
         Assert.Equal(VideoFrameRateLabel, request.ProgramVideo.FrameRateLabel);
@@ -293,6 +294,34 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         Assert.Equal(RecordingAudioBitrateKbps, request.Recording.AudioBitrateKbps);
         Assert.Equal(1, request.Recording.AudioChannelCount);
         Assert.True(request.Recording.PreferFilePicker);
+    }
+
+    [Fact]
+    public void GoLivePage_StartRecording_WithPictureInPictureLayout_KeepsOverlaySourcesRenderable()
+    {
+        SeedSceneState(CreateSceneWithTwoAudioInputs());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                LocalRecordingEnabled = true,
+                OutputResolution = StreamingResolutionPreset.FullHd1080p30
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        cut.FindByTestId(UiTestIds.GoLive.LayoutPictureInPicture).Click();
+        cut.FindByTestId(UiTestIds.GoLive.StartRecording).Click();
+
+        var invocation = Assert.Single(
+            _harness.JsRuntime.InvocationRecords,
+            record => string.Equals(record.Identifier, StartLocalRecordingInteropMethod, StringComparison.Ordinal));
+        var request = Assert.IsType<GoLiveOutputRuntimeRequest>(invocation.Arguments[1]);
+
+        Assert.Equal(2, request.VideoSources.Count(source => source.IsRenderable));
     }
 
     private static MediaSceneState CreateTwoCameraScene() =>

@@ -39,6 +39,7 @@
             <span class="gl-tools-label">Layout</span>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Full ? "active" : null)"
+                    data-testid="@UiTestIds.GoLive.LayoutFull"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Full)">
                 <svg width="14"
                      height="14"
@@ -52,6 +53,7 @@
             </button>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Split ? "active" : null)"
+                    data-testid="@UiTestIds.GoLive.LayoutSplit"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Split)">
                 <svg width="14"
                      height="14"
@@ -66,6 +68,7 @@
             </button>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.PictureInPicture ? "active" : null)"
+                    data-testid="@UiTestIds.GoLive.LayoutPictureInPicture"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.PictureInPicture)">
                 <svg width="14"
                      height="14"

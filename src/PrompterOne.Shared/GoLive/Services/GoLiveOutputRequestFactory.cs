@@ -19,6 +19,7 @@ public static class GoLiveOutputRequestFactory
     public static GoLiveOutputRuntimeRequest Build(
         SceneCameraSource? primaryCamera,
         MediaSceneState scene,
+        bool allowOverlaySources,
         StreamStudioSettings streaming,
         SettingsPagePreferences recordingPreferences,
         string recordingFileStem)
@@ -26,7 +27,7 @@ public static class GoLiveOutputRequestFactory
         var liveKitDestination = ResolveLiveKitDestination(streaming);
         var vdoNinjaDestination = ResolveVdoNinjaDestination(streaming);
         var programVideo = ResolveProgramVideo(streaming.OutputResolution);
-        var videoSources = BuildVideoSources(primaryCamera, scene.Cameras);
+        var videoSources = BuildVideoSources(primaryCamera, scene.Cameras, allowOverlaySources);
         var audioInputs = BuildAudioInputs(scene);
         var recording = BuildRecordingExport(recordingPreferences, recordingFileStem);
 
@@ -171,7 +172,8 @@ public static class GoLiveOutputRequestFactory
 
     private static IReadOnlyList<GoLiveOutputVideoSource> BuildVideoSources(
         SceneCameraSource? primaryCamera,
-        IReadOnlyList<SceneCameraSource> cameras)
+        IReadOnlyList<SceneCameraSource> cameras,
+        bool allowOverlaySources)
     {
         return cameras.Select(camera => new GoLiveOutputVideoSource(
                 SourceId: camera.SourceId,
@@ -186,11 +188,24 @@ public static class GoLiveOutputRequestFactory
                     camera.Transform.MirrorHorizontal,
                     camera.Transform.MirrorVertical,
                     camera.Transform.Visible,
-                    camera.Transform.IncludeInOutput,
+                    ShouldIncludeInOutput(camera, primaryCamera, allowOverlaySources),
                     camera.Transform.ZIndex,
                     camera.Transform.Opacity),
                 IsPrimary: string.Equals(camera.SourceId, primaryCamera?.SourceId, StringComparison.Ordinal)))
             .ToList();
+    }
+
+    private static bool ShouldIncludeInOutput(
+        SceneCameraSource camera,
+        SceneCameraSource? primaryCamera,
+        bool allowOverlaySources)
+    {
+        if (string.Equals(camera.SourceId, primaryCamera?.SourceId, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        return allowOverlaySources && camera.Transform.IncludeInOutput;
     }
 
     private static int ResolveAudioChannelCount(string channelLabel)
