@@ -4,7 +4,7 @@ author: "Lena Ortiz"
 profile: "Host"
 base_wpm: 150
 version: "1.0"
-display_duration: "6:15"
+duration: "6:15"
 display_word_count: 910
 display_segment_count: 4
 display_wpm: 150
@@ -31,7 +31,7 @@ without flattening a speaker's natural rhythm. //
 Better prompts, / clearer pacing, / and stronger visual feedback
 all help speakers stay present on camera. //
 
-## [Outro|145WPM|optimistic]
+## [Outro|145WPM|motivational]
 
 ### [Outro Block|145WPM]
 

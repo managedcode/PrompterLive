@@ -4,7 +4,7 @@ author: "Priya Shah"
 profile: "Actor"
 base_wpm: 152
 version: "1.0"
-display_duration: "6:40"
+duration: "6:40"
 display_word_count: 940
 display_segment_count: 4
 display_wpm: 152

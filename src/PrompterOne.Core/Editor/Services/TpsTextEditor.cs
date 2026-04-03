@@ -4,19 +4,35 @@ namespace PrompterOne.Core.Services.Editor;
 
 public sealed class TpsTextEditor
 {
-    private static readonly IReadOnlyList<(string OpeningToken, string ClosingToken)> ColorTokenPairs =
+    private static readonly IReadOnlyList<(string OpeningToken, string ClosingToken)> InlineTokenPairs =
     [
-        ("[red]", "[/red]"),
-        ("[green]", "[/green]"),
-        ("[blue]", "[/blue]"),
-        ("[yellow]", "[/yellow]"),
-        ("[orange]", "[/orange]"),
-        ("[purple]", "[/purple]"),
-        ("[cyan]", "[/cyan]"),
-        ("[magenta]", "[/magenta]"),
-        ("[pink]", "[/pink]"),
-        ("[teal]", "[/teal]"),
-        ("[gray]", "[/gray]")
+        ("[emphasis]", "[/emphasis]"),
+        ("[highlight]", "[/highlight]"),
+        ("[stress]", "[/stress]"),
+        ("[warm]", "[/warm]"),
+        ("[concerned]", "[/concerned]"),
+        ("[focused]", "[/focused]"),
+        ("[motivational]", "[/motivational]"),
+        ("[neutral]", "[/neutral]"),
+        ("[urgent]", "[/urgent]"),
+        ("[happy]", "[/happy]"),
+        ("[excited]", "[/excited]"),
+        ("[sad]", "[/sad]"),
+        ("[calm]", "[/calm]"),
+        ("[energetic]", "[/energetic]"),
+        ("[professional]", "[/professional]"),
+        ("[loud]", "[/loud]"),
+        ("[soft]", "[/soft]"),
+        ("[whisper]", "[/whisper]"),
+        ("[aside]", "[/aside]"),
+        ("[rhetorical]", "[/rhetorical]"),
+        ("[sarcasm]", "[/sarcasm]"),
+        ("[building]", "[/building]"),
+        ("[xslow]", "[/xslow]"),
+        ("[slow]", "[/slow]"),
+        ("[normal]", "[/normal]"),
+        ("[fast]", "[/fast]"),
+        ("[xfast]", "[/xfast]")
     ];
 
     public EditorTextMutationResult WrapSelection(
@@ -62,7 +78,7 @@ public sealed class TpsTextEditor
         var safeText = text ?? string.Empty;
         var range = NormalizeSelection(selection, safeText.Length);
         var selectedText = safeText[range.OrderedStart..range.OrderedEnd];
-        var cleanedSelection = RemoveColorTokens(selectedText);
+        var cleanedSelection = RemoveInlineTokens(selectedText);
 
         if (!string.Equals(cleanedSelection, selectedText, StringComparison.Ordinal))
         {
@@ -71,7 +87,7 @@ public sealed class TpsTextEditor
             return new EditorTextMutationResult(updatedText, new EditorSelectionRange(range.OrderedStart, end));
         }
 
-        foreach (var (openingToken, closingToken) in ColorTokenPairs)
+        foreach (var (openingToken, closingToken) in InlineTokenPairs)
         {
             if (!TryFindEnclosingTokenRange(safeText, range, openingToken, closingToken, out var tokenRange))
             {
@@ -96,14 +112,32 @@ public sealed class TpsTextEditor
         return new EditorSelectionRange(start, end);
     }
 
-    private static string RemoveColorTokens(string text)
+    private static string RemoveInlineTokens(string text)
     {
         var cleaned = text;
-        foreach (var (openingToken, closingToken) in ColorTokenPairs)
+        foreach (var (openingToken, closingToken) in InlineTokenPairs)
         {
             cleaned = cleaned.Replace(openingToken, string.Empty, StringComparison.Ordinal);
             cleaned = cleaned.Replace(closingToken, string.Empty, StringComparison.Ordinal);
         }
+
+        cleaned = System.Text.RegularExpressions.Regex.Replace(
+            cleaned,
+            @"\[(?:pronunciation|phonetic|stress):[^\]]+\]",
+            string.Empty,
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        cleaned = System.Text.RegularExpressions.Regex.Replace(
+            cleaned,
+            @"\[/\d+WPM\]",
+            string.Empty,
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        cleaned = System.Text.RegularExpressions.Regex.Replace(
+            cleaned,
+            @"\[\d+WPM\]",
+            string.Empty,
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         return cleaned;
     }

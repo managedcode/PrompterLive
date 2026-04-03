@@ -4,7 +4,7 @@ author: "Marta Iliev"
 profile: "Host"
 base_wpm: 146
 version: "1.0"
-display_duration: "5:55"
+duration: "5:55"
 display_word_count: 860
 display_segment_count: 3
 display_wpm: 146

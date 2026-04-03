@@ -10,8 +10,8 @@ public sealed class LibraryCardColorTests : BunitContext
     private const string CssColorVariableName = "--emo:";
     private const string NeutralAccentCssValue = "#2563EB";
     private const string MotivationalAccentCssValue = "#7C3AED";
-    private const string CalmAccentCssValue = "#0D9488";
-    private const string UrgentAccentCssValue = "#B91C1C";
+    private const string CalmAccentCssValue = "#0F766E";
+    private const string UrgentAccentCssValue = "#DC2626";
 
     public LibraryCardColorTests()
     {

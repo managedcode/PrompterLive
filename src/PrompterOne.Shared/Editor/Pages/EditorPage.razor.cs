@@ -20,6 +20,9 @@ public partial class EditorPage
     private const string EditorSyntaxMessage = "The TPS draft has a syntax issue. Fix it and keep writing.";
     private const int DraftAnalysisDelayMilliseconds = 1_000;
     private const int AutosaveDelayMilliseconds = 1_500;
+    private const int LargeDraftAnalysisDelayMilliseconds = 3_000;
+    private const int LargeDraftAutosaveDelayMilliseconds = 4_000;
+    private const int LargeDraftDebounceThreshold = 16_000;
     private const int UntitledDraftAutosaveDelayMilliseconds = 1_500;
     private const int UntitledDraftAutosaveCharacterThreshold = 2;
     private const string DefaultAuthor = "PrompterOne";

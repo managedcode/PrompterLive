@@ -13,7 +13,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const int BenefitsCardIndex = 5;
     private const int ClosingCardIndex = 7;
     private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
-    private const string GreenWord = "transformative";
+    private const string ProfessionalWord = "transformative";
     private const string HighlightWord = "solution";
     private const int IntroductionCardIndex = 4;
     private const string IntroductionWord = "comes";
@@ -29,7 +29,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const string FastWord = "Full";
-    private const string PurpleWord = "focus";
+    private const string RhetoricalWord = "focus";
     private const string SecurityIncidentEmphasisPhrase = "No payment data was exposed,";
     private const string SlowWord = "elephant";
     private const string SpeedOffsetsFastWord = "flight.";
@@ -41,7 +41,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string TeleprompterWord = "teleprompter";
     private const string UrgentWord = "time";
     private const string VisionWord = "vision";
-    private const string WarmWord = "Let";
+    private const string SoftWord = "Let";
 
     [Fact]
     public void TeleprompterPage_UsesReferenceSizedReaderGroupsForSecurityIncident()
@@ -103,7 +103,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var fastWord = FindReaderWordByText(cut, BenefitsCardIndex, FastWord);
             var visionWord = FindReaderWordByText(cut, InspirationCardIndex, VisionWord);
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
-            var purpleWord = FindReaderWordByText(cut, InspirationCardIndex, PurpleWord);
+            var rhetoricalWord = FindReaderWordByText(cut, InspirationCardIndex, RhetoricalWord);
 
             Assert.Contains("tps-xslow", slowWord.ClassName, StringComparison.Ordinal);
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
@@ -115,7 +115,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(fastWord));
 
-            Assert.Contains("tps-purple", purpleWord.ClassName, StringComparison.Ordinal);
+            Assert.Contains("tps-rhetorical", rhetoricalWord.ClassName, StringComparison.Ordinal);
 
             Assert.Equal("ˈviʒən", visionWord.GetAttribute("data-pronunciation"));
             Assert.Contains("Pronunciation: ˈviʒən", visionWord.GetAttribute("title"), StringComparison.Ordinal);
@@ -179,9 +179,9 @@ public sealed class TeleprompterFidelityTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var neutralWord = FindReaderWordByText(cut, OpeningCardIndex, NeutralWord);
-            var greenWord = FindReaderWordByText(cut, OpeningCardIndex, GreenWord);
+            var professionalWord = FindReaderWordByText(cut, OpeningCardIndex, ProfessionalWord);
             var highlightWord = FindReaderWordByText(cut, PurposeCardIndex, HighlightWord);
-            var warmWord = FindReaderWordByText(cut, InspirationCardIndex, WarmWord);
+            var softWord = FindReaderWordByText(cut, InspirationCardIndex, SoftWord);
             var urgentWord = FindReaderWordByText(cut, ClosingCardIndex, UrgentWord);
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
             var introductionWord = FindReaderWordByText(cut, IntroductionCardIndex, IntroductionWord);
@@ -190,14 +190,14 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.DoesNotContain("tps-warm", neutralWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-focused", neutralWord.ClassName, StringComparison.Ordinal);
 
-            Assert.Contains("tps-green", greenWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-warm", greenWord.ClassName, StringComparison.Ordinal);
+            Assert.Contains("tps-professional", professionalWord.ClassName, StringComparison.Ordinal);
+            Assert.DoesNotContain("tps-warm", professionalWord.ClassName, StringComparison.Ordinal);
 
             Assert.Contains("tps-highlight", highlightWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-warm", highlightWord.ClassName, StringComparison.Ordinal);
 
-            Assert.Contains("tps-warm", warmWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-motivational", warmWord.ClassName, StringComparison.Ordinal);
+            Assert.Contains("tps-soft", softWord.ClassName, StringComparison.Ordinal);
+            Assert.DoesNotContain("tps-motivational", softWord.ClassName, StringComparison.Ordinal);
 
             Assert.Contains("tps-urgent", urgentWord.ClassName, StringComparison.Ordinal);
             Assert.DoesNotContain("tps-energetic", urgentWord.ClassName, StringComparison.Ordinal);

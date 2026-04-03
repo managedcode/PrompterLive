@@ -4,7 +4,7 @@ author: "Alex Chen"
 profile: "Actor"
 base_wpm: 155
 version: "1.0"
-display_duration: "5:30"
+duration: "5:30"
 display_word_count: 852
 display_segment_count: 3
 display_wpm: 155

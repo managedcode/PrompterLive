@@ -185,21 +185,7 @@
 }
 .rd-cluster b { font-weight: 700; }
 
-/* ── TPS Inline Colors — keep semantic contrast without neon spill ── */
-.tps-red { color: #F19A9A; }
-.tps-green { color: #9FD7AD; }
-.tps-blue { color: #ACCBE6; }
-.tps-yellow { color: #E8D58E; }
-.tps-orange { color: #E4B07A; }
-.tps-purple { color: #C5A4DD; }
-.tps-cyan { color: #93CDD7; }
-.tps-magenta { color: #D9A5BF; }
-.tps-pink { color: #DEB1C5; }
-.tps-teal { color: #8ECDBE; }
-.tps-white { color: #F2E6CC; }
-.tps-gray { color: #BBB8B0; }
-
-/* ── TPS Highlight — yellow background overlay ── */
+/* ── TPS Highlight ── */
 .tps-highlight {
     background: rgba(255,224,102,.12);
     border-radius: 4px;
@@ -211,8 +197,15 @@
 .tps-em { font-style: italic; }
 .tps-strong { font-weight: 900; }
 .tps-emphasis { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.tps-stress {
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-color: rgba(255,208,96,.42);
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+}
 
-/* ── TPS Emotion Inline Colors ── */
+/* ── TPS Emotion Inline Semantics ── */
 .tps-warm { color: #E4B07A; }
 .tps-concerned { color: #E49A9A; }
 .tps-focused { color: #9FD7AD; }
@@ -225,6 +218,15 @@
 .tps-calm { color: #8ECDBE; }
 .tps-energetic { color: #E1A581; }
 .tps-professional { color: #A9BFE7; }
+
+/* ── TPS Delivery And Volume ── */
+.tps-loud { color: #F2C18B; font-weight: 800; }
+.tps-soft { color: #C7DDF5; }
+.tps-whisper { color: #CFCBD7; opacity: .92; font-style: italic; }
+.tps-aside { color: #D8C29B; font-style: italic; }
+.tps-rhetorical { color: #CDB3E9; }
+.tps-sarcasm { color: #E2B6C7; }
+.tps-building { color: #F0D48D; font-weight: 700; }
 
 /* ── TPS Speed Indicators (visual cue for speed tags) ── */
 .tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.085em); }

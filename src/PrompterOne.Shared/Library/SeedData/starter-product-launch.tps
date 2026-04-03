@@ -4,7 +4,7 @@ author: "Jane Doe"
 profile: "Actor"
 base_wpm: 140
 version: "1.0"
-display_duration: "10:00"
+duration: "10:00"
 display_word_count: 1420
 display_segment_count: 4
 display_wpm: 140
@@ -15,7 +15,7 @@ display_wpm: 140
 ### [Opening Block|140WPM]
 
 Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
-will be a [green]transformative moment[/green] for our company. //
+will be a [professional]transformative moment[/professional] for our company. //
 
 [pause:2s]
 
@@ -29,7 +29,7 @@ how our customers interact with technology. //
 
 ### [Statistics Block|150WPM|neutral]
 
-But first, / let's address the [xslow][red]elephant in the room[/red][/xslow]. /
+But first, / let's address the [xslow][stress]elephant[/stress] in the room[/xslow]. /
 Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem. //
 
 [edit_point:high]
@@ -41,20 +41,20 @@ due to [highlight]complexity and poor user experience[/highlight]. //
 ### [Impact Block|140WPM]
 
 This affects [emphasis]millions[/emphasis] of people worldwide, /
-costing businesses [red]billions in revenue[/red] annually. //
+costing businesses [loud]billions in revenue[/loud] annually. //
 
 ## [Solution|160WPM|focused]
 
 ### [Introduction Block|150WPM]
 
-That's where our [blue][emphasis]new platform[/emphasis][/blue] comes in. /
-We've developed a [green]local-first teleprompter workflow[/green] that /
+That's where our [aside][emphasis]new platform[/emphasis][/aside] comes in. /
+We've developed a [professional]local-first teleprompter workflow[/professional] that /
 [highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experience[/emphasis]. //
 
 ### [Benefits Block|160WPM|excited]
 
-With our solution, / you can expect a [green][emphasis]50% reduction[/emphasis][/green] in user abandonment /
-and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
+With our solution, / you can expect a [highlight][emphasis]50% reduction[/emphasis][/highlight] in user abandonment /
+and a [highlight][emphasis]30% increase[/emphasis][/highlight] in engagement. //
 
 [pause:1s]
 
@@ -67,15 +67,15 @@ and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
 
 ### [Inspiration Block|130WPM]
 
-[warm]Let me share something personal.[/warm] //
+[soft]Let me share something personal.[/soft] //
 
 When we started this journey, / our [phonetic:ˈviʒən]vision[/phonetic] was simple: /
-make technology [emphasis]disappear[/emphasis] / so people can [purple]focus on what matters[/purple]. //
+make technology [emphasis]disappear[/emphasis] / so people can [rhetorical]focus on what matters[/rhetorical]. //
 
 [slow]I want each of you to [emphasis]imagine[/emphasis] a world[/slow] /
-where [cyan]every interaction is intuitive[/cyan], /
-every workflow is [teal]seamless[/teal], /
-and every user feels [orange]empowered[/orange]. //
+where [building]every interaction is intuitive[/building], /
+every workflow is [soft]seamless[/soft], /
+and every user feels [loud]empowered[/loud]. //
 
 [pause:3s]
 
@@ -86,6 +86,6 @@ and every user feels [orange]empowered[/orange]. //
 [180WPM]Join us in building the future of [pronunciation:TELE-promp-ter]teleprompter[/pronunciation] technology.[/180WPM] /
 [fast]Visit our booth in the exhibition hall for live demos.[/fast] /
 [motivational]Together, we will change how the world communicates.[/motivational] //
-[yellow]**Thank you**[/yellow] - [magenta]you are the future[/magenta]. //
+[highlight]**Thank you**[/highlight] - [building]you are the future[/building]. //
 
 [edit_point:high]

@@ -5,14 +5,16 @@ namespace PrompterOne.App.Tests;
 public sealed class EditorMarkupRendererTests
 {
     [Fact]
-    public void Render_RendersNestedSpeedAndColorTagsInDesignOrder()
+    public void Render_RendersNestedSpeedAndStressTagsInDesignOrder()
     {
-        var markup = EditorMarkupRenderer.Render("But first, / let's address the [xslow][red]elephant in the room[/red][/xslow].").Value;
+        var markup = EditorMarkupRenderer.Render("But first, / let's address the [xslow][stress]elephant[/stress] in the room[/xslow].").Value;
 
         Assert.Contains("<span class=\"mk-tag\">[xslow]</span>", markup);
-        Assert.Contains("<span class=\"mk-tag\">[red]</span>", markup);
-        Assert.Contains("<span class=\"mk-color-red mk-xslow\">elephant in the room</span>", markup);
-        Assert.Contains("<span class=\"mk-tag\">[/red]</span><span class=\"mk-tag\">[/xslow]</span>", markup);
+        Assert.Contains("<span class=\"mk-tag\">[stress]</span>", markup);
+        Assert.Contains("<span class=\"mk-stress mk-xslow\">elephant</span>", markup);
+        Assert.Contains("<span class=\"mk-tag\">[/stress]</span>", markup);
+        Assert.Contains("<span class=\"mk-xslow\"> in the room</span>", markup);
+        Assert.Contains("<span class=\"mk-tag\">[/xslow]</span>", markup);
     }
 
     [Fact]
@@ -27,12 +29,13 @@ public sealed class EditorMarkupRendererTests
     }
 
     [Fact]
-    public void Render_RendersPauseAndEditPointMarkers()
+    public void Render_RendersPauseBreathAndEditPointMarkers()
     {
-        var markup = EditorMarkupRenderer.Render("Good morning //\n\n[pause:2s]\n\n[edit_point:high]").Value;
+        var markup = EditorMarkupRenderer.Render("Good morning //\n\n[breath]\n\n[pause:2s]\n\n[edit_point:high]").Value;
 
         Assert.Contains("<span class=\"mk-pause\">//</span>", markup);
-        Assert.Contains("<br><br><span class=\"mk-special\">[pause:2s]</span><br><br>", markup);
+        Assert.Contains("<br><br><span class=\"mk-breath\">[breath]</span><br><br>", markup);
+        Assert.Contains("<span class=\"mk-special\">[pause:2s]</span>", markup);
         Assert.Contains("<span class=\"mk-edit\">[edit_point:high]</span>", markup);
     }
 }

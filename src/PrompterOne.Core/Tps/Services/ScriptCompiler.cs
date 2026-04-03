@@ -881,10 +881,14 @@ internal static class TpsCompilerCore
                 _stressTextBuilder.Append(character);
             }
 
-            HasAbsoluteSpeed = state.HasAbsoluteSpeed;
-            AbsoluteSpeed = state.AbsoluteSpeed;
-            HasRelativeSpeed = state.HasRelativeSpeed;
-            RelativeSpeedMultiplier = state.RelativeSpeedMultiplier;
+            if (ShouldCaptureSpeedMetadata(character))
+            {
+                HasAbsoluteSpeed = state.HasAbsoluteSpeed;
+                AbsoluteSpeed = state.AbsoluteSpeed;
+                HasRelativeSpeed = state.HasRelativeSpeed;
+                RelativeSpeedMultiplier = state.RelativeSpeedMultiplier;
+            }
+
             Speaker = state.Speaker;
         }
 
@@ -924,5 +928,9 @@ internal static class TpsCompilerCore
 
             return metadata;
         }
+
+        private static bool ShouldCaptureSpeedMetadata(char character) =>
+            !char.IsWhiteSpace(character) &&
+            !TpsTokenTextRules.IsStandalonePunctuationToken(character.ToString());
     }
 }

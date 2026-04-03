@@ -4,6 +4,8 @@
     const defaultMeasuredLineHeightPx = 32;
     const offscreenMirrorLeftPx = -99999;
     const interactiveOverlayLargeDraftThreshold = 16000;
+    const plainTextInputCssClass = "ed-source-input-plain";
+    const plainTextOverlayCssClass = "ed-source-highlight-plain";
     const selectionViewportMarginLineCount = 2;
     const floatingToolbarMinimumTopCssVariable = "--ed-floatbar-min-top";
     const textareaMirrorCaretMarkerWidthPx = 1;
@@ -36,20 +38,6 @@
     const renderedLengthDataAttribute = "renderedLength";
     const editorSurfaceStates = new WeakMap();
     const overlaySurfaceStates = new WeakMap();
-    const colorClasses = new Map([
-        ["red", "mk-color-red"],
-        ["green", "mk-color-green"],
-        ["blue", "mk-color-blue"],
-        ["yellow", "mk-color-yellow"],
-        ["orange", "mk-color-orange"],
-        ["purple", "mk-color-purple"],
-        ["cyan", "mk-color-cyan"],
-        ["magenta", "mk-color-magenta"],
-        ["pink", "mk-color-pink"],
-        ["teal", "mk-color-teal"],
-        ["white", "mk-color-white"],
-        ["gray", "mk-color-gray"]
-    ]);
     const emotionClasses = new Map([
         ["warm", "mk-emo-warm"],
         ["concerned", "mk-emo-concerned"],
@@ -63,6 +51,17 @@
         ["calm", "mk-emo-calm"],
         ["energetic", "mk-emo-energetic"],
         ["professional", "mk-emo-professional"]
+    ]);
+    const volumeClasses = new Map([
+        ["loud", "mk-vol-loud"],
+        ["soft", "mk-vol-soft"],
+        ["whisper", "mk-vol-whisper"]
+    ]);
+    const deliveryClasses = new Map([
+        ["aside", "mk-del-aside"],
+        ["rhetorical", "mk-del-rhetorical"],
+        ["sarcasm", "mk-del-sarcasm"],
+        ["building", "mk-del-building"]
     ]);
     const speedClasses = new Map([
         ["xslow", "mk-xslow"],
@@ -83,6 +82,7 @@
                 existingState.overlay = overlay;
                 overlaySurfaceStates.set(overlay, existingState);
                 cancelScheduledOverlayRender(existingState);
+                applyInteractivePlainTextMode(textarea, overlay, shouldUseInteractivePlainTextRender(textarea.value));
                 renderSurfaceOverlay(overlay, textarea.value, false);
                 return true;
             }
@@ -99,6 +99,7 @@
             textarea.addEventListener("input", state.onInput);
             editorSurfaceStates.set(textarea, state);
             overlaySurfaceStates.set(overlay, state);
+            applyInteractivePlainTextMode(textarea, overlay, shouldUseInteractivePlainTextRender(textarea.value));
             renderSurfaceOverlay(overlay, textarea.value, false);
             return true;
         },
@@ -398,10 +399,18 @@
 
         const text = textarea.value;
         const useInteractivePlainTextMode = shouldUseInteractivePlainTextRender(text);
+        applyInteractivePlainTextMode(textarea, state.overlay, useInteractivePlainTextMode);
 
-        renderSurfaceOverlay(state.overlay, text, useInteractivePlainTextMode);
+        if (useInteractivePlainTextMode) {
+            cancelDeferredHighlightRender(state);
+            updateRenderedLengthMarker(state.overlay, text);
+            window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+            return;
+        }
+
+        renderSurfaceOverlay(state.overlay, text, false);
         window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
-        scheduleDeferredHighlightRender(textarea, state, useInteractivePlainTextMode);
+        scheduleDeferredHighlightRender(textarea, state, false);
     }
 
     function scheduleOverlayRender(textarea, state) {
@@ -446,6 +455,15 @@
         }, deferredOverlayHighlightDelayMs);
     }
 
+    function cancelDeferredHighlightRender(state) {
+        if (!state || !state.pendingFullRenderTimeoutId) {
+            return;
+        }
+
+        window.clearTimeout(state.pendingFullRenderTimeoutId);
+        state.pendingFullRenderTimeoutId = 0;
+    }
+
     function shouldUseInteractivePlainTextRender(text) {
         return (text || "").length >= interactiveOverlayLargeDraftThreshold;
     }
@@ -453,6 +471,16 @@
     function shouldUseDeferredHighlightRender(text, useInteractivePlainTextMode) {
         return useInteractivePlainTextMode
             && (text || "").length <= deferredOverlayHighlightMaximumLength;
+    }
+
+    function applyInteractivePlainTextMode(textarea, overlay, enabled) {
+        if (textarea) {
+            textarea.classList.toggle(plainTextInputCssClass, enabled);
+        }
+
+        if (overlay) {
+            overlay.classList.toggle(plainTextOverlayCssClass, enabled);
+        }
     }
 
     function renderPlainTextOverlay(text) {
@@ -609,7 +637,7 @@
 
     function renderInlineMarkup(content) {
         if (!content || !content.trim()) {
-            return "<span class=\"mk-color-gray\">Add script content here.</span>";
+            return "<span class=\"mk-muted\">Add script content here.</span>";
         }
 
         const builder = [];
@@ -706,6 +734,11 @@
                 return;
             }
 
+            if (equalsIgnoreCase(name, "breath")) {
+                appendStandalone("mk-breath", rawTag);
+                return;
+            }
+
             if (equalsIgnoreCase(name, "edit_point") || equalsIgnoreCase(name, "editpoint")) {
                 appendStandalone("mk-edit", rawTag);
                 return;
@@ -729,6 +762,12 @@
                 return;
             }
 
+            if (equalsIgnoreCase(name, "stress")) {
+                appendTag(rawTag);
+                pushScope(name, scopeKindStyle, { ...currentState, isStress: true });
+                return;
+            }
+
             const speedClass = speedClasses.get(name.toLowerCase());
             if (speedClasses.has(name.toLowerCase())) {
                 appendTag(rawTag);
@@ -736,10 +775,17 @@
                 return;
             }
 
-            const colorClass = colorClasses.get(name.toLowerCase());
-            if (colorClass) {
+            const volumeClass = volumeClasses.get(name.toLowerCase());
+            if (volumeClass) {
                 appendTag(rawTag);
-                pushScope(name, scopeKindStyle, { ...currentState, colorClass });
+                pushScope(name, scopeKindStyle, { ...currentState, volumeClass });
+                return;
+            }
+
+            const deliveryClass = deliveryClasses.get(name.toLowerCase());
+            if (deliveryClass) {
+                appendTag(rawTag);
+                pushScope(name, scopeKindStyle, { ...currentState, deliveryClass });
                 return;
             }
 
@@ -834,11 +880,13 @@
 
     function createRenderState() {
         return {
-            colorClass: null,
             emotionClass: null,
+            volumeClass: null,
+            deliveryClass: null,
             speedClass: null,
             isEmphasis: false,
-            isHighlighted: false
+            isHighlighted: false,
+            isStress: false
         };
     }
 
@@ -850,14 +898,20 @@
         if (state.isHighlighted) {
             classes.push("mk-hl");
         }
-        if (state.colorClass) {
-            classes.push(state.colorClass);
-        }
         if (state.emotionClass) {
             classes.push(state.emotionClass);
         }
+        if (state.volumeClass) {
+            classes.push(state.volumeClass);
+        }
+        if (state.deliveryClass) {
+            classes.push(state.deliveryClass);
+        }
         if (state.speedClass) {
             classes.push(state.speedClass);
+        }
+        if (state.isStress) {
+            classes.push("mk-stress");
         }
         for (const extraClass of extraClasses || []) {
             if (extraClass) {

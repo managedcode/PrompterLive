@@ -4,7 +4,7 @@ author: "Nina Park"
 profile: "Actor"
 base_wpm: 148
 version: "1.0"
-display_duration: "7:10"
+duration: "7:10"
 display_word_count: 980
 display_segment_count: 4
 display_wpm: 148

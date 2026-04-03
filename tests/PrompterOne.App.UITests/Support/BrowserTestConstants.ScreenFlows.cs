@@ -65,10 +65,10 @@ internal static partial class BrowserTestConstants
         public const string FastWord = "Full";
         public const string FontScaleAfterIncrease = "40";
         public const string NeutralWord = "Good";
-        public const string ProductLaunchGreenWord = "transformative";
+        public const string ProductLaunchProfessionalWord = "transformative";
         public const string ProductLaunchHighlightWord = "solution";
         public const string WidthAfterChange = "900";
-        public const string ProductLaunchPurpleWord = "focus";
+        public const string ProductLaunchRhetoricalWord = "focus";
         public const string ProductLaunchSlowWord = "elephant";
         public const string ProductLaunchTeleprompterWord = "teleprompter";
         public const string ProductLaunchTeleprompterPronunciation = "TELE-promp-ter";
@@ -76,7 +76,7 @@ internal static partial class BrowserTestConstants
         public const string ProductLaunchUrgentWord = "time";
         public const string ProductLaunchVisionPronunciation = "ˈviʒən";
         public const string ProductLaunchVisionWord = "vision";
-        public const string ProductLaunchWarmWord = "Let";
+        public const string ProductLaunchSoftWord = "Let";
         public const string SpeedOffsetsFastWord = "flight.";
         public const string SpeedOffsetsFastWpm = "154";
         public const string SpeedOffsetsNormalWord = "center";

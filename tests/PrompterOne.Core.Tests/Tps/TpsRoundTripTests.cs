@@ -95,6 +95,30 @@ public sealed class TpsRoundTripTests
     }
 
     [Fact]
+    public async Task CompileAsync_PreservesRelativeSpeedWhenClosingTagIsFollowedByPunctuation()
+    {
+        var compiled = await CompileAsync(
+            """
+            ---
+            title: "Speed punctuation"
+            base_wpm: 140
+            speed_offsets:
+              fast: 10
+            ---
+
+            ## [Signal|neutral]
+
+            ### [Reader Block]
+
+            [fast]flight[/fast].
+            """);
+
+        var flight = FlattenWords(compiled).Single(word => string.Equals(word.CleanText, "flight.", StringComparison.Ordinal));
+
+        Assert.Equal(1.1f, flight.Metadata.SpeedMultiplier);
+    }
+
+    [Fact]
     public async Task ParseAsync_UsesLastHeaderParameterAndFallsBackFromInvalidValues()
     {
         var parser = new TpsParser();

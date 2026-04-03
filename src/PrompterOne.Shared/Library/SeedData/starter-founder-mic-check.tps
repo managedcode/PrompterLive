@@ -4,7 +4,7 @@ author: "Owen Brooks"
 profile: "Host"
 base_wpm: 144
 version: "1.0"
-display_duration: "4:45"
+duration: "4:45"
 display_word_count: 690
 display_segment_count: 3
 display_wpm: 144

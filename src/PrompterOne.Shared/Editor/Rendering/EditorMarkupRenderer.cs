@@ -10,22 +10,6 @@ public static class EditorMarkupRenderer
     private static readonly Regex TagRegex = new(@"\[[^\[\]]+\]", RegexOptions.Compiled);
     private static readonly Regex NumericWpmRegex = new(@"^(?<wpm>\d+)\s*WPM$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    private static readonly IReadOnlyDictionary<string, string> ColorClasses = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-    {
-        ["red"] = "mk-color-red",
-        ["green"] = "mk-color-green",
-        ["blue"] = "mk-color-blue",
-        ["yellow"] = "mk-color-yellow",
-        ["orange"] = "mk-color-orange",
-        ["purple"] = "mk-color-purple",
-        ["cyan"] = "mk-color-cyan",
-        ["magenta"] = "mk-color-magenta",
-        ["pink"] = "mk-color-pink",
-        ["teal"] = "mk-color-teal",
-        ["white"] = "mk-color-white",
-        ["gray"] = "mk-color-gray"
-    };
-
     private static readonly IReadOnlyDictionary<string, string> EmotionClasses = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
         ["warm"] = "mk-emo-warm",
@@ -42,6 +26,21 @@ public static class EditorMarkupRenderer
         ["professional"] = "mk-emo-professional"
     };
 
+    private static readonly IReadOnlyDictionary<string, string> VolumeClasses = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["loud"] = "mk-vol-loud",
+        ["soft"] = "mk-vol-soft",
+        ["whisper"] = "mk-vol-whisper"
+    };
+
+    private static readonly IReadOnlyDictionary<string, string> DeliveryClasses = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["aside"] = "mk-del-aside",
+        ["rhetorical"] = "mk-del-rhetorical",
+        ["sarcasm"] = "mk-del-sarcasm",
+        ["building"] = "mk-del-building"
+    };
+
     private static readonly IReadOnlyDictionary<string, string?> SpeedClasses = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
     {
         ["xslow"] = "mk-xslow",
@@ -55,7 +54,7 @@ public static class EditorMarkupRenderer
     {
         if (string.IsNullOrWhiteSpace(content))
         {
-            return (MarkupString)"<span class=\"mk-color-gray\">Add script content here.</span>";
+            return (MarkupString)"<span class=\"mk-muted\">Add script content here.</span>";
         }
 
         var renderer = new Renderer();
@@ -189,6 +188,12 @@ public static class EditorMarkupRenderer
                 return;
             }
 
+            if (string.Equals(name, "breath", StringComparison.OrdinalIgnoreCase))
+            {
+                AppendStandalone("mk-breath", rawTag);
+                return;
+            }
+
             if (string.Equals(name, "edit_point", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(name, "editpoint", StringComparison.OrdinalIgnoreCase))
             {
@@ -220,6 +225,13 @@ public static class EditorMarkupRenderer
                 return;
             }
 
+            if (string.Equals(name, "stress", StringComparison.OrdinalIgnoreCase))
+            {
+                AppendTag(rawTag);
+                PushScope(name, ScopeKind.Style, CurrentState with { IsStress = true });
+                return;
+            }
+
             if (SpeedClasses.TryGetValue(name, out var speedClass))
             {
                 AppendTag(rawTag);
@@ -227,10 +239,17 @@ public static class EditorMarkupRenderer
                 return;
             }
 
-            if (ColorClasses.TryGetValue(name, out var colorClass))
+            if (VolumeClasses.TryGetValue(name, out var volumeClass))
             {
                 AppendTag(rawTag);
-                PushScope(name, ScopeKind.Style, CurrentState with { ColorClass = colorClass });
+                PushScope(name, ScopeKind.Style, CurrentState with { VolumeClass = volumeClass });
+                return;
+            }
+
+            if (DeliveryClasses.TryGetValue(name, out var deliveryClass))
+            {
+                AppendTag(rawTag);
+                PushScope(name, ScopeKind.Style, CurrentState with { DeliveryClass = deliveryClass });
                 return;
             }
 
@@ -375,17 +394,19 @@ public static class EditorMarkupRenderer
     }
 
     private sealed record RenderState(
-        string? ColorClass,
         string? EmotionClass,
+        string? VolumeClass,
+        string? DeliveryClass,
         string? SpeedClass,
         bool IsEmphasis,
-        bool IsHighlighted)
+        bool IsHighlighted,
+        bool IsStress)
     {
-        public static readonly RenderState Default = new(null, null, null, false, false);
+        public static readonly RenderState Default = new(null, null, null, null, false, false, false);
 
         public string BuildCssClass(params string[] extraClasses)
         {
-            var classes = new List<string>(6);
+            var classes = new List<string>(8);
 
             if (IsEmphasis)
             {
@@ -397,14 +418,24 @@ public static class EditorMarkupRenderer
                 classes.Add("mk-hl");
             }
 
-            if (!string.IsNullOrWhiteSpace(ColorClass))
+            if (IsStress)
             {
-                classes.Add(ColorClass);
+                classes.Add("mk-stress");
             }
 
             if (!string.IsNullOrWhiteSpace(EmotionClass))
             {
                 classes.Add(EmotionClass);
+            }
+
+            if (!string.IsNullOrWhiteSpace(VolumeClass))
+            {
+                classes.Add(VolumeClass);
+            }
+
+            if (!string.IsNullOrWhiteSpace(DeliveryClass))
+            {
+                classes.Add(DeliveryClass);
             }
 
             if (!string.IsNullOrWhiteSpace(SpeedClass))

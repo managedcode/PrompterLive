@@ -34,6 +34,7 @@
 - Do not add server-only dependencies.
 - Keep keyboard shortcuts, screen ids/selectors, and reusable UI constants in Blazor/C# contracts when possible; leave JS only with unavoidable browser API interop and direct DOM work that Blazor cannot replace cleanly.
 - Prefer removing JS files that only orchestrate UI behavior, reader state, or shell interactions; keep those flows in Razor components or C# services and let JS expose only the minimal browser or SDK call surface.
+- TPS 1.1.0 removed legacy inline color tags, so editor, reader, menus, examples, and tests in this project must not expose or insert `[red]`, `[green]`, or other deprecated color-tag authoring paths.
 
 ## Project-Local Commands
 

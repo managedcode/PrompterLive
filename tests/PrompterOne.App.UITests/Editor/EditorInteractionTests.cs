@@ -279,11 +279,22 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
             await page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.PauseFragment)));
 
+            await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
+                """
+                element => {
+                    element.focus();
+                    const position = element.value.length;
+                    element.setSelectionRange(position, position);
+                    element.dispatchEvent(new Event("select", { bubbles: true }));
+                    element.dispatchEvent(new Event("keyup", { bubbles: true }));
+                }
+                """);
+
             await page.GetByTestId(UiTestIds.Editor.InsertTrigger).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.MenuInsert)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Editor.InsertBlockMenu).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
-                new Regex(@"### \[Block Name\|140WPM\]"));
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureBlockToken)));
 
             await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
@@ -364,13 +375,13 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
             await Expect(page.GetByTestId(UiTestIds.Editor.MenuColor)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Editor.ColorGreen).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(
-                new Regex(Regex.Escape(BrowserTestConstants.Editor.GreenFragment)));
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.LoudFragment)));
 
             await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """
                 element => {
                     const text = element.value;
-                    const target = "[green]welcome[/green]";
+                    const target = "[loud]welcome[/loud]";
                     const start = text.indexOf(target);
                     element.focus();
                     element.setSelectionRange(start, start + target.length);
@@ -382,7 +393,7 @@ public sealed class EditorInteractionTests(StandaloneAppFixture fixture) : IClas
             await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
             await page.GetByTestId(UiTestIds.Editor.ColorClear).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).Not.ToHaveValueAsync(
-                new Regex(Regex.Escape(BrowserTestConstants.Editor.GreenFragment)));
+                new Regex(Regex.Escape(BrowserTestConstants.Editor.LoudFragment)));
 
             await page.GetByTestId(UiTestIds.Editor.SourceInput).EvaluateAsync(
                 """

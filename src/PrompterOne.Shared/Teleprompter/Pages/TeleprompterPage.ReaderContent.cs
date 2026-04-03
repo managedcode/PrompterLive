@@ -270,16 +270,32 @@ public partial class TeleprompterPage
 
         var classes = new List<string>();
 
-        var colorClass = ResolveColorClass(metadata.Color, TpsClassPrefix);
-        if (!string.IsNullOrWhiteSpace(colorClass))
+        if (metadata.IsHighlight)
         {
-            classes.Add(colorClass);
+            classes.Add($"{TpsClassPrefix}-highlight");
         }
 
         var emotionClass = ResolveEmotionWordClass(metadata.InlineEmotionHint, TpsClassPrefix);
         if (!string.IsNullOrWhiteSpace(emotionClass))
         {
             classes.Add(emotionClass);
+        }
+
+        var volumeClass = ResolveSemanticWordClass(metadata.VolumeLevel, TpsClassPrefix);
+        if (!string.IsNullOrWhiteSpace(volumeClass))
+        {
+            classes.Add(volumeClass);
+        }
+
+        var deliveryClass = ResolveSemanticWordClass(metadata.DeliveryMode, TpsClassPrefix);
+        if (!string.IsNullOrWhiteSpace(deliveryClass))
+        {
+            classes.Add(deliveryClass);
+        }
+
+        if (!string.IsNullOrWhiteSpace(metadata.StressText) || !string.IsNullOrWhiteSpace(metadata.StressGuide))
+        {
+            classes.Add($"{TpsClassPrefix}-stress");
         }
 
         var effectiveWpm = ResolveEffectiveWpm(metadata, targetWpm);
@@ -366,31 +382,14 @@ public partial class TeleprompterPage
         };
     }
 
-    private static string ResolveColorClass(string? color, string prefix)
+    private static string ResolveSemanticWordClass(string? value, string prefix)
     {
-        if (string.IsNullOrWhiteSpace(color))
+        if (string.IsNullOrWhiteSpace(value))
         {
             return string.Empty;
         }
 
-        return color.Trim().ToLowerInvariant() switch
-        {
-            "#ff5252" or "red" => $"{prefix}-red",
-            "#4caf50" or "green" => $"{prefix}-green",
-            "#2196f3" or "blue" => $"{prefix}-blue",
-            "#ffd700" or "yellow" => $"{prefix}-yellow",
-            "#ff9800" or "orange" => $"{prefix}-orange",
-            "#9c27b0" or "purple" => $"{prefix}-purple",
-            "#00bcd4" or "cyan" => $"{prefix}-cyan",
-            "#ff00ff" or "magenta" => $"{prefix}-magenta",
-            "#ec4899" or "pink" => $"{prefix}-pink",
-            "#14b8a6" or "teal" => $"{prefix}-teal",
-            "#ffffff" or "white" => $"{prefix}-white",
-            "#111827" or "black" => $"{prefix}-gray",
-            "#6b7280" or "gray" => $"{prefix}-gray",
-            "#ffeb3b" or "highlight" => $"{prefix}-highlight",
-            _ => string.Empty
-        };
+        return $"{prefix}-{value.Trim().ToLowerInvariant()}";
     }
 
     private static string ResolveEmotionWordClass(string? emotion, string prefix)

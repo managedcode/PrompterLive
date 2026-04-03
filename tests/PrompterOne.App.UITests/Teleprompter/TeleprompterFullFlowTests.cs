@@ -108,22 +108,22 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
     private static async Task AssertProductLaunchTpsRenderingAsync(Microsoft.Playwright.IPage page)
     {
         var neutralWord = await GetWordProbeAsync(page, OpeningCardIndex, BrowserTestConstants.TeleprompterFlow.NeutralWord);
-        var greenWord = await GetWordProbeAsync(page, OpeningCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchGreenWord);
+        var professionalWord = await GetWordProbeAsync(page, OpeningCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchProfessionalWord);
         var highlightWord = await GetWordProbeAsync(page, PurposeCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchHighlightWord);
         var slowWord = await GetWordProbeAsync(page, StatisticsCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchSlowWord);
         var fastWord = await GetWordProbeAsync(page, BenefitsCardIndex, BrowserTestConstants.TeleprompterFlow.FastWord);
-        var warmWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchWarmWord);
+        var softWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchSoftWord);
         var urgentWord = await GetWordProbeAsync(page, ClosingCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchUrgentWord);
         var visionWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionWord);
-        var purpleWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchPurpleWord);
+        var rhetoricalWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchRhetoricalWord);
         var teleprompterWord = await GetWordProbeAsync(page, ClosingCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWord);
 
         Assert.DoesNotContain("tps-neutral", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-warm", neutralWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-focused", neutralWord.Classes, StringComparison.Ordinal);
 
-        Assert.Contains("tps-green", greenWord.Classes, StringComparison.Ordinal);
-        Assert.DoesNotContain("tps-warm", greenWord.Classes, StringComparison.Ordinal);
+        Assert.Contains("tps-professional", professionalWord.Classes, StringComparison.Ordinal);
+        Assert.DoesNotContain("tps-warm", professionalWord.Classes, StringComparison.Ordinal);
 
         Assert.Contains("tps-highlight", highlightWord.Classes, StringComparison.Ordinal);
         Assert.Contains(ReaderNextCardCssClass, highlightWord.CardClasses, StringComparison.Ordinal);
@@ -131,11 +131,11 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
 
         Assert.Contains("tps-xslow", slowWord.Classes, StringComparison.Ordinal);
         Assert.Contains("tps-xfast", fastWord.Classes, StringComparison.Ordinal);
-        Assert.Contains("tps-warm", warmWord.Classes, StringComparison.Ordinal);
-        Assert.DoesNotContain("tps-motivational", warmWord.Classes, StringComparison.Ordinal);
+        Assert.Contains("tps-soft", softWord.Classes, StringComparison.Ordinal);
+        Assert.DoesNotContain("tps-motivational", softWord.Classes, StringComparison.Ordinal);
         Assert.Contains("tps-urgent", urgentWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-energetic", urgentWord.Classes, StringComparison.Ordinal);
-        Assert.Contains("tps-purple", purpleWord.Classes, StringComparison.Ordinal);
+        Assert.Contains("tps-rhetorical", rhetoricalWord.Classes, StringComparison.Ordinal);
         Assert.DoesNotContain("tps-energetic", teleprompterWord.Classes, StringComparison.Ordinal);
 
         Assert.Equal(BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionPronunciation, visionWord.Pronunciation);
@@ -152,8 +152,8 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
             StringComparison.Ordinal);
 
         Assert.True(ParseMilliseconds(slowWord.DurationMs) > ParseMilliseconds(fastWord.DurationMs));
-        Assert.NotEqual(neutralWord.Color, greenWord.Color);
-        Assert.NotEqual(neutralWord.Color, warmWord.Color);
+        Assert.NotEqual(neutralWord.Color, professionalWord.Color);
+        Assert.NotEqual(neutralWord.Color, softWord.Color);
         Assert.NotEqual(neutralWord.Color, urgentWord.Color);
         Assert.True(ParsePixels(slowWord.LetterSpacing) > ParsePixels(neutralWord.LetterSpacing));
         Assert.True(ParsePixels(fastWord.LetterSpacing) < ParsePixels(neutralWord.LetterSpacing));

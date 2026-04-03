@@ -298,7 +298,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
-    public void EditorPage_ColorMenuIncludesClearAction()
+    public void EditorPage_VoiceMenuIncludesInlineResetAction()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);

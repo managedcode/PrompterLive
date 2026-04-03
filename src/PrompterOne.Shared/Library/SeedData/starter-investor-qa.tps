@@ -4,7 +4,7 @@ author: "Sam Rivera"
 profile: "Actor"
 base_wpm: 142
 version: "1.0"
-display_duration: "8:40"
+duration: "8:40"
 display_word_count: 1120
 display_segment_count: 5
 display_wpm: 142
@@ -37,7 +37,7 @@ We are investing where product speed and customer retention reinforce each other
 The most common question is pace. /
 Our answer is deliberate expansion with measurable returns. //
 
-## [Close|138WPM|confident]
+## [Close|138WPM|professional]
 
 ### [Closing Block|138WPM]
 

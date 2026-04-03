@@ -177,7 +177,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
                 element.value = value;
                 element.dispatchEvent(new Event("input", { bubbles: true }));
 
-                const target = "[green]Alpha[/green]";
+                const target = "[loud]Alpha[/loud]";
                 const start = element.value.indexOf(target);
                 element.setSelectionRange(start, start + target.length);
                 element.dispatchEvent(new Event("select", { bubbles: true }));
@@ -205,7 +205,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
     private static class BrowserTestSource
     {
         internal const string AlphaToken = "Alpha";
-        internal const string ColoredAlphaToken = "[green]Alpha[/green]";
+        internal const string ColoredAlphaToken = "[loud]Alpha[/loud]";
         internal const string AlphaSource = """
             ## [Intro|140WPM|warm]
             ### [Opening Block|140WPM]
@@ -214,7 +214,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
         internal const string ColoredSource = """
             ## [Intro|140WPM|warm]
             ### [Opening Block|140WPM]
-            [green]Alpha[/green]
+            [loud]Alpha[/loud]
             """;
     }
 }

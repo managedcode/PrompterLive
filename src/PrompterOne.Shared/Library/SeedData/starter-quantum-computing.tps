@@ -4,7 +4,7 @@ author: "You"
 profile: "RSVP"
 base_wpm: 300
 version: "1.0"
-display_duration: "25:00"
+duration: "25:00"
 display_word_count: 7500
 display_segment_count: 8
 display_wpm: 300

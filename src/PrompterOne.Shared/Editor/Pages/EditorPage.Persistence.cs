@@ -142,7 +142,7 @@ public partial class EditorPage
     {
         try
         {
-            await Task.Delay(DraftAnalysisDelayMilliseconds, cancellationToken);
+            await Task.Delay(GetDraftAnalysisDelayMilliseconds(), cancellationToken);
             await InvokeAsync(() =>
             {
                 _skipNextRenderFromTyping = false;
@@ -186,9 +186,16 @@ public partial class EditorPage
     }
 
     private int GetAutosaveDelayMilliseconds() =>
-        string.IsNullOrWhiteSpace(SessionService.State.ScriptId)
-            ? UntitledDraftAutosaveDelayMilliseconds
-            : AutosaveDelayMilliseconds;
+        IsLargeDraft()
+            ? LargeDraftAutosaveDelayMilliseconds
+            : string.IsNullOrWhiteSpace(SessionService.State.ScriptId)
+                ? UntitledDraftAutosaveDelayMilliseconds
+                : AutosaveDelayMilliseconds;
+
+    private int GetDraftAnalysisDelayMilliseconds() =>
+        IsLargeDraft()
+            ? LargeDraftAnalysisDelayMilliseconds
+            : DraftAnalysisDelayMilliseconds;
 
     private bool ShouldQueueAutosave()
     {
@@ -199,4 +206,7 @@ public partial class EditorPage
 
         return _sourceText.Trim().Length >= UntitledDraftAutosaveCharacterThreshold;
     }
+
+    private bool IsLargeDraft() =>
+        _sourceText.Length >= LargeDraftDebounceThreshold;
 }

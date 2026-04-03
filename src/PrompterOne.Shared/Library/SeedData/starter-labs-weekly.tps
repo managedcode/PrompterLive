@@ -4,7 +4,7 @@ author: "Iris Novak"
 profile: "Actor"
 base_wpm: 149
 version: "1.0"
-display_duration: "7:25"
+duration: "7:25"
 display_word_count: 1010
 display_segment_count: 4
 display_wpm: 149

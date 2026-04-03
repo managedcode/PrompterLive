@@ -8,8 +8,24 @@ namespace PrompterOne.Shared.Rendering;
 public static class TpsSourceHighlighter
 {
     private static readonly Regex BlockHeaderRegex = new(@"^(?<hash>###)\s+\[(?<content>.+)\]\s*$", RegexOptions.Compiled);
-    private static readonly Regex FrontMatterEntryRegex = new(@"^(?<key>[A-Za-z0-9_]+):\s*(?<value>.+)$", RegexOptions.Compiled);
+    private static readonly Regex FrontMatterEntryRegex = new(@"^(?<indent>\s*)(?<key>[A-Za-z0-9_]+):\s*(?<value>.*)$", RegexOptions.Compiled);
+    private static readonly Regex HeaderWpmRegex = new(@"^\d+\s*WPM$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex SegmentHeaderRegex = new(@"^(?<hash>##)\s+\[(?<content>.+)\]\s*$", RegexOptions.Compiled);
+    private static readonly HashSet<string> EmotionTokens =
+    [
+        "neutral",
+        "warm",
+        "professional",
+        "focused",
+        "concerned",
+        "urgent",
+        "motivational",
+        "excited",
+        "happy",
+        "sad",
+        "calm",
+        "energetic"
+    ];
 
     public static MarkupString Render(string? text)
     {
@@ -59,10 +75,11 @@ public static class TpsSourceHighlighter
         return WrapLine(
             "ed-src-line ed-src-line-frontmatter",
             string.Concat(
+                WebUtility.HtmlEncode(match.Groups["indent"].Value),
                 "<span class=\"ed-src-frontmatter-key\">",
                 WebUtility.HtmlEncode(match.Groups["key"].Value),
                 "</span>: <span class=\"ed-src-frontmatter-value\">",
-                WebUtility.HtmlEncode(match.Groups["value"].Value),
+                EncodeOrSpace(match.Groups["value"].Value),
                 "</span>"));
     }
 
@@ -105,13 +122,7 @@ public static class TpsSourceHighlighter
                 builder.Append("<span class=\"h-sep\">|</span>");
             }
 
-            var cssClass = index switch
-            {
-                0 => "h-name",
-                1 => "h-wpm",
-                2 => "h-emo",
-                _ => isSegment ? "h-wpm" : "h-emo"
-            };
+            var cssClass = ResolveHeaderPartCssClass(parts[index], index, isSegment);
 
             builder.Append("<span class=\"")
                 .Append(cssClass)
@@ -122,6 +133,36 @@ public static class TpsSourceHighlighter
 
         builder.Append("<span class=\"h-br\">]</span>");
         return builder.ToString();
+    }
+
+    private static string ResolveHeaderPartCssClass(string part, int index, bool isSegment)
+    {
+        if (index == 0)
+        {
+            return "h-name";
+        }
+
+        if (part.StartsWith("Speaker:", StringComparison.OrdinalIgnoreCase))
+        {
+            return "h-speaker";
+        }
+
+        if (HeaderWpmRegex.IsMatch(part))
+        {
+            return "h-wpm";
+        }
+
+        if (EmotionTokens.Contains(part))
+        {
+            return "h-emo";
+        }
+
+        if (isSegment && part.Contains('-', StringComparison.Ordinal) && part.Contains(':', StringComparison.Ordinal))
+        {
+            return "h-timing";
+        }
+
+        return "h-meta";
     }
 
     private static string EncodeOrSpace(string line) =>
