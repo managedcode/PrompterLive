@@ -2,6 +2,10 @@
 /* Phone-width and low-height teleprompter layout compaction. */
 
 @media (max-width: 430px) {
+    .rd-progress-shell {
+        display: none;
+    }
+
     .rd-controls {
         left: 12px;
         right: 12px;
@@ -59,6 +63,10 @@
 }
 
 @media (max-height: 430px) {
+    .rd-progress-shell {
+        display: none;
+    }
+
     .rd-back {
         top: 12px;
         left: 12px;

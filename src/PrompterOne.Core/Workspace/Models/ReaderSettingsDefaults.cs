@@ -8,6 +8,7 @@ public static class ReaderSettingsDefaults
     public const double ScrollSpeed = 1.0;
     public const bool MirrorText = false;
     public const bool MirrorVertical = false;
+    public const ReaderTextOrientation TextOrientation = ReaderTextOrientation.Landscape;
     public const bool ShowFocusLine = true;
     public const bool ShowProgress = true;
     public const bool ShowCameraScene = false;

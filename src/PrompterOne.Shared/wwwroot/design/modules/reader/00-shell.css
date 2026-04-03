@@ -169,6 +169,9 @@
     height: 100%;
     --rd-font-size: 36px;
 }
+.rd-cluster-wrap[data-reader-orientation='portrait'] {
+    max-width: min(70vh, 780px);
+}
 
 /* Clusters */
 .rd-cluster {

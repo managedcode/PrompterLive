@@ -45,6 +45,17 @@ internal static partial class BrowserTestConstants
         public const double ControlsMinimumOpacity = 0.9;
         public const string MirrorScenarioName = "teleprompter-mirror-controls";
         public const string MirrorStep = "01-mirror-controls";
+        public const string OrientationPortraitValue = "portrait";
+        public const string OrientationLandscapeValue = "landscape";
+        public const string FullscreenScenarioName = "teleprompter-fullscreen";
+        public const string FullscreenStep = "01-fullscreen-active";
+        public const string FullscreenStateScript = "() => Boolean(document.fullscreenElement)";
+        public const string FullscreenInactiveStateScript = "() => !document.fullscreenElement";
+        public const string ProgressScenarioName = "teleprompter-segmented-progress";
+        public const string ProgressStep = "01-block-progress";
+        public const string ProgressEmptyStylePattern = @"width:\s*0%";
+        public const string ProgressFilledStylePattern = @"width:\s*100%";
+        public const string ReaderOrientationAttribute = "data-reader-orientation";
         public const string MirrorHorizontalTransform = "scaleX(-1)";
         public const string MirrorVerticalTransform = "scaleY(-1)";
         public const string OpeningBlock = "Opening Block";

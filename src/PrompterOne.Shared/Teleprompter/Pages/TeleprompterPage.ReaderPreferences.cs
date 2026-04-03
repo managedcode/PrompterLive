@@ -13,7 +13,8 @@ public partial class TeleprompterPage
             TextWidth = BuildReaderTextWidthRatio(_readerTextWidth),
             FocalPointPercent = _readerFocalPointPercent,
             MirrorText = _isReaderMirrorHorizontal,
-            MirrorVertical = _isReaderMirrorVertical
+            MirrorVertical = _isReaderMirrorVertical,
+            TextOrientation = _readerTextOrientation
         });
     }
 

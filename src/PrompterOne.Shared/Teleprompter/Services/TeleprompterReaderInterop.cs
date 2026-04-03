@@ -19,4 +19,14 @@ public sealed class TeleprompterReaderInterop(IJSRuntime jsRuntime)
             targetWordId,
             focalPointPercent,
             neutralizeCard);
+
+    public ValueTask<bool> ToggleFullscreenAsync(string elementId) =>
+        _jsRuntime.InvokeAsync<bool>(
+            TeleprompterReaderInteropMethodNames.ToggleFullscreen,
+            elementId);
+
+    public ValueTask<bool> IsFullscreenActiveAsync(string elementId) =>
+        _jsRuntime.InvokeAsync<bool>(
+            TeleprompterReaderInteropMethodNames.IsFullscreenActive,
+            elementId);
 }

@@ -13,7 +13,10 @@ public partial class TeleprompterPage : IAsyncDisposable
         switch (key)
         {
             case UiKeyboardKeys.Escape:
-                await NavigateBackToEditorAsync();
+                if (!await ExitReaderFullscreenIfActiveAsync())
+                {
+                    await NavigateBackToEditorAsync();
+                }
                 break;
             case UiKeyboardKeys.Space:
                 await ToggleReaderPlaybackAsync();

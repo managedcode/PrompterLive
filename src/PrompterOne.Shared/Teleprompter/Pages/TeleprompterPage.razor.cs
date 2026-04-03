@@ -26,6 +26,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderFontStep = 4;
     private const int ReaderForwardStep = 1;
     private const int ReaderGuideActiveDurationMilliseconds = 800;
+    private const string ReaderFullscreenTitle = "Toggle fullscreen";
     private const string ReaderMirrorHorizontalLabel = "H";
     private const string ReaderMirrorHorizontalTitle = "Mirror horizontally";
     private const int ReaderMaxFontSize = 56;
@@ -34,6 +35,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderMinFontSize = 24;
     private const int ReaderMinTextWidth = 400;
     private const int ReaderMinFocalPointPercent = 15;
+    private const string ReaderOrientationTitle = "Rotate text";
     private const string ReaderMirrorVerticalLabel = "V";
     private const string ReaderMirrorVerticalTitle = "Mirror vertically";
     private const int DefaultReaderTextWidth = ReaderMaxTextWidth;
@@ -65,6 +67,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private bool _areWidthGuidesActive;
     private bool _focusScreenAfterRender = true;
     private bool _isReaderGradientTransitionDisabled = true;
+    private bool _isReaderFullscreenActive;
     private bool _isReaderMirrorHorizontal;
     private bool _isReaderMirrorVertical;
     private bool _isFocalGuideActive;
@@ -77,6 +80,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private int _readerFontSize = DefaultReaderFontSize;
     private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
     private int _readerTextWidth = DefaultReaderTextWidth;
+    private ReaderTextOrientation _readerTextOrientation = ReaderSettingsDefaults.TextOrientation;
     private int _totalDurationMilliseconds = 1000;
     private int _totalSeconds = 1;
     private int? _countdownValue;
@@ -173,10 +177,12 @@ public partial class TeleprompterPage : IAsyncDisposable
         _isReaderMirrorHorizontal = SessionService.State.ReaderSettings.MirrorText;
         _isReaderMirrorVertical = SessionService.State.ReaderSettings.MirrorVertical;
         _readerTextWidth = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
+        _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
         _activeReaderCardIndex = 0;
         _activeReaderWordIndex = -1;
         _isReaderPlaying = false;
         _isReaderCountdownActive = false;
+        _isReaderFullscreenActive = false;
         _countdownValue = null;
         _totalDurationMilliseconds = Math.Max(1000, _cards.Sum(card => card.DurationMilliseconds));
         _totalSeconds = Math.Max(1, (int)Math.Ceiling(_totalDurationMilliseconds / 1000d));

@@ -1,4 +1,5 @@
 using System.Globalization;
+using PrompterOne.Core.Models.Workspace;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -21,6 +22,9 @@ public partial class TeleprompterPage
     private const string ReaderHorizontalGuideCssClass = "rd-guide-h";
     private const string ReaderMirrorButtonCssClass = "rd-mirror-btn";
     private const string ReaderMirrorHorizontalTransform = "scaleX(-1)";
+    private const string ReaderOrientationLandscapeValue = "landscape";
+    private const string ReaderOrientationPortraitTransform = "rotate(90deg)";
+    private const string ReaderOrientationPortraitValue = "portrait";
     private const string ReaderMirrorTransformOrigin = "center center";
     private const string ReaderMirrorVerticalTransform = "scaleY(-1)";
     private const string ReaderVerticalGuideCssClass = "rd-guide-v";
@@ -88,6 +92,12 @@ public partial class TeleprompterPage
     private static string BuildReaderMirrorButtonCssClass(bool isActive) =>
         BuildClassList(ReaderControlButtonCssClass, ReaderMirrorButtonCssClass, isActive ? ActiveCssClass : null);
 
+    private string BuildReaderFullscreenButtonCssClass() =>
+        BuildReaderMirrorButtonCssClass(_isReaderFullscreenActive);
+
+    private string BuildReaderOrientationButtonCssClass() =>
+        BuildReaderMirrorButtonCssClass(_readerTextOrientation == ReaderTextOrientation.Portrait);
+
     private string BuildCountdownCssClass() =>
         BuildClassList(ReaderCountdownCssClass, _isReaderCountdownActive ? ActiveCssClass : null);
 
@@ -119,20 +129,25 @@ public partial class TeleprompterPage
             $"max-width:{_readerTextWidth.ToString(CultureInfo.InvariantCulture)}px",
             $"--rd-font-size:{_readerFontSize.ToString(CultureInfo.InvariantCulture)}px"
         };
-        var mirrorTransform = BuildReaderMirrorTransform();
+        var readerTransform = BuildReaderTransform();
 
-        if (!string.IsNullOrWhiteSpace(mirrorTransform))
+        if (!string.IsNullOrWhiteSpace(readerTransform))
         {
             styleParts.Add($"transform-origin:{ReaderMirrorTransformOrigin}");
-            styleParts.Add($"transform:{mirrorTransform}");
+            styleParts.Add($"transform:{readerTransform}");
         }
 
         return string.Join(';', styleParts) + ';';
     }
 
-    private string BuildReaderMirrorTransform()
+    private string BuildReaderTransform()
     {
         var transforms = new List<string>();
+
+        if (_readerTextOrientation == ReaderTextOrientation.Portrait)
+        {
+            transforms.Add(ReaderOrientationPortraitTransform);
+        }
 
         if (_isReaderMirrorHorizontal)
         {
@@ -146,6 +161,11 @@ public partial class TeleprompterPage
 
         return string.Join(' ', transforms);
     }
+
+    private string BuildReaderOrientationDataAttribute() =>
+        _readerTextOrientation == ReaderTextOrientation.Portrait
+            ? ReaderOrientationPortraitValue
+            : ReaderOrientationLandscapeValue;
 
     private string BuildReaderCardCssClass(int index)
     {
@@ -218,6 +238,17 @@ public partial class TeleprompterPage
         return $"width:{card.WidthPercentString};opacity:{opacity};background:{card.EdgeColor};";
     }
 
+    private string BuildReaderProgressLabel() =>
+        _cards.Count == 0
+            ? "0%"
+            : $"{BuildProgressPercent():0}% · {_activeReaderCardIndex + 1} / {_cards.Count}";
+
+    private static string BuildReaderProgressSegmentStyle(ReaderCardViewModel card) =>
+        $"flex:0 0 {card.WidthPercentString};";
+
+    private string BuildReaderProgressSegmentFillStyle(int index) =>
+        $"width:{BuildReaderCardProgressPercent(index):0.##}%;";
+
     private string BuildReaderProgressStyle() => $"width:{_readerProgressFillWidth};";
 
     private string BuildElapsedLabel() => _elapsedLabel;
@@ -237,6 +268,33 @@ public partial class TeleprompterPage
             .Sum(GetCardWordCount);
         var wordsInCurrentCard = Math.Max(0, _activeReaderWordIndex);
         return (wordsBeforeCard + wordsInCurrentCard) * 100d / totalWords;
+    }
+
+    private double BuildReaderCardProgressPercent(int cardIndex)
+    {
+        if (cardIndex < 0 || cardIndex >= _cards.Count)
+        {
+            return 0;
+        }
+
+        if (cardIndex < _activeReaderCardIndex)
+        {
+            return 100;
+        }
+
+        if (cardIndex > _activeReaderCardIndex)
+        {
+            return 0;
+        }
+
+        var wordCount = GetCardWordCount(_cards[cardIndex]);
+        if (wordCount <= 0)
+        {
+            return 0;
+        }
+
+        var completedWordCount = Math.Clamp(_activeReaderWordIndex, 0, wordCount);
+        return completedWordCount * 100d / wordCount;
     }
 
     private int GetElapsedMilliseconds()

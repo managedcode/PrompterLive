@@ -44,6 +44,28 @@
                         data-testid="@UiTestIds.Teleprompter.MirrorVerticalToggle">
                     @ReaderMirrorVerticalLabel
                 </button>
+                <button class="@BuildReaderOrientationButtonCssClass()"
+                        @onclick="ToggleReaderOrientationAsync"
+                        title="@ReaderOrientationTitle"
+                        data-testid="@UiTestIds.Teleprompter.OrientationToggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M7 3H3v4"></path>
+                        <path d="M3 7a9 9 0 0 1 14.3-3.6"></path>
+                        <path d="M17 21h4v-4"></path>
+                        <path d="M21 17a9 9 0 0 1-14.3 3.6"></path>
+                    </svg>
+                </button>
+                <button class="@BuildReaderFullscreenButtonCssClass()"
+                        @onclick="ToggleReaderFullscreenAsync"
+                        title="@ReaderFullscreenTitle"
+                        data-testid="@UiTestIds.Teleprompter.FullscreenToggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polyline points="8,3 3,3 3,8"></polyline>
+                        <polyline points="16,3 21,3 21,8"></polyline>
+                        <polyline points="3,16 3,21 8,21"></polyline>
+                        <polyline points="16,21 21,21 21,16"></polyline>
+                    </svg>
+                </button>
             </div>
 
             <div class="rd-sliders" data-testid="@UiTestIds.Teleprompter.Sliders">
@@ -92,6 +114,7 @@
 
                 <div class="rd-cluster-wrap"
                      id="@UiDomIds.Teleprompter.ClusterWrap"
+                     data-reader-orientation="@BuildReaderOrientationDataAttribute()"
                      data-testid="@UiTestIds.Teleprompter.ClusterWrap"
                      style="@BuildClusterWrapStyle()">
                     @foreach (var entry in _cards.Select((card, index) => (card, index)))
@@ -173,6 +196,23 @@
                       id="@UiDomIds.Teleprompter.Time"
                       data-total-seconds="@_totalSeconds"
                       data-total-ms="@_totalDurationMilliseconds">@BuildElapsedLabel()</span>
+            </div>
+
+            <div class="rd-progress-shell" data-testid="@UiTestIds.Teleprompter.Progress">
+                <div class="rd-progress-meta">
+                    <span class="rd-progress-title">@BuildBlockIndicatorLabel()</span>
+                    <span class="rd-progress-label" data-testid="@UiTestIds.Teleprompter.ProgressLabel">@BuildReaderProgressLabel()</span>
+                </div>
+                <div class="rd-progress-track" data-testid="@UiTestIds.Teleprompter.ProgressSegments">
+                    @foreach (var entry in _cards.Select((card, index) => (card, index)))
+                    {
+                        <div class="rd-progress-segment" style="@BuildReaderProgressSegmentStyle(entry.card)">
+                            <div class="rd-progress-segment-fill"
+                                 data-testid="@UiTestIds.Teleprompter.ProgressSegmentFill(entry.index)"
+                                 style="@BuildReaderProgressSegmentFillStyle(entry.index)"></div>
+                        </div>
+                    }
+                </div>
             </div>
 
             <div class="rd-controls" data-testid="@UiTestIds.Teleprompter.Controls">

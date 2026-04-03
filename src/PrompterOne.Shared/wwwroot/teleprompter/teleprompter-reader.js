@@ -79,6 +79,11 @@
         }
     }
 
+    function resolveFullscreenElement(elementId) {
+        const element = document.getElementById(elementId);
+        return element instanceof HTMLElement ? element : null;
+    }
+
     window[teleprompterReaderNamespace] = {
         measureClusterOffset(stageId, textId, targetWordId, focalPointPercent, neutralizeCard) {
             const stage = document.getElementById(stageId);
@@ -100,6 +105,24 @@
             return Boolean(neutralizeCard)
                 ? withNeutralizedCard(card, text, readOffset)
                 : readOffset();
+        },
+        isFullscreenActive(elementId) {
+            const element = resolveFullscreenElement(elementId);
+            return element !== null && document.fullscreenElement === element;
+        },
+        async toggleFullscreen(elementId) {
+            const element = resolveFullscreenElement(elementId);
+            if (element === null || !document.fullscreenEnabled || typeof element.requestFullscreen !== "function") {
+                return false;
+            }
+
+            if (document.fullscreenElement === element) {
+                await document.exitFullscreen();
+                return false;
+            }
+
+            await element.requestFullscreen();
+            return document.fullscreenElement === element;
         }
     };
 })();

@@ -7,6 +7,7 @@ public static class UiTestIds
     public static class Header
     {
         public const string Back = "header-back";
+        public const string Brand = "header-brand";
         public const string Center = "header-center";
         public const string EditorLearn = "header-editor-learn";
         public const string EditorRead = "header-editor-read";
@@ -98,6 +99,7 @@ public static class UiTestIds
         public const string ColorGreen = "editor-color-green";
         public const string ColorTrigger = "editor-color-trigger";
         public const string Created = "editor-created";
+        public const string CreatedIcon = "editor-created-icon";
         public const string Duration = "editor-duration";
         public const string EmotionProfessional = "editor-emotion-professional";
         public const string EmotionTrigger = "editor-emotion-trigger";
@@ -183,15 +185,20 @@ public static class UiTestIds
         public const string FocalGuide = "teleprompter-focal-guide";
         public const string FontDown = "teleprompter-font-down";
         public const string FontUp = "teleprompter-font-up";
+        public const string FullscreenToggle = "teleprompter-fullscreen-toggle";
         public const string MirrorControls = "teleprompter-mirror-controls";
         public const string MirrorHorizontalToggle = "teleprompter-mirror-horizontal";
         public const string MirrorVerticalToggle = "teleprompter-mirror-vertical";
         public const string NextBlock = "teleprompter-next-block";
         public const string NextWord = "teleprompter-next-word";
+        public const string OrientationToggle = "teleprompter-orientation-toggle";
         public const string Page = "teleprompter-page";
         public const string PlayToggle = "teleprompter-play-toggle";
         public const string PreviousBlock = "teleprompter-previous-block";
         public const string PreviousWord = "teleprompter-previous-word";
+        public const string Progress = "teleprompter-progress";
+        public const string ProgressLabel = "teleprompter-progress-label";
+        public const string ProgressSegments = "teleprompter-progress-segments";
         public const string Sliders = "teleprompter-sliders";
         public const string Stage = "teleprompter-stage";
         public const string WidthSlider = "teleprompter-width-slider";
@@ -206,6 +213,8 @@ public static class UiTestIds
 
         public static string CardWord(int cardIndex, int groupIndex, int wordIndex) =>
             $"teleprompter-card-word-{cardIndex}-{groupIndex}-{wordIndex}";
+
+        public static string ProgressSegmentFill(int index) => $"teleprompter-progress-segment-fill-{index}";
     }
 
     public static class Settings
