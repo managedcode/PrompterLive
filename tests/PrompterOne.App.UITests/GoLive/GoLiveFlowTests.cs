@@ -538,7 +538,8 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     internal static async Task SeedGoLiveSceneForReuseAsync(Microsoft.Playwright.IPage page)
     {
         await page.GotoAsync(BrowserTestConstants.Routes.Library);
-        await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Library.Page))
+            .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
         await page.EvaluateAsync(
             BrowserTestConstants.GoLive.SeedSceneScript,

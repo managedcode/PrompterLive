@@ -100,10 +100,10 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             Assert.Equal(expectedLength, result.FinalInputLength);
             Assert.Equal(expectedLength, result.FinalRenderedLength);
             Assert.True(result.TypingSampleCount >= 2);
-            Assert.InRange(
-                result.PasteMaxLongTaskMs,
-                0,
-                EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs);
+            Assert.True(
+                result.PasteMaxLongTaskMs >= 0 &&
+                result.PasteMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs,
+                $"Large draft paste long-task budget exceeded. PasteMaxLongTaskMs: {result.PasteMaxLongTaskMs}; MaxPasteLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
             Assert.True(
                 result.TypingLatencyMs >= 0 &&
                 result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxTypingLatencyMs,
