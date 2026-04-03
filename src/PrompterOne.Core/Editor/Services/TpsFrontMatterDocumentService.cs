@@ -27,36 +27,18 @@ public sealed class TpsFrontMatterDocumentService
 
     public TpsFrontMatterDocument Parse(string? text)
     {
-        var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         if (string.IsNullOrWhiteSpace(text))
         {
-            return new TpsFrontMatterDocument(metadata, string.Empty, 0);
+            return new TpsFrontMatterDocument(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), string.Empty, 0);
         }
 
         var match = FrontMatterRegex.Match(text);
         if (!match.Success)
         {
-            return new TpsFrontMatterDocument(metadata, text, 0);
+            return new TpsFrontMatterDocument(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), text, 0);
         }
 
-        foreach (var line in match.Groups["front"].Value.Split(
-                     '\n',
-                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-            var separatorIndex = line.IndexOf(':');
-            if (separatorIndex <= 0)
-            {
-                continue;
-            }
-
-            var key = line[..separatorIndex].Trim();
-            var value = line[(separatorIndex + 1)..].Trim().Trim('"');
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                metadata[key] = value;
-            }
-        }
-
+        var metadata = ParseMetadata(match.Groups["front"].Value);
         return new TpsFrontMatterDocument(metadata, text[match.Length..], match.Length);
     }
 
@@ -154,6 +136,49 @@ public sealed class TpsFrontMatterDocumentService
         public const string Version = "version";
         public const string XfastOffset = "xfast_offset";
         public const string XslowOffset = "xslow_offset";
+    }
+
+    private static Dictionary<string, string> ParseMetadata(string frontMatterText)
+    {
+        var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string? currentSection = null;
+
+        foreach (var rawLine in frontMatterText.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var line = rawLine.TrimEnd();
+            var trimmedLine = line.Trim();
+            if (string.IsNullOrWhiteSpace(trimmedLine))
+            {
+                continue;
+            }
+
+            var separatorIndex = trimmedLine.IndexOf(':');
+            if (separatorIndex <= 0)
+            {
+                continue;
+            }
+
+            var key = trimmedLine[..separatorIndex].Trim();
+            var value = trimmedLine[(separatorIndex + 1)..].Trim().Trim('"', '\'');
+            var isNestedLine = line.Length != line.TrimStart().Length;
+
+            if (isNestedLine && !string.IsNullOrWhiteSpace(currentSection))
+            {
+                metadata[$"{currentSection}.{key}"] = value;
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                currentSection = key;
+                continue;
+            }
+
+            currentSection = null;
+            metadata[key] = value;
+        }
+
+        return TpsFrontMatterMetadataNormalizer.Normalize(metadata);
     }
 
     private static bool IsNumericMetadataKey(string key) =>

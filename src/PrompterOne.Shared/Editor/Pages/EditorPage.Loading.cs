@@ -1,5 +1,4 @@
 using System.Globalization;
-using PrompterOne.Core.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -63,7 +62,6 @@ public partial class EditorPage
         var state = SessionService.State;
         var document = _frontMatterService.Parse(state.Text);
         var metadata = document.Metadata;
-        var computedDuration = FormatDuration(state.EstimatedDuration);
 
         if (resetHistory)
         {
@@ -71,17 +69,7 @@ public partial class EditorPage
         }
 
         _sourceText = document.Body;
-        _screenTitle = _frontMatterService.ResolveTitle(state.Text, state.Title);
-        _author = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Author, DefaultAuthor);
-        _baseWpm = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.BaseWpm, state.ScriptData?.TargetWpm ?? 140);
-        _profile = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Profile, _baseWpm >= 250 ? DefaultProfileRsvp : DefaultProfileActor);
-        _version = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Version, DefaultVersion);
-        _createdDate = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.Created, _createdDate);
-        _displayDuration = GetMetadata(metadata, TpsFrontMatterDocumentService.MetadataKeys.DisplayDuration, computedDuration);
-        _xslowOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.XslowOffset, DefaultXslowOffset);
-        _slowOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.SlowOffset, DefaultSlowOffset);
-        _fastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.FastOffset, DefaultFastOffset);
-        _xfastOffset = TryGetInt(metadata, TpsFrontMatterDocumentService.MetadataKeys.XfastOffset, DefaultXfastOffset);
+        ApplyLoadedMetadata(metadata, state);
         _segments = OutlineBuilder.Build(state.ScriptData, document.Body, 0);
         _errorMessage = state.ErrorMessage;
         UpdateDraftMetrics(state);

@@ -97,4 +97,38 @@ public sealed class TpsEditorServicesTests
         Assert.Equal("Editor Test", document.Metadata[TpsFrontMatterDocumentService.MetadataKeys.Author]);
         Assert.Contains("## [Intro|140WPM|warm]", document.Body);
     }
+
+    [Fact]
+    public void Parse_NormalizesDurationAliasAndNestedPresetSpeeds()
+    {
+        var source =
+            """
+            ---
+            title: "System Design and Software Architecture for Vibe Coders"
+            profile: Actor
+            duration: "145:00"
+            base_wpm: 140
+            presets:
+              slow: 120
+              fast: 160
+            author: "Konstantin Semenenko"
+            created: "2026-03-25"
+            version: "1.0"
+            ---
+
+            ## [Architecture Intro|140WPM|focused]
+            ### [Structure Block|140WPM]
+            Keep the body in the visible editor only.
+            """;
+
+        var document = _frontMatter.Parse(source);
+
+        Assert.Equal("145:00", document.Metadata[TpsFrontMatterDocumentService.MetadataKeys.DisplayDuration]);
+        Assert.Equal("-14", document.Metadata[TpsFrontMatterDocumentService.MetadataKeys.SlowOffset]);
+        Assert.Equal("14", document.Metadata[TpsFrontMatterDocumentService.MetadataKeys.FastOffset]);
+        Assert.Equal("120", document.Metadata["presets.slow"]);
+        Assert.Equal("160", document.Metadata["presets.fast"]);
+        Assert.DoesNotContain("title:", document.Body, StringComparison.Ordinal);
+        Assert.StartsWith("## [Architecture Intro|140WPM|focused]", document.Body, StringComparison.Ordinal);
+    }
 }

@@ -64,9 +64,11 @@ public partial class EditorPage
 
     private Task OnSourceChangedAsync(string text)
     {
-        _sourceText = text ?? string.Empty;
+        var sourceText = text ?? string.Empty;
+        var importedFrontMatter = TryImportFrontMatterFromSource(sourceText, out var bodyText);
+        _sourceText = importedFrontMatter ? bodyText : sourceText;
         _history.TryRecord(_sourceText, _selection.Range);
-        _skipNextRenderFromTyping = true;
+        _skipNextRenderFromTyping = !importedFrontMatter;
         QueueDraftAnalysis();
         QueueAutosave();
         return Task.CompletedTask;

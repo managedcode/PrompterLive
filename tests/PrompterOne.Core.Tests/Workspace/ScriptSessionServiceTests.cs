@@ -65,7 +65,7 @@ public sealed class ScriptSessionServiceTests
     }
 
     [Fact]
-    public async Task SaveAsync_PersistsDraftAndReloadsSavedDocument()
+    public async Task SaveAsync_PersistsDraftAndKeepsCurrentSessionState()
     {
         var repository = new InMemoryScriptRepository();
         var session = CreateSession(repository);

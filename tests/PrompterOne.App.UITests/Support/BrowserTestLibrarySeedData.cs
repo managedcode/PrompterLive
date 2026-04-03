@@ -54,6 +54,20 @@ internal static class BrowserTestLibrarySeedData
     private static IReadOnlyList<BrowserStoredScriptDocumentDto> CreateDocuments() =>
     [
         CreateDocument(
+            BrowserTestConstants.Scripts.HugeDraftId,
+            BrowserTestConstants.Scripts.HugeDraftTitle,
+            "test-huge-editor-draft.tps",
+            EditorLargeDraftPerformanceTestData.BuildHugeDraft(),
+            new DateTimeOffset(2026, 4, 3, 7, 30, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
+            BrowserTestConstants.Scripts.LargeDraftId,
+            BrowserTestConstants.Scripts.LargeDraftTitle,
+            "test-large-editor-draft.tps",
+            EditorLargeDraftPerformanceTestData.BuildLargeDraft(),
+            new DateTimeOffset(2026, 4, 3, 7, 0, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
             BrowserTestConstants.Scripts.DemoId,
             BrowserTestConstants.Scripts.ProductLaunchTitle,
             "test-product-launch.tps",
@@ -101,6 +115,7 @@ internal static class BrowserTestLibrarySeedData
         string id,
         string title,
         string documentName,
+        string text,
         DateTimeOffset updatedAt,
         string? folderId)
     {
@@ -108,11 +123,21 @@ internal static class BrowserTestLibrarySeedData
         {
             Id = id,
             Title = title,
-            Text = File.ReadAllText(GetScriptPath(documentName)),
+            Text = text,
             DocumentName = documentName,
             UpdatedAt = updatedAt,
             FolderId = folderId
         };
+    }
+
+    private static BrowserStoredScriptDocumentDto CreateDocument(
+        string id,
+        string title,
+        string documentName,
+        DateTimeOffset updatedAt,
+        string? folderId)
+    {
+        return CreateDocument(id, title, documentName, File.ReadAllText(GetScriptPath(documentName)), updatedAt, folderId);
     }
 
     private static BrowserStoredLibraryFolderDto CreateFolder(string id, string name, string? parentId, int displayOrder)

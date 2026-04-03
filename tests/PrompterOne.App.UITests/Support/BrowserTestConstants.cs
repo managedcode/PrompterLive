@@ -28,12 +28,16 @@ internal static partial class BrowserTestConstants
     public static class Scripts
     {
         public const string DemoId = "test-product-launch-script";
+        public const string HugeDraftId = "test-huge-editor-draft-script";
+        public const string LargeDraftId = "test-large-editor-draft-script";
         public const string LeadershipId = "test-ted-leadership-script";
         public const string LearnWpmBoundaryId = "test-learn-wpm-boundary-script";
         public const string QuantumId = "test-quantum-computing-script";
         public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
+        public const string HugeDraftTitle = "Huge Editor Performance Probe";
+        public const string LargeDraftTitle = "Large Editor Performance Probe";
         public const string ProductLaunchTitle = "Product Launch";
         public const string LeadershipTitle = "TED: Leadership";
         public const string LearnWpmBoundaryTitle = "Learn WPM Boundary Probe";
@@ -805,6 +809,8 @@ internal static partial class BrowserTestConstants
         public static string Settings => AppRoutes.Settings;
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);
         public static string EditorQuantum => AppRoutes.EditorWithId(Scripts.QuantumId);
+        public static string EditorHugeDraft => AppRoutes.EditorWithId(Scripts.HugeDraftId);
+        public static string EditorLargeDraft => AppRoutes.EditorWithId(Scripts.LargeDraftId);
         public static string LearnDemo => AppRoutes.LearnWithId(Scripts.DemoId);
         public static string LearnLeadership => AppRoutes.LearnWithId(Scripts.LeadershipId);
         public static string LearnQuantum => AppRoutes.LearnWithId(Scripts.QuantumId);

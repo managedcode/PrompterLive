@@ -167,7 +167,15 @@ public sealed class ScriptSessionService(
             existingId: State.ScriptId,
             cancellationToken: cancellationToken);
 
-        await OpenAsync(document, cancellationToken);
+        State = State with
+        {
+            ScriptId = document.Id,
+            Title = document.Title,
+            Text = document.Text,
+            DocumentName = document.DocumentName
+        };
+
+        NotifyChanged();
         _logger.LogInformation("Saved script {ScriptId}.", document.Id);
         return document;
     }

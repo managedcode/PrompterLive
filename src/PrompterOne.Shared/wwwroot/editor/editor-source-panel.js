@@ -1,6 +1,12 @@
 (function () {
+    const deferredOverlayHighlightDelayMs = 180;
+    const defaultMeasuredLineHeightPx = 32;
     const offscreenMirrorLeftPx = -99999;
+    const interactiveOverlayLargeDraftThreshold = 16000;
+    const selectionViewportMarginLineCount = 2;
     const floatingToolbarMinimumTopCssVariable = "--ed-floatbar-min-top";
+    const textareaMirrorCaretMarkerWidthPx = 1;
+    const textareaMirrorCaretMarkerText = "\u200b";
     const textareaMirrorStyleProperties = [
         "whiteSpace",
         "wordBreak",
@@ -76,12 +82,13 @@
                 existingState.overlay = overlay;
                 overlaySurfaceStates.set(overlay, existingState);
                 cancelScheduledOverlayRender(existingState);
-                renderSurfaceOverlay(overlay, textarea.value);
+                renderSurfaceOverlay(overlay, textarea.value, false);
                 return true;
             }
 
             const state = {
                 overlay,
+                pendingFullRenderTimeoutId: 0,
                 pendingRenderFrameId: 0,
                 onInput() {
                     scheduleOverlayRender(textarea, state);
@@ -91,7 +98,7 @@
             textarea.addEventListener("input", state.onInput);
             editorSurfaceStates.set(textarea, state);
             overlaySurfaceStates.set(overlay, state);
-            renderSurfaceOverlay(overlay, textarea.value);
+            renderSurfaceOverlay(overlay, textarea.value, false);
             return true;
         },
 
@@ -101,7 +108,7 @@
                 cancelScheduledOverlayRender(state);
             }
 
-            renderSurfaceOverlay(overlay, text);
+            renderSurfaceOverlay(overlay, text, false);
         },
 
         syncScroll(textarea, overlay) {
@@ -122,8 +129,10 @@
                 return createEmptyEditorSelectionState();
             }
 
-            textarea.focus();
+            focusTextareaWithoutScroll(textarea);
             textarea.setSelectionRange(start, end);
+            ensureSelectionRangeVisible(textarea, start, end);
+            syncOverlayForTextarea(textarea);
             return createEditorSelectionState(textarea);
         }
     };
@@ -169,6 +178,19 @@
         };
     }
 
+    function focusTextareaWithoutScroll(textarea) {
+        if (!textarea || typeof textarea.focus !== "function") {
+            return;
+        }
+
+        try {
+            textarea.focus({ preventScroll: true });
+        }
+        catch {
+            textarea.focus();
+        }
+    }
+
     function getTextLocation(text, index) {
         const prefix = (text || "").slice(0, index);
         const prefixLines = prefix.split("\n");
@@ -199,6 +221,44 @@
         });
     }
 
+    function measureTextareaContentGeometry(textarea, start, end) {
+        if (!textarea) {
+            return null;
+        }
+
+        const value = textarea.value || "";
+        const normalizedStart = Math.max(0, Math.min(start, value.length));
+        const normalizedEnd = Math.max(normalizedStart, Math.min(end, value.length));
+
+        return measureWithTextareaMirror(textarea, mirror => {
+            const marker = document.createElement("span");
+            const selectedText = value.slice(normalizedStart, normalizedEnd);
+
+            mirror.textContent = value.slice(0, normalizedStart);
+            if (selectedText.length > 0) {
+                marker.textContent = selectedText;
+            }
+            else {
+                marker.textContent = textareaMirrorCaretMarkerText;
+                marker.style.display = "inline-block";
+                marker.style.width = `${textareaMirrorCaretMarkerWidthPx}px`;
+            }
+
+            mirror.appendChild(marker);
+
+            const mirrorRect = mirror.getBoundingClientRect();
+            const markerRects = marker.getClientRects();
+            const markerRect = marker.getBoundingClientRect();
+            const firstRect = markerRects[0] || markerRect;
+            const lastRect = markerRects[markerRects.length - 1] || markerRect;
+
+            return {
+                top: firstRect.top - mirrorRect.top,
+                bottom: lastRect.bottom - mirrorRect.top
+            };
+        });
+    }
+
     function getLineTopInsetPx(style) {
         const lineHeight = Number.parseFloat(style.lineHeight);
         const fontSize = Number.parseFloat(style.fontSize);
@@ -207,6 +267,43 @@
         }
 
         return Math.max(0, lineHeight - fontSize);
+    }
+
+    function getSelectionViewportMarginPx(textarea) {
+        const lineHeight = textarea
+            ? Number.parseFloat(window.getComputedStyle(textarea).lineHeight)
+            : Number.NaN;
+        const measuredLineHeight = Number.isFinite(lineHeight)
+            ? lineHeight
+            : defaultMeasuredLineHeightPx;
+
+        return measuredLineHeight * selectionViewportMarginLineCount;
+    }
+
+    function ensureSelectionRangeVisible(textarea, start, end) {
+        if (!textarea) {
+            return;
+        }
+
+        const geometry = measureTextareaContentGeometry(textarea, start, end);
+        if (!geometry) {
+            return;
+        }
+
+        const margin = getSelectionViewportMarginPx(textarea);
+        const viewportTop = textarea.scrollTop;
+        const viewportBottom = viewportTop + textarea.clientHeight;
+        const requiredTop = Math.max(0, geometry.top - margin);
+        const requiredBottom = geometry.bottom + margin;
+
+        if (requiredTop < viewportTop) {
+            textarea.scrollTop = requiredTop;
+            return;
+        }
+
+        if (requiredBottom > viewportBottom) {
+            textarea.scrollTop = Math.max(0, requiredBottom - textarea.clientHeight);
+        }
     }
 
     function getFloatingToolbarMinimumTopPx(textarea) {
@@ -249,12 +346,23 @@
         return mirror;
     }
 
-    function renderSurfaceOverlay(overlay, text) {
+    function syncOverlayForTextarea(textarea) {
+        const state = editorSurfaceStates.get(textarea);
+        if (!state || !state.overlay) {
+            return;
+        }
+
+        window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+    }
+
+    function renderSurfaceOverlay(overlay, text, interactivePlainTextMode) {
         if (!overlay) {
             return;
         }
 
-        overlay.innerHTML = renderSourceHighlight(text);
+        overlay.innerHTML = interactivePlainTextMode
+            ? renderPlainTextOverlay(text)
+            : renderSourceHighlight(text);
         updateRenderedLengthMarker(overlay, text);
     }
 
@@ -275,6 +383,11 @@
             window.cancelAnimationFrame(state.pendingRenderFrameId);
             state.pendingRenderFrameId = 0;
         }
+
+        if (state.pendingFullRenderTimeoutId) {
+            window.clearTimeout(state.pendingFullRenderTimeoutId);
+            state.pendingFullRenderTimeoutId = 0;
+        }
     }
 
     function renderScheduledOverlay(textarea, state) {
@@ -282,8 +395,12 @@
             return;
         }
 
-        renderSurfaceOverlay(state.overlay, textarea.value);
+        const text = textarea.value;
+        const useInteractivePlainTextMode = shouldUseInteractivePlainTextRender(text);
+
+        renderSurfaceOverlay(state.overlay, text, useInteractivePlainTextMode);
         window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+        scheduleDeferredHighlightRender(textarea, state, useInteractivePlainTextMode);
     }
 
     function scheduleOverlayRender(textarea, state) {
@@ -295,6 +412,54 @@
             state.pendingRenderFrameId = 0;
             renderScheduledOverlay(textarea, state);
         });
+    }
+
+    function scheduleDeferredHighlightRender(textarea, state, useInteractivePlainTextMode) {
+        if (!state) {
+            return;
+        }
+
+        if (!useInteractivePlainTextMode) {
+            if (state.pendingFullRenderTimeoutId) {
+                window.clearTimeout(state.pendingFullRenderTimeoutId);
+                state.pendingFullRenderTimeoutId = 0;
+            }
+
+            return;
+        }
+
+        if (state.pendingFullRenderTimeoutId) {
+            window.clearTimeout(state.pendingFullRenderTimeoutId);
+        }
+
+        state.pendingFullRenderTimeoutId = window.setTimeout(() => {
+            state.pendingFullRenderTimeoutId = 0;
+
+            if (!textarea || !state.overlay) {
+                return;
+            }
+
+            renderSurfaceOverlay(state.overlay, textarea.value, false);
+            window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
+        }, deferredOverlayHighlightDelayMs);
+    }
+
+    function shouldUseInteractivePlainTextRender(text) {
+        return (text || "").length >= interactiveOverlayLargeDraftThreshold;
+    }
+
+    function renderPlainTextOverlay(text) {
+        if (!text || !text.trim()) {
+            return emptySourceMarkup;
+        }
+
+        const normalizedText = text.replace(/\r\n/g, "\n");
+        return normalizedText
+            .split("\n")
+            .map(line => line.trim()
+                ? wrapLine("ed-src-line", encodeOrSpace(line))
+                : wrapLine("ed-src-line ed-src-line-empty", "&nbsp;"))
+            .join("");
     }
 
     function renderSourceHighlight(text) {

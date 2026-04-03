@@ -185,6 +185,70 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Fact]
+    public async Task EditorPage_PastedFrontMatterHydratesMetadataAndKeepsVisibleBodyClean()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.EditorDemo);
+        var cut = Render<EditorPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+            Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
+        });
+
+        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSourceInteractionTestSource.ImportedFrontMatterDocument);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedBodyOnly,
+                cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedProfile,
+                cut.FindByTestId(UiTestIds.Editor.Profile).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedBaseWpm,
+                cut.FindByTestId(UiTestIds.Editor.BaseWpm).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedDuration,
+                cut.FindByTestId(UiTestIds.Editor.Duration).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedAuthor,
+                cut.FindByTestId(UiTestIds.Editor.Author).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedCreatedDate,
+                cut.FindByTestId(UiTestIds.Editor.Created).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedVersion,
+                cut.FindByTestId(UiTestIds.Editor.Version).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedSlowOffset,
+                cut.FindByTestId(UiTestIds.Editor.SpeedSlow).GetAttribute("value"));
+            Assert.Equal(
+                EditorSourceInteractionTestSource.ImportedFastOffset,
+                cut.FindByTestId(UiTestIds.Editor.SpeedFast).GetAttribute("value"));
+        });
+
+        await Task.Delay(EditorSourceInteractionTestSource.PostAutosaveObservationDelay);
+
+        cut.WaitForAssertion(() =>
+        {
+            var persistedText = _harness.Session.State.Text;
+
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedTitlePersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedDurationPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedAuthorPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedCreatedPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedVersionPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedSlowOffsetPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedFastOffsetPersistenceLine, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorSourceInteractionTestSource.ImportedBodyOnly, persistedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorSourceInteractionTestSource.FrontMatterDelimiterWithTitle, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"), StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
     public async Task EditorPage_KeyboardUndoAndRedoReplaySourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -259,6 +323,47 @@ public sealed class EditorSourceInteractionTests : BunitContext
         public const string BaseWpmPersistenceLine = "base_wpm: 210";
         public const string CreatedPersistenceLine = "created: \"2026-03-26\"";
         public const string EditPointToken = "[edit_point]";
+        public const string FrontMatterDelimiterWithTitle = "---\ntitle:";
+        public const string ImportedAuthor = "Konstantin Semenenko";
+        public const string ImportedAuthorPersistenceLine = "author: \"Konstantin Semenenko\"";
+        public const string ImportedBaseWpm = "140";
+        public const string ImportedBodyOnly =
+            """
+            ## [Architecture Intro|140WPM|focused]
+            ### [Structure Block|140WPM]
+            Keep the body in the visible editor only.
+            """;
+        public const string ImportedCreatedDate = "2026-03-25";
+        public const string ImportedCreatedPersistenceLine = "created: \"2026-03-25\"";
+        public const string ImportedDuration = "145:00";
+        public const string ImportedDurationPersistenceLine = "display_duration: \"145:00\"";
+        public const string ImportedFastOffset = "14";
+        public const string ImportedFastOffsetPersistenceLine = "fast_offset: 14";
+        public const string ImportedFrontMatterDocument =
+            """
+            ---
+            title: "System Design and Software Architecture for Vibe Coders"
+            profile: Actor
+            duration: "145:00"
+            base_wpm: 140
+            presets:
+              slow: 120
+              fast: 160
+            author: "Konstantin Semenenko"
+            created: "2026-03-25"
+            version: "1.0"
+            ---
+
+            ## [Architecture Intro|140WPM|focused]
+            ### [Structure Block|140WPM]
+            Keep the body in the visible editor only.
+            """;
+        public const string ImportedProfile = "Actor";
+        public const string ImportedSlowOffset = "-14";
+        public const string ImportedSlowOffsetPersistenceLine = "slow_offset: -14";
+        public const string ImportedTitlePersistenceLine = "title: \"System Design and Software Architecture for Vibe Coders\"";
+        public const string ImportedVersion = "1.0";
+        public const string ImportedVersionPersistenceLine = "version: \"1.0\"";
         public const string ProfileField = "profile:";
         public const string ProfilePersistenceLine = "profile: \"RSVP\"";
         public const string ProfileRsvp = "RSVP";
