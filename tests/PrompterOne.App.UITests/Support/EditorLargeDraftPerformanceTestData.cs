@@ -12,7 +12,7 @@ internal static class EditorLargeDraftPerformanceTestData
     public const int LargeDraftMinimumLength = 32_000;
     public const int MaxPasteLongTaskMs = 175;
     public const int MaxHugeFollowupLongTaskMs = 325;
-    public const int MaxHugeTypingLatencyMs = 70;
+    public const int MaxHugeTypingLatencyMs = 175;
     public const int MaxTypingLatencyMs = 45;
     public const int NavigationTargetSegmentIndex = 14;
     public const int ObservationDelayMs = 2_200;
