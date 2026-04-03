@@ -48,6 +48,17 @@ internal static partial class BrowserTestConstants
             "() => window.__prompterOneRecordingFileHarness.getSavedRecordingState()";
         public const string AnalyzeSavedRecordingScript =
             "() => window.__prompterOneRecordingFileHarness.analyzeSavedRecording()";
+        public const string ElementTextExcludesValuesScript =
+            """
+            ([testId, values]) => {
+                const text = document.querySelector(`[data-testid="${testId}"]`)?.textContent ?? "";
+                return Array.isArray(values) && values.every(value => typeof value !== "string" || !text.includes(value));
+            }
+            """;
+        public const string ElementTextIsBlankScript =
+            """
+            testId => ((document.querySelector(`[data-testid="${testId}"]`)?.textContent ?? "").trim().length === 0)
+            """;
         public const string ResetSavedRecordingScript =
             "() => window.__prompterOneRecordingFileHarness.reset()";
         public const string SavedRecordingReadyScript =

@@ -222,6 +222,7 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 - After tests pass, run `format`, then the final required verification commands.
 - The task is complete only when every planned checklist item is done and all relevant tests are green.
 - Summarize the change, risks, and verification before marking the task complete.
+- When the user asks to fix GitHub Actions or CI, do not stop at locally green commands: after pushing, watch the relevant GitHub Actions run and continue iterating until the replacement run is green or an explicit external blocker is documented.
 
 ### Documentation
 

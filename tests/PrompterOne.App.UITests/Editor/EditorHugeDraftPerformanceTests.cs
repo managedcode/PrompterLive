@@ -144,10 +144,10 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
             Assert.Equal(expectedLength, result.FinalInputLength);
             Assert.Equal(expectedLength, result.FinalRenderedLength);
             Assert.True(result.TypingSampleCount >= 2);
-            Assert.InRange(
-                result.FollowupMaxLongTaskMs,
-                0,
-                EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs);
+            Assert.True(
+                result.FollowupMaxLongTaskMs >= 0 &&
+                result.FollowupMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs,
+                $"Huge draft follow-up long task exceeded the acceptance budget. FollowupMaxLongTaskMs: {result.FollowupMaxLongTaskMs}; MaxHugeFollowupLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
             Assert.True(
                 result.TypingLatencyMs >= 0 &&
                 result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxHugeTypingLatencyMs,
