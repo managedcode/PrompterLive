@@ -1,0 +1,123 @@
+/* Module: 30-responsive.css */
+/* Phone-width and low-height teleprompter layout compaction. */
+
+@media (max-width: 430px) {
+    .rd-controls {
+        left: 12px;
+        right: 12px;
+        justify-content: space-between;
+        gap: 4px;
+        padding: 6px 8px;
+        transform: none;
+    }
+
+    .rd-ctrl-group {
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .rd-ctrl-main {
+        margin: 0;
+        padding: 0 4px;
+    }
+
+    .rd-ctrl-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+    }
+
+    .rd-ctrl-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .rd-ctrl-sm {
+        width: 24px;
+        height: 24px;
+    }
+
+    .rd-ctrl-play {
+        width: 36px;
+        height: 36px;
+    }
+
+    .rd-ctrl-play svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .rd-ctrl-label {
+        min-width: 20px;
+        font-size: 10px;
+    }
+
+    .rd-block-indicator {
+        min-width: 28px;
+        font-size: 9px;
+    }
+}
+
+@media (max-height: 430px) {
+    .rd-back {
+        top: 12px;
+        left: 12px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .rd-sliders,
+    .rd-mirror-controls {
+        gap: 12px;
+        padding: 8px 4px;
+    }
+
+    .rd-mirror-controls {
+        left: 8px;
+        gap: 6px;
+    }
+
+    .rd-sliders {
+        right: 8px;
+    }
+
+    .rd-slider-group {
+        gap: 4px;
+    }
+
+    .rd-slider-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .rd-slider-val {
+        font-size: 8px;
+    }
+
+    .rd-vslider {
+        height: 74px;
+    }
+
+    .rd-mirror-btn {
+        font-size: 11px;
+    }
+
+    .rd-controls {
+        bottom: 10px;
+        padding: 4px 8px;
+    }
+
+    .rd-edge-info {
+        bottom: 50px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .rd-countdown {
+        font-size: 88px;
+    }
+
+    .rd-pause-indicator {
+        width: 96px;
+    }
+}

@@ -7,6 +7,7 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 18px;
     align-items: stretch;
+    min-width: 0;
 }
 
 /* Card wrapper — gradient border via padding trick */
@@ -253,3 +254,15 @@
     box-shadow: 0 0 16px color-mix(in srgb, var(--emo) 10%, transparent);
 }
 
+@media (max-width: 1400px) {
+    .dcards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .dcards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
+        gap: 14px;
+    }
+}

@@ -8,6 +8,7 @@
 /* Design tokens: see tokens.css
    Legacy aliases for backward compat within this file */
 :root {
+    --app-header-height: 52px;
     --bg: var(--bg-1);
     --bg2: var(--bg-2);
     --bg3: var(--bg-3);
@@ -73,7 +74,8 @@ html[data-density="spacious"] {
 
 .screen {
     display: none;
-    height: calc(100vh - 52px);
+    min-height: calc(100svh - var(--app-header-height));
+    height: calc(100svh - var(--app-header-height));
 }
 .screen.active { display: flex; }
 

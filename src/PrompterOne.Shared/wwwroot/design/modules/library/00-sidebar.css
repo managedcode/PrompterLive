@@ -19,6 +19,7 @@
     padding: 16px 20px;
     flex-shrink: 0;
     min-height: 0;
+    min-width: 0;
     overflow: hidden;
     overflow-x: hidden;
 }
@@ -184,4 +185,66 @@
     padding: 2px 8px;
     border-radius: 7px;
     font-family: var(--mono);
+}
+
+@media (max-width: 900px) {
+    .lib-sidebar {
+        width: 220px;
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 720px) {
+    .lib-sidebar {
+        width: 184px;
+        padding: 12px;
+    }
+
+    .nav-item {
+        gap: 10px;
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+
+    .lib-folders-header {
+        padding: 0 10px;
+    }
+
+    .folder-item {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .folder-children {
+        padding-left: 20px;
+        margin-left: 12px;
+    }
+
+    .nav-count {
+        padding: 2px 6px;
+    }
+}
+
+@media (max-height: 430px) {
+    .lib-sidebar {
+        padding: 12px;
+    }
+
+    .nav-item {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .lib-folders-section {
+        margin-top: 12px;
+    }
+
+    .folder-item {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .lib-nav-bottom {
+        padding-top: 8px;
+    }
 }

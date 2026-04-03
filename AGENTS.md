@@ -116,6 +116,7 @@ Browser test execution rules:
 - Browser UI scenarios are the primary acceptance gate for this repo. Component and core tests are supporting layers, not the release bar.
 - Major user flows MUST be covered by long Playwright scenarios that execute real browser interactions end to end.
 - Major browser scenarios MUST capture screenshot artifacts under `output/playwright/`.
+- Responsive layout work is not done until Playwright verifies every routed screen across a phone-and-tablet viewport matrix that includes small, medium, and large handset sizes plus small, medium, and large tablet sizes in both portrait and landscape, with assertions that primary page controls stay visible inside the viewport without clipping.
 - Editor typing and latency fixes are not done until they are reproduced and cleared on the live dev-host editor with real keyboard input, not only synthetic input helpers or the static UI-test host.
 - When the user reports an editor regression on a specific script or exact `/editor?id=...` URL, reproduce on that same live script before treating browser-suite results as sufficient.
 - Editor surface changes must ship with real-browser checks for scroll behavior, floating toolbar dropdowns, and TPS section controls when those areas are touched; static component tests alone are not enough.
@@ -302,6 +303,7 @@ Repo-specific design rules:
 - Keep UI routes in shared route constants and keep `data-testid` names in shared UI contract constants.
 - Keep UI flow logic, keyboard shortcuts, DOM ids/selectors, and reusable UI constants in C#/Blazor contracts whenever the platform allows it; use JS only for unavoidable browser API interop or DOM access that Blazor cannot own directly.
 - Prefer deleting JS files entirely when they only hold product UI behavior or duplicated constants; JS modules may exist only as thin bridges to browser APIs or external JS SDKs, with the owning workflow and state kept in C#/Blazor.
+- TPS front matter pasted or imported into the editor source MUST be parsed into the metadata rail automatically and removed from the visible body text instead of staying inline in the source editor.
 - For standalone cloud-storage integrations, persist provider keys, tokens, and connection metadata in browser `localStorage`; do not introduce server-side secret storage for runtime auth in this app shape.
 - Third-party runtime JavaScript SDKs MUST be sourced only from explicitly pinned GitHub Release tags and assets, copied into the repo, bundled locally with their runtime dependencies, and never loaded from CDNs, package registries, `latest` endpoints, or ad-hoc remote downloads at app runtime.
 - Repo-owned manifests, scripts, workflows, and project files that track third-party runtime JavaScript SDKs MUST point to concrete GitHub release versions and asset URLs, never floating references.
@@ -397,6 +399,7 @@ Ask first:
 
 ### Dislikes
 
+- fallback code paths, compatibility shims, or alternate behavior branches added "just in case"; implement the direct fix and only add a fallback when the user explicitly asks for one
 - backend creep in the standalone runtime
 - `git worktree`, temporary worktrees, throwaway repo copies, or off-branch isolation for normal repo tasks when the active workspace branch is available; do the work in the current repo and current branch unless the user explicitly asks for isolation
 - OBS-coupled runtime architecture or UI; `PrompterOne` must be the streaming system itself, not an OBS companion or Browser Source wrapper

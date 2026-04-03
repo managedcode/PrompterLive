@@ -1,0 +1,188 @@
+/* Module: 31-rsvp-responsive.css */
+/* Phone-height learn layout compaction. */
+
+@media (max-height: 700px) {
+    .rsvp-display {
+        padding: 24px 24px 20px;
+    }
+
+    .rsvp-crosshair {
+        margin-bottom: 20px;
+    }
+
+    .rsvp-h-row {
+        min-height: 112px;
+    }
+
+    .rsvp-ctx-left,
+    .rsvp-ctx-right {
+        gap: 10px;
+        font-size: clamp(20px, 4.2vw, 24px);
+    }
+
+    .rsvp-focus {
+        font-size: clamp(52px, 10vw, 64px);
+    }
+
+    .rsvp-phrase {
+        margin-top: 24px;
+        max-width: min(540px, 84vw);
+    }
+
+    .rsvp-phrase p {
+        font-size: 14px;
+    }
+
+    .rsvp-pause-track {
+        width: 160px;
+        margin-top: 16px;
+    }
+
+    .rsvp-bottom {
+        gap: 16px;
+        padding: 16px 24px 20px;
+    }
+
+    .rsvp-speed {
+        gap: 14px;
+    }
+
+    .rsvp-speed-num span {
+        font-size: 28px;
+    }
+
+    .rsvp-play-band {
+        grid-template-columns: 30px max-content 30px;
+        gap: 12px;
+    }
+
+    .rsvp-play-side-slot {
+        width: 30px;
+        height: 30px;
+    }
+
+    .rsvp-play-row {
+        gap: 12px;
+    }
+
+    .rsvp-play {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+@media (max-height: 430px) and (orientation: landscape) {
+    .rsvp {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: 2px minmax(0, 1fr);
+    }
+
+    .rsvp-progress {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .rsvp-display {
+        grid-column: 1;
+        grid-row: 2;
+        padding: 14px 20px 14px 16px;
+    }
+
+    .rsvp-crosshair {
+        display: none;
+    }
+
+    .rsvp-h-row {
+        min-height: 88px;
+    }
+
+    .rsvp-ctx-left,
+    .rsvp-ctx-right {
+        gap: 8px;
+        font-size: clamp(18px, 3vw, 22px);
+    }
+
+    .rsvp-focus {
+        font-size: clamp(42px, 6vw, 52px);
+    }
+
+    .rsvp-orp-line {
+        top: 22%;
+        bottom: 36%;
+    }
+
+    .rsvp-phrase {
+        margin-top: 16px;
+        max-width: min(420px, 56vw);
+    }
+
+    .rsvp-phrase-label {
+        margin-bottom: 4px;
+    }
+
+    .rsvp-phrase p {
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .rsvp-pause-track {
+        width: 132px;
+        margin-top: 12px;
+    }
+
+    .rsvp-bottom {
+        grid-column: 2;
+        grid-row: 2;
+        justify-content: center;
+        gap: 10px;
+        min-width: 152px;
+        padding: 12px 14px 12px 10px;
+    }
+
+    .rsvp-speed {
+        gap: 10px;
+    }
+
+    .rsvp-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .rsvp-btn-sm {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+    }
+
+    .rsvp-speed-num {
+        min-width: 56px;
+    }
+
+    .rsvp-speed-num span {
+        font-size: 24px;
+    }
+
+    .rsvp-play-band {
+        grid-template-columns: max-content;
+        gap: 0;
+    }
+
+    .rsvp-play-side-slot {
+        display: none;
+    }
+
+    .rsvp-play-row {
+        gap: 8px;
+    }
+
+    .rsvp-play {
+        width: 48px;
+        height: 48px;
+    }
+
+    .rsvp-pos {
+        font-size: 11px;
+    }
+}

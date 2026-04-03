@@ -198,6 +198,32 @@
     overflow-y: auto;
 }
 
+@media (max-width: 1400px) {
+    .ed-layout {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .ed-sidebar {
+        width: 220px;
+    }
+
+    .ed-right {
+        width: 280px;
+        padding: 18px 14px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .ed-sidebar {
+        width: 204px;
+    }
+
+    .ed-right {
+        width: 248px;
+    }
+}
+
 /* ---- Bottom floating toolbar (Figma-style) ---- */
 .ed-bottom-bar {
     display: flex;
