@@ -9,11 +9,11 @@ public sealed class EditorInterop(IJSRuntime jsRuntime)
 {
     private readonly IJSRuntime _jsRuntime = jsRuntime;
 
-    public ValueTask<bool> InitializeAsync(ElementReference textarea, ElementReference overlay) =>
-        _jsRuntime.InvokeAsync<bool>(EditorSurfaceInteropMethodNames.Initialize, textarea, overlay);
+    public ValueTask<bool> InitializeAsync(ElementReference textarea, ElementReference overlay, object cueContracts) =>
+        _jsRuntime.InvokeAsync<bool>(EditorSurfaceInteropMethodNames.Initialize, textarea, overlay, cueContracts);
 
-    public ValueTask RenderOverlayAsync(ElementReference overlay, string text) =>
-        _jsRuntime.InvokeVoidAsync(EditorSurfaceInteropMethodNames.RenderOverlay, overlay, text ?? string.Empty);
+    public ValueTask RenderOverlayAsync(ElementReference overlay, string text, object cueContracts) =>
+        _jsRuntime.InvokeVoidAsync(EditorSurfaceInteropMethodNames.RenderOverlay, overlay, text ?? string.Empty, cueContracts);
 
     public ValueTask SyncScrollAsync(ElementReference textarea, ElementReference overlay) =>
         _jsRuntime.InvokeVoidAsync(EditorSurfaceInteropMethodNames.SyncScroll, textarea, overlay);

@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Shared.Rendering;
 
@@ -140,18 +141,13 @@ public static class EditorMarkupRenderer
             var encoded = WebUtility.HtmlEncode(text)
                 .Replace("\n", "<br>", StringComparison.Ordinal);
 
-            var classes = CurrentState.BuildCssClass();
-            if (string.IsNullOrWhiteSpace(classes))
+            if (!CurrentState.RequiresSpan())
             {
                 _builder.Append(encoded);
                 return;
             }
 
-            _builder.Append("<span class=\"")
-                .Append(classes)
-                .Append("\">")
-                .Append(encoded)
-                .Append("</span>");
+            AppendStyledSpan(encoded, CurrentState);
         }
 
         private void HandleTag(string rawTag)
@@ -235,21 +231,42 @@ public static class EditorMarkupRenderer
             if (SpeedClasses.TryGetValue(name, out var speedClass))
             {
                 AppendTag(rawTag);
-                PushScope(name, ScopeKind.Style, CurrentState with { SpeedClass = speedClass });
+                PushScope(
+                    name,
+                    ScopeKind.Style,
+                    CurrentState with
+                    {
+                        SpeedClass = speedClass,
+                        SpeedValue = speedClass is null ? null : name.ToLowerInvariant()
+                    });
                 return;
             }
 
             if (VolumeClasses.TryGetValue(name, out var volumeClass))
             {
                 AppendTag(rawTag);
-                PushScope(name, ScopeKind.Style, CurrentState with { VolumeClass = volumeClass });
+                PushScope(
+                    name,
+                    ScopeKind.Style,
+                    CurrentState with
+                    {
+                        VolumeClass = volumeClass,
+                        VolumeValue = name.ToLowerInvariant()
+                    });
                 return;
             }
 
             if (DeliveryClasses.TryGetValue(name, out var deliveryClass))
             {
                 AppendTag(rawTag);
-                PushScope(name, ScopeKind.Style, CurrentState with { DeliveryClass = deliveryClass });
+                PushScope(
+                    name,
+                    ScopeKind.Style,
+                    CurrentState with
+                    {
+                        DeliveryClass = deliveryClass,
+                        DeliveryValue = name.ToLowerInvariant()
+                    });
                 return;
             }
 
@@ -324,11 +341,21 @@ public static class EditorMarkupRenderer
                 .Append(guide)
                 .Append("</span> ");
 
-            var cssClass = parentState.BuildCssClass("mk-phonetic-word");
-            _builder.Append("<span class=\"")
-                .Append(cssClass)
-                .Append("\">")
-                .Append(spoken)
+            AppendStyledSpan(spoken, parentState, "mk-phonetic-word");
+        }
+
+        private void AppendStyledSpan(string encodedText, RenderState state, params string[] extraClasses)
+        {
+            if (!state.RequiresSpan(extraClasses))
+            {
+                _builder.Append(encodedText);
+                return;
+            }
+
+            _builder.Append("<span");
+            state.AppendHtmlAttributes(_builder, extraClasses);
+            _builder.Append('>')
+                .Append(encodedText)
                 .Append("</span>");
         }
 
@@ -395,14 +422,27 @@ public static class EditorMarkupRenderer
 
     private sealed record RenderState(
         string? EmotionClass,
+        string? VolumeValue,
         string? VolumeClass,
+        string? DeliveryValue,
         string? DeliveryClass,
+        string? SpeedValue,
         string? SpeedClass,
         bool IsEmphasis,
         bool IsHighlighted,
         bool IsStress)
     {
-        public static readonly RenderState Default = new(null, null, null, null, false, false, false);
+        public static readonly RenderState Default = new(null, null, null, null, null, null, null, false, false, false);
+
+        public bool RequiresSpan(params string[] extraClasses) =>
+            !string.IsNullOrWhiteSpace(EmotionClass) ||
+            !string.IsNullOrWhiteSpace(VolumeClass) ||
+            !string.IsNullOrWhiteSpace(DeliveryClass) ||
+            !string.IsNullOrWhiteSpace(SpeedClass) ||
+            IsEmphasis ||
+            IsHighlighted ||
+            IsStress ||
+            extraClasses.Any(static value => !string.IsNullOrWhiteSpace(value));
 
         public string BuildCssClass(params string[] extraClasses)
         {
@@ -445,6 +485,44 @@ public static class EditorMarkupRenderer
 
             classes.AddRange(extraClasses.Where(static value => !string.IsNullOrWhiteSpace(value)));
             return string.Join(" ", classes);
+        }
+
+        public void AppendHtmlAttributes(StringBuilder builder, params string[] extraClasses)
+        {
+            var classes = BuildCssClass(extraClasses);
+            if (!string.IsNullOrWhiteSpace(classes))
+            {
+                AppendAttribute(builder, "class", classes);
+            }
+
+            if (!string.IsNullOrWhiteSpace(VolumeValue))
+            {
+                AppendAttribute(builder, TpsVisualCueContracts.VolumeAttributeName, VolumeValue);
+            }
+
+            if (!string.IsNullOrWhiteSpace(DeliveryValue))
+            {
+                AppendAttribute(builder, TpsVisualCueContracts.DeliveryAttributeName, DeliveryValue);
+            }
+
+            if (!string.IsNullOrWhiteSpace(SpeedValue))
+            {
+                AppendAttribute(builder, TpsVisualCueContracts.SpeedAttributeName, SpeedValue);
+            }
+
+            if (IsStress)
+            {
+                AppendAttribute(builder, TpsVisualCueContracts.StressAttributeName, TpsVisualCueContracts.StressAttributeValue);
+            }
+        }
+
+        private static void AppendAttribute(StringBuilder builder, string name, string value)
+        {
+            builder.Append(' ')
+                .Append(name)
+                .Append("=\"")
+                .Append(WebUtility.HtmlEncode(value))
+                .Append('"');
         }
     }
 

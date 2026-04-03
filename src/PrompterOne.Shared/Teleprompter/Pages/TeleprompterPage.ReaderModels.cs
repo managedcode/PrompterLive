@@ -47,7 +47,8 @@ public partial class TeleprompterPage
         string? Style = null,
         string? Title = null,
         string? PronunciationGuide = null,
-        int? EffectiveWpm = null);
+        int? EffectiveWpm = null,
+        IReadOnlyDictionary<string, object>? Attributes = null);
 
     private sealed record ReaderCameraLayerViewModel(
         string ElementId,

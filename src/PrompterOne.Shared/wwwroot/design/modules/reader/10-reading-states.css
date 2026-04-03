@@ -287,6 +287,19 @@ span.rd-pause.rd-pause-long {
     position: relative;
 }
 
+.rd-w[data-tps-volume],
+.rd-w[data-tps-delivery],
+.rd-w[data-tps-speed],
+.rd-w[data-tps-stress="true"] {
+    --tps-cue-opacity: 1;
+    --tps-cue-scale: 1;
+    display: inline-block;
+    font-weight: var(--tps-cue-weight, inherit);
+    opacity: var(--tps-cue-opacity);
+    transform: translateY(calc((1 - var(--tps-cue-scale)) * .08em)) scale(var(--tps-cue-scale));
+    transform-origin: left 72%;
+}
+
 .rd-card-prev .rd-w,
 .rd-card-next .rd-w {
     color: rgba(232,213,176,.22) !important;

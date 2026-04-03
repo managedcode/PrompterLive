@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
 using PrompterOne.Core.Models.Editor;
+using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Shared.Components.Editor;
 
@@ -30,6 +31,14 @@ public partial class EditorSourcePanel
     private bool _syncScrollAfterRender = true;
     private bool _visibleCanRedo;
     private bool _visibleCanUndo;
+    private static readonly object SourceCueContracts = new
+    {
+        volumeAttributeName = TpsVisualCueContracts.VolumeAttributeName,
+        deliveryAttributeName = TpsVisualCueContracts.DeliveryAttributeName,
+        speedAttributeName = TpsVisualCueContracts.SpeedAttributeName,
+        stressAttributeName = TpsVisualCueContracts.StressAttributeName,
+        stressAttributeValue = TpsVisualCueContracts.StressAttributeValue
+    };
 
     [Parameter] public bool CanRedo { get; set; }
 
@@ -237,7 +246,7 @@ public partial class EditorSourcePanel
         }
 
         _surfaceInteropReady = await RunInitializationInteropAsync(
-            () => Interop.InitializeAsync(_textareaRef, _overlayRef),
+            () => Interop.InitializeAsync(_textareaRef, _overlayRef, SourceCueContracts),
             InitializeSurfaceFailureMessage);
     }
 
@@ -251,7 +260,7 @@ public partial class EditorSourcePanel
     private async Task SafeRenderOverlayAsync()
     {
         _ = await RunInteropAsync(
-            () => Interop.RenderOverlayAsync(_overlayRef, Text),
+            () => Interop.RenderOverlayAsync(_overlayRef, Text, SourceCueContracts),
             InitializeSurfaceFailureMessage);
     }
 

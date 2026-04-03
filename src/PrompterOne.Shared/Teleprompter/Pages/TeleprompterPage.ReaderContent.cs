@@ -159,13 +159,15 @@ public partial class TeleprompterPage
 
     private static IReadOnlyList<ReaderChunkViewModel> BuildReaderChunks(IEnumerable<CompiledWord> words, int targetWpm)
     {
+        var compiledWords = words.ToList();
         var chunks = new List<ReaderChunkViewModel>();
         var currentGroup = new List<ReaderWordViewModel>();
         var currentCharacterCount = 0;
         bool? currentGroupIsEmphasis = null;
 
-        foreach (var word in words)
+        for (var compiledWordIndex = 0; compiledWordIndex < compiledWords.Count; compiledWordIndex++)
         {
+            var word = compiledWords[compiledWordIndex];
             if (word.Metadata?.IsPause == true)
             {
                 var pauseDuration = Math.Max(MinimumPauseDurationMilliseconds, word.Metadata.PauseDuration ?? MinimumPauseDurationMilliseconds);
@@ -211,14 +213,20 @@ public partial class TeleprompterPage
             }
 
             var effectiveWpm = ResolveEffectiveWpm(word.Metadata, targetWpm);
+            var speedCueValue = ResolveReaderSpeedCueValue(targetWpm, effectiveWpm);
             currentGroup.Add(new ReaderWordViewModel(
                 Text: word.CleanText,
-                CssClass: BuildReaderWordBaseClass(word.Metadata, targetWpm),
+                CssClass: BuildReaderWordBaseClass(word.Metadata, speedCueValue),
                 DurationMs: Math.Max(MinimumReaderWordDurationMilliseconds, (int)Math.Round(word.DisplayDuration.TotalMilliseconds)),
-                Style: BuildReaderWordStyle(word.Metadata, targetWpm, effectiveWpm),
+                Style: BuildReaderWordStyle(
+                    word.Metadata,
+                    targetWpm,
+                    effectiveWpm,
+                    ResolveReaderCueProgress(compiledWords, compiledWordIndex)),
                 Title: BuildReaderWordTitle(word.Metadata, targetWpm, effectiveWpm),
                 PronunciationGuide: string.IsNullOrWhiteSpace(word.Metadata?.PronunciationGuide) ? null : word.Metadata.PronunciationGuide.Trim(),
-                EffectiveWpm: effectiveWpm));
+                EffectiveWpm: effectiveWpm,
+                Attributes: BuildReaderWordAttributes(word.Metadata, speedCueValue)));
 
             if (ShouldEndReaderGroup(word.CleanText, currentGroup.Count, currentCharacterCount))
             {
@@ -261,7 +269,7 @@ public partial class TeleprompterPage
     private static bool IsReaderWordEmphasis(WordMetadata? metadata) =>
         metadata?.IsEmphasis == true;
 
-    private static string BuildReaderWordBaseClass(WordMetadata? metadata, int targetWpm)
+    private static string BuildReaderWordBaseClass(WordMetadata? metadata, string? speedCueValue)
     {
         if (metadata is null)
         {
@@ -298,23 +306,9 @@ public partial class TeleprompterPage
             classes.Add($"{TpsClassPrefix}-stress");
         }
 
-        var effectiveWpm = ResolveEffectiveWpm(metadata, targetWpm);
-        var speedRatio = effectiveWpm / (double)Math.Max(MinimumReaderReferenceWpm, targetWpm);
-        if (speedRatio <= 0.65d)
+        if (!string.IsNullOrWhiteSpace(speedCueValue))
         {
-            classes.Add("tps-xslow");
-        }
-        else if (speedRatio < 0.95d)
-        {
-            classes.Add("tps-slow");
-        }
-        else if (speedRatio >= 1.45d)
-        {
-            classes.Add("tps-xfast");
-        }
-        else if (speedRatio > 1.05d)
-        {
-            classes.Add("tps-fast");
+            classes.Add($"{TpsClassPrefix}-{speedCueValue}");
         }
 
         if (!string.IsNullOrWhiteSpace(metadata.PronunciationGuide))
@@ -324,6 +318,78 @@ public partial class TeleprompterPage
 
         return string.Join(' ', classes);
     }
+
+    private static IReadOnlyDictionary<string, object>? BuildReaderWordAttributes(WordMetadata? metadata, string? speedCueValue)
+    {
+        if (metadata is null)
+        {
+            return null;
+        }
+
+        Dictionary<string, object>? attributes = null;
+        AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.VolumeAttributeName, NormalizeCueValue(metadata.VolumeLevel));
+        AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.DeliveryAttributeName, NormalizeCueValue(metadata.DeliveryMode));
+        AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.SpeedAttributeName, speedCueValue);
+
+        if (!string.IsNullOrWhiteSpace(metadata.StressText) || !string.IsNullOrWhiteSpace(metadata.StressGuide))
+        {
+            AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.StressAttributeName, TpsVisualCueContracts.StressAttributeValue);
+        }
+
+        return attributes;
+    }
+
+    private static string? NormalizeCueValue(string? value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? null
+            : value.Trim().ToLowerInvariant();
+
+    private static void AddReaderWordAttribute(ref Dictionary<string, object>? attributes, string name, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        attributes ??= new Dictionary<string, object>(StringComparer.Ordinal);
+        attributes[name] = value;
+    }
+
+    private static double ResolveReaderCueProgress(IReadOnlyList<CompiledWord> words, int currentIndex)
+    {
+        if (currentIndex < 0 || currentIndex >= words.Count || !IsBuildingCueWord(words[currentIndex]))
+        {
+            return 0d;
+        }
+
+        var startIndex = currentIndex;
+        while (startIndex > 0 && IsBuildingCueWord(words[startIndex - 1]))
+        {
+            startIndex--;
+        }
+
+        var endIndex = currentIndex;
+        while (endIndex < words.Count - 1 && IsBuildingCueWord(words[endIndex + 1]))
+        {
+            endIndex++;
+        }
+
+        var runLength = endIndex - startIndex + 1;
+        if (runLength <= 1)
+        {
+            return 1d;
+        }
+
+        return (currentIndex - startIndex) / (double)(runLength - 1);
+    }
+
+    private static bool IsBuildingCueWord(CompiledWord word) =>
+        word.Metadata?.IsPause != true &&
+        !string.IsNullOrWhiteSpace(word.CleanText) &&
+        string.Equals(
+            NormalizeCueValue(word.Metadata?.DeliveryMode),
+            TpsVisualCueContracts.DeliveryModeBuilding,
+            StringComparison.Ordinal);
 
     private static int CountReadableWords(IEnumerable<CompiledWord> words) =>
         words.Count(word => word.Metadata?.IsPause != true && !string.IsNullOrWhiteSpace(word.CleanText));

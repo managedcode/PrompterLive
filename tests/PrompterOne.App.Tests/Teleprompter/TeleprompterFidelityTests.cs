@@ -38,6 +38,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string SpeedOffsetsSlowWord = "steady";
     private const string SpeedOffsetsSlowWpm = "126";
     private const string SpeedOffsetsFastWpm = "154";
+    private const string WordLetterSpacingVariableName = "--tps-word-letter-spacing";
     private const string TeleprompterWord = "teleprompter";
     private const string UrgentWord = "time";
     private const string VisionWord = "vision";
@@ -263,10 +264,11 @@ public sealed class TeleprompterFidelityTests : BunitContext
     {
         var style = word.GetAttribute("style") ?? string.Empty;
         var value = style
-            .Split(':', 2, StringSplitOptions.TrimEntries)
-            .LastOrDefault()?
-            .Replace("em;", string.Empty, StringComparison.Ordinal)
-            .Trim();
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(segment => segment.Split(':', 2, StringSplitOptions.TrimEntries))
+            .Where(parts => parts.Length == 2 && string.Equals(parts[0], WordLetterSpacingVariableName, StringComparison.Ordinal))
+            .Select(parts => parts[1].Replace("em", string.Empty, StringComparison.Ordinal).Trim())
+            .SingleOrDefault();
 
         return double.Parse(value ?? "0", CultureInfo.InvariantCulture);
     }

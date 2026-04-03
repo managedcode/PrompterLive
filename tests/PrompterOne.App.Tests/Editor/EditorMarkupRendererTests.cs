@@ -1,3 +1,4 @@
+using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Rendering;
 
 namespace PrompterOne.App.Tests;
@@ -11,9 +12,15 @@ public sealed class EditorMarkupRendererTests
 
         Assert.Contains("<span class=\"mk-tag\">[xslow]</span>", markup);
         Assert.Contains("<span class=\"mk-tag\">[stress]</span>", markup);
-        Assert.Contains("<span class=\"mk-stress mk-xslow\">elephant</span>", markup);
+        Assert.Contains(
+            $"<span class=\"mk-stress mk-xslow\" {TpsVisualCueContracts.SpeedAttributeName}=\"{TpsVisualCueContracts.SpeedCueXslow}\" {TpsVisualCueContracts.StressAttributeName}=\"{TpsVisualCueContracts.StressAttributeValue}\">elephant</span>",
+            markup,
+            StringComparison.Ordinal);
         Assert.Contains("<span class=\"mk-tag\">[/stress]</span>", markup);
-        Assert.Contains("<span class=\"mk-xslow\"> in the room</span>", markup);
+        Assert.Contains(
+            $"<span class=\"mk-xslow\" {TpsVisualCueContracts.SpeedAttributeName}=\"{TpsVisualCueContracts.SpeedCueXslow}\"> in the room</span>",
+            markup,
+            StringComparison.Ordinal);
         Assert.Contains("<span class=\"mk-tag\">[/xslow]</span>", markup);
     }
 

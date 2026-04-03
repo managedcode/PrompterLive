@@ -220,13 +220,13 @@
 .tps-professional { color: #A9BFE7; }
 
 /* ── TPS Delivery And Volume ── */
-.tps-loud { color: #F2C18B; font-weight: 800; }
-.tps-soft { color: #C7DDF5; }
-.tps-whisper { color: #CFCBD7; opacity: .92; font-style: italic; }
-.tps-aside { color: #D8C29B; font-style: italic; }
+.tps-loud { color: #F2C18B; font-weight: var(--tps-cue-weight, 800); }
+.tps-soft { color: #C7DDF5; opacity: var(--tps-cue-opacity, .86); }
+.tps-whisper { color: #CFCBD7; opacity: var(--tps-cue-opacity, .76); font-style: italic; }
+.tps-aside { color: #D8C29B; opacity: var(--tps-cue-opacity, .88); font-style: italic; }
 .tps-rhetorical { color: #CDB3E9; }
-.tps-sarcasm { color: #E2B6C7; }
-.tps-building { color: #F0D48D; font-weight: 700; }
+.tps-sarcasm { color: #E2B6C7; opacity: var(--tps-cue-opacity, .92); }
+.tps-building { color: #F0D48D; font-weight: var(--tps-cue-weight, 700); }
 
 /* ── TPS Speed Indicators (visual cue for speed tags) ── */
 .tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.085em); }

@@ -72,23 +72,26 @@
     ]);
 
     window[editorSurfaceNamespace] = {
-        initialize(textarea, overlay) {
+        initialize(textarea, overlay, cueContracts) {
             if (!textarea || !overlay) {
                 return false;
             }
 
+            const normalizedCueContracts = normalizeCueContracts(cueContracts);
             const existingState = editorSurfaceStates.get(textarea);
             if (existingState) {
                 existingState.overlay = overlay;
+                existingState.cueContracts = normalizedCueContracts;
                 overlaySurfaceStates.set(overlay, existingState);
                 cancelScheduledOverlayRender(existingState);
                 applyInteractivePlainTextMode(textarea, overlay, shouldUseInteractivePlainTextRender(textarea.value));
-                renderSurfaceOverlay(overlay, textarea.value, false);
+                renderSurfaceOverlay(overlay, textarea.value, false, normalizedCueContracts);
                 return true;
             }
 
             const state = {
                 overlay,
+                cueContracts: normalizedCueContracts,
                 pendingFullRenderTimeoutId: 0,
                 pendingRenderFrameId: 0,
                 onInput() {
@@ -100,17 +103,18 @@
             editorSurfaceStates.set(textarea, state);
             overlaySurfaceStates.set(overlay, state);
             applyInteractivePlainTextMode(textarea, overlay, shouldUseInteractivePlainTextRender(textarea.value));
-            renderSurfaceOverlay(overlay, textarea.value, false);
+            renderSurfaceOverlay(overlay, textarea.value, false, normalizedCueContracts);
             return true;
         },
 
-        renderOverlay(overlay, text) {
+        renderOverlay(overlay, text, cueContracts) {
             const state = overlaySurfaceStates.get(overlay);
             if (state) {
+                state.cueContracts = normalizeCueContracts(cueContracts) || state.cueContracts;
                 cancelScheduledOverlayRender(state);
             }
 
-            renderSurfaceOverlay(overlay, text, false);
+            renderSurfaceOverlay(overlay, text, false, state?.cueContracts);
         },
 
         syncScroll(textarea, overlay) {
@@ -357,14 +361,14 @@
         window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
     }
 
-    function renderSurfaceOverlay(overlay, text, interactivePlainTextMode) {
+    function renderSurfaceOverlay(overlay, text, interactivePlainTextMode, cueContracts) {
         if (!overlay) {
             return;
         }
 
         overlay.innerHTML = interactivePlainTextMode
             ? renderPlainTextOverlay(text)
-            : renderSourceHighlight(text);
+            : renderSourceHighlight(text, cueContracts);
         updateRenderedLengthMarker(overlay, text);
     }
 
@@ -408,7 +412,7 @@
             return;
         }
 
-        renderSurfaceOverlay(state.overlay, text, false);
+        renderSurfaceOverlay(state.overlay, text, false, state.cueContracts);
         window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
         scheduleDeferredHighlightRender(textarea, state, false);
     }
@@ -450,7 +454,7 @@
                 return;
             }
 
-            renderSurfaceOverlay(state.overlay, textarea.value, false);
+            renderSurfaceOverlay(state.overlay, textarea.value, false, state.cueContracts);
             window[editorSurfaceNamespace].syncScroll(textarea, state.overlay);
         }, deferredOverlayHighlightDelayMs);
     }
@@ -497,7 +501,7 @@
             .join("");
     }
 
-    function renderSourceHighlight(text) {
+    function renderSourceHighlight(text, cueContracts) {
         if (!text || !text.trim()) {
             return emptySourceMarkup;
         }
@@ -517,7 +521,7 @@
                 continue;
             }
 
-            parts.push(renderBodyLine(line));
+            parts.push(renderBodyLine(line, cueContracts));
         }
 
         return parts.join("");
@@ -538,7 +542,7 @@
             `<span class="ed-src-frontmatter-key">${encodeHtml(match.groups.key)}</span>: <span class="ed-src-frontmatter-value">${encodeHtml(match.groups.value)}</span>`);
     }
 
-    function renderBodyLine(line) {
+    function renderBodyLine(line, cueContracts) {
         if (!line.trim()) {
             return wrapLine("ed-src-line ed-src-line-empty", "&nbsp;");
         }
@@ -550,10 +554,10 @@
                     ? "ed-src-line ed-src-line-segment"
                     : "ed-src-line ed-src-line-block",
                 buildHeaderMarkup(header.hashToken, header.content, header.isSegment, header.hasClosingBracket) +
-                renderHeaderTrailingText(header.trailingText));
+                renderHeaderTrailingText(header.trailingText, cueContracts));
         }
 
-        return wrapLine("ed-src-line", renderInlineMarkup(line));
+        return wrapLine("ed-src-line", renderInlineMarkup(line, cueContracts));
     }
 
     function tryParseHeaderLine(line) {
@@ -625,17 +629,17 @@
         return fragments.join("");
     }
 
-    function renderHeaderTrailingText(text) {
+    function renderHeaderTrailingText(text, cueContracts) {
         if (!text) {
             return "";
         }
 
         return text.trim()
-            ? renderInlineMarkup(text)
+            ? renderInlineMarkup(text, cueContracts)
             : encodeOrSpace(text);
     }
 
-    function renderInlineMarkup(content) {
+    function renderInlineMarkup(content, cueContracts) {
         if (!content || !content.trim()) {
             return "<span class=\"mk-muted\">Add script content here.</span>";
         }
@@ -696,13 +700,13 @@
             }
 
             const encoded = encodeHtml(text).replace(/\n/g, "<br>");
-            const cssClass = buildCssClass(getCurrentScope().state);
-            if (!cssClass) {
+            const currentState = getCurrentScope().state;
+            if (!requiresStyledSpan(currentState)) {
                 builder.push(encoded);
                 return;
             }
 
-            builder.push(`<span class="${cssClass}">${encoded}</span>`);
+            appendStyledSpan(encoded, currentState);
         }
 
         function handleTag(rawTag) {
@@ -771,21 +775,33 @@
             const speedClass = speedClasses.get(name.toLowerCase());
             if (speedClasses.has(name.toLowerCase())) {
                 appendTag(rawTag);
-                pushScope(name, scopeKindStyle, { ...currentState, speedClass });
+                pushScope(name, scopeKindStyle, {
+                    ...currentState,
+                    speedClass,
+                    speedValue: speedClass ? name.toLowerCase() : null
+                });
                 return;
             }
 
             const volumeClass = volumeClasses.get(name.toLowerCase());
             if (volumeClass) {
                 appendTag(rawTag);
-                pushScope(name, scopeKindStyle, { ...currentState, volumeClass });
+                pushScope(name, scopeKindStyle, {
+                    ...currentState,
+                    volumeClass,
+                    volumeValue: name.toLowerCase()
+                });
                 return;
             }
 
             const deliveryClass = deliveryClasses.get(name.toLowerCase());
             if (deliveryClass) {
                 appendTag(rawTag);
-                pushScope(name, scopeKindStyle, { ...currentState, deliveryClass });
+                pushScope(name, scopeKindStyle, {
+                    ...currentState,
+                    deliveryClass,
+                    deliveryValue: name.toLowerCase()
+                });
                 return;
             }
 
@@ -845,10 +861,9 @@
             const spokenText = scope.buffer.length === 0
                 ? ""
                 : encodeHtml(normalizePronunciationText(scope.buffer.join("")));
-            const cssClass = buildCssClass(parentState, ["mk-phonetic-word"]);
 
             builder.push(`<span class="mk-phonetic">${guide}</span> `);
-            builder.push(`<span class="${cssClass}">${spokenText}</span>`);
+            appendStyledSpan(spokenText, parentState, ["mk-phonetic-word"]);
         }
 
         function appendTag(value) {
@@ -866,6 +881,15 @@
         function getCurrentScope() {
             return scopes[scopes.length - 1];
         }
+
+        function appendStyledSpan(encodedText, state, extraClasses) {
+            if (!requiresStyledSpan(state, extraClasses)) {
+                builder.push(encodedText);
+                return;
+            }
+
+            builder.push(`<span${buildHtmlAttributes(state, cueContracts, extraClasses)}>${encodedText}</span>`);
+        }
     }
 
     function createScopeFrame(name, kind, state, argument) {
@@ -881,12 +905,25 @@
     function createRenderState() {
         return {
             emotionClass: null,
+            volumeValue: null,
             volumeClass: null,
+            deliveryValue: null,
             deliveryClass: null,
+            speedValue: null,
             speedClass: null,
             isEmphasis: false,
             isHighlighted: false,
             isStress: false
+        };
+    }
+
+    function normalizeCueContracts(rawContracts) {
+        return {
+            volumeAttributeName: rawContracts?.volumeAttributeName || "",
+            deliveryAttributeName: rawContracts?.deliveryAttributeName || "",
+            speedAttributeName: rawContracts?.speedAttributeName || "",
+            stressAttributeName: rawContracts?.stressAttributeName || "",
+            stressAttributeValue: rawContracts?.stressAttributeValue || ""
         };
     }
 
@@ -920,6 +957,40 @@
         }
 
         return classes.join(" ");
+    }
+
+    function requiresStyledSpan(state, extraClasses) {
+        return Boolean(
+            state.isEmphasis ||
+            state.isHighlighted ||
+            state.isStress ||
+            state.emotionClass ||
+            state.volumeClass ||
+            state.deliveryClass ||
+            state.speedClass ||
+            (extraClasses || []).some(value => Boolean(value)));
+    }
+
+    function buildHtmlAttributes(state, cueContracts, extraClasses) {
+        const attributes = [];
+        const cssClass = buildCssClass(state, extraClasses);
+        appendHtmlAttribute(attributes, "class", cssClass);
+        appendHtmlAttribute(attributes, cueContracts?.volumeAttributeName, state.volumeValue);
+        appendHtmlAttribute(attributes, cueContracts?.deliveryAttributeName, state.deliveryValue);
+        appendHtmlAttribute(attributes, cueContracts?.speedAttributeName, state.speedValue);
+        if (state.isStress) {
+            appendHtmlAttribute(attributes, cueContracts?.stressAttributeName, cueContracts?.stressAttributeValue);
+        }
+
+        return attributes.join("");
+    }
+
+    function appendHtmlAttribute(attributes, name, value) {
+        if (!name || !value) {
+            return;
+        }
+
+        attributes.push(` ${name}="${encodeHtml(value)}"`);
     }
 
     function getPauseLength(text, index) {
