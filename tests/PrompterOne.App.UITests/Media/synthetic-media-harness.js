@@ -67,6 +67,9 @@
     const requestLog = [];
     const remoteSourcesByConnection = new Map();
     let requestId = 0;
+    let captureCapabilities = {
+        supportsConcurrentLocalCameraCaptures: true
+    };
     let concealDeviceIdentityUntilMediaRequest =
         window.sessionStorage?.getItem(concealIdentitySessionFlag) === "true";
     let hasResolvedMediaRequest = false;
@@ -471,12 +474,21 @@
                 metadata
             };
         },
+        getCaptureCapabilities() {
+            return cloneJson(captureCapabilities);
+        },
         setRemoteSources(connectionId, sources) {
             const existing = remoteSourcesByConnection.get(connectionId) ?? [];
             disposeRemoteSources(existing);
             remoteSourcesByConnection.set(
                 connectionId,
                 (Array.isArray(sources) ? sources : []).map(buildRemoteSourceStream));
+        },
+        setCaptureCapabilities(nextCapabilities) {
+            captureCapabilities = {
+                supportsConcurrentLocalCameraCaptures:
+                    nextCapabilities?.supportsConcurrentLocalCameraCaptures !== false
+            };
         },
         clearRemoteSources(connectionId) {
             if (typeof connectionId === "string" && connectionId) {

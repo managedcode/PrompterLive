@@ -116,6 +116,10 @@ public static class GoLiveText
         public const string SourcesTitle = "Sources";
         public const string StatusBitrateLabel = "Bitrate";
         public const string StatusOutputLabel = "Output";
+        public const string SingleLocalCameraPreviewHint = "iPad browsers can preview one local camera at a time. Select a camera, then switch it live. Remote guest feeds can stay live.";
+        public const string SingleLocalCameraPreviewLimitDescription = "This browser is previewing the selected local camera only. Use Switch to move the live feed.";
+        public const string SingleLocalCameraPreviewLimitTitle = "Live preview limited";
+        public const string SingleLocalCameraPreviewPlaceholderLabel = "Select to preview";
         public const string StreamFormatFullHd30 = "1080p30";
         public const string StreamFormatFullHd60 = "1080p60";
         public const string StreamFormatHd30 = "720p30";

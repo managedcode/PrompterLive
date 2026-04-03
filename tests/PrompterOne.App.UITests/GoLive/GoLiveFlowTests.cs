@@ -340,6 +340,50 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
     }
 
     [Fact]
+    public async Task GoLivePage_OnSingleLocalCameraBrowsers_ShowsHintAndMovesLivePreviewToTheSelectedCamera()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.AddInitScriptAsync(BrowserTestConstants.Media.DisableConcurrentLocalCameraCaptureScript);
+            await SeedGoLiveSceneForReuseAsync(page);
+            await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SingleLocalPreviewHint)).ToBeVisibleAsync();
+
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
+                new object[]
+                {
+                    UiDomIds.GoLive.ProgramVideo,
+                    BrowserTestConstants.Media.PrimaryCameraId
+                },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SourceVideo(BrowserTestConstants.GoLive.SecondSourceId))).ToHaveCountAsync(0);
+
+            await page.GetByTestId(UiTestIds.GoLive.SourceCameraSelect(BrowserTestConstants.GoLive.SecondSourceId)).ClickAsync();
+
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
+                new object[]
+                {
+                    UiDomIds.GoLive.ProgramVideo,
+                    BrowserTestConstants.Media.SecondaryCameraId
+                },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SourceVideo(BrowserTestConstants.GoLive.SecondSourceId))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.SourceVideo(BrowserTestConstants.GoLive.FirstSourceId))).ToHaveCountAsync(0);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task GoLivePage_StartStream_WithVdoNinjaArmed_PublishesProgramVideoAndAudio()
     {
         var page = await _fixture.NewPageAsync();

@@ -172,8 +172,11 @@
                        data-testid="@UiTestIds.GoLive.SourceRail">
                     <GoLiveSourcesCard Sources="@VisibleSceneCameras"
                                        ActiveSourceId="@ActiveCamera?.SourceId"
+                                       LiveSourceIds="@LiveSourceIds"
                                        LiveState="@SessionIndicatorState"
                                        SelectedSourceId="@SelectedCamera?.SourceId"
+                                       ShowSingleLocalPreviewHint="@ShowSingleLocalPreviewHint"
+                                       SingleLocalPreviewHint="@SingleLocalPreviewHint"
                                        Title="@SourcesHeaderTitle"
                                        UtilitySources="@UtilitySources"
                                        HasPrimaryMicrophone="@HasPrimaryMicrophone"
@@ -189,7 +192,7 @@
             <div class="gl-program">
                 <GoLiveProgramFeedCard ActiveSourceLabel="@ActiveSourceLabel"
                                        ActiveSessionLabel="@ActiveSessionLabel"
-                                       Camera="@SelectedCamera"
+                                       Camera="@LiveProgramCamera"
                                        IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
                                        IsStreamActive="@GoLiveSession.State.IsStreamActive"
                                        ProgramResolutionLabel="@ProgramResolutionLabel"
@@ -213,8 +216,10 @@
             {
                 <aside class="gl-sidebar-right"
                        data-testid="@UiTestIds.GoLive.PreviewRail">
-                    <GoLiveCameraPreviewCard Camera="@ActiveCamera"
+                    <GoLiveCameraPreviewCard Camera="@LivePreviewCamera"
                                              Description="@ActiveSessionLabel"
+                                             EmptyDescription="@LivePreviewEmptyDescription"
+                                             EmptyTitle="@LivePreviewEmptyTitle"
                                              LiveState="@SessionIndicatorState"
                                              Title="@GoLiveText.Chrome.LivePreviewTitle" />
                     <GoLiveStudioSidebar ActiveTab="@_activeStudioTab"

@@ -25,19 +25,20 @@ public partial class GoLivePage
     private async Task BootstrapPageAsync()
     {
         await Diagnostics.RunAsync(
-            GoLiveText.Load.LoadOperation,
-            GoLiveText.Load.LoadMessage,
-            async () =>
-            {
-                await Bootstrapper.EnsureReadyAsync();
-                await EnsureSessionLoadedAsync();
-                await EnsureSceneDefaultsAsync();
-                await LoadRecordingPreferencesAsync();
-                await LoadStudioSettingsAsync();
-                await SyncRemoteSourcesAsync();
-                UpdateScreenMetadata();
-                StateHasChanged();
-            });
+    GoLiveText.Load.LoadOperation,
+    GoLiveText.Load.LoadMessage,
+    async () =>
+    {
+        await Bootstrapper.EnsureReadyAsync();
+        await LoadCaptureCapabilitiesAsync();
+        await EnsureSessionLoadedAsync();
+        await EnsureSceneDefaultsAsync();
+        await LoadRecordingPreferencesAsync();
+        await LoadStudioSettingsAsync();
+        await SyncRemoteSourcesAsync();
+        UpdateScreenMetadata();
+        StateHasChanged();
+    });
     }
 
     private async Task EnsurePageReadyAsync()

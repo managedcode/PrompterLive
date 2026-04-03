@@ -547,6 +547,7 @@ flowchart LR
 
 - The runtime must remain backend-free.
 - `Go Live` may operate multiple concurrent browser publish transports when the operator explicitly arms them, but every active transport must still consume the same canonical browser-owned program feed.
+- When a browser cannot capture multiple local cameras concurrently, `Go Live` must degrade to one live local camera preview/render at a time while preserving source switching and leaving remote feeds unaffected.
 - `Go Live` must not require any PrompterOne-owned backend, relay, ingest layer, or media server; only third-party browser-facing transport infrastructure is allowed.
 - Browser-language localization must default to English, must allow a persisted user override, and must support `en`, `uk`, `fr`, `es`, `it`, `de`, and `pt`.
 - Russian is intentionally unsupported and must fall back to English.

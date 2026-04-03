@@ -23,6 +23,8 @@ internal static partial class BrowserTestConstants
         public const string FabricatedUnnamedDeviceLabel = "Unnamed device";
         public const string ListDevicesScript = "() => window.__prompterOneMediaHarness.listDevices()";
         public const string ClearDeviceLabelsScript = "() => window.__prompterOneMediaHarness.clearDeviceLabels()";
+        public const string DisableConcurrentLocalCameraCaptureScript =
+            "window.__prompterOneMediaCapabilityOverride = { supportsConcurrentLocalCameraCaptures: false };";
         public const string ClearRequestLogScript = "() => window.__prompterOneMediaHarness.clearRequestLog()";
         public const string ConcealDeviceIdentityUntilRequestScript = "() => window.__prompterOneMediaHarness.concealDeviceIdentityUntilRequest()";
         public const string GetRequestLogScript = "() => window.__prompterOneMediaHarness.getRequestLog()";

@@ -6,6 +6,7 @@ internal static class BrowserMediaInteropMethodNames
 
     public const string AttachCamera = NamespacePrefix + ".attachCamera";
     public const string DetachCamera = NamespacePrefix + ".detachCamera";
+    public const string GetCaptureCapabilities = NamespacePrefix + ".getCaptureCapabilities";
     public const string ListDevices = NamespacePrefix + ".listDevices";
     public const string QueryPermissions = NamespacePrefix + ".queryPermissions";
     public const string RequestPermissions = NamespacePrefix + ".requestPermissions";

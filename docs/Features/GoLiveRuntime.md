@@ -52,6 +52,7 @@ The browser compositor is the single source of truth. All sinks reuse that same 
 - Local recording is a first-class sink and is not modeled as a fake external destination.
 - Downstream targets such as `YouTube`, `Twitch`, and `Custom RTMP` are bound to transport connections and are only activatable when the chosen transport exposes that path honestly.
 - Unsupported downstream paths must be shown as blocked, not silently degraded.
+- When the browser cannot capture multiple local cameras concurrently, `Go Live` must fall back to one live local camera preview at a time while preserving fast source switching and keeping remote guest feeds live.
 
 ## Operator Surface
 
@@ -69,6 +70,12 @@ The right rail now renders destination rows from two persisted collections:
 - `DistributionTargets`
 
 Local recording stays controlled by the `REC` action and runtime metadata instead of showing up as a fake destination row.
+
+On browsers with single-local-camera capture limits, the operator surface must stay honest:
+
+- only one local camera may render live across the local preview/program surfaces at a time
+- selecting another local camera moves the live local preview to that source
+- the live-status rail must explain the limitation instead of pretending all armed local cameras are simultaneously live
 
 ## Architecture
 
@@ -238,6 +245,7 @@ Current capability model:
   - `LiveKit` publish can start from the composed program feed
   - both transports can be active in one session
   - source switching updates the live program state
+  - single-local-camera browsers show an explicit fallback hint and move the live local preview when the operator selects another camera
   - blocked downstream targets are shown honestly
 
 ## Rules

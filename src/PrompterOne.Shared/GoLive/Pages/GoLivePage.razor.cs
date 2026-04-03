@@ -16,6 +16,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private GoLiveOutputRuntimeService GoLiveOutputRuntime { get; set; } = null!;
     [Inject] private GoLiveRemoteSourceRuntimeService GoLiveRemoteSourceRuntime { get; set; } = null!;
+    [Inject] private BrowserMediaCaptureCapabilitiesService BrowserMediaCaptureCapabilityService { get; set; } = null!;
     [Inject] private MicrophoneLevelInterop MicrophoneLevelInterop { get; set; } = null!;
     [Inject] private StreamingPublishDescriptorResolver StreamingDescriptorResolver { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
@@ -32,6 +33,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     private Task? _bootstrapTask;
     private readonly SemaphoreSlim _interactionGate = new(1, 1);
     private IReadOnlyList<MediaDeviceInfo> _mediaDevices = [];
+    private BrowserMediaCaptureCapabilities _captureCapabilities = BrowserMediaCaptureCapabilities.Default;
     private bool _loadState = true;
     private SettingsPagePreferences _recordingPreferences = SettingsPagePreferences.Default;
     private string _sessionSubtitle = GoLiveText.Chrome.StreamingSubtitle;

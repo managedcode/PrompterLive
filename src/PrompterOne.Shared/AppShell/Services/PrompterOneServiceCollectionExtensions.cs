@@ -69,6 +69,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<CloudStorageProviderFactory>();
         services.AddScoped<CloudStorageTransferService>();
         services.AddScoped<StudioSettingsStore>();
+        services.AddScoped<BrowserMediaCaptureCapabilitiesService>();
         services.AddScoped<CameraPreviewInterop>();
         services.AddScoped<LearnRsvpLayoutInterop>();
         services.AddScoped<MicrophoneLevelInterop>();

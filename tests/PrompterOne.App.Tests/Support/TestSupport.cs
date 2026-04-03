@@ -125,6 +125,7 @@ internal static class TestHarnessFactory
                     AppTestData.About.BuildNumber)));
         context.Services.AddSingleton(shell);
         context.Services.AddSingleton<StudioSettingsStore>();
+        context.Services.AddSingleton<BrowserMediaCaptureCapabilitiesService>();
         context.Services.AddSingleton<CameraPreviewInterop>();
         context.Services.AddSingleton<LearnRsvpLayoutInterop>();
         context.Services.AddSingleton<MicrophoneLevelInterop>();
@@ -184,6 +185,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
 {
     private const string BrowserCultureGetLanguagesIdentifier = BrowserCultureInteropMethodNames.GetBrowserLanguages;
     private const string BrowserCultureSetDocumentLanguageIdentifier = BrowserCultureInteropMethodNames.SetDocumentLanguage;
+    private const string BrowserMediaGetCaptureCapabilitiesIdentifier = BrowserMediaInteropMethodNames.GetCaptureCapabilities;
     private const string CrossTabDisposeIdentifier = "PrompterOneCrossTabInterop.dispose";
     private const string CrossTabInitializeIdentifier = "PrompterOneCrossTabInterop.initialize";
     private const string CrossTabPublishIdentifier = "PrompterOneCrossTabInterop.publish";
@@ -217,6 +219,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
 
     private readonly TimeSpan _invocationDelay = invocationDelay ?? TimeSpan.Zero;
     public IReadOnlyList<string> BrowserLanguages { get; private set; } = [AppCultureCatalog.EnglishCultureName];
+    public BrowserMediaCaptureCapabilities CaptureCapabilities { get; set; } = BrowserMediaCaptureCapabilities.Default;
     public string DocumentLanguage { get; private set; } = AppCultureCatalog.DefaultCultureName;
     public Dictionary<string, object?> SavedValues { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, string> SavedJsonValues { get; } = new(StringComparer.Ordinal);
@@ -300,6 +303,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         {
             BrowserCultureGetLanguagesIdentifier => BrowserLanguages.ToArray(),
             BrowserCultureSetDocumentLanguageIdentifier => SetDocumentLanguage(args),
+            BrowserMediaGetCaptureCapabilitiesIdentifier => CaptureCapabilities,
             CrossTabDisposeIdentifier => null,
             CrossTabInitializeIdentifier => true,
             CrossTabPublishIdentifier => null,

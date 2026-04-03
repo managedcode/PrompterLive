@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.GoLive
+@using PrompterOne.Shared.GoLive.Models
 @using PrompterOne.Shared.Services
 
 <section class="gl-sources-panel">
@@ -22,6 +23,14 @@
         </button>
     </div>
 
+    @if (ShowSingleLocalPreviewHint)
+    {
+        <div class="gl-preview-limit-hint"
+             data-testid="@UiTestIds.GoLive.SingleLocalPreviewHint">
+            @SingleLocalPreviewHint
+        </div>
+    }
+
     <div class="gl-src-list"
          data-testid="@UiTestIds.GoLive.SourcesCard">
         @if (Sources.Count == 0)
@@ -32,6 +41,7 @@
         {
             @foreach (var source in Sources)
             {
+                var surfaceCamera = ResolveSurfaceCamera(source);
                 <article class="@GetSourceCardCssClass(source)"
                          @attributes="GetSourceDiagnostics(source)"
                          data-testid="@UiTestIds.GoLive.SourceCamera(source.SourceId)">
@@ -39,15 +49,29 @@
                             class="gl-cam-main"
                             data-testid="@UiTestIds.GoLive.SourceCameraSelect(source.SourceId)"
                             @onclick="() => SelectSource.InvokeAsync(source.SourceId)">
-                        <GoLiveCameraSurface Camera="@source"
+                        <GoLiveCameraSurface Camera="@surfaceCamera"
                                              ContainerClass="gl-cam-thumb"
                                              VideoClass="gl-source-feed"
                                              VideoTestId="@UiTestIds.GoLive.SourceVideo(source.SourceId)">
                             <OverlayContent>
-                                <span class="@GetSourceBadgeCssClass(source)"
-                                      data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
-                                      data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
+                                @if (surfaceCamera is not null)
+                                {
+                                    <span class="@GetSourceBadgeCssClass(source)"
+                                          data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
+                                          data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
+                                }
                             </OverlayContent>
+                            <EmptyContent>
+                                @if (ShowSourcePreviewPlaceholder(source))
+                                {
+                                    <div class="gl-cam-thumb-limited">
+                                        <span class="@GetSourceBadgeCssClass(source)"
+                                              data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
+                                              data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
+                                        <span class="gl-cam-thumb-limited-copy">@GoLiveText.Surface.SingleLocalCameraPreviewPlaceholderLabel</span>
+                                    </div>
+                                }
+                            </EmptyContent>
                         </GoLiveCameraSurface>
 
                         <div class="gl-cam-meta">
@@ -110,11 +134,14 @@
     [Parameter] public string? ActiveSourceId { get; set; }
     [Parameter] public bool CanAddCamera { get; set; }
     [Parameter] public bool HasPrimaryMicrophone { get; set; }
+    [Parameter] public IReadOnlyList<string> LiveSourceIds { get; set; } = [];
     [Parameter] public string LiveState { get; set; } = IdleStateValue;
     [Parameter] public string MicrophoneName { get; set; } = string.Empty;
     [Parameter] public string MicrophoneRouteLabel { get; set; } = string.Empty;
     [Parameter] public EventCallback<string> SelectSource { get; set; }
     [Parameter] public string? SelectedSourceId { get; set; }
+    [Parameter] public bool ShowSingleLocalPreviewHint { get; set; }
+    [Parameter] public string SingleLocalPreviewHint { get; set; } = string.Empty;
     [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
     [Parameter] public string Title { get; set; } = DefaultTitle;
     [Parameter] public EventCallback<string> ToggleSource { get; set; }
@@ -133,6 +160,17 @@
 
     private bool IsSelected(SceneCameraSource source) =>
         string.Equals(source.SourceId, SelectedSourceId, StringComparison.Ordinal);
+
+    private SceneCameraSource? ResolveSurfaceCamera(SceneCameraSource source) =>
+        CanRenderLiveSource(source)
+            ? source
+            : null;
+
+    private bool CanRenderLiveSource(SceneCameraSource source) =>
+        LiveSourceIds.Count == 0 || LiveSourceIds.Contains(source.SourceId, StringComparer.Ordinal);
+
+    private bool ShowSourcePreviewPlaceholder(SceneCameraSource source) =>
+        ShowSingleLocalPreviewHint && !CanRenderLiveSource(source);
 
     private static string GetSourceStatus(SceneCameraSource source)
     {

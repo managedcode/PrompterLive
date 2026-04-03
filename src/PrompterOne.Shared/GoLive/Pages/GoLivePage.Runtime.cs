@@ -10,7 +10,7 @@ public partial class GoLivePage
         GoLiveOutputRequestFactory.Build(
             camera,
             MediaSceneService.State,
-            AvailableSceneSources,
+            BuildRuntimeSceneSources(camera),
             _activeSceneLayout != GoLiveSceneLayout.Full,
             _studioSettings.Streaming,
             _recordingPreferences,

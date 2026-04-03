@@ -23,8 +23,8 @@
                 <div id="@UiDomIds.GoLive.PreviewEmpty"
                      class="gl-preview-empty"
                      data-testid="@UiTestIds.GoLive.PreviewEmpty">
-                    <div class="gl-preview-empty-title">@EmptyTitle</div>
-                    <div class="gl-preview-empty-copy">@EmptyDescription</div>
+                    <div class="gl-preview-empty-title">@ResolvedEmptyTitle</div>
+                    <div class="gl-preview-empty-copy">@ResolvedEmptyDescription</div>
                 </div>
             </EmptyContent>
         </GoLiveCameraSurface>
@@ -39,14 +39,16 @@
 @code {
     private const string DefaultDescription = "Preview the current live scene camera before arming or switching destinations.";
     private const string DefaultTitle = "Preview";
-    private const string EmptyDescription = "Add a scene camera in Settings or include one in the live output to preview it here.";
-    private const string EmptyTitle = "No camera";
+    private const string DefaultEmptyDescription = "Add a scene camera in Settings or include one in the live output to preview it here.";
+    private const string DefaultEmptyTitle = "No camera";
     private const string IdleStateValue = "idle";
     private const string LiveDotCssClass = "gl-air-dot-live";
 
     [Parameter] public SceneCameraSource? Camera { get; set; }
     [Parameter] public bool CanSwitchProgram { get; set; }
     [Parameter] public string Description { get; set; } = DefaultDescription;
+    [Parameter] public string EmptyDescription { get; set; } = string.Empty;
+    [Parameter] public string EmptyTitle { get; set; } = string.Empty;
     [Parameter] public string LiveState { get; set; } = IdleStateValue;
     [Parameter] public bool ShowSwitchAction { get; set; }
     [Parameter] public EventCallback SwitchSelectedSource { get; set; }
@@ -55,6 +57,14 @@
 
     private bool HasCamera => Camera is not null;
     private string CameraLabel => Camera is null ? string.Empty : MediaDeviceLabelSanitizer.Sanitize(Camera.Label);
+
+    private string ResolvedEmptyDescription => string.IsNullOrWhiteSpace(EmptyDescription)
+        ? DefaultEmptyDescription
+        : EmptyDescription;
+
+    private string ResolvedEmptyTitle => string.IsNullOrWhiteSpace(EmptyTitle)
+        ? DefaultEmptyTitle
+        : EmptyTitle;
 
     private string PreviewIndicatorState => ShowLiveDot
         ? LiveState

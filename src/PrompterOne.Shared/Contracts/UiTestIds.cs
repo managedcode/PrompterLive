@@ -442,6 +442,7 @@ public static class UiTestIds
         public const string SceneBar = "go-live-scene-bar";
         public const string SceneControls = "go-live-scene-controls";
         public const string ScreenTitle = "go-live-screen-title";
+        public const string SingleLocalPreviewHint = "go-live-single-local-preview-hint";
         public const string SessionBar = "go-live-session-bar";
         public const string SessionTimer = "go-live-session-timer";
         public const string SourceRail = "go-live-source-rail";

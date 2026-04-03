@@ -10,6 +10,9 @@
     const monitorMap = new Map();
     const remoteCaptureMap = new Map();
     const remoteStreamMap = new Map();
+    const appleVendorFragment = "Apple";
+    const captureCapabilitiesOverrideGlobal = "__prompterOneMediaCapabilityOverride";
+    const touchMacPlatform = "MacIntel";
     const syntheticHarnessGlobal = "__prompterOneMediaHarness";
     const syntheticMetadataProperty = "__prompterOneSyntheticMedia";
     const videoInputKind = "videoinput";
@@ -172,6 +175,41 @@
 
     function hasSyntheticMediaHarness() {
         return typeof window[syntheticHarnessGlobal] === "object" && window[syntheticHarnessGlobal] !== null;
+    }
+
+    function normalizeCaptureCapabilities(rawCapabilities) {
+        return {
+            supportsConcurrentLocalCameraCaptures: rawCapabilities?.supportsConcurrentLocalCameraCaptures !== false
+        };
+    }
+
+    function isAppleMobileWebKit() {
+        const userAgent = typeof navigator.userAgent === "string" ? navigator.userAgent : "";
+        const platform = typeof navigator.platform === "string" ? navigator.platform : "";
+        const vendor = typeof navigator.vendor === "string" ? navigator.vendor : "";
+        const maxTouchPoints = Number.isFinite(navigator.maxTouchPoints) ? navigator.maxTouchPoints : 0;
+        const isAppleMobileUserAgent = /iPad|iPhone|iPod/.test(userAgent);
+        const isTouchMac = platform === touchMacPlatform && maxTouchPoints > 1;
+
+        return vendor.includes(appleVendorFragment) && (isAppleMobileUserAgent || isTouchMac);
+    }
+
+    function getCaptureCapabilities() {
+        const overriddenCapabilities = window[captureCapabilitiesOverrideGlobal];
+        if (overriddenCapabilities && typeof overriddenCapabilities === "object") {
+            return normalizeCaptureCapabilities(overriddenCapabilities);
+        }
+
+        if (hasSyntheticMediaHarness()) {
+            const harnessCapabilities = window[syntheticHarnessGlobal]?.getCaptureCapabilities?.();
+            if (harnessCapabilities && typeof harnessCapabilities === "object") {
+                return normalizeCaptureCapabilities(harnessCapabilities);
+            }
+        }
+
+        return normalizeCaptureCapabilities({
+            supportsConcurrentLocalCameraCaptures: !isAppleMobileWebKit()
+        });
     }
 
     async function getLocalDevicesFallback(kind, requestPermissions) {
@@ -502,6 +540,10 @@
     }
 
     window[interopNamespace] = {
+        getCaptureCapabilities() {
+            return getCaptureCapabilities();
+        },
+
         async queryPermissions() {
             const state = { cameraGranted: false, microphoneGranted: false };
 

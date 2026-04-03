@@ -6,6 +6,7 @@ using PrompterOne.Core.Models.Media;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Pages;
+using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.App.Tests;
@@ -91,6 +92,25 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         });
     }
 
+    [Fact]
+    public void GoLivePage_ShowsSingleLocalPreviewHintWhenConcurrentLocalCaptureIsUnavailable()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        harness.JsRuntime.CaptureCapabilities = new BrowserMediaCaptureCapabilities(false);
+        harness.JsRuntime.SavedJsonValues[SceneSettingsStorageKey] = JsonSerializer.Serialize(CreateTwoCameraScene());
+
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.GoLiveDemo);
+
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SingleLocalPreviewHint));
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.GoLive.SourceVideo(AppTestData.Camera.SecondSourceId))));
+        });
+    }
+
     private static MediaSceneState CreateSingleCameraScene() =>
         new(
             [
@@ -98,6 +118,24 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
                     AppTestData.Camera.FirstSourceId,
                     AppTestData.Camera.FirstDeviceId,
                     AppTestData.Camera.FrontCamera,
+                    new MediaSourceTransform(IncludeInOutput: true))
+            ],
+            null,
+            null,
+            AudioBusState.Empty);
+
+    private static MediaSceneState CreateTwoCameraScene() =>
+        new(
+            [
+                new SceneCameraSource(
+                    AppTestData.Camera.FirstSourceId,
+                    AppTestData.Camera.FirstDeviceId,
+                    AppTestData.Camera.FrontCamera,
+                    new MediaSourceTransform(IncludeInOutput: true)),
+                new SceneCameraSource(
+                    AppTestData.Camera.SecondSourceId,
+                    AppTestData.Camera.SecondDeviceId,
+                    AppTestData.Camera.SideCamera,
                     new MediaSourceTransform(IncludeInOutput: true))
             ],
             null,
