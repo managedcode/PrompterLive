@@ -244,7 +244,7 @@ public partial class TeleprompterPage
             : $"{BuildProgressPercent():0}% · {_activeReaderCardIndex + 1} / {_cards.Count}";
 
     private static string BuildReaderProgressSegmentStyle(ReaderCardViewModel card) =>
-        $"flex:0 0 {card.WidthPercentString};";
+        $"flex:{BuildReaderProgressSegmentFlexWeight(card)} 1 0;min-width:0;";
 
     private string BuildReaderProgressSegmentFillStyle(int index) =>
         $"width:{BuildReaderCardProgressPercent(index):0.##}%;";
@@ -254,6 +254,11 @@ public partial class TeleprompterPage
     private string BuildElapsedLabel() => _elapsedLabel;
 
     private static string BuildBooleanDataAttribute(bool value) => value ? "true" : "false";
+
+    private static string BuildReaderProgressSegmentFlexWeight(ReaderCardViewModel card) =>
+        card.WidthPercentString.EndsWith("%", StringComparison.Ordinal)
+            ? card.WidthPercentString[..^1]
+            : card.WidthPercentString;
 
     private double BuildProgressPercent()
     {

@@ -78,7 +78,7 @@
                     </button>
                 </div>
             </div>
-            <div class="dcard-inner">
+            <div class="dcard-inner" data-testid="@UiTestIds.Library.CardSurface(card.Id)">
                 <div class="dcard-cover @card.CoverClass">
                     <div class="dcover-orb dcover-orb1"></div>
                     <div class="dcover-orb dcover-orb2"></div>
@@ -126,7 +126,7 @@
     }
 
     <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-testid="@UiTestIds.Library.CreateScript">
-        <div class="dcard-create-inner">
+        <div class="dcard-create-inner" data-testid="@UiTestIds.Library.CreateScriptSurface">
             <div class="dcreate-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -140,7 +140,7 @@
     <article class="dcard dcard-create dcard-create-folder"
              @onclick="HandleStartCreateFolderAsync"
              data-testid="@UiTestIds.Library.FolderCreateTile">
-        <div class="dcard-create-inner">
+        <div class="dcard-create-inner" data-testid="@UiTestIds.Library.FolderCreateTileSurface">
             <div class="dcreate-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />

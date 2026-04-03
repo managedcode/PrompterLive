@@ -916,3 +916,253 @@
         flex-direction: column;
     }
 }
+
+html[data-theme="light"] .set-card-copy,
+html.theme-light .set-card-copy,
+body.theme-light .set-card-copy,
+html[data-theme="light"] .set-sub-title,
+html.theme-light .set-sub-title,
+body.theme-light .set-sub-title,
+html[data-theme="light"] .set-ai-desc,
+html.theme-light .set-ai-desc,
+body.theme-light .set-ai-desc {
+    color: #6B5E4E;
+}
+
+html[data-theme="light"] .set-add-source-menu,
+html.theme-light .set-add-source-menu,
+body.theme-light .set-add-source-menu {
+    background: rgba(255, 255, 255, .94);
+    border-color: rgba(107, 90, 72, .12);
+    box-shadow: 0 8px 24px rgba(107, 90, 72, .12);
+}
+
+html[data-theme="light"] .set-add-source-opt,
+html.theme-light .set-add-source-opt,
+body.theme-light .set-add-source-opt {
+    color: #6B5E4E;
+}
+
+html[data-theme="light"] .set-add-source-opt:hover,
+html.theme-light .set-add-source-opt:hover,
+body.theme-light .set-add-source-opt:hover {
+    background: rgba(107, 90, 72, .08);
+    color: #3D3428;
+}
+
+html[data-theme="light"] .set-dest-card,
+html.theme-light .set-dest-card,
+body.theme-light .set-dest-card {
+    background: rgba(255, 255, 255, .5);
+    border-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-dest-card:hover,
+html.theme-light .set-dest-card:hover,
+body.theme-light .set-dest-card:hover {
+    border-color: rgba(107, 90, 72, .18);
+}
+
+html[data-theme="light"] .set-dest-card.open,
+html.theme-light .set-dest-card.open,
+body.theme-light .set-dest-card.open {
+    border-color: rgba(107, 90, 72, .25);
+}
+
+html[data-theme="light"] .set-dest-card.active,
+html.theme-light .set-dest-card.active,
+body.theme-light .set-dest-card.active {
+    border-color: rgba(139, 115, 85, .3);
+    box-shadow: 0 0 24px rgba(139, 115, 85, .08);
+}
+
+html[data-theme="light"] .set-dest-card.active .set-dest-name,
+html.theme-light .set-dest-card.active .set-dest-name,
+body.theme-light .set-dest-card.active .set-dest-name {
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .set-dest-idle,
+html.theme-light .set-dest-idle,
+body.theme-light .set-dest-idle,
+html[data-theme="light"] .set-dest-chevron,
+html.theme-light .set-dest-chevron,
+body.theme-light .set-dest-chevron {
+    color: #8C7E6A;
+}
+
+html[data-theme="light"] .set-dest-ok,
+html.theme-light .set-dest-ok,
+body.theme-light .set-dest-ok,
+html[data-theme="light"] .set-ai-status-ok,
+html.theme-light .set-ai-status-ok,
+body.theme-light .set-ai-status-ok {
+    color: #059669;
+}
+
+html[data-theme="light"] .set-dest-body,
+html.theme-light .set-dest-body,
+body.theme-light .set-dest-body,
+html[data-theme="light"] .set-device-body,
+html.theme-light .set-device-body,
+body.theme-light .set-device-body,
+html[data-theme="light"] .set-vu-meter,
+html.theme-light .set-vu-meter,
+body.theme-light .set-vu-meter {
+    border-top-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-camera-preview-panel,
+html.theme-light .set-camera-preview-panel,
+body.theme-light .set-camera-preview-panel {
+    background: rgba(255, 255, 255, .55);
+    border-color: rgba(107, 90, 72, .1);
+}
+
+html[data-theme="light"] .set-camera-preview-feed,
+html.theme-light .set-camera-preview-feed,
+body.theme-light .set-camera-preview-feed {
+    background: linear-gradient(135deg, rgba(139, 115, 85, .14) 0%, rgba(255, 255, 255, .85) 100%);
+}
+
+html[data-theme="light"] .set-camera-preview-feed::after,
+html.theme-light .set-camera-preview-feed::after,
+body.theme-light .set-camera-preview-feed::after {
+    border-bottom-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-camera-preview-name,
+html.theme-light .set-camera-preview-name,
+body.theme-light .set-camera-preview-name,
+html[data-theme="light"] .set-device-name,
+html.theme-light .set-device-name,
+body.theme-light .set-device-name {
+    color: #3D3428;
+}
+
+html[data-theme="light"] .set-camera-preview-meta,
+html.theme-light .set-camera-preview-meta,
+body.theme-light .set-camera-preview-meta,
+html[data-theme="light"] .set-device-meta,
+html.theme-light .set-device-meta,
+body.theme-light .set-device-meta,
+html[data-theme="light"] .set-vu-db,
+html.theme-light .set-vu-db,
+body.theme-light .set-vu-db,
+html[data-theme="light"] .set-delay-hint,
+html.theme-light .set-delay-hint,
+body.theme-light .set-delay-hint {
+    color: #6B5E4E;
+}
+
+html[data-theme="light"] .set-camera-preview-empty,
+html.theme-light .set-camera-preview-empty,
+body.theme-light .set-camera-preview-empty,
+html[data-theme="light"] .set-device-card:not(.active) .set-device-meta,
+html.theme-light .set-device-card:not(.active) .set-device-meta,
+body.theme-light .set-device-card:not(.active) .set-device-meta {
+    color: #8C7E6A;
+}
+
+html[data-theme="light"] .set-device-card,
+html.theme-light .set-device-card,
+body.theme-light .set-device-card {
+    background: rgba(255, 255, 255, .5);
+    border-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-device-card.active,
+html.theme-light .set-device-card.active,
+body.theme-light .set-device-card.active {
+    border-color: rgba(107, 90, 72, .18);
+}
+
+html[data-theme="light"] .set-device-card.active:hover,
+html.theme-light .set-device-card.active:hover,
+body.theme-light .set-device-card.active:hover {
+    border-color: rgba(107, 90, 72, .25);
+    box-shadow: 0 0 20px rgba(107, 90, 72, .06);
+}
+
+html[data-theme="light"] .set-device-card.set-cam-selected,
+html.theme-light .set-device-card.set-cam-selected,
+body.theme-light .set-device-card.set-cam-selected {
+    border-color: rgba(139, 115, 85, .3);
+    box-shadow: 0 0 24px rgba(139, 115, 85, .08);
+}
+
+html[data-theme="light"] .set-device-card:not(.active),
+html.theme-light .set-device-card:not(.active),
+body.theme-light .set-device-card:not(.active) {
+    border-color: rgba(107, 90, 72, .12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4);
+}
+
+html[data-theme="light"] .set-device-card:not(.active) .set-device-name,
+html.theme-light .set-device-card:not(.active) .set-device-name,
+body.theme-light .set-device-card:not(.active) .set-device-name {
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .set-cam-preview,
+html.theme-light .set-cam-preview,
+body.theme-light .set-cam-preview {
+    background: rgba(107, 90, 72, .06);
+    border-color: rgba(107, 90, 72, .1);
+}
+
+html[data-theme="light"] .set-cam-feed.cam-off,
+html.theme-light .set-cam-feed.cam-off,
+body.theme-light .set-cam-feed.cam-off {
+    background: rgba(107, 90, 72, .06);
+}
+
+html[data-theme="light"] .set-mic-preview,
+html.theme-light .set-mic-preview,
+body.theme-light .set-mic-preview {
+    background: rgba(139, 115, 85, .08);
+    border-color: rgba(107, 90, 72, .1);
+}
+
+html[data-theme="light"] .set-mic-preview.set-mic-off,
+html.theme-light .set-mic-preview.set-mic-off,
+body.theme-light .set-mic-preview.set-mic-off {
+    color: #8C7E6A;
+    background: rgba(107, 90, 72, .06);
+}
+
+html[data-theme="light"] .set-badge-primary,
+html.theme-light .set-badge-primary,
+body.theme-light .set-badge-primary {
+    background: rgba(139, 115, 85, .7);
+}
+
+html[data-theme="light"] .set-btn-primary-cam.active,
+html.theme-light .set-btn-primary-cam.active,
+body.theme-light .set-btn-primary-cam.active {
+    color: #5C4D3D;
+    background: rgba(139, 115, 85, .15);
+    border-color: rgba(139, 115, 85, .3);
+}
+
+html[data-theme="light"] .set-vu-track,
+html.theme-light .set-vu-track,
+body.theme-light .set-vu-track {
+    background: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-about-hero,
+html.theme-light .set-about-hero,
+body.theme-light .set-about-hero {
+    background: linear-gradient(135deg, rgba(139, 115, 85, .06) 0%, rgba(255, 255, 255, 0) 70%);
+    border-color: rgba(107, 90, 72, .12);
+}
+
+html[data-theme="light"] .set-about-appname,
+html.theme-light .set-about-appname,
+body.theme-light .set-about-appname {
+    background: linear-gradient(135deg, #5C4D3D, #8B7355);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

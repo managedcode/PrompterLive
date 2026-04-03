@@ -13,29 +13,61 @@ internal static partial class BrowserTestConstants
         public const string OpeningBlock = "Opening Block";
         public const string PurposeBlock = "Purpose Block";
         public const string BenefitsBlock = "Benefits Block";
+        public const string DatePickerScenario = "editor-date-picker-theme";
+        public const string DatePickerDarkStep = "01-dark-theme-date-picker";
+        public const string DatePickerLightStep = "02-light-theme-date-picker";
         public const string LearnSpeedAfterIncrease = "260";
         public const int BenefitsSegmentIndex = 2;
         public const int BenefitsBlockIndex = 1;
+        public const string LightThemeScenario = "editor-light-theme-emotion-menu";
+        public const string LightThemeStep = "01-readable-menu-and-tooltip";
+        public const double MinimumDateFieldWidthPx = 150;
+        public const int TooltipSettleDelayMs = 120;
+        public const double MaximumReadableTextChannel = 160;
+        public const double MinimumLightMenuSurfaceChannel = 220;
+        public const double MinimumLightTooltipSurfaceChannel = 215;
+        public const double MinimumVisibleTooltipOpacity = 0.9;
     }
 
     public static class SettingsFlow
     {
         public const string CrossTabThemeScenario = "settings-cross-tab-theme-sync";
         public const string CrossTabThemeSyncedStep = "01-light-theme-synced";
+        public const string DarkTheme = "dark";
         public const int SharedContextPageCount = 2;
         public const string HtmlThemeAttribute = "data-theme";
         public const string LightTheme = "light";
         public const string CloudStorageScenario = "settings-cloud-storage";
         public const string CloudStorageConfiguredStep = "01-cloud-storage-configured";
         public const string CloudStorageReloadedStep = "02-cloud-storage-reloaded";
+        public const string LightThemeScenario = "settings-cloud-light-theme";
+        public const string LightThemeStep = "01-readable-colors";
         public const string DropboxLabel = "Managed Dropbox";
         public const string DropboxValidationMessage = "Dropbox requires an access token or a refresh token with app key.";
         public const string OpenAiProviderId = "openai";
         public const string MicLevelPercentText = "82%";
         public const string MicLevelValue = "82";
         public const double NavItemLayoutTolerancePx = 0.5;
+        public const double MinimumLightSurfaceChannel = 220;
+        public const double MinimumLightFieldChannel = 230;
+        public const double MaximumReadableTextChannel = 140;
+        public const double MaximumReadableSecondaryTextChannel = 160;
         public const string MicLevelInputScript =
             "element => { element.value = '82'; element.dispatchEvent(new Event('input', { bubbles: true })); }";
+    }
+
+    public static class LibraryFlow
+    {
+        public const string BackgroundColorProperty = "backgroundColor";
+        public const string ColorProperty = "color";
+        public const string LightThemeScenario = "library-light-theme";
+        public const string LightThemeStep = "01-readable-library-screen";
+        public const double MinimumLightSidebarSurfaceChannel = 225;
+        public const double MinimumLightSearchSurfaceChannel = 230;
+        public const double MinimumLightCardSurfaceChannel = 210;
+        public const double MinimumLightCreateTileSurfaceChannel = 210;
+        public const double MaximumReadableTextChannel = 160;
+        public const double MaximumReadableSecondaryTextChannel = 175;
     }
 
     public static class TeleprompterFlow
@@ -53,8 +85,11 @@ internal static partial class BrowserTestConstants
         public const string FullscreenInactiveStateScript = "() => !document.fullscreenElement";
         public const string ProgressScenarioName = "teleprompter-segmented-progress";
         public const string ProgressStep = "01-block-progress";
+        public const string ProgressFitScenarioName = "teleprompter-progress-shell-fit";
+        public const string ProgressFitStep = "01-track-contained";
         public const string ProgressEmptyStylePattern = @"width:\s*0%";
         public const string ProgressFilledStylePattern = @"width:\s*100%";
+        public const double MaxProgressShellOverflowPx = 0.5;
         public const string ReaderOrientationAttribute = "data-reader-orientation";
         public const string MirrorHorizontalTransform = "scaleX(-1)";
         public const string MirrorVerticalTransform = "scaleY(-1)";

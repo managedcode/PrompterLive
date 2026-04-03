@@ -187,6 +187,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutCompanyWebsite)).ToHaveAttributeAsync("href", AboutLinks.ManagedCodeWebsiteUrl);
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutCompanyGitHub)).ToHaveAttributeAsync("href", AboutLinks.ManagedCodeGitHubUrl);
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutProductGitHub)).ToHaveAttributeAsync("href", AboutLinks.ProductRepositoryUrl);
+        await Expect(page.GetByTestId(UiTestIds.Settings.AboutTpsGitHub)).ToHaveAttributeAsync("href", AboutLinks.TpsRepositoryUrl);
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutRepositoryLink)).ToHaveAttributeAsync("href", AboutLinks.ProductRepositoryUrl);
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutReleasesLink)).ToHaveAttributeAsync("href", AboutLinks.ProductReleasesUrl);
         await Expect(page.GetByTestId(UiTestIds.Settings.AboutIssuesLink)).ToHaveAttributeAsync("href", AboutLinks.ProductIssuesUrl);

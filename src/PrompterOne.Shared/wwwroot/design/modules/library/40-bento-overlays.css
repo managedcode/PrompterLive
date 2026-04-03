@@ -220,6 +220,144 @@
     background: radial-gradient(ellipse at 50% 40%, rgba(13,148,136,.05), transparent 60%);
 }
 
+html[data-theme="light"] .dcard-menu-btn,
+html.theme-light .dcard-menu-btn,
+body.theme-light .dcard-menu-btn {
+    background: rgba(107,90,72,.06);
+    color: rgba(107,90,72,.5);
+    border-color: rgba(107,90,72,.1);
+}
+
+html[data-theme="light"] .dcard-menu-btn:hover,
+html.theme-light .dcard-menu-btn:hover,
+body.theme-light .dcard-menu-btn:hover {
+    background: rgba(107,90,72,.15);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .dcard-dropdown,
+html.theme-light .dcard-dropdown,
+body.theme-light .dcard-dropdown {
+    background: rgba(255,255,255,.95);
+    border-color: rgba(107,90,72,.15);
+    box-shadow: 0 8px 32px rgba(107,90,72,.12);
+}
+
+html[data-theme="light"] .dcard-dropdown button:hover,
+html.theme-light .dcard-dropdown button:hover,
+body.theme-light .dcard-dropdown button:hover {
+    background: rgba(107,90,72,.06);
+}
+
+html[data-theme="light"] .dcard-dropdown-danger,
+html.theme-light .dcard-dropdown-danger,
+body.theme-light .dcard-dropdown-danger {
+    color: #DC2626 !important;
+}
+
+html[data-theme="light"] .dcard-dropdown-danger:hover,
+html.theme-light .dcard-dropdown-danger:hover,
+body.theme-light .dcard-dropdown-danger:hover {
+    background: rgba(220,38,38,.08) !important;
+    color: #DC2626 !important;
+}
+
+html[data-theme="light"] .dcard-create,
+html.theme-light .dcard-create,
+body.theme-light .dcard-create {
+    background: linear-gradient(160deg, rgba(139,115,85,.18), rgba(139,115,85,.06) 40%, rgba(139,115,85,.12)) !important;
+}
+
+html[data-theme="light"] .dcard-create:hover,
+html.theme-light .dcard-create:hover,
+body.theme-light .dcard-create:hover {
+    background: linear-gradient(160deg, rgba(139,115,85,.28), rgba(139,115,85,.1) 40%, rgba(139,115,85,.18)) !important;
+}
+
+html[data-theme="light"] .dcard-create-inner,
+html.theme-light .dcard-create-inner,
+body.theme-light .dcard-create-inner {
+    background: rgba(255,255,255,.72);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.85),
+        inset 0 -1px 0 rgba(107,90,72,.06),
+        inset 0 0 0 1px rgba(107,90,72,.06);
+}
+
+html[data-theme="light"] .dcard-create-inner::before,
+html.theme-light .dcard-create-inner::before,
+body.theme-light .dcard-create-inner::before {
+    background: radial-gradient(ellipse at 50% 40%, rgba(139,115,85,.08), transparent 60%);
+}
+
+html[data-theme="light"] .dcreate-icon,
+html.theme-light .dcreate-icon,
+body.theme-light .dcreate-icon {
+    background: rgba(139,115,85,.1);
+    border-color: rgba(139,115,85,.18);
+    color: #8B7355;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+}
+
+html[data-theme="light"] .dcard-create:hover .dcreate-icon,
+html.theme-light .dcard-create:hover .dcreate-icon,
+body.theme-light .dcard-create:hover .dcreate-icon {
+    background: rgba(139,115,85,.18);
+    border-color: rgba(139,115,85,.28);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .dcreate-label,
+html.theme-light .dcreate-label,
+body.theme-light .dcreate-label {
+    color: #8B7355;
+}
+
+html[data-theme="light"] .dcard-create:hover .dcreate-label,
+html.theme-light .dcard-create:hover .dcreate-label,
+body.theme-light .dcard-create:hover .dcreate-label {
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .dcard-create-folder,
+html.theme-light .dcard-create-folder,
+body.theme-light .dcard-create-folder {
+    background: linear-gradient(160deg, rgba(13,148,136,.18), rgba(13,148,136,.06) 40%, rgba(13,148,136,.12)) !important;
+}
+
+html[data-theme="light"] .dcard-create-folder:hover,
+html.theme-light .dcard-create-folder:hover,
+body.theme-light .dcard-create-folder:hover {
+    background: linear-gradient(160deg, rgba(13,148,136,.26), rgba(13,148,136,.1) 40%, rgba(13,148,136,.18)) !important;
+}
+
+html[data-theme="light"] .dcard-create-folder .dcreate-icon,
+html.theme-light .dcard-create-folder .dcreate-icon,
+body.theme-light .dcard-create-folder .dcreate-icon {
+    background: rgba(13,148,136,.1);
+    border-color: rgba(13,148,136,.18);
+    color: #0F766E;
+}
+
+html[data-theme="light"] .dcard-create-folder:hover .dcreate-icon,
+html.theme-light .dcard-create-folder:hover .dcreate-icon,
+body.theme-light .dcard-create-folder:hover .dcreate-icon {
+    background: rgba(13,148,136,.18);
+    border-color: rgba(13,148,136,.28);
+}
+
+html[data-theme="light"] .dcard-create-folder .dcreate-label,
+html.theme-light .dcard-create-folder .dcreate-label,
+body.theme-light .dcard-create-folder .dcreate-label {
+    color: #0F766E;
+}
+
+html[data-theme="light"] .dcard-create-folder .dcard-create-inner::before,
+html.theme-light .dcard-create-folder .dcard-create-inner::before,
+body.theme-light .dcard-create-folder .dcard-create-inner::before {
+    background: radial-gradient(ellipse at 50% 40%, rgba(13,148,136,.08), transparent 60%);
+}
+
 .lib-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -389,4 +527,3 @@
         padding-right: 20px;
     }
 }
-

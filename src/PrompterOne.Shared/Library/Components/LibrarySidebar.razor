@@ -3,7 +3,7 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="lib-sidebar">
+<div class="lib-sidebar" data-testid="@UiTestIds.Library.Sidebar">
     <nav class="lib-nav">
         <a class="nav-item @(IsAllSelected ? "active" : null)"
            @onclick="HandleSelectAllAsync"

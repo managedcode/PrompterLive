@@ -187,6 +187,77 @@
     font-family: var(--mono);
 }
 
+html[data-theme="light"] .lib-sidebar,
+html.theme-light .lib-sidebar,
+body.theme-light .lib-sidebar {
+    background: rgba(255,255,255,.6);
+    border-color: rgba(107,90,72,.08);
+}
+
+html[data-theme="light"] .lib-logo span,
+html.theme-light .lib-logo span,
+body.theme-light .lib-logo span {
+    background: linear-gradient(135deg, #5C4D3D, #8B7355);
+    -webkit-background-clip: text;
+}
+
+html[data-theme="light"] .logo-icon,
+html.theme-light .logo-icon,
+body.theme-light .logo-icon {
+    background: linear-gradient(145deg, rgba(139,115,85,.1), rgba(196,168,130,.06));
+    border-color: rgba(139,115,85,.15);
+    box-shadow: 0 2px 12px rgba(139,115,85,.06), inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+html[data-theme="light"] .lib-folders-header,
+html.theme-light .lib-folders-header,
+body.theme-light .lib-folders-header,
+html[data-theme="light"] .folder-add-btn,
+html.theme-light .folder-add-btn,
+body.theme-light .folder-add-btn {
+    color: rgba(92,77,61,.62);
+}
+
+html[data-theme="light"] .folder-add-btn:hover,
+html.theme-light .folder-add-btn:hover,
+body.theme-light .folder-add-btn:hover,
+html[data-theme="light"] .folder-item:hover,
+html.theme-light .folder-item:hover,
+body.theme-light .folder-item:hover,
+html[data-theme="light"] .nav-item:hover,
+html.theme-light .nav-item:hover,
+body.theme-light .nav-item:hover {
+    background: rgba(107,90,72,.06);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .folder-item.active,
+html.theme-light .folder-item.active,
+body.theme-light .folder-item.active,
+html[data-theme="light"] .nav-item.active,
+html.theme-light .nav-item.active,
+body.theme-light .nav-item.active {
+    color: #5C4D3D;
+    background: rgba(139,115,85,.1);
+    border-color: rgba(139,115,85,.15);
+}
+
+html[data-theme="light"] .nav-count,
+html.theme-light .nav-count,
+body.theme-light .nav-count {
+    color: #8B7355;
+    background: rgba(139,115,85,.08);
+}
+
+html[data-theme="light"] .folder-children,
+html.theme-light .folder-children,
+body.theme-light .folder-children,
+html[data-theme="light"] .lib-nav-bottom,
+html.theme-light .lib-nav-bottom,
+body.theme-light .lib-nav-bottom {
+    border-color: rgba(107,90,72,.08);
+}
+
 @media (max-width: 900px) {
     .lib-sidebar {
         width: 220px;

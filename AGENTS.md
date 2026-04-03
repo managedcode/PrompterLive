@@ -299,6 +299,9 @@ Repo-specific design rules:
 - Treat every file under `design/` as a static design/prototype reference only. Production UI must be implemented as Blazor components in `src/PrompterOne.Shared`; do not ship raw `design` HTML as runtime UI.
 - Do not re-invent the UI when the answer should be “port the markup and classes from `design`”.
 - For parity tasks, port the full routed screen from its matching `design/*.html` reference, not just isolated high-signal blocks. Settings, Editor, Learn, Teleprompter, and Go Live must match the reference screen in layout and intended interaction while staying Blazor/C# owned.
+- When the user reports a visual or theme regression on a routed screen, verify the adjacent chrome and primary controls on that same screen in the affected theme instead of fixing only the single highlighted widget; add or update a browser regression that covers the broader screen-level parity check.
+- When routed UI or visual design changes materially, refresh the README screenshots and feature/status copy before release so public docs match the shipped product.
+- Release-ready work is not done until the requested branch is pushed and the corresponding GitHub CI run finishes green; if the user asks to land in `main`, use `main` and wait for the resulting pipeline status instead of stopping at local verification.
 - About content must stay factual and current: do not invent team members or contributor names; use Managed Code attribution and official company links only.
 - Do not introduce a server host for the app runtime.
 - Preserve stable `data-testid` selectors on core flows because the Playwright suite depends on them.

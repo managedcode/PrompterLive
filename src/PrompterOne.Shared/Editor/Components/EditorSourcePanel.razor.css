@@ -58,9 +58,103 @@
 .efb-menu-item{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;color:var(--text-2);border-radius:8px;cursor:pointer;border:none;background:transparent;font-family:var(--font-sans);width:100%;text-align:left;}
 .efb-menu-item:hover{background:var(--gold-07);color:var(--text-1);}
 .efb-menu-item small{margin-left:auto;font-family:var(--font-mono);color:var(--text-4);font-size:10px;}
-.efb-btn[title]{position:relative;}
-.efb-btn[title]::after{content:attr(title);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:500;color:#D0D8D4;background:rgba(4,6,10,.94);border:1px solid var(--gold-12);padding:4px 10px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:300;font-family:var(--font);}
-.efb-btn[title]:hover::after{opacity:1;}
+.efb-btn[data-tip],.efb-menu-item[data-tip]{position:relative;}
+.efb-btn[data-tip]::after,.efb-menu-item[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:normal;max-width:260px;min-width:120px;width:max-content;font-size:11px;line-height:1.4;font-weight:500;color:#D0D8D4;background:rgba(4,6,10,.94);border:1px solid var(--gold-12);padding:6px 10px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:300;font-family:var(--font-sans);text-align:left;box-shadow:0 10px 24px rgba(0,0,0,.34);}
+.efb-btn[data-tip]:hover::after,.efb-menu-item[data-tip]:hover::after{opacity:1;}
+
+html[data-theme="light"] .ed-main,
+html.theme-light .ed-main,
+body.theme-light .ed-main {
+    background: rgba(255, 255, 255, .72);
+    border-color: rgba(107, 90, 72, .1);
+    box-shadow: 0 22px 48px rgba(92, 77, 61, .08), inset 0 1px 0 rgba(255, 255, 255, .84);
+}
+
+html[data-theme="light"] .ed-toolbar,
+html.theme-light .ed-toolbar,
+body.theme-light .ed-toolbar {
+    background: rgba(255, 255, 255, .88);
+    border-bottom-color: rgba(107, 90, 72, .1);
+}
+
+html[data-theme="light"] .tb-label,
+html.theme-light .tb-label,
+body.theme-light .tb-label {
+    color: rgba(107, 90, 72, .5);
+}
+
+html[data-theme="light"] .tb-div,
+html.theme-light .tb-div,
+body.theme-light .tb-div {
+    background: rgba(107, 90, 72, .1);
+}
+
+html[data-theme="light"] .tb-btn,
+html.theme-light .tb-btn,
+body.theme-light .tb-btn {
+    color: rgba(107, 90, 72, .58);
+}
+
+html[data-theme="light"] .tb-btn:hover,
+html.theme-light .tb-btn:hover,
+body.theme-light .tb-btn:hover {
+    color: #5C4D3D;
+    background: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .tb-dropdown,
+html.theme-light .tb-dropdown,
+body.theme-light .tb-dropdown {
+    background: rgba(255, 255, 255, .96);
+    border-color: rgba(139, 115, 85, .16);
+    box-shadow: 0 18px 44px rgba(92, 77, 61, .14);
+}
+
+html[data-theme="light"] .tb-drop-label,
+html.theme-light .tb-drop-label,
+body.theme-light .tb-drop-label {
+    color: rgba(107, 90, 72, .56);
+}
+
+html[data-theme="light"] .tb-drop-sep,
+html.theme-light .tb-drop-sep,
+body.theme-light .tb-drop-sep {
+    background: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .tb-emo-item,
+html.theme-light .tb-emo-item,
+body.theme-light .tb-emo-item {
+    color: #4B4034;
+}
+
+html[data-theme="light"] .tb-emo-item:hover,
+html.theme-light .tb-emo-item:hover,
+body.theme-light .tb-emo-item:hover {
+    color: #2C2418;
+    background: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .tb-emo-item small,
+html.theme-light .tb-emo-item small,
+body.theme-light .tb-emo-item small {
+    color: #8C7E6A;
+}
+
+html[data-theme="light"] .tb-tip::after,
+html[data-theme="light"] .efb-btn[data-tip]::after,
+html[data-theme="light"] .efb-menu-item[data-tip]::after,
+html.theme-light .tb-tip::after,
+html.theme-light .efb-btn[data-tip]::after,
+html.theme-light .efb-menu-item[data-tip]::after,
+body.theme-light .tb-tip::after,
+body.theme-light .efb-btn[data-tip]::after,
+body.theme-light .efb-menu-item[data-tip]::after {
+    color: #2C2418;
+    background: rgba(255, 255, 255, .98);
+    border-color: rgba(139, 115, 85, .16);
+    box-shadow: 0 12px 30px rgba(92, 77, 61, .16);
+}
 
 @keyframes floatBarIn{
     from{opacity:0;transform:translate(-50%,calc(-100% - var(--ed-floatbar-gap) + 6px)) scale(.96);}

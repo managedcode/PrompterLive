@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -107,8 +108,84 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TeleprompterFlow.ProgressStep);
         });
 
+    [Fact]
+    public Task TeleprompterScreen_DesktopProgressShell_KeepsSegmentsInsideItsBorder() =>
+        RunPageAsync(async page =>
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync(new()
+            {
+                Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+            });
+
+            var progressShell = page.GetByTestId(UiTestIds.Teleprompter.Progress);
+            var progressTrack = page.GetByTestId(UiTestIds.Teleprompter.ProgressSegments);
+
+            await Expect(progressShell).ToBeVisibleAsync();
+            await Expect(progressTrack).ToBeVisibleAsync();
+
+            var shellBounds = await GetRequiredBoundingBoxAsync(progressShell);
+            var segmentBounds = await MeasureProgressSegmentBoundsAsync(progressTrack);
+            var viewportBounds = await ReadViewportBoundsAsync(page);
+
+            Assert.True(
+                shellBounds.X >= -BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
+                $"Expected teleprompter progress shell left edge {shellBounds.X:0.##} to stay inside viewport.");
+            Assert.True(
+                shellBounds.X + shellBounds.Width <= viewportBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
+                $"Expected teleprompter progress shell right edge {shellBounds.X + shellBounds.Width:0.##} to stay within viewport width {viewportBounds.Width:0.##}.");
+            Assert.True(
+                segmentBounds.Left >= shellBounds.X - BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
+                $"Expected teleprompter progress segments left edge {segmentBounds.Left:0.##} to stay inside shell left edge {shellBounds.X:0.##}.");
+            Assert.True(
+                segmentBounds.Right <= shellBounds.X + shellBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
+                $"Expected teleprompter progress segments right edge {segmentBounds.Right:0.##} to stay inside shell right edge {shellBounds.X + shellBounds.Width:0.##}.");
+
+            await UiScenarioArtifacts.CapturePageAsync(
+                page,
+                BrowserTestConstants.TeleprompterFlow.ProgressFitScenarioName,
+                BrowserTestConstants.TeleprompterFlow.ProgressFitStep);
+        });
+
     private static async Task<bool> IsFullscreenActiveAsync(Microsoft.Playwright.IPage page) =>
         await page.EvaluateAsync<bool>(BrowserTestConstants.TeleprompterFlow.FullscreenStateScript);
+
+    private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(ILocator locator) =>
+        await locator.EvaluateAsync<LayoutBounds>(
+            """
+            element => {
+                const rect = element.getBoundingClientRect();
+                return {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height
+                };
+            }
+            """);
+
+    private static async Task<SegmentBounds> MeasureProgressSegmentBoundsAsync(ILocator locator) =>
+        await locator.EvaluateAsync<SegmentBounds>(
+            """
+            element => {
+                const childRects = Array.from(element.children, child => child.getBoundingClientRect());
+                const left = childRects.reduce((minimum, rect) => Math.min(minimum, rect.left), Number.POSITIVE_INFINITY);
+                const right = childRects.reduce((maximum, rect) => Math.max(maximum, rect.right), Number.NEGATIVE_INFINITY);
+                return {
+                    left: Number.isFinite(left) ? left : 0,
+                    right: Number.isFinite(right) ? right : 0
+                };
+            }
+            """);
+
+    private static async Task<ViewportBounds> ReadViewportBoundsAsync(IPage page) =>
+        await page.EvaluateAsync<ViewportBounds>(
+            """
+            () => ({
+                width: window.innerWidth,
+                height: window.innerHeight
+            })
+            """);
 
     private static async Task<int> ReadTotalBlockCountAsync(Microsoft.Playwright.IPage page)
     {
@@ -119,4 +196,8 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
             ? totalBlockCount
             : throw new Xunit.Sdk.XunitException($"Unable to parse teleprompter block count from '{blockIndicatorText}'.");
     }
+
+    private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
+    private readonly record struct SegmentBounds(double Left, double Right);
+    private readonly record struct ViewportBounds(double Width, double Height);
 }

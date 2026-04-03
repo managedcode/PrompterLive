@@ -127,3 +127,10 @@
     color: #F5E6D0;
 }
 
+html[data-theme="light"] .sort-btn.active,
+html.theme-light .sort-btn.active,
+body.theme-light .sort-btn.active {
+    background: rgba(139,115,85,.08);
+    border-color: rgba(139,115,85,.15);
+    color: #5C4D3D;
+}

@@ -16,6 +16,7 @@ public static class UiTestIds
         public const string LibraryBreadcrumbCurrent = "header-library-breadcrumb-current";
         public const string LibraryNewScript = "header-library-new-script";
         public const string LibrarySearch = "library-search";
+        public const string LibrarySearchSurface = "library-search-surface";
         public const string LiveWidget = "header-go-live-widget";
         public const string LiveWidgetPreview = "header-go-live-widget-preview";
         public const string Subtitle = "header-subtitle";
@@ -40,12 +41,15 @@ public static class UiTestIds
 
     public static class Library
     {
+        public const string Sidebar = "library-sidebar";
         public const string Page = "library-page";
         public const string CreateScript = "library-create-script";
+        public const string CreateScriptSurface = "library-create-script-surface";
         public const string FolderAll = "library-folder-all";
         public const string FolderChips = "library-folder-chips";
         public const string FolderCreateStart = "library-folder-create-start";
         public const string FolderCreateTile = "library-folder-create-tile";
+        public const string FolderCreateTileSurface = "library-folder-create-tile-surface";
         public const string NewFolderCard = "library-new-folder-card";
         public const string NewFolderCancel = "library-new-folder-cancel";
         public const string NewFolderName = "library-new-folder-name";
@@ -64,6 +68,8 @@ public static class UiTestIds
         public static string BreadcrumbCurrent(string folderId) => $"library-breadcrumb-{folderId}";
 
         public static string Card(string scriptId) => $"library-card-{scriptId}";
+
+        public static string CardSurface(string scriptId) => $"library-card-surface-{scriptId}";
 
         public static string CardDuplicate(string scriptId) => $"library-card-duplicate-{scriptId}";
 
@@ -103,6 +109,7 @@ public static class UiTestIds
         public const string Created = "editor-created";
         public const string CreatedIcon = "editor-created-icon";
         public const string Duration = "editor-duration";
+        public const string EmotionMotivational = "editor-emotion-motivational";
         public const string EmotionProfessional = "editor-emotion-professional";
         public const string EmotionTrigger = "editor-emotion-trigger";
         public const string Error = "editor-error";
@@ -110,6 +117,7 @@ public static class UiTestIds
         public const string FloatingBar = "editor-floating-bar";
         public const string FloatingEmotion = "editor-float-emotion";
         public const string FloatingEmotionMenu = "editor-floating-emotion-menu";
+        public const string FloatingEmotionMotivational = "editor-float-emotion-motivational";
         public const string FloatingEmotionProfessional = "editor-float-emotion-professional";
         public const string FloatingPause = "editor-float-pause";
         public const string FloatingSlow = "editor-floating-slow";
@@ -227,6 +235,7 @@ public static class UiTestIds
         public const string AboutCompanyWebsite = "settings-about-company-website";
         public const string AboutPanel = "settings-about-panel";
         public const string AboutProductGitHub = "settings-about-product-github";
+        public const string AboutTpsGitHub = "settings-about-tps-github";
         public const string AboutProductWebsite = "settings-about-product-website";
         public const string AboutRepositoryLink = "settings-about-repository-link";
         public const string AboutReleasesLink = "settings-about-releases-link";
@@ -349,6 +358,8 @@ public static class UiTestIds
         public static string SceneFlip(string sourceId) => $"settings-scene-flip-{sourceId}";
 
         public static string SceneMirror(string sourceId) => $"settings-scene-mirror-{sourceId}";
+
+        public static string SelectPanel(string triggerTestId) => $"{triggerTestId}-panel";
 
         public static string SelectOption(string triggerTestId, string optionValue) =>
             $"{triggerTestId}-option-{optionValue}";

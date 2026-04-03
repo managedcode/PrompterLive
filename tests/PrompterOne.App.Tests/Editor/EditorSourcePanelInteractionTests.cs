@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -26,6 +27,34 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         var updatedStyle = cut.FindByTestId(UiTestIds.Editor.FloatingBar).GetAttribute("style");
 
         Assert.Equal(initialStyle, updatedStyle);
+    }
+
+    [Fact]
+    public void EditorSourcePanel_TooltipButtonsUseCustomTooltipContractWithoutNativeTitle()
+    {
+        var cut = Render<EditorSourcePanelHost>();
+
+        var emotionTrigger = cut.FindByTestId(UiTestIds.Editor.EmotionTrigger);
+        AssertTooltipContract(emotionTrigger, "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text");
+
+        emotionTrigger.Click();
+        var motivationalEmotion = cut.FindByTestId(UiTestIds.Editor.EmotionMotivational);
+        AssertTooltipContract(motivationalEmotion, "Inspiring, encouraging. Inline: [motivational]text[/motivational]");
+        emotionTrigger.Click();
+
+        var floatingEmotionTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingEmotion);
+        AssertTooltipContract(floatingEmotionTrigger, "Emotion");
+
+        floatingEmotionTrigger.Click();
+        var floatingMotivationalEmotion = cut.FindByTestId(UiTestIds.Editor.FloatingEmotionMotivational);
+        AssertTooltipContract(floatingMotivationalEmotion, "Inspiring, encouraging. Inline: [motivational]text[/motivational]");
+    }
+
+    private static void AssertTooltipContract(IElement element, string expectedTooltip)
+    {
+        Assert.Null(element.GetAttribute("title"));
+        Assert.Equal(expectedTooltip, element.GetAttribute("data-tip"));
+        Assert.Equal(expectedTooltip, element.GetAttribute("aria-label"));
     }
 
     private sealed class EditorSourcePanelHost : ComponentBase

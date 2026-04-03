@@ -17,9 +17,9 @@
                         <button class="@toolbarAction.CssClass"
                                 type="button"
                                 style="@toolbarAction.Style"
-                                title="@toolbarAction.Tooltip"
                                 data-tip="@toolbarAction.Tooltip"
                                 data-testid="@toolbarAction.TestId"
+                                aria-label="@toolbarAction.Tooltip"
                                 aria-expanded="@GetActionAriaExpanded(toolbarAction)"
                                 disabled="@GetActionDisabled(toolbarAction)"
                                 @onmousedown:preventDefault="@toolbarAction.PreventMouseDown"
@@ -44,9 +44,9 @@
                                     <button class="@dropdownAction.CssClass"
                                             type="button"
                                             style="@dropdownAction.Style"
-                                            title="@dropdownAction.Tooltip"
                                             data-tip="@dropdownAction.Tooltip"
                                             data-testid="@dropdownAction.TestId"
+                                            aria-label="@dropdownAction.Tooltip"
                                             @onclick="() => ExecuteToolbarActionAsync(dropdownAction)">@((MarkupString)dropdownAction.ContentHtml)</button>
                                 }
                             </div>
@@ -95,8 +95,9 @@
                         {
                             <button class="@action.CssClass"
                                     type="button"
-                                    title="@action.Tooltip"
+                                    data-tip="@action.Tooltip"
                                     data-testid="@action.TestId"
+                                    aria-label="@action.Tooltip"
                                     @onmousedown:preventDefault="@action.PreventMouseDown"
                                     @onclick="() => ExecuteToolbarActionAsync(action)">@((MarkupString)action.ContentHtml)</button>
                         }
@@ -117,8 +118,9 @@
                                 {
                                     <button class="@action.CssClass"
                                             type="button"
-                                            title="@action.Tooltip"
+                                            data-tip="@action.Tooltip"
                                             data-testid="@action.TestId"
+                                            aria-label="@action.Tooltip"
                                             @onmousedown:preventDefault="@action.PreventMouseDown"
                                             @onclick="() => ExecuteToolbarActionAsync(action)">@((MarkupString)action.ContentHtml)</button>
                                 }

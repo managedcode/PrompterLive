@@ -38,7 +38,8 @@
 
 .ed-meta-date-wrap {
     position: relative;
-    width: 140px;
+    width: 156px;
+    min-width: 156px;
     color: var(--t2);
 }
 
@@ -49,11 +50,28 @@
 /* Date picker affordance — keep native picker behavior but own the visible icon. */
 .ed-meta-date-input {
     width: 100%;
-    padding-right: 34px;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 32px;
+    font-variant-numeric: tabular-nums;
 }
 
 .ed-meta-date-input[type="date"] {
     color-scheme: dark;
+}
+
+.ed-meta-date-input[type="date"]::-webkit-date-and-time-value,
+.ed-meta-date-input[type="date"]::-webkit-datetime-edit,
+.ed-meta-date-input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+    margin: 0;
+}
+
+.ed-meta-date-input[type="date"]::-webkit-datetime-edit,
+.ed-meta-date-input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
 }
 
 .ed-meta-date-icon {
@@ -69,12 +87,27 @@
 }
 
 .ed-meta-date-input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 32px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
     opacity: 0;
     cursor: pointer;
 }
 
 .ed-meta-date-input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 0;
+}
+
+html[data-theme="light"] .ed-meta-date-input[type="date"],
+html.theme-light .ed-meta-date-input[type="date"],
+body.theme-light .ed-meta-date-input[type="date"] {
+    color-scheme: light;
 }
 .ed-meta-num {
     width: 80px;

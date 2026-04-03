@@ -149,10 +149,13 @@
     transform: translateX(-50%);
     z-index: 12;
     width: min(620px, calc(100% - 220px));
+    max-width: calc(100% - 24px);
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 12px 14px;
+    box-sizing: border-box;
+    overflow: hidden;
     border-radius: 16px;
     border: 1px solid var(--gold-14);
     background: rgba(14,12,9,.72);
@@ -182,9 +185,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 .rd-progress-segment {
     position: relative;
+    min-width: 0;
     height: 8px;
     border-radius: 999px;
     overflow: hidden;

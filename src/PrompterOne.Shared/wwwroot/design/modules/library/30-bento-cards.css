@@ -254,6 +254,70 @@
     box-shadow: 0 0 16px color-mix(in srgb, var(--emo) 10%, transparent);
 }
 
+html[data-theme="light"] .dcard-inner,
+html.theme-light .dcard-inner,
+body.theme-light .dcard-inner {
+    background: rgba(255,255,255,.7);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.8),
+        inset 0 -1px 0 rgba(107,90,72,.05),
+        inset 0 0 0 1px rgba(107,90,72,.06),
+        0 20px 60px rgba(107,90,72,.08),
+        0 4px 12px rgba(107,90,72,.05);
+}
+
+html[data-theme="light"] .dcard-cover::before,
+html.theme-light .dcard-cover::before,
+body.theme-light .dcard-cover::before {
+    background: linear-gradient(to top, rgba(255,255,255,.7), transparent);
+}
+
+html[data-theme="light"] .dcard-data,
+html.theme-light .dcard-data,
+body.theme-light .dcard-data {
+    background: rgba(255,255,255,.64);
+}
+
+html[data-theme="light"] .ddata-foot,
+html.theme-light .ddata-foot,
+body.theme-light .ddata-foot {
+    border-top-color: rgba(107,90,72,.08);
+}
+
+html[data-theme="light"] .dcard-act,
+html.theme-light .dcard-act,
+body.theme-light .dcard-act {
+    background: rgba(107,90,72,.06);
+    border-color: rgba(107,90,72,.12);
+    color: rgba(92,77,61,.78);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+html[data-theme="light"] .dcard-act:hover,
+html.theme-light .dcard-act:hover,
+body.theme-light .dcard-act:hover {
+    background: rgba(107,90,72,.12);
+    color: #5C4D3D;
+    border-color: rgba(107,90,72,.18);
+}
+
+html[data-theme="light"] .dcard-act-go,
+html.theme-light .dcard-act-go,
+body.theme-light .dcard-act-go {
+    background: rgba(139,115,85,.1);
+    color: #5C4D3D;
+    border-color: rgba(139,115,85,.18);
+}
+
+html[data-theme="light"] .dcard-act-go:hover,
+html.theme-light .dcard-act-go:hover,
+body.theme-light .dcard-act-go:hover {
+    background: rgba(139,115,85,.16);
+    color: #5C4D3D;
+    border-color: rgba(139,115,85,.24);
+    box-shadow: 0 0 16px rgba(139,115,85,.12);
+}
+
 @media (max-width: 1400px) {
     .dcards-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

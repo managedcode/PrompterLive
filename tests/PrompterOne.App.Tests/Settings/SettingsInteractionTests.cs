@@ -311,6 +311,9 @@ public sealed class SettingsInteractionTests : BunitContext
                 AboutLinks.ProductRepositoryUrl,
                 cut.FindByTestId(UiTestIds.Settings.AboutProductGitHub).GetAttribute("href"));
             Assert.Equal(
+                AboutLinks.TpsRepositoryUrl,
+                cut.FindByTestId(UiTestIds.Settings.AboutTpsGitHub).GetAttribute("href"));
+            Assert.Equal(
                 AboutLinks.ProductWebsiteUrl,
                 cut.FindByTestId(UiTestIds.Settings.AboutProductWebsite).GetAttribute("href"));
             Assert.Equal(

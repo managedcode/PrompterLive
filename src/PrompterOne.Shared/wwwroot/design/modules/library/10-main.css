@@ -174,6 +174,74 @@
     color: var(--t4);
 }
 
+html[data-theme="light"] .lib-search,
+html.theme-light .lib-search,
+body.theme-light .lib-search {
+    background: rgba(255,255,255,.6);
+    border-color: rgba(107,90,72,.12);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 1px 3px rgba(107,90,72,.06);
+}
+
+html[data-theme="light"] .lib-search:focus-within,
+html.theme-light .lib-search:focus-within,
+body.theme-light .lib-search:focus-within {
+    border-color: rgba(139,115,85,.3);
+    background: rgba(255,255,255,.8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 0 20px rgba(139,115,85,.06);
+}
+
+html[data-theme="light"] .lib-search input::placeholder,
+html.theme-light .lib-search input::placeholder,
+body.theme-light .lib-search input::placeholder {
+    color: rgba(92,77,61,.45);
+}
+
+html[data-theme="light"] .btn-create,
+html.theme-light .btn-create,
+body.theme-light .btn-create {
+    background: rgba(139,115,85,.12);
+    color: #5C4D3D;
+    border-color: rgba(139,115,85,.2);
+    box-shadow: 0 0 20px rgba(139,115,85,.08);
+}
+
+html[data-theme="light"] .btn-create:hover,
+html.theme-light .btn-create:hover,
+body.theme-light .btn-create:hover {
+    background: rgba(139,115,85,.2);
+    border-color: rgba(139,115,85,.3);
+    box-shadow: 0 0 30px rgba(139,115,85,.12);
+}
+
+html[data-theme="light"] .btn-create svg,
+html.theme-light .btn-create svg,
+body.theme-light .btn-create svg {
+    stroke: #5C4D3D;
+}
+
+html[data-theme="light"] .folder-chip,
+html.theme-light .folder-chip,
+body.theme-light .folder-chip {
+    background: rgba(255,255,255,.65);
+    border-color: rgba(107,90,72,.12);
+    color: rgba(92,77,61,.7);
+}
+
+html[data-theme="light"] .folder-chip:hover,
+html.theme-light .folder-chip:hover,
+body.theme-light .folder-chip:hover {
+    background: rgba(139,115,85,.12);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .folder-chip.active,
+html.theme-light .folder-chip.active,
+body.theme-light .folder-chip.active {
+    background: rgba(139,115,85,.16);
+    border-color: rgba(139,115,85,.2);
+    color: #5C4D3D;
+}
+
 @media (max-width: 1100px) {
     .lib-scroll {
         padding: 16px 28px 32px;

@@ -24,6 +24,8 @@ public partial class SettingsAboutSection
     private const string ResourcesCardSubtitle = "Live app, releases, and support";
     private const string ResourcesCardTitle = "Help & Resources";
     private const string SoftwareUpdatesLabel = "Software Updates";
+    private const string TpsGitHubLabel = "TPS on GitHub";
+    private const string TpsGitHubDescription = "TelePrompterScript format, docs, and examples";
     private const string UpToDateLabel = "Up to date";
 
     private static readonly AboutLinkItem[] AppLinks =
@@ -32,7 +34,12 @@ public partial class SettingsAboutSection
             UiTestIds.Settings.AboutProductGitHub,
             "PrompterOne on GitHub",
             "Source code, docs, and milestones",
-            AboutLinks.ProductRepositoryUrl)
+            AboutLinks.ProductRepositoryUrl),
+        new(
+            UiTestIds.Settings.AboutTpsGitHub,
+            TpsGitHubLabel,
+            TpsGitHubDescription,
+            AboutLinks.TpsRepositoryUrl)
     ];
 
     private static readonly AboutLinkItem[] CompanyLinks =

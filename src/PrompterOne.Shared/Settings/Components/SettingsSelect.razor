@@ -26,7 +26,8 @@
 
     @if (_open)
     {
-        <div class="ss-panel">
+        <div class="ss-panel"
+             data-testid="@GetPanelTestId()">
             @foreach (var option in Options)
             {
                 var isSelected = string.Equals(option.Value, Value, StringComparison.Ordinal);
@@ -77,6 +78,9 @@
 
     private string? GetOptionTestId(string optionValue) =>
         TestId is null ? null : UiTestIds.Settings.SelectOption(TestId, optionValue);
+
+    private string? GetPanelTestId() =>
+        TestId is null ? null : UiTestIds.Settings.SelectPanel(TestId);
 
     private void Toggle()
     {

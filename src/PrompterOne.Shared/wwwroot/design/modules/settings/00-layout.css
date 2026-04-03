@@ -326,3 +326,151 @@
         font-size: 11px;
     }
 }
+
+html[data-theme="light"] .set-sidebar,
+html.theme-light .set-sidebar,
+body.theme-light .set-sidebar {
+    background: rgba(255, 255, 255, .6);
+    border-right-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-title,
+html.theme-light .set-title,
+body.theme-light .set-title {
+    background: linear-gradient(135deg, #5C4D3D, #8B7355);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="light"] .set-back-row svg,
+html[data-theme="light"] .set-back-row .set-back-btn,
+html.theme-light .set-back-row svg,
+html.theme-light .set-back-row .set-back-btn,
+body.theme-light .set-back-row svg,
+body.theme-light .set-back-row .set-back-btn {
+    color: rgba(107, 90, 72, .6);
+}
+
+html[data-theme="light"] .set-nav-item,
+html.theme-light .set-nav-item,
+body.theme-light .set-nav-item {
+    color: rgba(107, 90, 72, .6);
+}
+
+html[data-theme="light"] .set-nav-item:hover,
+html.theme-light .set-nav-item:hover,
+body.theme-light .set-nav-item:hover {
+    color: #5C4D3D;
+    background: rgba(107, 90, 72, .06);
+}
+
+html[data-theme="light"] .set-nav-item.active,
+html.theme-light .set-nav-item.active,
+body.theme-light .set-nav-item.active {
+    color: #5C4D3D;
+    background: rgba(139, 115, 85, .1);
+    border-color: rgba(139, 115, 85, .2);
+}
+
+html[data-theme="light"] .set-section-title,
+html.theme-light .set-section-title,
+body.theme-light .set-section-title {
+    color: #3D3428;
+}
+
+html[data-theme="light"] .set-section-desc,
+html.theme-light .set-section-desc,
+body.theme-light .set-section-desc {
+    color: #6B5E4E;
+}
+
+html[data-theme="light"] .set-account,
+html.theme-light .set-account,
+body.theme-light .set-account {
+    background: rgba(255, 255, 255, .6);
+    border-color: rgba(107, 90, 72, .1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+
+html[data-theme="light"] .set-connected,
+html.theme-light .set-connected,
+body.theme-light .set-connected {
+    color: #059669;
+}
+
+html[data-theme="light"] .set-disconnected,
+html.theme-light .set-disconnected,
+body.theme-light .set-disconnected {
+    color: #8C7E6A;
+}
+
+html[data-theme="light"] .set-btn-golden,
+html.theme-light .set-btn-golden,
+body.theme-light .set-btn-golden {
+    color: #5C4D3D;
+    background: rgba(139, 115, 85, .12);
+    border-color: rgba(139, 115, 85, .25);
+    box-shadow: none;
+}
+
+html[data-theme="light"] .set-btn-golden:hover,
+html.theme-light .set-btn-golden:hover,
+body.theme-light .set-btn-golden:hover {
+    background: rgba(139, 115, 85, .2);
+    border-color: rgba(139, 115, 85, .35);
+}
+
+html[data-theme="light"] .set-btn-outline,
+html.theme-light .set-btn-outline,
+body.theme-light .set-btn-outline {
+    color: #6B5E4E;
+    background: rgba(107, 90, 72, .06);
+    border-color: rgba(107, 90, 72, .15);
+}
+
+html[data-theme="light"] .set-btn-outline:hover,
+html.theme-light .set-btn-outline:hover,
+body.theme-light .set-btn-outline:hover {
+    background: rgba(107, 90, 72, .12);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .set-field label,
+html.theme-light .set-field label,
+body.theme-light .set-field label {
+    color: rgba(107, 90, 72, .7);
+}
+
+html[data-theme="light"] .set-field-toggle,
+html.theme-light .set-field-toggle,
+body.theme-light .set-field-toggle {
+    border-bottom-color: rgba(107, 90, 72, .08);
+}
+
+html[data-theme="light"] .set-field-toggle label,
+html.theme-light .set-field-toggle label,
+body.theme-light .set-field-toggle label {
+    color: #3D3428;
+}
+
+html[data-theme="light"] .set-select,
+html[data-theme="light"] .set-input,
+html.theme-light .set-select,
+html.theme-light .set-input,
+body.theme-light .set-select,
+body.theme-light .set-input {
+    color: #3D3428;
+    background: rgba(255, 255, 255, .8);
+    border-color: rgba(107, 90, 72, .12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+html[data-theme="light"] .set-select:focus,
+html[data-theme="light"] .set-input:focus,
+html.theme-light .set-select:focus,
+html.theme-light .set-input:focus,
+body.theme-light .set-select:focus,
+body.theme-light .set-input:focus {
+    border-color: rgba(139, 115, 85, .4);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 12px rgba(139, 115, 85, .08);
+}
