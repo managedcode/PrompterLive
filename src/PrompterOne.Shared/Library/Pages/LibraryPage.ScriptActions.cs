@@ -1,4 +1,5 @@
 using PrompterOne.Shared.Components.Library;
+using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -29,18 +30,18 @@ public partial class LibraryPage
                 }
 
                 await SessionService.OpenAsync(document);
-                Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(id)}");
+                Navigation.NavigateTo(AppRoutes.EditorWithId(id));
             });
 
     private Task LearnScriptAsync(string id)
     {
-        Navigation.NavigateTo($"/learn?id={Uri.EscapeDataString(id)}");
+        Navigation.NavigateTo(AppRoutes.LearnWithId(id));
         return Task.CompletedTask;
     }
 
     private Task ReadScriptAsync(string id)
     {
-        Navigation.NavigateTo($"/teleprompter?id={Uri.EscapeDataString(id)}");
+        Navigation.NavigateTo(AppRoutes.TeleprompterWithId(id));
         return Task.CompletedTask;
     }
 

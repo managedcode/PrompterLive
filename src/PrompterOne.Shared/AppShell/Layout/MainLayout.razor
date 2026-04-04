@@ -172,14 +172,17 @@
             <div class="app-live-widget-overlay"></div>
             <div class="app-live-widget-meta">
                 <span class="app-live-widget-live-pill">@GoLiveWidgetStateLabel</span>
-                <span class="app-live-widget-timer">@GoLiveWidgetElapsed</span>
+                <span class="app-live-widget-timer"
+                      data-testid="@UiTestIds.Header.LiveWidgetTimer">@GoLiveWidgetElapsed</span>
             </div>
         </div>
 
         <div class="app-live-widget-copy">
             <span class="app-live-widget-eyebrow">@GoLiveIndicatorCopy</span>
-            <strong class="app-live-widget-title">@GoLiveWidgetTitle</strong>
-            <span class="app-live-widget-detail">@GoLiveWidgetDetail</span>
+            <strong class="app-live-widget-title"
+                    data-testid="@UiTestIds.Header.LiveWidgetTitle">@GoLiveWidgetTitle</strong>
+            <span class="app-live-widget-detail"
+                  data-testid="@UiTestIds.Header.LiveWidgetDetail">@GoLiveWidgetDetail</span>
         </div>
     </button>
 }

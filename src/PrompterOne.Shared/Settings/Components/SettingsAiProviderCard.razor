@@ -8,6 +8,7 @@
                         AdditionalCssClass="@AdditionalCssClass"
                         IsOpen="@IsOpen"
                         OnToggle="@OnToggle"
+                        SubtitleTestId="@SubtitleTestId"
                         TestId="@TestId">
     <Icon>
         @if (Icon is not null)
@@ -79,6 +80,8 @@
     [Parameter] public string StatusLabel { get; set; } = string.Empty;
 
     [Parameter] public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter] public string SubtitleTestId { get; set; } = string.Empty;
 
     [Parameter] public string TestId { get; set; } = string.Empty;
 

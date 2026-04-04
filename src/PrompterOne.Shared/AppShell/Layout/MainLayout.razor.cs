@@ -14,6 +14,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 {
     private const string GoLiveWidgetIdleElapsed = "00:00:00";
     private const string RouteChangedLogTemplate = "Route changed to {Location}.";
+    private static readonly TimeSpan GoLiveWidgetRefreshInterval = TimeSpan.FromSeconds(1);
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
@@ -24,6 +25,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     [Inject] private ILogger<MainLayout> Logger { get; set; } = null!;
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
+
+    private CancellationTokenSource? _goLiveWidgetRefreshCancellationTokenSource;
+    private Task? _goLiveWidgetRefreshTask;
 
     private AppShellState ShellState => Shell.State;
 
@@ -41,7 +45,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private bool ShowLearnWpmBadge => ShellState.Screen == AppShellScreen.Learn;
 
-    private bool ShowReadAction => ShellState.Screen is AppShellScreen.Editor or AppShellScreen.GoLive;
+    private bool ShowReadAction => ShellState.Screen == AppShellScreen.Editor;
 
     private bool ShowHeaderSubtitle => !string.IsNullOrWhiteSpace(HeaderSubtitle);
 
@@ -76,9 +80,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         ? GoLiveSessionState.RecordingStartedAt ?? GoLiveSessionState.StreamStartedAt
         : GoLiveSessionState.StreamStartedAt;
 
-    private string GoLiveWidgetDetail => string.IsNullOrWhiteSpace(GoLiveSessionState.ScriptSubtitle)
-        ? GoLiveSessionState.PrimaryMicrophoneLabel
-        : GoLiveSessionState.ScriptSubtitle;
+    private string GoLiveWidgetDetail => string.IsNullOrWhiteSpace(GoLiveSessionState.PrimaryMicrophoneLabel)
+        ? GoLiveWidgetStateLabel
+        : GoLiveSessionState.PrimaryMicrophoneLabel;
 
     private string GoLiveWidgetElapsed => FormatSessionElapsed(GoLiveStartedAt);
 
@@ -90,9 +94,11 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         _ => GoLiveIndicatorCopy
     };
 
-    private string GoLiveWidgetTitle => string.IsNullOrWhiteSpace(GoLiveSessionState.ActiveSourceLabel)
-        ? GoLiveSessionState.ScriptTitle
-        : GoLiveSessionState.ActiveSourceLabel;
+    private string GoLiveWidgetTitle => !string.IsNullOrWhiteSpace(GoLiveSessionState.ActiveSourceLabel)
+        ? GoLiveSessionState.ActiveSourceLabel
+        : !string.IsNullOrWhiteSpace(GoLiveSessionState.SelectedSourceLabel)
+            ? GoLiveSessionState.SelectedSourceLabel
+            : Text(UiTextKey.HeaderGoLive);
 
     private bool ShowGoLiveWidget => GoLiveSessionState.HasActiveSession && ShellState.Screen != AppShellScreen.GoLive;
 
@@ -129,6 +135,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         GoLiveSession.StateChanged += HandleGoLiveSessionChanged;
         Shell.TrackNavigation(Navigation.Uri);
         SyncShellStateWithCurrentRoute(Navigation.Uri);
+        UpdateGoLiveWidgetRefreshLoop();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -146,7 +153,11 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private void HandleShellStateChanged() => InvokeAsync(StateHasChanged);
 
-    private void HandleGoLiveSessionChanged() => InvokeAsync(StateHasChanged);
+    private void HandleGoLiveSessionChanged()
+    {
+        UpdateGoLiveWidgetRefreshLoop();
+        _ = InvokeAsync(StateHasChanged);
+    }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
@@ -228,7 +239,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private Task HandleBackClickAsync()
     {
-        Navigation.NavigateTo(AppRoutes.Library);
+        Navigation.NavigateTo(Shell.GetBackRoute());
         return Task.CompletedTask;
     }
 
@@ -263,10 +274,61 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
+    private void UpdateGoLiveWidgetRefreshLoop()
+    {
+        if (GoLiveSessionState.HasActiveSession)
+        {
+            StartGoLiveWidgetRefreshLoop();
+            return;
+        }
+
+        StopGoLiveWidgetRefreshLoop();
+    }
+
+    private void StartGoLiveWidgetRefreshLoop()
+    {
+        if (_goLiveWidgetRefreshTask is not null)
+        {
+            return;
+        }
+
+        _goLiveWidgetRefreshCancellationTokenSource = new CancellationTokenSource();
+        _goLiveWidgetRefreshTask = RefreshGoLiveWidgetAsync(_goLiveWidgetRefreshCancellationTokenSource.Token);
+    }
+
+    private async Task RefreshGoLiveWidgetAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(GoLiveWidgetRefreshInterval);
+            while (await timer.WaitForNextTickAsync(cancellationToken))
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void StopGoLiveWidgetRefreshLoop()
+    {
+        if (_goLiveWidgetRefreshCancellationTokenSource is null)
+        {
+            return;
+        }
+
+        _goLiveWidgetRefreshCancellationTokenSource.Cancel();
+        _goLiveWidgetRefreshCancellationTokenSource.Dispose();
+        _goLiveWidgetRefreshCancellationTokenSource = null;
+        _goLiveWidgetRefreshTask = null;
+    }
+
     public void Dispose()
     {
         Navigation.LocationChanged -= HandleLocationChanged;
         Shell.StateChanged -= HandleShellStateChanged;
         GoLiveSession.StateChanged -= HandleGoLiveSessionChanged;
+        StopGoLiveWidgetRefreshLoop();
     }
 }

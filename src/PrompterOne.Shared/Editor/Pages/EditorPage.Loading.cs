@@ -1,4 +1,6 @@
 using System.Globalization;
+using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -44,16 +46,18 @@ public partial class EditorPage
 
     private async Task LoadScriptFromQueryAsync()
     {
-        var document = await ScriptRepository.GetAsync(ScriptId!);
-        if (document is not null &&
-            !string.Equals(SessionService.State.ScriptId, document.Id, StringComparison.Ordinal))
-        {
-            await SessionService.OpenAsync(document);
-        }
+        var didLoadRequestedScript = await ScriptRouteSessionLoader.EnsureRequestedSessionAsync(
+            ScriptId,
+            ScriptRepository,
+            SessionService);
 
-        if (document is not null)
+        if (didLoadRequestedScript)
         {
-            _createdDate = document.UpdatedAt.LocalDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var document = await ScriptRepository.GetAsync(ScriptId!);
+            if (document is not null)
+            {
+                _createdDate = document.UpdatedAt.LocalDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            }
         }
     }
 
@@ -68,6 +72,7 @@ public partial class EditorPage
             _draftRevision = checked(_draftRevision + 1);
         }
 
+        ResetMetadataDefaults(state);
         _sourceText = document.Body;
         ApplyLoadedMetadata(metadata, state);
         _segments = OutlineBuilder.Build(state.ScriptData, document.Body, 0);
@@ -80,6 +85,24 @@ public partial class EditorPage
         RefreshStructureAuthoringState();
         UpdateStatus();
         Shell.ShowEditor(_screenTitle, state.ScriptId);
+    }
+
+    private void ResetMetadataDefaults(ScriptWorkspaceState state)
+    {
+        var defaultBaseWpm = state.ScriptData?.TargetWpm ?? 140;
+        _screenTitle = state.Title;
+        _author = DefaultAuthor;
+        _baseWpm = defaultBaseWpm;
+        _profile = defaultBaseWpm >= 250 ? DefaultProfileRsvp : DefaultProfileActor;
+        _version = DefaultVersion;
+        _createdDate = string.IsNullOrWhiteSpace(state.ScriptId)
+            ? DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+            : _createdDate;
+        _displayDuration = FormatDuration(state.EstimatedDuration);
+        _xslowOffset = DefaultXslowOffset;
+        _slowOffset = DefaultSlowOffset;
+        _fastOffset = DefaultFastOffset;
+        _xfastOffset = DefaultXfastOffset;
     }
 
     private void UpdateSyntaxDiagnostics()

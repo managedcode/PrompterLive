@@ -57,6 +57,23 @@
         element.remove();
     }
 
+    function stopTrackHandle(track) {
+        if (!track) {
+            return;
+        }
+
+        try {
+            if (typeof track.stop === "function") {
+                track.stop();
+                return;
+            }
+
+            track.mediaStreamTrack?.stop?.();
+        }
+        catch {
+        }
+    }
+
     function ensureProgramCanvas(session, request) {
         const needsCanvas = !session.programCanvas
             || !session.programContext
@@ -232,9 +249,25 @@
             disconnectAudioOutput(binding);
             binding.sourceNode.disconnect();
             binding.delayNode.disconnect();
-            binding.track.stop();
+            stopTrackHandle(binding.track);
             session.audioBindings.delete(deviceId);
         }
+    }
+
+    async function cleanupVideoBinding(binding) {
+        try {
+            binding.track.detach(binding.element);
+        }
+        catch {
+        }
+
+        try {
+            await getBrowserMedia().releaseSharedCameraTrack(binding.captureKey);
+        }
+        catch {
+        }
+
+        removeElement(binding.element);
     }
 
     async function ensureAudioBindings(session, request) {
@@ -255,7 +288,7 @@
 
         binding.gainNode.disconnect();
         binding.sourceNode.disconnect();
-        binding.track.stop?.();
+        stopTrackHandle(binding.track);
         session.primarySourceAudioBinding = null;
     }
 
@@ -447,15 +480,14 @@
         session.canvasStream = null;
 
         for (const binding of session.videoBindings?.values() ?? []) {
-            stopTrackSet(binding.stream);
-            removeElement(binding.element);
+            await cleanupVideoBinding(binding);
         }
 
         for (const binding of session.audioBindings?.values() ?? []) {
             disconnectAudioOutput(binding);
             binding.sourceNode.disconnect();
             binding.delayNode.disconnect();
-            stopTrackSet(binding.stream);
+            stopTrackHandle(binding.track);
         }
 
         session.videoBindings?.clear?.();

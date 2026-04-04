@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Settings.Models;
 using static Microsoft.Playwright.Assertions;
@@ -14,9 +15,14 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
     public async Task GoLivePage_StartStream_LeavesPersistentWidgetAndReturnsToActiveSession()
     {
         var page = await _fixture.NewPageAsync();
+        var compactViewport = new ResponsiveViewport(
+            BrowserTestConstants.AppShellFlow.LiveWidgetViewportName,
+            BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth,
+            BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight);
 
         try
         {
+            await page.SetViewportSizeAsync(compactViewport.Width, compactViewport.Height);
             await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
             await GoLiveFlowTests.SeedGoLiveOperationalSettingsAsync(page);
             await page.GotoAsync(BrowserTestConstants.Routes.GoLiveDemo);
@@ -33,6 +39,23 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidget)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
+            await Expect(page.GetByTestId(UiTestIds.Header.LiveWidgetDetail)).ToContainTextAsync(BrowserTestConstants.Media.PrimaryMicrophoneLabel);
+            await Expect(page.GetByTestId(UiTestIds.Header.LiveWidgetDetail))
+                .Not.ToContainTextAsync(BrowserTestConstants.Scripts.IntroSubtitle);
+            await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page.GetByTestId(UiTestIds.Header.LiveWidget),
+                UiTestIds.Header.LiveWidget,
+                BrowserTestConstants.AppShellFlow.LiveWidgetScenario,
+                compactViewport);
+            await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page.GetByTestId(UiTestIds.Header.LiveWidgetPreview),
+                UiTestIds.Header.LiveWidgetPreview,
+                BrowserTestConstants.AppShellFlow.LiveWidgetScenario,
+                compactViewport);
+
+            var initialTimerLabel = (await page.GetByTestId(UiTestIds.Header.LiveWidgetTimer).TextContentAsync())?.Trim() ?? string.Empty;
+            var updatedTimerLabel = await WaitForTextChangeAsync(page, UiTestIds.Header.LiveWidgetTimer, initialTimerLabel);
+            Assert.NotEqual(initialTimerLabel, updatedTimerLabel);
 
             await CaptureScreenshotAsync(page, BrowserTestConstants.GoLive.WidgetReturnScreenshotPath);
             await page.GetByTestId(UiTestIds.Header.LiveWidget).ClickAsync();
@@ -315,6 +338,21 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         var fullPath = Path.Combine(AppContext.BaseDirectory, relativePath);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         await page.ScreenshotAsync(new() { Path = fullPath, FullPage = true });
+    }
+
+    private static async Task<string> WaitForTextChangeAsync(IPage page, string testId, string initialText)
+    {
+        for (var attempt = 0; attempt < BrowserTestConstants.AppShellFlow.LiveWidgetTimerPollAttempts; attempt++)
+        {
+            await page.WaitForTimeoutAsync(BrowserTestConstants.AppShellFlow.LiveWidgetTimerPollDelayMs);
+            var currentText = (await page.GetByTestId(testId).TextContentAsync())?.Trim() ?? string.Empty;
+            if (!string.Equals(initialText, currentText, StringComparison.Ordinal))
+            {
+                return currentText;
+            }
+        }
+
+        return initialText;
     }
 
     private static string GetRecordingFileHarnessScriptPath() =>

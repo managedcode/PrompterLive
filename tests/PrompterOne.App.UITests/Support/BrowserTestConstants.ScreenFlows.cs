@@ -27,6 +27,7 @@ internal static partial class BrowserTestConstants
         public const double MinimumLightMenuSurfaceChannel = 220;
         public const double MinimumLightTooltipSurfaceChannel = 215;
         public const double MinimumVisibleTooltipOpacity = 0.9;
+        public const double ToolbarOverflowTolerancePx = 2;
     }
 
     public static class SettingsFlow
@@ -62,12 +63,30 @@ internal static partial class BrowserTestConstants
         public const string ColorProperty = "color";
         public const string LightThemeScenario = "library-light-theme";
         public const string LightThemeStep = "01-readable-library-screen";
+        public const double MinimumTouchMenuOpacity = 0.9;
         public const double MinimumLightSidebarSurfaceChannel = 225;
         public const double MinimumLightSearchSurfaceChannel = 230;
         public const double MinimumLightCardSurfaceChannel = 210;
         public const double MinimumLightCreateTileSurfaceChannel = 210;
         public const double MaximumReadableTextChannel = 160;
         public const double MaximumReadableSecondaryTextChannel = 175;
+    }
+
+    public static class AppShellFlow
+    {
+        public const string PlaybackLaunchScenario = "app-shell-playback-launch";
+        public const string LearnLaunchStep = "01-library-card-learn";
+        public const string LearnBackStep = "02-header-back-from-learn";
+        public const string TeleprompterLaunchStep = "03-library-card-read";
+        public const string TeleprompterBackStep = "04-header-back-from-teleprompter";
+        public const string SettingsOriginScenario = "app-shell-settings-origin";
+        public const string SettingsLaunchStep = "01-go-live-open-settings";
+        public const string SettingsBackStep = "02-header-back-from-settings";
+        public const string SettingsTitle = "Settings";
+        public const string LiveWidgetScenario = "app-shell-live-widget";
+        public const string LiveWidgetViewportName = "iphone-medium-portrait";
+        public const int LiveWidgetTimerPollAttempts = 5;
+        public const int LiveWidgetTimerPollDelayMs = 450;
     }
 
     public static class TeleprompterFlow

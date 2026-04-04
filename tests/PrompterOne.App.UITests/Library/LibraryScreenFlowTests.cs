@@ -173,4 +173,28 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
         });
+
+    [Fact]
+    public Task LibraryScreen_TouchViewport_ShowsCardMenuWithoutHover_AndHidesBreadcrumb() =>
+        RunPageAsync(async page =>
+        {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth,
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight);
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+
+            var demoCardMenu = page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId));
+            var demoCardMenuOpacity = await demoCardMenu.EvaluateAsync<double>(
+                """
+                element => Number.parseFloat(getComputedStyle(element).opacity)
+                """);
+
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToBeHiddenAsync();
+            Assert.True(demoCardMenuOpacity >= BrowserTestConstants.LibraryFlow.MinimumTouchMenuOpacity);
+
+            await demoCardMenu.ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)))
+                .ToBeVisibleAsync();
+        });
 }

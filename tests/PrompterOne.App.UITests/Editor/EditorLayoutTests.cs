@@ -129,6 +129,61 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
+    [Fact]
+    public async Task EditorScreen_ToolbarKeepsFarActionsReachableOnPhoneLandscape()
+    {
+        var page = await _fixture.NewPageAsync();
+
+        try
+        {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight,
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth);
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+
+            var toolbar = page.GetByTestId(UiTestIds.Editor.Toolbar);
+            var aiButton = page.GetByTestId(UiTestIds.Editor.Ai);
+
+            await Expect(toolbar)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(aiButton)
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+
+            var toolbarState = await toolbar.EvaluateAsync<ToolbarOverflowState>(
+                """
+                element => ({
+                    clientWidth: element.clientWidth,
+                    scrollWidth: element.scrollWidth,
+                    overflowX: getComputedStyle(element).overflowX
+                })
+                """);
+
+            Assert.True(
+                new[] { "auto", "scroll" }.Contains(toolbarState.OverflowX, StringComparer.Ordinal),
+                $"Unexpected toolbar overflow-x value: {toolbarState.OverflowX}");
+
+            await toolbar.EvaluateAsync(
+                """
+                element => {
+                    element.scrollLeft = element.scrollWidth;
+                    element.dispatchEvent(new Event('scroll', { bubbles: true }));
+                }
+                """);
+
+            var toolbarBounds = await GetRequiredBoundingBoxAsync(toolbar);
+            var aiButtonBounds = await GetRequiredBoundingBoxAsync(aiButton);
+            var aiOverflowRight = (aiButtonBounds.X + aiButtonBounds.Width) - (toolbarBounds.X + toolbarBounds.Width);
+            var aiOverflowLeft = toolbarBounds.X - aiButtonBounds.X;
+
+            Assert.InRange(aiOverflowRight, double.MinValue, BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
+            Assert.InRange(aiOverflowLeft, double.MinValue, BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
     private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(ILocator locator) =>
         await locator.EvaluateAsync<LayoutBounds>(
             """
@@ -143,6 +198,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
             }
             """);
 
+    private readonly record struct ToolbarOverflowState(double ClientWidth, double ScrollWidth, string OverflowX);
     private readonly record struct EditorScrollState(double InputScrollTop, double HostScrollTop, string HostOverflowY);
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 }

@@ -21,6 +21,10 @@ public sealed class SettingsInteractionTests : BunitContext
     private const string DropboxLabel = "Managed Dropbox";
     private const string DropboxValidationMessage = "Dropbox requires an access token or a refresh token with app key.";
     private const string NotConnectedLabel = "Not connected";
+    private const string ClaudeConfiguredModel = "claude-opus-4-6";
+    private const string OllamaConfiguredAuthority = "ollama.local:11434";
+    private const string OllamaConfiguredModel = "llama3.2";
+    private const string OpenAiConfiguredModel = "o3-mini";
 
     private readonly AppHarness _harness;
 
@@ -226,6 +230,43 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Equal(
             "Saved locally in this browser. Runtime connection testing is not available yet.",
             cut.FindByTestId(UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
+    }
+
+    [Fact]
+    public void AiSection_RendersProviderSubtitlesFromCurrentSettings()
+    {
+        _harness.JsRuntime.SavedValues[AiProviderSettings.StorageKey] = new AiProviderSettings
+        {
+            ClaudeApi = new AnthropicAiProviderSettings
+            {
+                Model = ClaudeConfiguredModel
+            },
+            OpenAi = new OpenAiProviderSettings
+            {
+                Model = OpenAiConfiguredModel
+            },
+            Ollama = new OllamaAiProviderSettings
+            {
+                Endpoint = $"http://{OllamaConfiguredAuthority}",
+                Model = OllamaConfiguredModel
+            }
+        };
+
+        var cut = Render<SettingsPage>();
+
+        cut.FindByTestId(UiTestIds.Settings.NavAi).Click();
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                $"Anthropic · {ClaudeConfiguredModel}",
+                cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.ClaudeApi)).TextContent.Trim());
+            Assert.Equal(
+                $"OpenAI · {OpenAiConfiguredModel}",
+                cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
+            Assert.Equal(
+                $"Self-hosted · {OllamaConfiguredAuthority} · {OllamaConfiguredModel}",
+                cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.Ollama)).TextContent.Trim());
+        });
     }
 
     [Fact]

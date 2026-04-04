@@ -19,10 +19,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
+    opacity: .94;
+    transition: opacity .18s ease, background .18s ease, color .18s ease;
 }
-.dcard:hover .dcard-menu-btn { opacity: 1; }
+.dcard:hover .dcard-menu-btn,
+.dcard:focus-within .dcard-menu-btn,
+.dcard-menu-wrap.open .dcard-menu-btn { opacity: 1; }
 .dcard-menu-btn:hover { background: rgba(0,0,0,.6); color: #E8D5B0; }
+
+@media (hover: hover) and (pointer: fine) {
+    .dcard-menu-btn {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .dcard-menu-btn {
+        opacity: 1;
+    }
+}
 
 .dcard-dropdown {
     display: none;

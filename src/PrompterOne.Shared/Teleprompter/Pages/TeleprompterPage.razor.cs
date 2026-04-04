@@ -149,13 +149,10 @@ public partial class TeleprompterPage : IAsyncDisposable
     {
         if (!string.IsNullOrWhiteSpace(ScriptId))
         {
-            var document = await ScriptRepository.GetAsync(ScriptId);
-            if (document is not null &&
-                !string.Equals(SessionService.State.ScriptId, document.Id, StringComparison.Ordinal))
-            {
-                await SessionService.OpenAsync(document);
-            }
-
+            await ScriptRouteSessionLoader.EnsureRequestedSessionAsync(
+                ScriptId,
+                ScriptRepository,
+                SessionService);
             return;
         }
 

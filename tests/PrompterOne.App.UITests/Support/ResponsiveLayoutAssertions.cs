@@ -37,7 +37,7 @@ internal static class ResponsiveLayoutAssertions
             routeName,
             viewport.Name);
 
-    private static async Task AssertVisibleWithinViewportAsync(
+    internal static async Task AssertVisibleWithinViewportAsync(
         ILocator locator,
         string controlTestId,
         string routeName,

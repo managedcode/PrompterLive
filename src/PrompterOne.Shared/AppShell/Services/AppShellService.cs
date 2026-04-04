@@ -10,6 +10,7 @@ public sealed class AppShellService
 
     private string _currentRoute = AppRoutes.Library;
     private string _goLiveBackRoute = AppRoutes.Library;
+    private string _settingsBackRoute = AppRoutes.Library;
 
     public event Action? StateChanged;
     public event Action<string>? LibrarySearchChanged;
@@ -79,8 +80,21 @@ public sealed class AppShellService
 
     public string GetGoLiveRoute() => BuildScriptScopedRoute(AppShellScreen.GoLive);
 
+    public string GetBackRoute() => State.Screen switch
+    {
+        AppShellScreen.Learn => GetEditorRoute(),
+        AppShellScreen.Teleprompter => GetEditorRoute(),
+        AppShellScreen.Settings => GetSettingsBackRoute(),
+        AppShellScreen.GoLive => GetGoLiveBackRoute(),
+        _ => AppRoutes.Library
+    };
+
     public string GetGoLiveBackRoute() => IsValidGoLiveBackTarget(_goLiveBackRoute)
         ? _goLiveBackRoute
+        : AppRoutes.Library;
+
+    public string GetSettingsBackRoute() => IsValidSettingsBackTarget(_settingsBackRoute)
+        ? _settingsBackRoute
         : AppRoutes.Library;
 
     public void TrackNavigation(string uri)
@@ -89,6 +103,11 @@ public sealed class AppShellService
         if (string.IsNullOrWhiteSpace(nextRoute) || string.Equals(_currentRoute, nextRoute, StringComparison.Ordinal))
         {
             return;
+        }
+
+        if (IsSettingsRoute(nextRoute) && IsValidSettingsBackTarget(_currentRoute))
+        {
+            _settingsBackRoute = _currentRoute;
         }
 
         if (IsGoLiveRoute(nextRoute) && IsValidGoLiveBackTarget(_currentRoute))
@@ -142,14 +161,10 @@ public sealed class AppShellService
     }
 
     private static bool IsGoLiveRoute(string route)
-    {
-        var querySeparatorIndex = route.IndexOf(QuerySeparator, StringComparison.Ordinal);
-        var routeBase = querySeparatorIndex >= 0
-            ? route[..querySeparatorIndex]
-            : route;
+        => string.Equals(GetRouteBase(route), AppRoutes.GoLive, StringComparison.Ordinal);
 
-        return string.Equals(routeBase, AppRoutes.GoLive, StringComparison.Ordinal);
-    }
+    private static bool IsSettingsRoute(string route) =>
+        string.Equals(GetRouteBase(route), AppRoutes.Settings, StringComparison.Ordinal);
 
     private static bool IsTrackedRoute(string path) => path switch
     {
@@ -164,6 +179,17 @@ public sealed class AppShellService
 
     private static bool IsValidGoLiveBackTarget(string route) =>
         !string.IsNullOrWhiteSpace(route) && !IsGoLiveRoute(route);
+
+    private static bool IsValidSettingsBackTarget(string route) =>
+        !string.IsNullOrWhiteSpace(route) && !IsSettingsRoute(route);
+
+    private static string GetRouteBase(string route)
+    {
+        var querySeparatorIndex = route.IndexOf(QuerySeparator, StringComparison.Ordinal);
+        return querySeparatorIndex >= 0
+            ? route[..querySeparatorIndex]
+            : route;
+    }
 
     private static string NormalizeAppRoute(string uri)
     {

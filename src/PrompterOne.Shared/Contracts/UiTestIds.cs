@@ -18,7 +18,10 @@ public static class UiTestIds
         public const string LibrarySearch = "library-search";
         public const string LibrarySearchSurface = "library-search-surface";
         public const string LiveWidget = "header-go-live-widget";
+        public const string LiveWidgetDetail = "header-go-live-widget-detail";
         public const string LiveWidgetPreview = "header-go-live-widget-preview";
+        public const string LiveWidgetTimer = "header-go-live-widget-timer";
+        public const string LiveWidgetTitle = "header-go-live-widget-title";
         public const string Subtitle = "header-subtitle";
         public const string Title = "header-title";
         public const string Wpm = "header-wpm";
@@ -147,6 +150,7 @@ public static class UiTestIds
         public const string SourceInput = "editor-source-input";
         public const string SourceScrollHost = "editor-source-scroll-host";
         public const string SourceStage = "editor-source-stage";
+        public const string Toolbar = "editor-toolbar";
         public const string SpeedFast = "editor-speed-fast";
         public const string SpeedCustomWpm = "editor-speed-custom-wpm";
         public const string SpeedSlow = "editor-speed-slow";
@@ -324,6 +328,8 @@ public static class UiTestIds
         public static string AiProviderMessage(string providerId) => $"settings-ai-provider-{providerId}-message";
 
         public static string AiProviderSave(string providerId) => $"settings-ai-provider-{providerId}-save";
+
+        public static string AiProviderSubtitle(string providerId) => $"settings-ai-provider-{providerId}-subtitle";
 
         public static string CameraDevice(string deviceId) => $"settings-camera-device-{deviceId}";
 

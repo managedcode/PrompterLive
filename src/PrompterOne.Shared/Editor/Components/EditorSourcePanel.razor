@@ -5,7 +5,7 @@
 @inject EditorInterop Interop
 
 <div class="ed-main" data-testid="@UiTestIds.Editor.MainPanel">
-    <div class="ed-toolbar">
+    <div class="ed-toolbar" data-testid="@UiTestIds.Editor.Toolbar">
         @for (var sectionIndex = 0; sectionIndex < ToolbarSections.Count; sectionIndex++)
         {
             var toolbarSection = ToolbarSections[sectionIndex];

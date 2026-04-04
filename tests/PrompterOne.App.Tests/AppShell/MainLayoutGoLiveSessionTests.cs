@@ -45,6 +45,51 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
     }
 
     [Fact]
+    public void MainLayout_LiveWidget_UsesOperationalMetadataInsteadOfScriptSubtitle()
+    {
+        _ = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppRoutes.Library);
+        Services.GetRequiredService<GoLiveSessionService>().SetState(CreateActiveSession(isRecordingActive: false));
+
+        var cut = RenderLayout();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                AppTestData.Camera.FrontCamera,
+                cut.FindByTestId(UiTestIds.Header.LiveWidgetTitle).TextContent.Trim());
+            Assert.Equal(
+                AppTestData.Scripts.BroadcastMic,
+                cut.FindByTestId(UiTestIds.Header.LiveWidgetDetail).TextContent.Trim());
+            Assert.DoesNotContain(
+                "Intro",
+                cut.FindByTestId(UiTestIds.Header.LiveWidgetDetail).TextContent,
+                StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
+    public void MainLayout_LiveWidget_FallsBackToGenericGoLiveLabel_WhenNoSourceLabelExists()
+    {
+        _ = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppRoutes.Library);
+        Services.GetRequiredService<GoLiveSessionService>().SetState(CreateActiveSession(isRecordingActive: false) with
+        {
+            SelectedSourceId = string.Empty,
+            SelectedSourceLabel = string.Empty,
+            ActiveSourceId = string.Empty,
+            ActiveSourceLabel = string.Empty
+        });
+
+        var cut = RenderLayout();
+
+        cut.WaitForAssertion(() =>
+            Assert.Equal(
+                "Go Live",
+                cut.FindByTestId(UiTestIds.Header.LiveWidgetTitle).TextContent.Trim()));
+    }
+
+    [Fact]
     public void MainLayout_MarksGoLiveIndicator_AsRecording_WhenRecordingSessionIsActive()
     {
         _ = TestHarnessFactory.Create(this);

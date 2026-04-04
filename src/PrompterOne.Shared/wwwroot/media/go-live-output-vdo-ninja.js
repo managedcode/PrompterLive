@@ -183,13 +183,13 @@
         });
 
         attachEvents(session, publisher);
+        session.vdoNinjaPublisher = publisher;
         await publisher.connect();
         if (config.roomName) {
             await publisher.joinRoom({ room: config.roomName });
             session.vdoNinjaJoinedRoom = true;
         }
 
-        session.vdoNinjaPublisher = publisher;
         session.vdoNinjaConnected = true;
         return publisher;
     }
@@ -222,25 +222,30 @@
         const config = resolveConfig(connection);
         const needsNewPublisher = !session.vdoNinjaPublisher || session.vdoNinjaRoomName !== config.roomName;
 
-        if (needsNewPublisher) {
-            await stopSession(session);
-            await createPublisher(session, config);
-        } else if (session.vdoNinjaActive) {
-            await session.vdoNinjaPublisher.stopPublishing().catch(() => {});
+        try {
+            if (needsNewPublisher) {
+                await stopSession(session);
+                await createPublisher(session, config);
+            } else if (session.vdoNinjaActive) {
+                await session.vdoNinjaPublisher.stopPublishing().catch(() => {});
+            }
+
+            await session.vdoNinjaPublisher.publish(session.mediaStream, {
+                label: config.label,
+                room: config.roomName || undefined,
+                streamID: config.streamId
+            });
+
+            session.vdoNinjaActive = true;
+            session.vdoNinjaConnectionId = config.connectionId;
+            session.vdoNinjaPublishUrl = config.publishUrl;
+            session.vdoNinjaRoomName = config.roomName;
+            session.vdoNinjaStreamId = config.streamId;
+            session.vdoNinjaViewUrl = config.viewUrl;
+        } catch (error) {
+            await stopSession(session).catch(() => {});
+            throw error;
         }
-
-        await session.vdoNinjaPublisher.publish(session.mediaStream, {
-            label: config.label,
-            room: config.roomName || undefined,
-            streamID: config.streamId
-        });
-
-        session.vdoNinjaActive = true;
-        session.vdoNinjaConnectionId = config.connectionId;
-        session.vdoNinjaPublishUrl = config.publishUrl;
-        session.vdoNinjaRoomName = config.roomName;
-        session.vdoNinjaStreamId = config.streamId;
-        session.vdoNinjaViewUrl = config.viewUrl;
     }
 
     function buildSnapshot(session) {

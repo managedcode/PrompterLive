@@ -213,6 +213,43 @@
         outputSessions.delete(sessionId);
     }
 
+    async function stopLiveKitSessionInternal(sessionId) {
+        const session = outputSessions.get(sessionId);
+        if (!session) {
+            return;
+        }
+
+        if (session.liveKitPublishedVideoTrack && session.liveKitRoom?.localParticipant) {
+            await session.liveKitRoom.localParticipant.unpublishTrack(session.liveKitPublishedVideoTrack, false).catch(() => {});
+        }
+
+        if (session.liveKitPublishedAudioTrack && session.liveKitRoom?.localParticipant) {
+            await session.liveKitRoom.localParticipant.unpublishTrack(session.liveKitPublishedAudioTrack, false).catch(() => {});
+        }
+
+        session.liveKitPublishedVideoTrack = null;
+        session.liveKitPublishedAudioTrack = null;
+        session.liveKitActive = false;
+        session.liveKitConnected = false;
+        session.liveKitConnectionId = "";
+        session.liveKitServerUrl = "";
+        session.liveKitRoomName = "";
+        session.liveKitRoom?.disconnect?.();
+        session.liveKitRoom = null;
+
+        await cleanupSessionIfIdle(sessionId, session);
+    }
+
+    async function stopVdoNinjaSessionInternal(sessionId) {
+        const session = outputSessions.get(sessionId);
+        if (!session) {
+            return;
+        }
+
+        await getVdoNinjaRuntime().stopSession(session);
+        await cleanupSessionIfIdle(sessionId, session);
+    }
+
     async function ensureProgramSession(session, rawRequest) {
         const request = getSupport().normalizeRequest(rawRequest);
         await getComposer().ensureProgramSession(session, request);
@@ -266,29 +303,34 @@
     window[interopNamespace] = {
         async startLiveKitSession(sessionId, rawRequest) {
             const session = ensureSession(sessionId);
-            const request = await ensureProgramSession(session, rawRequest);
-            const liveKitClient = getLiveKitClient();
-            const connection = findTransportConnection(request, streamingPlatformLiveKit);
-            if (!connection) {
-                return;
-            }
+            try {
+                const request = await ensureProgramSession(session, rawRequest);
+                const liveKitClient = getLiveKitClient();
+                const connection = findTransportConnection(request, streamingPlatformLiveKit);
+                if (!connection) {
+                    return;
+                }
 
-            if (!session.liveKitRoom
-                || !session.liveKitConnected
-                || session.liveKitServerUrl !== connection.serverUrl
-                || session.liveKitRoomName !== connection.roomName
-                || session.liveKitConnectionId !== connection.connectionId) {
-                session.liveKitRoom?.disconnect?.();
-                session.liveKitRoom = new liveKitClient.Room();
-                await session.liveKitRoom.connect(connection.serverUrl, connection.token);
-                session.liveKitConnected = true;
-                session.liveKitServerUrl = connection.serverUrl;
-                session.liveKitRoomName = connection.roomName;
-                session.liveKitConnectionId = connection.connectionId;
-            }
+                if (!session.liveKitRoom
+                    || !session.liveKitConnected
+                    || session.liveKitServerUrl !== connection.serverUrl
+                    || session.liveKitRoomName !== connection.roomName
+                    || session.liveKitConnectionId !== connection.connectionId) {
+                    session.liveKitRoom?.disconnect?.();
+                    session.liveKitRoom = new liveKitClient.Room();
+                    await session.liveKitRoom.connect(connection.serverUrl, connection.token);
+                    session.liveKitConnected = true;
+                    session.liveKitServerUrl = connection.serverUrl;
+                    session.liveKitRoomName = connection.roomName;
+                    session.liveKitConnectionId = connection.connectionId;
+                }
 
-            await republishLiveKitTracks(session, liveKitClient);
-            session.liveKitActive = true;
+                await republishLiveKitTracks(session, liveKitClient);
+                session.liveKitActive = true;
+            } catch (error) {
+                await stopLiveKitSessionInternal(sessionId).catch(() => {});
+                throw error;
+            }
         },
 
         async startLocalRecording(sessionId, rawRequest) {
@@ -311,50 +353,26 @@
 
         async startVdoNinjaSession(sessionId, rawRequest) {
             const session = ensureSession(sessionId);
-            const request = await ensureProgramSession(session, rawRequest);
-            const connection = findTransportConnection(request, streamingPlatformVdoNinja);
-            if (!connection) {
-                return;
-            }
+            try {
+                const request = await ensureProgramSession(session, rawRequest);
+                const connection = findTransportConnection(request, streamingPlatformVdoNinja);
+                if (!connection) {
+                    return;
+                }
 
-            await getVdoNinjaRuntime().startSession(session, connection);
+                await getVdoNinjaRuntime().startSession(session, connection);
+            } catch (error) {
+                await stopVdoNinjaSessionInternal(sessionId).catch(() => {});
+                throw error;
+            }
         },
 
         async stopLiveKitSession(sessionId) {
-            const session = outputSessions.get(sessionId);
-            if (!session) {
-                return;
-            }
-
-            if (session.liveKitPublishedVideoTrack && session.liveKitRoom?.localParticipant) {
-                await session.liveKitRoom.localParticipant.unpublishTrack(session.liveKitPublishedVideoTrack, false).catch(() => {});
-            }
-
-            if (session.liveKitPublishedAudioTrack && session.liveKitRoom?.localParticipant) {
-                await session.liveKitRoom.localParticipant.unpublishTrack(session.liveKitPublishedAudioTrack, false).catch(() => {});
-            }
-
-            session.liveKitPublishedVideoTrack = null;
-            session.liveKitPublishedAudioTrack = null;
-            session.liveKitActive = false;
-            session.liveKitConnected = false;
-            session.liveKitConnectionId = "";
-            session.liveKitServerUrl = "";
-            session.liveKitRoomName = "";
-            session.liveKitRoom?.disconnect?.();
-            session.liveKitRoom = null;
-
-            await cleanupSessionIfIdle(sessionId, session);
+            await stopLiveKitSessionInternal(sessionId);
         },
 
         async stopVdoNinjaSession(sessionId) {
-            const session = outputSessions.get(sessionId);
-            if (!session) {
-                return;
-            }
-
-            await getVdoNinjaRuntime().stopSession(session);
-            await cleanupSessionIfIdle(sessionId, session);
+            await stopVdoNinjaSessionInternal(sessionId);
         },
 
         async stopLocalRecording(sessionId) {

@@ -151,6 +151,13 @@
     -webkit-text-fill-color: transparent;
 }
 .bc-sep { color: var(--t4); }
+
+@media (max-width: 720px) {
+    .lib-breadcrumb {
+        display: none;
+    }
+}
+
 .lib-nav-bottom {
     margin-top: auto;
     flex-shrink: 0;

@@ -36,15 +36,18 @@ internal static partial class BrowserTestConstants
         public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
+        public const string MissingId = "test-missing-script-id";
         public const string HugeDraftTitle = "Huge Editor Performance Probe";
         public const string LargeDraftTitle = "Large Editor Performance Probe";
         public const string ProductLaunchTitle = "Product Launch";
         public const string LeadershipTitle = "TED: Leadership";
         public const string LearnWpmBoundaryTitle = "Learn WPM Boundary Probe";
+        public const string IntroSubtitle = "Intro";
         public const string QuantumTitle = "Quantum Computing";
         public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
         public const string SpeedOffsetsTitle = "TPS Speed Offsets";
+        public const string UntitledTitle = "Untitled Script";
     }
 
     public static class Learn
@@ -237,6 +240,7 @@ internal static partial class BrowserTestConstants
         public const string CrossTabIndicatorScenario = "go-live-cross-tab-indicator";
         public const string FirstSourceId = "scene-cam-a";
         public const string FrontCameraLabel = "Front camera";
+        public const string BroadcastMicLabel = "Broadcast mic";
         public const string HostParticipantName = "Host";
         public const string IdleStateValue = "idle";
         public const string LegacyNetworkUploadMetric = "8.2 Mbps";
@@ -811,9 +815,11 @@ internal static partial class BrowserTestConstants
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);
         public static string EditorHugeDraft => AppRoutes.EditorWithId(Scripts.HugeDraftId);
         public static string EditorLargeDraft => AppRoutes.EditorWithId(Scripts.LargeDraftId);
+        public static string EditorMissing => AppRoutes.EditorWithId(Scripts.MissingId);
         public static string EditorQuantum => AppRoutes.EditorWithId(Scripts.QuantumId);
         public static string LearnDemo => AppRoutes.LearnWithId(Scripts.DemoId);
         public static string LearnLeadership => AppRoutes.LearnWithId(Scripts.LeadershipId);
+        public static string LearnMissing => AppRoutes.LearnWithId(Scripts.MissingId);
         public static string LearnQuantum => AppRoutes.LearnWithId(Scripts.QuantumId);
         public static string LearnWpmBoundary => AppRoutes.LearnWithId(Scripts.LearnWpmBoundaryId);
         public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
@@ -821,6 +827,7 @@ internal static partial class BrowserTestConstants
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
         public static string TeleprompterLeadership => AppRoutes.TeleprompterWithId(Scripts.LeadershipId);
+        public static string TeleprompterMissing => AppRoutes.TeleprompterWithId(Scripts.MissingId);
         public static string TeleprompterSecurityIncident => AppRoutes.TeleprompterWithId(Scripts.SecurityIncidentId);
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
         public static string TeleprompterReaderTiming => AppRoutes.TeleprompterWithId(Scripts.ReaderTimingId);

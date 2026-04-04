@@ -9,15 +9,20 @@ namespace PrompterOne.Shared.Components.Settings;
 public partial class SettingsAiSection : ComponentBase
 {
     private const string ActiveCssClass = "active";
+    private const string AnthropicLabel = "Anthropic";
     private const string ClaudeApiCardId = "ai-claude-api";
     private const string DisconnectedStatusClass = "set-dest-idle";
     private const string DisconnectedStatusLabel = "Not configured";
     private const string LocalOnlySavedMessage = "Saved locally in this browser. Runtime connection testing is not available yet.";
+    private const string LocalhostAuthority = "localhost:11434";
     private const string LocalStatusClass = "set-dest-local";
     private const string LocalStatusLabel = "Saved locally";
+    private const string OpenAiLabel = "OpenAI";
     private const string OllamaCardId = "ai-ollama";
     private const string OpenAiCardId = "ai-openai";
     private const string ProviderClearedMessage = "Provider draft cleared from this browser.";
+    private const string SelfHostedLabel = "Self-hosted";
+    private const string SubtitleSeparator = " · ";
 
     private static readonly IReadOnlyList<SettingsSelectOption> ClaudeModelOptions =
     [
@@ -83,6 +88,29 @@ public partial class SettingsAiSection : ComponentBase
     private static string BuildStatusLabel(OllamaAiProviderSettings settings) =>
         IsConfigured(settings) ? LocalStatusLabel : DisconnectedStatusLabel;
 
+    private static string BuildClaudeSubtitle(AnthropicAiProviderSettings settings) =>
+        BuildCatalogSubtitle(AnthropicLabel, settings.Model, ClaudeModelOptions);
+
+    private static string BuildOpenAiSubtitle(OpenAiProviderSettings settings) =>
+        BuildCatalogSubtitle(OpenAiLabel, settings.Model, OpenAiModelOptions);
+
+    private static string BuildOllamaSubtitle(OllamaAiProviderSettings settings)
+    {
+        var endpointLabel = BuildOllamaEndpointLabel(settings.Endpoint);
+        var modelLabel = string.IsNullOrWhiteSpace(settings.Model)
+            ? LocalStatusLabel.ToLowerInvariant()
+            : settings.Model.Trim();
+
+        return string.Join(
+            SubtitleSeparator,
+            new[]
+            {
+                SelfHostedLabel,
+                endpointLabel,
+                modelLabel
+            });
+    }
+
     private string GetMessage(string providerId) =>
         _messages.GetValueOrDefault(providerId) ?? string.Empty;
 
@@ -97,6 +125,28 @@ public partial class SettingsAiSection : ComponentBase
     private static bool IsConfigured(OllamaAiProviderSettings settings) =>
         !string.IsNullOrWhiteSpace(settings.Endpoint) &&
         !string.IsNullOrWhiteSpace(settings.Model);
+
+    private static string BuildCatalogSubtitle(
+        string providerLabel,
+        string configuredModel,
+        IReadOnlyList<SettingsSelectOption> options)
+    {
+        var modelLabel = string.IsNullOrWhiteSpace(configuredModel)
+            ? string.Join(SubtitleSeparator, options.Select(static option => option.Label))
+            : configuredModel.Trim();
+        return string.Concat(providerLabel, SubtitleSeparator, modelLabel);
+    }
+
+    private static string BuildOllamaEndpointLabel(string endpoint)
+    {
+        if (Uri.TryCreate(endpoint, UriKind.Absolute, out var endpointUri) &&
+            !string.IsNullOrWhiteSpace(endpointUri.Authority))
+        {
+            return endpointUri.Authority;
+        }
+
+        return LocalhostAuthority;
+    }
 
     private Task OnClaudeModelChanged(ChangeEventArgs args)
     {

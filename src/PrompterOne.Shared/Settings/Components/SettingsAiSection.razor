@@ -15,13 +15,14 @@
 
     <div class="set-device-list">
         <SettingsAiProviderCard Title="Claude API"
-                                Subtitle="Anthropic · claude-sonnet-4-6"
+                                Subtitle="@BuildClaudeSubtitle(_settings.ClaudeApi)"
                                 StatusLabel="@BuildStatusLabel(_settings.ClaudeApi)"
                                 StatusClass="@BuildStatusClass(_settings.ClaudeApi)"
                                 IconStyle="background:rgba(196,160,96,.16); color:#E8D5B0;"
                                 AdditionalCssClass="@BuildCardCssClass(_settings.ClaudeApi)"
                                 IsOpen="@IsCardOpen(ClaudeApiCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(ClaudeApiCardId))"
+                                SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.ClaudeApi)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.ClaudeApi)"
                                 Save="SaveClaudeAsync"
                                 Clear="ClearClaudeAsync"
@@ -55,13 +56,14 @@
         </SettingsAiProviderCard>
 
         <SettingsAiProviderCard Title="OpenAI"
-                                Subtitle="GPT-4o · o1 · o3"
+                                Subtitle="@BuildOpenAiSubtitle(_settings.OpenAi)"
                                 StatusLabel="@BuildStatusLabel(_settings.OpenAi)"
                                 StatusClass="@BuildStatusClass(_settings.OpenAi)"
                                 IconStyle="background:rgba(16,163,127,.16); color:#7DE0BD;"
                                 AdditionalCssClass="@BuildCardCssClass(_settings.OpenAi)"
                                 IsOpen="@IsCardOpen(OpenAiCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(OpenAiCardId))"
+                                SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.OpenAi)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.OpenAi)"
                                 Save="SaveOpenAiAsync"
                                 Clear="ClearOpenAiAsync"
@@ -96,13 +98,14 @@
         </SettingsAiProviderCard>
 
         <SettingsAiProviderCard Title="Local / Ollama"
-                                Subtitle="Self-hosted · localhost:11434"
+                                Subtitle="@BuildOllamaSubtitle(_settings.Ollama)"
                                 StatusLabel="@BuildStatusLabel(_settings.Ollama)"
                                 StatusClass="@BuildStatusClass(_settings.Ollama)"
                                 IconStyle="background:rgba(99,102,241,.16); color:#A5B4FC;"
                                 AdditionalCssClass="@BuildCardCssClass(_settings.Ollama)"
                                 IsOpen="@IsCardOpen(OllamaCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(OllamaCardId))"
+                                SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.Ollama)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.Ollama)"
                                 Save="SaveOllamaAsync"
                                 Clear="ClearOllamaAsync"
