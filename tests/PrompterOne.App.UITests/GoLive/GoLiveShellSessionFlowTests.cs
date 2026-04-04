@@ -99,6 +99,41 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
     }
 
     [Fact]
+    public async Task GoLivePage_GenericActiveSession_WidgetReturnsToPlainGoLiveRoute_WithoutInjectingEditorScriptId()
+    {
+        var pages = await _fixture.NewSharedPagesAsync(BrowserTestConstants.GoLive.SharedContextPageCount);
+        var primaryPage = pages[0];
+        var secondaryPage = pages[1];
+
+        try
+        {
+            await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(primaryPage);
+            await primaryPage.GotoAsync(BrowserTestConstants.Routes.GoLive);
+            await Expect(primaryPage.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await primaryPage.GetByTestId(UiTestIds.GoLive.StartRecording).ClickAsync();
+            await primaryPage.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeActiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await secondaryPage.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await Expect(secondaryPage.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await Expect(secondaryPage.GetByTestId(UiTestIds.Header.LiveWidget)).ToBeVisibleAsync();
+
+            await secondaryPage.GetByTestId(UiTestIds.Header.LiveWidget).ClickAsync();
+
+            await secondaryPage.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.GoLive));
+            await Expect(secondaryPage.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            Assert.Equal(BrowserTestConstants.Routes.GoLive, new Uri(secondaryPage.Url).PathAndQuery);
+        }
+        finally
+        {
+            await primaryPage.Context.CloseAsync();
+        }
+    }
+
+    [Fact]
     public async Task GoLivePage_RecordingState_PropagatesAcrossSharedTabsAndReturnsToIdleAfterStop()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.GoLive.CrossTabIndicatorScenario);

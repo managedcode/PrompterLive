@@ -1,8 +1,10 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Layout;
+using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.App.Tests;
@@ -81,5 +83,37 @@ public sealed class MainLayoutActionTests : BunitContext
             var newScriptIndex = cut.Markup.IndexOf(UiTestIds.Header.LibraryNewScript, StringComparison.Ordinal);
             Assert.True(goLiveIndex >= 0 && newScriptIndex >= 0 && goLiveIndex < newScriptIndex);
         });
+    }
+
+    [Fact]
+    public void MainLayout_ActiveGenericGoLiveSession_UsesPlainGoLiveRoute_InsteadOfCurrentEditorScriptScope()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.DemoId));
+        Services.GetRequiredService<GoLiveSessionService>().SetState(new GoLiveSessionState(
+            ScriptId: string.Empty,
+            ScriptTitle: string.Empty,
+            ScriptSubtitle: string.Empty,
+            SelectedSourceId: AppTestData.Camera.FirstSourceId,
+            SelectedSourceLabel: AppTestData.Camera.FrontCamera,
+            ActiveSourceId: AppTestData.Camera.FirstSourceId,
+            ActiveSourceLabel: AppTestData.Camera.FrontCamera,
+            PrimaryMicrophoneLabel: AppTestData.Scripts.BroadcastMic,
+            OutputResolution: StreamingResolutionPreset.FullHd1080p30,
+            BitrateKbps: AppTestData.Streaming.BitrateKbps,
+            IsStreamActive: true,
+            IsRecordingActive: false,
+            StreamStartedAt: DateTimeOffset.UtcNow.AddMinutes(-1),
+            RecordingStartedAt: null));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LiveWidget)));
+        cut.FindByTestId(UiTestIds.Header.LiveWidget).Click();
+
+        Assert.EndsWith(AppRoutes.GoLive, navigation.Uri, StringComparison.Ordinal);
+        Assert.DoesNotContain(AppRoutes.ScriptIdQueryKey, navigation.Uri, StringComparison.Ordinal);
     }
 }

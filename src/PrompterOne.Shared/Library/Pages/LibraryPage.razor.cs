@@ -12,7 +12,6 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class LibraryPage : ComponentBase, IDisposable
 {
-    private const int RootFolderNodeIndex = 0;
     private const string LibrarySettingsKey = "prompterone.library";
     private const string LoadLibraryOperation = "Library load";
     private const string LoadLibraryMessage = "Unable to load the library right now.";

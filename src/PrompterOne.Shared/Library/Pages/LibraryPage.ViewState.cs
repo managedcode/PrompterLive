@@ -81,9 +81,7 @@ public partial class LibraryPage
     {
         if (IsAllSelected)
         {
-            return _folderNodes.Count > 0
-                ? _folderNodes[RootFolderNodeIndex].Name
-                : Text(UiTextKey.LibraryAllScripts);
+            return Text(UiTextKey.LibraryAllScripts);
         }
 
         return _folders

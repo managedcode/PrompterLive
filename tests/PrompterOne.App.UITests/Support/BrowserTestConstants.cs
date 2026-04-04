@@ -136,6 +136,7 @@ internal static partial class BrowserTestConstants
 
     public static class Folders
     {
+        public const string AllScriptsName = "All Scripts";
         public const string PresentationsId = "test-presentations";
         public const string PresentationsName = "Presentations";
         public const string TedTalksId = "test-ted-talks";
@@ -810,6 +811,7 @@ internal static partial class BrowserTestConstants
     public static class Routes
     {
         public static string Editor => AppRoutes.Editor;
+        public static string GoLive => AppRoutes.GoLive;
         public static string Library => AppRoutes.Library;
         public static string Settings => AppRoutes.Settings;
         public static string EditorDemo => AppRoutes.EditorWithId(Scripts.DemoId);

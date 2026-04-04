@@ -406,6 +406,7 @@ Ask first:
 - thin WASM host boundaries
 - browser-realistic UI verification
 - domain logic that stays reusable and serializable
+- one extra proactive hardening pass after a broad audit or release-critical task, even when the first CI run is already green, so lingering UX or lifecycle issues are caught before the user has to ask again
 
 ### Dislikes
 

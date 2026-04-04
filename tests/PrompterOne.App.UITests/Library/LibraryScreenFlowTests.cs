@@ -15,7 +15,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await page.GotoAsync(BrowserTestConstants.Routes.Library);
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
-                .ToHaveTextAsync(BrowserTestConstants.Folders.PresentationsName);
+                .ToHaveTextAsync(BrowserTestConstants.Folders.AllScriptsName);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveClassAsync(BrowserTestConstants.Regexes.GoLiveHeaderClass);
             await Expect(page.GetByTestId(UiTestIds.Library.FolderChips)).ToHaveCountAsync(0);
@@ -131,6 +131,26 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Library.FolderAll)).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
+        });
+
+    [Fact]
+    public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
+        RunPageAsync(async page =>
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
+
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
+                .ToHaveTextAsync(BrowserTestConstants.Folders.AllScriptsName);
+
+            var headerCenterText = (await page.GetByTestId(UiTestIds.Header.Center).TextContentAsync()) ?? string.Empty;
+            var allScriptsOccurrences = headerCenterText.Split(
+                BrowserTestConstants.Folders.AllScriptsName,
+                StringSplitOptions.None).Length - 1;
+
+            Assert.Equal(1, allScriptsOccurrences);
         });
 
     [Fact]

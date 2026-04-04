@@ -41,6 +41,14 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private bool ShowLibraryActions => ShellState.Screen == AppShellScreen.Library;
 
+    private bool IsLibraryRootBreadcrumb =>
+        string.IsNullOrWhiteSpace(ShellState.BreadcrumbLabel)
+        || string.Equals(ShellState.BreadcrumbLabel, Text(UiTextKey.LibraryAllScripts), StringComparison.Ordinal);
+
+    private string LibraryBreadcrumbCurrentLabel => IsLibraryRootBreadcrumb
+        ? Text(UiTextKey.LibraryAllScripts)
+        : ShellState.BreadcrumbLabel;
+
     private bool ShowLearnAction => ShellState.Screen == AppShellScreen.Editor;
 
     private bool ShowLearnWpmBadge => ShellState.Screen == AppShellScreen.Learn;
@@ -102,8 +110,10 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private bool ShowGoLiveWidget => GoLiveSessionState.HasActiveSession && ShellState.Screen != AppShellScreen.GoLive;
 
-    private string GoLiveRoute => !string.IsNullOrWhiteSpace(GoLiveSessionState.ScriptId)
-        ? AppRoutes.GoLiveWithId(GoLiveSessionState.ScriptId)
+    private string GoLiveRoute => GoLiveSessionState.HasActiveSession
+        ? string.IsNullOrWhiteSpace(GoLiveSessionState.ScriptId)
+            ? AppRoutes.GoLive
+            : AppRoutes.GoLiveWithId(GoLiveSessionState.ScriptId)
         : Shell.GetGoLiveRoute();
 
     private const string IdleStateValue = "idle";

@@ -26,10 +26,18 @@
             @if (IsLibraryScreen)
             {
                 <div class="lib-breadcrumb">
-                    <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
-                    <span class="bc-sep">/</span>
-                    <span class="bc-item bc-current"
-                          data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@ShellState.BreadcrumbLabel</span>
+                    @if (IsLibraryRootBreadcrumb)
+                    {
+                        <span class="bc-item bc-current"
+                              data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                    }
+                    else
+                    {
+                        <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
+                        <span class="bc-sep">/</span>
+                        <span class="bc-item bc-current"
+                              data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                    }
                 </div>
             }
             else
