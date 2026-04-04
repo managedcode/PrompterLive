@@ -87,13 +87,17 @@
 
 .rd-cluster-text {
     font-size: var(--rd-font-size, 36px);
+    max-width: min(100%, var(--rd-content-max-width, 940px));
     font-weight: 700;
     line-height: 1.9;
     color: rgba(242,230,204,.34);
     letter-spacing: 0.01em;
     word-spacing: 0.08em;
+    margin-inline: auto;
     overflow-wrap: break-word;
     hyphens: none;
+    text-align: center;
+    text-wrap: balance;
     font-kerning: normal;
     font-feature-settings: "kern" 1;
     -webkit-font-smoothing: antialiased;

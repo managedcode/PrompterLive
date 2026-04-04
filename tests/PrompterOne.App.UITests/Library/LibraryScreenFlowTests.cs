@@ -19,8 +19,16 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveClassAsync(BrowserTestConstants.Regexes.GoLiveHeaderClass);
             await Expect(page.GetByTestId(UiTestIds.Library.FolderChips)).ToHaveCountAsync(0);
+
+            var presentationsFolder = page.GetByTestId(BrowserTestConstants.Elements.PresentationsFolder);
+            await presentationsFolder.ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
+                .ToHaveTextAsync(BrowserTestConstants.Folders.PresentationsName);
             UiScenarioArtifacts.ResetScenario(StartupScenarioName);
             await UiScenarioArtifacts.CapturePageAsync(page, StartupScenarioName, StartupScenarioStep);
+
+            await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
+
             var demoCard = page.GetByTestId(BrowserTestConstants.Elements.DemoCard);
             await Expect(demoCard).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(demoCard.Locator(BrowserTestConstants.Selectors.CardCoverMeta))

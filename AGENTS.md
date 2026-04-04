@@ -78,6 +78,8 @@ Rule format:
 
 - Use `PrompterOne` as the canonical product, solution, namespace, and folder name across code, docs, tests, and build paths; do not reintroduce legacy product-name variants after the rename.
 - Repo-owned docs, README, ADRs, and AGENTS files must not contain local usernames, home-directory paths, or personal machine-specific references; use repo-relative paths or neutral wording instead.
+- Public-facing screenshots and any screenshot-generating or screenshot-asserting tests must use English-visible content so README, docs, and release assets stay globally readable and consistent.
+- Public-facing screenshots that include camera or preview feeds must not ship mirrored or reversed readable text; choose or configure the capture so visible text reads correctly in the final asset.
 
 ## Rules to Follow (Mandatory)
 

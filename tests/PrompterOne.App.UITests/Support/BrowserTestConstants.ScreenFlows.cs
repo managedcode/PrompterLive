@@ -109,6 +109,9 @@ internal static partial class BrowserTestConstants
         public const string ProgressEmptyStylePattern = @"width:\s*0%";
         public const string ProgressFilledStylePattern = @"width:\s*100%";
         public const double MaxProgressShellOverflowPx = 0.5;
+        public const int MinimumBalancedTextLineCount = 2;
+        public const double MaximumTextLineAsymmetryPx = 120;
+        public const double MaximumAverageTextLineAsymmetryPx = 88;
         public const string ReaderOrientationAttribute = "data-reader-orientation";
         public const string MirrorHorizontalTransform = "scaleX(-1)";
         public const string MirrorVerticalTransform = "scaleY(-1)";

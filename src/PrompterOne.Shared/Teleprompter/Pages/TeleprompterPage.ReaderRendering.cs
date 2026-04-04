@@ -11,6 +11,9 @@ public partial class TeleprompterPage
     private const string ReaderCardCssClass = "rd-card";
     private const string ReaderCardNextCssClass = "rd-card-next";
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
+    private const int ReaderComfortableContentMaxWidth = 940;
+    private const int ReaderComfortablePortraitContentMaxWidth = 760;
+    private const string ReaderContentMaxWidthVariableName = "--rd-content-max-width";
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
     private const string ReaderCountdownCssClass = "rd-countdown";
     private const string ReaderGradientCssClass = "rd-gradient";
@@ -124,9 +127,11 @@ public partial class TeleprompterPage
 
     private string BuildClusterWrapStyle()
     {
+        var contentMaxWidth = ResolveReaderContentMaxWidth();
         var styleParts = new List<string>
         {
             $"max-width:{_readerTextWidth.ToString(CultureInfo.InvariantCulture)}px",
+            $"{ReaderContentMaxWidthVariableName}:{contentMaxWidth.ToString(CultureInfo.InvariantCulture)}px",
             $"--rd-font-size:{_readerFontSize.ToString(CultureInfo.InvariantCulture)}px"
         };
         var readerTransform = BuildReaderTransform();
@@ -138,6 +143,14 @@ public partial class TeleprompterPage
         }
 
         return string.Join(';', styleParts) + ';';
+    }
+
+    private int ResolveReaderContentMaxWidth()
+    {
+        var contentMaxWidth = Math.Min(_readerTextWidth, ReaderComfortableContentMaxWidth);
+        return _readerTextOrientation == ReaderTextOrientation.Portrait
+            ? Math.Min(contentMaxWidth, ReaderComfortablePortraitContentMaxWidth)
+            : contentMaxWidth;
     }
 
     private string BuildReaderTransform()
