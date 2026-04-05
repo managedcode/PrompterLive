@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
+using PrompterOne.Shared.Localization;
+
 namespace PrompterOne.Shared.Pages;
 
 public partial class EditorPage
 {
-    private const string CollapseMetadataRailLabel = "Collapse metadata panel";
-    private const string ExpandMetadataRailLabel = "Expand metadata panel";
+    [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
 
     private bool _isMetadataRailCollapsed;
 
@@ -14,5 +17,7 @@ public partial class EditorPage
     }
 
     private string GetMetadataRailToggleLabel() =>
-        _isMetadataRailCollapsed ? ExpandMetadataRailLabel : CollapseMetadataRailLabel;
+        _isMetadataRailCollapsed
+            ? Localizer[UiTextKey.EditorMetadataToggleExpand.ToString()]
+            : Localizer[UiTextKey.EditorMetadataToggleCollapse.ToString()];
 }

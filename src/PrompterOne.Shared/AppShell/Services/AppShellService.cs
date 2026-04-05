@@ -1,5 +1,4 @@
 using PrompterOne.Shared.Contracts;
-using PrompterOne.Shared.GoLive.Models;
 
 namespace PrompterOne.Shared.Services;
 
@@ -42,11 +41,11 @@ public sealed class AppShellService
     public void ShowTeleprompter(string title, string subtitle, string? scriptId) =>
         SetScriptScopedState(AppShellScreen.Teleprompter, title, subtitle, string.Empty, scriptId);
 
-    public void ShowGoLive(string? scriptId) =>
+    public void ShowGoLive(string title, string subtitle, string? scriptId) =>
         SetScriptScopedState(
             AppShellScreen.GoLive,
-            GoLiveText.Chrome.ScreenTitle,
-            GoLiveText.Chrome.StreamingSubtitle,
+            title,
+            subtitle,
             string.Empty,
             scriptId);
 

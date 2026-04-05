@@ -2,6 +2,7 @@ using Bunit;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
@@ -20,6 +21,11 @@ public sealed class EditorStructureSidebarTests : BunitContext
     private const string CreatedEpisodeOne = "Episode 1 - How to Think About Systems";
     private const string CreatedEpisodeTwo = "Episode 2 - How Systems Talk to Each Other";
     private const string CreatedEpisodeThree = "Episode 3 - Event Sourcing and CQRS";
+
+    public EditorStructureSidebarTests()
+    {
+        TestHarnessFactory.Create(this);
+    }
 
     [Fact]
     public void EditorStructureSidebar_SplitButtonsInvokeExpectedModes_AndRenderSplitFeedback()

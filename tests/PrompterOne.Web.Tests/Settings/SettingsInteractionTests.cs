@@ -1,7 +1,10 @@
 using Bunit;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
@@ -209,8 +212,8 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.DoesNotContain("/Users/you/", markup, StringComparison.Ordinal);
         Assert.Contains(BrowserStorageKeys.DocumentLibrary, markup, StringComparison.Ordinal);
         Assert.Contains(PrompterStorageDefaults.BrowserContainerDisplayPrefix, markup, StringComparison.Ordinal);
-        Assert.Contains("Auto-save local script changes", markup, StringComparison.Ordinal);
-        Assert.Contains("Keep recent browser-local revisions", markup, StringComparison.Ordinal);
+        Assert.Contains(Text(UiTextKey.SettingsFilesScriptsAutoSave), markup, StringComparison.Ordinal);
+        Assert.Contains(Text(UiTextKey.SettingsFilesScriptsHistory), markup, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -230,7 +233,7 @@ public sealed class SettingsInteractionTests : BunitContext
         var savedSettings = _harness.JsRuntime.GetSavedValue<AiProviderSettings>(AiProviderSettings.StorageKey);
         Assert.Equal("sk-live-openai", savedSettings.OpenAi.ApiKey);
         Assert.Equal(
-            "Saved locally in this browser. Runtime connection testing is not available yet.",
+            Text(UiTextKey.SettingsAiSavedLocallyDetail),
             cut.FindByTestId(UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
     }
 
@@ -451,4 +454,7 @@ public sealed class SettingsInteractionTests : BunitContext
             Assert.Contains(AppTestData.Microphone.StartLevelMonitorInvocation, _harness.JsRuntime.Invocations, StringComparer.Ordinal);
         });
     }
+
+    private string Text(UiTextKey key) =>
+        Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key.ToString()];
 }

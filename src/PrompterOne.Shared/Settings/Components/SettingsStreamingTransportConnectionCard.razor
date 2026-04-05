@@ -1,12 +1,15 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Core.Models.Media
 @using PrompterOne.Core.Models.Streaming
 @using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Core.Services.Streaming
 @using PrompterOne.Shared.Services
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
 @inject StreamingPublishDescriptorResolver DescriptorResolver
+@inject IStringLocalizer<SharedResource> Localizer
 
 <SettingsStreamingTargetCard Title="@Connection.Name"
                              Account="@Presentation.SettingsAccountLabel"
@@ -23,7 +26,7 @@
                              OnCardToggle="@(() => ToggleCard.InvokeAsync(CardId))"
                              IconClass="@Presentation.IconCssClass">
     <div class="set-field">
-        <label>@SettingsStreamingText.TargetNameLabel</label>
+        <label>@Text(SettingsStreamingText.TargetNameLabel)</label>
         <input type="text"
                class="set-input"
                value="@Connection.Name"
@@ -32,7 +35,7 @@
     </div>
 
     <div class="set-field">
-        <label>@SettingsStreamingText.ConnectionRoleLabel</label>
+        <label>@Text(SettingsStreamingText.ConnectionRoleLabel)</label>
         <SettingsSelect Value="@Connection.Roles.ToString()"
                        Options="@RoleOptions"
                        OnChange="OnRoleChanged"
@@ -48,7 +51,7 @@
     {
         case StreamingPlatformKind.LiveKit:
             <div class="set-field">
-                <label>@SettingsStreamingText.ServerUrlLabel</label>
+                <label>@Text(SettingsStreamingText.ServerUrlLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.ServerUrl"
@@ -56,7 +59,7 @@
                        data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ServerUrl)" />
             </div>
             <div class="set-field">
-                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <label>@Text(SettingsStreamingText.RoomNameLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.RoomName"
@@ -64,7 +67,7 @@
                        data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
             </div>
             <div class="set-field">
-                <label>@SettingsStreamingText.TokenLabel</label>
+                <label>@Text(SettingsStreamingText.TokenLabel)</label>
                 <input type="password"
                        class="set-input"
                        value="@Connection.Token"
@@ -74,7 +77,7 @@
             break;
         case StreamingPlatformKind.VdoNinja:
             <div class="set-field">
-                <label>@SettingsStreamingText.BaseUrlLabel</label>
+                <label>@Text(SettingsStreamingText.BaseUrlLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.BaseUrl"
@@ -82,7 +85,7 @@
                        data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.BaseUrl)" />
             </div>
             <div class="set-field">
-                <label>@SettingsStreamingText.RoomNameLabel</label>
+                <label>@Text(SettingsStreamingText.RoomNameLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.RoomName"
@@ -90,7 +93,7 @@
                        data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
             </div>
             <div class="set-field">
-                <label>@SettingsStreamingText.PublishUrlLabel</label>
+                <label>@Text(SettingsStreamingText.PublishUrlLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.PublishUrl"
@@ -98,7 +101,7 @@
                        data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.PublishUrl)" />
             </div>
             <div class="set-field">
-                <label>@SettingsStreamingText.ViewUrlLabel</label>
+                <label>@Text(SettingsStreamingText.ViewUrlLabel)</label>
                 <input type="text"
                        class="set-input"
                        value="@Connection.ViewUrl"
@@ -113,20 +116,13 @@
                 class="set-btn-outline set-btn-sm"
                 data-testid="@UiTestIds.Settings.StreamingTransportRemove(Connection.Id)"
                 @onclick="@(() => RemoveConnection.InvokeAsync(Connection.Id))">
-            @SettingsStreamingText.RemoveDestinationLabel
+            @Text(SettingsStreamingText.RemoveDestinationLabel)
         </button>
     </div>
 </SettingsStreamingTargetCard>
 
 @code {
     private const string SelectedStatusClass = "set-dest-ok";
-
-    private static readonly IReadOnlyList<SettingsSelectOption> RoleOptions =
-    [
-        new(nameof(StreamingTransportRole.Both), "Source + Publish"),
-        new(nameof(StreamingTransportRole.Publish), "Publish only"),
-        new(nameof(StreamingTransportRole.Source), "Source only")
-    ];
 
     [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
     [Parameter, EditorRequired] public TransportConnectionProfile Connection { get; set; } = default!;
@@ -149,6 +145,13 @@
 
     private StreamingPlatformPresentation Presentation => StreamingPlatformPresentationCatalog.Get(Connection.PlatformKind);
 
+    private IReadOnlyList<SettingsSelectOption> RoleOptions =>
+    [
+        new(nameof(StreamingTransportRole.Both), Text(SettingsStreamingText.ConnectionRoleBothLabel)),
+        new(nameof(StreamingTransportRole.Publish), Text(SettingsStreamingText.ConnectionRolePublishLabel)),
+        new(nameof(StreamingTransportRole.Source), Text(SettingsStreamingText.ConnectionRoleSourceLabel))
+    ];
+
     private IReadOnlyList<string> SelectedSourceIds =>
         GoLiveDestinationRouting.GetSelectedSourceIds(Settings, Connection.Id, Sources);
 
@@ -160,15 +163,15 @@
         {
             if (!Connection.IsEnabled)
             {
-                return SettingsStreamingText.DestinationDisabledStatusLabel;
+                return Text(SettingsStreamingText.DestinationDisabledStatusLabel);
             }
 
             if (SelectedSourceIds.Count == 0 || !Descriptor.IsReady)
             {
-                return SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+                return Text(SettingsStreamingText.DestinationNeedsSetupStatusLabel);
             }
 
-            return SettingsStreamingText.DestinationReadyStatusLabel;
+            return Text(SettingsStreamingText.DestinationReadyStatusLabel);
         }
     }
 
@@ -178,12 +181,12 @@
         {
             if (!Connection.IsEnabled)
             {
-                return SettingsStreamingText.DestinationDisabledSummary;
+                return Text(SettingsStreamingText.DestinationDisabledSummary);
             }
 
             if (SelectedSourceIds.Count == 0)
             {
-                return SettingsStreamingText.DestinationNoSourceSummary;
+                return Text(SettingsStreamingText.DestinationNoSourceSummary);
             }
 
             return Descriptor.Summary;
@@ -192,6 +195,8 @@
 
     private Task OnRoleChanged(ChangeEventArgs args) =>
         UpdateRole.InvokeAsync((Connection.Id, GetValue(args)));
+
+    private string Text(string key) => Localizer[key];
 
     private static string GetValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
 }

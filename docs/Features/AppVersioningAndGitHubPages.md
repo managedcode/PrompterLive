@@ -11,6 +11,7 @@ This flow keeps the version number automated:
 - the About screen reads the compiled assembly metadata instead of hardcoded copy
 - the About screen links only to official Managed Code and `managedcode/PrompterOne` resources; it must never invent a team roster
 - the About screen includes the official Microsoft Clarity privacy disclosure for production telemetry transparency
+- the host enables production-only runtime telemetry and error monitoring for Google Analytics, Clarity, and Sentry
 
 ## Version And Deploy Flow
 

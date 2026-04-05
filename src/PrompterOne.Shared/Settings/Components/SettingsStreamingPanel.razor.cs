@@ -1,8 +1,11 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Streaming;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Settings.Models;
 
@@ -10,19 +13,13 @@ namespace PrompterOne.Shared.Components.Settings;
 
 public partial class SettingsStreamingPanel
 {
-    private static readonly IReadOnlyList<SettingsSelectOption> OutputResolutionOptions =
-    [
-        new(nameof(StreamingResolutionPreset.FullHd1080p30), SettingsStreamingText.FullHd1080p30Label),
-        new(nameof(StreamingResolutionPreset.FullHd1080p60), SettingsStreamingText.FullHd1080p60Label),
-        new(nameof(StreamingResolutionPreset.Hd720p30), SettingsStreamingText.Hd720p30Label),
-        new(nameof(StreamingResolutionPreset.UltraHd2160p30), SettingsStreamingText.UltraHd2160p30Label),
-    ];
-
     private const string OnCssClass = "on";
     private const string SelectedStatusClass = "set-dest-ok";
 
     private bool _isAddDistributionTargetMenuOpen;
     private bool _isAddTransportConnectionMenuOpen;
+
+    [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
 
     [Parameter, EditorRequired] public StreamStudioSettings Settings { get; set; } = default!;
     [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
@@ -63,6 +60,14 @@ public partial class SettingsStreamingPanel
 
     private IReadOnlyList<TransportConnectionProfile> TransportConnections =>
         Settings.TransportConnections ?? Array.Empty<TransportConnectionProfile>();
+
+    private IReadOnlyList<SettingsSelectOption> OutputResolutionOptions =>
+    [
+        new(nameof(StreamingResolutionPreset.FullHd1080p30), Text(SettingsStreamingText.FullHd1080p30Label)),
+        new(nameof(StreamingResolutionPreset.FullHd1080p60), Text(SettingsStreamingText.FullHd1080p60Label)),
+        new(nameof(StreamingResolutionPreset.Hd720p30), Text(SettingsStreamingText.Hd720p30Label)),
+        new(nameof(StreamingResolutionPreset.UltraHd2160p30), Text(SettingsStreamingText.UltraHd2160p30Label)),
+    ];
 
     private async Task AddDistributionTargetAndOpenCardAsync(StreamingPlatformKind kind)
     {
@@ -109,8 +114,8 @@ public partial class SettingsStreamingPanel
     {
         var selectedSources = GetSelectedSourceIds(targetId);
         return selectedSources.Count == 0
-            ? SettingsStreamingText.DestinationNoSourceSummary
-            : $"{selectedSources.Count}{SettingsStreamingText.LocalDestinationSummarySuffix}";
+            ? Text(SettingsStreamingText.DestinationNoSourceSummary)
+            : Format(SettingsStreamingText.LocalDestinationSummaryFormat, selectedSources.Count);
     }
 
     private string BuildLocalTargetStatusClass(string targetId) =>
@@ -120,12 +125,12 @@ public partial class SettingsStreamingPanel
     {
         if (!IsLocalTargetEnabled(targetId))
         {
-            return SettingsStreamingText.DestinationDisabledStatusLabel;
+            return Text(SettingsStreamingText.DestinationDisabledStatusLabel);
         }
 
         return BuildLocalTargetIsReady(targetId)
-            ? SettingsStreamingText.DestinationReadyStatusLabel
-            : SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+            ? Text(SettingsStreamingText.DestinationReadyStatusLabel)
+            : Text(SettingsStreamingText.DestinationNeedsSetupStatusLabel);
     }
 
     private bool IsLocalTargetEnabled(string targetId) => targetId switch
@@ -163,4 +168,9 @@ public partial class SettingsStreamingPanel
         _isAddDistributionTargetMenuOpen = false;
         await ToggleCard.InvokeAsync(cardId);
     }
+
+    private string Format(string key, params object[] arguments) =>
+        string.Format(CultureInfo.CurrentCulture, Text(key), arguments);
+
+    private string Text(string key) => Localizer[key];
 }

@@ -2,9 +2,12 @@ using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Tests;
 
@@ -40,19 +43,19 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         var cut = Render<EditorSourcePanelHost>();
 
         var emotionTrigger = cut.FindByTestId(UiTestIds.Editor.EmotionTrigger);
-        AssertTooltipContract(emotionTrigger, "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text");
+        AssertTooltipContract(emotionTrigger, Text(UiTextKey.EditorToolbarTooltipEmotionTrigger));
 
         emotionTrigger.Click();
         var motivationalEmotion = cut.FindByTestId(UiTestIds.Editor.EmotionMotivational);
-        AssertTooltipContract(motivationalEmotion, "Inspiring, encouraging. Inline: [motivational]text[/motivational]");
+        AssertTooltipContract(motivationalEmotion, Text(UiTextKey.EditorToolbarTooltipEmotionMotivational));
         emotionTrigger.Click();
 
         var floatingEmotionTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingEmotion);
-        AssertTooltipContract(floatingEmotionTrigger, "Emotion and delivery");
+        AssertTooltipContract(floatingEmotionTrigger, Text(UiTextKey.EditorToolbarTooltipFloatingEmotionTrigger));
 
         floatingEmotionTrigger.Click();
         var floatingMotivationalEmotion = cut.FindByTestId(UiTestIds.Editor.FloatingEmotionMotivational);
-        AssertTooltipContract(floatingMotivationalEmotion, "Inspiring, encouraging. Inline: [motivational]text[/motivational]");
+        AssertTooltipContract(floatingMotivationalEmotion, Text(UiTextKey.EditorToolbarTooltipEmotionMotivational));
     }
 
     [Fact]
@@ -66,13 +69,13 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
             tooltips,
             tooltip => string.Equals(
                 tooltip.TextContent.Trim(),
-                "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text",
+                Text(UiTextKey.EditorToolbarTooltipEmotionTrigger),
                 StringComparison.Ordinal));
         Assert.Contains(
             tooltips,
             tooltip => string.Equals(
                 tooltip.TextContent.Trim(),
-                "Inspiring, encouraging. Inline: [motivational]text[/motivational]",
+                Text(UiTextKey.EditorToolbarTooltipEmotionMotivational),
                 StringComparison.Ordinal));
     }
 
@@ -83,7 +86,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         var toolbarTooltip = cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Editor.ToolbarTooltip))
             .Single(tooltip => string.Equals(
                 tooltip.TextContent.Trim(),
-                "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text",
+                Text(UiTextKey.EditorToolbarTooltipEmotionTrigger),
                 StringComparison.Ordinal));
 
         Assert.Equal("tooltip", toolbarTooltip.GetAttribute("role"));
@@ -96,53 +99,53 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         var cut = Render<EditorSourcePanelHost>();
 
         var floatingVoiceTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingVoice);
-        AssertTooltipContract(floatingVoiceTrigger, "Voice cues");
+        AssertTooltipContract(floatingVoiceTrigger, Text(UiTextKey.EditorToolbarTooltipFloatingVoiceTrigger));
         floatingVoiceTrigger.Click();
         Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.FloatingVoiceMenu));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingVoiceWhisper),
-            "Very quiet, intimate delivery. [whisper]text[/whisper]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingVoiceWhisper));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingVoiceLegato),
-            "Smooth connected phrasing. [legato]text[/legato]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingVoiceLegato));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingVoiceEnergy),
-            "Explicit energy contour from 0 to 10. [energy:8]text[/energy]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingVoiceEnergy));
 
         var floatingPauseTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingPauseTrigger);
-        AssertTooltipContract(floatingPauseTrigger, "Pause cues");
+        AssertTooltipContract(floatingPauseTrigger, Text(UiTextKey.EditorToolbarTooltipFloatingPauseTrigger));
         floatingPauseTrigger.Click();
         Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.FloatingPauseMenu));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingPauseTimed),
-            "Custom timed pause in milliseconds. [pause:1000ms]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingPauseTimed));
 
         var floatingSpeedTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingSpeedTrigger);
-        AssertTooltipContract(floatingSpeedTrigger, "Speed cues");
+        AssertTooltipContract(floatingSpeedTrigger, Text(UiTextKey.EditorToolbarTooltipFloatingSpeedTrigger));
         floatingSpeedTrigger.Click();
         Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.FloatingSpeedMenu));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingSpeedCustomWpm),
-            "Set an absolute WPM value for a text span. [180WPM]text[/180WPM]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingSpeedCustomWpm));
 
         var floatingInsertTrigger = cut.FindByTestId(UiTestIds.Editor.FloatingInsert);
-        AssertTooltipContract(floatingInsertTrigger, "Insert TPS helpers");
+        AssertTooltipContract(floatingInsertTrigger, Text(UiTextKey.EditorToolbarTooltipFloatingInsertTrigger));
         floatingInsertTrigger.Click();
         Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.FloatingInsertMenu));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.FloatingInsertPronunciation),
-            "Simple pronunciation guide for easy reading. [pronunciation:guide]word[/pronunciation]");
+            Text(UiTextKey.EditorToolbarTooltipFloatingInsertPronunciation));
 
         var insertTrigger = cut.FindByTestId(UiTestIds.Editor.InsertTrigger);
-        AssertTooltipContract(insertTrigger, "More insert options");
+        AssertTooltipContract(insertTrigger, Text(UiTextKey.EditorToolbarTooltipMoreInsertOptions));
         insertTrigger.Click();
         Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.MenuInsert));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.InsertSegmentArchetypeMenu),
-            "Segment with an archetype preset. ## [Name|Speaker:Host|Archetype:Coach|emotion|0:00-0:30]");
+            Text(UiTextKey.EditorToolbarTooltipInsertSegmentArchetype));
         AssertTooltipContract(
             cut.FindByTestId(UiTestIds.Editor.InsertBlockArchetypeMenu),
-            "Block with an archetype preset. ### [Name|Speaker:Host|Archetype:Educator|emotion]");
+            Text(UiTextKey.EditorToolbarTooltipInsertBlockArchetype));
     }
 
     [Fact]
@@ -184,6 +187,9 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         Assert.Equal(expectedTooltip, element.GetAttribute("data-tip"));
         Assert.Equal(expectedTooltip, element.GetAttribute("aria-label"));
     }
+
+    private string Text(UiTextKey key) =>
+        Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key.ToString()];
 
     private sealed class EditorSourcePanelHost : ComponentBase
     {

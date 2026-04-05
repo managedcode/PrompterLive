@@ -11,11 +11,11 @@ public partial class GoLivePage
     private SceneCameraSource? LivePreviewCamera => ResolveLiveSurfaceCamera(ActiveCamera);
 
     private string LivePreviewEmptyDescription => IsActivePreviewLimited
-        ? string.Concat(ActiveSourceLabel, ". ", GoLiveText.Surface.SingleLocalCameraPreviewLimitDescription)
+        ? string.Concat(ActiveSourceLabel, ". ", Text(GoLiveText.Surface.SingleLocalCameraPreviewLimitDescription))
         : string.Empty;
 
     private string LivePreviewEmptyTitle => IsActivePreviewLimited
-        ? GoLiveText.Surface.SingleLocalCameraPreviewLimitTitle
+        ? Text(GoLiveText.Surface.SingleLocalCameraPreviewLimitTitle)
         : string.Empty;
 
     private IReadOnlyList<string> LiveSourceIds => BuildLiveSourceIds();
@@ -23,7 +23,7 @@ public partial class GoLivePage
     private bool ShowSingleLocalPreviewHint =>
         UsesSingleLocalCameraPreviewMode && SceneCameras.Count > 1;
 
-    private static string SingleLocalPreviewHint => GoLiveText.Surface.SingleLocalCameraPreviewHint;
+    private string SingleLocalPreviewHint => Text(GoLiveText.Surface.SingleLocalCameraPreviewHint);
 
     private bool SupportsConcurrentLocalCameraCaptures => _captureCapabilities.SupportsConcurrentLocalCameraCaptures;
 

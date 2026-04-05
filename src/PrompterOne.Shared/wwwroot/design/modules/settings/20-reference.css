@@ -131,6 +131,12 @@
     font-weight: 600;
 }
 
+.set-dest-description {
+    color: var(--t3);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
 .set-dest-account {
     color: var(--t3);
     font-family: var(--mono);

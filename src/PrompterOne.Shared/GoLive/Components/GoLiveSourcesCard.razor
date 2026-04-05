@@ -1,10 +1,13 @@
 @namespace PrompterOne.Shared.Components.GoLive
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Shared.GoLive.Models
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="gl-sources-panel">
     <div class="gl-sources-header">
-        <span class="section-label">@Title</span>
+        <span class="section-label">@EffectiveTitle</span>
         <button type="button"
                 class="gl-add-src-btn"
                 disabled="@(!CanAddCamera)"
@@ -68,7 +71,7 @@
                                         <span class="@GetSourceBadgeCssClass(source)"
                                               data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
                                               data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
-                                        <span class="gl-cam-thumb-limited-copy">@GoLiveText.Surface.SingleLocalCameraPreviewPlaceholderLabel</span>
+                                        <span class="gl-cam-thumb-limited-copy">@Text(GoLiveText.Surface.SingleLocalCameraPreviewPlaceholderLabel)</span>
                                     </div>
                                 }
                             </EmptyContent>
@@ -86,7 +89,7 @@
                             class="gl-cam-action"
                             @onclick="() => ToggleSource.InvokeAsync(source.SourceId)"
                             data-testid="@UiTestIds.GoLive.SourceCameraAction(source.DeviceId)">
-                        @(source.Transform.IncludeInOutput ? RemoveLabel : AddLabel)
+                        @(source.Transform.IncludeInOutput ? Text(RemoveLabelKey) : Text(AddLabelKey))
                     </button>
                 </article>
             }
@@ -110,25 +113,25 @@
     </div>
 
     <div class="gl-mic-card">
-        <span class="section-label">@MicrophoneTitle</span>
+        <span class="section-label">@Text(MicrophoneTitleKey)</span>
         <strong>@DisplayMicrophoneName</strong>
         <span>@MicrophoneRouteLabel</span>
     </div>
 </section>
 
 @code {
-    private const string AddLabel = "Include";
-    private const string DefaultTitle = "Inputs";
-    private const string EmptyStateMessage = "No scene cameras are configured yet. Add them in Settings first.";
-    private const string MicrophoneTitle = "Microphone";
+    private const string AddLabelKey = "GoLiveSourcesAddLabel";
+    private const string DefaultTitleKey = "GoLiveSourcesDefaultTitle";
+    private const string EmptyStateMessageKey = "GoLiveSourcesEmptyStateMessage";
+    private const string MicrophoneTitleKey = "GoLiveSourcesMicrophoneTitle";
     private const string PrompterUtilitySourceId = "prompter-display";
-    private const string RemoveLabel = "Remove";
+    private const string RemoveLabelKey = "GoLiveSourcesRemoveLabel";
     private const string ScreenShareUtilitySourceId = "screen-share";
     private const string IdleStateValue = "idle";
-    private const string SourceIncludedLabel = "Armed for output";
-    private const string SourceLiveLabel = "Ready for canvas";
-    private const string SourceOnAirLabel = "On air";
-    private const string SourceSceneOnlyLabel = "Scene only";
+    private const string SourceIncludedLabelKey = "GoLiveSourcesIncludedLabel";
+    private const string SourceLiveLabelKey = "GoLiveSourcesLiveLabel";
+    private const string SourceOnAirLabelKey = "GoLiveSourcesOnAirLabel";
+    private const string SourceSceneOnlyLabelKey = "GoLiveSourcesSceneOnlyLabel";
 
     [Parameter] public EventCallback AddCamera { get; set; }
     [Parameter] public string? ActiveSourceId { get; set; }
@@ -143,10 +146,12 @@
     [Parameter] public bool ShowSingleLocalPreviewHint { get; set; }
     [Parameter] public string SingleLocalPreviewHint { get; set; } = string.Empty;
     [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
-    [Parameter] public string Title { get; set; } = DefaultTitle;
+    [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public EventCallback<string> ToggleSource { get; set; }
     [Parameter] public IReadOnlyList<GoLiveUtilitySourceViewModel> UtilitySources { get; set; } = [];
     private string DisplayMicrophoneName => MediaDeviceLabelSanitizer.Sanitize(MicrophoneName);
+    private string EffectiveTitle => string.IsNullOrWhiteSpace(Title) ? Text(DefaultTitleKey) : Title;
+    private string EmptyStateMessage => Text(EmptyStateMessageKey);
     private static string FormatSourceLabel(SceneCameraSource source) => MediaDeviceLabelSanitizer.Sanitize(source.Label);
 
     private bool IsActive(SceneCameraSource source) =>
@@ -172,30 +177,18 @@
     private bool ShowSourcePreviewPlaceholder(SceneCameraSource source) =>
         ShowSingleLocalPreviewHint && !CanRenderLiveSource(source);
 
-    private static string GetSourceStatus(SceneCameraSource source)
-    {
-        if (source.Transform.IncludeInOutput)
-        {
-            return SourceIncludedLabel;
-        }
-
-        return source.Transform.Visible
-            ? SourceLiveLabel
-            : SourceSceneOnlyLabel;
-    }
-
     private string GetSourceBadge(SceneCameraSource source)
     {
         if (IsOnAir(source))
         {
-            return SourceOnAirLabel;
+            return Text(SourceOnAirLabelKey);
         }
 
         return IsSelected(source)
-            ? SourceLiveLabel
+            ? Text(SourceLiveLabelKey)
             : source.Transform.IncludeInOutput
-                ? SourceIncludedLabel
-                : SourceSceneOnlyLabel;
+                ? Text(SourceIncludedLabelKey)
+                : Text(SourceSceneOnlyLabelKey);
     }
 
     private string GetSourceIndicatorState(SceneCameraSource source) =>
@@ -243,4 +236,18 @@
             [UiTestIds.GoLive.SourceDeviceIdAttribute] = source.DeviceId
         };
     }
+
+    private string GetSourceStatus(SceneCameraSource source)
+    {
+        if (source.Transform.IncludeInOutput)
+        {
+            return Text(SourceIncludedLabelKey);
+        }
+
+        return source.Transform.Visible
+            ? Text(SourceLiveLabelKey)
+            : Text(SourceSceneOnlyLabelKey);
+    }
+
+    private string Text(string key) => Localizer[key];
 }

@@ -1,5 +1,6 @@
 @page "/teleprompter"
 @namespace PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
 
 <div id="@UiDomIds.Design.TeleprompterScreen"
@@ -279,9 +280,8 @@
                                                           data-pause-ms="@word.PauseAfterMs"
                                                           data-effective-wpm="@word.EffectiveWpm"
                                                           data-pronunciation="@word.PronunciationGuide"
-                                                          @attributes="word.Attributes"
-                                                          title="@word.Title"
-                                                          style="@word.Style"
+                                                           @attributes="word.Attributes"
+                                                           style="@word.Style"
                                                           data-testid="@UiTestIds.Teleprompter.CardWord(entry.index, chunkIndex, wordIndex)">@word.Text</span>
                                                     @if (wordIndex < group.Words.Count - 1)
                                                     {
@@ -347,35 +347,77 @@
 
             <div class="@BuildReaderControlsCssClass()" data-testid="@UiTestIds.Teleprompter.Controls">
                 <div class="rd-ctrl-group">
-                    <button class="rd-ctrl-btn" @onclick="DecreaseReaderFontSizeAsync" title="Smaller text" data-testid="@UiTestIds.Teleprompter.FontDown">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                    </button>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.FontDown" Text="@ReaderFontDownTooltip">
+                        <button class="rd-ctrl-btn"
+                                @onclick="DecreaseReaderFontSizeAsync"
+                                aria-label="@ReaderFontDownTooltip"
+                                data-testid="@UiTestIds.Teleprompter.FontDown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        </button>
+                    </TooltipAnchor>
                     <span class="rd-ctrl-label" id="@UiDomIds.Teleprompter.FontLabel">@_readerFontSize</span>
-                    <button class="rd-ctrl-btn" @onclick="IncreaseReaderFontSizeAsync" title="Larger text" data-testid="@UiTestIds.Teleprompter.FontUp">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                    </button>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.FontUp" Text="@ReaderFontUpTooltip">
+                        <button class="rd-ctrl-btn"
+                                @onclick="IncreaseReaderFontSizeAsync"
+                                aria-label="@ReaderFontUpTooltip"
+                                data-testid="@UiTestIds.Teleprompter.FontUp">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        </button>
+                    </TooltipAnchor>
                 </div>
 
                 <div class="rd-ctrl-group rd-ctrl-main">
-                    <button class="rd-ctrl-btn" @onclick="JumpToPreviousReaderCardAsync" title="Previous block" data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" @onclick="StepReaderBackwardAsync" title="Back one word" data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                    <button class="rd-ctrl-btn rd-ctrl-play" id="tp-play-btn" @onclick="ToggleReaderPlaybackAsync" title="Play / Pause" data-testid="@UiTestIds.Teleprompter.PlayToggle">
-                        <span data-toggle-icon="play" hidden="@_isReaderPlaying">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
-                        </span>
-                        <span data-toggle-icon="pause" hidden="@(!_isReaderPlaying)">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-                        </span>
-                    </button>
-                    <button class="rd-ctrl-btn rd-ctrl-sm" @onclick="StepReaderForwardAsync" title="Forward one word" data-testid="@UiTestIds.Teleprompter.NextWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                    <button class="rd-ctrl-btn" @onclick="JumpToNextReaderCardAsync" title="Next block" data-testid="@UiTestIds.Teleprompter.NextBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.PreviousBlock" Text="@ReaderPreviousBlockTooltip">
+                        <button class="rd-ctrl-btn"
+                                @onclick="JumpToPreviousReaderCardAsync"
+                                aria-label="@ReaderPreviousBlockTooltip"
+                                data-testid="@UiTestIds.Teleprompter.PreviousBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19,20 9,12 19,4" /><line x1="5" y1="4" x2="5" y2="20" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.PreviousWord" Text="@ReaderPreviousWordTooltip">
+                        <button class="rd-ctrl-btn rd-ctrl-sm"
+                                @onclick="StepReaderBackwardAsync"
+                                aria-label="@ReaderPreviousWordTooltip"
+                                data-testid="@UiTestIds.Teleprompter.PreviousWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.PlayToggle" Text="@ReaderPlayToggleTooltip">
+                        <button class="rd-ctrl-btn rd-ctrl-play"
+                                id="tp-play-btn"
+                                @onclick="ToggleReaderPlaybackAsync"
+                                aria-label="@ReaderPlayToggleTooltip"
+                                data-testid="@UiTestIds.Teleprompter.PlayToggle">
+                            <span data-toggle-icon="play" hidden="@_isReaderPlaying">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
+                            </span>
+                            <span data-toggle-icon="pause" hidden="@(!_isReaderPlaying)">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                            </span>
+                        </button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.NextWord" Text="@ReaderNextWordTooltip">
+                        <button class="rd-ctrl-btn rd-ctrl-sm"
+                                @onclick="StepReaderForwardAsync"
+                                aria-label="@ReaderNextWordTooltip"
+                                data-testid="@UiTestIds.Teleprompter.NextWord"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.NextBlock" Text="@ReaderNextBlockTooltip">
+                        <button class="rd-ctrl-btn"
+                                @onclick="JumpToNextReaderCardAsync"
+                                aria-label="@ReaderNextBlockTooltip"
+                                data-testid="@UiTestIds.Teleprompter.NextBlock"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5,4 15,12 5,20" /><line x1="19" y1="4" x2="19" y2="20" /></svg></button>
+                    </TooltipAnchor>
                 </div>
 
                 <div class="rd-ctrl-group">
                     <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator">@BuildBlockIndicatorLabel()</span>
-                    <button class="@BuildCameraButtonCssClass()" id="@UiDomIds.Teleprompter.CameraButton" @onclick="ToggleReaderCameraAsync" title="Camera" data-testid="@UiTestIds.Teleprompter.CameraToggle">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-                    </button>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.CameraToggle" Text="@ReaderCameraTooltip">
+                        <button class="@BuildCameraButtonCssClass()"
+                                id="@UiDomIds.Teleprompter.CameraButton"
+                                @onclick="ToggleReaderCameraAsync"
+                                aria-label="@ReaderCameraTooltip"
+                                data-testid="@UiTestIds.Teleprompter.CameraToggle">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+                        </button>
+                    </TooltipAnchor>
                 </div>
             </div>
         </div>

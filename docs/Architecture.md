@@ -89,7 +89,7 @@ flowchart LR
 
 | Component / Slice | What It Is | Why It Exists | Where It Lives | Owns | Must Not Own |
 | --- | --- | --- | --- | --- | --- |
-| `PrompterOne.Web` | Browser host and startup shell | Boots the standalone WASM app on the stable local origin | `src/PrompterOne.Web` | startup, host config, app shell entrypoint, production-only telemetry provider ids | domain logic, feature behavior, server runtime code |
+| `PrompterOne.Web` | Browser host and startup shell | Boots the standalone WASM app on the stable local origin | `src/PrompterOne.Web` | startup, host config, app shell entrypoint, production-only telemetry and error-monitoring provider ids | domain logic, feature behavior, server runtime code |
 | `AppShell` | Shared routed layout and navigation shell | Keeps one navigation, header, widget, and screen-frame contract across the app | `src/PrompterOne.Shared/AppShell` | layout chrome, route-aware header state, persistent shell widgets, runtime page/event telemetry ownership | feature-specific editing, streaming, or document logic |
 | `Library` | Script and folder browsing surface | Lets users discover, search, and organize scripts | `src/PrompterOne.Shared/Library`, `src/PrompterOne.Core/Library` | cards, folder tree UI, repository-backed browse flows | TPS authoring rules, reader rendering, streaming orchestration |
 | `Editor` | TPS authoring surface | Creates and reshapes scripts with structure-aware tooling | `src/PrompterOne.Shared/Editor`, `src/PrompterOne.Core/Editor`, `src/PrompterOne.Core/Tps` | source editing UI, toolbar actions, front matter, TPS transforms | shell navigation policy, teleprompter playback, live runtime wiring |
@@ -135,7 +135,7 @@ flowchart TD
     Ui --> Localization
     Ui --> BrowserStorage
     Ui --> CloudStorage
-    Ui --> Analytics["Runtime telemetry bridge<br/>GA + Clarity on production only"]
+    Ui --> Analytics["Runtime telemetry bridge<br/>GA + Clarity + Sentry on production only"]
     BrowserStorage --> WebApis
     CloudStorage --> WebApis
     Ui --> WebApis

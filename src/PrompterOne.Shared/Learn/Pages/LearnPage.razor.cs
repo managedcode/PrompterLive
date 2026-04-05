@@ -3,6 +3,7 @@ using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 
@@ -11,13 +12,11 @@ namespace PrompterOne.Shared.Pages;
 public partial class LearnPage : IAsyncDisposable
 {
     private const int DefaultContextWordCount = LearnSettingsDefaults.ContextWords;
-    private const string EndOfScriptPhrase = "End of script.";
     private const string LoadLearnMessage = "Unable to load RSVP rehearsal right now.";
     private const string LoadLearnOperation = "Learn load";
     private const int MinimumLoopDelayMilliseconds = 60;
     private const int MinimumWordDurationMilliseconds = 60;
     private const string NeutralEmotion = "neutral";
-    private const string ReadyWord = "Ready";
     private const int ReadyWordDurationMilliseconds = 240;
     private const int PreviewWordCount = 10;
     private const int RsvpMaxSpeed = 600;
@@ -169,11 +168,11 @@ public partial class LearnPage : IAsyncDisposable
         {
             MarkFocusLayoutDirty();
             _currentWordLeading = string.Empty;
-            _currentWordOrp = ReadyWord;
+            _currentWordOrp = Text(UiTextKey.LearnReadyWord);
             _currentWordTrailing = string.Empty;
             _leftContextWords = [];
             _rightContextWords = [];
-            _nextPhrase = EndOfScriptPhrase;
+            _nextPhrase = Text(UiTextKey.LearnEndOfScript);
             _progressFillWidth = "0%";
             _progressLabel = string.Empty;
             _syncFocusLayoutAfterRender = true;

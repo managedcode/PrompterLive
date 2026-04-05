@@ -15,8 +15,8 @@
     <div class="set-device-list">
         @foreach (var group in AppHotkeys.Groups)
         {
-            <SettingsExpandableCard Title="@group.Title"
-                                    Subtitle="@group.Subtitle"
+            <SettingsExpandableCard Title="@GroupTitle(group)"
+                                    Subtitle="@GroupSubtitle(group)"
                                     IconStyle="@BuildIconStyle(group.Surface)"
                                     IsOpen="@IsCardOpen(group.Id)"
                                     OnToggle="@(() => ToggleCard.InvokeAsync(group.Id))"
@@ -36,8 +36,8 @@
                              data-testid="@UiTestIds.Settings.ShortcutsAction(group.Id, definition.Id)"
                              data-test-id="@UiTestIds.Settings.ShortcutsAction(group.Id, definition.Id)">
                             <div class="set-shortcut-copy">
-                                <span class="set-shortcut-name">@definition.ActionLabel</span>
-                                <span class="set-shortcut-desc">@definition.Description</span>
+                                <span class="set-shortcut-name">@ActionLabel(definition)</span>
+                                <span class="set-shortcut-desc">@ActionDescription(definition)</span>
                             </div>
                             <div class="set-shortcut-chords">
                                 @foreach (var shortcut in definition.Shortcuts)
@@ -67,6 +67,100 @@
         AppHotkeySurface.Teleprompter => "background:rgba(245,158,11,.16); color:#FCD34D;",
         AppHotkeySurface.GoLive => "background:rgba(239,68,68,.16); color:#FCA5A5;",
         _ => "background:rgba(148,163,184,.14); color:#CBD5E1;"
+    };
+
+    private string ActionDescription(AppHotkeyDefinition definition) => definition.Id switch
+    {
+        "editor-undo" => Text(UiTextKey.SettingsHotkeyEditorUndoDescription),
+        "editor-redo" => Text(UiTextKey.SettingsHotkeyEditorRedoDescription),
+        "editor-select-all" => Text(UiTextKey.SettingsHotkeyEditorSelectAllDescription),
+        "learn-back" => Text(UiTextKey.SettingsHotkeyLearnBackDescription),
+        "learn-play-pause" => Text(UiTextKey.SettingsHotkeyLearnPlayPauseDescription),
+        "learn-speed-down" => Text(UiTextKey.SettingsHotkeyLearnSpeedDownDescription),
+        "learn-speed-up" => Text(UiTextKey.SettingsHotkeyLearnSpeedUpDescription),
+        "learn-step-backward" => Text(UiTextKey.SettingsHotkeyLearnStepBackwardDescription),
+        "learn-step-backward-large" => Text(UiTextKey.SettingsHotkeyLearnStepBackwardLargeDescription),
+        "learn-step-forward" => Text(UiTextKey.SettingsHotkeyLearnStepForwardDescription),
+        "learn-step-forward-large" => Text(UiTextKey.SettingsHotkeyLearnStepForwardLargeDescription),
+        "learn-toggle-loop" => Text(UiTextKey.SettingsHotkeyLearnLoopDescription),
+        "teleprompter-back" => Text(UiTextKey.SettingsHotkeyTeleprompterBackDescription),
+        "teleprompter-play-pause" => Text(UiTextKey.SettingsHotkeyTeleprompterPlayPauseDescription),
+        "teleprompter-previous-block" => Text(UiTextKey.SettingsHotkeyTeleprompterPreviousBlockDescription),
+        "teleprompter-next-block" => Text(UiTextKey.SettingsHotkeyTeleprompterNextBlockDescription),
+        "teleprompter-mirror-horizontal" => Text(UiTextKey.SettingsHotkeyTeleprompterMirrorHorizontalDescription),
+        "teleprompter-mirror-vertical" => Text(UiTextKey.SettingsHotkeyTeleprompterMirrorVerticalDescription),
+        "teleprompter-orientation" => Text(UiTextKey.SettingsHotkeyTeleprompterOrientationDescription),
+        "teleprompter-fullscreen" => Text(UiTextKey.SettingsHotkeyTeleprompterFullscreenDescription),
+        "teleprompter-alignment-left" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignLeftDescription),
+        "teleprompter-alignment-center" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignCenterDescription),
+        "teleprompter-alignment-right" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignRightDescription),
+        "teleprompter-alignment-justify" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignJustifyDescription),
+        "teleprompter-camera" => Text(UiTextKey.SettingsHotkeyTeleprompterCameraDescription),
+        "go-live-director-mode" => Text(UiTextKey.SettingsHotkeyGoLiveDirectorModeDescription),
+        "go-live-studio-mode" => Text(UiTextKey.SettingsHotkeyGoLiveStudioModeDescription),
+        "go-live-left-rail" => Text(UiTextKey.SettingsHotkeyGoLiveLeftRailDescription),
+        "go-live-right-rail" => Text(UiTextKey.SettingsHotkeyGoLiveRightRailDescription),
+        "go-live-full-program" => Text(UiTextKey.SettingsHotkeyGoLiveFullProgramDescription),
+        "go-live-take-to-air" => Text(UiTextKey.SettingsHotkeyGoLiveTakeToAirDescription),
+        "go-live-recording" => Text(UiTextKey.SettingsHotkeyGoLiveRecordingDescription),
+        "go-live-stream" => Text(UiTextKey.SettingsHotkeyGoLiveStreamDescription),
+        _ => definition.Description
+    };
+
+    private string ActionLabel(AppHotkeyDefinition definition) => definition.Id switch
+    {
+        "editor-undo" => Text(UiTextKey.SettingsHotkeyEditorUndoLabel),
+        "editor-redo" => Text(UiTextKey.SettingsHotkeyEditorRedoLabel),
+        "editor-select-all" => Text(UiTextKey.SettingsHotkeyEditorSelectAllLabel),
+        "learn-back" => Text(UiTextKey.SettingsHotkeyLearnBackLabel),
+        "learn-play-pause" => Text(UiTextKey.SettingsHotkeyLearnPlayPauseLabel),
+        "learn-speed-down" => Text(UiTextKey.SettingsHotkeyLearnSpeedDownLabel),
+        "learn-speed-up" => Text(UiTextKey.SettingsHotkeyLearnSpeedUpLabel),
+        "learn-step-backward" => Text(UiTextKey.SettingsHotkeyLearnStepBackwardLabel),
+        "learn-step-backward-large" => Text(UiTextKey.SettingsHotkeyLearnStepBackwardLargeLabel),
+        "learn-step-forward" => Text(UiTextKey.SettingsHotkeyLearnStepForwardLabel),
+        "learn-step-forward-large" => Text(UiTextKey.SettingsHotkeyLearnStepForwardLargeLabel),
+        "learn-toggle-loop" => Text(UiTextKey.SettingsHotkeyLearnLoopLabel),
+        "teleprompter-back" => Text(UiTextKey.SettingsHotkeyTeleprompterBackLabel),
+        "teleprompter-play-pause" => Text(UiTextKey.SettingsHotkeyTeleprompterPlayPauseLabel),
+        "teleprompter-previous-block" => Text(UiTextKey.SettingsHotkeyTeleprompterPreviousBlockLabel),
+        "teleprompter-next-block" => Text(UiTextKey.SettingsHotkeyTeleprompterNextBlockLabel),
+        "teleprompter-mirror-horizontal" => Text(UiTextKey.SettingsHotkeyTeleprompterMirrorHorizontalLabel),
+        "teleprompter-mirror-vertical" => Text(UiTextKey.SettingsHotkeyTeleprompterMirrorVerticalLabel),
+        "teleprompter-orientation" => Text(UiTextKey.SettingsHotkeyTeleprompterOrientationLabel),
+        "teleprompter-fullscreen" => Text(UiTextKey.SettingsHotkeyTeleprompterFullscreenLabel),
+        "teleprompter-alignment-left" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignLeftLabel),
+        "teleprompter-alignment-center" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignCenterLabel),
+        "teleprompter-alignment-right" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignRightLabel),
+        "teleprompter-alignment-justify" => Text(UiTextKey.SettingsHotkeyTeleprompterAlignJustifyLabel),
+        "teleprompter-camera" => Text(UiTextKey.SettingsHotkeyTeleprompterCameraLabel),
+        "go-live-director-mode" => Text(UiTextKey.SettingsHotkeyGoLiveDirectorModeLabel),
+        "go-live-studio-mode" => Text(UiTextKey.SettingsHotkeyGoLiveStudioModeLabel),
+        "go-live-left-rail" => Text(UiTextKey.SettingsHotkeyGoLiveLeftRailLabel),
+        "go-live-right-rail" => Text(UiTextKey.SettingsHotkeyGoLiveRightRailLabel),
+        "go-live-full-program" => Text(UiTextKey.SettingsHotkeyGoLiveFullProgramLabel),
+        "go-live-take-to-air" => Text(UiTextKey.SettingsHotkeyGoLiveTakeToAirLabel),
+        "go-live-recording" => Text(UiTextKey.SettingsHotkeyGoLiveRecordingLabel),
+        "go-live-stream" => Text(UiTextKey.SettingsHotkeyGoLiveStreamLabel),
+        _ => definition.ActionLabel
+    };
+
+    private string GroupSubtitle(AppHotkeyGroup group) => group.Id switch
+    {
+        "editor" => Text(UiTextKey.SettingsHotkeysGroupEditorSubtitle),
+        "learn" => Text(UiTextKey.SettingsHotkeysGroupLearnSubtitle),
+        "teleprompter" => Text(UiTextKey.SettingsHotkeysGroupTeleprompterSubtitle),
+        "go-live" => Text(UiTextKey.SettingsHotkeysGroupGoLiveSubtitle),
+        _ => group.Subtitle
+    };
+
+    private string GroupTitle(AppHotkeyGroup group) => group.Id switch
+    {
+        "editor" => Text(UiTextKey.SettingsHotkeysGroupEditorTitle),
+        "learn" => Text(UiTextKey.SettingsHotkeysGroupLearnTitle),
+        "teleprompter" => Text(UiTextKey.SettingsHotkeysGroupTeleprompterTitle),
+        "go-live" => Text(UiTextKey.SettingsHotkeysGroupGoLiveTitle),
+        _ => group.Title
     };
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];

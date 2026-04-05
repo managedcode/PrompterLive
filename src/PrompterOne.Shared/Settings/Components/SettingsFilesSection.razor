@@ -13,7 +13,7 @@
     <p class="set-section-desc">@Text(UiTextKey.SettingsFilesSectionDescription)</p>
 
     <div class="set-device-list">
-        <SettingsExpandableCard Title="Scripts"
+        <SettingsExpandableCard Title="@Text(UiTextKey.CommonScripts)"
                                 Subtitle="@_viewState.Scripts.Subtitle"
                                 IconStyle="background:rgba(196,160,96,.14); color:var(--gold);"
                                 IsOpen="@IsCardOpen(ScriptsCardId)"
@@ -26,11 +26,11 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Storage Mode</label>
+                    <label>@Text(UiTextKey.CommonStorageMode)</label>
                     <input type="text" class="set-input" value="@_viewState.Scripts.ScopeLabel" readonly />
                 </div>
                 <div class="set-field">
-                    <label>Browser Keys</label>
+                    <label>@Text(UiTextKey.CommonBrowserKeys)</label>
                     <input type="text" class="set-input" value="@_viewState.Scripts.LocationLabel" readonly />
                 </div>
                 <p class="set-card-copy">@_viewState.Scripts.DetailLabel</p>
@@ -55,7 +55,7 @@
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Recordings"
+        <SettingsExpandableCard Title="@Text(UiTextKey.CommonRecordings)"
                                 Subtitle="@_viewState.Recordings.Subtitle"
                                 IconStyle="background:rgba(239,68,68,.14); color:#F87171;"
                                 IsOpen="@IsCardOpen(RecordingsCardId)"
@@ -66,15 +66,15 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Storage Scope</label>
+                    <label>@Text(UiTextKey.CommonStorageScope)</label>
                     <input type="text" class="set-input" value="@_viewState.Recordings.ScopeLabel" readonly />
                 </div>
                 <div class="set-field">
-                    <label>Browser Container Path</label>
+                    <label>@Text(UiTextKey.CommonBrowserContainerPath)</label>
                     <input type="text" class="set-input" value="@_viewState.Recordings.LocationLabel" readonly />
                 </div>
                 <div class="set-field">
-                    <label>Max Storage</label>
+                    <label>@Text(UiTextKey.CommonMaxStorage)</label>
                     <SettingsSelect Value="@_settings.RecordingsStorageLimit"
                                    Options="@StorageLimitOptions"
                                    OnChange="OnStorageLimitChanged" />
@@ -83,7 +83,7 @@
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Exports"
+        <SettingsExpandableCard Title="@Text(UiTextKey.CommonExports)"
                                 Subtitle="@_viewState.Exports.Subtitle"
                                 IconStyle="background:rgba(99,102,241,.16); color:#A5B4FC;"
                                 IsOpen="@IsCardOpen(ExportsCardId)"
@@ -95,17 +95,17 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Default Export Format</label>
+                    <label>@Text(UiTextKey.CommonDefaultExportFormat)</label>
                     <SettingsSelect Value="@_settings.ExportFormat"
                                    Options="@ExportFormatOptions"
                                    OnChange="OnExportFormatChanged" />
                 </div>
                 <div class="set-field">
-                    <label>Browser Container Path</label>
+                    <label>@Text(UiTextKey.CommonBrowserContainerPath)</label>
                     <input type="text" class="set-input" value="@_viewState.Exports.LocationLabel" readonly />
                 </div>
                 <div class="set-field">
-                    <label>Storage Scope</label>
+                    <label>@Text(UiTextKey.CommonStorageScope)</label>
                     <input type="text" class="set-input" value="@_viewState.Exports.ScopeLabel" readonly />
                 </div>
                 <p class="set-card-copy">@_viewState.Exports.DetailLabel</p>

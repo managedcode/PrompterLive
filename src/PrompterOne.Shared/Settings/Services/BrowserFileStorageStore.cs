@@ -1,5 +1,7 @@
 using ManagedCode.Storage.VirtualFileSystem.Core;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Storage;
@@ -10,15 +12,13 @@ public sealed class BrowserFileStorageStore(
     IUserSettingsStore settingsStore,
     IScriptRepository scriptRepository,
     ILibraryFolderRepository libraryFolderRepository,
+    IStringLocalizer<SharedResource> localizer,
     IVirtualFileSystem? virtualFileSystem = null)
 {
-    private const string BrowserJsonLibraryScopeLabel = "Browser JSON library store";
-    private const string EmptyUsageLabel = "No files yet";
-    private const string RecordingsScopeLabel = "ManagedCode browser container";
     private const string ScriptsStorageKeyLabel = $"{BrowserStorageKeys.DocumentLibrary} / {BrowserStorageKeys.FolderLibrary}";
-    private const string VfsScopeLabel = "ManagedCode.Storage browser VFS";
 
     private readonly ILibraryFolderRepository _libraryFolderRepository = libraryFolderRepository;
+    private readonly IStringLocalizer<SharedResource> _localizer = localizer;
     private readonly IScriptRepository _scriptRepository = scriptRepository;
     private readonly IUserSettingsStore _settingsStore = settingsStore;
     private readonly IVirtualFileSystem? _virtualFileSystem = virtualFileSystem;
@@ -39,19 +39,19 @@ public sealed class BrowserFileStorageStore(
         return new BrowserFileStorageViewState(
             Scripts: new FileStorageCardState(
                 Subtitle: BuildScriptsSubtitle(scripts.Count, folders.Count),
-                ScopeLabel: BrowserJsonLibraryScopeLabel,
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeBrowserJsonLibrary),
                 LocationLabel: ScriptsStorageKeyLabel,
-                DetailLabel: "Authoritative day-to-day script and folder persistence stays in browser storage, not on a desktop filesystem path."),
+                DetailLabel: Text(UiTextKey.SettingsFilesScriptsDetail)),
             Recordings: new FileStorageCardState(
                 Subtitle: BuildVfsSubtitle(PrompterStorageDefaults.RecordingsDirectoryPath, recordingsUsage),
-                ScopeLabel: RecordingsScopeLabel,
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeManagedCodeBrowserContainer),
                 LocationLabel: BuildDisplayPath(PrompterStorageDefaults.RecordingsDirectoryPath),
-                DetailLabel: "PrompterOne provisions this browser-local container path for recording artifacts."),
+                DetailLabel: Text(UiTextKey.SettingsFilesRecordingsDetail)),
             Exports: new FileStorageCardState(
                 Subtitle: BuildVfsSubtitle(PrompterStorageDefaults.ExportDirectoryPath, exportsUsage),
-                ScopeLabel: VfsScopeLabel,
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeManagedCodeBrowserVfs),
                 LocationLabel: BuildDisplayPath(PrompterStorageDefaults.ExportDirectoryPath),
-                DetailLabel: "Exports are written to the browser-local container instead of a fake desktop Downloads folder."));
+                DetailLabel: Text(UiTextKey.SettingsFilesExportsDetail)));
     }
 
     public Task SaveSettingsAsync(BrowserFileStorageSettings settings, CancellationToken cancellationToken = default)
@@ -83,28 +83,30 @@ public sealed class BrowserFileStorageStore(
     private static string BuildDisplayPath(string path) =>
         string.Concat(PrompterStorageDefaults.BrowserContainerDisplayPrefix, path);
 
-    private static string BuildScriptsSubtitle(int scriptCount, int folderCount) =>
+    private string BuildScriptsSubtitle(int scriptCount, int folderCount) =>
         string.Concat(
-            Pluralize(scriptCount, "script"),
+            Pluralize(scriptCount, UiTextKey.SettingsFilesSingularScript, UiTextKey.SettingsFilesPluralScript),
             " · ",
-            Pluralize(folderCount, "folder"));
+            Pluralize(folderCount, UiTextKey.SettingsFilesSingularFolder, UiTextKey.SettingsFilesPluralFolder));
 
-    private static string BuildVfsSubtitle(string path, DirectoryUsage usage) =>
+    private string BuildVfsSubtitle(string path, DirectoryUsage usage) =>
         string.Concat(
             BuildDisplayPath(path),
             " · ",
-            usage.FileCount == 0 ? EmptyUsageLabel : usage.ToDisplayString());
+            usage.FileCount == 0 ? Text(UiTextKey.SettingsFilesEmptyUsage) : usage.ToDisplayString(this));
 
-    private static string Pluralize(int count, string noun) =>
-        count == 1 ? $"1 {noun}" : $"{count} {noun}s";
+    private string Pluralize(int count, UiTextKey singularKey, UiTextKey pluralKey) =>
+        count == 1
+            ? $"1 {Text(singularKey)}"
+            : $"{count} {Text(pluralKey)}";
 
     private readonly record struct DirectoryUsage(int FileCount, long TotalSizeBytes)
     {
         public static DirectoryUsage Empty { get; } = new(0, 0);
 
-        public string ToDisplayString() =>
+        public string ToDisplayString(BrowserFileStorageStore owner) =>
             string.Concat(
-                Pluralize(FileCount, "file"),
+                owner.Pluralize(FileCount, UiTextKey.SettingsFilesSingularFile, UiTextKey.SettingsFilesPluralFile),
                 " · ",
                 FormatSize(TotalSizeBytes));
 
@@ -126,4 +128,6 @@ public sealed class BrowserFileStorageStore(
             return $"{bytes} B";
         }
     }
+
+    private string Text(UiTextKey key) => _localizer[key.ToString()];
 }

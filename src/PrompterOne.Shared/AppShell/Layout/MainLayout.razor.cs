@@ -209,7 +209,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
                 Shell.ShowTeleprompter(ShellState.Title, ShellState.Subtitle, currentScriptId);
                 break;
             case AppRoutes.GoLive:
-                Shell.ShowGoLive(currentScriptId);
+                Shell.ShowGoLive(Text(UiTextKey.HeaderGoLive), string.Empty, currentScriptId);
                 break;
             case AppRoutes.Settings:
                 Shell.ShowSettings();

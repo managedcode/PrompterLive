@@ -8,10 +8,6 @@ namespace PrompterOne.Web.UITests;
 [Collection(EditorAuthoringCollection.Name)]
 public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
 {
-    private const string EmotionTooltipText =
-        "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text";
-    private const string MotivationalTooltipText =
-        "Inspiring, encouraging. Inline: [motivational]text[/motivational]";
     private const string WrappedTooltipSelectionFragment = "[motivational]script[/motivational]";
 
     private readonly record struct ElementBounds(double Left, double Top, double Right, double Bottom);
@@ -25,7 +21,7 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
             await OpenEditorAsync(page);
 
             var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
-            var tooltip = GetTooltipLocator(page, EmotionTooltipText);
+            var tooltip = GetTooltipLocator(page, BrowserTestConstants.EditorFlow.EmotionTooltipText);
 
             await emotionTrigger.HoverAsync();
             await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.TooltipEarlyCheckDelayMs);
@@ -38,7 +34,7 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
             await page.WaitForTimeoutAsync(
                 BrowserTestConstants.EditorFlow.TooltipSettleDelayMs - BrowserTestConstants.EditorFlow.TooltipEarlyCheckDelayMs);
             await Expect(tooltip).ToBeVisibleAsync();
-            await Expect(tooltip).ToHaveTextAsync(EmotionTooltipText);
+            await Expect(tooltip).ToHaveTextAsync(BrowserTestConstants.EditorFlow.EmotionTooltipText);
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -59,7 +55,7 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
             var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
             var emotionMenu = page.GetByTestId(UiTestIds.Editor.MenuEmotion);
             var motivationalEmotion = page.GetByTestId(UiTestIds.Editor.EmotionMotivational);
-            var tooltip = GetTooltipLocator(page, MotivationalTooltipText);
+            var tooltip = GetTooltipLocator(page, BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText);
 
             await emotionTrigger.ClickAsync();
             await Expect(emotionMenu).ToBeVisibleAsync();
@@ -74,7 +70,7 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
             await page.WaitForTimeoutAsync(
                 BrowserTestConstants.EditorFlow.TooltipSettleDelayMs - BrowserTestConstants.EditorFlow.TooltipEarlyCheckDelayMs);
             await Expect(tooltip).ToBeVisibleAsync();
-            await Expect(tooltip).ToHaveTextAsync(MotivationalTooltipText);
+            await Expect(tooltip).ToHaveTextAsync(BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText);
 
             var tooltipSurface = await ReadTooltipSurfaceAsync(tooltip);
             Assert.True(tooltipSurface.BorderAlpha >= BrowserTestConstants.EditorFlow.MinimumTooltipSurfaceBorderAlpha);
@@ -95,6 +91,38 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
                 page,
                 BrowserTestConstants.EditorFlow.ToolbarTooltipScenario,
                 BrowserTestConstants.EditorFlow.ToolbarTooltipDropdownStep);
+        });
+
+    [Fact]
+    public Task EditorScreen_ToolbarTooltip_StaysInsideViewport() =>
+        RunPageAsync(async page =>
+        {
+            UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarTooltipScenario);
+
+            await OpenEditorAsync(page);
+
+            var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
+            var tooltip = GetTooltipLocator(page, BrowserTestConstants.EditorFlow.EmotionTooltipText);
+
+            await emotionTrigger.HoverAsync();
+            await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.TooltipSettleDelayMs);
+
+            await Expect(tooltip).ToBeVisibleAsync();
+
+            var tooltipBounds = await ReadBoundsAsync(tooltip);
+            var viewportHeight = await ReadViewportHeightAsync(page);
+            var overlap = CalculateIntersectionArea(await ReadBoundsAsync(emotionTrigger), tooltipBounds);
+
+            Assert.True(tooltipBounds.Top >= 0, $"Expected tooltip top to stay within viewport, but it was {tooltipBounds.Top:0.##}.");
+            Assert.True(
+                tooltipBounds.Bottom <= viewportHeight + BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx,
+                $"Expected tooltip bottom to stay within viewport height {viewportHeight:0.##}, but it was {tooltipBounds.Bottom:0.##}.");
+            Assert.InRange(overlap, 0, BrowserTestConstants.EditorFlow.MaximumTooltipMenuOverlapPx);
+
+            await UiScenarioArtifacts.CapturePageAsync(
+                page,
+                BrowserTestConstants.EditorFlow.ToolbarTooltipScenario,
+                BrowserTestConstants.EditorFlow.ToolbarTooltipViewportStep);
         });
 
     private static double CalculateIntersectionArea(ElementBounds left, ElementBounds right)
@@ -135,6 +163,9 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
                 };
             }
             """);
+
+    private static async Task<double> ReadViewportHeightAsync(IPage page) =>
+        await page.EvaluateAsync<double>("() => window.innerHeight");
 
     private static async Task<TooltipSurfaceMetrics> ReadTooltipSurfaceAsync(ILocator locator) =>
         await locator.EvaluateAsync<TooltipSurfaceMetrics>(

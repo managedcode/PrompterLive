@@ -87,6 +87,9 @@ Rule format:
 - File workflows must stay local-first inside PrompterOne: scripts need in-app autosave and an internal change-history path in the browser environment, not only external disk import/export actions.
 - Hotkey work must target PrompterOne’s own browser surfaces and settings inventory only; do not design around OBS commands or claim OBS integration paths that the product does not have.
 - When the vendored TPS SDK already owns parsing or compile semantics, prefer removing redundant local TPS parser wrappers and keep only thin PrompterOne adapters that translate SDK models into app-owned contracts.
+- After syncing the vendored TPS SDK, delete repo-local TPS catalogs, constants, wrappers, or helper code that only duplicate the SDK contract; do not keep parallel spec copies in `Core` once consumers can read the vendored SDK directly.
+- Production TPS behavior must have one authoritative implementation path. Do not keep a second repo-local TPS parser, compiler, or regex-based semantic fallback beside the vendored SDK; plain-text fallbacks may exist only for truly non-TPS input.
+- Product localization must be complete across all supported UI languages: audit hardcoded user-facing strings with an explicit inventory file, move them into shared localization catalogs, and include tooltip text in the same localization pass instead of leaving tooltip copy or chrome labels hardcoded.
 
 ## Rules to Follow (Mandatory)
 

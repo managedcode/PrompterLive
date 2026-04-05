@@ -14,7 +14,7 @@
     <p class="set-section-desc">@Text(UiTextKey.SettingsAiSectionDescription)</p>
 
     <div class="set-device-list">
-        <SettingsAiProviderCard Title="Claude API"
+        <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiClaudeTitle)"
                                 Subtitle="@BuildClaudeSubtitle(_settings.ClaudeApi)"
                                 StatusLabel="@BuildStatusLabel(_settings.ClaudeApi)"
                                 StatusClass="@BuildStatusClass(_settings.ClaudeApi)"
@@ -38,24 +38,24 @@
             <ChildContent>
                 <div class="set-device-fields">
                     <div class="set-field">
-                        <label>API Key</label>
+                        <label>@Text(UiTextKey.CommonApiKey)</label>
                         <input type="password" class="set-input" placeholder="sk-ant-..." @bind="_settings.ClaudeApi.ApiKey" @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>Model</label>
+                        <label>@Text(UiTextKey.CommonModel)</label>
                         <SettingsSelect Value="@_settings.ClaudeApi.Model"
                                        Options="@ClaudeModelOptions"
                                        OnChange="OnClaudeModelChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Base URL (optional)</label>
+                        <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
                         <input type="text" class="set-input" placeholder="https://api.anthropic.com" @bind="_settings.ClaudeApi.BaseUrl" @onclick:stopPropagation="true" />
                     </div>
                 </div>
             </ChildContent>
         </SettingsAiProviderCard>
 
-        <SettingsAiProviderCard Title="OpenAI"
+        <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiOpenAiTitle)"
                                 Subtitle="@BuildOpenAiSubtitle(_settings.OpenAi)"
                                 StatusLabel="@BuildStatusLabel(_settings.OpenAi)"
                                 StatusClass="@BuildStatusClass(_settings.OpenAi)"
@@ -80,24 +80,24 @@
             <ChildContent>
                 <div class="set-device-fields">
                     <div class="set-field">
-                        <label>API Key</label>
+                        <label>@Text(UiTextKey.CommonApiKey)</label>
                         <input type="password" class="set-input" placeholder="sk-..." @bind="_settings.OpenAi.ApiKey" @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>Model</label>
+                        <label>@Text(UiTextKey.CommonModel)</label>
                         <SettingsSelect Value="@_settings.OpenAi.Model"
                                        Options="@OpenAiModelOptions"
                                        OnChange="OnOpenAiModelChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Base URL (optional)</label>
+                        <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
                         <input type="text" class="set-input" placeholder="https://api.openai.com/v1" @bind="_settings.OpenAi.BaseUrl" @onclick:stopPropagation="true" />
                     </div>
                 </div>
             </ChildContent>
         </SettingsAiProviderCard>
 
-        <SettingsAiProviderCard Title="Local / Ollama"
+        <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiOllamaTitle)"
                                 Subtitle="@BuildOllamaSubtitle(_settings.Ollama)"
                                 StatusLabel="@BuildStatusLabel(_settings.Ollama)"
                                 StatusClass="@BuildStatusClass(_settings.Ollama)"
@@ -123,11 +123,11 @@
             <ChildContent>
                 <div class="set-device-fields">
                     <div class="set-field">
-                        <label>Ollama URL</label>
+                        <label>@Text(UiTextKey.SettingsAiOllamaUrlLabel)</label>
                         <input type="text" class="set-input" placeholder="http://localhost:11434" @bind="_settings.Ollama.Endpoint" @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>Model</label>
+                        <label>@Text(UiTextKey.CommonModel)</label>
                         <input type="text" class="set-input" placeholder="llama3, mistral, gemma..." @bind="_settings.Ollama.Model" @onclick:stopPropagation="true" />
                     </div>
                 </div>

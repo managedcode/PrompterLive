@@ -2,6 +2,7 @@ using ManagedCode.Storage.CloudKit.Options;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Storage.Cloud;
 
@@ -10,10 +11,7 @@ namespace PrompterOne.Shared.Components.Settings;
 public partial class SettingsCloudSection : ComponentBase
 {
     private const string ConnectedStatusClass = "set-dest-ok";
-    private const string ConnectedStatusLabel = "Connected";
     private const string DisconnectedStatusClass = "set-dest-idle";
-    private const string DisconnectedSubtitle = "Not connected";
-    private const string DisconnectedStatusLabel = "Disconnected";
     private const string OnCssClass = "on";
     private const string SetToggleCssClass = "set-toggle";
 
@@ -156,7 +154,7 @@ public partial class SettingsCloudSection : ComponentBase
     {
         await CloudStorageStore.RemoveCredentialsAsync(providerId);
         ResetProvider(providerId);
-        _providerMessages[providerId] = "Provider disconnected.";
+        _providerMessages[providerId] = Text(UiTextKey.SettingsCloudProviderDisconnected);
         await PersistPreferencesAsync();
     }
 
@@ -243,11 +241,11 @@ public partial class SettingsCloudSection : ComponentBase
     private static string GetStatusClass(CloudStorageConnectionState connection) =>
         connection.IsConnected ? ConnectedStatusClass : DisconnectedStatusClass;
 
-    private static string GetStatusLabel(CloudStorageConnectionState connection) =>
-        connection.IsConnected ? ConnectedStatusLabel : DisconnectedStatusLabel;
+    private string GetStatusLabel(CloudStorageConnectionState connection) =>
+        connection.IsConnected ? Text(UiTextKey.CommonConnected) : Text(UiTextKey.CommonDisconnected);
 
-    private static string GetSubtitle(CloudStorageConnectionState connection) =>
-        string.IsNullOrWhiteSpace(connection.AccountLabel) ? DisconnectedSubtitle : connection.AccountLabel;
+    private string GetSubtitle(CloudStorageConnectionState connection) =>
+        string.IsNullOrWhiteSpace(connection.AccountLabel) ? Text(UiTextKey.CommonNotConnected) : connection.AccountLabel;
 
     private RenderFragment ProviderActions(string providerId) => builder =>
     {
@@ -255,10 +253,10 @@ public partial class SettingsCloudSection : ComponentBase
         var message = _providerMessages.GetValueOrDefault(providerId) ?? GetConnection(providerId).LastError;
 
         builder.AddMarkupContent(0, $"<div class=\"set-path-field\" style=\"margin-top:12px\">");
-        BuildActionButton(builder, 1, "set-btn-golden", UiTestIds.Settings.CloudProviderConnect(providerId), "Save & Test", () => SaveAndValidateAsync(providerId));
-        BuildActionButton(builder, 2, "set-btn-outline set-btn-sm", UiTestIds.Settings.CloudProviderExport(providerId), "Export", () => ExportAsync(providerId), !isConnected);
-        BuildActionButton(builder, 3, "set-btn-outline set-btn-sm", UiTestIds.Settings.CloudProviderImport(providerId), "Import", () => ImportAsync(providerId), !isConnected);
-        BuildActionButton(builder, 4, "set-btn-outline set-btn-sm set-danger-action", UiTestIds.Settings.CloudProviderDisconnect(providerId), "Disconnect", () => DisconnectAsync(providerId), !isConnected);
+        BuildActionButton(builder, 1, "set-btn-golden", UiTestIds.Settings.CloudProviderConnect(providerId), Text(UiTextKey.CommonSaveAndTest), () => SaveAndValidateAsync(providerId));
+        BuildActionButton(builder, 2, "set-btn-outline set-btn-sm", UiTestIds.Settings.CloudProviderExport(providerId), Text(UiTextKey.CommonExport), () => ExportAsync(providerId), !isConnected);
+        BuildActionButton(builder, 3, "set-btn-outline set-btn-sm", UiTestIds.Settings.CloudProviderImport(providerId), Text(UiTextKey.CommonImport), () => ImportAsync(providerId), !isConnected);
+        BuildActionButton(builder, 4, "set-btn-outline set-btn-sm set-danger-action", UiTestIds.Settings.CloudProviderDisconnect(providerId), Text(UiTextKey.CommonDisconnect), () => DisconnectAsync(providerId), !isConnected);
         builder.AddMarkupContent(5, "</div>");
 
         if (!string.IsNullOrWhiteSpace(message))

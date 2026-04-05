@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Storage;
 
 namespace PrompterOne.Shared.Pages;
@@ -7,16 +8,14 @@ public partial class LearnPage
 {
     private const string LoopToggleButtonBaseCssClass = "rsvp-btn rsvp-btn-sm rsvp-loop-toggle";
     private const string LoopToggleButtonActiveCssClass = LoopToggleButtonBaseCssClass + " is-active";
-    private const string LoopToggleTitleDisabled = "Loop playback is off";
-    private const string LoopToggleTitleEnabled = "Loop playback is on";
 
     private string LoopToggleButtonCssClass => _isLoopEnabled
         ? LoopToggleButtonActiveCssClass
         : LoopToggleButtonBaseCssClass;
 
     private string LoopToggleButtonTitle => _isLoopEnabled
-        ? LoopToggleTitleEnabled
-        : LoopToggleTitleDisabled;
+        ? Text(UiTextKey.TooltipLoopPlaybackOn)
+        : Text(UiTextKey.TooltipLoopPlaybackOff);
 
     private bool IsOnFinalTimelineEntry() => _timeline.Count > 0 && _currentIndex >= _timeline.Count - 1;
 

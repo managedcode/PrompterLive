@@ -1,4 +1,7 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <SettingsExpandableCard Title="@Title"
                         Subtitle="@Subtitle"
@@ -24,19 +27,19 @@
         }
 
         <div class="set-path-field" style="margin-top:12px">
-            <button class="set-btn-golden set-btn-sm"
+                <button class="set-btn-golden set-btn-sm"
                     type="button"
                     data-testid="@SaveTestId"
                     @onclick="Save"
                     @onclick:stopPropagation="true">
-                Save locally
+                @Text(UiTextKey.CommonSaveLocally)
             </button>
             <button class="set-btn-outline set-btn-sm"
                     type="button"
                     data-testid="@ClearTestId"
                     @onclick="Clear"
                     @onclick:stopPropagation="true">
-                Clear
+                @Text(UiTextKey.CommonClear)
             </button>
         </div>
 
@@ -86,4 +89,6 @@
     [Parameter] public string TestId { get; set; } = string.Empty;
 
     [Parameter] public string Title { get; set; } = string.Empty;
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

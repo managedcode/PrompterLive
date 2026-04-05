@@ -112,44 +112,44 @@ public partial class GoLivePage
         await SyncRemoteSourcesAsync();
     }
 
-    private static string BuildTargetSummary(DistributionTargetProfile target, StreamingPublishDescriptor descriptor)
+    private string BuildTargetSummary(DistributionTargetProfile target, StreamingPublishDescriptor descriptor)
     {
         if (!target.IsEnabled)
         {
-            return GoLiveText.Destination.DisabledSummary;
+            return Text(GoLiveText.Destination.DisabledSummary);
         }
 
         if (target.GetBoundTransportConnectionIds().Count == 0)
         {
-            return GoLiveText.Destination.TransportBindingSummary;
+            return Text(GoLiveText.Destination.TransportBindingSummary);
         }
 
         if (!descriptor.IsSupported)
         {
-            return GoLiveText.Destination.BlockedSummary;
+            return Text(GoLiveText.Destination.BlockedSummary);
         }
 
         return descriptor.Summary;
     }
 
-    private static string BuildTargetStatusLabel(DistributionTargetProfile target, StreamingPublishDescriptor descriptor)
+    private string BuildTargetStatusLabel(DistributionTargetProfile target, StreamingPublishDescriptor descriptor)
     {
         if (!target.IsEnabled)
         {
-            return GoLiveText.Destination.DisabledStatusLabel;
+            return Text(GoLiveText.Destination.DisabledStatusLabel);
         }
 
         if (!descriptor.IsSupported)
         {
-            return GoLiveText.Destination.BlockedStatusLabel;
+            return Text(GoLiveText.Destination.BlockedStatusLabel);
         }
 
         if (!descriptor.IsReady)
         {
-            return GoLiveText.Destination.NeedsSetupStatusLabel;
+            return Text(GoLiveText.Destination.NeedsSetupStatusLabel);
         }
 
-        return GoLiveText.Destination.RelayStatusLabel;
+        return Text(GoLiveText.Destination.RelayStatusLabel);
     }
 
     private bool BuildTransportConnectionIsReady(TransportConnectionProfile connection, StreamingPublishDescriptor descriptor)
@@ -166,27 +166,27 @@ public partial class GoLivePage
     {
         if (!connection.IsEnabled)
         {
-            return GoLiveText.Destination.DisabledStatusLabel;
+            return Text(GoLiveText.Destination.DisabledStatusLabel);
         }
 
         if (!BuildTransportConnectionIsReady(connection, descriptor))
         {
-            return GoLiveText.Destination.NeedsSetupStatusLabel;
+            return Text(GoLiveText.Destination.NeedsSetupStatusLabel);
         }
 
-        return GoLiveText.Destination.EnabledStatusLabel;
+        return Text(GoLiveText.Destination.EnabledStatusLabel);
     }
 
     private string BuildTransportSummary(TransportConnectionProfile connection, StreamingPublishDescriptor descriptor)
     {
         if (!connection.IsEnabled)
         {
-            return GoLiveText.Destination.DisabledSummary;
+            return Text(GoLiveText.Destination.DisabledSummary);
         }
 
         if (GetSelectedSourceIds(connection.Id).Count == 0)
         {
-            return GoLiveText.Destination.NoSourceSummary;
+            return Text(GoLiveText.Destination.NoSourceSummary);
         }
 
         return descriptor.Summary;

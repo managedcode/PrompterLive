@@ -184,12 +184,12 @@
     </div>
 
     <div class="ed-statusbar">
-        <span>Ln @Status.Line, Col @Status.Column</span>
+        <span>@StatusLineShortLabel @Status.Line, @StatusColumnShortLabel @Status.Column</span>
         <span>@Status.Profile</span>
-        <span>@Status.BaseWpm WPM</span>
-        <span>@Status.SegmentCount Segments</span>
-        <span>~@Status.WordCount Words</span>
+        <span>@Status.BaseWpm @L(UiTextKey.CommonWpm)</span>
+        <span>@StatusSegmentsLabel</span>
+        <span>@StatusWordCountLabel</span>
         <span>~@Status.Duration</span>
-        <span>@($"TPS v{Status.Version}")</span>
+        <span>@StatusVersionLabel</span>
     </div>
 </div>

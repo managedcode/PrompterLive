@@ -5,12 +5,12 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class GoLivePage
 {
-    private static string FormatRouteTarget(AudioRouteTarget routeTarget) =>
+    private string FormatRouteTarget(AudioRouteTarget routeTarget) =>
         routeTarget switch
         {
-            AudioRouteTarget.Monitor => GoLiveText.Audio.MonitorOnlyLabel,
-            AudioRouteTarget.Stream => GoLiveText.Audio.StreamOnlyLabel,
-            _ => GoLiveText.Audio.DefaultMicrophoneRouteLabel
+            AudioRouteTarget.Monitor => Text(GoLiveText.Audio.MonitorOnlyLabel),
+            AudioRouteTarget.Stream => Text(GoLiveText.Audio.StreamOnlyLabel),
+            _ => Text(GoLiveText.Audio.DefaultMicrophoneRouteLabel)
         };
 
     private sealed record GoLiveDestinationState(

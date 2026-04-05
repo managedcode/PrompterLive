@@ -223,7 +223,6 @@ public partial class TeleprompterPage
                     targetWpm,
                     effectiveWpm,
                     ResolveReaderCueProgress(compiledWords, compiledWordIndex)),
-                Title: BuildReaderWordTitle(word.Metadata, targetWpm, effectiveWpm),
                 PronunciationGuide: string.IsNullOrWhiteSpace(word.Metadata?.PronunciationGuide) ? null : word.Metadata.PronunciationGuide.Trim(),
                 EffectiveWpm: effectiveWpm,
                 Attributes: BuildReaderWordAttributes(word.Metadata, speedCueValue)));

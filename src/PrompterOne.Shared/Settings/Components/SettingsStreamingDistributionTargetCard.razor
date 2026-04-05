@@ -1,8 +1,11 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Core.Models.Streaming
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
 @using PrompterOne.Shared.Settings.Models
 @inject StreamingPublishDescriptorResolver DescriptorResolver
+@inject IStringLocalizer<SharedResource> Localizer
 
 <SettingsStreamingTargetCard Title="@Target.Name"
                              Account="@Presentation.SettingsAccountLabel"
@@ -21,7 +24,7 @@
     @if (Target.PlatformKind is StreamingPlatformKind.CustomRtmp)
     {
         <div class="set-field">
-            <label>@SettingsStreamingText.TargetNameLabel</label>
+            <label>@Text(SettingsStreamingText.TargetNameLabel)</label>
             <input type="text"
                    class="set-input"
                    value="@Target.Name"
@@ -31,11 +34,11 @@
     }
 
     <div class="set-field">
-        <label>@SettingsStreamingText.BoundTransportConnectionsLabel</label>
+        <label>@Text(SettingsStreamingText.BoundTransportConnectionsLabel)</label>
         @if (TransportConnections.Count == 0)
         {
             <div class="set-empty-card live-destination-sources-empty">
-                @SettingsStreamingText.BoundTransportConnectionsSummary
+                @Text(SettingsStreamingText.BoundTransportConnectionsSummary)
             </div>
         }
         else
@@ -49,7 +52,7 @@
                             data-testid="@UiTestIds.Settings.StreamingDistributionTransport(Target.Id, connection.Id)"
                             @onclick="() => ToggleBoundTransport.InvokeAsync((Target.Id, connection.Id))">
                         <span class="live-destination-source-name">@connection.Name</span>
-                        <span class="live-destination-source-state">@(isSelected ? "Bound" : "Available")</span>
+                        <span class="live-destination-source-state">@(isSelected ? Text(SettingsStreamingText.BoundTransportSelectedLabel) : Text(SettingsStreamingText.BoundTransportAvailableLabel))</span>
                     </button>
                 }
             </div>
@@ -57,7 +60,7 @@
     </div>
 
     <div class="set-field">
-        <label>@SettingsStreamingText.RtmpUrlLabel</label>
+        <label>@Text(SettingsStreamingText.RtmpUrlLabel)</label>
         <input type="text"
                class="set-input"
                value="@Target.RtmpUrl"
@@ -65,7 +68,7 @@
                data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.RtmpUrl)" />
     </div>
     <div class="set-field">
-        <label>@SettingsStreamingText.StreamKeyLabel</label>
+        <label>@Text(SettingsStreamingText.StreamKeyLabel)</label>
         <input type="password"
                class="set-input"
                value="@Target.StreamKey"
@@ -78,7 +81,7 @@
                 class="set-btn-outline set-btn-sm"
                 data-testid="@UiTestIds.Settings.StreamingDistributionRemove(Target.Id)"
                 @onclick="@(() => RemoveTarget.InvokeAsync(Target.Id))">
-            @SettingsStreamingText.RemoveDestinationLabel
+            @Text(SettingsStreamingText.RemoveDestinationLabel)
         </button>
     </div>
 </SettingsStreamingTargetCard>
@@ -113,20 +116,20 @@
         {
             if (!Target.IsEnabled)
             {
-                return SettingsStreamingText.DestinationDisabledStatusLabel;
+                return Text(SettingsStreamingText.DestinationDisabledStatusLabel);
             }
 
             if (!Descriptor.IsSupported)
             {
-                return SettingsStreamingText.BlockedStatusLabel;
+                return Text(SettingsStreamingText.BlockedStatusLabel);
             }
 
             if (!Descriptor.IsReady)
             {
-                return SettingsStreamingText.DestinationNeedsSetupStatusLabel;
+                return Text(SettingsStreamingText.DestinationNeedsSetupStatusLabel);
             }
 
-            return SettingsStreamingText.DestinationRelayStatusLabel;
+            return Text(SettingsStreamingText.DestinationRelayStatusLabel);
         }
     }
 
@@ -136,22 +139,24 @@
         {
             if (!Target.IsEnabled)
             {
-                return SettingsStreamingText.DestinationDisabledSummary;
+                return Text(SettingsStreamingText.DestinationDisabledSummary);
             }
 
             if (BoundConnectionIds.Count == 0)
             {
-                return SettingsStreamingText.BoundTransportConnectionsSummary;
+                return Text(SettingsStreamingText.BoundTransportConnectionsSummary);
             }
 
             if (!Descriptor.IsSupported)
             {
-                return SettingsStreamingText.UnsupportedTransportSummary;
+                return Text(SettingsStreamingText.UnsupportedTransportSummary);
             }
 
             return Descriptor.Summary;
         }
     }
+
+    private string Text(string key) => Localizer[key];
 
     private static string GetValue(ChangeEventArgs args) => args.Value?.ToString() ?? string.Empty;
 }

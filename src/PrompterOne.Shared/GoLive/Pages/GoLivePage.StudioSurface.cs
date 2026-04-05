@@ -68,8 +68,8 @@ public partial class GoLivePage
 
     private string SourcesHeaderTitle =>
         _activeStudioMode == GoLiveStudioMode.Director
-            ? GoLiveText.Surface.DirectorSourcesTitle
-            : GoLiveText.Surface.SourcesTitle;
+            ? Text(GoLiveText.Surface.DirectorSourcesTitle)
+            : Text(GoLiveText.Surface.SourcesTitle);
 
     private string GoLiveContentClass
     {
@@ -123,21 +123,21 @@ public partial class GoLivePage
             new(
                 GoLiveText.Surface.AudioMicChannelId,
                 PrimaryMicrophoneLabel,
-                HasPrimaryMicrophone ? PrimaryMicrophoneRoute : GoLiveText.Audio.NoMicrophoneLabel,
+                HasPrimaryMicrophone ? PrimaryMicrophoneRoute : Text(GoLiveText.Audio.NoMicrophoneLabel),
                 microphoneLevel),
             new(
                 GoLiveText.Surface.AudioProgramChannelId,
-                GoLiveText.Surface.AudioProgramChannelLabel,
-                GoLiveSession.State.HasActiveSession ? ActiveSourceLabel : GoLiveText.Surface.ProgramStandbyDetailLabel,
+                Text(GoLiveText.Surface.AudioProgramChannelLabel),
+                GoLiveSession.State.HasActiveSession ? ActiveSourceLabel : Text(GoLiveText.Surface.ProgramStandbyDetailLabel),
                 programLevel),
             new(
                 GoLiveText.Surface.AudioRecordingChannelId,
-                GoLiveText.Surface.AudioRecordingChannelLabel,
+                Text(GoLiveText.Surface.AudioRecordingChannelLabel),
                 GoLiveOutputRuntime.State.RecordingActive
-                    ? GoLiveText.Surface.RecordingActiveMetricValue
+                    ? Text(GoLiveText.Surface.RecordingActiveMetricValue)
                     : _studioSettings.Streaming.RecordingSettings.IsEnabled
-                        ? GoLiveText.Surface.RecordingReadyDetailLabel
-                        : GoLiveText.Surface.AudioIdleDetailLabel,
+                        ? Text(GoLiveText.Surface.RecordingReadyDetailLabel)
+                        : Text(GoLiveText.Surface.AudioIdleDetailLabel),
                 recordingLevel)
         ];
     }
@@ -154,9 +154,9 @@ public partial class GoLivePage
         {
             new(
                 GoLiveText.Surface.HostParticipantId,
-                GoLiveText.Surface.HostParticipantInitial,
-                GoLiveText.Surface.HostParticipantName,
-                GoLiveText.Surface.DetailLocalProgramLabel,
+                Text(GoLiveText.Surface.HostParticipantInitial),
+                Text(GoLiveText.Surface.HostParticipantName),
+                Text(GoLiveText.Surface.DetailLocalProgramLabel),
                 participantLevel,
                 true)
         };
@@ -202,20 +202,20 @@ public partial class GoLivePage
         [
             new(
                 GoLiveMetricIds.RuntimeCamera,
-                string.IsNullOrWhiteSpace(ActiveSourceLabel) ? GoLiveText.Session.CameraFallbackLabel : ActiveSourceLabel,
-                GoLiveText.Surface.ProgramMetricLabel),
+                string.IsNullOrWhiteSpace(ActiveSourceLabel) ? Text(GoLiveText.Session.CameraFallbackLabel) : ActiveSourceLabel,
+                Text(GoLiveText.Surface.ProgramMetricLabel)),
             new(
                 GoLiveMetricIds.RuntimeMicrophone,
                 PrimaryMicrophoneLabel,
-                GoLiveText.Surface.MicrophoneMetricLabel),
+                Text(GoLiveText.Surface.MicrophoneMetricLabel)),
             new(
                 GoLiveMetricIds.RuntimeRecording,
                 BuildRecordingMetricValue(),
-                GoLiveText.Surface.RecordingMetricLabel),
+                Text(GoLiveText.Surface.RecordingMetricLabel)),
             new(
                 GoLiveMetricIds.RuntimeEngine,
                 BuildRuntimeEngineValue(),
-                GoLiveText.Surface.RuntimeEngineLabel)
+                Text(GoLiveText.Surface.RuntimeEngineLabel))
         ];
     }
 
@@ -225,17 +225,17 @@ public partial class GoLivePage
         var secondaryCamera = AvailableSceneSources.Count > 1 ? AvailableSceneSources[1] : null;
         var scenes = new List<GoLiveSceneChipViewModel>
         {
-            new(GoLiveText.Surface.PrimarySceneId, primaryCamera is null ? GoLiveText.Session.CameraFallbackLabel : MediaDeviceLabelSanitizer.Sanitize(primaryCamera.Label), GoLiveSceneChipKind.Camera, primaryCamera?.SourceId),
-            new(GoLiveText.Surface.SecondarySceneId, secondaryCamera is null ? GoLiveText.Surface.InterviewSceneFallback : MediaDeviceLabelSanitizer.Sanitize(secondaryCamera.Label), GoLiveSceneChipKind.Split, secondaryCamera?.SourceId),
-            new(GoLiveText.Surface.SceneSlidesId, GoLiveText.Surface.SceneSlidesLabel, GoLiveSceneChipKind.Slides, null),
-            new(GoLiveText.Surface.PictureInPictureSceneId, GoLiveText.Surface.PictureInPictureSceneLabel, GoLiveSceneChipKind.PictureInPicture, primaryCamera?.SourceId)
+            new(GoLiveText.Surface.PrimarySceneId, primaryCamera is null ? Text(GoLiveText.Session.CameraFallbackLabel) : MediaDeviceLabelSanitizer.Sanitize(primaryCamera.Label), GoLiveSceneChipKind.Camera, primaryCamera?.SourceId),
+            new(GoLiveText.Surface.SecondarySceneId, secondaryCamera is null ? Text(GoLiveText.Surface.InterviewSceneFallback) : MediaDeviceLabelSanitizer.Sanitize(secondaryCamera.Label), GoLiveSceneChipKind.Split, secondaryCamera?.SourceId),
+            new(GoLiveText.Surface.SceneSlidesId, Text(GoLiveText.Surface.SceneSlidesLabel), GoLiveSceneChipKind.Slides, null),
+            new(GoLiveText.Surface.PictureInPictureSceneId, Text(GoLiveText.Surface.PictureInPictureSceneLabel), GoLiveSceneChipKind.PictureInPicture, primaryCamera?.SourceId)
         };
 
         for (var index = 1; index <= _customSceneCount; index++)
         {
             scenes.Add(new(
                 $"{GoLiveText.Surface.CustomScenePrefix}{index}",
-                $"{GoLiveText.Surface.CustomSceneTitlePrefix}{index + 4}",
+                string.Concat(Text(GoLiveText.Surface.CustomSceneTitlePrefix), index + 4),
                 GoLiveSceneChipKind.Custom,
                 null));
         }
@@ -251,19 +251,19 @@ public partial class GoLivePage
             new(
                 GoLiveMetricIds.StatusBitrate,
                 BuildBitrateMetricValue(),
-                GoLiveText.Surface.StatusBitrateLabel),
+                Text(GoLiveText.Surface.StatusBitrateLabel)),
             new(
                 GoLiveMetricIds.StatusOutput,
                 BuildOutputMetricValue(),
-                GoLiveText.Surface.StatusOutputLabel),
+                Text(GoLiveText.Surface.StatusOutputLabel)),
             new(
                 GoLiveMetricIds.StatusDestinations,
                 enabledDestinations.ToString(CultureInfo.InvariantCulture),
-                GoLiveText.Surface.ActiveDestinationsMetricLabel),
+                Text(GoLiveText.Surface.ActiveDestinationsMetricLabel)),
             new(
                 GoLiveMetricIds.StatusSession,
                 ActiveSessionLabel,
-                GoLiveText.Surface.SessionMetricLabel)
+                Text(GoLiveText.Surface.SessionMetricLabel))
         ];
     }
 
@@ -276,8 +276,8 @@ public partial class GoLivePage
         }
 
         return _studioSettings.Streaming.RecordingSettings.IsEnabled
-            ? GoLiveText.Surface.RecordingReadyMetricValue
-            : GoLiveText.Surface.AudioIdleDetailLabel;
+            ? Text(GoLiveText.Surface.RecordingReadyMetricValue)
+            : Text(GoLiveText.Surface.AudioIdleDetailLabel);
     }
 
     private string BuildRuntimeEngineValue()
@@ -287,7 +287,7 @@ public partial class GoLivePage
         {
             activeModules.Add(string.Join(MetricSeparator, new[]
             {
-                GoLiveText.Surface.RuntimeEngineRecorderValue,
+                Text(GoLiveText.Surface.RuntimeEngineRecorderValue),
                 ResolveRecordingContainerValue(),
                 ResolveRecordingSaveModeValue()
             }.Where(value => !string.IsNullOrWhiteSpace(value))));
@@ -304,7 +304,7 @@ public partial class GoLivePage
         }
 
         return activeModules.Count == 0
-            ? GoLiveText.Surface.RuntimeEngineIdleValue
+            ? Text(GoLiveText.Surface.RuntimeEngineIdleValue)
             : string.Join(MetricSeparator, activeModules);
     }
 
@@ -375,8 +375,8 @@ public partial class GoLivePage
 
     private string ResolveRecordingSaveModeValue() => GoLiveOutputRuntime.State.Recording.SaveMode switch
     {
-        FileSystemSaveMode => GoLiveText.Surface.RecordingSaveModeLocalFileValue,
-        DownloadSaveMode => GoLiveText.Surface.RecordingSaveModeBrowserDownloadValue,
+        FileSystemSaveMode => Text(GoLiveText.Surface.RecordingSaveModeLocalFileValue),
+        DownloadSaveMode => Text(GoLiveText.Surface.RecordingSaveModeBrowserDownloadValue),
         _ => string.Empty
     };
 
@@ -484,16 +484,16 @@ public partial class GoLivePage
         return Task.CompletedTask;
     }
 
-    private static string ResolveParticipantInitial(string label) =>
+    private string ResolveParticipantInitial(string label) =>
         string.IsNullOrWhiteSpace(label)
-            ? GoLiveText.Surface.HostParticipantInitial
+            ? Text(GoLiveText.Surface.HostParticipantInitial)
             : label.Trim()[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
 
-    private static string ResolveParticipantPlatformLabel(StreamingPlatformKind platformKind) =>
+    private string ResolveParticipantPlatformLabel(StreamingPlatformKind platformKind) =>
         platformKind switch
         {
             StreamingPlatformKind.LiveKit => GoLiveTargetCatalog.TargetNames.LiveKit,
             StreamingPlatformKind.VdoNinja => GoLiveTargetCatalog.TargetNames.VdoNinja,
-            _ => GoLiveText.Surface.DetailLocalProgramLabel
+            _ => Text(GoLiveText.Surface.DetailLocalProgramLabel)
         };
 }

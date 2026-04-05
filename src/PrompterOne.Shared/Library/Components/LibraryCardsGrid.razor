@@ -1,4 +1,9 @@
 @namespace PrompterOne.Shared.Components.Library
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
 <div class="dcards-grid">
     @foreach (var card in Cards)
     {
@@ -8,16 +13,21 @@
                  data-testid="@card.TestId">
             <div class="@GetCardMenuWrapClass(card.Id)"
                  @onclick:stopPropagation="true">
-                <button class="dcard-menu-btn"
-                        type="button"
-                        data-testid="@UiTestIds.Library.CardMenu(card.Id)"
-                        @onclick="() => ToggleCardMenu(card.Id)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <circle cx="12" cy="5" r="2" />
-                        <circle cx="12" cy="12" r="2" />
-                        <circle cx="12" cy="19" r="2" />
-                    </svg>
-                </button>
+                <TooltipAnchor OwnerTestId="@UiTestIds.Library.CardMenu(card.Id)"
+                               Placement="TooltipPlacement.LeftCenter"
+                               Text="@Text(UiTextKey.TooltipMoreScriptActions)">
+                    <button class="dcard-menu-btn"
+                            type="button"
+                            aria-label="@Text(UiTextKey.TooltipMoreScriptActions)"
+                            data-testid="@UiTestIds.Library.CardMenu(card.Id)"
+                            @onclick="() => ToggleCardMenu(card.Id)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="5" r="2" />
+                            <circle cx="12" cy="12" r="2" />
+                            <circle cx="12" cy="19" r="2" />
+                        </svg>
+                    </button>
+                </TooltipAnchor>
                 <div class="dcard-dropdown"
                      data-testid="@UiTestIds.Library.CardMenuDropdown(card.Id)"
                      @onclick:stopPropagation="true">
@@ -28,7 +38,7 @@
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
-                        Rename
+                        @Text(UiTextKey.CommonRename)
                     </button>
                     <button type="button"
                             @onclick:stopPropagation="true"
@@ -38,10 +48,10 @@
                             <rect x="9" y="9" width="13" height="13" rx="2" />
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                         </svg>
-                        Duplicate
+                        @Text(UiTextKey.CommonDuplicate)
                     </button>
                     <div class="dcard-dropdown-group">
-                        <div class="dcard-dropdown-label">Move to...</div>
+                        <div class="dcard-dropdown-label">@Text(UiTextKey.CommonMoveToEllipsis)</div>
                         <button type="button"
                                 data-testid="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
                                 @onclick:stopPropagation="true"
@@ -50,7 +60,7 @@
                                 <line x1="6" y1="6" x2="18" y2="18" />
                                 <line x1="6" y1="18" x2="18" y2="6" />
                             </svg>
-                            No Folder
+                            @Text(UiTextKey.CommonNoFolder)
                         </button>
                         @foreach (var folder in FolderOptions)
                         {
@@ -74,7 +84,7 @@
                             <polyline points="3,6 5,6 21,6" />
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
-                        Delete
+                        @Text(UiTextKey.CommonDelete)
                     </button>
                 </div>
             </div>
@@ -91,9 +101,9 @@
                 </div>
                 <div class="dcard-data">
                     <div class="ddata-row">
-                        <span data-testid="@UiTestIds.Library.CardWpm(card.Id)">@card.WpmLabel</span>
-                        <span data-testid="@UiTestIds.Library.CardWordCount(card.Id)">@card.WordCountLabel</span>
-                        <span data-testid="@UiTestIds.Library.CardSegmentCount(card.Id)">@card.SegmentCountLabel</span>
+                        <span data-testid="@UiTestIds.Library.CardWpm(card.Id)">@card.AverageWpm @Text(UiTextKey.CommonWpm)</span>
+                        <span data-testid="@UiTestIds.Library.CardWordCount(card.Id)">@Format(UiTextKey.LibraryCardWordsFormat, card.WordCount)</span>
+                        <span data-testid="@UiTestIds.Library.CardSegmentCount(card.Id)">@BuildSegmentCountLabel(card.SegmentCount)</span>
                     </div>
                     <div class="ddata-foot">
                         <span>@card.Author</span>
@@ -109,7 +119,7 @@
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </svg>
-                        Learn
+                        @Text(UiTextKey.LibraryCardLearn)
                     </button>
                     <button class="dcard-act dcard-act-go"
                             @onclick:stopPropagation="true"
@@ -118,7 +128,7 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="5,3 19,12 5,21" />
                         </svg>
-                        Read
+                        @Text(UiTextKey.LibraryCardRead)
                     </button>
                 </div>
             </div>
@@ -133,7 +143,7 @@
                     <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
             </div>
-            <span class="dcreate-label">New Script</span>
+            <span class="dcreate-label">@Text(UiTextKey.HeaderNewScript)</span>
         </div>
     </article>
 
@@ -148,7 +158,7 @@
                     <line x1="9" y1="14" x2="15" y2="14" />
                 </svg>
             </div>
-            <span class="dcreate-label">New Folder</span>
+            <span class="dcreate-label">@Text(UiTextKey.LibraryNewFolder)</span>
         </div>
     </article>
 </div>
@@ -248,4 +258,13 @@
         _openCardMenuId = null;
         return true;
     }
+
+    private string BuildSegmentCountLabel(int segmentCount) =>
+        segmentCount == 1
+            ? Text(UiTextKey.LibraryCardOneSegment)
+            : Format(UiTextKey.LibraryCardSegmentsFormat, segmentCount);
+
+    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

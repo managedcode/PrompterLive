@@ -1,4 +1,7 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <article class="@CardCssClass"
          data-testid="@CardTestId"
@@ -32,7 +35,7 @@
         }
 
         <div class="set-field set-field-toggle">
-            <label>Arm destination</label>
+            <label>@Text(UiTextKey.SettingsStreamingArmDestination)</label>
             <div class="set-toggle @(IsEnabled ? OnCssClass : null)"
                  data-testid="@ToggleTestId"
                  @onclick="ToggleEnabled"
@@ -84,4 +87,6 @@
     [Parameter] public string Summary { get; set; } = string.Empty;
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string ToggleTestId { get; set; } = string.Empty;
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

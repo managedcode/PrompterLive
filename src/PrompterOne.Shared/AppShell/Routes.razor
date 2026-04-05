@@ -1,4 +1,7 @@
 @namespace PrompterOne.Shared
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 ﻿<Router AppAssembly="typeof(Layout.MainLayout).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
@@ -7,8 +10,8 @@
     <NotFound>
         <LayoutView Layout="typeof(Layout.MainLayout)">
             <section class="empty-state">
-                <h1>Route not found</h1>
-                <p>The requested PrompterOne screen does not exist.</p>
+                <h1>@Localizer[UiTextKey.RoutesNotFoundTitle.ToString()]</h1>
+                <p>@Localizer[UiTextKey.RoutesNotFoundDescription.ToString()]</p>
             </section>
         </LayoutView>
     </NotFound>

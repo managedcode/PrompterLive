@@ -288,4 +288,316 @@
   <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
     <value>Mostrar painel de atalhos do teclado</value>
   </data>
+  <data name="TooltipDecreaseSpeed" xml:space="preserve">
+    <value>Diminuir velocidade</value>
+  </data>
+  <data name="TooltipIncreaseSpeed" xml:space="preserve">
+    <value>Aumentar velocidade</value>
+  </data>
+  <data name="TooltipBackFiveWords" xml:space="preserve">
+    <value>Voltar 5 palavras</value>
+  </data>
+  <data name="TooltipBackOneWord" xml:space="preserve">
+    <value>Voltar 1 palavra</value>
+  </data>
+  <data name="TooltipPlayPlayback" xml:space="preserve">
+    <value>Iniciar reprodução</value>
+  </data>
+  <data name="TooltipPausePlayback" xml:space="preserve">
+    <value>Pausar reprodução</value>
+  </data>
+  <data name="TooltipForwardOneWord" xml:space="preserve">
+    <value>Avançar 1 palavra</value>
+  </data>
+  <data name="TooltipForwardFiveWords" xml:space="preserve">
+    <value>Avançar 5 palavras</value>
+  </data>
+  <data name="TooltipLoopPlaybackOn" xml:space="preserve">
+    <value>A reprodução em loop está ativada</value>
+  </data>
+  <data name="TooltipLoopPlaybackOff" xml:space="preserve">
+    <value>A reprodução em loop está desativada</value>
+  </data>
+  <data name="TooltipMirrorReaderHorizontally" xml:space="preserve">
+    <value>Espelhar o leitor horizontalmente</value>
+  </data>
+  <data name="TooltipMirrorReaderVertically" xml:space="preserve">
+    <value>Espelhar o leitor verticalmente</value>
+  </data>
+  <data name="TooltipRotateReaderOrientation" xml:space="preserve">
+    <value>Girar o leitor entre paisagem e retrato</value>
+  </data>
+  <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
+    <value>Alternar tela cheia do navegador</value>
+  </data>
+  <data name="TooltipAlignTextLeft" xml:space="preserve">
+    <value>Alinhar texto à esquerda</value>
+  </data>
+  <data name="TooltipAlignTextCenter" xml:space="preserve">
+    <value>Centralizar o texto na faixa de leitura</value>
+  </data>
+  <data name="TooltipAlignTextRight" xml:space="preserve">
+    <value>Alinhar texto à direita</value>
+  </data>
+  <data name="TooltipAlignTextJustify" xml:space="preserve">
+    <value>Estender o texto por toda a largura legível</value>
+  </data>
+  <data name="TooltipMoveFocalReadingGuide" xml:space="preserve">
+    <value>Mover a guia focal de leitura</value>
+  </data>
+  <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
+    <value>Ajustar a largura do texto do leitor</value>
+  </data>
+  <data name="TooltipSmallerText" xml:space="preserve">
+    <value>Texto menor</value>
+  </data>
+  <data name="TooltipLargerText" xml:space="preserve">
+    <value>Texto maior</value>
+  </data>
+  <data name="TooltipPreviousBlock" xml:space="preserve">
+    <value>Bloco anterior</value>
+  </data>
+  <data name="TooltipPreviousWord" xml:space="preserve">
+    <value>Voltar uma palavra</value>
+  </data>
+  <data name="TooltipNextWord" xml:space="preserve">
+    <value>Avançar uma palavra</value>
+  </data>
+  <data name="TooltipNextBlock" xml:space="preserve">
+    <value>Próximo bloco</value>
+  </data>
+  <data name="TooltipToggleCameraPreview" xml:space="preserve">
+    <value>Alternar pré-visualização da câmera</value>
+  </data>
+  <data name="TooltipCreateFolder" xml:space="preserve">
+    <value>Criar pasta</value>
+  </data>
+  <data name="TooltipMoreScriptActions" xml:space="preserve">
+    <value>Mais ações do roteiro</value>
+  </data>
+  <data name="TooltipDeleteScript" xml:space="preserve">
+    <value>Excluir roteiro</value>
+  </data>
+  <data name="TooltipAccentGold" xml:space="preserve">
+    <value>Acento dourado</value>
+  </data>
+  <data name="TooltipAccentBlue" xml:space="preserve">
+    <value>Acento azul</value>
+  </data>
+  <data name="TooltipAccentEmerald" xml:space="preserve">
+    <value>Acento esmeralda</value>
+  </data>
+  <data name="TooltipAccentPink" xml:space="preserve">
+    <value>Acento rosa</value>
+  </data>
+  <data name="TooltipAccentPurple" xml:space="preserve">
+    <value>Acento roxo</value>
+  </data>
+  <data name="TooltipAccentOrange" xml:space="preserve">
+    <value>Acento laranja</value>
+  </data>
+  <data name="TooltipTextColorWhite" xml:space="preserve">
+    <value>Texto branco</value>
+  </data>
+  <data name="TooltipTextColorWarmWhite" xml:space="preserve">
+    <value>Texto branco quente</value>
+  </data>
+  <data name="TooltipTextColorAmber" xml:space="preserve">
+    <value>Texto âmbar</value>
+  </data>
+  <data name="TooltipTextColorMint" xml:space="preserve">
+    <value>Texto menta</value>
+  </data>
+  <data name="GoLiveBackLabel" xml:space="preserve">
+    <value>Voltar</value>
+  </data>
+  <data name="GoLiveStreamingSubtitle" xml:space="preserve">
+    <value>Roteamento do programa</value>
+  </data>
+  <data name="GoLiveAudioDefaultMicrophoneRouteLabel" xml:space="preserve">
+    <value>Monitor + transmissão</value>
+  </data>
+  <data name="GoLiveAudioMonitorOnlyLabel" xml:space="preserve">
+    <value>Apenas monitor</value>
+  </data>
+  <data name="GoLiveAudioNoMicrophoneLabel" xml:space="preserve">
+    <value>Nenhum microfone</value>
+  </data>
+  <data name="GoLiveAudioStreamOnlyLabel" xml:space="preserve">
+    <value>Apenas transmissão</value>
+  </data>
+  <data name="GoLiveDestinationBlockedStatusLabel" xml:space="preserve">
+    <value>Bloqueado</value>
+  </data>
+  <data name="GoLiveDestinationBlockedSummary" xml:space="preserve">
+    <value>Este destino está ligado apenas a transportes que não conseguem fornecer uma rota de retransmissão a jusante.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledSummary" xml:space="preserve">
+    <value>Desativado nesta sessão ao vivo.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledStatusLabel" xml:space="preserve">
+    <value>Desativado</value>
+  </data>
+  <data name="GoLiveDestinationEnabledStatusLabel" xml:space="preserve">
+    <value>Pronto</value>
+  </data>
+  <data name="GoLiveDestinationNeedsSetupStatusLabel" xml:space="preserve">
+    <value>Configuração necessária</value>
+  </data>
+  <data name="GoLiveDestinationNoSourceSummary" xml:space="preserve">
+    <value>Ainda não existe nenhuma fonte encaminhada armada para este destino.</value>
+  </data>
+  <data name="GoLiveDestinationRelayStatusLabel" xml:space="preserve">
+    <value>Retransmissão</value>
+  </data>
+  <data name="GoLiveDestinationTransportBindingSummary" xml:space="preserve">
+    <value>Ligue este destino a pelo menos uma ligação de transporte armada.</value>
+  </data>
+  <data name="GoLiveSourcesAddLabel" xml:space="preserve">
+    <value>Incluir</value>
+  </data>
+  <data name="GoLiveSourcesDefaultTitle" xml:space="preserve">
+    <value>Entradas</value>
+  </data>
+  <data name="GoLiveSourcesEmptyStateMessage" xml:space="preserve">
+    <value>Ainda não existem câmaras de cena configuradas. Adicione-as primeiro em Definições.</value>
+  </data>
+  <data name="GoLiveSourcesMicrophoneTitle" xml:space="preserve">
+    <value>Microfone</value>
+  </data>
+  <data name="GoLiveSourcesRemoveLabel" xml:space="preserve">
+    <value>Remover</value>
+  </data>
+  <data name="GoLiveSourcesIncludedLabel" xml:space="preserve">
+    <value>Pronto para saída</value>
+  </data>
+  <data name="GoLiveSourcesLiveLabel" xml:space="preserve">
+    <value>Pronto para a cena</value>
+  </data>
+  <data name="GoLiveSourcesOnAirLabel" xml:space="preserve">
+    <value>No ar</value>
+  </data>
+  <data name="GoLiveSourcesSceneOnlyLabel" xml:space="preserve">
+    <value>Apenas cena</value>
+  </data>
+  <data name="SettingsAboutSectionDescription" xml:space="preserve">
+    <value>PrompterOne é um teleponto profissional para criadores, broadcasters e oradores públicos.</value>
+  </data>
+  <data name="SettingsAboutAutomaticUpdatesLabel" xml:space="preserve">
+    <value>Procurar atualizações automaticamente</value>
+  </data>
+  <data name="SettingsAboutFooterText" xml:space="preserve">
+    <value>Criado e mantido pela Managed Code.</value>
+  </data>
+  <data name="SettingsAboutLicensedStatusLabel" xml:space="preserve">
+    <value>Licenciado</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardCopy" xml:space="preserve">
+    <value>Tudo no PrompterOne é concebido, desenvolvido e mantido pela Managed Code. Utilize as ligações oficiais abaixo para o site da empresa, a organização pública no GitHub e o site do produto em produção.</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardSubtitle" xml:space="preserve">
+    <value>Produto, design e engenharia pela Managed Code</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardSubtitle" xml:space="preserve">
+    <value>Bibliotecas e licenças</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardTitle" xml:space="preserve">
+    <value>Código aberto</value>
+  </data>
+  <data name="SettingsAboutResourcesCardSubtitle" xml:space="preserve">
+    <value>Aplicação em produção, lançamentos e suporte</value>
+  </data>
+  <data name="SettingsAboutResourcesCardTitle" xml:space="preserve">
+    <value>Ajuda e recursos</value>
+  </data>
+  <data name="SettingsAboutSoftwareUpdatesLabel" xml:space="preserve">
+    <value>Atualizações de software</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureLabel" xml:space="preserve">
+    <value>Divulgação de privacidade do Clarity</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureDescription" xml:space="preserve">
+    <value>Divulgação oficial de privacidade do Microsoft Clarity</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubLabel" xml:space="preserve">
+    <value>TPS no GitHub</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubDescription" xml:space="preserve">
+    <value>Formato TelePrompterScript, documentação e exemplos</value>
+  </data>
+  <data name="SettingsAboutUpToDateLabel" xml:space="preserve">
+    <value>Atualizado</value>
+  </data>
+  <data name="SettingsAboutProductGitHubLabel" xml:space="preserve">
+    <value>PrompterOne no GitHub</value>
+  </data>
+  <data name="SettingsAboutProductGitHubDescription" xml:space="preserve">
+    <value>Código-fonte, documentação e marcos</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteLabel" xml:space="preserve">
+    <value>Site da Managed Code</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteDescription" xml:space="preserve">
+    <value>Site oficial da empresa</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubLabel" xml:space="preserve">
+    <value>Managed Code no GitHub</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubDescription" xml:space="preserve">
+    <value>Organização oficial no GitHub</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteLabel" xml:space="preserve">
+    <value>Aplicação PrompterOne</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteDescription" xml:space="preserve">
+    <value>Build WebAssembly autónoma em produção</value>
+  </data>
+  <data name="SettingsAboutLibraryInterDescription" xml:space="preserve">
+    <value>Tipo de letra UI · Rasmus Andersson</value>
+  </data>
+  <data name="SettingsAboutLibraryJetBrainsMonoDescription" xml:space="preserve">
+    <value>Monoespaçada · JetBrains</value>
+  </data>
+  <data name="SettingsAboutLibraryPlayfairDisplayDescription" xml:space="preserve">
+    <value>Serif de destaque · Claus Eggers Sorensen</value>
+  </data>
+  <data name="SettingsAboutLibraryFeatherIconsDescription" xml:space="preserve">
+    <value>Conjunto de ícones open source</value>
+  </data>
+  <data name="SettingsAboutLibraryWebRtcDescription" xml:space="preserve">
+    <value>APIs de comunicação em tempo real</value>
+  </data>
+  <data name="SettingsAboutLibraryMediaRecorderDescription" xml:space="preserve">
+    <value>Gravação multimédia do navegador</value>
+  </data>
+  <data name="SettingsAboutLibraryWebAudioDescription" xml:space="preserve">
+    <value>Processamento de áudio de alto nível</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkLabel" xml:space="preserve">
+    <value>Repositório PrompterOne</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkDescription" xml:space="preserve">
+    <value>Código-fonte, documentação e marcos</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkLabel" xml:space="preserve">
+    <value>Notas de lançamento</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkDescription" xml:space="preserve">
+    <value>Builds publicadas e changelog</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkLabel" xml:space="preserve">
+    <value>Reportar um problema</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkDescription" xml:space="preserve">
+    <value>Relatórios de erros e feedback do produto</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingTitle" xml:space="preserve">
+    <value>Gravação</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingAccountLabel" xml:space="preserve">
+    <value>Gravação no navegador · Feed do programa</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingDescription" xml:space="preserve">
+    <value>Arme a gravação local como destino de primeira classe do mesmo feed de programa composto usado pelos transportes ao vivo.</value>
+  </data>
 </root>

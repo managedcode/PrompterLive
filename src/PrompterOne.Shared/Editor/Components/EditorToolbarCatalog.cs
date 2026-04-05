@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Components.Editor;
 
@@ -273,6 +275,20 @@ public static class EditorToolbarCatalog
     public static IReadOnlyList<EditorFloatingMenuDescriptor> FloatingMenus =>
         EditorFloatingToolbarCatalog.Menus;
 
+    public static IReadOnlyList<EditorToolbarSectionDescriptor> BuildSections(IStringLocalizer<SharedResource> localizer) =>
+        Sections.Select(section => new EditorToolbarSectionDescriptor(
+                section.Key,
+                LocalizeSectionLabel(localizer, section.Key),
+                section.MenuId,
+                section.DropdownTestId,
+                section.DropdownStyle,
+                section.MainActions.Select(action => LocalizeAction(localizer, action)).ToArray(),
+                section.DropdownGroups.Select(group => new EditorToolbarDropdownGroupDescriptor(
+                    LocalizeGroupLabel(localizer, group.Label),
+                    group.Actions.Select(action => LocalizeAction(localizer, action)).ToArray(),
+                    group.HasSeparatorBefore)).ToArray()))
+            .ToArray();
+
     private static EditorToolbarActionDescriptor Ai(
         string key,
         string contentHtml,
@@ -341,4 +357,74 @@ public static class EditorToolbarCatalog
             style,
             Command: new EditorCommandRequest(EditorCommandKind.Wrap, openingToken, closingToken, placeholder),
             PreventMouseDown: true);
+
+    private static EditorToolbarActionDescriptor LocalizeAction(
+        IStringLocalizer<SharedResource> localizer,
+        EditorToolbarActionDescriptor action)
+    {
+        var tooltip = ResolveLocalizedTooltip(localizer, action);
+        return string.Equals(tooltip, action.Tooltip, StringComparison.Ordinal)
+            ? action
+            : action with { Tooltip = tooltip };
+    }
+
+    private static string LocalizeGroupLabel(IStringLocalizer<SharedResource> localizer, string label) =>
+        label switch
+        {
+            "Formatting" => Text(localizer, UiTextKey.EditorToolbarGroupFormatting),
+            "Volume" => Text(localizer, UiTextKey.EditorToolbarGroupVolume),
+            "Articulation" => Text(localizer, UiTextKey.EditorToolbarGroupArticulation),
+            "Dynamics" => Text(localizer, UiTextKey.EditorToolbarGroupDynamics),
+            "Stress" => Text(localizer, UiTextKey.EditorToolbarGroupStress),
+            "Reset" => Text(localizer, UiTextKey.EditorToolbarGroupReset),
+            "TPS Emotions" => Text(localizer, UiTextKey.EditorToolbarGroupTpsEmotions),
+            "Delivery Modes" => Text(localizer, UiTextKey.EditorToolbarGroupDeliveryModes),
+            "Breath And Pauses" => Text(localizer, UiTextKey.EditorToolbarGroupBreathAndPauses),
+            "Speed Presets" => Text(localizer, UiTextKey.EditorToolbarGroupSpeedPresets),
+            "Custom Speed" => Text(localizer, UiTextKey.EditorToolbarGroupCustomSpeed),
+            "Structure" => Text(localizer, UiTextKey.EditorToolbarGroupStructure),
+            "Edit Points" => Text(localizer, UiTextKey.EditorToolbarGroupEditPoints),
+            "Pronunciation" => Text(localizer, UiTextKey.EditorToolbarGroupPronunciation),
+            _ => label
+        };
+
+    private static string LocalizeSectionLabel(IStringLocalizer<SharedResource> localizer, string key) =>
+        key switch
+        {
+            "history" => Text(localizer, UiTextKey.EditorToolbarSectionHistory),
+            "format" => Text(localizer, UiTextKey.EditorToolbarSectionFormat),
+            "voice" => Text(localizer, UiTextKey.EditorToolbarSectionVoice),
+            "emotion" => Text(localizer, UiTextKey.EditorToolbarSectionEmotion),
+            "pause" => Text(localizer, UiTextKey.EditorToolbarSectionPause),
+            "speed" => Text(localizer, UiTextKey.EditorToolbarSectionSpeed),
+            "insert" => Text(localizer, UiTextKey.EditorToolbarSectionInsert),
+            "ai" => Text(localizer, UiTextKey.EditorToolbarSectionAi),
+            _ => key
+        };
+
+    private static string ResolveLocalizedTooltip(
+        IStringLocalizer<SharedResource> localizer,
+        EditorToolbarActionDescriptor action)
+    {
+        return action.TestId switch
+        {
+            "editor-undo" => Text(localizer, UiTextKey.EditorToolbarTooltipUndo),
+            "editor-redo" => Text(localizer, UiTextKey.EditorToolbarTooltipRedo),
+            "editor-format-trigger" => Text(localizer, UiTextKey.EditorToolbarTooltipMoreFormatting),
+            "editor-color-trigger" => Text(localizer, UiTextKey.EditorToolbarTooltipVoiceCues),
+            UiTestIds.Editor.EmotionTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipEmotionTrigger),
+            UiTestIds.Editor.EmotionMotivational => Text(localizer, UiTextKey.EditorToolbarTooltipEmotionMotivational),
+            UiTestIds.Editor.PauseTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipPauseCues),
+            UiTestIds.Editor.SpeedTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipSpeedCues),
+            UiTestIds.Editor.InsertTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipMoreInsertOptions),
+            UiTestIds.Editor.Ai => Text(localizer, UiTextKey.EditorToolbarTooltipAiAssist),
+            "editor-reset-color" => Text(localizer, UiTextKey.EditorToolbarTooltipRemoveInlineTags),
+            UiTestIds.Editor.InsertSegmentArchetypeMenu => Text(localizer, UiTextKey.EditorToolbarTooltipInsertSegmentArchetype),
+            UiTestIds.Editor.InsertBlockArchetypeMenu => Text(localizer, UiTextKey.EditorToolbarTooltipInsertBlockArchetype),
+            _ => action.Tooltip
+        };
+    }
+
+    private static string Text(IStringLocalizer<SharedResource> localizer, UiTextKey key) =>
+        localizer[key.ToString()];
 }

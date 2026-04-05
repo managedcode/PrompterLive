@@ -1,0 +1,61 @@
+@namespace PrompterOne.Shared.Components
+@using PrompterOne.Shared.Contracts
+
+<span class="@BuildAnchorCssClass()">
+    @ChildContent
+    <span id="@UiDomIds.Tooltip.Surface(OwnerTestId)"
+          class="@BuildTooltipCssClass()"
+          role="tooltip"
+          data-testid="@UiTestIds.Tooltip.Surface(OwnerTestId)"
+          data-test-id="@UiTestIds.Tooltip.Surface(OwnerTestId)"
+          data-tooltip-placement="@BuildPlacementValue()">@Text</span>
+</span>
+
+@code {
+    [Parameter]
+    public string AnchorClass { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string OwnerTestId { get; set; } = string.Empty;
+
+    [Parameter]
+    public TooltipPlacement Placement { get; set; } = TooltipPlacement.TopCenter;
+
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    private string BuildAnchorCssClass() =>
+        string.IsNullOrWhiteSpace(AnchorClass)
+            ? TooltipCssClass
+            : $"{TooltipCssClass} {AnchorClass}";
+
+    private string BuildPlacementCssClass() =>
+        Placement switch
+        {
+            TooltipPlacement.LeftCenter => $"{TooltipSurfaceCssClass} {TooltipLeftCssClass}",
+            TooltipPlacement.RightCenter => $"{TooltipSurfaceCssClass} {TooltipRightCssClass}",
+            _ => $"{TooltipSurfaceCssClass} {TooltipTopCssClass}"
+        };
+
+    private string BuildPlacementValue() =>
+        Placement switch
+        {
+            TooltipPlacement.LeftCenter => LeftPlacementValue,
+            TooltipPlacement.RightCenter => RightPlacementValue,
+            _ => TopPlacementValue
+        };
+
+    private string BuildTooltipCssClass() => BuildPlacementCssClass();
+
+    private const string LeftPlacementValue = "left";
+    private const string RightPlacementValue = "right";
+    private const string TopPlacementValue = "top";
+    private const string TooltipCssClass = "po-tooltip-anchor";
+    private const string TooltipLeftCssClass = "po-tooltip-surface--left";
+    private const string TooltipRightCssClass = "po-tooltip-surface--right";
+    private const string TooltipSurfaceCssClass = "po-tooltip-surface";
+    private const string TooltipTopCssClass = "po-tooltip-surface--top";
+}

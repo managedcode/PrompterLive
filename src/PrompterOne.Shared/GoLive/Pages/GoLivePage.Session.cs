@@ -16,14 +16,14 @@ public partial class GoLivePage
 
     private string ActiveSessionLabel => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
-        (true, true) => GoLiveText.Session.SessionStreamingRecordingLabel,
-        (true, false) => GoLiveText.Session.SessionStreamingLabel,
-        (false, true) => GoLiveText.Session.SessionRecordingLabel,
-        _ => GoLiveText.Session.SessionIdleLabel
+        (true, true) => Text(GoLiveText.Session.SessionStreamingRecordingLabel),
+        (true, false) => Text(GoLiveText.Session.SessionStreamingLabel),
+        (false, true) => Text(GoLiveText.Session.SessionRecordingLabel),
+        _ => Text(GoLiveText.Session.SessionIdleLabel)
     };
 
     private string ActiveSourceLabel => ActiveCamera is null
-        ? GoLiveText.Session.CameraFallbackLabel
+        ? Text(GoLiveText.Session.CameraFallbackLabel)
         : MediaDeviceLabelSanitizer.Sanitize(ActiveCamera.Label);
 
     private bool CanControlProgram => SelectedCamera is not null;
@@ -44,10 +44,10 @@ public partial class GoLivePage
 
     private string PrimarySessionBadge => (GoLiveSession.State.IsStreamActive, GoLiveSession.State.IsRecordingActive) switch
     {
-        (true, true) => GoLiveText.Session.ProgramBadgeStreamingRecordingLabel,
-        (true, false) => GoLiveText.Session.ProgramBadgeLiveLabel,
-        (false, true) => GoLiveText.Session.ProgramBadgeRecordingLabel,
-        _ => GoLiveText.Session.ProgramBadgeIdleLabel
+        (true, true) => Text(GoLiveText.Session.ProgramBadgeStreamingRecordingLabel),
+        (true, false) => Text(GoLiveText.Session.ProgramBadgeLiveLabel),
+        (false, true) => Text(GoLiveText.Session.ProgramBadgeRecordingLabel),
+        _ => Text(GoLiveText.Session.ProgramBadgeIdleLabel)
     };
 
     private string ProgramResolutionLabel => $"{ResolveResolutionDimensions(_studioSettings.Streaming.ProgramCaptureSettings.ResolutionPreset)} • {ActiveSourceLabel}";
@@ -62,7 +62,7 @@ public partial class GoLivePage
     };
 
     private string SelectedSourceLabel => SelectedCamera is null
-        ? GoLiveText.Session.CameraFallbackLabel
+        ? Text(GoLiveText.Session.CameraFallbackLabel)
         : MediaDeviceLabelSanitizer.Sanitize(SelectedCamera.Label);
 
     private SceneCameraSource? SelectedCamera => ResolveSessionSource(GoLiveSession.State.SelectedSourceId) ?? ActiveCamera;
@@ -70,14 +70,14 @@ public partial class GoLivePage
     private string StageFrameRateLabel => BuildStageFrameRateLabel(_studioSettings.Streaming.ProgramCaptureSettings.ResolutionPreset);
 
     private string StreamActionLabel => GoLiveSession.State.IsStreamActive
-        ? GoLiveText.Session.StreamStopLabel
-        : GoLiveText.Session.StreamButtonLabel;
+        ? Text(GoLiveText.Session.StreamStopLabel)
+        : Text(GoLiveText.Session.StreamButtonLabel);
 
     private string StreamButtonDisplayText => StreamActionLabel.ToUpperInvariant();
 
     private string SwitchActionLabel => CanSwitchProgram
-        ? GoLiveText.Session.SwitchButtonLabel
-        : GoLiveText.Session.SwitchButtonDisabledLabel;
+        ? Text(GoLiveText.Session.SwitchButtonLabel)
+        : Text(GoLiveText.Session.SwitchButtonDisabledLabel);
 
     private DateTimeOffset? SessionStartedAt => GoLiveSession.State.IsRecordingActive
         ? GoLiveSession.State.RecordingStartedAt ?? GoLiveSession.State.StreamStartedAt
@@ -111,7 +111,7 @@ public partial class GoLivePage
         await EnsureSelectedCameraReadyForProgramAsync();
         await Diagnostics.RunAsync(
             GoLiveText.Session.SwitchProgramOperation,
-            GoLiveText.Session.SwitchProgramMessage,
+            Text(GoLiveText.Session.SwitchProgramMessage),
             async () =>
             {
                 var nextCamera = SelectedCamera;
@@ -132,7 +132,7 @@ public partial class GoLivePage
             {
                 await Diagnostics.RunAsync(
                     GoLiveText.Session.StopStreamOperation,
-                    GoLiveText.Session.StopStreamMessage,
+                    Text(GoLiveText.Session.StopStreamMessage),
                     async () =>
                     {
                         await GoLiveOutputRuntime.StopStreamAsync();
@@ -144,7 +144,7 @@ public partial class GoLivePage
             await EnsureSelectedCameraReadyForProgramAsync();
             await Diagnostics.RunAsync(
                 GoLiveText.Session.StartStreamOperation,
-                GoLiveText.Session.StartStreamMessage,
+                Text(GoLiveText.Session.StartStreamMessage),
                 async () =>
                 {
                     await GoLiveOutputRuntime.StartStreamAsync(BuildRuntimeRequest(SelectedCamera));
@@ -153,8 +153,8 @@ public partial class GoLivePage
                     {
                         Diagnostics.ReportRecoverable(
                             GoLiveText.Session.StreamPrerequisiteOperation,
-                            GoLiveText.Session.StreamPrerequisiteMessage,
-                            GoLiveText.Session.StreamPrerequisiteDetail);
+                            Text(GoLiveText.Session.StreamPrerequisiteMessage),
+                            Text(GoLiveText.Session.StreamPrerequisiteDetail));
                         return;
                     }
 
@@ -171,7 +171,7 @@ public partial class GoLivePage
             {
                 await Diagnostics.RunAsync(
                         GoLiveText.Session.StopRecordingOperation,
-                        GoLiveText.Session.StopRecordingMessage,
+                        Text(GoLiveText.Session.StopRecordingMessage),
                         async () =>
                     {
                         await GoLiveOutputRuntime.StopRecordingAsync();
@@ -184,7 +184,7 @@ public partial class GoLivePage
             await EnsureRecordingOutputEnabledAsync();
             await Diagnostics.RunAsync(
                     GoLiveText.Session.StartRecordingOperation,
-                    GoLiveText.Session.StartRecordingMessage,
+                    Text(GoLiveText.Session.StartRecordingMessage),
                     async () =>
                 {
                     await GoLiveOutputRuntime.StartRecordingAsync(BuildRuntimeRequest(SelectedCamera));

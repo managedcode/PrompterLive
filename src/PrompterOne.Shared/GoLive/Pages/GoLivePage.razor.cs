@@ -38,7 +38,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     private bool _loadState = true;
     private SettingsPagePreferences _recordingPreferences = SettingsPagePreferences.Default;
     private ElementReference _screenRoot;
-    private string _sessionSubtitle = GoLiveText.Chrome.StreamingSubtitle;
+    private string _sessionSubtitle = string.Empty;
     private string _sessionTitle = ScriptWorkspaceState.UntitledScriptTitle;
     private StudioSettings _studioSettings = StudioSettings.Default;
 
@@ -50,12 +50,12 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
         ?? (AvailableSceneSources.Count > 0 ? AvailableSceneSources[0] : null);
 
     private string PrimaryMicrophoneLabel => string.IsNullOrWhiteSpace(MediaSceneService.State.PrimaryMicrophoneLabel)
-        ? GoLiveText.Audio.NoMicrophoneLabel
+        ? Text(GoLiveText.Audio.NoMicrophoneLabel)
         : MediaDeviceLabelSanitizer.Sanitize(MediaSceneService.State.PrimaryMicrophoneLabel);
 
     private string BackRoute => Shell.GetGoLiveBackRoute();
 
-    private static string ScreenTitle => GoLiveText.Chrome.ScreenTitle;
+    private string ScreenTitle => Text(GoLiveText.Chrome.ScreenTitle);
 
     private string PrimaryMicrophoneRoute
     {
@@ -66,7 +66,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
                 ?.RouteTarget;
 
             return route is null
-                ? GoLiveText.Audio.DefaultMicrophoneRouteLabel
+                ? Text(GoLiveText.Audio.DefaultMicrophoneRouteLabel)
                 : FormatRouteTarget(route.Value);
         }
     }

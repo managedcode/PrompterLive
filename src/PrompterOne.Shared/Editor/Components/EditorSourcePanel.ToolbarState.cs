@@ -9,13 +9,8 @@ public partial class EditorSourcePanel
     private string? _openMenuId;
     private bool _pendingFloatingBarReanchor = true;
 
-    private static IReadOnlyList<EditorToolbarSectionDescriptor> ToolbarSections => EditorToolbarCatalog.Sections;
-
-    private static IReadOnlyList<EditorFloatingMenuDescriptor> FloatingMenus => EditorToolbarCatalog.FloatingMenus;
-
-    private static IReadOnlyList<IReadOnlyList<EditorToolbarActionDescriptor>> FloatingActionGroups => EditorToolbarCatalog.FloatingActionGroups;
-
-    private EditorFloatingMenuDescriptor? OpenFloatingMenu => EditorFloatingToolbarCatalog.FindMenu(_openFloatingMenuId);
+    private EditorFloatingMenuDescriptor? OpenFloatingMenu =>
+        FloatingMenus.FirstOrDefault(menu => string.Equals(menu.MenuId, _openFloatingMenuId, StringComparison.Ordinal));
 
     private Task ExecuteAiActionAsync(EditorAiAssistAction action)
     {
@@ -129,7 +124,7 @@ public partial class EditorSourcePanel
     private bool IsFloatingMenuOpen(string menuId) =>
         string.Equals(_openFloatingMenuId, menuId, StringComparison.Ordinal);
 
-    private static bool IsFloatingMenu(string menuId) =>
+    private bool IsFloatingMenu(string menuId) =>
         FloatingMenus.Any(menu => string.Equals(menu.MenuId, menuId, StringComparison.Ordinal));
 
     private void ToggleMenu(string menuId)

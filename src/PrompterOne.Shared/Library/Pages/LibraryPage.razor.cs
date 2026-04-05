@@ -44,7 +44,6 @@ public partial class LibraryPage : ComponentBase, IDisposable
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private ScriptCompiler ScriptCompiler { get; set; } = null!;
     [Inject] private TpsDocumentReader TpsDocumentReader { get; set; } = null!;
-
     private bool _loadLibrary = true;
     private bool _isCreatingFolder;
     private string _folderDraftName = string.Empty;

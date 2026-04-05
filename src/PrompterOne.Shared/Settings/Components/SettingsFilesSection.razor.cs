@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Settings.Models;
@@ -9,47 +10,15 @@ namespace PrompterOne.Shared.Components.Settings;
 
 public partial class SettingsFilesSection : ComponentBase
 {
-    private static readonly IReadOnlyList<SettingsSelectOption> ExportFormatOptions =
-    [
-        new("TPS (Native)", "TPS (Native)"),
-        new("Markdown", "Markdown"),
-        new("Plain Text", "Plain Text"),
-        new("PDF", "PDF"),
-    ];
-
-    private static readonly IReadOnlyList<SettingsSelectOption> StorageLimitOptions =
-    [
-        new("No limit", "No limit"),
-        new("10 GB", "10 GB"),
-        new("50 GB", "50 GB"),
-        new("100 GB", "100 GB"),
-    ];
-
     private const string ExportsCardId = "files-exports";
+    private const string EmptyValue = "";
     private const string OnCssClass = "on";
     private const string RecordingsCardId = "files-recordings";
     private const string ScriptsCardId = "files-scripts";
-    private const string ScriptsAutoSaveLabel = "Auto-save local script changes";
-    private const string ScriptsHistoryLabel = "Keep recent browser-local revisions";
     private const string SetToggleCssClass = "set-toggle";
 
     private BrowserFileStorageSettings _settings = BrowserFileStorageSettings.Default;
-    private BrowserFileStorageViewState _viewState = new(
-        Scripts: new FileStorageCardState(
-            Subtitle: "0 scripts · 0 folders",
-            ScopeLabel: "Browser JSON library store",
-            LocationLabel: $"{BrowserStorageKeys.DocumentLibrary} / {BrowserStorageKeys.FolderLibrary}",
-            DetailLabel: "Authoritative day-to-day script and folder persistence stays in browser storage, not on a desktop filesystem path."),
-        Recordings: new FileStorageCardState(
-            Subtitle: $"{PrompterStorageDefaults.BrowserContainerDisplayPrefix}{PrompterStorageDefaults.RecordingsDirectoryPath} · No files yet",
-            ScopeLabel: "ManagedCode browser container",
-            LocationLabel: $"{PrompterStorageDefaults.BrowserContainerDisplayPrefix}{PrompterStorageDefaults.RecordingsDirectoryPath}",
-            DetailLabel: "PrompterOne provisions this browser-local container path for recording artifacts."),
-        Exports: new FileStorageCardState(
-            Subtitle: $"{PrompterStorageDefaults.BrowserContainerDisplayPrefix}{PrompterStorageDefaults.ExportDirectoryPath} · No files yet",
-            ScopeLabel: "ManagedCode.Storage browser VFS",
-            LocationLabel: $"{PrompterStorageDefaults.BrowserContainerDisplayPrefix}{PrompterStorageDefaults.ExportDirectoryPath}",
-            DetailLabel: "Exports are written to the browser-local container instead of a fake desktop Downloads folder."));
+    private BrowserFileStorageViewState _viewState = BuildEmptyViewState();
 
     [Inject] private BrowserFileStorageStore FileStorageStore { get; set; } = null!;
 
@@ -58,6 +27,31 @@ public partial class SettingsFilesSection : ComponentBase
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
 
     [Parameter] public EventCallback<string> ToggleCard { get; set; }
+
+    private IReadOnlyList<SettingsSelectOption> ExportFormatOptions =>
+    [
+        new(Text(UiTextKey.SettingsFilesExportFormatTpsNative), "TPS (Native)"),
+        new(Text(UiTextKey.SettingsFilesExportFormatMarkdown), "Markdown"),
+        new(Text(UiTextKey.SettingsFilesExportFormatPlainText), "Plain Text"),
+        new(Text(UiTextKey.SettingsFilesExportFormatPdf), "PDF"),
+    ];
+
+    private string ScriptsAutoSaveLabel => Text(UiTextKey.SettingsFilesScriptsAutoSave);
+
+    private string ScriptsHistoryLabel => Text(UiTextKey.SettingsFilesScriptsHistory);
+
+    private IReadOnlyList<SettingsSelectOption> StorageLimitOptions =>
+    [
+        new(Text(UiTextKey.SettingsFilesStorageLimitNoLimit), "No limit"),
+        new(Text(UiTextKey.SettingsFilesStorageLimit10Gb), "10 GB"),
+        new(Text(UiTextKey.SettingsFilesStorageLimit50Gb), "50 GB"),
+        new(Text(UiTextKey.SettingsFilesStorageLimit100Gb), "100 GB"),
+    ];
+
+    protected override void OnInitialized()
+    {
+        _viewState = BuildInitialViewState();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,6 +64,30 @@ public partial class SettingsFilesSection : ComponentBase
         _viewState = await FileStorageStore.LoadViewStateAsync();
         await InvokeAsync(StateHasChanged);
     }
+
+    private BrowserFileStorageViewState BuildInitialViewState() =>
+        new(
+            Scripts: new FileStorageCardState(
+                Subtitle: string.Concat("0 ", Text(UiTextKey.SettingsFilesPluralScript), " · 0 ", Text(UiTextKey.SettingsFilesPluralFolder)),
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeBrowserJsonLibrary),
+                LocationLabel: string.Concat(BrowserStorageKeys.DocumentLibrary, " / ", BrowserStorageKeys.FolderLibrary),
+                DetailLabel: Text(UiTextKey.SettingsFilesScriptsDetail)),
+            Recordings: new FileStorageCardState(
+                Subtitle: string.Concat(PrompterStorageDefaults.BrowserContainerDisplayPrefix, PrompterStorageDefaults.RecordingsDirectoryPath, " · ", Text(UiTextKey.SettingsFilesEmptyUsage)),
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeManagedCodeBrowserContainer),
+                LocationLabel: string.Concat(PrompterStorageDefaults.BrowserContainerDisplayPrefix, PrompterStorageDefaults.RecordingsDirectoryPath),
+                DetailLabel: Text(UiTextKey.SettingsFilesRecordingsDetail)),
+            Exports: new FileStorageCardState(
+                Subtitle: string.Concat(PrompterStorageDefaults.BrowserContainerDisplayPrefix, PrompterStorageDefaults.ExportDirectoryPath, " · ", Text(UiTextKey.SettingsFilesEmptyUsage)),
+                ScopeLabel: Text(UiTextKey.SettingsFilesScopeManagedCodeBrowserVfs),
+                LocationLabel: string.Concat(PrompterStorageDefaults.BrowserContainerDisplayPrefix, PrompterStorageDefaults.ExportDirectoryPath),
+                DetailLabel: Text(UiTextKey.SettingsFilesExportsDetail)));
+
+    private static BrowserFileStorageViewState BuildEmptyViewState() =>
+        new(
+            Scripts: new FileStorageCardState(EmptyValue, EmptyValue, EmptyValue, EmptyValue),
+            Recordings: new FileStorageCardState(EmptyValue, EmptyValue, EmptyValue, EmptyValue),
+            Exports: new FileStorageCardState(EmptyValue, EmptyValue, EmptyValue, EmptyValue));
 
     private static string BuildToggleCssClass(bool isOn) =>
         isOn ? $"{SetToggleCssClass} {OnCssClass}" : SetToggleCssClass;

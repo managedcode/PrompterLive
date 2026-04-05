@@ -1,20 +1,23 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Core.Models.Media
 @using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-mics"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.MicsPanel">
-    <h3 class="set-section-title">Microphones</h3>
-    <p class="set-section-desc">Choose which microphones are used in GO LIVE. Add audio delay to sync with video if needed.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsNavMicrophones)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsMicrophonesSectionDescription)</p>
 
     @if (ShouldShowMediaAccessAction)
     {
         <div class="set-sub-header">
-            <h4 class="set-sub-title">Device Access</h4>
+            <h4 class="set-sub-title">@Text(UiTextKey.SettingsMicrophonesDeviceAccessTitle)</h4>
             <button class="set-btn-outline set-btn-sm"
                     @onclick="RequestMediaAccess">
                 @MediaAccessActionLabel
@@ -26,7 +29,7 @@
         @if (Microphones.Count == 0)
         {
             <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoMics">
-                No microphones are currently visible to the browser.
+                @Text(UiTextKey.SettingsMicrophonesNoDevicesVisible)
             </div>
         }
         else
@@ -53,7 +56,7 @@
                         <ChildContent>
                             <div class="set-device-fields">
                                 <div class="set-field">
-                                    <label>Input Level</label>
+                                    <label>@Text(UiTextKey.SettingsMicrophonesInputLevel)</label>
                                     <div class="set-level-bar">
                                         <div class="set-level-fill" style="@BuildLevelFillStyle(MicrophoneSettings.InputLevelPercent)"></div>
                                         <div class="set-level-thumb" style="@BuildLevelThumbStyle(MicrophoneSettings.InputLevelPercent)"></div>
@@ -68,7 +71,7 @@
                                     </div>
                                 </div>
                                 <div class="set-field">
-                                    <label>Audio Delay (ms)</label>
+                                    <label>@Text(UiTextKey.SettingsMicrophonesAudioDelay)</label>
                                     <div class="set-delay-row">
                                         <input type="number"
                                                class="set-input set-input-sm"
@@ -78,11 +81,11 @@
                                                value="@primaryAudioInput.DelayMs"
                                                @oninput="args => UpdateAudioDelayAsync(SelectedMicrophone, args)"
                                                data-testid="@UiTestIds.Settings.MicDelay(SelectedMicrophone.DeviceId)" />
-                                        <span class="set-delay-hint">0 - 5000 ms</span>
+                                        <span class="set-delay-hint">@Text(UiTextKey.SettingsMicrophonesAudioDelayHint)</span>
                                     </div>
                                 </div>
                                 <div class="set-field set-field-toggle">
-                                    <label>Noise Suppression</label>
+                                    <label>@Text(UiTextKey.SettingsMicrophonesNoiseSuppression)</label>
                                     <div class="@BuildToggleCssClass(MicrophoneSettings.NoiseSuppression)"
                                          @onclick="ToggleNoiseSuppression"
                                          data-testid="@UiTestIds.Settings.NoiseSuppression">
@@ -90,7 +93,7 @@
                                     </div>
                                 </div>
                                 <div class="set-field set-field-toggle">
-                                    <label>Echo Cancellation</label>
+                                    <label>@Text(UiTextKey.SettingsMicrophonesEchoCancellation)</label>
                                     <div class="@BuildToggleCssClass(MicrophoneSettings.EchoCancellation)"
                                          @onclick="ToggleEchoCancellation"
                                          data-testid="@UiTestIds.Settings.EchoCancellation">
@@ -132,7 +135,7 @@
                             {
                                 <div class="set-device-fields">
                                     <div class="set-field">
-                                        <label>Input Level</label>
+                                        <label>@Text(UiTextKey.SettingsMicrophonesInputLevel)</label>
                                         <div class="set-level-bar">
                                             <div class="set-level-fill" style="@BuildLevelFillStyle(ConvertGainToPercent(inputState.Gain))"></div>
                                             <div class="set-level-thumb" style="@BuildLevelThumbStyle(ConvertGainToPercent(inputState.Gain))"></div>
@@ -146,7 +149,7 @@
                                         </div>
                                     </div>
                                     <div class="set-field">
-                                        <label>Audio Delay (ms)</label>
+                                        <label>@Text(UiTextKey.SettingsMicrophonesAudioDelay)</label>
                                         <div class="set-delay-row">
                                             <input type="number"
                                                    class="set-input set-input-sm"
@@ -156,18 +159,18 @@
                                                    value="@inputState.DelayMs"
                                                    @oninput="args => UpdateAudioDelayAsync(microphone, args)"
                                                    data-testid="@UiTestIds.Settings.MicDelay(microphone.DeviceId)" />
-                                            <span class="set-delay-hint">0 - 5000 ms</span>
+                                            <span class="set-delay-hint">@Text(UiTextKey.SettingsMicrophonesAudioDelayHint)</span>
                                         </div>
                                     </div>
                                     <div class="set-field set-field-toggle">
-                                        <label>Noise Suppression</label>
+                                        <label>@Text(UiTextKey.SettingsMicrophonesNoiseSuppression)</label>
                                         <div class="@BuildToggleCssClass(MicrophoneSettings.NoiseSuppression)"
                                              @onclick="ToggleNoiseSuppression">
                                             <div class="set-toggle-thumb"></div>
                                         </div>
                                     </div>
                                     <div class="set-field set-field-toggle">
-                                        <label>Echo Cancellation</label>
+                                        <label>@Text(UiTextKey.SettingsMicrophonesEchoCancellation)</label>
                                         <div class="@BuildToggleCssClass(MicrophoneSettings.EchoCancellation)"
                                              @onclick="ToggleEchoCancellation">
                                             <div class="set-toggle-thumb"></div>
@@ -183,10 +186,10 @@
     </div>
 
     <div class="set-subsection" style="margin-top:28px">
-        <h4 class="set-sub-title">General</h4>
+        <h4 class="set-sub-title">@Text(UiTextKey.SettingsMicrophonesGeneralTitle)</h4>
         <div class="set-devices">
             <div class="set-field set-field-toggle">
-                <label>Mute all microphones when not in GO LIVE</label>
+                <label>@Text(UiTextKey.SettingsMicrophonesMuteWhenNotInGoLive)</label>
                 <div class="@BuildToggleCssClass(AllMicrophonesMutedOutsideGoLive)"
                      @onclick="ToggleMuteAllMicrophones">
                     <div class="set-toggle-thumb"></div>
@@ -254,4 +257,6 @@
 
     private Task UpdateAudioGainAsync(MediaDeviceInfo microphone, ChangeEventArgs args) =>
         UpdateAudioGain?.Invoke(microphone, args) ?? Task.CompletedTask;
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

@@ -1,10 +1,11 @@
 using PrompterOne.Core.Services.Rsvp;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage
 {
-    private static IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed)
+    private IReadOnlyList<RsvpTimelineEntry> BuildTimeline(RsvpTextProcessor.ProcessedScript processed)
     {
         var entries = new List<RsvpTimelineEntry>();
         var timelineIndexByWordIndex = new Dictionary<int, int>();
@@ -29,7 +30,7 @@ public partial class LearnPage
         }
 
         return entries.Count == 0
-            ? [new RsvpTimelineEntry(-1, ReadyWord, 0, 0, EndOfScriptPhrase, NeutralEmotion)]
+            ? [new RsvpTimelineEntry(-1, Text(UiTextKey.LearnReadyWord), 0, 0, Text(UiTextKey.LearnEndOfScript), NeutralEmotion)]
             : ApplySentenceRanges(entries, processed.AllWords, timelineIndexByWordIndex);
     }
 
@@ -46,16 +47,16 @@ public partial class LearnPage
             .Sum(GetTimelineEntryPlaybackMilliseconds);
 
         var remainingSeconds = (int)Math.Ceiling(remainingMilliseconds / 1000d);
-        return $"Word {safeCurrentIndex + 1} / {timeline.Count} · ~{remainingSeconds / 60}:{remainingSeconds % 60:00} left";
+        return Format(UiTextKey.LearnProgressFormat, safeCurrentIndex + 1, timeline.Count, remainingSeconds / 60, remainingSeconds % 60);
     }
 
     private static string BuildWpmLabel(int speed) => string.Concat(speed, WpmSuffix);
 
-    private static RsvpFocusWordViewModel BuildFocusWord(string word)
+    private RsvpFocusWordViewModel BuildFocusWord(string word)
     {
         if (string.IsNullOrWhiteSpace(word))
         {
-            return new RsvpFocusWordViewModel(string.Empty, ReadyWord, string.Empty);
+            return new RsvpFocusWordViewModel(string.Empty, Text(UiTextKey.LearnReadyWord), string.Empty);
         }
 
         var orpIndex = GetOrpIndex(word);
@@ -82,7 +83,7 @@ public partial class LearnPage
         };
     }
 
-    private static string ResolveFallbackNextPhrase(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
+    private string ResolveFallbackNextPhrase(IReadOnlyList<RsvpTimelineEntry> timeline, int currentIndex)
     {
         var fallbackWords = timeline
             .Skip(currentIndex + 1)
@@ -92,11 +93,11 @@ public partial class LearnPage
             .ToArray();
 
         return fallbackWords.Length == 0
-            ? EndOfScriptPhrase
+            ? Text(UiTextKey.LearnEndOfScript)
             : string.Join(' ', fallbackWords);
     }
 
-    private static string ResolveNextPhrase(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
+    private string ResolveNextPhrase(RsvpTextProcessor.ProcessedScript processed, int currentWordIndex)
     {
         var currentSentencePreview = ResolveCurrentSentencePreview(processed.AllWords, currentWordIndex);
         if (!string.IsNullOrWhiteSpace(currentSentencePreview))
@@ -111,7 +112,7 @@ public partial class LearnPage
             .ToArray();
 
         return fallbackWords.Length == 0
-            ? EndOfScriptPhrase
+            ? Text(UiTextKey.LearnEndOfScript)
             : string.Join(' ', fallbackWords);
     }
 

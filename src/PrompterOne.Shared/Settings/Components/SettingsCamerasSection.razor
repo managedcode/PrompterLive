@@ -1,18 +1,21 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Core.Models.Media
 @using PrompterOne.Core.Models.Workspace
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
 @using PrompterOne.Shared.Settings.Components
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
          id="set-cameras"
          style="@DisplayStyle"
          data-testid="@UiTestIds.Settings.CamerasPanel">
-    <h3 class="set-section-title">Cameras</h3>
-    <p class="set-section-desc">Choose which cameras are available in GO LIVE and select the primary stream camera.</p>
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsNavCameras)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsCamerasSectionDescription)</p>
 
     <div class="set-sub-header">
-        <h4 class="set-sub-title">Device Access</h4>
+        <h4 class="set-sub-title">@Text(UiTextKey.SettingsCamerasDeviceAccessTitle)</h4>
         <button class="set-btn-outline set-btn-sm"
                 @onclick="RequestMediaAccess"
                 data-testid="@UiTestIds.Settings.RequestMedia">
@@ -25,7 +28,7 @@
             @if (Cameras.Count == 0)
             {
                 <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoCameras">
-                    No camera devices are currently visible to the browser.
+                    @Text(UiTextKey.SettingsCamerasNoDevicesVisible)
                 </div>
             }
             else
@@ -49,7 +52,7 @@
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        Primary
+                                        @Text(UiTextKey.SettingsCamerasPrimaryBadge)
                                     </span>
                                 }
                             </div>
@@ -70,14 +73,14 @@
                             <div class="set-device-body" @onclick:stopPropagation="true">
                                 <div class="set-device-fields">
                                     <div class="set-field">
-                                        <label>Resolution</label>
+                                        <label>@Text(UiTextKey.CommonResolution)</label>
                                         <SettingsSelect Value="@StudioSettings.Camera.Resolution.ToString()"
                                                        Options="@CameraResolutionOptions"
                                                        OnChange="CameraResolutionChanged"
                                                        TestId="@(isPrimary ? UiTestIds.Settings.CameraResolution : null)" />
                                     </div>
                                     <div class="set-field set-field-toggle">
-                                        <label>Mirror (Flip Horizontal)</label>
+                                        <label>@Text(UiTextKey.SettingsCamerasMirrorHorizontal)</label>
                                         <div class="@BuildToggleCssClass(sceneCamera.Transform.MirrorHorizontal)"
                                              @onclick="() => ToggleSceneMirror.InvokeAsync(sceneCamera.SourceId)"
                                              data-testid="@BuildMirrorTestId(isPrimary, sceneCamera.SourceId)">
@@ -85,7 +88,7 @@
                                         </div>
                                     </div>
                                     <div class="set-field set-field-toggle">
-                                        <label>Auto-start on Read</label>
+                                        <label>@Text(UiTextKey.SettingsCamerasAutoStartOnRead)</label>
                                         <div class="@BuildToggleCssClass(ReaderCameraEnabled)"
                                              @onclick="ToggleReaderCameraScene"
                                              data-testid="@(isPrimary ? UiTestIds.Settings.ReaderCameraToggle : null)">
@@ -103,7 +106,7 @@
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                         <circle cx="12" cy="12" r="3" />
                                     </svg>
-                                    @(isPrimary ? PrimaryCameraLabel : SetPrimaryCameraLabel)
+                                    @(isPrimary ? Text(UiTextKey.SettingsCamerasPrimaryButton) : Text(UiTextKey.SettingsCamerasSetPrimaryButton))
                                 </button>
                             </div>
                         }
@@ -112,10 +115,10 @@
             }
 
             <div class="set-subsection" style="margin-top:12px">
-                <h4 class="set-sub-title">General</h4>
+                <h4 class="set-sub-title">@Text(UiTextKey.SettingsCamerasGeneralTitle)</h4>
                 <div class="set-devices">
                     <div class="set-field set-field-toggle">
-                        <label>Auto-start all enabled cameras on GO LIVE</label>
+                        <label>@Text(UiTextKey.SettingsCamerasAutoStartAllOnGoLive)</label>
                         <div class="@BuildToggleCssClass(AllSceneCamerasIncludedInOutput)"
                              @onclick="ToggleAllSceneOutputs">
                             <div class="set-toggle-thumb"></div>
@@ -137,9 +140,6 @@
 @code {
     private const string PrimaryCameraButtonActiveCssClass = "set-btn-golden set-btn-sm set-btn-primary-cam active";
     private const string PrimaryCameraButtonCssClass = "set-btn-outline set-btn-sm set-btn-primary-cam";
-    private const string PrimaryCameraLabel = "Primary Camera";
-    private const string SetPrimaryCameraLabel = "Set as Primary";
-
     [Parameter] public bool AllSceneCamerasIncludedInOutput { get; set; }
 
     [Parameter] public IReadOnlyList<SettingsSelectOption> CameraResolutionOptions { get; set; } = [];
@@ -203,4 +203,6 @@
 
     private bool IsPreviewCamera(MediaDeviceInfo camera) =>
         string.Equals(PreviewCamera?.DeviceId, camera.DeviceId, StringComparison.Ordinal);
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

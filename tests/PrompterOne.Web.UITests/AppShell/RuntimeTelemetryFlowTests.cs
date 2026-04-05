@@ -36,7 +36,9 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var createScriptSnapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(createScriptSnapshot.Initializations, entry => entry.RuntimeEnabled && entry.HostEnabled && !entry.DebugEnabled);
+            Assert.Contains(
+                createScriptSnapshot.Initializations,
+                entry => entry.RuntimeEnabled && entry.HostEnabled && !entry.DebugEnabled && entry.SentryConfigured && entry.SentryRuntimeEnabled);
             Assert.Contains(createScriptSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Library, StringComparison.Ordinal));
             Assert.Contains(createScriptSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
             Assert.Contains(createScriptSnapshot.Events, entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.CreateScript, StringComparison.Ordinal));
@@ -128,7 +130,9 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var snapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(snapshot.Initializations, entry => entry.DebugEnabled && !entry.RuntimeEnabled && entry.HostEnabled);
+            Assert.Contains(
+                snapshot.Initializations,
+                entry => entry.DebugEnabled && !entry.RuntimeEnabled && entry.HostEnabled && entry.SentryConfigured && !entry.SentryRuntimeEnabled);
             Assert.Empty(snapshot.PageViews);
             Assert.Empty(snapshot.Events);
             Assert.Empty(snapshot.VendorLoads);
@@ -225,6 +229,12 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
         [JsonPropertyName("runtimeEnabled")]
         public bool RuntimeEnabled { get; set; }
+
+        [JsonPropertyName("sentryConfigured")]
+        public bool SentryConfigured { get; set; }
+
+        [JsonPropertyName("sentryRuntimeEnabled")]
+        public bool SentryRuntimeEnabled { get; set; }
     }
 
     public sealed class TelemetryPageViewEntry

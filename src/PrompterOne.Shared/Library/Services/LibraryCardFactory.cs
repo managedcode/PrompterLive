@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.CompiledScript;
 using PrompterOne.Core.Models.Documents;
@@ -6,15 +7,13 @@ using PrompterOne.Core.Services;
 using PrompterOne.Core.Services.Preview;
 using PrompterOne.Shared.Components.Library;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Services.Library;
 
 internal static class LibraryCardFactory
 {
     private const int FirstPreviewSegmentIndex = 0;
-    private const string DefaultAuthor = "You";
-    private const string DefaultEmotion = "Neutral";
-    private const string DefaultModeLabel = "Actor";
     private const string FallbackAccentColor = "#2563EB";
     private const string UpdatedLabelFormat = "MMM dd";
     private const int CssRgbHexLength = 6;
@@ -28,6 +27,7 @@ internal static class LibraryCardFactory
         IScriptPreviewService previewService,
         TpsDocumentReader documentReader,
         ScriptCompiler compiler,
+        IStringLocalizer<SharedResource> localizer,
         CancellationToken cancellationToken = default)
     {
         var cards = new List<LibraryCardViewModel>(summaries.Count);
@@ -41,6 +41,7 @@ internal static class LibraryCardFactory
                 previewService,
                 documentReader,
                 compiler,
+                localizer,
                 cancellationToken);
             if (card is not null)
             {
@@ -58,6 +59,7 @@ internal static class LibraryCardFactory
         IScriptPreviewService previewService,
         TpsDocumentReader documentReader,
         ScriptCompiler compiler,
+        IStringLocalizer<SharedResource> localizer,
         CancellationToken cancellationToken)
     {
         var document = await scriptRepository.GetAsync(summary.Id, cancellationToken);
@@ -77,16 +79,16 @@ internal static class LibraryCardFactory
         return new LibraryCardViewModel(
             Id: summary.Id,
             Title: summary.Title,
-            Emotion: firstSegment?.Emotion ?? DefaultEmotion,
+            Emotion: firstSegment?.Emotion ?? DefaultEmotion(localizer),
             CoverClass: ResolveCoverClass(firstSegment?.EmotionKey),
             AccentColor: ResolveAccentColor(firstSegment?.AccentColor, firstSegment?.BackgroundColor),
             AverageWpm: averageWpm,
             WordCount: metrics.WordCount,
             SegmentCount: segmentCount,
-            Author: ResolveAuthor(parsed.Metadata),
+            Author: ResolveAuthor(parsed.Metadata, localizer),
             UpdatedAt: summary.UpdatedAt,
             UpdatedLabel: summary.UpdatedAt.ToLocalTime().ToString(UpdatedLabelFormat, CultureInfo.CurrentCulture),
-            ModeLabel: ResolveModeLabel(parsed.Metadata, averageWpm),
+            ModeLabel: ResolveModeLabel(parsed.Metadata, averageWpm, localizer),
             Duration: metrics.Duration,
             DurationLabel: $"{(int)Math.Max(metrics.Duration.TotalMinutes, 0)}:{metrics.Duration.Seconds:00}",
             FolderId: summary.FolderId,
@@ -143,17 +145,17 @@ internal static class LibraryCardFactory
         return new LibraryCardMetrics(wordCount, totalDuration);
     }
 
-    private static string ResolveAuthor(IReadOnlyDictionary<string, string> metadata) =>
+    private static string ResolveAuthor(IReadOnlyDictionary<string, string> metadata, IStringLocalizer<SharedResource> localizer) =>
         metadata.TryGetValue("author", out var author) && !string.IsNullOrWhiteSpace(author)
             ? author
-            : DefaultAuthor;
+            : Text(localizer, UiTextKey.LibraryDefaultAuthor);
 
-    private static string ResolveModeLabel(IReadOnlyDictionary<string, string> metadata, int averageWpm) =>
+    private static string ResolveModeLabel(IReadOnlyDictionary<string, string> metadata, int averageWpm, IStringLocalizer<SharedResource> localizer) =>
         metadata.TryGetValue("profile", out var profile) && !string.IsNullOrWhiteSpace(profile)
             ? profile.Trim().Trim('"')
             : averageWpm >= 250
                 ? "RSVP"
-                : DefaultModeLabel;
+                : Text(localizer, UiTextKey.LibraryDefaultModeActor);
 
     private static string ResolveCoverClass(string? emotionKey) =>
         NormalizeEmotion(emotionKey) switch
@@ -191,6 +193,9 @@ internal static class LibraryCardFactory
             ? "neutral"
             : emotionKey.Trim().ToLowerInvariant();
 
+    private static string DefaultEmotion(IStringLocalizer<SharedResource> localizer) =>
+        Text(localizer, UiTextKey.LibraryDefaultEmotion);
+
     private static IEnumerable<CompiledWord> EnumerateWords(CompiledScript compiledScript)
     {
         foreach (var segment in compiledScript.Segments)
@@ -216,4 +221,7 @@ internal static class LibraryCardFactory
     }
 
     private readonly record struct LibraryCardMetrics(int WordCount, TimeSpan Duration);
+
+    private static string Text(IStringLocalizer<SharedResource> localizer, UiTextKey key) =>
+        localizer[key.ToString()];
 }

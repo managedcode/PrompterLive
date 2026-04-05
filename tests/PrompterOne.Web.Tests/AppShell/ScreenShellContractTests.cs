@@ -1,8 +1,10 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Tests;
 
@@ -96,10 +98,14 @@ public sealed class ScreenShellContractTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.Page));
-            Assert.Contains("Cloud Storage", cut.Markup);
-            Assert.Contains("Choose which cameras are available in GO LIVE", cut.Markup);
-            Assert.Contains("Mute all microphones when not in GO LIVE", cut.Markup);
-            Assert.Contains("Teleprompter Display", cut.Markup);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.CloudPanel));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.CamerasPanel));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.MicsPanel));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.AppearancePanel));
+            Assert.Contains(Text(UiTextKey.SettingsNavCloud), cut.Markup);
+            Assert.Contains(Text(UiTextKey.SettingsCamerasSectionDescription), cut.Markup);
+            Assert.Contains(Text(UiTextKey.SettingsMicrophonesMuteWhenNotInGoLive), cut.Markup);
+            Assert.Contains(Text(UiTextKey.SettingsAppearanceTeleprompterTitle), cut.Markup);
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.MicPreviewCard));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.CameraPrimaryAction(AppTestData.Camera.FirstDeviceId)));
         });
@@ -122,4 +128,7 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
         });
     }
+
+    private string Text(UiTextKey key) =>
+        Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key.ToString()];
 }

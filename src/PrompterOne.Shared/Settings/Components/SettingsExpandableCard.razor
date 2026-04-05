@@ -12,6 +12,10 @@
         </div>
         <div class="set-dest-info">
             <span class="set-dest-name">@Title</span>
+            @if (!string.IsNullOrWhiteSpace(Description))
+            {
+                <span class="set-dest-description">@Description</span>
+            }
             <span class="set-dest-account" @attributes="SubtitleAttributes">@Subtitle</span>
         </div>
         @if (!string.IsNullOrWhiteSpace(StatusLabel))
@@ -72,6 +76,8 @@
     [Parameter] public bool IsOpen { get; set; }
 
     [Parameter] public string AdditionalCssClass { get; set; } = string.Empty;
+
+    [Parameter] public string Description { get; set; } = string.Empty;
 
     [Parameter] public EventCallback OnToggle { get; set; }
 

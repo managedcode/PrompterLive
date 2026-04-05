@@ -288,4 +288,538 @@
   <data name="SettingsAppearanceShowShortcutOverlayLabel" xml:space="preserve">
     <value>Mostrar panel de atajos de teclado</value>
   </data>
+  <data name="TooltipDecreaseSpeed" xml:space="preserve">
+    <value>Reducir velocidad</value>
+  </data>
+  <data name="TooltipIncreaseSpeed" xml:space="preserve">
+    <value>Aumentar velocidad</value>
+  </data>
+  <data name="TooltipBackFiveWords" xml:space="preserve">
+    <value>Retroceder 5 palabras</value>
+  </data>
+  <data name="TooltipBackOneWord" xml:space="preserve">
+    <value>Retroceder 1 palabra</value>
+  </data>
+  <data name="TooltipPlayPlayback" xml:space="preserve">
+    <value>Iniciar reproducción</value>
+  </data>
+  <data name="TooltipPausePlayback" xml:space="preserve">
+    <value>Pausar reproducción</value>
+  </data>
+  <data name="TooltipForwardOneWord" xml:space="preserve">
+    <value>Avanzar 1 palabra</value>
+  </data>
+  <data name="TooltipForwardFiveWords" xml:space="preserve">
+    <value>Avanzar 5 palabras</value>
+  </data>
+  <data name="TooltipLoopPlaybackOn" xml:space="preserve">
+    <value>La reproducción en bucle está activada</value>
+  </data>
+  <data name="TooltipLoopPlaybackOff" xml:space="preserve">
+    <value>La reproducción en bucle está desactivada</value>
+  </data>
+  <data name="TooltipMirrorReaderHorizontally" xml:space="preserve">
+    <value>Reflejar el lector horizontalmente</value>
+  </data>
+  <data name="TooltipMirrorReaderVertically" xml:space="preserve">
+    <value>Reflejar el lector verticalmente</value>
+  </data>
+  <data name="TooltipRotateReaderOrientation" xml:space="preserve">
+    <value>Girar el lector entre horizontal y vertical</value>
+  </data>
+  <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
+    <value>Alternar pantalla completa del navegador</value>
+  </data>
+  <data name="TooltipAlignTextLeft" xml:space="preserve">
+    <value>Alinear texto a la izquierda</value>
+  </data>
+  <data name="TooltipAlignTextCenter" xml:space="preserve">
+    <value>Centrar el texto en la línea de lectura</value>
+  </data>
+  <data name="TooltipAlignTextRight" xml:space="preserve">
+    <value>Alinear texto a la derecha</value>
+  </data>
+  <data name="TooltipAlignTextJustify" xml:space="preserve">
+    <value>Extender el texto a todo el ancho legible</value>
+  </data>
+  <data name="TooltipMoveFocalReadingGuide" xml:space="preserve">
+    <value>Mover la guía focal de lectura</value>
+  </data>
+  <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
+    <value>Ajustar el ancho del texto del lector</value>
+  </data>
+  <data name="TooltipSmallerText" xml:space="preserve">
+    <value>Texto más pequeño</value>
+  </data>
+  <data name="TooltipLargerText" xml:space="preserve">
+    <value>Texto más grande</value>
+  </data>
+  <data name="TooltipPreviousBlock" xml:space="preserve">
+    <value>Bloque anterior</value>
+  </data>
+  <data name="TooltipPreviousWord" xml:space="preserve">
+    <value>Retroceder una palabra</value>
+  </data>
+  <data name="TooltipNextWord" xml:space="preserve">
+    <value>Avanzar una palabra</value>
+  </data>
+  <data name="TooltipNextBlock" xml:space="preserve">
+    <value>Siguiente bloque</value>
+  </data>
+  <data name="TooltipToggleCameraPreview" xml:space="preserve">
+    <value>Alternar vista previa de cámara</value>
+  </data>
+  <data name="TooltipCreateFolder" xml:space="preserve">
+    <value>Crear carpeta</value>
+  </data>
+  <data name="TooltipMoreScriptActions" xml:space="preserve">
+    <value>Más acciones del guion</value>
+  </data>
+  <data name="TooltipDeleteScript" xml:space="preserve">
+    <value>Eliminar guion</value>
+  </data>
+  <data name="TooltipAccentGold" xml:space="preserve">
+    <value>Acento dorado</value>
+  </data>
+  <data name="TooltipAccentBlue" xml:space="preserve">
+    <value>Acento azul</value>
+  </data>
+  <data name="TooltipAccentEmerald" xml:space="preserve">
+    <value>Acento esmeralda</value>
+  </data>
+  <data name="TooltipAccentPink" xml:space="preserve">
+    <value>Acento rosa</value>
+  </data>
+  <data name="TooltipAccentPurple" xml:space="preserve">
+    <value>Acento púrpura</value>
+  </data>
+  <data name="TooltipAccentOrange" xml:space="preserve">
+    <value>Acento naranja</value>
+  </data>
+  <data name="TooltipTextColorWhite" xml:space="preserve">
+    <value>Texto blanco</value>
+  </data>
+  <data name="TooltipTextColorWarmWhite" xml:space="preserve">
+    <value>Texto blanco cálido</value>
+  </data>
+  <data name="TooltipTextColorAmber" xml:space="preserve">
+    <value>Texto ámbar</value>
+  </data>
+  <data name="TooltipTextColorMint" xml:space="preserve">
+    <value>Texto menta</value>
+  </data>
+  <data name="GoLiveBackLabel" xml:space="preserve">
+    <value>Volver</value>
+  </data>
+  <data name="GoLiveDirectorModeLabel" xml:space="preserve">
+    <value>Dirección</value>
+  </data>
+  <data name="GoLiveLivePreviewTitle" xml:space="preserve">
+    <value>En vivo</value>
+  </data>
+  <data name="GoLiveStreamingSubtitle" xml:space="preserve">
+    <value>Enrutamiento del programa</value>
+  </data>
+  <data name="GoLiveStudioModeLabel" xml:space="preserve">
+    <value>Estudio</value>
+  </data>
+  <data name="GoLiveLoadMessage" xml:space="preserve">
+    <value>No se puede preparar el enrutamiento en vivo en este momento.</value>
+  </data>
+  <data name="GoLiveSaveSceneMessage" xml:space="preserve">
+    <value>No se puede guardar la escena en vivo actual en este momento.</value>
+  </data>
+  <data name="GoLiveSaveStudioMessage" xml:space="preserve">
+    <value>No se pueden guardar los ajustes de enrutamiento en vivo en este momento.</value>
+  </data>
+  <data name="GoLiveAudioDefaultMicrophoneRouteLabel" xml:space="preserve">
+    <value>Monitoreo + transmisión</value>
+  </data>
+  <data name="GoLiveAudioMonitorOnlyLabel" xml:space="preserve">
+    <value>Solo monitoreo</value>
+  </data>
+  <data name="GoLiveAudioNoMicrophoneLabel" xml:space="preserve">
+    <value>Sin micrófono</value>
+  </data>
+  <data name="GoLiveAudioStreamOnlyLabel" xml:space="preserve">
+    <value>Solo transmisión</value>
+  </data>
+  <data name="GoLiveSessionCameraFallbackLabel" xml:space="preserve">
+    <value>No se seleccionó ninguna cámara</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeIdleLabel" xml:space="preserve">
+    <value>Listo</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeLiveLabel" xml:space="preserve">
+    <value>En vivo</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeRecordingLabel" xml:space="preserve">
+    <value>Rec</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeStreamingRecordingLabel" xml:space="preserve">
+    <value>En vivo + Rec</value>
+  </data>
+  <data name="GoLiveSessionRecordingIndicatorLabel" xml:space="preserve">
+    <value>REC</value>
+  </data>
+  <data name="GoLiveSessionIdleLabel" xml:space="preserve">
+    <value>Listo</value>
+  </data>
+  <data name="GoLiveSessionRecordingLabel" xml:space="preserve">
+    <value>Grabación</value>
+  </data>
+  <data name="GoLiveSessionStreamingLabel" xml:space="preserve">
+    <value>Transmisión</value>
+  </data>
+  <data name="GoLiveSessionStreamingRecordingLabel" xml:space="preserve">
+    <value>Transmisión + grabación</value>
+  </data>
+  <data name="GoLiveSessionStartStreamMessage" xml:space="preserve">
+    <value>No se pueden iniciar las salidas en vivo en este momento.</value>
+  </data>
+  <data name="GoLiveSessionStopStreamMessage" xml:space="preserve">
+    <value>No se pueden detener las salidas en vivo en este momento.</value>
+  </data>
+  <data name="GoLiveSessionStreamButtonLabel" xml:space="preserve">
+    <value>Iniciar transmisión</value>
+  </data>
+  <data name="GoLiveSessionStreamPrerequisiteDetail" xml:space="preserve">
+    <value>No hay ninguna salida en vivo directa del navegador activada. Los destinos RTMP todavía requieren un relay externo.</value>
+  </data>
+  <data name="GoLiveSessionStreamPrerequisiteMessage" xml:space="preserve">
+    <value>Activa al menos un transporte de publicación directo del navegador antes de iniciar la transmisión.</value>
+  </data>
+  <data name="GoLiveSessionStreamStopLabel" xml:space="preserve">
+    <value>Detener transmisión</value>
+  </data>
+  <data name="GoLiveSessionSwitchProgramMessage" xml:space="preserve">
+    <value>No se puede cambiar la fuente del programa en vivo en este momento.</value>
+  </data>
+  <data name="GoLiveSessionSwitchButtonDisabledLabel" xml:space="preserve">
+    <value>En programa</value>
+  </data>
+  <data name="GoLiveSessionSwitchButtonLabel" xml:space="preserve">
+    <value>Cambiar</value>
+  </data>
+  <data name="GoLiveSessionStartRecordingMessage" xml:space="preserve">
+    <value>No se puede iniciar la grabación en este momento.</value>
+  </data>
+  <data name="GoLiveSessionStopRecordingMessage" xml:space="preserve">
+    <value>No se puede detener la grabación en este momento.</value>
+  </data>
+  <data name="GoLiveSurfaceActiveDestinationsMetricLabel" xml:space="preserve">
+    <value>Destinos</value>
+  </data>
+  <data name="GoLiveSurfaceAudioIdleDetailLabel" xml:space="preserve">
+    <value>Inactivo</value>
+  </data>
+  <data name="GoLiveSurfaceAudioProgramChannelLabel" xml:space="preserve">
+    <value>Programa</value>
+  </data>
+  <data name="GoLiveSurfaceAudioRecordingChannelLabel" xml:space="preserve">
+    <value>Grabación</value>
+  </data>
+  <data name="GoLiveSurfaceCustomSceneTitlePrefix" xml:space="preserve">
+    <value>Escena </value>
+  </data>
+  <data name="GoLiveSurfaceDetailLocalProgramLabel" xml:space="preserve">
+    <value>Programa local</value>
+  </data>
+  <data name="GoLiveSurfaceDirectorSourcesTitle" xml:space="preserve">
+    <value>Cámaras</value>
+  </data>
+  <data name="GoLiveSurfaceHostParticipantInitial" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="GoLiveSurfaceHostParticipantName" xml:space="preserve">
+    <value>Anfitrión</value>
+  </data>
+  <data name="GoLiveSurfaceInterviewSceneFallback" xml:space="preserve">
+    <value>Entrevista</value>
+  </data>
+  <data name="GoLiveSurfaceMicrophoneMetricLabel" xml:space="preserve">
+    <value>Mic</value>
+  </data>
+  <data name="GoLiveSurfacePictureInPictureSceneLabel" xml:space="preserve">
+    <value>Diapositivas PiP</value>
+  </data>
+  <data name="GoLiveSurfaceProgramMetricLabel" xml:space="preserve">
+    <value>Cámara</value>
+  </data>
+  <data name="GoLiveSurfaceProgramStandbyDetailLabel" xml:space="preserve">
+    <value>Programa inactivo</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingActiveMetricValue" xml:space="preserve">
+    <value>Guardando</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingMetricLabel" xml:space="preserve">
+    <value>Grabación</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingReadyDetailLabel" xml:space="preserve">
+    <value>Listo</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingReadyMetricValue" xml:space="preserve">
+    <value>Preparado</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingSaveModeBrowserDownloadValue" xml:space="preserve">
+    <value>Descarga del navegador</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingSaveModeLocalFileValue" xml:space="preserve">
+    <value>Archivo local</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineIdleValue" xml:space="preserve">
+    <value>Inactivo</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineLabel" xml:space="preserve">
+    <value>Runtime</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineRecorderValue" xml:space="preserve">
+    <value>Grabador</value>
+  </data>
+  <data name="GoLiveSurfaceSceneSlidesLabel" xml:space="preserve">
+    <value>Diapositivas</value>
+  </data>
+  <data name="GoLiveSurfaceSessionMetricLabel" xml:space="preserve">
+    <value>Sesión</value>
+  </data>
+  <data name="GoLiveSurfaceSourcesTitle" xml:space="preserve">
+    <value>Fuentes</value>
+  </data>
+  <data name="GoLiveSurfaceStatusBitrateLabel" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="GoLiveSurfaceStatusOutputLabel" xml:space="preserve">
+    <value>Salida</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewHint" xml:space="preserve">
+    <value>Los navegadores de iPad solo pueden previsualizar una cámara local a la vez. Selecciona una cámara y luego cámbiala al vivo. Los feeds remotos de invitados pueden seguir activos.</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewLimitDescription" xml:space="preserve">
+    <value>Este navegador está previsualizando solo la cámara local seleccionada. Usa Cambiar para mover la señal en vivo.</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewLimitTitle" xml:space="preserve">
+    <value>Vista previa en vivo limitada</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewPlaceholderLabel" xml:space="preserve">
+    <value>Seleccionar para previsualizar</value>
+  </data>
+  <data name="GoLiveDestinationBlockedStatusLabel" xml:space="preserve">
+    <value>Bloqueado</value>
+  </data>
+  <data name="GoLiveDestinationBlockedSummary" xml:space="preserve">
+    <value>Este destino está vinculado solo a transportes que no pueden ofrecer una ruta downstream de relay.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledSummary" xml:space="preserve">
+    <value>Desactivado en esta sesión en vivo.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledStatusLabel" xml:space="preserve">
+    <value>Desactivado</value>
+  </data>
+  <data name="GoLiveDestinationEnabledStatusLabel" xml:space="preserve">
+    <value>Listo</value>
+  </data>
+  <data name="GoLiveDestinationNeedsSetupStatusLabel" xml:space="preserve">
+    <value>Requiere configuración</value>
+  </data>
+  <data name="GoLiveDestinationNoSourceSummary" xml:space="preserve">
+    <value>Todavía no hay ninguna fuente enrutada activada para este destino.</value>
+  </data>
+  <data name="GoLiveDestinationRelayStatusLabel" xml:space="preserve">
+    <value>Relay</value>
+  </data>
+  <data name="GoLiveDestinationTransportBindingSummary" xml:space="preserve">
+    <value>Vincula este destino al menos a una conexión de transporte activada.</value>
+  </data>
+  <data name="GoLiveSidebarAudioTabLabel" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="GoLiveSidebarCreateRoomLabel" xml:space="preserve">
+    <value>Crear sala</value>
+  </data>
+  <data name="GoLiveSidebarCueLabel" xml:space="preserve">
+    <value>Señal</value>
+  </data>
+  <data name="GoLiveSidebarDestinationsLabel" xml:space="preserve">
+    <value>Destinos</value>
+  </data>
+  <data name="GoLiveSidebarGuestsLabel" xml:space="preserve">
+    <value>Invitados</value>
+  </data>
+  <data name="GoLiveSidebarInviteLabel" xml:space="preserve">
+    <value>Invitar</value>
+  </data>
+  <data name="GoLiveSidebarLiveBadgeLabel" xml:space="preserve">
+    <value>En vivo</value>
+  </data>
+  <data name="GoLiveSidebarMuteAllLabel" xml:space="preserve">
+    <value>Silenciar a todos</value>
+  </data>
+  <data name="GoLiveSidebarRoomDescription" xml:space="preserve">
+    <value>Invita a invitados remotos a enviar su cámara, micrófono o pantalla. Tú controlas todo desde aquí.</value>
+  </data>
+  <data name="GoLiveSidebarRoomTabLabel" xml:space="preserve">
+    <value>Sala</value>
+  </data>
+  <data name="GoLiveSidebarRoomTitle" xml:space="preserve">
+    <value>Sala remota</value>
+  </data>
+  <data name="GoLiveSidebarRuntimeLabel" xml:space="preserve">
+    <value>Runtime</value>
+  </data>
+  <data name="GoLiveSidebarStatusLabel" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="GoLiveSidebarStreamTabLabel" xml:space="preserve">
+    <value>Transmisión</value>
+  </data>
+  <data name="GoLiveSidebarTalkLabel" xml:space="preserve">
+    <value>Hablar</value>
+  </data>
+  <data name="GoLiveSourcesAddLabel" xml:space="preserve">
+    <value>Incluir</value>
+  </data>
+  <data name="GoLiveSourcesDefaultTitle" xml:space="preserve">
+    <value>Entradas</value>
+  </data>
+  <data name="GoLiveSourcesEmptyStateMessage" xml:space="preserve">
+    <value>Todavía no hay cámaras de escena configuradas. Agrégalas primero en Settings.</value>
+  </data>
+  <data name="GoLiveSourcesMicrophoneTitle" xml:space="preserve">
+    <value>Micrófono</value>
+  </data>
+  <data name="GoLiveSourcesRemoveLabel" xml:space="preserve">
+    <value>Quitar</value>
+  </data>
+  <data name="GoLiveSourcesIncludedLabel" xml:space="preserve">
+    <value>Preparado para salida</value>
+  </data>
+  <data name="GoLiveSourcesLiveLabel" xml:space="preserve">
+    <value>Listo para el lienzo</value>
+  </data>
+  <data name="GoLiveSourcesOnAirLabel" xml:space="preserve">
+    <value>Al aire</value>
+  </data>
+  <data name="GoLiveSourcesSceneOnlyLabel" xml:space="preserve">
+    <value>Solo escena</value>
+  </data>
+  <data name="SettingsAboutSectionDescription" xml:space="preserve">
+    <value>PrompterOne es un teleprompter profesional para creadores, broadcasters y oradores públicos.</value>
+  </data>
+  <data name="SettingsAboutAutomaticUpdatesLabel" xml:space="preserve">
+    <value>Buscar actualizaciones automáticamente</value>
+  </data>
+  <data name="SettingsAboutFooterText" xml:space="preserve">
+    <value>Creado y mantenido por Managed Code.</value>
+  </data>
+  <data name="SettingsAboutLicensedStatusLabel" xml:space="preserve">
+    <value>Con licencia</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardCopy" xml:space="preserve">
+    <value>Todo en PrompterOne está diseñado, desarrollado y mantenido por Managed Code. Usa los enlaces oficiales de abajo para el sitio de la empresa, la organización pública de GitHub y el sitio activo del producto.</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardSubtitle" xml:space="preserve">
+    <value>Producto, diseño e ingeniería por Managed Code</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardSubtitle" xml:space="preserve">
+    <value>Librerías y licencias</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardTitle" xml:space="preserve">
+    <value>Código abierto</value>
+  </data>
+  <data name="SettingsAboutResourcesCardSubtitle" xml:space="preserve">
+    <value>Aplicación en vivo, versiones y soporte</value>
+  </data>
+  <data name="SettingsAboutResourcesCardTitle" xml:space="preserve">
+    <value>Ayuda y recursos</value>
+  </data>
+  <data name="SettingsAboutSoftwareUpdatesLabel" xml:space="preserve">
+    <value>Actualizaciones de software</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureLabel" xml:space="preserve">
+    <value>Aviso de privacidad de Clarity</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureDescription" xml:space="preserve">
+    <value>Aviso oficial de privacidad de Microsoft Clarity</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubLabel" xml:space="preserve">
+    <value>TPS en GitHub</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubDescription" xml:space="preserve">
+    <value>Formato TelePrompterScript, documentación y ejemplos</value>
+  </data>
+  <data name="SettingsAboutUpToDateLabel" xml:space="preserve">
+    <value>Actualizado</value>
+  </data>
+  <data name="SettingsAboutProductGitHubLabel" xml:space="preserve">
+    <value>PrompterOne en GitHub</value>
+  </data>
+  <data name="SettingsAboutProductGitHubDescription" xml:space="preserve">
+    <value>Código fuente, documentación e hitos</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteLabel" xml:space="preserve">
+    <value>Sitio web de Managed Code</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteDescription" xml:space="preserve">
+    <value>Sitio web oficial de la empresa</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubLabel" xml:space="preserve">
+    <value>Managed Code en GitHub</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubDescription" xml:space="preserve">
+    <value>Organización oficial de GitHub</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteLabel" xml:space="preserve">
+    <value>Aplicación PrompterOne</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteDescription" xml:space="preserve">
+    <value>Build standalone WebAssembly en vivo</value>
+  </data>
+  <data name="SettingsAboutLibraryInterDescription" xml:space="preserve">
+    <value>Tipografía de UI · Rasmus Andersson</value>
+  </data>
+  <data name="SettingsAboutLibraryJetBrainsMonoDescription" xml:space="preserve">
+    <value>Monoespaciada · JetBrains</value>
+  </data>
+  <data name="SettingsAboutLibraryPlayfairDisplayDescription" xml:space="preserve">
+    <value>Serif de display · Claus Eggers Sorensen</value>
+  </data>
+  <data name="SettingsAboutLibraryFeatherIconsDescription" xml:space="preserve">
+    <value>Conjunto de iconos open source</value>
+  </data>
+  <data name="SettingsAboutLibraryWebRtcDescription" xml:space="preserve">
+    <value>APIs de comunicación en tiempo real</value>
+  </data>
+  <data name="SettingsAboutLibraryMediaRecorderDescription" xml:space="preserve">
+    <value>Grabación multimedia del navegador</value>
+  </data>
+  <data name="SettingsAboutLibraryWebAudioDescription" xml:space="preserve">
+    <value>Procesamiento de audio de alto nivel</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkLabel" xml:space="preserve">
+    <value>Repositorio de PrompterOne</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkDescription" xml:space="preserve">
+    <value>Código fuente, documentación e hitos</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkLabel" xml:space="preserve">
+    <value>Notas de la versión</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkDescription" xml:space="preserve">
+    <value>Builds publicadas y changelog</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkLabel" xml:space="preserve">
+    <value>Informar un problema</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkDescription" xml:space="preserve">
+    <value>Reportes de errores y feedback del producto</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingTitle" xml:space="preserve">
+    <value>Grabación</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingAccountLabel" xml:space="preserve">
+    <value>Grabación del navegador · Señal de programa</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingDescription" xml:space="preserve">
+    <value>Activa la grabación local como destino de primera clase de la misma señal de programa compuesta que usan los transportes en vivo.</value>
+  </data>
 </root>

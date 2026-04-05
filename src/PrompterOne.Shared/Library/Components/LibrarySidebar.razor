@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.Library
+@using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
@@ -35,15 +36,19 @@
     <div class="lib-folders-section">
         <div class="lib-folders-header">
             <span data-testid="@UiTestIds.Library.SectionFoldersTitle">@Text(UiTextKey.LibraryFolders)</span>
-            <button class="folder-add-btn"
-                    title="@Text(UiTextKey.LibraryNewFolder)"
-                    @onclick="HandleStartCreateAsync"
-                    data-testid="@UiTestIds.Library.FolderCreateStart">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-            </button>
+            <TooltipAnchor OwnerTestId="@UiTestIds.Library.FolderCreateStart"
+                           Placement="TooltipPlacement.LeftCenter"
+                           Text="@Text(UiTextKey.TooltipCreateFolder)">
+                <button class="folder-add-btn"
+                        aria-label="@Text(UiTextKey.TooltipCreateFolder)"
+                        @onclick="HandleStartCreateAsync"
+                        data-testid="@UiTestIds.Library.FolderCreateStart">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+            </TooltipAnchor>
         </div>
         <nav class="lib-folder-tree">
             @foreach (var folder in Folders)

@@ -2,9 +2,11 @@ using System.Text.Json;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Tests;
@@ -87,7 +89,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var primarySceneChip = cut.FindByTestId(UiTestIds.GoLive.SceneChip(GoLiveText.Surface.PrimarySceneId));
-            Assert.Contains(GoLiveText.Session.CameraFallbackLabel, primarySceneChip.TextContent, StringComparison.Ordinal);
+            Assert.Contains(Text(GoLiveText.Session.CameraFallbackLabel), primarySceneChip.TextContent, StringComparison.Ordinal);
             Assert.DoesNotContain(LegacyPrimarySceneFallbackLabel, primarySceneChip.TextContent, StringComparison.Ordinal);
         });
     }
@@ -141,4 +143,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
             null,
             null,
             AudioBusState.Empty);
+
+    private string Text(string key) =>
+        Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key];
 }

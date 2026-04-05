@@ -303,4 +303,538 @@
   <data name="SettingsShortcutsSectionDescription" xml:space="preserve">
     <value>Перегляньте поточні клавіатурні команди для редактора, Learn, Teleprompter і Go Live.</value>
   </data>
+  <data name="TooltipDecreaseSpeed" xml:space="preserve">
+    <value>Зменшити швидкість</value>
+  </data>
+  <data name="TooltipIncreaseSpeed" xml:space="preserve">
+    <value>Збільшити швидкість</value>
+  </data>
+  <data name="TooltipBackFiveWords" xml:space="preserve">
+    <value>Назад на 5 слів</value>
+  </data>
+  <data name="TooltipBackOneWord" xml:space="preserve">
+    <value>Назад на 1 слово</value>
+  </data>
+  <data name="TooltipPlayPlayback" xml:space="preserve">
+    <value>Почати відтворення</value>
+  </data>
+  <data name="TooltipPausePlayback" xml:space="preserve">
+    <value>Поставити відтворення на паузу</value>
+  </data>
+  <data name="TooltipForwardOneWord" xml:space="preserve">
+    <value>Вперед на 1 слово</value>
+  </data>
+  <data name="TooltipForwardFiveWords" xml:space="preserve">
+    <value>Вперед на 5 слів</value>
+  </data>
+  <data name="TooltipLoopPlaybackOn" xml:space="preserve">
+    <value>Зациклене відтворення увімкнено</value>
+  </data>
+  <data name="TooltipLoopPlaybackOff" xml:space="preserve">
+    <value>Зациклене відтворення вимкнено</value>
+  </data>
+  <data name="TooltipMirrorReaderHorizontally" xml:space="preserve">
+    <value>Віддзеркалити суфлер горизонтально</value>
+  </data>
+  <data name="TooltipMirrorReaderVertically" xml:space="preserve">
+    <value>Віддзеркалити суфлер вертикально</value>
+  </data>
+  <data name="TooltipRotateReaderOrientation" xml:space="preserve">
+    <value>Повернути суфлер між альбомним і портретним режимами</value>
+  </data>
+  <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
+    <value>Перемкнути повноекранний режим браузера</value>
+  </data>
+  <data name="TooltipAlignTextLeft" xml:space="preserve">
+    <value>Вирівняти текст ліворуч</value>
+  </data>
+  <data name="TooltipAlignTextCenter" xml:space="preserve">
+    <value>Вирівняти текст по центру смуги читання</value>
+  </data>
+  <data name="TooltipAlignTextRight" xml:space="preserve">
+    <value>Вирівняти текст праворуч</value>
+  </data>
+  <data name="TooltipAlignTextJustify" xml:space="preserve">
+    <value>Розтягнути текст на всю читабельну ширину</value>
+  </data>
+  <data name="TooltipMoveFocalReadingGuide" xml:space="preserve">
+    <value>Перемістити фокальну направляючу читання</value>
+  </data>
+  <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
+    <value>Налаштувати ширину тексту суфлера</value>
+  </data>
+  <data name="TooltipSmallerText" xml:space="preserve">
+    <value>Менший текст</value>
+  </data>
+  <data name="TooltipLargerText" xml:space="preserve">
+    <value>Більший текст</value>
+  </data>
+  <data name="TooltipPreviousBlock" xml:space="preserve">
+    <value>Попередній блок</value>
+  </data>
+  <data name="TooltipPreviousWord" xml:space="preserve">
+    <value>Назад на одне слово</value>
+  </data>
+  <data name="TooltipNextWord" xml:space="preserve">
+    <value>Вперед на одне слово</value>
+  </data>
+  <data name="TooltipNextBlock" xml:space="preserve">
+    <value>Наступний блок</value>
+  </data>
+  <data name="TooltipToggleCameraPreview" xml:space="preserve">
+    <value>Перемкнути перегляд камери</value>
+  </data>
+  <data name="TooltipCreateFolder" xml:space="preserve">
+    <value>Створити папку</value>
+  </data>
+  <data name="TooltipMoreScriptActions" xml:space="preserve">
+    <value>Більше дій зі сценарієм</value>
+  </data>
+  <data name="TooltipDeleteScript" xml:space="preserve">
+    <value>Видалити сценарій</value>
+  </data>
+  <data name="TooltipAccentGold" xml:space="preserve">
+    <value>Золотий акцент</value>
+  </data>
+  <data name="TooltipAccentBlue" xml:space="preserve">
+    <value>Синій акцент</value>
+  </data>
+  <data name="TooltipAccentEmerald" xml:space="preserve">
+    <value>Смарагдовий акцент</value>
+  </data>
+  <data name="TooltipAccentPink" xml:space="preserve">
+    <value>Рожевий акцент</value>
+  </data>
+  <data name="TooltipAccentPurple" xml:space="preserve">
+    <value>Фіолетовий акцент</value>
+  </data>
+  <data name="TooltipAccentOrange" xml:space="preserve">
+    <value>Помаранчевий акцент</value>
+  </data>
+  <data name="TooltipTextColorWhite" xml:space="preserve">
+    <value>Білий текст</value>
+  </data>
+  <data name="TooltipTextColorWarmWhite" xml:space="preserve">
+    <value>Теплий білий текст</value>
+  </data>
+  <data name="TooltipTextColorAmber" xml:space="preserve">
+    <value>Бурштиновий текст</value>
+  </data>
+  <data name="TooltipTextColorMint" xml:space="preserve">
+    <value>М’ятний текст</value>
+  </data>
+  <data name="GoLiveBackLabel" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="GoLiveDirectorModeLabel" xml:space="preserve">
+    <value>Режисер</value>
+  </data>
+  <data name="GoLiveLivePreviewTitle" xml:space="preserve">
+    <value>Ефір</value>
+  </data>
+  <data name="GoLiveStreamingSubtitle" xml:space="preserve">
+    <value>Маршрутизація програми</value>
+  </data>
+  <data name="GoLiveStudioModeLabel" xml:space="preserve">
+    <value>Студія</value>
+  </data>
+  <data name="GoLiveLoadMessage" xml:space="preserve">
+    <value>Зараз не вдається підготувати live-маршрутизацію.</value>
+  </data>
+  <data name="GoLiveSaveSceneMessage" xml:space="preserve">
+    <value>Зараз не вдається зберегти поточну live-сцену.</value>
+  </data>
+  <data name="GoLiveSaveStudioMessage" xml:space="preserve">
+    <value>Зараз не вдається зберегти налаштування live-маршрутизації.</value>
+  </data>
+  <data name="GoLiveAudioDefaultMicrophoneRouteLabel" xml:space="preserve">
+    <value>Моніторинг + стрим</value>
+  </data>
+  <data name="GoLiveAudioMonitorOnlyLabel" xml:space="preserve">
+    <value>Лише моніторинг</value>
+  </data>
+  <data name="GoLiveAudioNoMicrophoneLabel" xml:space="preserve">
+    <value>Без мікрофона</value>
+  </data>
+  <data name="GoLiveAudioStreamOnlyLabel" xml:space="preserve">
+    <value>Лише стрим</value>
+  </data>
+  <data name="GoLiveSessionCameraFallbackLabel" xml:space="preserve">
+    <value>Камеру не вибрано</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeIdleLabel" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeLiveLabel" xml:space="preserve">
+    <value>Ефір</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeRecordingLabel" xml:space="preserve">
+    <value>REC</value>
+  </data>
+  <data name="GoLiveSessionProgramBadgeStreamingRecordingLabel" xml:space="preserve">
+    <value>Ефір + REC</value>
+  </data>
+  <data name="GoLiveSessionRecordingIndicatorLabel" xml:space="preserve">
+    <value>REC</value>
+  </data>
+  <data name="GoLiveSessionIdleLabel" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="GoLiveSessionRecordingLabel" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="GoLiveSessionStreamingLabel" xml:space="preserve">
+    <value>Стрим</value>
+  </data>
+  <data name="GoLiveSessionStreamingRecordingLabel" xml:space="preserve">
+    <value>Стрим + запис</value>
+  </data>
+  <data name="GoLiveSessionStartStreamMessage" xml:space="preserve">
+    <value>Зараз не вдається запустити live-виходи.</value>
+  </data>
+  <data name="GoLiveSessionStopStreamMessage" xml:space="preserve">
+    <value>Зараз не вдається зупинити live-виходи.</value>
+  </data>
+  <data name="GoLiveSessionStreamButtonLabel" xml:space="preserve">
+    <value>Почати стрим</value>
+  </data>
+  <data name="GoLiveSessionStreamPrerequisiteDetail" xml:space="preserve">
+    <value>Жоден прямий browser live-вихід не озброєно. Для RTMP-призначень і далі потрібен зовнішній relay.</value>
+  </data>
+  <data name="GoLiveSessionStreamPrerequisiteMessage" xml:space="preserve">
+    <value>Перед стартом стриму озбройте щонайменше один прямий browser transport для публікації.</value>
+  </data>
+  <data name="GoLiveSessionStreamStopLabel" xml:space="preserve">
+    <value>Зупинити стрим</value>
+  </data>
+  <data name="GoLiveSessionSwitchProgramMessage" xml:space="preserve">
+    <value>Зараз не вдається перемкнути live-джерело програми.</value>
+  </data>
+  <data name="GoLiveSessionSwitchButtonDisabledLabel" xml:space="preserve">
+    <value>У програмі</value>
+  </data>
+  <data name="GoLiveSessionSwitchButtonLabel" xml:space="preserve">
+    <value>Перемкнути</value>
+  </data>
+  <data name="GoLiveSessionStartRecordingMessage" xml:space="preserve">
+    <value>Зараз не вдається почати запис.</value>
+  </data>
+  <data name="GoLiveSessionStopRecordingMessage" xml:space="preserve">
+    <value>Зараз не вдається зупинити запис.</value>
+  </data>
+  <data name="GoLiveSurfaceActiveDestinationsMetricLabel" xml:space="preserve">
+    <value>Виходи</value>
+  </data>
+  <data name="GoLiveSurfaceAudioIdleDetailLabel" xml:space="preserve">
+    <value>Очікування</value>
+  </data>
+  <data name="GoLiveSurfaceAudioProgramChannelLabel" xml:space="preserve">
+    <value>Програма</value>
+  </data>
+  <data name="GoLiveSurfaceAudioRecordingChannelLabel" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="GoLiveSurfaceCustomSceneTitlePrefix" xml:space="preserve">
+    <value>Сцена </value>
+  </data>
+  <data name="GoLiveSurfaceDetailLocalProgramLabel" xml:space="preserve">
+    <value>Локальна програма</value>
+  </data>
+  <data name="GoLiveSurfaceDirectorSourcesTitle" xml:space="preserve">
+    <value>Камери</value>
+  </data>
+  <data name="GoLiveSurfaceHostParticipantInitial" xml:space="preserve">
+    <value>В</value>
+  </data>
+  <data name="GoLiveSurfaceHostParticipantName" xml:space="preserve">
+    <value>Ведучий</value>
+  </data>
+  <data name="GoLiveSurfaceInterviewSceneFallback" xml:space="preserve">
+    <value>Інтерв’ю</value>
+  </data>
+  <data name="GoLiveSurfaceMicrophoneMetricLabel" xml:space="preserve">
+    <value>Мікрофон</value>
+  </data>
+  <data name="GoLiveSurfacePictureInPictureSceneLabel" xml:space="preserve">
+    <value>PiP слайди</value>
+  </data>
+  <data name="GoLiveSurfaceProgramMetricLabel" xml:space="preserve">
+    <value>Камера</value>
+  </data>
+  <data name="GoLiveSurfaceProgramStandbyDetailLabel" xml:space="preserve">
+    <value>Програма неактивна</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingActiveMetricValue" xml:space="preserve">
+    <value>Збереження</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingMetricLabel" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingReadyDetailLabel" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingReadyMetricValue" xml:space="preserve">
+    <value>Озброєно</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingSaveModeBrowserDownloadValue" xml:space="preserve">
+    <value>Завантаження браузером</value>
+  </data>
+  <data name="GoLiveSurfaceRecordingSaveModeLocalFileValue" xml:space="preserve">
+    <value>Локальний файл</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineIdleValue" xml:space="preserve">
+    <value>Очікування</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineLabel" xml:space="preserve">
+    <value>Runtime</value>
+  </data>
+  <data name="GoLiveSurfaceRuntimeEngineRecorderValue" xml:space="preserve">
+    <value>Recorder</value>
+  </data>
+  <data name="GoLiveSurfaceSceneSlidesLabel" xml:space="preserve">
+    <value>Слайди</value>
+  </data>
+  <data name="GoLiveSurfaceSessionMetricLabel" xml:space="preserve">
+    <value>Сесія</value>
+  </data>
+  <data name="GoLiveSurfaceSourcesTitle" xml:space="preserve">
+    <value>Джерела</value>
+  </data>
+  <data name="GoLiveSurfaceStatusBitrateLabel" xml:space="preserve">
+    <value>Бітрейт</value>
+  </data>
+  <data name="GoLiveSurfaceStatusOutputLabel" xml:space="preserve">
+    <value>Вивід</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewHint" xml:space="preserve">
+    <value>У браузерах iPad одночасно можна попередньо переглядати лише одну локальну камеру. Виберіть камеру, а потім перемкніть її в ефір. Віддалені гостьові фіди можуть лишатися активними.</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewLimitDescription" xml:space="preserve">
+    <value>Цей браузер зараз переглядає лише вибрану локальну камеру. Скористайтеся Switch, щоб перенести live-фід.</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewLimitTitle" xml:space="preserve">
+    <value>Live-перегляд обмежено</value>
+  </data>
+  <data name="GoLiveSurfaceSingleLocalCameraPreviewPlaceholderLabel" xml:space="preserve">
+    <value>Виберіть для перегляду</value>
+  </data>
+  <data name="GoLiveDestinationBlockedStatusLabel" xml:space="preserve">
+    <value>Заблоковано</value>
+  </data>
+  <data name="GoLiveDestinationBlockedSummary" xml:space="preserve">
+    <value>Це призначення прив’язане лише до transport-з’єднань, які не можуть дати downstream relay-шлях.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledSummary" xml:space="preserve">
+    <value>Вимкнено в цій live-сесії.</value>
+  </data>
+  <data name="GoLiveDestinationDisabledStatusLabel" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="GoLiveDestinationEnabledStatusLabel" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="GoLiveDestinationNeedsSetupStatusLabel" xml:space="preserve">
+    <value>Потрібне налаштування</value>
+  </data>
+  <data name="GoLiveDestinationNoSourceSummary" xml:space="preserve">
+    <value>Для цього призначення ще не озброєно жодного маршрутизованого джерела.</value>
+  </data>
+  <data name="GoLiveDestinationRelayStatusLabel" xml:space="preserve">
+    <value>Relay</value>
+  </data>
+  <data name="GoLiveDestinationTransportBindingSummary" xml:space="preserve">
+    <value>Прив’яжіть це призначення щонайменше до одного озброєного transport-з’єднання.</value>
+  </data>
+  <data name="GoLiveSidebarAudioTabLabel" xml:space="preserve">
+    <value>Аудіо</value>
+  </data>
+  <data name="GoLiveSidebarCreateRoomLabel" xml:space="preserve">
+    <value>Створити кімнату</value>
+  </data>
+  <data name="GoLiveSidebarCueLabel" xml:space="preserve">
+    <value>Сигнал</value>
+  </data>
+  <data name="GoLiveSidebarDestinationsLabel" xml:space="preserve">
+    <value>Виходи</value>
+  </data>
+  <data name="GoLiveSidebarGuestsLabel" xml:space="preserve">
+    <value>Гості</value>
+  </data>
+  <data name="GoLiveSidebarInviteLabel" xml:space="preserve">
+    <value>Запросити</value>
+  </data>
+  <data name="GoLiveSidebarLiveBadgeLabel" xml:space="preserve">
+    <value>Ефір</value>
+  </data>
+  <data name="GoLiveSidebarMuteAllLabel" xml:space="preserve">
+    <value>Заглушити всіх</value>
+  </data>
+  <data name="GoLiveSidebarRoomDescription" xml:space="preserve">
+    <value>Запросіть віддалених гостей надіслати свою камеру, мікрофон або екран. Ви керуєте всім звідси.</value>
+  </data>
+  <data name="GoLiveSidebarRoomTabLabel" xml:space="preserve">
+    <value>Кімната</value>
+  </data>
+  <data name="GoLiveSidebarRoomTitle" xml:space="preserve">
+    <value>Віддалена кімната</value>
+  </data>
+  <data name="GoLiveSidebarRuntimeLabel" xml:space="preserve">
+    <value>Runtime</value>
+  </data>
+  <data name="GoLiveSidebarStatusLabel" xml:space="preserve">
+    <value>Стан</value>
+  </data>
+  <data name="GoLiveSidebarStreamTabLabel" xml:space="preserve">
+    <value>Стрим</value>
+  </data>
+  <data name="GoLiveSidebarTalkLabel" xml:space="preserve">
+    <value>Говорити</value>
+  </data>
+  <data name="GoLiveSourcesAddLabel" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="GoLiveSourcesDefaultTitle" xml:space="preserve">
+    <value>Входи</value>
+  </data>
+  <data name="GoLiveSourcesEmptyStateMessage" xml:space="preserve">
+    <value>Камери сцени ще не налаштовано. Спочатку додайте їх у Settings.</value>
+  </data>
+  <data name="GoLiveSourcesMicrophoneTitle" xml:space="preserve">
+    <value>Мікрофон</value>
+  </data>
+  <data name="GoLiveSourcesRemoveLabel" xml:space="preserve">
+    <value>Прибрати</value>
+  </data>
+  <data name="GoLiveSourcesIncludedLabel" xml:space="preserve">
+    <value>Додано у вивід</value>
+  </data>
+  <data name="GoLiveSourcesLiveLabel" xml:space="preserve">
+    <value>Готово для канви</value>
+  </data>
+  <data name="GoLiveSourcesOnAirLabel" xml:space="preserve">
+    <value>В ефірі</value>
+  </data>
+  <data name="GoLiveSourcesSceneOnlyLabel" xml:space="preserve">
+    <value>Лише сцена</value>
+  </data>
+  <data name="SettingsAboutSectionDescription" xml:space="preserve">
+    <value>PrompterOne — професійний телесуфлер для креаторів, мовників і публічних спікерів.</value>
+  </data>
+  <data name="SettingsAboutAutomaticUpdatesLabel" xml:space="preserve">
+    <value>Автоматично перевіряти оновлення</value>
+  </data>
+  <data name="SettingsAboutFooterText" xml:space="preserve">
+    <value>Створено та підтримується Managed Code.</value>
+  </data>
+  <data name="SettingsAboutLicensedStatusLabel" xml:space="preserve">
+    <value>Ліцензовано</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardCopy" xml:space="preserve">
+    <value>Усе в PrompterOne спроєктовано, створено та підтримується Managed Code. Скористайтеся офіційними посиланнями нижче для сайту компанії, публічної GitHub-організації та живого сайту продукту.</value>
+  </data>
+  <data name="SettingsAboutManagedCodeCardSubtitle" xml:space="preserve">
+    <value>Продукт, дизайн і інженерія від Managed Code</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardSubtitle" xml:space="preserve">
+    <value>Бібліотеки й ліцензії</value>
+  </data>
+  <data name="SettingsAboutOpenSourceCardTitle" xml:space="preserve">
+    <value>Відкрите ПЗ</value>
+  </data>
+  <data name="SettingsAboutResourcesCardSubtitle" xml:space="preserve">
+    <value>Живий застосунок, релізи й підтримка</value>
+  </data>
+  <data name="SettingsAboutResourcesCardTitle" xml:space="preserve">
+    <value>Довідка й ресурси</value>
+  </data>
+  <data name="SettingsAboutSoftwareUpdatesLabel" xml:space="preserve">
+    <value>Оновлення ПЗ</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureLabel" xml:space="preserve">
+    <value>Повідомлення про конфіденційність Clarity</value>
+  </data>
+  <data name="SettingsAboutClarityDisclosureDescription" xml:space="preserve">
+    <value>Офіційне повідомлення Microsoft Clarity про конфіденційність</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubLabel" xml:space="preserve">
+    <value>TPS на GitHub</value>
+  </data>
+  <data name="SettingsAboutTpsGitHubDescription" xml:space="preserve">
+    <value>Формат TelePrompterScript, документація та приклади</value>
+  </data>
+  <data name="SettingsAboutUpToDateLabel" xml:space="preserve">
+    <value>Актуально</value>
+  </data>
+  <data name="SettingsAboutProductGitHubLabel" xml:space="preserve">
+    <value>PrompterOne на GitHub</value>
+  </data>
+  <data name="SettingsAboutProductGitHubDescription" xml:space="preserve">
+    <value>Вихідний код, документація та майлстоуни</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteLabel" xml:space="preserve">
+    <value>Сайт Managed Code</value>
+  </data>
+  <data name="SettingsAboutCompanyWebsiteDescription" xml:space="preserve">
+    <value>Офіційний сайт компанії</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubLabel" xml:space="preserve">
+    <value>Managed Code на GitHub</value>
+  </data>
+  <data name="SettingsAboutCompanyGitHubDescription" xml:space="preserve">
+    <value>Офіційна GitHub-організація</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteLabel" xml:space="preserve">
+    <value>Застосунок PrompterOne</value>
+  </data>
+  <data name="SettingsAboutProductWebsiteDescription" xml:space="preserve">
+    <value>Жива standalone WebAssembly-збірка</value>
+  </data>
+  <data name="SettingsAboutLibraryInterDescription" xml:space="preserve">
+    <value>UI-шрифт · Rasmus Andersson</value>
+  </data>
+  <data name="SettingsAboutLibraryJetBrainsMonoDescription" xml:space="preserve">
+    <value>Моноширинний шрифт · JetBrains</value>
+  </data>
+  <data name="SettingsAboutLibraryPlayfairDisplayDescription" xml:space="preserve">
+    <value>Акцидентна антиква · Claus Eggers Sorensen</value>
+  </data>
+  <data name="SettingsAboutLibraryFeatherIconsDescription" xml:space="preserve">
+    <value>Набір іконок з відкритим кодом</value>
+  </data>
+  <data name="SettingsAboutLibraryWebRtcDescription" xml:space="preserve">
+    <value>API для комунікації в реальному часі</value>
+  </data>
+  <data name="SettingsAboutLibraryMediaRecorderDescription" xml:space="preserve">
+    <value>Запис медіа в браузері</value>
+  </data>
+  <data name="SettingsAboutLibraryWebAudioDescription" xml:space="preserve">
+    <value>Високорівнева обробка аудіо</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkLabel" xml:space="preserve">
+    <value>Репозиторій PrompterOne</value>
+  </data>
+  <data name="SettingsAboutRepositoryLinkDescription" xml:space="preserve">
+    <value>Вихідний код, документація та майлстоуни</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkLabel" xml:space="preserve">
+    <value>Нотатки до релізів</value>
+  </data>
+  <data name="SettingsAboutReleasesLinkDescription" xml:space="preserve">
+    <value>Опубліковані збірки та changelog</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkLabel" xml:space="preserve">
+    <value>Повідомити про проблему</value>
+  </data>
+  <data name="SettingsAboutIssuesLinkDescription" xml:space="preserve">
+    <value>Баг-репорти та відгуки про продукт</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingTitle" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingAccountLabel" xml:space="preserve">
+    <value>Запис у браузері · Програмний фід</value>
+  </data>
+  <data name="SettingsStreamingLocalRecordingDescription" xml:space="preserve">
+    <value>Озбройте локальний запис як повноцінний sink того самого скомпонованого program feed, який використовують live-транспорти.</value>
+  </data>
 </root>

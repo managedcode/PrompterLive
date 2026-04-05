@@ -1,9 +1,12 @@
 @namespace PrompterOne.Shared.Components
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 <article class="glass-card library-card" data-testid="@Summary.RowAutomationId" @onclick="OpenAsync">
     <div class="library-card-cover">
-        <span class="library-card-badge">TPS</span>
+        <span class="library-card-badge">@Text(UiTextKey.LibraryCardBadgeTps)</span>
         <h3 data-testid="@Summary.TitleAutomationId">@Summary.Title</h3>
-        <p>@Summary.WordCount words</p>
+        <p>@Format(UiTextKey.LibraryCardWordsFormat, Summary.WordCount)</p>
     </div>
 
     <div class="library-card-body">
@@ -13,9 +16,17 @@
         </div>
 
         <div class="library-card-actions">
-            <button class="action-btn" data-testid="@($"{Summary.LoadAutomationId}-learn")" @onclick:stopPropagation="true" @onclick="LearnAsync">Learn</button>
-            <button class="action-btn action-btn-primary" data-testid="@($"{Summary.LoadAutomationId}-read")" @onclick:stopPropagation="true" @onclick="ReadAsync">Read</button>
-            <button class="icon-btn" data-testid="@($"{Summary.LoadAutomationId}-delete")" title="Delete script" @onclick:stopPropagation="true" @onclick="DeleteAsync">×</button>
+            <button class="action-btn" data-testid="@($"{Summary.LoadAutomationId}-learn")" @onclick:stopPropagation="true" @onclick="LearnAsync">@Text(UiTextKey.LibraryCardLearn)</button>
+            <button class="action-btn action-btn-primary" data-testid="@($"{Summary.LoadAutomationId}-read")" @onclick:stopPropagation="true" @onclick="ReadAsync">@Text(UiTextKey.LibraryCardRead)</button>
+            <TooltipAnchor OwnerTestId="@($"{Summary.LoadAutomationId}-delete")"
+                           Placement="TooltipPlacement.LeftCenter"
+                           Text="@Text(UiTextKey.TooltipDeleteScript)">
+                <button class="icon-btn"
+                        data-testid="@($"{Summary.LoadAutomationId}-delete")"
+                        aria-label="@Text(UiTextKey.TooltipDeleteScript)"
+                        @onclick:stopPropagation="true"
+                        @onclick="DeleteAsync">×</button>
+            </TooltipAnchor>
         </div>
     </div>
 </article>
@@ -43,4 +54,8 @@
     private Task ReadAsync() => OnRead.InvokeAsync(Summary.Id);
 
     private Task DeleteAsync() => OnDelete.InvokeAsync(Summary.Id);
+
+    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

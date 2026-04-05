@@ -4,6 +4,11 @@ namespace PrompterOne.Shared.Contracts;
 
 public static class UiTestIds
 {
+    public static class Tooltip
+    {
+        public static string Surface(string ownerTestId) => $"{ownerTestId}-tooltip";
+    }
+
     public static class Header
     {
         public const string Back = "header-back";
@@ -78,6 +83,8 @@ public static class UiTestIds
         public static string CardSurface(string scriptId) => $"library-card-surface-{scriptId}";
 
         public static string CardDuplicate(string scriptId) => $"library-card-duplicate-{scriptId}";
+
+        public static string CardDelete(string scriptId) => $"library-card-delete-{scriptId}";
 
         public static string CardLearn(string scriptId) => $"library-card-learn-{scriptId}";
 
@@ -412,6 +419,8 @@ public static class UiTestIds
 
         public static string AiProvider(string providerId) => $"settings-ai-provider-{providerId}";
 
+        public static string AccentSwatch(string swatchId) => $"settings-accent-swatch-{swatchId}";
+
         public static string AiProviderClear(string providerId) => $"settings-ai-provider-{providerId}-clear";
 
         public static string AiProviderMessage(string providerId) => $"settings-ai-provider-{providerId}-message";
@@ -419,6 +428,8 @@ public static class UiTestIds
         public static string AiProviderSave(string providerId) => $"settings-ai-provider-{providerId}-save";
 
         public static string AiProviderSubtitle(string providerId) => $"settings-ai-provider-{providerId}-subtitle";
+
+        public static string TextColorSwatch(string swatchId) => $"settings-text-color-swatch-{swatchId}";
 
         public static string CameraDevice(string deviceId) => $"settings-camera-device-{deviceId}";
 

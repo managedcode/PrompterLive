@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Settings.Models;
@@ -12,16 +13,11 @@ public partial class SettingsAiSection : ComponentBase
     private const string AnthropicLabel = "Anthropic";
     private const string ClaudeApiCardId = "ai-claude-api";
     private const string DisconnectedStatusClass = "set-dest-idle";
-    private const string DisconnectedStatusLabel = "Not configured";
-    private const string LocalOnlySavedMessage = "Saved locally in this browser. Runtime connection testing is not available yet.";
     private const string LocalhostAuthority = "localhost:11434";
     private const string LocalStatusClass = "set-dest-local";
-    private const string LocalStatusLabel = "Saved locally";
     private const string OpenAiLabel = "OpenAI";
     private const string OllamaCardId = "ai-ollama";
     private const string OpenAiCardId = "ai-openai";
-    private const string ProviderClearedMessage = "Provider draft cleared from this browser.";
-    private const string SelfHostedLabel = "Self-hosted";
     private const string SubtitleSeparator = " · ";
 
     private static readonly IReadOnlyList<SettingsSelectOption> ClaudeModelOptions =
@@ -79,14 +75,14 @@ public partial class SettingsAiSection : ComponentBase
     private static string BuildStatusClass(OllamaAiProviderSettings settings) =>
         settings.IsConfigured() ? LocalStatusClass : DisconnectedStatusClass;
 
-    private static string BuildStatusLabel(AnthropicAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusLabel : DisconnectedStatusLabel;
+    private string BuildStatusLabel(AnthropicAiProviderSettings settings) =>
+        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
 
-    private static string BuildStatusLabel(OpenAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusLabel : DisconnectedStatusLabel;
+    private string BuildStatusLabel(OpenAiProviderSettings settings) =>
+        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
 
-    private static string BuildStatusLabel(OllamaAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusLabel : DisconnectedStatusLabel;
+    private string BuildStatusLabel(OllamaAiProviderSettings settings) =>
+        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
 
     private static string BuildClaudeSubtitle(AnthropicAiProviderSettings settings) =>
         BuildCatalogSubtitle(AnthropicLabel, settings.Model, ClaudeModelOptions);
@@ -94,18 +90,18 @@ public partial class SettingsAiSection : ComponentBase
     private static string BuildOpenAiSubtitle(OpenAiProviderSettings settings) =>
         BuildCatalogSubtitle(OpenAiLabel, settings.Model, OpenAiModelOptions);
 
-    private static string BuildOllamaSubtitle(OllamaAiProviderSettings settings)
+    private string BuildOllamaSubtitle(OllamaAiProviderSettings settings)
     {
         var endpointLabel = BuildOllamaEndpointLabel(settings.Endpoint);
         var modelLabel = string.IsNullOrWhiteSpace(settings.Model)
-            ? LocalStatusLabel.ToLowerInvariant()
+            ? Text(UiTextKey.CommonSavedLocally).ToLowerInvariant()
             : settings.Model.Trim();
 
         return string.Join(
             SubtitleSeparator,
             new[]
             {
-                SelfHostedLabel,
+                Text(UiTextKey.SettingsAiSelfHosted),
                 endpointLabel,
                 modelLabel
             });
@@ -151,39 +147,39 @@ public partial class SettingsAiSection : ComponentBase
     private async Task SaveClaudeAsync()
     {
         await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.ClaudeApi] = LocalOnlySavedMessage;
+        _messages[SettingsAiProviderIds.ClaudeApi] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
     }
 
     private async Task SaveOpenAiAsync()
     {
         await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.OpenAi] = LocalOnlySavedMessage;
+        _messages[SettingsAiProviderIds.OpenAi] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
     }
 
     private async Task SaveOllamaAsync()
     {
         await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.Ollama] = LocalOnlySavedMessage;
+        _messages[SettingsAiProviderIds.Ollama] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
     }
 
     private async Task ClearClaudeAsync()
     {
         _settings.ClaudeApi = new AnthropicAiProviderSettings();
-        _messages[SettingsAiProviderIds.ClaudeApi] = ProviderClearedMessage;
+        _messages[SettingsAiProviderIds.ClaudeApi] = Text(UiTextKey.SettingsAiProviderCleared);
         await SettingsStore.SaveAsync(_settings);
     }
 
     private async Task ClearOpenAiAsync()
     {
         _settings.OpenAi = new OpenAiProviderSettings();
-        _messages[SettingsAiProviderIds.OpenAi] = ProviderClearedMessage;
+        _messages[SettingsAiProviderIds.OpenAi] = Text(UiTextKey.SettingsAiProviderCleared);
         await SettingsStore.SaveAsync(_settings);
     }
 
     private async Task ClearOllamaAsync()
     {
         _settings.Ollama = new OllamaAiProviderSettings();
-        _messages[SettingsAiProviderIds.Ollama] = ProviderClearedMessage;
+        _messages[SettingsAiProviderIds.Ollama] = Text(UiTextKey.SettingsAiProviderCleared);
         await SettingsStore.SaveAsync(_settings);
     }
 }

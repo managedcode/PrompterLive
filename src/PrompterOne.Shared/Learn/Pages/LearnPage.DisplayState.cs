@@ -1,3 +1,5 @@
+using PrompterOne.Shared.Localization;
+
 namespace PrompterOne.Shared.Pages;
 
 public partial class LearnPage
@@ -35,10 +37,10 @@ public partial class LearnPage
             : words.Take(maximumWordCount).ToArray();
     }
 
-    private static string BuildDisplayPreviewText(string previewText)
+    private string BuildDisplayPreviewText(string previewText)
     {
         if (string.IsNullOrWhiteSpace(previewText) ||
-            string.Equals(previewText, EndOfScriptPhrase, StringComparison.Ordinal))
+            string.Equals(previewText, Text(UiTextKey.LearnEndOfScript), StringComparison.Ordinal))
         {
             return previewText;
         }

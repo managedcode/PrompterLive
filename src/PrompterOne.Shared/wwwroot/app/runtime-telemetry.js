@@ -154,13 +154,16 @@ async function ensureClarityConfigured() {
 
 function buildInitializationSnapshot(config) {
     const runtime = getRuntime();
+    const sentryConfigured = config?.sentryConfigured === true;
 
     return {
         clarityConfigured: Boolean(config?.clarityProjectId),
         debugEnabled: runtime.wasmDebugEnabled === true,
         googleAnalyticsConfigured: Boolean(config?.googleAnalyticsMeasurementId),
         hostEnabled: config?.hostEnabled === true,
-        runtimeEnabled: telemetryState.runtimeEnabled
+        runtimeEnabled: telemetryState.runtimeEnabled,
+        sentryConfigured,
+        sentryRuntimeEnabled: sentryConfigured && telemetryState.runtimeEnabled
     };
 }
 

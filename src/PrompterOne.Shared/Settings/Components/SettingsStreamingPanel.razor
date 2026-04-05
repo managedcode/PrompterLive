@@ -5,17 +5,17 @@
 @using PrompterOne.Shared.Settings.Models
 
 <div class="set-subsection">
-    <h4 class="set-sub-title">@SettingsStreamingText.ProgramCaptureTitle</h4>
+    <h4 class="set-sub-title">@Text(SettingsStreamingText.ProgramCaptureTitle)</h4>
     <div class="set-devices">
         <div class="set-field">
-            <label>@SettingsStreamingText.OutputResolutionLabel</label>
+            <label>@Text(SettingsStreamingText.OutputResolutionLabel)</label>
             <SettingsSelect Value="@ProgramCapture.ResolutionPreset.ToString()"
                            Options="@OutputResolutionOptions"
                            OnChange="OutputResolutionChanged"
                            TestId="@UiTestIds.Settings.StreamingOutputResolution" />
         </div>
         <div class="set-field">
-            <label>@SettingsStreamingText.BitrateLabel</label>
+            <label>@Text(SettingsStreamingText.BitrateLabel)</label>
             <input type="number"
                    class="set-input"
                    value="@ProgramCapture.BitrateKbps"
@@ -23,7 +23,7 @@
                    data-testid="@UiTestIds.Settings.StreamingBitrate" />
         </div>
         <div class="set-field set-field-toggle">
-            <label>@SettingsStreamingText.ShowTextOverlayLabel</label>
+            <label>@Text(SettingsStreamingText.ShowTextOverlayLabel)</label>
             <div class="set-toggle @(ProgramCapture.ShowTextOverlay ? OnCssClass : null)"
                  @onclick="ToggleTextOverlay"
                  data-testid="@UiTestIds.Settings.StreamingTextOverlay">
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="set-field set-field-toggle">
-            <label>@SettingsStreamingText.IncludeCameraInOutputLabel</label>
+            <label>@Text(SettingsStreamingText.IncludeCameraInOutputLabel)</label>
             <div class="set-toggle @(ProgramCapture.IncludeCameraInOutput ? OnCssClass : null)"
                  @onclick="ToggleIncludeCamera"
                  data-testid="@UiTestIds.Settings.StreamingIncludeCamera">
@@ -42,15 +42,15 @@
 </div>
 
 <div class="set-sub-header" style="margin-bottom:14px">
-    <h4 class="set-sub-title">@SettingsStreamingText.LocalRecordingTitle</h4>
+    <h4 class="set-sub-title">@Text(SettingsStreamingText.LocalRecordingTitle)</h4>
 </div>
 
 <div class="set-device-list">
     @foreach (var localTarget in LocalTargetCards)
     {
-        <SettingsStreamingTargetCard Title="@localTarget.Name"
-                                     Account="@localTarget.AccountLabel"
-                                     Description="@localTarget.Description"
+        <SettingsStreamingTargetCard Title="@Text(localTarget.NameKey)"
+                                     Account="@Text(localTarget.AccountLabelKey)"
+                                     Description="@Text(localTarget.DescriptionKey)"
                                      Summary="@BuildLocalSummary(localTarget.TargetId)"
                                      StatusLabel="@BuildLocalTargetStatusLabel(localTarget.TargetId)"
                                      StatusClass="@BuildLocalTargetStatusClass(localTarget.TargetId)"
@@ -62,7 +62,7 @@
                                      ToggleEnabled="@(() => ToggleLocalTargetAsync(localTarget.TargetId))"
                                      OnCardToggle="@(() => ToggleStreamingCardAsync(localTarget.CardId))">
             <div class="set-field set-field-toggle">
-                <label>@SettingsStreamingText.AvailableInProgramRoutingLabel</label>
+                <label>@Text(SettingsStreamingText.AvailableInProgramRoutingLabel)</label>
                 <span class="set-dest-status @(BuildLocalTargetIsReady(localTarget.TargetId) ? SelectedStatusClass : string.Empty)">
                     @BuildLocalSummary(localTarget.TargetId)
                 </span>
@@ -72,7 +72,7 @@
 </div>
 
 <div class="set-sub-header" style="margin:18px 0 14px">
-    <h4 class="set-sub-title">@SettingsStreamingText.TransportConnectionsTitle</h4>
+    <h4 class="set-sub-title">@Text(SettingsStreamingText.TransportConnectionsTitle)</h4>
     <button class="set-btn-outline set-btn-sm"
             type="button"
             data-testid="@UiTestIds.Settings.StreamingTransportAdd"
@@ -81,7 +81,7 @@
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        @SettingsStreamingText.AddTransportConnectionButtonLabel
+        @Text(SettingsStreamingText.AddTransportConnectionButtonLabel)
     </button>
 </div>
 
@@ -114,7 +114,7 @@
 </div>
 
 <div class="set-sub-header" style="margin:18px 0 14px">
-    <h4 class="set-sub-title">@SettingsStreamingText.DistributionTargetsTitle</h4>
+    <h4 class="set-sub-title">@Text(SettingsStreamingText.DistributionTargetsTitle)</h4>
     <button class="set-btn-outline set-btn-sm"
             type="button"
             data-testid="@UiTestIds.Settings.StreamingDistributionAdd"
@@ -123,7 +123,7 @@
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
-        @SettingsStreamingText.AddDistributionTargetButtonLabel
+        @Text(SettingsStreamingText.AddDistributionTargetButtonLabel)
     </button>
 </div>
 

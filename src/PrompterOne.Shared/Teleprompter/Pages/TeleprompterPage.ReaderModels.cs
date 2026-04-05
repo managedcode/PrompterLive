@@ -45,7 +45,6 @@ public partial class TeleprompterPage
         int DurationMs,
         int PauseAfterMs = 0,
         string? Style = null,
-        string? Title = null,
         string? PronunciationGuide = null,
         int? EffectiveWpm = null,
         IReadOnlyDictionary<string, object>? Attributes = null);

@@ -12,7 +12,6 @@ namespace PrompterOne.Shared.Components.Editor;
 
 public partial class EditorSourcePanel : IAsyncDisposable
 {
-    private const string DefaultPlaceholderText = "Start writing in TPS.";
     private const string FocusSelectionFailureMessage = "Editor selection focus interop failed during source panel update.";
     private const string InitializeSurfaceFailureMessage = "Editor surface interop failed during source panel initialization.";
     private const string RefreshSelectionFailureMessage = "Editor selection refresh interop failed during source panel update.";
@@ -78,6 +77,7 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     protected override void OnParametersSet()
     {
+        EnsureToolbarCatalogs();
         var textChanged = !string.Equals(Text, _lastRenderedText, StringComparison.Ordinal);
         var isLocalTextEcho = _hasPendingLocalInputText &&
                               textChanged &&
@@ -290,7 +290,7 @@ public partial class EditorSourcePanel : IAsyncDisposable
             SurfaceSyncFailureMessage);
     }
 
-    private static object CreateInitializationOptions() => new
+    private object CreateInitializationOptions() => new
     {
         browserHarnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
         cueContracts = SourceCueContracts,
@@ -306,11 +306,12 @@ public partial class EditorSourcePanel : IAsyncDisposable
         monacoLoaderPath = EditorMonacoRuntimeContract.MonacoLoaderPath,
         monacoStylesheetPath = EditorMonacoRuntimeContract.MonacoStylesheetPath,
         monacoVsPath = EditorMonacoRuntimeContract.MonacoVsPath,
-        placeholder = DefaultPlaceholderText,
+        placeholder = PlaceholderText,
         selectionChangedCallbackName = EditorMonacoInteropMethodNames.NotifySelectionChanged,
         sourceGutterTestId = UiTestIds.Editor.SourceGutter,
         sourceMinimapTestId = UiTestIds.Editor.SourceMinimap,
         supportedFileNameSuffixes = ScriptDocumentFileTypes.SupportedFileNameSuffixes,
+        tpsCatalog = EditorTpsCatalog.Current,
         textChangedCallbackName = EditorMonacoInteropMethodNames.NotifyTextChanged
     };
 

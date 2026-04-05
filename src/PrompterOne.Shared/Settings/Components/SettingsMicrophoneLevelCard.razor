@@ -2,7 +2,9 @@
 @namespace PrompterOne.Shared.Components
 @using System.Globalization
 @using Microsoft.JSInterop
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @inject Microsoft.Extensions.Logging.ILogger<SettingsMicrophoneLevelCard> Logger
 @inject MicrophoneLevelInterop MicrophoneLevelInterop
 
@@ -36,7 +38,7 @@
         else
         {
             <span class="live-status @(CanMonitor ? ReadyStatusCssClass : PendingStatusCssClass)">
-                @(CanMonitor ? ReadyStatusLabel : PendingStatusLabel)
+                @(CanMonitor ? Text(ReadyStatusLabelKey) : Text(PendingStatusLabelKey))
             </span>
         }
     </div>
@@ -76,18 +78,18 @@
 
 @code {
     private const string ActiveStateValue = "active";
-    private const string DefaultDescription = "Speak into the selected microphone to confirm the browser sees a live signal before recording or streaming.";
-    private const string DefaultTitle = "Microphone Activity";
+    private const string DefaultDescriptionKey = "SettingsMicrophoneMonitorDefaultDescription";
+    private const string DefaultTitleKey = "SettingsMicrophoneMonitorDefaultTitle";
     private const string IdleStateValue = "idle";
-    private const string NoMicrophoneDescription = "Pick a default microphone to see a live level meter here.";
-    private const string NoMicrophoneTitle = "No microphone selected";
+    private const string NoMicrophoneDescriptionKey = "SettingsMicrophoneMonitorNoMicrophoneDescription";
+    private const string NoMicrophoneTitleKey = "SettingsMicrophoneMonitorNoMicrophoneTitle";
     private const string PendingStatusCssClass = "pending";
-    private const string PendingStatusLabel = "Waiting";
-    private const string PermissionDescription = "Enable microphone access in Cameras first, then return here to confirm live input activity.";
-    private const string PermissionTitle = "Microphone access required";
-    private const string PreviewDescription = "Live browser input monitor";
+    private const string PendingStatusLabelKey = "SettingsMicrophoneMonitorPendingStatusLabel";
+    private const string PermissionDescriptionKey = "SettingsMicrophoneMonitorPermissionDescription";
+    private const string PermissionTitleKey = "SettingsMicrophoneMonitorPermissionTitle";
+    private const string PreviewDescriptionKey = "SettingsMicrophoneMonitorPreviewDescription";
     private const string ReadyStatusCssClass = "ready";
-    private const string ReadyStatusLabel = "Live level";
+    private const string ReadyStatusLabelKey = "SettingsMicrophoneMonitorReadyStatusLabel";
     private const string StartMonitorFailureMessage = "Failed to start Settings microphone monitor for device {DeviceId}.";
     private const string StopMonitorFailureMessage = "Failed to stop Settings microphone monitor.";
 
@@ -103,7 +105,7 @@
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    [Parameter] public string Description { get; set; } = DefaultDescription;
+    [Parameter] public string Description { get; set; } = string.Empty;
 
     [Parameter] public RenderFragment? HeaderAction { get; set; }
 
@@ -117,7 +119,7 @@
 
     [Parameter] public string? MonitorElementId { get; set; }
 
-    [Parameter] public string Title { get; set; } = DefaultTitle;
+    [Parameter] public string Title { get; set; } = string.Empty;
 
     private string CardCssClass =>
         IsEnabled ? "set-device-card active" : "set-device-card";
@@ -128,19 +130,19 @@
 
     private string EmptyDescription =>
         !AccessGranted
-            ? PermissionDescription
-            : NoMicrophoneDescription;
+            ? Text(PermissionDescriptionKey)
+            : Text(NoMicrophoneDescriptionKey);
 
     private string EmptyTitle =>
         !AccessGranted
-            ? PermissionTitle
-            : NoMicrophoneTitle;
+            ? Text(PermissionTitleKey)
+            : Text(NoMicrophoneTitleKey);
 
     private string MicrophoneLabel => MediaDeviceLabelSanitizer.Sanitize(Microphone?.Label);
 
     private string MonitorDescription =>
         CanRenderMonitor
-            ? string.IsNullOrWhiteSpace(MetaText) ? PreviewDescription : MetaText
+            ? string.IsNullOrWhiteSpace(MetaText) ? Text(PreviewDescriptionKey) : MetaText
             : EmptyDescription;
 
     private string MonitorFillStyle =>
@@ -247,4 +249,6 @@
             await ResetLevelAsync();
         }
     }
+
+    private string Text(string key) => Localizer[key];
 }

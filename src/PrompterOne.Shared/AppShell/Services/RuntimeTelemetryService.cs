@@ -31,7 +31,8 @@ public sealed class RuntimeTelemetryService(IJSRuntime jsRuntime, RuntimeTelemet
             {
                 clarityProjectId = _options.ClarityProjectId,
                 googleAnalyticsMeasurementId = _options.GoogleAnalyticsMeasurementId,
-                hostEnabled = _options.HostEnabled
+                hostEnabled = _options.HostEnabled,
+                sentryConfigured = _options.SentryConfigured
             });
     }
 

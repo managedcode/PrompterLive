@@ -1,9 +1,11 @@
+using ManagedCode.Tps;
 using PrompterOne.Core.Services.Rsvp;
 
 namespace PrompterOne.Core.Tests;
 
 public sealed class RsvpTextProcessorTimelineTests
 {
+    private const int PlainTextReadingDefaultSpeed = 250;
     private readonly RsvpTextProcessor _processor = new();
 
     [Fact]
@@ -25,6 +27,19 @@ public sealed class RsvpTextProcessorTimelineTests
         Assert.Equal(RsvpTextProcessorTimelineTestSource.FirstPhraseWord, firstPhrase.Words[0]);
         Assert.Equal(RsvpTextProcessorTimelineTestSource.SecondPhraseWord, secondPhrase.Words[0]);
         Assert.Equal(RsvpTextProcessorTimelineTestSource.ThirdPhraseWord, thirdPhrase.Words[0]);
+    }
+
+    [Fact]
+    public void ParseScript_PlainTextUsesSdkImplicitSegmentTitleAndReadingDefaultSpeed()
+    {
+        const string source = "Hello world.\nThis is still plain text.";
+
+        var processed = _processor.ParseScript(source);
+
+        var segment = Assert.Single(processed.Segments);
+        Assert.Equal(TpsSpec.DefaultImplicitSegmentName, segment.Title);
+        Assert.Equal(PlainTextReadingDefaultSpeed, segment.Speed);
+        Assert.Equal("Hello", processed.AllWords[0]);
     }
 }
 

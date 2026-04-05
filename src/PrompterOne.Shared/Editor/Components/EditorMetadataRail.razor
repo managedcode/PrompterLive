@@ -1,11 +1,14 @@
 @namespace PrompterOne.Shared.Components.Editor
 @using System.Globalization
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div class="ed-right" data-testid="@UiTestIds.Editor.MetadataRail" data-collapsed="@GetCollapsedAttributeValue()">
     <div class="ed-meta-header">
         @if (!IsCollapsed)
         {
-            <div class="ed-section-label ed-meta-header-label">METADATA</div>
+            <div class="ed-section-label ed-meta-header-label">@Text(UiTextKey.EditorMetadataSection)</div>
         }
 
         <button type="button"
@@ -27,7 +30,7 @@
          hidden="@IsCollapsed"
          aria-hidden="@IsCollapsed">
         <div class="ed-meta-field">
-            <label>Title</label>
+            <label>@Text(UiTextKey.CommonTitle)</label>
             <input type="text"
                    class="ed-meta-input"
                    value="@Title"
@@ -35,17 +38,17 @@
                    data-testid="@UiTestIds.Editor.Title" />
         </div>
         <div class="ed-meta-field">
-            <label>Profile</label>
+            <label>@Text(UiTextKey.CommonProfile)</label>
             <select class="ed-meta-select"
                     value="@Profile"
                     @onchange="OnProfileChange"
                     data-testid="@UiTestIds.Editor.Profile">
-                <option value="Actor">Actor</option>
-                <option value="RSVP">RSVP</option>
+                <option value="Actor">@Text(UiTextKey.CommonActor)</option>
+                <option value="RSVP">@Text(UiTextKey.CommonRsvp)</option>
             </select>
         </div>
         <div class="ed-meta-field">
-            <label>Base WPM</label>
+            <label>@Text(UiTextKey.CommonBaseWpm)</label>
             <input type="number"
                    class="ed-meta-input"
                    value="@BaseWpm"
@@ -55,7 +58,7 @@
                    data-testid="@UiTestIds.Editor.BaseWpm" />
         </div>
         <div class="ed-meta-field">
-            <label>Duration</label>
+            <label>@Text(UiTextKey.CommonDuration)</label>
             <input type="text"
                    class="ed-meta-input"
                    value="@Duration"
@@ -63,7 +66,7 @@
                    data-testid="@UiTestIds.Editor.Duration" />
         </div>
         <div class="ed-meta-field">
-            <label>Author</label>
+            <label>@Text(UiTextKey.CommonAuthor)</label>
             <input type="text"
                    class="ed-meta-input"
                    value="@Author"
@@ -71,7 +74,7 @@
                    data-testid="@UiTestIds.Editor.Author" />
         </div>
         <div class="ed-meta-field">
-            <label>Created</label>
+            <label>@Text(UiTextKey.CommonCreated)</label>
             <div class="ed-meta-date-wrap">
                 <input type="date"
                        class="ed-meta-input ed-meta-date-input"
@@ -89,7 +92,7 @@
             </div>
         </div>
         <div class="ed-meta-field">
-            <label>Version</label>
+            <label>@Text(UiTextKey.CommonVersion)</label>
             <input type="text"
                    class="ed-meta-input"
                    value="@Version"
@@ -97,9 +100,9 @@
                    data-testid="@UiTestIds.Editor.Version" />
         </div>
 
-        <div class="ed-section-label ed-meta-subsection">SPEED OFFSETS</div>
+        <div class="ed-section-label ed-meta-subsection">@Text(UiTextKey.EditorMetadataSpeedOffsetsSection)</div>
         <div class="ed-meta-field">
-            <label>xslow</label>
+            <label>@Text(UiTextKey.CommonXslow)</label>
             <div class="ed-meta-row">
                 <input type="number"
                        class="ed-meta-input ed-meta-num"
@@ -110,7 +113,7 @@
             </div>
         </div>
         <div class="ed-meta-field">
-            <label>slow</label>
+            <label>@Text(UiTextKey.CommonSlow)</label>
             <div class="ed-meta-row">
                 <input type="number"
                        class="ed-meta-input ed-meta-num"
@@ -121,7 +124,7 @@
             </div>
         </div>
         <div class="ed-meta-field">
-            <label>fast</label>
+            <label>@Text(UiTextKey.CommonFast)</label>
             <div class="ed-meta-row">
                 <input type="number"
                        class="ed-meta-input ed-meta-num"
@@ -132,7 +135,7 @@
             </div>
         </div>
         <div class="ed-meta-field">
-            <label>xfast</label>
+            <label>@Text(UiTextKey.CommonXfast)</label>
             <div class="ed-meta-row">
                 <input type="number"
                        class="ed-meta-input ed-meta-num"
@@ -143,11 +146,11 @@
             </div>
         </div>
 
-        <div class="ed-section-label ed-meta-subsection">STATS</div>
-        <div class="ed-stat"><span>Words</span><b>~@Status.WordCount</b></div>
-        <div class="ed-stat"><span>Est. Time</span><b>@Status.Duration</b></div>
-        <div class="ed-stat"><span>Segments</span><b>@Status.SegmentCount</b></div>
-        <div class="ed-stat"><span>Blocks</span><b>@Status.BlockCount</b></div>
+        <div class="ed-section-label ed-meta-subsection">@Text(UiTextKey.EditorMetadataStatsSection)</div>
+        <div class="ed-stat"><span>@Text(UiTextKey.CommonWords)</span><b>~@Status.WordCount</b></div>
+        <div class="ed-stat"><span>@Text(UiTextKey.CommonEstimatedTime)</span><b>@Status.Duration</b></div>
+        <div class="ed-stat"><span>@Text(UiTextKey.CommonSegments)</span><b>@Status.SegmentCount</b></div>
+        <div class="ed-stat"><span>@Text(UiTextKey.CommonBlocks)</span><b>@Status.BlockCount</b></div>
 
         <div class="ed-section-label ed-meta-subsection">@LocalFileSectionLabel</div>
         <div class="ed-stat" data-testid="@UiTestIds.Editor.LocalHistoryStatus"><span>@AutoSaveLabel</span><b>@GetAutoSaveStateLabel()</b></div>
@@ -243,22 +246,21 @@
 
     [Parameter] public EventCallback<int> XslowOffsetChanged { get; set; }
 
-    private const string AutoSaveLabel = "Auto-save";
-    private const string AutoSaveOffLabel = "Off";
-    private const string AutoSaveOnLabel = "On";
-    private const string EmptyHistoryLabel = "No browser-local history yet.";
-    private const string HistoryLabel = "History";
-    private const string MultipleRevisionsFormat = "{0} revisions";
-    private const string LastSavedFormat = "Last internal save {0}";
     private const string LastSavedTimestampFormat = "yyyy-MM-dd HH:mm:ss";
     private const string LeftChevronDirection = "left";
     private const string LeftChevronPoints = "15,18 9,12 15,6";
-    private const string LocalFileSectionLabel = "LOCAL FILE";
-    private const string LocalHistoryHintLabel = "Recent browser-local versions appear here after the first internal save.";
-    private const string OneRevisionLabel = "1 revision";
     private const string RightChevronDirection = "right";
     private const string RightChevronPoints = "9,18 15,12 9,6";
-    private const string RestoreLabel = "Restore";
+
+    private string AutoSaveLabel => Text(UiTextKey.EditorMetadataAutoSave);
+
+    private string EmptyHistoryLabel => Text(UiTextKey.EditorMetadataNoLocalHistory);
+
+    private string HistoryLabel => Text(UiTextKey.CommonHistory);
+
+    private string LocalFileSectionLabel => Text(UiTextKey.EditorMetadataLocalFileSection);
+
+    private string RestoreLabel => Text(UiTextKey.CommonRestore);
 
     private Task OnAuthorChange(ChangeEventArgs args) =>
         AuthorChanged.InvokeAsync(args.Value?.ToString() ?? string.Empty);
@@ -303,27 +305,31 @@
 
     private string GetToggleChevronPoints() => IsCollapsed ? LeftChevronPoints : RightChevronPoints;
 
-    private string GetAutoSaveStateLabel() => AutoSaveEnabled ? AutoSaveOnLabel : AutoSaveOffLabel;
+    private string GetAutoSaveStateLabel() => AutoSaveEnabled ? Text(UiTextKey.CommonOn) : Text(UiTextKey.CommonOff);
 
     private string GetHistoryCountLabel()
     {
         var count = LocalHistory.Count;
         return count == 1
-            ? OneRevisionLabel
-            : string.Format(CultureInfo.InvariantCulture, MultipleRevisionsFormat, count);
+            ? Text(UiTextKey.EditorMetadataOneRevision)
+            : Format(UiTextKey.EditorMetadataMultipleRevisionsFormat, count);
     }
 
     private string GetLocalFileNote()
     {
         if (LastLocalSaveAt is null)
         {
-            return LocalHistoryHintLabel;
+            return Text(UiTextKey.EditorMetadataHistoryHint);
         }
 
         var timestamp = LastLocalSaveAt.Value.LocalDateTime.ToString(LastSavedTimestampFormat, CultureInfo.InvariantCulture);
-        return string.Format(CultureInfo.InvariantCulture, LastSavedFormat, timestamp);
+        return Format(UiTextKey.EditorMetadataLastInternalSaveFormat, timestamp);
     }
 
     private static int ParseInt(string? value, int fallback) =>
         int.TryParse(value, out var parsed) ? parsed : fallback;
+
+    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

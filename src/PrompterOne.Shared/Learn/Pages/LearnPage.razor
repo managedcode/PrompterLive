@@ -1,5 +1,6 @@
 @page "/learn"
 @namespace PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
 
 <HeadContent>
@@ -70,7 +71,7 @@
             </div>
 
             <div class="rsvp-phrase">
-                <span class="rsvp-phrase-label">Next</span>
+                <span class="rsvp-phrase-label">@Text(UiTextKey.LearnNext)</span>
                 <p id="@UiDomIds.Learn.NextPhrase" data-testid="@UiTestIds.Learn.NextPhrase">@_nextPhrase</p>
             </div>
 
@@ -81,42 +82,77 @@
 
         <div class="rsvp-bottom">
             <div class="rsvp-speed">
-                <button class="rsvp-btn" @onclick="DecreaseRsvpSpeedAsync" data-testid="@UiTestIds.Learn.SpeedDown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
-                <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed" data-testid="@UiTestIds.Learn.SpeedValue" data-test-id="@UiTestIds.Learn.SpeedValue">@_speed</span><small>WPM</small></div>
-                <button class="rsvp-btn" @onclick="IncreaseRsvpSpeedAsync" data-testid="@UiTestIds.Learn.SpeedUp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                <TooltipAnchor OwnerTestId="@UiTestIds.Learn.SpeedDown" Text="@DecreaseSpeedTooltip">
+                    <button class="rsvp-btn"
+                            @onclick="DecreaseRsvpSpeedAsync"
+                            aria-label="@DecreaseSpeedTooltip"
+                            data-testid="@UiTestIds.Learn.SpeedDown"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                </TooltipAnchor>
+                <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed" data-testid="@UiTestIds.Learn.SpeedValue" data-test-id="@UiTestIds.Learn.SpeedValue">@_speed</span><small>@Text(UiTextKey.CommonWpm)</small></div>
+                <TooltipAnchor OwnerTestId="@UiTestIds.Learn.SpeedUp" Text="@IncreaseSpeedTooltip">
+                    <button class="rsvp-btn"
+                            @onclick="IncreaseRsvpSpeedAsync"
+                            aria-label="@IncreaseSpeedTooltip"
+                            data-testid="@UiTestIds.Learn.SpeedUp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></button>
+                </TooltipAnchor>
             </div>
             <div class="rsvp-play-band">
                 <div class="rsvp-play-side-slot" aria-hidden="true"></div>
                 <div class="rsvp-play-row">
-                    <button class="rsvp-btn" @onclick="StepRsvpBackwardLargeAsync" title="Back 5 words" data-testid="@UiTestIds.Learn.StepBackwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
-                    <button class="rsvp-btn rsvp-btn-sm" @onclick="StepRsvpBackwardAsync" title="Back 1 word" data-testid="@UiTestIds.Learn.StepBackward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
-                    <button class="rsvp-play"
-                            id="rsvp-play-btn"
-                            @onclick="ToggleRsvpPlaybackAsync"
-                            aria-pressed="@(_isPlaying ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
-                            data-testid="@UiTestIds.Learn.PlayToggle">
-                        <span data-toggle-icon="play" hidden="@_isPlaying">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
-                        </span>
-                        <span data-toggle-icon="pause" hidden="@(!_isPlaying)">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-                        </span>
-                    </button>
-                    <button class="rsvp-btn rsvp-btn-sm" @onclick="StepRsvpForwardAsync" title="Forward 1 word" data-testid="@UiTestIds.Learn.StepForward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
-                    <button class="rsvp-btn" @onclick="StepRsvpForwardLargeAsync" title="Forward 5 words" data-testid="@UiTestIds.Learn.StepForwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepBackwardLarge" Text="@BackFiveWordsTooltip">
+                        <button class="rsvp-btn"
+                                @onclick="StepRsvpBackwardLargeAsync"
+                                aria-label="@BackFiveWordsTooltip"
+                                data-testid="@UiTestIds.Learn.StepBackwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19,20 9,12 19,4" /><line x1="5" y1="19" x2="5" y2="5" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepBackward" Text="@BackOneWordTooltip">
+                        <button class="rsvp-btn rsvp-btn-sm"
+                                @onclick="StepRsvpBackwardAsync"
+                                aria-label="@BackOneWordTooltip"
+                                data-testid="@UiTestIds.Learn.StepBackward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.PlayToggle" Text="@PlayToggleTooltip">
+                        <button class="rsvp-play"
+                                id="rsvp-play-btn"
+                                @onclick="ToggleRsvpPlaybackAsync"
+                                aria-label="@PlayToggleTooltip"
+                                aria-pressed="@(_isPlaying ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
+                                data-testid="@UiTestIds.Learn.PlayToggle">
+                            <span data-toggle-icon="play" hidden="@_isPlaying">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
+                            </span>
+                            <span data-toggle-icon="pause" hidden="@(!_isPlaying)">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                            </span>
+                        </button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepForward" Text="@ForwardOneWordTooltip">
+                        <button class="rsvp-btn rsvp-btn-sm"
+                                @onclick="StepRsvpForwardAsync"
+                                aria-label="@ForwardOneWordTooltip"
+                                data-testid="@UiTestIds.Learn.StepForward"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,6 15,12 9,18" /></svg></button>
+                    </TooltipAnchor>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepForwardLarge" Text="@ForwardFiveWordsTooltip">
+                        <button class="rsvp-btn"
+                                @onclick="StepRsvpForwardLargeAsync"
+                                aria-label="@ForwardFiveWordsTooltip"
+                                data-testid="@UiTestIds.Learn.StepForwardLarge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,4 15,12 5,20" /><line x1="19" y1="5" x2="19" y2="19" /></svg></button>
+                    </TooltipAnchor>
                 </div>
-                <button class="@LoopToggleButtonCssClass"
-                        @onclick="ToggleLoopPlaybackAsync"
-                        title="@LoopToggleButtonTitle"
-                        aria-pressed="@(_isLoopEnabled ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
-                        data-testid="@UiTestIds.Learn.LoopToggle">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 1l4 4-4 4" />
-                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                        <path d="M7 23l-4-4 4-4" />
-                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                    </svg>
-                </button>
+                <TooltipAnchor OwnerTestId="@UiTestIds.Learn.LoopToggle" Text="@LoopToggleButtonTitle">
+                    <button class="@LoopToggleButtonCssClass"
+                            @onclick="ToggleLoopPlaybackAsync"
+                            aria-label="@LoopToggleButtonTitle"
+                            aria-pressed="@(_isLoopEnabled ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
+                            data-testid="@UiTestIds.Learn.LoopToggle">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 1l4 4-4 4" />
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                            <path d="M7 23l-4-4 4-4" />
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                        </svg>
+                    </button>
+                </TooltipAnchor>
             </div>
             <div class="rsvp-pos"
                  id="@UiDomIds.Learn.ProgressLabel"

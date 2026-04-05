@@ -12,8 +12,8 @@
     <p class="set-section-desc">@Text(UiTextKey.SettingsRecordingSectionDescription)</p>
 
     <div class="set-device-list">
-        <SettingsExpandableCard Title="General"
-                                Subtitle="Folder · File naming · Auto-record"
+        <SettingsExpandableCard Title="@Text(UiTextKey.SettingsRecordingGeneralTitle)"
+                                Subtitle="@Text(UiTextKey.SettingsRecordingGeneralSubtitle)"
                                 IconStyle="background:rgba(196,160,96,.10); color:var(--gold);"
                                 IsOpen="@IsCardOpen(GeneralCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(GeneralCardId))">
@@ -22,7 +22,7 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field set-field-toggle">
-                    <label>Auto-record when streaming</label>
+                    <label>@Text(UiTextKey.SettingsRecordingAutoRecordWhenStreaming)</label>
                     <div class="set-toggle @(AutoRecordWhenStreaming ? "on" : null)"
                          data-testid="@UiTestIds.Settings.RecordingAutoRecord"
                          @onclick="ToggleAutoRecordWhenStreaming"
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Split recording every hour</label>
+                    <label>@Text(UiTextKey.SettingsRecordingSplitHourly)</label>
                     <div class="set-toggle @(SplitRecordingHourly ? "on" : null)"
                          data-testid="@UiTestIds.Settings.RecordingSplit"
                          @onclick="ToggleSplitRecordingHourly"
@@ -40,14 +40,14 @@
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>Recording Folder</label>
+                    <label>@Text(UiTextKey.SettingsRecordingFolder)</label>
                     <div class="set-path-field">
                         <input type="text" class="set-input" value="@RecordingFolder" readonly />
-                        <button class="set-btn-outline set-btn-sm" type="button">Browse</button>
+                        <button class="set-btn-outline set-btn-sm" type="button">@Text(UiTextKey.SettingsRecordingBrowse)</button>
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>File Naming</label>
+                    <label>@Text(UiTextKey.SettingsRecordingFileNaming)</label>
                     <SettingsSelect Value="@RecordingNamingPattern"
                                    Options="@NamingPatternOptions"
                                    OnChange="OnNamingChanged" />
@@ -55,8 +55,8 @@
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Video"
-                                Subtitle="@($"{RecordingVideoCodec} · {RecordingVideoResolution} · {RecordingVideoFrameRate} · {RecordingVideoBitrateKbps} kbps")"
+        <SettingsExpandableCard Title="@Text(UiTextKey.CommonVideo)"
+                                Subtitle="@Format(UiTextKey.SettingsRecordingVideoSubtitleFormat, RecordingVideoCodec, RecordingVideoResolution, RecordingVideoFrameRate, RecordingVideoBitrateKbps)"
                                 IconStyle="background:rgba(59,130,246,.10); color:#60A5FA;"
                                 IsOpen="@IsCardOpen(VideoCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(VideoCardId))">
@@ -67,32 +67,32 @@
             <div class="set-device-fields">
                 <div class="set-rec-grid">
                     <div class="set-field">
-                        <label>Container</label>
+                        <label>@Text(UiTextKey.CommonContainer)</label>
                         <SettingsSelect Value="@RecordingContainer"
                                        Options="@ContainerOptions"
                                        OnChange="OnContainerChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Codec</label>
+                        <label>@Text(UiTextKey.CommonCodec)</label>
                         <SettingsSelect Value="@RecordingVideoCodec"
                                        Options="@VideoCodecOptions"
                                        OnChange="OnVideoCodecChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Resolution</label>
+                        <label>@Text(UiTextKey.CommonResolution)</label>
                         <SettingsSelect Value="@RecordingVideoResolution"
                                        Options="@VideoResolutionOptions"
                                        OnChange="OnVideoResolutionChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Frame Rate</label>
+                        <label>@Text(UiTextKey.CommonFrameRate)</label>
                         <SettingsSelect Value="@RecordingVideoFrameRate"
                                        Options="@VideoFrameRateOptions"
                                        OnChange="OnVideoFrameRateChanged" />
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>Bitrate (kbps)</label>
+                    <label>@Text(UiTextKey.SettingsRecordingBitrateKbps)</label>
                     <input type="number"
                            class="set-input"
                            value="@RecordingVideoBitrateKbps"
@@ -102,8 +102,8 @@
             </div>
         </SettingsExpandableCard>
 
-        <SettingsExpandableCard Title="Audio"
-                                Subtitle="@($"{RecordingAudioCodec} · {RecordingAudioSampleRate} · {RecordingAudioBitrateKbps} kbps · {RecordingAudioChannels}")"
+        <SettingsExpandableCard Title="@Text(UiTextKey.CommonAudio)"
+                                Subtitle="@Format(UiTextKey.SettingsRecordingAudioSubtitleFormat, RecordingAudioCodec, RecordingAudioSampleRate, RecordingAudioBitrateKbps, RecordingAudioChannels)"
                                 IconStyle="background:rgba(16,185,129,.10); color:#34D399;"
                                 IsOpen="@IsCardOpen(AudioCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(AudioCardId))">
@@ -115,19 +115,19 @@
             <div class="set-device-fields">
                 <div class="set-rec-grid">
                     <div class="set-field">
-                        <label>Codec</label>
+                        <label>@Text(UiTextKey.CommonCodec)</label>
                         <SettingsSelect Value="@RecordingAudioCodec"
                                        Options="@AudioCodecOptions"
                                        OnChange="OnAudioCodecChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Sample Rate</label>
+                        <label>@Text(UiTextKey.CommonSampleRate)</label>
                         <SettingsSelect Value="@RecordingAudioSampleRate"
                                        Options="@AudioSampleRateOptions"
                                        OnChange="OnSampleRateChanged" />
                     </div>
                     <div class="set-field">
-                        <label>Bitrate (kbps)</label>
+                        <label>@Text(UiTextKey.SettingsRecordingBitrateKbps)</label>
                         <input type="number"
                                class="set-input"
                                value="@RecordingAudioBitrateKbps"
@@ -135,7 +135,7 @@
                                @oninput="UpdateAudioBitrate" />
                     </div>
                     <div class="set-field">
-                        <label>Channels</label>
+                        <label>@Text(UiTextKey.CommonChannels)</label>
                         <SettingsSelect Value="@RecordingAudioChannels"
                                        Options="@AudioChannelsOptions"
                                        OnChange="OnAudioChannelsChanged" />
@@ -147,6 +147,7 @@
 </section>
 
 @code {
+    private string Format(UiTextKey key, params object[] arguments) => Localizer[key.ToString(), arguments];
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }
 
@@ -181,13 +182,6 @@
         new("WebM", "WebM"),
     ];
 
-    private static readonly IReadOnlyList<SettingsSelectOption> NamingPatternOptions =
-    [
-        new("Script Name + Date", "Script Name + Date"),
-        new("Date + Time", "Date + Time"),
-        new("Custom Prefix", "Custom Prefix"),
-    ];
-
     private static readonly IReadOnlyList<SettingsSelectOption> VideoCodecOptions =
     [
         new("H.264 (AVC)", "H.264 (AVC)"),
@@ -198,25 +192,32 @@
         new("AV1", "AV1"),
     ];
 
-    private static readonly IReadOnlyList<SettingsSelectOption> VideoFrameRateOptions =
+    private const string AudioCardId = "recording-audio";
+    private const string GeneralCardId = "recording-general";
+    private const string VideoCardId = "recording-video";
+
+    private IReadOnlyList<SettingsSelectOption> NamingPatternOptions =>
+    [
+        new("Script Name + Date", "Script Name + Date"),
+        new("Date + Time", "Date + Time"),
+        new("Custom Prefix", "Custom Prefix"),
+    ];
+
+    private IReadOnlyList<SettingsSelectOption> VideoFrameRateOptions =>
     [
         new("30 fps", "30 fps"),
         new("60 fps", "60 fps"),
         new("24 fps", "24 fps"),
-        new("Same as source", "Same as source"),
+        new(Text(UiTextKey.SettingsRecordingSameAsSource), Text(UiTextKey.SettingsRecordingSameAsSource)),
     ];
 
-    private static readonly IReadOnlyList<SettingsSelectOption> VideoResolutionOptions =
+    private IReadOnlyList<SettingsSelectOption> VideoResolutionOptions =>
     [
-        new("Same as source", "Same as source"),
+        new(Text(UiTextKey.SettingsRecordingSameAsSource), Text(UiTextKey.SettingsRecordingSameAsSource)),
         new("3840 \u00d7 2160 (4K)", "3840 \u00d7 2160 (4K)"),
         new("1920 \u00d7 1080 (FHD)", "1920 \u00d7 1080 (FHD)"),
         new("1280 \u00d7 720 (HD)", "1280 \u00d7 720 (HD)"),
     ];
-
-    private const string AudioCardId = "recording-audio";
-    private const string GeneralCardId = "recording-general";
-    private const string VideoCardId = "recording-video";
 
     [Parameter] public bool AutoRecordWhenStreaming { get; set; }
 

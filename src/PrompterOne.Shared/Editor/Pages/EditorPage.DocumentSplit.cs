@@ -3,6 +3,7 @@ using PrompterOne.Core.Models.Editor;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Shared.Pages;
@@ -13,12 +14,6 @@ public partial class EditorPage
     private const string SplitDocumentNameExtension = ".tps";
     private const string SplitDocumentNameSeparator = "-";
     private const string SplitDocumentNameToken = "split";
-    private const string SplitFeedbackActionLabel = "Open In Library";
-    private const string SplitFeedbackSavedToLibraryMessage = "New scripts were added to Library. Open them there when you are ready.";
-    private const string SplitFeedbackSavedToSiblingFolderMessage = "New scripts were added next to this draft in the same Library folder.";
-    private const string SplitFeedbackSavedToSiblingMessage = "New scripts were added next to this draft in Library.";
-    private const string SplitFeedbackDraftRemainsOpenMessage = "This draft stayed open here so you can keep editing.";
-    private const string SplitFeedbackTitle = "Split complete";
     private const int MinimumSplitDocumentCount = 2;
 
     private Task OnSplitRequestedAsync(TpsDocumentSplitMode mode)
@@ -92,7 +87,7 @@ public partial class EditorPage
                + SplitDocumentNameExtension;
     }
 
-    private static EditorSplitFeedbackViewModel BuildSplitFeedback(
+    private EditorSplitFeedbackViewModel BuildSplitFeedback(
         IReadOnlyList<TpsDocumentSplitDocument> splitDocuments,
         StoredScriptDocument? sourceDocument,
         TpsDocumentSplitMode mode)
@@ -105,41 +100,44 @@ public partial class EditorPage
 
         return new EditorSplitFeedbackViewModel(
             Title: SplitFeedbackTitle,
-            Summary: BuildSplitSummary(splitDocuments.Count, mode),
+            Summary: BuildSplitSummary(splitDocuments.Count),
             HeadingBadge: BuildSplitHeadingBadge(mode),
             DestinationNote: BuildSplitDestinationNote(sourceDocument),
-            DraftNote: SplitFeedbackDraftRemainsOpenMessage,
-            OpenLibraryLabel: SplitFeedbackActionLabel,
+            DraftNote: Text(UiTextKey.EditorSplitDraftStayedOpen),
+            OpenLibraryLabel: Text(UiTextKey.CommonOpenInLibrary),
             CreatedTitles: previewTitles,
             AdditionalCount: additionalCount);
     }
 
-    private static string ResolveSplitRequirementDetail(TpsDocumentSplitMode mode) =>
+    private string ResolveSplitRequirementDetail(TpsDocumentSplitMode mode) =>
         mode == TpsDocumentSplitMode.TopLevelHeading
-            ? "Need at least two # headings to split this draft."
-            : "Need at least two ## headings to split this draft.";
+            ? Text(UiTextKey.EditorSplitNeedTopLevelHeadings)
+            : Text(UiTextKey.EditorSplitNeedSegmentHeadings);
 
-    private static string BuildSplitDestinationNote(StoredScriptDocument? sourceDocument)
+    private string BuildSplitDestinationNote(StoredScriptDocument? sourceDocument)
     {
         if (sourceDocument is null)
         {
-            return SplitFeedbackSavedToLibraryMessage;
+            return Text(UiTextKey.EditorSplitSavedToLibrary);
         }
 
         return string.IsNullOrWhiteSpace(sourceDocument.FolderId)
-            ? SplitFeedbackSavedToSiblingMessage
-            : SplitFeedbackSavedToSiblingFolderMessage;
+            ? Text(UiTextKey.EditorSplitSavedToSibling)
+            : Text(UiTextKey.EditorSplitSavedToSiblingFolder);
     }
 
-    private static string BuildSplitHeadingBadge(TpsDocumentSplitMode mode) =>
-        $"{ResolveHeadingLabel(mode)} headings";
+    private string BuildSplitHeadingBadge(TpsDocumentSplitMode mode) =>
+        Format(UiTextKey.EditorSplitHeadingBadgeFormat, ResolveHeadingLabel(mode));
 
-    private static string BuildSplitSummary(int count, TpsDocumentSplitMode mode)
-    {
-        var noun = count == 1 ? "script" : "scripts";
-        return $"{count} new {noun} created.";
-    }
+    private string BuildSplitSummary(int count) =>
+        Format(UiTextKey.EditorSplitSummaryFormat, count);
 
     private static string ResolveHeadingLabel(TpsDocumentSplitMode mode) =>
         mode == TpsDocumentSplitMode.TopLevelHeading ? "#" : "##";
+
+    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+
+    private string SplitFeedbackTitle => Text(UiTextKey.EditorSplitCompleteTitle);
 }

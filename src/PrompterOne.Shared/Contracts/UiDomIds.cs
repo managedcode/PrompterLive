@@ -2,6 +2,11 @@ namespace PrompterOne.Shared.Contracts;
 
 public static class UiDomIds
 {
+    public static class Tooltip
+    {
+        public static string Surface(string ownerDomId) => $"{ownerDomId}-tooltip";
+    }
+
     public static class AppShell
     {
         public const string LibraryOpenScriptInput = "app-shell-library-open-script-input";

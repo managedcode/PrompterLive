@@ -32,7 +32,7 @@ public partial class GoLivePage
     {
         await Diagnostics.RunAsync(
             GoLiveText.Load.LoadOperation,
-            GoLiveText.Load.LoadMessage,
+            Text(GoLiveText.Load.LoadMessage),
             async () =>
             {
                 await Bootstrapper.EnsureReadyAsync();
@@ -155,17 +155,17 @@ public partial class GoLivePage
         _sessionTitle = SessionService.State.Title;
         _sessionSubtitle = SessionService.State.PreviewSegments.Count > 0
             ? SessionService.State.PreviewSegments[0].Title
-            : GoLiveText.Chrome.StreamingSubtitle;
+            : Text(GoLiveText.Chrome.StreamingSubtitle);
         SyncGoLiveSessionState();
         EnsureStudioSurfaceState();
-        Shell.ShowGoLive(SessionService.State.ScriptId);
+        Shell.ShowGoLive(ScreenTitle, _sessionSubtitle, SessionService.State.ScriptId);
     }
 
     private async Task PersistSceneAsync()
     {
         await Diagnostics.RunAsync(
             GoLiveText.Load.SaveSceneOperation,
-            GoLiveText.Load.SaveSceneMessage,
+            Text(GoLiveText.Load.SaveSceneMessage),
             () => SettingsStore.SaveAsync(BrowserAppSettingsKeys.SceneSettings, MediaSceneService.State));
         SyncGoLiveSessionState();
     }
@@ -174,7 +174,7 @@ public partial class GoLivePage
     {
         await Diagnostics.RunAsync(
             GoLiveText.Load.SaveStudioOperation,
-            GoLiveText.Load.SaveStudioMessage,
+            Text(GoLiveText.Load.SaveStudioMessage),
             () => StudioSettingsStore.SaveAsync(_studioSettings));
         SyncGoLiveSessionState();
     }

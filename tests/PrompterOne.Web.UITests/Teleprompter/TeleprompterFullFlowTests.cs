@@ -77,7 +77,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
 
             Assert.Contains("tps-slow", slowWord.Classes, StringComparison.Ordinal);
             Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm, slowWord.EffectiveWpm);
-            Assert.Contains(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm, slowWord.Title, StringComparison.Ordinal);
+            Assert.Equal(string.Empty, slowWord.Title);
 
             Assert.Equal(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsNormalWpm, normalWord.EffectiveWpm);
             Assert.DoesNotContain("tps-slow", normalWord.Classes, StringComparison.Ordinal);
@@ -139,17 +139,11 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture) : IC
         Assert.DoesNotContain("tps-energetic", teleprompterWord.Classes, StringComparison.Ordinal);
 
         Assert.Equal(BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionPronunciation, visionWord.Pronunciation);
-        Assert.Contains(
-            BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionPronunciation,
-            visionWord.Title,
-            StringComparison.Ordinal);
+        Assert.Equal(string.Empty, visionWord.Title);
 
         Assert.Equal(BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterPronunciation, teleprompterWord.Pronunciation);
         Assert.Equal(BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWpm, teleprompterWord.EffectiveWpm);
-        Assert.Contains(
-            BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWpm,
-            teleprompterWord.Title,
-            StringComparison.Ordinal);
+        Assert.Equal(string.Empty, teleprompterWord.Title);
 
         Assert.True(ParseMilliseconds(slowWord.DurationMs) > ParseMilliseconds(fastWord.DurationMs));
         Assert.NotEqual(neutralWord.Color, professionalWord.Color);

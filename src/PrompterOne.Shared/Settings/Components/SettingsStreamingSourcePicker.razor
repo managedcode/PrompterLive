@@ -1,10 +1,15 @@
 @namespace PrompterOne.Shared.Components.Settings
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
+@using PrompterOne.Shared.Settings.Models
+@inject IStringLocalizer<SharedResource> Localizer
 
 <section class="live-destination-sources"
          data-testid="@UiTestIds.Settings.StreamingProviderSourcePicker(TargetId)">
     <div class="live-destination-sources-header">
-        <span class="set-section-label">@SectionLabel</span>
+        <span class="set-section-label">@Text(SettingsStreamingText.SourcePickerSectionLabel)</span>
         <span class="live-status @(SelectedCount > 0 ? ReadyCssClass : PendingCssClass)"
               data-testid="@UiTestIds.Settings.StreamingProviderSourceSummary(TargetId)">
             @SourceSummary
@@ -15,7 +20,7 @@
     {
         <div class="set-empty-card live-destination-sources-empty"
              data-testid="@UiTestIds.Settings.StreamingSourcePickerEmpty">
-            @EmptyStateMessage
+            @Text(SettingsStreamingText.SourcePickerEmptyStateMessage)
         </div>
     }
     else
@@ -29,7 +34,7 @@
                         data-testid="@UiTestIds.Settings.StreamingProviderSourceToggle(TargetId, source.SourceId)"
                         @onclick="() => ToggleSource.InvokeAsync(source.SourceId)">
                     <span class="live-destination-source-name">@FormatSourceLabel(source)</span>
-                    <span class="live-destination-source-state">@(isSelected ? SelectedLabel : AvailableLabel)</span>
+                    <span class="live-destination-source-state">@(isSelected ? Text(SettingsStreamingText.SourcePickerSelectedLabel) : Text(SettingsStreamingText.SourcePickerAvailableLabel))</span>
                 </button>
             }
         </div>
@@ -37,16 +42,9 @@
 </section>
 
 @code {
-    private const string AvailableLabel = "Available";
-    private const string CameraPluralLabel = "cameras selected";
-    private const string CameraSingularLabel = "camera selected";
     private const string ChipEnabledCssClass = "on";
-    private const string EmptyStateMessage = "No scene cameras are available for this destination yet.";
-    private const string NoSourceLabel = "No cameras selected";
     private const string PendingCssClass = "pending";
     private const string ReadyCssClass = "ready";
-    private const string SectionLabel = "DESTINATION SOURCES";
-    private const string SelectedLabel = "Selected";
 
     [Parameter] public IReadOnlyList<SceneCameraSource> Sources { get; set; } = [];
     [Parameter] public IReadOnlyList<string> SelectedSourceIds { get; set; } = [];
@@ -61,8 +59,13 @@
     private string SourceSummary =>
         SelectedCount switch
         {
-            0 => NoSourceLabel,
-            1 => string.Concat(SelectedCount.ToString(System.Globalization.CultureInfo.InvariantCulture), " ", CameraSingularLabel),
-            _ => string.Concat(SelectedCount.ToString(System.Globalization.CultureInfo.InvariantCulture), " ", CameraPluralLabel)
+            0 => Text(SettingsStreamingText.SourcePickerNoCamerasSelectedLabel),
+            1 => Format(SettingsStreamingText.SourcePickerSingleCameraSelectedFormat, SelectedCount),
+            _ => Format(SettingsStreamingText.SourcePickerMultipleCamerasSelectedFormat, SelectedCount)
         };
+
+    private string Format(string key, params object[] arguments) =>
+        string.Format(CultureInfo.CurrentCulture, Text(key), arguments);
+
+    private string Text(string key) => Localizer[key];
 }

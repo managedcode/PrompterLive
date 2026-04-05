@@ -40,6 +40,9 @@ internal static partial class BrowserTestConstants
         public const string ToolbarTooltipScenario = "editor-toolbar-tooltips";
         public const string ToolbarTooltipDelayStep = "01-delayed-toolbar-tooltip";
         public const string ToolbarTooltipDropdownStep = "02-dropdown-tooltip-gap";
+        public const string ToolbarTooltipViewportStep = "03-toolbar-tooltip-in-viewport";
+        public const string EmotionTooltipText = "TPS emotions";
+        public const string MotivationalEmotionTooltipText = "Motivational emotion";
         public const string ToolbarSemanticScenario = "editor-toolbar-semantic-icons";
         public const string ToolbarSemanticStep = "02-refined-floating-toolbar";
         public const string ToolbarSurfaceScenario = "editor-toolbar-surface-rhythm";
@@ -63,6 +66,31 @@ internal static partial class BrowserTestConstants
         public const double MinimumVisibleTooltipOpacity = 0.9;
         public const double MaximumTooltipMenuOverlapPx = 0.5;
         public const double ToolbarOverflowTolerancePx = 2;
+    }
+
+    public static class TooltipAuditFlow
+    {
+        public const string LibraryFolderScenario = "tooltip-surface-library-folder";
+        public const string LibraryCardMenuScenario = "tooltip-surface-library-card-menu";
+        public const string LibraryFolderStep = "01-folder-create";
+        public const string LibraryCardMenuStep = "02-card-menu";
+        public const string LearnScenario = "tooltip-surface-learn";
+        public const string LearnPlayStep = "01-play-toggle";
+        public const string TeleprompterScenario = "tooltip-surface-teleprompter";
+        public const string TeleprompterPlayStep = "01-play-toggle";
+        public const string SettingsScenario = "tooltip-surface-settings";
+        public const string SettingsAccentStep = "01-accent-swatch";
+        public const string PlacementLeft = "left";
+        public const string PlacementTop = "top";
+        public const string TextTransformNone = "none";
+        public const string CreateFolderTooltipText = "Create folder";
+        public const string MoreScriptActionsTooltipText = "More script actions";
+        public const string PlayPlaybackTooltipText = "Start playback";
+        public const string GoldAccentTooltipText = "Gold accent";
+        public const int SharedTooltipSettleDelayMs = 560;
+        public const double MinimumBorderAlpha = 0.28;
+        public const double MinimumVisibleOpacity = 0.7;
+        public const double MaximumOverlapPx = 0.5;
     }
 
     public static class SettingsFlow

@@ -1,6 +1,7 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using Microsoft.AspNetCore.Components
 @using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
@@ -54,12 +55,16 @@
                     <div class="set-accent-options">
                         @foreach (var accent in AccentOptions)
                         {
-                            <button class="@(accent.Value == AccentColor ? "set-accent-swatch active" : "set-accent-swatch")"
-                                    style="@($"background:{accent.Value}")"
-                                    title="@accent.Label"
-                                    type="button"
-                                    @onclick="() => UpdateAccentColor.InvokeAsync(accent.Value)"
-                                    @onclick:stopPropagation="true"></button>
+                            <TooltipAnchor OwnerTestId="@UiTestIds.Settings.AccentSwatch(accent.Id)"
+                                           Text="@Text(accent.TooltipKey)">
+                                <button class="@(accent.Value == AccentColor ? "set-accent-swatch active" : "set-accent-swatch")"
+                                        style="@($"background:{accent.Value}")"
+                                        type="button"
+                                        aria-label="@Text(accent.TooltipKey)"
+                                        data-testid="@UiTestIds.Settings.AccentSwatch(accent.Id)"
+                                        @onclick="() => UpdateAccentColor.InvokeAsync(accent.Value)"
+                                        @onclick:stopPropagation="true"></button>
+                            </TooltipAnchor>
                         }
                     </div>
                 </div>
@@ -107,12 +112,16 @@
                     <div class="set-accent-options">
                         @foreach (var swatch in TextColorOptions)
                         {
-                            <button class="@(swatch.Value == TeleprompterTextColor ? "set-accent-swatch active" : "set-accent-swatch")"
-                                    style="@($"background:{swatch.Value}")"
-                                    title="@swatch.Label"
-                                    type="button"
-                                    @onclick="() => UpdateTeleprompterTextColor.InvokeAsync(swatch.Value)"
-                                    @onclick:stopPropagation="true"></button>
+                            <TooltipAnchor OwnerTestId="@UiTestIds.Settings.TextColorSwatch(swatch.Id)"
+                                           Text="@Text(swatch.TooltipKey)">
+                                <button class="@(swatch.Value == TeleprompterTextColor ? "set-accent-swatch active" : "set-accent-swatch")"
+                                        style="@($"background:{swatch.Value}")"
+                                        type="button"
+                                        aria-label="@Text(swatch.TooltipKey)"
+                                        data-testid="@UiTestIds.Settings.TextColorSwatch(swatch.Id)"
+                                        @onclick="() => UpdateTeleprompterTextColor.InvokeAsync(swatch.Value)"
+                                        @onclick:stopPropagation="true"></button>
+                            </TooltipAnchor>
                         }
                     </div>
                 </div>
@@ -197,14 +206,14 @@
         new("System Serif", "System Serif"),
     ];
 
-    private static readonly ThemeOption[] AccentOptions =
+    private static readonly ColorSwatchOption[] AccentOptions =
     [
-        new("Gold", "#C4A060"),
-        new("Blue", "#60A5FA"),
-        new("Emerald", "#34D399"),
-        new("Pink", "#F472B6"),
-        new("Purple", "#A78BFA"),
-        new("Orange", "#FB923C")
+        new("gold", "#C4A060", UiTextKey.TooltipAccentGold),
+        new("blue", "#60A5FA", UiTextKey.TooltipAccentBlue),
+        new("emerald", "#34D399", UiTextKey.TooltipAccentEmerald),
+        new("pink", "#F472B6", UiTextKey.TooltipAccentPink),
+        new("purple", "#A78BFA", UiTextKey.TooltipAccentPurple),
+        new("orange", "#FB923C", UiTextKey.TooltipAccentOrange)
     ];
 
     private ThemeOption[] DensityOptions =>
@@ -214,12 +223,12 @@
         new(SettingsAppearanceValues.SpaciousDensity, Text(UiTextKey.SettingsAppearanceDensitySpacious), "background:rgba(196,160,96,.08);display:flex;align-items:center;justify-content:center;", "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" style=\"color:var(--t3)\"><line x1=\"4\" y1=\"8\" x2=\"20\" y2=\"8\"/><line x1=\"4\" y1=\"16\" x2=\"20\" y2=\"16\"/></svg>")
     ];
 
-    private static readonly ThemeOption[] TextColorOptions =
+    private static readonly ColorSwatchOption[] TextColorOptions =
     [
-        new("White", "#FFFFFF"),
-        new("Warm White", "#F5E6D0"),
-        new("Amber", "#FDE68A"),
-        new("Mint", "#6EE7B7")
+        new("white", "#FFFFFF", UiTextKey.TooltipTextColorWhite),
+        new("warm-white", "#F5E6D0", UiTextKey.TooltipTextColorWarmWhite),
+        new("amber", "#FDE68A", UiTextKey.TooltipTextColorAmber),
+        new("mint", "#6EE7B7", UiTextKey.TooltipTextColorMint)
     ];
 
     private ThemeOption[] ThemeOptions =>
@@ -287,4 +296,6 @@
         public string IconMarkup { get; init; } = string.Empty;
         public string SwatchStyle { get; init; } = string.Empty;
     }
+
+    private sealed record ColorSwatchOption(string Id, string Value, UiTextKey TooltipKey);
 }

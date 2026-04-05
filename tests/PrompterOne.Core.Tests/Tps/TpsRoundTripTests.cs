@@ -1,3 +1,4 @@
+using ManagedCode.Tps;
 using PrompterOne.Core.Models.CompiledScript;
 using PrompterOne.Core.Services;
 using PrompterOne.Core.Services.Rsvp;
@@ -177,10 +178,10 @@ public sealed class TpsRoundTripTests
         var compiledBlock = Assert.Single(compiledSegment.Blocks, candidate => string.Equals(candidate.Archetype, "educator", StringComparison.Ordinal));
 
         Assert.Equal("coach", segment.Archetype);
-        Assert.Equal(145, segment.TargetWPM);
+        Assert.Equal(TpsSpec.ArchetypeRecommendedWpm["coach"], segment.TargetWPM);
         Assert.Equal("educator", block.Archetype);
         Assert.Null(block.TargetWPM);
-        Assert.Equal(120, compiledBlock.TargetWPM);
+        Assert.Equal(TpsSpec.ArchetypeRecommendedWpm["educator"], compiledBlock.TargetWPM);
     }
 
     [Fact]

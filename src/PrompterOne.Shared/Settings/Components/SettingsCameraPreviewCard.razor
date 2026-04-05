@@ -1,7 +1,9 @@
 @implements IAsyncDisposable
 @namespace PrompterOne.Shared.Components
+@using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services
 @inject CameraPreviewInterop CameraPreviewInterop
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @inject Microsoft.Extensions.Logging.ILogger<SettingsCameraPreviewCard> Logger
 
 <section class="set-camera-preview-panel"
@@ -18,7 +20,7 @@
                    data-testid="@UiTestIds.Settings.CameraPreviewVideo"></video>
             <span class="set-camera-preview-label">
                 <span class="live-dot"></span>
-                @PreviewEyebrow
+                @Text(PreviewEyebrowKey)
             </span>
         }
         else
@@ -46,16 +48,16 @@
 </section>
 
 @code {
-    private const string DefaultDescription = "Preview the selected camera exactly where device setup happens, before going live or opening Reader.";
-    private const string DefaultTitle = "Camera Preview";
-    private const string NoCameraDescription = "Pick a default camera or add one to the scene to see a live preview here.";
-    private const string NoCameraTitle = "No camera selected";
-    private const string PermissionDescription = "Enable camera access to confirm framing, mirror mode, and the active device before reading.";
-    private const string PermissionTitle = "Camera access required";
+    private const string DefaultDescriptionKey = "SettingsCameraPreviewDefaultDescription";
+    private const string DefaultTitleKey = "SettingsCameraPreviewDefaultTitle";
+    private const string NoCameraDescriptionKey = "SettingsCameraPreviewNoCameraDescription";
+    private const string NoCameraTitleKey = "SettingsCameraPreviewNoCameraTitle";
+    private const string PermissionDescriptionKey = "SettingsCameraPreviewPermissionDescription";
+    private const string PermissionTitleKey = "SettingsCameraPreviewPermissionTitle";
     private const string PreviewAttachFailureMessage = "Failed to attach Settings camera preview for device {DeviceId}.";
     private const string PreviewDetachFailureMessage = "Failed to detach Settings camera preview.";
-    private const string PreviewEyebrow = "PREVIEW";
-    private const string PreviewReadyDescription = "This preview follows the current default camera selection and mirror state.";
+    private const string PreviewEyebrowKey = "SettingsCameraPreviewEyebrow";
+    private const string PreviewReadyDescriptionKey = "SettingsCameraPreviewReadyDescription";
 
     [Parameter] public bool AccessGranted { get; set; }
 
@@ -67,9 +69,9 @@
 
     [Parameter] public bool MirrorVertical { get; set; }
 
-    [Parameter] public string Description { get; set; } = DefaultDescription;
+    [Parameter] public string Description { get; set; } = string.Empty;
 
-    [Parameter] public string Title { get; set; } = DefaultTitle;
+    [Parameter] public string Title { get; set; } = string.Empty;
 
     private bool CanPreview => AccessGranted && !string.IsNullOrWhiteSpace(Camera?.DeviceId);
 
@@ -77,16 +79,16 @@
 
     private string EmptyDescription =>
         !AccessGranted
-            ? PermissionDescription
-            : NoCameraDescription;
+            ? Text(PermissionDescriptionKey)
+            : Text(NoCameraDescriptionKey);
 
     private string EmptyTitle =>
         !AccessGranted
-            ? PermissionTitle
-            : NoCameraTitle;
+            ? Text(PermissionTitleKey)
+            : Text(NoCameraTitleKey);
 
     private string PreviewDescription => string.IsNullOrWhiteSpace(Description)
-        ? PreviewReadyDescription
+        ? Text(PreviewReadyDescriptionKey)
         : Description;
 
     private string PreviewVideoStyle => BuildPreviewVideoStyle(MirrorHorizontal, MirrorVertical);
@@ -164,4 +166,6 @@
             ? string.Empty
             : string.Concat("transform:", string.Join(' ', transforms), ";");
     }
+
+    private string Text(string key) => Localizer[key];
 }

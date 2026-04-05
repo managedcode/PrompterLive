@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Components.Editor;
 
@@ -167,4 +169,81 @@ internal static class EditorFloatingToolbarCatalog
 
     public static EditorFloatingMenuDescriptor? FindMenu(string? menuId) =>
         Menus.FirstOrDefault(menu => string.Equals(menu.MenuId, menuId, StringComparison.Ordinal));
+
+    public static IReadOnlyList<IReadOnlyList<EditorToolbarActionDescriptor>> BuildActionGroups(IStringLocalizer<SharedResource> localizer) =>
+        ActionGroups
+            .Select(group => group.Select(action => LocalizeAction(localizer, action)).ToArray() as IReadOnlyList<EditorToolbarActionDescriptor>)
+            .ToArray();
+
+    public static IReadOnlyList<EditorFloatingMenuDescriptor> BuildMenus(IStringLocalizer<SharedResource> localizer) =>
+        Menus.Select(menu => new EditorFloatingMenuDescriptor(
+                menu.MenuId,
+                menu.TriggerTestId,
+                menu.PanelTestId,
+                LocalizeMenuLabel(localizer, menu.Label),
+                menu.DropdownGroups.Select(group => new EditorToolbarDropdownGroupDescriptor(
+                    LocalizeGroupLabel(localizer, group.Label),
+                    group.Actions.Select(action => LocalizeAction(localizer, action)).ToArray(),
+                    group.HasSeparatorBefore)).ToArray(),
+                menu.Style))
+            .ToArray();
+
+    private static EditorToolbarActionDescriptor LocalizeAction(
+        IStringLocalizer<SharedResource> localizer,
+        EditorToolbarActionDescriptor action)
+    {
+        var tooltip = action.TestId switch
+        {
+            UiTestIds.Editor.FloatingVoice => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingVoiceTrigger),
+            UiTestIds.Editor.FloatingEmotion => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingEmotionTrigger),
+            UiTestIds.Editor.FloatingEmotionMotivational => Text(localizer, UiTextKey.EditorToolbarTooltipEmotionMotivational),
+            UiTestIds.Editor.FloatingVoiceWhisper => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingVoiceWhisper),
+            UiTestIds.Editor.FloatingVoiceLegato => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingVoiceLegato),
+            UiTestIds.Editor.FloatingVoiceEnergy => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingVoiceEnergy),
+            UiTestIds.Editor.FloatingPauseTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingPauseTrigger),
+            UiTestIds.Editor.FloatingPauseTimed => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingPauseTimed),
+            UiTestIds.Editor.FloatingSpeedTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingSpeedTrigger),
+            UiTestIds.Editor.FloatingSpeedCustomWpm => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingSpeedCustomWpm),
+            UiTestIds.Editor.FloatingInsert => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingInsertTrigger),
+            UiTestIds.Editor.FloatingInsertPronunciation => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingInsertPronunciation),
+            UiTestIds.Editor.FloatingAi => Text(localizer, UiTextKey.EditorToolbarTooltipAiAssist),
+            _ => action.Tooltip
+        };
+
+        return string.Equals(tooltip, action.Tooltip, StringComparison.Ordinal)
+            ? action
+            : action with { Tooltip = tooltip };
+    }
+
+    private static string LocalizeGroupLabel(IStringLocalizer<SharedResource> localizer, string label) =>
+        label switch
+        {
+            "Volume" => Text(localizer, UiTextKey.EditorToolbarGroupVolume),
+            "Articulation" => Text(localizer, UiTextKey.EditorToolbarGroupArticulation),
+            "Dynamics" => Text(localizer, UiTextKey.EditorToolbarGroupDynamics),
+            "Stress" => Text(localizer, UiTextKey.EditorToolbarGroupStress),
+            "Reset" => Text(localizer, UiTextKey.EditorToolbarGroupReset),
+            "TPS Emotions" => Text(localizer, UiTextKey.EditorToolbarGroupTpsEmotions),
+            "Delivery Modes" => Text(localizer, UiTextKey.EditorToolbarGroupDeliveryModes),
+            "Breath And Pauses" => Text(localizer, UiTextKey.EditorToolbarGroupBreathAndPauses),
+            "Speed Presets" => Text(localizer, UiTextKey.EditorToolbarGroupSpeedPresets),
+            "Custom Speed" => Text(localizer, UiTextKey.EditorToolbarGroupCustomSpeed),
+            "Edit Points" => Text(localizer, UiTextKey.EditorToolbarGroupEditPoints),
+            "Pronunciation" => Text(localizer, UiTextKey.EditorToolbarGroupPronunciation),
+            _ => label
+        };
+
+    private static string LocalizeMenuLabel(IStringLocalizer<SharedResource> localizer, string label) =>
+        label switch
+        {
+            "Voice Cues" => Text(localizer, UiTextKey.EditorToolbarSectionVoice),
+            "Emotion" => Text(localizer, UiTextKey.EditorToolbarSectionEmotion),
+            "Pause" => Text(localizer, UiTextKey.EditorToolbarSectionPause),
+            "Speed" => Text(localizer, UiTextKey.EditorToolbarSectionSpeed),
+            "Insert" => Text(localizer, UiTextKey.EditorToolbarSectionInsert),
+            _ => label
+        };
+
+    private static string Text(IStringLocalizer<SharedResource> localizer, UiTextKey key) =>
+        localizer[key.ToString()];
 }

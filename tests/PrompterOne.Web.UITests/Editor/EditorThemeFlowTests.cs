@@ -43,7 +43,7 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
             var emotionMenu = page.GetByTestId(UiTestIds.Editor.MenuEmotion);
             var motivationalEmotion = page.GetByTestId(UiTestIds.Editor.EmotionMotivational);
             var tooltip = page.GetByTestId(UiTestIds.Editor.ToolbarTooltip)
-                .Filter(new() { HasTextString = "Inspiring, encouraging. Inline: [motivational]text[/motivational]" });
+                .Filter(new() { HasTextString = BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText });
 
             await emotionTrigger.ClickAsync();
             await Expect(emotionMenu).ToBeVisibleAsync();
@@ -61,10 +61,10 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
 
             Assert.Null(await motivationalEmotion.GetAttributeAsync("title"));
             Assert.Equal(
-                "Inspiring, encouraging. Inline: [motivational]text[/motivational]",
+                BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
                 await motivationalEmotion.GetAttributeAsync("aria-label"));
             Assert.Equal(
-                "Inspiring, encouraging. Inline: [motivational]text[/motivational]",
+                BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
                 await tooltip.InnerTextAsync());
 
             Assert.True(

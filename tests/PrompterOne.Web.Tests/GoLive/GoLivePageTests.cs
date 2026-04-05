@@ -2,11 +2,13 @@ using System.Text.Json;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Tests;
@@ -146,10 +148,11 @@ public sealed class GoLivePageTests : BunitContext
         {
             var screenTitle = cut.FindByTestId(UiTestIds.GoLive.ScreenTitle).TextContent.Trim();
             var shellState = Services.GetRequiredService<AppShellService>().State;
+            var expectedScreenTitle = Text(GoLiveText.Chrome.ScreenTitle);
 
-            Assert.Equal(GoLiveText.Chrome.ScreenTitle, screenTitle);
+            Assert.Equal(expectedScreenTitle, screenTitle);
             Assert.DoesNotContain(AppTestData.Scripts.TedLeadershipTitle, screenTitle, StringComparison.Ordinal);
-            Assert.Equal(GoLiveText.Chrome.ScreenTitle, shellState.Title);
+            Assert.Equal(expectedScreenTitle, shellState.Title);
             Assert.Equal(AppShellScreen.GoLive, shellState.Screen);
         });
     }
@@ -450,4 +453,7 @@ public sealed class GoLivePageTests : BunitContext
         Services.GetRequiredService<AppShellService>()
             .TrackNavigation(navigation.ToAbsoluteUri(route).ToString());
     }
+
+    private string Text(string key) =>
+        Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key];
 }

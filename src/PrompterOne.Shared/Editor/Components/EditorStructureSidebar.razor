@@ -1,9 +1,12 @@
 @namespace PrompterOne.Shared.Components.Editor
+@using Microsoft.Extensions.Localization
 @using PrompterOne.Core.Models.Editor
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div class="ed-sidebar">
     <div class="ed-structure">
-        <div class="ed-section-label">STRUCTURE</div>
+        <div class="ed-section-label">@Text(UiTextKey.EditorStructureSection)</div>
         <div class="ed-tree">
             @foreach (var segment in Segments)
             {
@@ -40,11 +43,11 @@
         <button class="ed-sidebar-action"
                 data-testid="@UiTestIds.Editor.SplitTopLevel"
                 type="button"
-                @onclick="() => OnSplitRequested.InvokeAsync(TpsDocumentSplitMode.TopLevelHeading)">Split #</button>
+                @onclick="() => OnSplitRequested.InvokeAsync(TpsDocumentSplitMode.TopLevelHeading)">@Text(UiTextKey.EditorSplitTopLevel)</button>
         <button class="ed-sidebar-action"
                 data-testid="@UiTestIds.Editor.SplitSegment"
                 type="button"
-                @onclick="() => OnSplitRequested.InvokeAsync(TpsDocumentSplitMode.SegmentHeading)">Split ##</button>
+                @onclick="() => OnSplitRequested.InvokeAsync(TpsDocumentSplitMode.SegmentHeading)">@Text(UiTextKey.EditorSplitSegment)</button>
     </div>
 
     @if (SplitFeedback is not null)
@@ -76,7 +79,7 @@
 
             @if (SplitFeedback.AdditionalCount > 0)
             {
-                <div class="ed-sidebar-note-more" data-testid="@UiTestIds.Editor.SplitResultMore">+@SplitFeedback.AdditionalCount more in Library</div>
+                <div class="ed-sidebar-note-more" data-testid="@UiTestIds.Editor.SplitResultMore">@Format(UiTextKey.EditorSplitMoreInLibraryFormat, SplitFeedback.AdditionalCount)</div>
             }
 
             <button class="ed-sidebar-note-link"
@@ -103,4 +106,8 @@
     [Parameter] public IReadOnlyList<EditorOutlineSegmentViewModel> Segments { get; set; } = [];
 
     [Parameter] public EditorSplitFeedbackViewModel? SplitFeedback { get; set; }
+
+    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

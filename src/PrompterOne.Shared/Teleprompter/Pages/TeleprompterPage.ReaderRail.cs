@@ -1,24 +1,35 @@
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Pages;
 
 public partial class TeleprompterPage
 {
-    private const string ReaderFocalSliderTitle = "Move the focal reading guide";
-    private const string ReaderFullscreenTitle = "Toggle browser fullscreen";
     private const string ReaderMirrorHorizontalLabel = "H";
-    private const string ReaderMirrorHorizontalTitle = "Mirror the reader horizontally";
     private const string ReaderMirrorVerticalLabel = "V";
-    private const string ReaderMirrorVerticalTitle = "Mirror the reader vertically";
-    private const string ReaderOrientationTitle = "Rotate the reader between landscape and portrait";
     private const string ReaderRailTooltipCssClass = "rd-rail-tooltip";
     private const string ReaderRailTooltipLeftCssClass = "rd-rail-tooltip--left";
     private const string ReaderRailTooltipRightCssClass = "rd-rail-tooltip--right";
-    private const string ReaderTextAlignCenterTitle = "Center text on the reading lane";
-    private const string ReaderTextAlignJustifyTitle = "Stretch text across the full readable width";
-    private const string ReaderTextAlignLeftTitle = "Align text to the left edge";
-    private const string ReaderTextAlignRightTitle = "Align text to the right edge";
-    private const string ReaderWidthSliderTitle = "Adjust the reader text width";
+
+    private string ReaderFocalSliderTitle => Text(UiTextKey.TooltipMoveFocalReadingGuide);
+
+    private string ReaderFullscreenTitle => Text(UiTextKey.TooltipToggleBrowserFullscreen);
+
+    private string ReaderMirrorHorizontalTitle => Text(UiTextKey.TooltipMirrorReaderHorizontally);
+
+    private string ReaderMirrorVerticalTitle => Text(UiTextKey.TooltipMirrorReaderVertically);
+
+    private string ReaderOrientationTitle => Text(UiTextKey.TooltipRotateReaderOrientation);
+
+    private string ReaderTextAlignCenterTitle => Text(UiTextKey.TooltipAlignTextCenter);
+
+    private string ReaderTextAlignJustifyTitle => Text(UiTextKey.TooltipAlignTextJustify);
+
+    private string ReaderTextAlignLeftTitle => Text(UiTextKey.TooltipAlignTextLeft);
+
+    private string ReaderTextAlignRightTitle => Text(UiTextKey.TooltipAlignTextRight);
+
+    private string ReaderWidthSliderTitle => Text(UiTextKey.TooltipAdjustReaderTextWidth);
 
     private static string BuildRailTooltipCssClass(bool placeOnRightSide) =>
         placeOnRightSide

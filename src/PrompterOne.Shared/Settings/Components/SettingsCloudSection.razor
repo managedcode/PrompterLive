@@ -14,17 +14,17 @@
     <p class="set-section-desc">@Text(UiTextKey.SettingsCloudSectionDescription)</p>
 
     <div class="set-subsection" style="margin-bottom:16px">
-        <h4 class="set-sub-title">Sync Defaults</h4>
+        <h4 class="set-sub-title">@Text(UiTextKey.SettingsCloudSyncDefaultsTitle)</h4>
         <div class="set-device-fields">
             <div class="set-field">
-                <label>Default provider</label>
+                <label>@Text(UiTextKey.CommonDefaultProvider)</label>
                 <SettingsSelect Value="@_preferences.PrimaryProviderId"
                                Options="@DefaultProviderOptions"
                                OnChange="OnPrimaryProviderChangedAsync"
                                TestId="@UiTestIds.Settings.CloudDefaultProvider" />
             </div>
             <div class="set-field set-field-toggle">
-                <label>Auto-sync on save</label>
+                <label>@Text(UiTextKey.CommonAutoSyncOnSave)</label>
                 <div class="@BuildToggleCssClass(_preferences.AutoSyncOnSave)"
                      @onclick="ToggleAutoSyncOnSaveAsync"
                      data-testid="@UiTestIds.Settings.CloudAutoSyncOnSave">
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="set-field set-field-toggle">
-                <label>Sync on startup</label>
+                <label>@Text(UiTextKey.CommonSyncOnStartup)</label>
                 <div class="@BuildToggleCssClass(_preferences.SyncOnStartup)"
                      @onclick="ToggleSyncOnStartupAsync"
                      data-testid="@UiTestIds.Settings.CloudSyncOnStartup">
@@ -40,11 +40,12 @@
                 </div>
             </div>
         </div>
-        <p class="set-card-copy">The script library stays browser-local by default. Cloud providers are explicit import/export targets, and their credentials stay in browser local storage.</p>
+        <p class="set-card-copy">@Text(UiTextKey.SettingsCloudLocalFirstNote)</p>
     </div>
 
     <div class="set-device-list">
         <SettingsExpandableCard Title="OneDrive"
+                                Description="@Text(UiTextKey.SettingsCloudOneDriveDescription)"
                                 Subtitle="@GetSubtitle(_preferences.OneDrive.Connection)"
                                 SubtitleTestId="@UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.OneDrive)"
                                 StatusLabel="@GetStatusLabel(_preferences.OneDrive.Connection)"
@@ -58,27 +59,27 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Account Label</label>
+                    <label>@Text(UiTextKey.CommonAccountLabel)</label>
                     <input type="text" class="set-input" @bind="_preferences.OneDrive.Connection.AccountLabel" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.AccountLabel)" />
                 </div>
                 <div class="set-field">
-                    <label>Tenant ID</label>
+                    <label>@Text(UiTextKey.CommonTenantId)</label>
                     <input type="text" class="set-input" @bind="_oneDriveCredentials.TenantId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.TenantId)" />
                 </div>
                 <div class="set-field">
-                    <label>Client ID</label>
+                    <label>@Text(UiTextKey.CommonClientId)</label>
                     <input type="text" class="set-input" @bind="_oneDriveCredentials.ClientId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.ClientId)" />
                 </div>
                 <div class="set-field">
-                    <label>Client Secret</label>
+                    <label>@Text(UiTextKey.CommonClientSecret)</label>
                     <input type="password" class="set-input" @bind="_oneDriveCredentials.ClientSecret" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.ClientSecret)" />
                 </div>
                 <div class="set-field">
-                    <label>Drive ID</label>
+                    <label>@Text(UiTextKey.CommonDriveId)</label>
                     <input type="text" class="set-input" @bind="_preferences.OneDrive.DriveId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.DriveId)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Path</label>
+                    <label>@Text(UiTextKey.CommonRootPath)</label>
                     <input type="text" class="set-input" @bind="_preferences.OneDrive.Connection.RootPath" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.OneDrive, CloudStorageFieldIds.RootPath)" />
                 </div>
             </div>
@@ -86,6 +87,7 @@
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="Google Drive"
+                                Description="@Text(UiTextKey.SettingsCloudGoogleDriveDescription)"
                                 Subtitle="@GetSubtitle(_preferences.GoogleDrive.Connection)"
                                 SubtitleTestId="@UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.GoogleDrive)"
                                 StatusLabel="@GetStatusLabel(_preferences.GoogleDrive.Connection)"
@@ -100,19 +102,19 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Account Label</label>
+                    <label>@Text(UiTextKey.CommonAccountLabel)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleDrive.Connection.AccountLabel" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.AccountLabel)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Folder ID</label>
+                    <label>@Text(UiTextKey.CommonRootFolderId)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleDrive.RootFolderId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.RootFolderId)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Path</label>
+                    <label>@Text(UiTextKey.CommonRootPath)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleDrive.Connection.RootPath" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.RootPath)" />
                 </div>
                 <div class="set-field set-field-toggle">
-                    <label>Support shared drives</label>
+                    <label>@Text(UiTextKey.CommonSupportSharedDrives)</label>
                     <div class="@BuildToggleCssClass(_preferences.GoogleDrive.SupportsAllDrives)"
                          @onclick="ToggleGoogleDriveAllDrivesAsync"
                          data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.SupportsAllDrives)">
@@ -120,7 +122,7 @@
                     </div>
                 </div>
                 <div class="set-field">
-                    <label>Service Account JSON</label>
+                    <label>@Text(UiTextKey.CommonServiceAccountJson)</label>
                     <textarea class="set-input" rows="6" @bind="_googleDriveCredentials.ServiceAccountJson" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.ServiceAccountJson)"></textarea>
                 </div>
             </div>
@@ -128,6 +130,7 @@
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="Dropbox"
+                                Description="@Text(UiTextKey.SettingsCloudDropboxDescription)"
                                 Subtitle="@GetSubtitle(_preferences.Dropbox.Connection)"
                                 SubtitleTestId="@UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.Dropbox)"
                                 StatusLabel="@GetStatusLabel(_preferences.Dropbox.Connection)"
@@ -141,27 +144,27 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Account Label</label>
+                    <label>@Text(UiTextKey.CommonAccountLabel)</label>
                     <input type="text" class="set-input" @bind="_preferences.Dropbox.Connection.AccountLabel" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Path</label>
+                    <label>@Text(UiTextKey.CommonRootPath)</label>
                     <input type="text" class="set-input" @bind="_preferences.Dropbox.Connection.RootPath" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.RootPath)" />
                 </div>
                 <div class="set-field">
-                    <label>Access Token</label>
+                    <label>@Text(UiTextKey.CommonAccessToken)</label>
                     <input type="password" class="set-input" @bind="_dropboxCredentials.AccessToken" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccessToken)" />
                 </div>
                 <div class="set-field">
-                    <label>Refresh Token</label>
+                    <label>@Text(UiTextKey.CommonRefreshToken)</label>
                     <input type="password" class="set-input" @bind="_dropboxCredentials.RefreshToken" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.RefreshToken)" />
                 </div>
                 <div class="set-field">
-                    <label>App Key</label>
+                    <label>@Text(UiTextKey.CommonAppKey)</label>
                     <input type="text" class="set-input" @bind="_dropboxCredentials.AppKey" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AppKey)" />
                 </div>
                 <div class="set-field">
-                    <label>App Secret</label>
+                    <label>@Text(UiTextKey.CommonAppSecret)</label>
                     <input type="password" class="set-input" @bind="_dropboxCredentials.AppSecret" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AppSecret)" />
                 </div>
             </div>
@@ -169,6 +172,7 @@
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="Google Cloud Storage"
+                                Description="@Text(UiTextKey.SettingsCloudGoogleCloudStorageDescription)"
                                 Subtitle="@GetSubtitle(_preferences.GoogleCloudStorage.Connection)"
                                 SubtitleTestId="@UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.GoogleCloudStorage)"
                                 StatusLabel="@GetStatusLabel(_preferences.GoogleCloudStorage.Connection)"
@@ -182,23 +186,23 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Account Label</label>
+                    <label>@Text(UiTextKey.CommonAccountLabel)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleCloudStorage.Connection.AccountLabel" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleCloudStorage, CloudStorageFieldIds.AccountLabel)" />
                 </div>
                 <div class="set-field">
-                    <label>Project ID</label>
+                    <label>@Text(UiTextKey.CommonProjectId)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleCloudStorage.ProjectId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleCloudStorage, CloudStorageFieldIds.ProjectId)" />
                 </div>
                 <div class="set-field">
-                    <label>Bucket Name</label>
+                    <label>@Text(UiTextKey.CommonBucketName)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleCloudStorage.BucketName" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleCloudStorage, CloudStorageFieldIds.BucketName)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Path</label>
+                    <label>@Text(UiTextKey.CommonRootPath)</label>
                     <input type="text" class="set-input" @bind="_preferences.GoogleCloudStorage.Connection.RootPath" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleCloudStorage, CloudStorageFieldIds.RootPath)" />
                 </div>
                 <div class="set-field">
-                    <label>Service Account JSON</label>
+                    <label>@Text(UiTextKey.CommonServiceAccountJson)</label>
                     <textarea class="set-input" rows="6" @bind="_googleCloudStorageCredentials.ServiceAccountJson" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleCloudStorage, CloudStorageFieldIds.ServiceAccountJson)"></textarea>
                 </div>
             </div>
@@ -206,6 +210,7 @@
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="CloudKit"
+                                Description="@Text(UiTextKey.SettingsCloudCloudKitDescription)"
                                 Subtitle="@GetSubtitle(_preferences.CloudKit.Connection)"
                                 SubtitleTestId="@UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.CloudKit)"
                                 StatusLabel="@GetStatusLabel(_preferences.CloudKit.Connection)"
@@ -219,45 +224,45 @@
             </svg>
             <div class="set-device-fields">
                 <div class="set-field">
-                    <label>Account Label</label>
+                    <label>@Text(UiTextKey.CommonAccountLabel)</label>
                     <input type="text" class="set-input" @bind="_preferences.CloudKit.Connection.AccountLabel" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.AccountLabel)" />
                 </div>
                 <div class="set-field">
-                    <label>Container ID</label>
+                    <label>@Text(UiTextKey.CommonContainerId)</label>
                     <input type="text" class="set-input" @bind="_preferences.CloudKit.ContainerId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.ContainerId)" />
                 </div>
                 <div class="set-field">
-                    <label>Root Path</label>
+                    <label>@Text(UiTextKey.CommonRootPath)</label>
                     <input type="text" class="set-input" @bind="_preferences.CloudKit.Connection.RootPath" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.RootPath)" />
                 </div>
                 <div class="set-field">
-                    <label>Environment</label>
+                    <label>@Text(UiTextKey.CommonEnvironment)</label>
                     <SettingsSelect Value="@_preferences.CloudKit.Environment.ToString()"
                                    Options="@CloudKitEnvironmentOptions"
                                    OnChange="OnCloudKitEnvironmentChanged"
                                    TestId="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Environment)" />
                 </div>
                 <div class="set-field">
-                    <label>Database</label>
+                    <label>@Text(UiTextKey.CommonDatabase)</label>
                     <SettingsSelect Value="@_preferences.CloudKit.Database.ToString()"
                                    Options="@CloudKitDatabaseOptions"
                                    OnChange="OnCloudKitDatabaseChanged"
                                    TestId="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.Database)" />
                 </div>
                 <div class="set-field">
-                    <label>API Token</label>
+                    <label>@Text(UiTextKey.CommonApiToken)</label>
                     <input type="password" class="set-input" @bind="_cloudKitCredentials.ApiToken" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.ApiToken)" />
                 </div>
                 <div class="set-field">
-                    <label>Web Auth Token</label>
+                    <label>@Text(UiTextKey.CommonWebAuthToken)</label>
                     <input type="password" class="set-input" @bind="_cloudKitCredentials.WebAuthToken" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.WebAuthToken)" />
                 </div>
                 <div class="set-field">
-                    <label>Server-to-Server Key ID</label>
+                    <label>@Text(UiTextKey.CommonServerToServerKeyId)</label>
                     <input type="text" class="set-input" @bind="_cloudKitCredentials.ServerToServerKeyId" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.ServerToServerKeyId)" />
                 </div>
                 <div class="set-field">
-                    <label>Server Private Key PEM</label>
+                    <label>@Text(UiTextKey.CommonServerPrivateKeyPem)</label>
                     <textarea class="set-input" rows="6" @bind="_cloudKitCredentials.ServerToServerPrivateKeyPem" data-testid="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.CloudKit, CloudStorageFieldIds.ServerPrivateKeyPem)"></textarea>
                 </div>
             </div>
