@@ -13,8 +13,11 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
 {
     private const string PersistedFocalPointValue = "37";
+    private const string PersistedFontValue = "52";
     private const string PersistedFocalGuideStyle = "top:37%;";
+    private const string PersistedFontStyleFragment = "--rd-font-size:52px";
     private const string PersistedTextWidthValue = "980";
+    private const double ReaderFontBaselinePixels = 36d;
     private const double ReaderWidthBaselinePixels = 1240d;
     private const string PersistedTextAlignmentValue = BrowserTestConstants.TeleprompterFlow.AlignmentJustifyValue;
     private const string ReaderCardActiveClass = "rd-card-active";
@@ -32,12 +35,16 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
+            await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FontSlider), PersistedFontValue);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider), PersistedTextWidthValue);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), PersistedFocalPointValue);
             await page.GetByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
 
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync(PersistedFontValue);
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(PersistedTextWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalGuide)).ToHaveAttributeAsync("style", PersistedFocalGuideStyle);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
+                .ToHaveAttributeAsync("style", new Regex(Regex.Escape(PersistedFontStyleFragment), RegexOptions.Compiled));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync(BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute, PersistedTextAlignmentValue);
 
@@ -48,6 +55,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
 
             Assert.NotNull(storedSettings);
             Assert.Equal(int.Parse(PersistedFocalPointValue, CultureInfo.InvariantCulture), storedSettings.FocalPointPercent);
+            Assert.Equal(double.Parse(PersistedFontValue, CultureInfo.InvariantCulture) / ReaderFontBaselinePixels, storedSettings.FontScale, 2);
             Assert.Equal(double.Parse(PersistedTextWidthValue, CultureInfo.InvariantCulture) / ReaderWidthBaselinePixels, storedSettings.TextWidth, 4);
             Assert.Equal(ReaderTextAlignment.Justify, storedSettings.TextAlignment);
 
@@ -55,10 +63,14 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.FontSlider)).ToHaveValueAsync(PersistedFontValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(PersistedTextWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider)).ToHaveValueAsync(PersistedFocalPointValue);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync(PersistedFontValue);
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(PersistedTextWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalGuide)).ToHaveAttributeAsync("style", PersistedFocalGuideStyle);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
+                .ToHaveAttributeAsync("style", new Regex(Regex.Escape(PersistedFontStyleFragment), RegexOptions.Compiled));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync(BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute, PersistedTextAlignmentValue);
         });

@@ -8,7 +8,7 @@ public sealed class UiIconRenderingTests : BunitContext
     [Fact]
     public void HelpCircle_UsesRoundedQuestionStrokeAndFilledDot()
     {
-        var cut = RenderComponent<UiIcon>(parameters => parameters
+        var cut = Render<UiIcon>(parameters => parameters
             .Add(icon => icon.Kind, UiIconKind.HelpCircle)
             .Add(icon => icon.Size, 16));
 

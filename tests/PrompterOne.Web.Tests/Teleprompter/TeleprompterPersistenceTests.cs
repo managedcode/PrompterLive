@@ -19,10 +19,12 @@ public sealed class TeleprompterPersistenceTests : BunitContext
     private const string HorizontalMirrorTransform = "scaleX(-1)";
     private const string VerticalMirrorTransform = "scaleY(-1)";
     private const int UpdatedFocalPointPercent = 37;
-    private const int UpdatedFontSize = 40;
+    private const int UpdatedFontSize = 52;
     private const int UpdatedTextWidthPixels = 980;
+    private const double ReaderFontBaselinePixels = 36d;
     private const double ReaderWidthBaselinePixels = 1240d;
-    private const double PersistedFontScale = PersistedFontSize / 36d;
+    private const double PersistedFontScale = PersistedFontSize / ReaderFontBaselinePixels;
+    private const double UpdatedFontScale = UpdatedFontSize / ReaderFontBaselinePixels;
     private const double PersistedTextWidthRatio = PersistedTextWidthPixels / ReaderWidthBaselinePixels;
     private const double UpdatedTextWidthRatio = UpdatedTextWidthPixels / ReaderWidthBaselinePixels;
     private const string DisabledCameraAttribute = "false";
@@ -57,6 +59,12 @@ public sealed class TeleprompterPersistenceTests : BunitContext
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
                 cut.Find($"#{UiDomIds.Teleprompter.FontLabel}").TextContent.Trim());
             Assert.Equal(
+                PersistedFontSize.ToString(CultureInfo.InvariantCulture),
+                cut.Find($"#{UiDomIds.Teleprompter.FontValue}").TextContent.Trim());
+            Assert.Equal(
+                PersistedFontSize.ToString(CultureInfo.InvariantCulture),
+                cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).GetAttribute("value"));
+            Assert.Equal(
                 $"top:{PersistedFocalPointPercent}%;",
                 cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
             var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
@@ -83,7 +91,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Teleprompter.WidthSlider, cut.Markup, StringComparison.Ordinal));
 
-        cut.FindByTestId(UiTestIds.Teleprompter.FontUp).Click();
+        cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).Input(UpdatedFontSize);
         cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).Input(UpdatedTextWidthPixels);
         cut.FindByTestId(UiTestIds.Teleprompter.FocalSlider).Input(UpdatedFocalPointPercent);
         cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).Click();
@@ -101,6 +109,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
                 : DisabledCameraAttribute;
 
             Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontLabel}").TextContent.Trim(), CultureInfo.InvariantCulture));
+            Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontValue}").TextContent.Trim(), CultureInfo.InvariantCulture));
             Assert.Equal(UpdatedTextWidthPixels, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim(), CultureInfo.InvariantCulture));
             Assert.Equal($"top:{UpdatedFocalPointPercent}%;", cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
             var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
@@ -114,7 +123,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Contains(HorizontalMirrorTransform, clusterWrapStyle, StringComparison.Ordinal);
             Assert.Contains(VerticalMirrorTransform, clusterWrapStyle, StringComparison.Ordinal);
 
-            Assert.Equal(PersistedFontScale, savedSettings.FontScale, 2);
+            Assert.Equal(UpdatedFontScale, savedSettings.FontScale, 2);
             Assert.Equal(UpdatedTextWidthRatio, savedSettings.TextWidth, 4);
             Assert.Equal(UpdatedFocalPointPercent, savedSettings.FocalPointPercent);
             Assert.True(savedSettings.MirrorText);

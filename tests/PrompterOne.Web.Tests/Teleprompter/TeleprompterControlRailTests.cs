@@ -14,6 +14,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     private const string AlignLeftTooltipText = "Align text to the left edge";
     private const string AlignRightTooltipText = "Align text to the right edge";
     private const string FocalSliderTooltipText = "Move the focal reading guide";
+    private const string FontSliderTooltipText = "Adjust the reader text size";
     private const string FullscreenTooltipText = "Toggle browser fullscreen";
     private const string MirrorHorizontalTooltipText = "Mirror the reader horizontally";
     private const string MirrorVerticalTooltipText = "Mirror the reader vertically";
@@ -62,6 +63,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipCenterKey, AlignCenterTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipRightKey, AlignRightTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipJustifyKey, AlignJustifyTooltipText);
+            AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey, FontSliderTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipFocalKey, FocalSliderTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipWidthKey, WidthSliderTooltipText);
         });

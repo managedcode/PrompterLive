@@ -184,6 +184,28 @@
             <div class="rd-sliders" data-testid="@UiTestIds.Teleprompter.Sliders">
                 <div class="rd-rail-tip-anchor">
                 <div class="rd-slider-group">
+                    <span class="rd-slider-icon rd-slider-icon--glyph" aria-hidden="true">T</span>
+                    <input type="range"
+                           class="rd-vslider"
+                           id="@UiDomIds.Teleprompter.FontSlider"
+                           min="@ReaderMinFontSize"
+                           max="@ReaderMaxFontSize"
+                           value="@_readerFontSize"
+                           @oninput="HandleReaderFontSizeInputAsync"
+                           @onkeydown:stopPropagation="true"
+                           aria-label="@ReaderFontSliderTitle"
+                           data-testid="@UiTestIds.Teleprompter.FontSlider"
+                           data-test-id="@UiTestIds.Teleprompter.FontSlider">
+                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.FontValue">@_readerFontSize</span>
+                </div>
+                <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)"
+                      class="@BuildRailTooltipCssClass(placeOnRightSide: false)"
+                      role="tooltip"
+                      data-testid="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)"
+                      data-test-id="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)">@ReaderFontSliderTitle</span>
+                </div>
+                <div class="rd-rail-tip-anchor">
+                <div class="rd-slider-group">
                     <svg class="rd-slider-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="8" x2="3" y2="16" /><line x1="21" y1="8" x2="21" y2="16" /></svg>
                     <input type="range"
                            class="rd-vslider"

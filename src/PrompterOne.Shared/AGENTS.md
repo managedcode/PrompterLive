@@ -45,7 +45,10 @@
 - Shared shell chrome such as the global `Go Live` entry must live behind one reusable Blazor component; routed pages must not fork their own spacing, icon color, or idle/active variants.
 - Editor TPS menus in `PrompterOne.Shared` must use one spec-driven grouping and command inventory across top toolbar, floating toolbar, and Monaco authoring help; if a TPS tag or header pattern is supported, every relevant editor command surface must expose it coherently.
 - `PrompterOne.Shared` must provide a localized first-run onboarding flow that walks new users through PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter, and Go Live, and it must persist completion or dismissal in browser-owned settings.
+- `PrompterOne.Shared` onboarding must give TPS its own dedicated explainer step or page, separate from the editor overview, so new users understand what TPS is and why PrompterOne centers it.
 - Library and editor routed surfaces in `PrompterOne.Shared` must expose real search affordances for script names and script content instead of relying only on manual browsing.
+- Teleprompter routed surfaces in `PrompterOne.Shared` must expose a direct in-reader text-size control, owned by the reader UI itself, so operators can tune readability during playback without leaving the route.
+- Teleprompter width controls in `PrompterOne.Shared` must scale relative to the active viewport or screen size and persist that adaptive ratio; do not clamp the readable lane around a fixed pixel-only desktop maximum.
 - Editor gutter line numbers must read as editor chrome, not as part of the script content; their color and emphasis must stay clearly separated from source text.
 - Editor wrap/format commands must not partially capture TPS tag syntax or create accidental nested wrappers by spanning across existing tag boundaries; if the selection touches tag markup, normalize or reject it instead of producing broken mixed-tag output.
 - File-creating editor actions such as document split must show explicit in-app feedback about what was created and where to find it; silent success states behind generic buttons are not user-friendly enough.

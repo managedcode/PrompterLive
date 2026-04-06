@@ -77,6 +77,8 @@ public static class UiDomIds
         public const string ClusterWrap = "rd-cluster-wrap";
         public const string Countdown = "rd-countdown";
         public const string FontLabel = "rd-font-label";
+        public const string FontSlider = "rd-font-slider";
+        public const string FontValue = "rd-font-val";
         public const string FocalGuide = "rd-guide-h";
         public const string HeaderSegment = "rd-header-segment";
         public const string PauseFill = "rd-pause-fill";

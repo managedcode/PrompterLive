@@ -385,6 +385,17 @@
     color: rgba(232,213,176,.72);
     flex-shrink: 0;
 }
+.rd-slider-icon--glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    min-height: 14px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
 .rd-slider-val {
     font-size: 9px;
     font-family: var(--mono);

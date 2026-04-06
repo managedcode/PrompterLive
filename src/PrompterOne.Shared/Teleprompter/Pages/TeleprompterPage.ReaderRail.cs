@@ -13,6 +13,8 @@ public partial class TeleprompterPage
 
     private string ReaderFocalSliderTitle => Text(UiTextKey.TooltipMoveFocalReadingGuide);
 
+    private string ReaderFontSliderTitle => Text(UiTextKey.TooltipAdjustReaderTextSize);
+
     private string ReaderFullscreenTitle => Text(UiTextKey.TooltipToggleBrowserFullscreen);
 
     private string ReaderMirrorHorizontalTitle => Text(UiTextKey.TooltipMirrorReaderHorizontally);

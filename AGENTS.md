@@ -92,6 +92,7 @@ Rule format:
 - Production TPS behavior must have one authoritative implementation path. Do not keep a second repo-local TPS parser, compiler, or regex-based semantic fallback beside the vendored SDK; plain-text fallbacks may exist only for truly non-TPS input.
 - Product localization must be complete across all supported UI languages: audit hardcoded user-facing strings with an explicit inventory file, move them into shared localization catalogs, and include tooltip text in the same localization pass instead of leaving tooltip copy or chrome labels hardcoded.
 - PrompterOne must ship a first-run onboarding flow that explains the product basics, TPS, RSVP, Editor, Learn, Teleprompter, and Go Live in-app; the walkthrough must appear on first launch until the user explicitly completes or dismisses it, persist that choice locally, and be fully localized across all supported UI languages.
+- The onboarding flow must include a dedicated TPS explainer step or page, separate from the generic editor step, that tells users what TPS is, why it exists, and how PrompterOne uses it.
 - Script discovery and authoring surfaces must support real search by script name and script content; Library/script pages and editor flows must not force manual browsing when the user needs to find files or text inside files.
 
 ## Rules to Follow (Mandatory)
@@ -354,10 +355,12 @@ Repo-specific design rules:
 - Teleprompter back navigation MUST stay as visible and readable as the rest of the page controls; a dim or low-contrast back button on the reader screen is a regression.
 - Teleprompter MUST expose both horizontal and vertical mirror toggles on the reader screen so tablet or reflected-glass setups can flip the output without leaving the route or editing CSS manually.
 - Teleprompter MUST expose an in-reader orientation toggle, matching the phone control pattern, so operators can switch the text flow direction directly on the reader screen without leaving playback.
+- Teleprompter MUST expose a direct in-reader text-size control so operators can enlarge or reduce the live reading text on the teleprompter surface without leaving playback or relying on settings-only defaults.
 - Teleprompter desktop chrome MUST expose a real browser fullscreen toggle when the browser supports it; simulating fullscreen with layout-only expansion is not enough.
 - Teleprompter desktop progress MUST show segmented read progress by block, similar to Learn progress semantics, so operators can see overall completion and block boundaries at a glance.
 - Learn and Teleprompter playback timing MUST align with real word-by-word progression in the browser: WPM, speed modifiers, and word counting must match the emitted words, and timing work is not done until a browser-level word-sequence check proves it.
 - Reader and Learn tokenization MUST treat punctuation-only tokens such as commas, periods, and dashes as punctuation attached to nearby words or pauses, never as standalone counted words.
+- Teleprompter reader-width controls and persistence MUST be adaptive to the current viewport or screen size, using relative sizing instead of fixed pixel-only maxima so the readable zone scales correctly across displays.
 - App-shell logo navigation MUST always lead to the main home/library screen; it must not deep-link into Go Live, Teleprompter, or another feature-specific route.
 - Learn rehearsal speed MUST default to about 250 WPM and stay user-adjustable upward from that baseline; shipping a 300 WPM startup default is too aggressive.
 - First-run onboarding MUST be dismissible, reopenable by the user, and after either completion or dismissal it must return the user to the main Library screen instead of leaving them on a feature route.

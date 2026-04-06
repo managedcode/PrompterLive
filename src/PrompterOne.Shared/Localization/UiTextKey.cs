@@ -161,6 +161,7 @@ public enum UiTextKey
     TooltipAlignTextRight,
     TooltipAlignTextJustify,
     TooltipMoveFocalReadingGuide,
+    TooltipAdjustReaderTextSize,
     TooltipAdjustReaderTextWidth,
     TooltipSmallerText,
     TooltipLargerText,

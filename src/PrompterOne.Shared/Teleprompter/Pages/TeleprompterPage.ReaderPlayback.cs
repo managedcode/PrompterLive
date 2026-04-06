@@ -44,6 +44,23 @@ public partial class TeleprompterPage
         await PersistCurrentReaderLayoutAsync();
     }
 
+    private async Task HandleReaderFontSizeInputAsync(ChangeEventArgs args)
+    {
+        var nextFontSize = ParseReaderControlValue(
+            args.Value,
+            ReaderMinFontSize,
+            ReaderMaxFontSize,
+            _readerFontSize);
+        if (nextFontSize == _readerFontSize)
+        {
+            return;
+        }
+
+        _readerFontSize = nextFontSize;
+        RequestReaderAlignment(instant: true);
+        await PersistCurrentReaderLayoutAsync();
+    }
+
     private async Task HandleReaderFocalPointInputAsync(ChangeEventArgs args)
     {
         _readerFocalPointPercent = ParseReaderControlValue(

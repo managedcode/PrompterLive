@@ -107,6 +107,12 @@
         height: 12px;
     }
 
+    .rd-slider-icon--glyph {
+        width: 12px;
+        min-height: 12px;
+        font-size: 10px;
+    }
+
     .rd-slider-val {
         font-size: 8px;
     }
@@ -149,5 +155,35 @@
 
     .rd-pause-indicator {
         width: 96px;
+    }
+}
+
+@media (max-height: 400px) {
+    .rd-sliders,
+    .rd-mirror-controls {
+        gap: 8px;
+        padding: 6px 4px;
+    }
+
+    .rd-slider-group {
+        gap: 3px;
+    }
+
+    .rd-vslider {
+        height: 58px;
+    }
+
+    .rd-slider-val {
+        font-size: 7px;
+    }
+
+    .rd-mirror-controls {
+        gap: 3px;
+        left: 6px;
+        padding: 5px 3px;
+    }
+
+    .rd-sliders {
+        right: 6px;
     }
 }

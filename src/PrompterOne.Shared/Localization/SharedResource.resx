@@ -366,6 +366,9 @@
   <data name="TooltipMoveFocalReadingGuide" xml:space="preserve">
     <value>Move the focal reading guide</value>
   </data>
+  <data name="TooltipAdjustReaderTextSize" xml:space="preserve">
+    <value>Adjust the reader text size</value>
+  </data>
   <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
     <value>Adjust the reader text width</value>
   </data>

@@ -366,6 +366,9 @@
   <data name="TooltipMoveFocalReadingGuide" xml:space="preserve">
     <value>Перемістити фокальну направляючу читання</value>
   </data>
+  <data name="TooltipAdjustReaderTextSize" xml:space="preserve">
+    <value>Налаштувати розмір тексту суфлера</value>
+  </data>
   <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
     <value>Налаштувати ширину тексту суфлера</value>
   </data>

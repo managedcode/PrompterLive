@@ -301,6 +301,7 @@ public static class UiTestIds
         public const string AlignmentLeft = "teleprompter-alignment-left";
         public const string AlignmentRight = "teleprompter-alignment-right";
         public const string AlignmentTooltipCenterKey = "alignment-center";
+        public const string AlignmentTooltipFontSizeKey = "font-size-slider";
         public const string AlignmentTooltipFocalKey = "focal-slider";
         public const string AlignmentTooltipFullscreenKey = "fullscreen";
         public const string AlignmentTooltipJustifyKey = "alignment-justify";
@@ -319,6 +320,7 @@ public static class UiTestIds
         public const string FocalSlider = "teleprompter-focal-slider";
         public const string FocalGuide = "teleprompter-focal-guide";
         public const string FontDown = "teleprompter-font-down";
+        public const string FontSlider = "teleprompter-font-slider";
         public const string FontUp = "teleprompter-font-up";
         public const string FullscreenToggle = "teleprompter-fullscreen-toggle";
         public const string MirrorControls = "teleprompter-mirror-controls";
