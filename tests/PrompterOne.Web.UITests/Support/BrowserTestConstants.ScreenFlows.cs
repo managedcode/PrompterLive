@@ -227,6 +227,7 @@ internal static partial class BrowserTestConstants
         public const string ReadingChromeStep = "01-muted-active-playback";
         public const string ReadingActiveCssClass = "rd-reading-active";
         public const float ReadingChromeSettleDelayMs = 400;
+        public const double MinimumShellButtonBackgroundAlphaReduction = 0.015;
         public const string ProgressEmptyStylePattern = @"width:\s*0%";
         public const string ProgressFilledStylePattern = @"width:\s*100%";
         public const double MaxProgressShellOverflowPx = 0.5;

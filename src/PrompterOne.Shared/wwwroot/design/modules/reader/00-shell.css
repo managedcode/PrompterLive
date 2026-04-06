@@ -130,16 +130,16 @@
 }
 
 .rd-back.rd-reading-active {
-    background: rgba(20,18,12,.58);
-    color: rgba(232,213,176,.54);
-    border-color: rgba(232,213,176,.10);
+    background: rgba(20,18,12,.42);
+    color: rgba(232,213,176,.44);
+    border-color: rgba(232,213,176,.08);
     box-shadow: none;
 }
 
 .rd-back.rd-reading-active:hover {
-    color: rgba(232,213,176,.74);
-    background: rgba(28,26,18,.74);
-    border-color: rgba(232,213,176,.16);
+    color: rgba(232,213,176,.62);
+    background: rgba(28,26,18,.58);
+    border-color: rgba(232,213,176,.12);
 }
 
 /* Stage — active cluster always centered vertically */

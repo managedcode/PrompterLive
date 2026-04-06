@@ -9,7 +9,6 @@ using PrompterOne.Shared.Components.GoLive;
 using PrompterOne.Shared.Components.Library;
 using PrompterOne.Shared.Components.Settings;
 using PrompterOne.Shared.Localization;
-using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
@@ -108,10 +107,13 @@ public sealed class LocalizationRenderingTests : BunitContext
             .Add(component => component.ToggleCard, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
             .Add(component => component.UpdateLanguageCulture, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask)));
 
+        var germanDisplayName = AppCultureCatalog.SupportedCultureDefinitionsInDisplayOrder
+            .Single(culture => string.Equals(culture.CultureName, AppCultureCatalog.GermanCultureName, StringComparison.Ordinal))
+            .DisplayName;
+
         Assert.Contains(Text(UiTextKey.SettingsAppearanceLanguageLabel), cut.Markup);
         Assert.Contains(Text(UiTextKey.SettingsLanguageSectionDescription), cut.Markup);
-        Assert.Contains(Text(UiTextKey.SettingsAppearanceLanguageLabel), cut.Markup);
-        Assert.Contains(AppCultureCatalog.GermanDisplayName, cut.Markup);
+        Assert.Contains(germanDisplayName, cut.Markup);
     }
 
     [Fact]

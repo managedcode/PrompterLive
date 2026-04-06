@@ -8,8 +8,8 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
 {
     private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const int ImmediateAlignmentFollowUpDelayMilliseconds = 180;
-    private const string MaximumReaderWidthCss = "1100px";
-    private const string MaximumReaderWidthValue = "1100";
+    private const string MaximumReaderWidthCss = "1240px";
+    private const string MaximumReaderWidthValue = "1240";
     private const int ParagraphMotionSettleDelayMilliseconds = 450;
     private const double ParagraphMotionTolerancePixels = 4d;
     private const int SecurityIncidentResponseCardIndex = 2;

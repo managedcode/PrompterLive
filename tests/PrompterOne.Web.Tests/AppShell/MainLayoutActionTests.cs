@@ -16,6 +16,7 @@ public sealed class MainLayoutActionTests : BunitContext
     private const string EnglishExportLabel = "Export";
     private const string EnglishGoLiveLabel = "Go Live";
     private const string EnglishImportLabel = "Import";
+    private const string IntroSubtitle = "Intro";
     private const string SupportedImportAcceptValue = ScriptDocumentFileTypes.AcceptValue;
     private const string UkrainianExportLabel = "Експорт";
     private const string UkrainianImportLabel = "Імпорт";
@@ -76,6 +77,35 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveIcon)));
             Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveLabel)));
             Assert.Null(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveStatus)));
+        });
+    }
+
+    [Fact]
+    public void MainLayout_TeleprompterPlayback_MutesSharedHeaderChrome()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        var shell = Services.GetRequiredService<AppShellService>();
+        navigation.NavigateTo(AppRoutes.TeleprompterWithId(AppTestData.Scripts.QuantumId));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        shell.ShowTeleprompter(AppTestData.Scripts.QuantumTitle, IntroSubtitle, AppTestData.Scripts.QuantumId);
+        shell.SetTeleprompterPlaybackActive(true);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("app-header--reader-muted", cut.Find("header").ClassName ?? string.Empty, StringComparison.Ordinal);
+            Assert.Contains("go-live-shell-button--subdued", cut.FindByTestId(UiTestIds.Header.GoLive).ClassName ?? string.Empty, StringComparison.Ordinal);
+        });
+
+        shell.SetTeleprompterPlaybackActive(false);
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.DoesNotContain("app-header--reader-muted", cut.Find("header").ClassName ?? string.Empty, StringComparison.Ordinal);
+            Assert.DoesNotContain("go-live-shell-button--subdued", cut.FindByTestId(UiTestIds.Header.GoLive).ClassName ?? string.Empty, StringComparison.Ordinal);
         });
     }
 

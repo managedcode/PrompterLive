@@ -25,10 +25,16 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             var controls = page.GetByTestId(UiTestIds.Teleprompter.Controls);
             var progressShell = page.GetByTestId(UiTestIds.Teleprompter.Progress);
             var edgeInfo = page.GetByTestId(UiTestIds.Teleprompter.EdgeInfo);
+            var headerBack = page.GetByTestId(UiTestIds.Header.Back);
+            var headerGoLive = page.GetByTestId(UiTestIds.Header.GoLive);
+            var readerBack = page.GetByTestId(UiTestIds.Teleprompter.Back);
 
             var initialControls = await ReadChromeVisualStateAsync(controls);
             var initialProgress = await ReadChromeVisualStateAsync(progressShell);
             var initialEdgeInfo = await ReadChromeVisualStateAsync(edgeInfo);
+            var initialHeaderBack = await ReadChromeVisualStateAsync(headerBack);
+            var initialHeaderGoLive = await ReadChromeVisualStateAsync(headerGoLive);
+            var initialReaderBack = await ReadChromeVisualStateAsync(readerBack);
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
             await page.GetByTestId(UiTestIds.Teleprompter.PlayToggle).ClickAsync();
@@ -41,6 +47,9 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             var activeControls = await ReadChromeVisualStateAsync(controls);
             var activeProgress = await ReadChromeVisualStateAsync(progressShell);
             var activeEdgeInfo = await ReadChromeVisualStateAsync(edgeInfo);
+            var activeHeaderBack = await ReadChromeVisualStateAsync(headerBack);
+            var activeHeaderGoLive = await ReadChromeVisualStateAsync(headerGoLive);
+            var activeReaderBack = await ReadChromeVisualStateAsync(readerBack);
 
             Assert.True(
                 initialControls.BackgroundAlpha - activeControls.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction,
@@ -51,6 +60,15 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             Assert.True(
                 initialEdgeInfo.Opacity - activeEdgeInfo.Opacity >= BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction,
                 $"Expected edge info opacity {activeEdgeInfo.Opacity:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction:0.###} lower than {initialEdgeInfo.Opacity:0.###} during active playback.");
+            Assert.True(
+                initialHeaderBack.BackgroundAlpha - activeHeaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction,
+                $"Expected header back background alpha {activeHeaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderBack.BackgroundAlpha:0.###} during active playback.");
+            Assert.True(
+                initialHeaderGoLive.BackgroundAlpha - activeHeaderGoLive.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction,
+                $"Expected header Go Live background alpha {activeHeaderGoLive.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderGoLive.BackgroundAlpha:0.###} during active playback.");
+            Assert.True(
+                initialReaderBack.BackgroundAlpha - activeReaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction,
+                $"Expected reader back background alpha {activeReaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialReaderBack.BackgroundAlpha:0.###} during active playback.");
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,

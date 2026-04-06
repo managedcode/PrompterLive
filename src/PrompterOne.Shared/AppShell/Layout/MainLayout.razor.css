@@ -4,21 +4,21 @@
 }
 
 .app-header--reader-muted .app-header-subtitle {
-    color: rgba(232, 213, 176, .26);
+    color: rgba(232, 213, 176, .20);
 }
 
 .app-header--reader-muted .btn-back {
-    background: rgba(255, 255, 255, .018);
-    border-color: rgba(214, 166, 91, .12);
-    color: rgba(248, 241, 226, .62);
+    background: rgba(255, 255, 255, .012);
+    border: 1px solid rgba(214, 166, 91, .08);
+    color: rgba(248, 241, 226, .50);
     box-shadow: none;
 }
 
 .app-header--reader-muted .btn-back:hover {
-    background: rgba(255, 255, 255, .034);
-    border-color: rgba(214, 166, 91, .18);
-    color: rgba(248, 241, 226, .76);
-    box-shadow: 0 0 14px rgba(214, 166, 91, .05);
+    background: rgba(255, 255, 255, .024);
+    border-color: rgba(214, 166, 91, .14);
+    color: rgba(248, 241, 226, .68);
+    box-shadow: 0 0 10px rgba(214, 166, 91, .04);
 }
 
 .btn-open-script {
@@ -95,14 +95,14 @@
 }
 
 .app-live-widget--reader-muted {
-    border-color: rgba(214, 166, 91, .10);
-    background: linear-gradient(180deg, rgba(8, 10, 18, .86), rgba(4, 6, 12, .92));
-    box-shadow: 0 18px 34px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .03);
+    border-color: rgba(214, 166, 91, .08);
+    background: linear-gradient(180deg, rgba(8, 10, 18, .80), rgba(4, 6, 12, .88));
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .20), inset 0 1px 0 rgba(255, 255, 255, .02);
 }
 
 .app-live-widget--reader-muted .app-live-widget-preview {
-    border-color: rgba(248, 113, 113, .12);
-    filter: saturate(.72) brightness(.78);
+    border-color: rgba(248, 113, 113, .10);
+    filter: saturate(.62) brightness(.72);
 }
 
 .app-live-widget--reader-muted .app-live-widget-overlay {
@@ -110,27 +110,27 @@
 }
 
 .app-live-widget--reader-muted .app-live-widget-live-pill {
-    border-color: rgba(255, 120, 120, .14);
-    background: rgba(92, 20, 26, .46);
-    color: rgba(247, 162, 162, .72);
+    border-color: rgba(255, 120, 120, .10);
+    background: rgba(92, 20, 26, .34);
+    color: rgba(247, 162, 162, .58);
 }
 
 .app-live-widget--reader-muted .app-live-widget-timer {
-    border-color: rgba(214, 166, 91, .08);
-    background: rgba(8, 10, 18, .44);
-    color: rgba(255, 245, 224, .58);
+    border-color: rgba(214, 166, 91, .06);
+    background: rgba(8, 10, 18, .36);
+    color: rgba(255, 245, 224, .48);
 }
 
 .app-live-widget--reader-muted .app-live-widget-eyebrow {
-    color: rgba(248, 241, 226, .30);
+    color: rgba(248, 241, 226, .24);
 }
 
 .app-live-widget--reader-muted .app-live-widget-title {
-    color: rgba(255, 245, 224, .76);
+    color: rgba(255, 245, 224, .66);
 }
 
 .app-live-widget--reader-muted .app-live-widget-detail {
-    color: rgba(248, 241, 226, .36);
+    color: rgba(248, 241, 226, .30);
 }
 
 .app-live-widget[data-live-state="streaming"],

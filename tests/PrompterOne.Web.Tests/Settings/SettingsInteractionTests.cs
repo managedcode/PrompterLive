@@ -2,6 +2,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
