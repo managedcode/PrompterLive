@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
-using PrompterOne.Core.Services;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
@@ -36,13 +35,11 @@ public partial class TeleprompterPage : IAsyncDisposable
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private CameraPreviewInterop CameraPreviewInterop { get; set; } = null!;
-    [Inject] private ScriptCompiler Compiler { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private IMediaDeviceService MediaDeviceService { get; set; } = null!;
     [Inject] private IMediaSceneService MediaSceneService { get; set; } = null!;
-    [Inject] private TpsDocumentReader TpsDocumentReader { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;

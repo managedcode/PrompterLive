@@ -565,12 +565,13 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             probe => {
                 const element = document.querySelector(`[data-testid="${probe.progressLabelTestId}"]`);
                 const text = element?.textContent ?? '';
-                const match = /Word\s+(\d+)/.exec(text);
+                const match = new RegExp(probe.progressPattern).exec(text);
                 return match !== null && Number(match[1]) >= probe.targetWordNumber;
             }
             """,
             new
             {
+                progressPattern = BrowserTestConstants.Learn.ProgressLabelPattern,
                 progressLabelTestId = UiTestIds.Learn.ProgressLabel,
                 targetWordNumber
             },

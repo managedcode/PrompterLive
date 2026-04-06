@@ -48,9 +48,49 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await UiScenarioArtifacts.CapturePageAsync(page, BrowserTestConstants.AppShellFlow.OnboardingScenario, BrowserTestConstants.AppShellFlow.OnboardingGoLiveStep);
 
             await page.GetByTestId(UiTestIds.Onboarding.Next).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
 
             await page.ReloadAsync();
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
+        });
+
+    [Fact]
+    public Task FirstRunOnboarding_DismissReturnsToLibrary_AndStaysHiddenAfterReload() =>
+        RunPageAsync(async page =>
+        {
+            await SeedPendingOnboardingAsync(page);
+
+            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeVisibleAsync();
+
+            await page.GetByTestId(UiTestIds.Onboarding.Dismiss).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
+
+            await page.ReloadAsync();
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
+        });
+
+    [Fact]
+    public Task OnboardingReopen_FromSettings_ReturnsToLibraryWithOverlay() =>
+        RunPageAsync(async page =>
+        {
+            await SeedCompletedOnboardingAsync(page);
+
+            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await page.GetByTestId(UiTestIds.Settings.NavAbout).ClickAsync();
+
+            await page.GetByTestId(UiTestIds.Settings.AboutOnboardingRestart).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.LibraryWithOnboarding));
+
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Onboarding.Title))
+                .ToHaveTextAsync(BrowserTestConstants.AppShellFlow.OnboardingEnglishWelcomeTitle);
+
+            await page.GetByTestId(UiTestIds.Onboarding.Dismiss).ClickAsync();
+            await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.Library));
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
         });
 
@@ -84,6 +124,24 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             {
                 BrowserStorageKeys.SettingsPrefix + SettingsPagePreferences.StorageKey,
                 pendingPreferences
+            });
+    }
+
+    private static Task SeedCompletedOnboardingAsync(Microsoft.Playwright.IPage page)
+    {
+        var completedPreferences = JsonSerializer.Serialize(
+            SettingsPagePreferences.Default with
+            {
+                HasSeenOnboarding = true
+            },
+            JsonOptions);
+
+        return page.EvaluateAsync(
+            BrowserTestConstants.Localization.SetLocalStorageScript,
+            new object[]
+            {
+                BrowserStorageKeys.SettingsPrefix + SettingsPagePreferences.StorageKey,
+                completedPreferences
             });
     }
 }

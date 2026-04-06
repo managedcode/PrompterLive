@@ -847,7 +847,7 @@
     <value>Tour abschließen</value>
   </data>
   <data name="OnboardingStepLibrary" xml:space="preserve">
-    <value>Bibliothek</value>
+    <value>PrompterOne</value>
   </data>
   <data name="OnboardingStepEditor" xml:space="preserve">
     <value>Editor</value>
@@ -862,16 +862,16 @@
     <value>Go Live</value>
   </data>
   <data name="OnboardingWelcomeEyebrow" xml:space="preserve">
-    <value>PROMPTER IM BROWSER</value>
+    <value>SO FUNKTIONIERT ES</value>
   </data>
   <data name="OnboardingWelcomeTitle" xml:space="preserve">
-    <value>Lernen Sie PrompterOne kennen</value>
+    <value>So funktioniert PrompterOne</value>
   </data>
   <data name="OnboardingWelcomeBody" xml:space="preserve">
-    <value>PrompterOne hält ein einziges Skript von der Bibliothek über Probe und Live-Lesen bis zur Sendung im Browser zusammen.</value>
+    <value>PrompterOne hält ein einziges Skript vom Schreiben über die Probe bis zur Live-Lesung und zur Sendung im Browser zusammen.</value>
   </data>
   <data name="OnboardingWelcomeBulletSearch" xml:space="preserve">
-    <value>Nutzen Sie die Bibliothekssuche, um Skripte nach Titel, Dateiname oder Textinhalt zu finden.</value>
+    <value>Durchsuchen Sie Skripte nach Titel, Dateiname oder Textinhalt.</value>
   </data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve">
     <value>Ein einziges TPS-Skript speist Editor, Learn, Teleprompter und Go Live statt getrennter Kopien.</value>
@@ -883,13 +883,13 @@
     <value>TPS-AUTHORING</value>
   </data>
   <data name="OnboardingEditorTitle" xml:space="preserve">
-    <value>Im Editor schreiben</value>
+    <value>Den TPS-Quelltext schreiben</value>
   </data>
   <data name="OnboardingEditorBody" xml:space="preserve">
-    <value>Im Editor formen Sie TPS, das Markdown-basierte TelePrompterScript-Format, das Struktur, Timing, Emotionen, Pausen und Vortrags-Hinweise als Klartext trägt.</value>
+    <value>Der Editor ist der Ort, an dem Sie TPS formen, das Markdown-basierte TelePrompterScript-Format aus der ManagedCode TPS-Spezifikation. Es trägt Struktur, Timing, Emotionen, Pausen und Vortrags-Hinweise als Klartext.</value>
   </data>
   <data name="OnboardingEditorBulletTps" xml:space="preserve">
-    <value>TPS bleibt in jedem Texteditor lesbar, aber PrompterOne versteht seine Tags, Überschriften und Timing-Semantik in Echtzeit.</value>
+    <value>TPS bleibt in jedem Texteditor lesbar, aber PrompterOne versteht seine Tags, Überschriften und das Front Matter in Echtzeit.</value>
   </data>
   <data name="OnboardingEditorBulletMetadata" xml:space="preserve">
     <value>Front Matter, WPM, Profil, Version und Geschwindigkeits-Offsets bleiben am Entwurf statt in getrennte Notizen abzuwandern.</value>
@@ -901,19 +901,19 @@
     <value>RSVP-PROBE</value>
   </data>
   <data name="OnboardingLearnTitle" xml:space="preserve">
-    <value>Mit Learn trainieren</value>
+    <value>Mit RSVP proben</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
-    <value>Learn nutzt RSVP, also Rapid Serial Visual Presentation, um Wörter in einem fokussierten Rhythmus zu zeigen und so Tempo, Artikulation und Behalten zu trainieren, ohne einen ganzen Absatz abzuscannen.</value>
+    <value>Learn nutzt RSVP, also Rapid Serial Visual Presentation, um jeweils ein Wort in einem fokussierten Rhythmus anzuzeigen, damit Sie Tempo, Artikulation und Behalten trainieren können.</value>
   </data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve">
-    <value>RSVP reduziert Augenbewegungen, indem das aktive Wort zentriert bleibt und der nahe Kontext sichtbar bleibt.</value>
+    <value>RSVP hält das aktive Wort zentriert, während der nahe Kontext sichtbar bleibt.</value>
   </data>
   <data name="OnboardingLearnBulletTiming" xml:space="preserve">
-    <value>Geschwindigkeitsregler und TPS-Timing-Hinweise helfen Ihnen, näher an der echten Sprechkadenz zu proben.</value>
+    <value>Geschwindigkeitsregler und TPS-Timing-Hinweise helfen Ihnen, näher an der gesprochenen Kadenz zu proben.</value>
   </data>
   <data name="OnboardingLearnBulletContext" xml:space="preserve">
-    <value>Nutzen Sie Learn, wenn Sie Wiederholung, Gedächtnisstützung und Tempo-Feedback brauchen, bevor die Kamera läuft.</value>
+    <value>Nutzen Sie Learn für Wiederholung, Gedächtnisstütze und Tempo-Feedback, bevor Sie vor die Kamera gehen.</value>
   </data>
   <data name="OnboardingTeleprompterEyebrow" xml:space="preserve">
     <value>LIVE-LESEN</value>
@@ -925,7 +925,7 @@
     <value>Der Teleprompter verwandelt dasselbe TPS-Skript in eine Live-Lesefläche mit Fokuslinien, Ausrichtung, Spiegelsteuerung, Orientierungswechsel und Live-Wiedergabebewegung.</value>
   </data>
   <data name="OnboardingTeleprompterBulletMirror" xml:space="preserve">
-    <value>Spiegeln Sie horizontal oder vertikal für Spiegelglas- und Tablet-Rigs, ohne die Leser-Route zu verlassen.</value>
+    <value>Spiegeln Sie horizontal oder vertikal für reflektierendes Glas und Tablet-Setups, ohne die Leserroute zu verlassen.</value>
   </data>
   <data name="OnboardingTeleprompterBulletFocus" xml:space="preserve">
     <value>Passen Sie Breite, Fokuspunkt, Textgröße und Ausrichtung an, damit die Zeile vor der Kamera ruhig und lesbar bleibt.</value>
@@ -934,22 +934,34 @@
     <value>TPS-Pausen, Geschwindigkeitswechsel, Betonungen und Vortrags-Hinweise bleiben beim Lesen sichtbar.</value>
   </data>
   <data name="OnboardingGoLiveEyebrow" xml:space="preserve">
-    <value>LIVE-BETRIEB</value>
+    <value>LIVE-STEUERUNG</value>
   </data>
   <data name="OnboardingGoLiveTitle" xml:space="preserve">
-    <value>Die Show in Go Live fahren</value>
+    <value>Führen Sie die Show in Go Live</value>
   </data>
   <data name="OnboardingGoLiveBody" xml:space="preserve">
-    <value>Go Live ist das Browser-Studio, um Ihr aktuelles Skript, den Programm-Feed, Quellen, Aufnahme und den Zustand der Downstream-Transporte über eine einzige Steuerfläche zu bedienen.</value>
+    <value>Go Live ist das Browser-Studio, um Ihr aktuelles Skript, den Programm-Feed, Quellen, Aufnahme und den Downstream-Transportzustand über eine einzige Steueroberfläche zu bedienen.</value>
   </data>
   <data name="OnboardingGoLiveBulletProgram" xml:space="preserve">
-    <value>Halten Sie einen einzigen Programm-Feed konsistent zwischen Vorschau, aktiver Quelle und Ziel-Routing.</value>
+    <value>Halten Sie einen einzigen Programm-Feed zwischen Vorschau, aktiver Quelle und den Zieldestinationen synchron.</value>
   </data>
   <data name="OnboardingGoLiveBulletRecording" xml:space="preserve">
-    <value>Aktivieren Sie die lokale Aufnahme und überwachen Sie den Sitzungszustand, ohne so zu tun, als würde ein Server-Backend die Arbeit übernehmen.</value>
+    <value>Schalten Sie die lokale Aufnahme scharf und überwachen Sie den Sitzungszustand, ohne so zu tun, als würde ein Server-Backend die Arbeit übernehmen.</value>
   </data>
   <data name="OnboardingGoLiveBulletRouting" xml:space="preserve">
-    <value>Nutzen Sie Go Live, wenn Sie von der Probe in Produktions-Routing und Aufnahme wechseln möchten.</value>
+    <value>Nutzen Sie Go Live, wenn Sie von der Probe in Routing und Capture wechseln möchten.</value>
+  </data>
+  <data name="SettingsAboutOnboardingCardTitle" xml:space="preserve">
+    <value>Einführung</value>
+  </data>
+  <data name="OnboardingRestartTour" xml:space="preserve">
+    <value>Tour neu starten</value>
+  </data>
+  <data name="OnboardingReopenTitle" xml:space="preserve">
+    <value>Geführte Tour erneut öffnen</value>
+  </data>
+  <data name="OnboardingReopenBody" xml:space="preserve">
+    <value>Verwenden Sie dies, wenn Sie PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter und Go Live erneut sehen möchten.</value>
   </data>
   <data name="EditorFindOpen" xml:space="preserve">
     <value>Suchen</value>

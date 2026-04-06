@@ -1,0 +1,49 @@
+@namespace PrompterOne.Shared.AppShell.Components
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Contracts
+
+<button type="button"
+        class="@CssClass"
+        title="@AccessibleLabel"
+        aria-label="@AccessibleLabel"
+        data-live-state="@LiveState"
+        data-testid="@TestId"
+        @onclick="HandleClick">
+    <span class="go-live-shell-button__signal" aria-hidden="true">
+        <span class="go-live-shell-button__dot"
+              data-testid="@UiTestIds.Header.GoLiveDot"></span>
+        <span class="go-live-shell-button__icon"
+              data-testid="@UiTestIds.Header.GoLiveIcon">
+            <UiIcon Kind="UiIconKind.Video" Size="15" />
+        </span>
+    </span>
+    <span class="go-live-shell-button__copy">
+        <span class="go-live-shell-button__label"
+              data-testid="@UiTestIds.Header.GoLiveLabel">@Label</span>
+        @if (ShowStatus)
+        {
+            <span class="go-live-shell-button__status"
+                  data-testid="@UiTestIds.Header.GoLiveStatus">@Status</span>
+        }
+    </span>
+</button>
+
+@code {
+    private const string BaseCssClass = "go-live-shell-button";
+
+    private string AccessibleLabel => string.IsNullOrWhiteSpace(Status)
+        ? Label
+        : string.Join(' ', new[] { Label, Status });
+
+    private string CssClass => BaseCssClass;
+
+    private bool ShowStatus => !string.IsNullOrWhiteSpace(Status);
+
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string LiveState { get; set; } = GoLiveIndicatorStates.Idle;
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string Status { get; set; } = string.Empty;
+    [Parameter] public string TestId { get; set; } = string.Empty;
+
+    private Task HandleClick() => OnClick.InvokeAsync();
+}

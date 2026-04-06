@@ -67,6 +67,21 @@ internal static class EditorMonacoDriver
         await SourceStage(page).ClickAsync(new() { Position = position });
     }
 
+    internal static async Task ClickUncoveredStageAreaAsync(IPage page)
+    {
+        var stageBounds = await SourceStage(page).BoundingBoxAsync();
+        Assert.NotNull(stageBounds);
+
+        var clickX = Math.Max(0, stageBounds!.Width - BrowserTestConstants.Editor.MenuDismissRightInsetPx);
+        var clickY = Math.Max(0, stageBounds.Height * BrowserTestConstants.Editor.MenuDismissClickVerticalFactor);
+
+        await ClickAsync(page, new Position
+        {
+            X = (float)clickX,
+            Y = (float)clickY
+        });
+    }
+
     internal static async Task ClearAndTypeAsync(IPage page, string text)
     {
         await ClickAsync(page);

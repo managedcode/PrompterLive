@@ -52,6 +52,7 @@ internal static partial class BrowserTestConstants
 
     public static class Learn
     {
+        public const string ProgressLabelPattern = @"^\s*(?<current>\d+)\s*/\s*(?<total>\d+)\b";
         public const string DemoProbeWord = "believe";
         public const int DemoProbeStepLimit = 12;
         public const string DemoContextLayoutProbeWord = "solution";
@@ -210,7 +211,7 @@ internal static partial class BrowserTestConstants
         public const string SlowFragment = "[slow]transformative moment[/slow]";
         public const string SlowCompanyFragment = "[slow]our company[/slow]";
         public const string PauseFragment = "[pause:2s]";
-        public const string TimedPauseFragment = "[pause:1000ms]";
+        public const string TimedPauseFragment = "[pause:500ms]";
         public const string CustomWpmToken = "[180WPM]";
         public const string CustomWpmCompanyFragment = "[180WPM]our company[/180WPM]";
         public const string PronunciationCompanyFragment = "[pronunciation:guide]our company[/pronunciation]";
@@ -218,6 +219,7 @@ internal static partial class BrowserTestConstants
         public const string StructureSegmentToken = "## [Segment Name|Speaker:Host|140WPM|neutral|0:00-0:30]";
         public const string StructureBlockToken = "### [Block Name|Speaker:Host|140WPM|focused]";
         public const string DurationField = "duration:";
+        public const string LineFeed = "\n";
         public const string PronunciationToken = "[pronunciation:guide]";
         public const string SegmentRewrite = "## [Launch Angle|205WPM|focused|1:00-2:00]";
         public const string BlockRewrite = "### [Signal Block|205WPM|professional]";
@@ -226,13 +228,21 @@ internal static partial class BrowserTestConstants
         public const string TypedTitle = "Typed Intro";
         public const string TypedBlock = "Typed Block";
         public const string TypedHighlight = "[highlight]Every word[/highlight]";
-        public const string TypedMultilineSelectionStart = "Typed Intro";
-        public const string TypedMultilineSelectionEnd = "professional";
+        public const string TypedMultilineSelectionStart = "typed TPS script.";
+        public const string TypedMultilineSelectionEnd = "floating toolbar";
+        public const string TypedMultilineSelectionProbeLine = "This is a typed TPS script.";
         public const string TypedSelectionTarget = "script";
+        public const string ReverseSelectionTarget = "script";
+        public const int ReverseSelectionCharacterCount = 5;
+        public const string ReverseSelectionExpectedText = "cript";
+        public const string ReverseMultilineSelectionTarget = "anchored.";
+        public const int ReverseMultilineSelectionCharacterCount = 72;
         public const string DemoFloatingSelectionTarget = "local-first teleprompter workflow";
         public const string ToolbarPinnedSelectionTarget = "welcome";
         public const int ToolbarPinnedSelectionCharacterCount = 7;
         public const double FloatingBarPinnedMaxDriftPx = 4;
+        public const double MenuDismissClickVerticalFactor = 0.5;
+        public const int MenuDismissRightInsetPx = 96;
         public const int LocalHistoryAutosaveObservationDelayMs = 1900;
         public const string LocalHistoryFirstLine = "First browser-local revision for restore.";
         public const string LocalHistorySecondLine = "Second browser-local revision for restore.";
@@ -275,6 +285,12 @@ internal static partial class BrowserTestConstants
             ## [Typed Intro|175WPM|focused|0:05-0:20]
             ### [Typed Block|165WPM|professional]
             This is a typed TPS script. / [highlight]Every word[/highlight] stays in sync. //
+            """;
+        public const string TypedMultilineScript = """
+            ## [Typed Intro|175WPM|focused|0:05-0:20]
+            ### [Typed Block|165WPM|professional]
+            This is a typed TPS script.
+            Professional speakers keep the floating toolbar anchored.
             """;
     }
 
@@ -850,7 +866,7 @@ internal static partial class BrowserTestConstants
     public static class Regexes
     {
         public static Regex ActiveClass { get; } = new(@"\bactive\b", RegexOptions.Compiled);
-        public static Regex GoLiveHeaderClass { get; } = new(@"btn-golive-header", RegexOptions.Compiled);
+        public static Regex LearnProgressLabel { get; } = new(BrowserTestConstants.Learn.ProgressLabelPattern, RegexOptions.Compiled);
         public static Regex SettingsAboutVersion { get; } = new(@"^Version 0\.1\.\d+ · Build \d+$", RegexOptions.Compiled);
         public static Regex ToggleOnClass { get; } = new(@"\bon\b", RegexOptions.Compiled);
         public static Regex NonZeroWidth { get; } = new(@"width:\s*0%", RegexOptions.Compiled);
@@ -907,6 +923,7 @@ internal static partial class BrowserTestConstants
         public static string LearnSecurityIncident => AppRoutes.LearnWithId(Scripts.SecurityIncidentId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
         public static string GoLiveQuantum => AppRoutes.GoLiveWithId(Scripts.QuantumId);
+        public static string LibraryWithOnboarding => AppRoutes.LibraryWithOnboarding();
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
         public static string TeleprompterLeadership => AppRoutes.TeleprompterWithId(Scripts.LeadershipId);
         public static string TeleprompterMissing => AppRoutes.TeleprompterWithId(Scripts.MissingId);

@@ -9,10 +9,10 @@ namespace PrompterOne.Web.Tests;
 public sealed class EditorStructureSidebarTests : BunitContext
 {
     private const string FocusedAccentColor = "#16A34A";
-    private const string SplitActionLabel = "Open In Library";
+    private const string SplitActionLabel = "Open in Library";
     private const string SplitFeedbackBadge = "From ##";
     private const string SplitFeedbackDestination = "New scripts were saved to the library.";
-    private const string SplitFeedbackDraftNote = "This draft stayed open here so you can keep editing.";
+    private const string SplitFeedbackDraftNote = "The current draft stayed open.";
     private const string SplitFeedbackSummary = "2 new scripts created.";
     private const string SplitFeedbackTitle = "Split complete";
     private const string WarmEmotion = "Warm";

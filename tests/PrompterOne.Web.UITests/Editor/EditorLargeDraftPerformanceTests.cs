@@ -137,29 +137,24 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             await page.WaitForFunctionAsync(
                 """
                 (args) => {
-                    const stage = document.querySelector(`[data-testid="${args.stageTestId}"]`);
-                    const scrollHost = document.querySelector(`[data-testid="${args.scrollHostTestId}"]`);
-                    if (!stage || !scrollHost) {
+                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
+                    const harness = window[args.harnessGlobalName];
+                    const state = harness?.getState(args.stageTestId);
+                    if (!input || !state?.visibleRange || !state?.selection) {
                         return false;
                     }
 
-                    const normalizeWhitespace = value => (value ?? '').replaceAll('\u00A0', ' ');
-                    const normalizedTargetHeader = normalizeWhitespace(args.targetHeader);
-                    const targetLine = Array
-                        .from(stage.querySelectorAll('.view-line'))
-                        .find(node => normalizeWhitespace(node.textContent).includes(normalizedTargetHeader));
-                    if (!(targetLine instanceof HTMLElement)) {
-                        return false;
-                    }
-
-                    const hostRect = scrollHost.getBoundingClientRect();
-                    const targetRect = targetLine.getBoundingClientRect();
-                    return targetRect.top >= hostRect.top && targetRect.bottom <= hostRect.bottom;
+                    const expectedStart = input.value.indexOf(args.targetHeader);
+                    return expectedStart >= 0 &&
+                        state.selection.start === expectedStart &&
+                        state.selection.line >= state.visibleRange.startLineNumber &&
+                        state.selection.line <= state.visibleRange.endLineNumber;
                 }
                 """,
                 new
                 {
-                    scrollHostTestId = UiTestIds.Editor.SourceScrollHost,
+                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                    inputTestId = UiTestIds.Editor.SourceInput,
                     stageTestId = UiTestIds.Editor.SourceStage,
                     targetHeader = targetSegmentHeader
                 },
@@ -169,30 +164,23 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
                 """
                 (args) => {
                     const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const stage = document.querySelector(`[data-testid="${args.stageTestId}"]`);
-                    const scrollHost = document.querySelector(`[data-testid="${args.scrollHostTestId}"]`);
                     const harness = window[args.harnessGlobalName];
-                    if (!input || !stage || !scrollHost || !harness) {
+                    if (!input || !harness) {
                         throw new Error("Large draft navigation probe result is unavailable.");
                     }
 
-                    const normalizeWhitespace = value => (value ?? '').replaceAll('\u00A0', ' ');
-                    const normalizedTargetHeader = normalizeWhitespace(args.targetHeader);
-                    const targetLine = Array
-                        .from(stage.querySelectorAll('.view-line'))
-                        .find(node => normalizeWhitespace(node.textContent).includes(normalizedTargetHeader));
                     const state = harness.getState(args.stageTestId);
-
-                    const hostRect = scrollHost.getBoundingClientRect();
-                    const targetRect = targetLine?.getBoundingClientRect();
 
                     return {
                         selectionStart: input.selectionStart ?? -1,
                         expectedStart: input.value.indexOf(args.targetHeader),
                         scrollTop: state?.scrollTop ?? -1,
-                        targetVisible: Boolean(targetRect) &&
-                            targetRect.top >= hostRect.top &&
-                            targetRect.bottom <= hostRect.bottom
+                        selectionLine: state?.selection?.line ?? -1,
+                        targetVisible: Boolean(state?.visibleRange) &&
+                            state.selection.line >= state.visibleRange.startLineNumber &&
+                            state.selection.line <= state.visibleRange.endLineNumber,
+                        visibleRangeEndLine: state?.visibleRange?.endLineNumber ?? -1,
+                        visibleRangeStartLine: state?.visibleRange?.startLineNumber ?? -1
                     };
                 }
                 """,
@@ -200,14 +188,15 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
                 {
                     harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
                     inputTestId = UiTestIds.Editor.SourceInput,
-                    scrollHostTestId = UiTestIds.Editor.SourceScrollHost,
                     stageTestId = UiTestIds.Editor.SourceStage,
                     targetHeader = targetSegmentHeader
                 });
 
             Assert.Equal(result.ExpectedStart, result.SelectionStart);
             Assert.True(result.ScrollTop > 0);
-            Assert.True(result.TargetVisible);
+            Assert.True(
+                result.TargetVisible,
+                $"Expected the target segment header to stay visible after navigation, but the Monaco visible range did not include the selected line. ScrollTop={result.ScrollTop}; SelectionStart={result.SelectionStart}; ExpectedStart={result.ExpectedStart}; SelectionLine={result.SelectionLine}; VisibleStart={result.VisibleRangeStartLine}; VisibleEnd={result.VisibleRangeEndLine}.");
         }
         finally
         {
@@ -234,8 +223,14 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
 
         public int SelectionStart { get; set; }
 
+        public int SelectionLine { get; set; }
+
         public double ScrollTop { get; set; }
 
         public bool TargetVisible { get; set; }
+
+        public int VisibleRangeEndLine { get; set; }
+
+        public int VisibleRangeStartLine { get; set; }
     }
 }

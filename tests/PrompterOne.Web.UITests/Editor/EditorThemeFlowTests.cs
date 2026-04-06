@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
+using Xunit.Sdk;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
@@ -16,77 +17,90 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
         RunPageAsync(async page =>
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.LightThemeScenario);
+            var browserErrors = BrowserErrorCollector.Attach(page);
+            var bootstrapOverlay = page.GetByTestId(UiTestIds.Diagnostics.Bootstrap);
 
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.Settings,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            try
+            {
+                await page.GotoAsync(
+                    BrowserTestConstants.Routes.Settings,
+                    new() { WaitUntil = WaitUntilState.NetworkIdle });
+                await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
+                    new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Settings.ThemeOption(BrowserTestConstants.SettingsFlow.LightTheme)).ClickAsync();
-            await Expect(page.Locator("html")).ToHaveAttributeAsync(
-                BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
-                BrowserTestConstants.SettingsFlow.LightTheme);
+                await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
+                await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();
+                await page.GetByTestId(UiTestIds.Settings.ThemeOption(BrowserTestConstants.SettingsFlow.LightTheme)).ClickAsync();
+                await Expect(page.Locator("html")).ToHaveAttributeAsync(
+                    BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
+                    BrowserTestConstants.SettingsFlow.LightTheme);
 
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.EditorDemo,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await Expect(page.Locator("html")).ToHaveAttributeAsync(
-                BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
-                BrowserTestConstants.SettingsFlow.LightTheme);
+                await page.GotoAsync(
+                    BrowserTestConstants.Routes.EditorDemo,
+                    new() { WaitUntil = WaitUntilState.NetworkIdle });
+                await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(
+                    new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await Expect(page.Locator("html")).ToHaveAttributeAsync(
+                    BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
+                    BrowserTestConstants.SettingsFlow.LightTheme);
+                await Expect(bootstrapOverlay).ToBeHiddenAsync();
 
-            var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
-            var emotionMenu = page.GetByTestId(UiTestIds.Editor.MenuEmotion);
-            var motivationalEmotion = page.GetByTestId(UiTestIds.Editor.EmotionMotivational);
-            var tooltip = page.GetByTestId(UiTestIds.Editor.ToolbarTooltip)
-                .Filter(new() { HasTextString = BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText });
+                var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
+                var emotionMenu = page.GetByTestId(UiTestIds.Editor.MenuEmotion);
+                var motivationalEmotion = page.GetByTestId(UiTestIds.Editor.EmotionMotivational);
+                var tooltip = page.GetByTestId(UiTestIds.Editor.ToolbarTooltip)
+                    .Filter(new() { HasTextString = BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText });
 
-            await emotionTrigger.ClickAsync();
-            await Expect(emotionMenu).ToBeVisibleAsync();
-            await Expect(motivationalEmotion).ToBeVisibleAsync();
+                await emotionTrigger.ClickAsync();
+                await Expect(emotionMenu).ToBeVisibleAsync();
+                await Expect(motivationalEmotion).ToBeVisibleAsync();
 
-            await motivationalEmotion.HoverAsync();
-            await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.TooltipSettleDelayMs);
-            await Expect(tooltip).ToBeVisibleAsync();
+                await motivationalEmotion.HoverAsync();
+                await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.TooltipSettleDelayMs);
+                await Expect(tooltip).ToBeVisibleAsync();
 
-            var menuBackground = await ReadCssColorAsync(emotionMenu, BackgroundColorProperty);
-            var menuItemColor = await ReadCssColorAsync(motivationalEmotion, ColorProperty);
-            var tooltipBackground = await ReadCssColorAsync(tooltip, BackgroundColorProperty);
-            var tooltipColor = await ReadCssColorAsync(tooltip, ColorProperty);
-            var tooltipOpacity = await ReadOpacityAsync(tooltip);
+                var menuBackground = await ReadCssColorAsync(emotionMenu, BackgroundColorProperty);
+                var menuItemColor = await ReadCssColorAsync(motivationalEmotion, ColorProperty);
+                var tooltipBackground = await ReadCssColorAsync(tooltip, BackgroundColorProperty);
+                var tooltipColor = await ReadCssColorAsync(tooltip, ColorProperty);
+                var tooltipOpacity = await ReadOpacityAsync(tooltip);
 
-            Assert.Null(await motivationalEmotion.GetAttributeAsync("title"));
-            Assert.Equal(
-                BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
-                await motivationalEmotion.GetAttributeAsync("aria-label"));
-            Assert.Equal(
-                BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
-                await tooltip.InnerTextAsync());
+                Assert.Null(await motivationalEmotion.GetAttributeAsync("title"));
+                Assert.Equal(
+                    BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
+                    await motivationalEmotion.GetAttributeAsync("aria-label"));
+                Assert.Equal(
+                    BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText,
+                    await tooltip.InnerTextAsync());
 
-            Assert.True(
-                HasMinimumChannels(menuBackground, BrowserTestConstants.EditorFlow.MinimumLightMenuSurfaceChannel),
-                $"Expected the light-theme editor emotion menu surface to stay light, but got rgba({menuBackground.R:0.##}, {menuBackground.G:0.##}, {menuBackground.B:0.##}, {menuBackground.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(menuItemColor, BrowserTestConstants.EditorFlow.MaximumReadableTextChannel),
-                $"Expected the light-theme editor emotion text to stay readable, but got rgba({menuItemColor.R:0.##}, {menuItemColor.G:0.##}, {menuItemColor.B:0.##}, {menuItemColor.A:0.##}).");
-            Assert.True(
-                HasMinimumChannels(tooltipBackground, BrowserTestConstants.EditorFlow.MinimumLightTooltipSurfaceChannel),
-                $"Expected the light-theme editor tooltip surface to stay light, but got rgba({tooltipBackground.R:0.##}, {tooltipBackground.G:0.##}, {tooltipBackground.B:0.##}, {tooltipBackground.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(tooltipColor, BrowserTestConstants.EditorFlow.MaximumReadableTextChannel),
-                $"Expected the light-theme editor tooltip text to stay readable, but got rgba({tooltipColor.R:0.##}, {tooltipColor.G:0.##}, {tooltipColor.B:0.##}, {tooltipColor.A:0.##}).");
-            Assert.True(
-                tooltipOpacity >= BrowserTestConstants.EditorFlow.MinimumVisibleTooltipOpacity,
-                $"Expected the custom editor tooltip to be visibly rendered on hover, but its opacity was {tooltipOpacity:0.##}.");
+                Assert.True(
+                    HasMinimumChannels(menuBackground, BrowserTestConstants.EditorFlow.MinimumLightMenuSurfaceChannel),
+                    $"Expected the light-theme editor emotion menu surface to stay light, but got rgba({menuBackground.R:0.##}, {menuBackground.G:0.##}, {menuBackground.B:0.##}, {menuBackground.A:0.##}).");
+                Assert.True(
+                    HasMaximumChannels(menuItemColor, BrowserTestConstants.EditorFlow.MaximumReadableTextChannel),
+                    $"Expected the light-theme editor emotion text to stay readable, but got rgba({menuItemColor.R:0.##}, {menuItemColor.G:0.##}, {menuItemColor.B:0.##}, {menuItemColor.A:0.##}).");
+                Assert.True(
+                    HasMinimumChannels(tooltipBackground, BrowserTestConstants.EditorFlow.MinimumLightTooltipSurfaceChannel),
+                    $"Expected the light-theme editor tooltip surface to stay light, but got rgba({tooltipBackground.R:0.##}, {tooltipBackground.G:0.##}, {tooltipBackground.B:0.##}, {tooltipBackground.A:0.##}).");
+                Assert.True(
+                    HasMaximumChannels(tooltipColor, BrowserTestConstants.EditorFlow.MaximumReadableTextChannel),
+                    $"Expected the light-theme editor tooltip text to stay readable, but got rgba({tooltipColor.R:0.##}, {tooltipColor.G:0.##}, {tooltipColor.B:0.##}, {tooltipColor.A:0.##}).");
+                Assert.True(
+                    tooltipOpacity >= BrowserTestConstants.EditorFlow.MinimumVisibleTooltipOpacity,
+                    $"Expected the custom editor tooltip to be visibly rendered on hover, but its opacity was {tooltipOpacity:0.##}.");
 
-            await UiScenarioArtifacts.CapturePageAsync(
-                page,
-                BrowserTestConstants.EditorFlow.LightThemeScenario,
-                BrowserTestConstants.EditorFlow.LightThemeStep);
+                await UiScenarioArtifacts.CapturePageAsync(
+                    page,
+                    BrowserTestConstants.EditorFlow.LightThemeScenario,
+                    BrowserTestConstants.EditorFlow.LightThemeStep);
+            }
+            catch (Exception exception)
+            {
+                var bootstrapText = await bootstrapOverlay.TextContentAsync() ?? string.Empty;
+                throw new XunitException(
+                    $"Editor light-theme dropdown flow failed. BootstrapOverlay='{bootstrapText}'. BrowserErrors:{Environment.NewLine}{browserErrors.Describe()}{Environment.NewLine}{exception}");
+            }
         });
 
     private static bool HasMaximumChannels(CssColor color, double maximum) =>

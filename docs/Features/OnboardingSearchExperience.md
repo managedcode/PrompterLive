@@ -4,6 +4,18 @@
 
 PrompterOne now explains itself on first launch instead of dropping a new user into a dense browser studio with no context. The first-run walkthrough introduces the product model, TPS, RSVP, Editor, Learn, Teleprompter, and Go Live, then stays dismissed once the user finishes or explicitly opts out.
 
+The tour can be reopened later from the library header or from the Settings About section. The shell button replays the guided flow in place, and the Settings action routes the user back to Library with an onboarding request so the overlay can open again.
+
+The walkthrough is intentionally ordered as:
+
+1. PrompterOne overview and library search.
+2. TPS authoring in the Editor.
+3. RSVP rehearsal in Learn.
+4. Live reading in the Teleprompter.
+5. Live control in Go Live.
+
+The wording follows the upstream TPS README definitions of TPS as a markdown-based script format with timing, emotion, pauses, delivery cues, and runtime surfaces for rehearsal and live reading: <https://github.com/managedcode/TPS/blob/main/README.md>.
+
 The same slice also makes script discovery and authoring searchable:
 
 - Library search matches script title, stored file name, and script body content.
@@ -28,6 +40,16 @@ flowchart LR
     Overlay --> Persist
     Persist --> App
     Flag -- "Yes" --> App
+```
+
+## Onboarding Story Map
+
+```mermaid
+flowchart LR
+    Start["PrompterOne overview"] --> Editor["TPS authoring"]
+    Editor --> Learn["RSVP rehearsal"]
+    Learn --> Teleprompter["Live reading"]
+    Teleprompter --> GoLive["Live control"]
 ```
 
 ## Search Contracts
@@ -57,11 +79,13 @@ sequenceDiagram
 ## Current Behavior
 
 - `MainLayout` checks `SettingsPagePreferences.HasSeenOnboarding` from the browser-owned settings store after bootstrap.
-- When the flag is `false`, the shell mounts a localized onboarding overlay and routes the user through Library, Editor, Learn, Teleprompter, and Go Live.
-- Completing the tour or choosing `Not interested` persists the same browser-local settings flag so the walkthrough does not reappear on the next load.
+- When the flag is `false`, the shell mounts a localized onboarding overlay and routes the user through the PrompterOne overview, Editor, Learn, Teleprompter, and Go Live.
+- Completing the tour or choosing `Not interested` persists the same browser-local settings flag, hides the overlay, and returns the user to Library.
+- Reopening the tour from the shell uses the current route and replays the overlay without clearing the seen flag.
+- Reopening the tour from Settings navigates to `Library?onboarding=1`, which causes the shell to show the same overlay again even after completion.
 - Onboarding copy is localized for all supported UI cultures: `en`, `uk`, `fr`, `es`, `it`, `de`, and `pt`.
 - The onboarding copy explains the product model in user terms:
-  - PrompterOne is browser-first and local-first.
+  - PrompterOne is browser-first and local-first, with script search and a single shared workflow.
   - TPS is the structured plain-text TelePrompterScript format used across authoring and reading.
   - RSVP in Learn is for focused rehearsal and pacing.
   - Teleprompter is the live reading surface.

@@ -11,8 +11,6 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class MainLayoutGoLiveSessionTests : BunitContext
 {
-    private const string StreamingStateValue = "streaming";
-
     [Fact]
     public void MainLayout_HidesSharedHeader_OnGoLiveScreen()
     {
@@ -100,7 +98,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
 
         cut.WaitForAssertion(() =>
             Assert.Equal(
-                "recording",
+                GoLiveIndicatorStates.Recording,
                 cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-live-state")));
     }
 
@@ -114,9 +112,12 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
         var cut = RenderLayout();
 
         cut.WaitForAssertion(() =>
+        {
             Assert.Equal(
-                StreamingStateValue,
-                cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-live-state")));
+                GoLiveIndicatorStates.Streaming,
+                cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-live-state"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.GoLiveStatus));
+        });
     }
 
     private static GoLiveSessionState CreateActiveSession(bool isRecordingActive) =>

@@ -554,25 +554,25 @@
   <data name="OnboardingOpenTeleprompter" xml:space="preserve"><value>Apri teleprompter</value></data>
   <data name="OnboardingOpenGoLive" xml:space="preserve"><value>Apri Go Live</value></data>
   <data name="OnboardingFinish" xml:space="preserve"><value>Termina il tour</value></data>
-  <data name="OnboardingStepLibrary" xml:space="preserve"><value>Libreria</value></data>
+  <data name="OnboardingStepLibrary" xml:space="preserve"><value>PrompterOne</value></data>
   <data name="OnboardingStepEditor" xml:space="preserve"><value>Editor</value></data>
   <data name="OnboardingStepLearn" xml:space="preserve"><value>Learn</value></data>
   <data name="OnboardingStepTeleprompter" xml:space="preserve"><value>Teleprompter</value></data>
   <data name="OnboardingStepGoLive" xml:space="preserve"><value>Go Live</value></data>
-  <data name="OnboardingWelcomeEyebrow" xml:space="preserve"><value>PROMPTER NEL BROWSER</value></data>
-  <data name="OnboardingWelcomeTitle" xml:space="preserve"><value>Scopri PrompterOne</value></data>
-  <data name="OnboardingWelcomeBody" xml:space="preserve"><value>PrompterOne mantiene lo stesso script dalla libreria alla prova, alla lettura dal vivo e alla messa in onda senza uscire dal browser.</value></data>
+  <data name="OnboardingWelcomeEyebrow" xml:space="preserve"><value>COME FUNZIONA</value></data>
+  <data name="OnboardingWelcomeTitle" xml:space="preserve"><value>Come funziona PrompterOne</value></data>
+  <data name="OnboardingWelcomeBody" xml:space="preserve"><value>PrompterOne mantiene lo stesso script dalla scrittura alla prova, alla lettura dal vivo e alla messa in onda senza uscire dal browser.</value></data>
   <data name="OnboardingWelcomeBulletSearch" xml:space="preserve"><value>Usa la ricerca della libreria per trovare script per titolo, nome file o testo contenuto nello script.</value></data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve"><value>Un solo script TPS alimenta Editor, Learn, Teleprompter e Go Live invece di copie separate.</value></data>
   <data name="OnboardingWelcomeBulletLocal" xml:space="preserve"><value>Il tuo workspace resta local-first in questo browser, con salvataggio automatico, cronologia, importazione ed esportazione integrati.</value></data>
   <data name="OnboardingEditorEyebrow" xml:space="preserve"><value>AUTHORING TPS</value></data>
-  <data name="OnboardingEditorTitle" xml:space="preserve"><value>Scrivi nell’editor</value></data>
+  <data name="OnboardingEditorTitle" xml:space="preserve"><value>Scrivi il sorgente TPS</value></data>
   <data name="OnboardingEditorBody" xml:space="preserve"><value>L’editor è il luogo in cui modelli TPS, il formato TelePrompterScript basato su Markdown che porta struttura, timing, emozioni, pause e indicazioni di delivery in testo semplice.</value></data>
   <data name="OnboardingEditorBulletTps" xml:space="preserve"><value>TPS resta leggibile in qualsiasi editor di testo, ma PrompterOne capisce in tempo reale i suoi tag, titoli e la semantica del timing.</value></data>
   <data name="OnboardingEditorBulletMetadata" xml:space="preserve"><value>Front matter, WPM, profilo, versione e speed offset restano legati alla bozza invece di finire in note separate.</value></data>
   <data name="OnboardingEditorBulletAuthoring" xml:space="preserve"><value>Usa la ricerca dell’editor, i menu, gli strumenti di struttura e gli aiuti IA per rifinire lo stesso script che verrà usato nelle superfici di lettura.</value></data>
   <data name="OnboardingLearnEyebrow" xml:space="preserve"><value>PROVA RSVP</value></data>
-  <data name="OnboardingLearnTitle" xml:space="preserve"><value>Allenati con Learn</value></data>
+  <data name="OnboardingLearnTitle" xml:space="preserve"><value>Prova con RSVP</value></data>
   <data name="OnboardingLearnBody" xml:space="preserve"><value>Learn usa RSVP, o Rapid Serial Visual Presentation, per mostrare le parole con un ritmo focalizzato così da allenare cadenza, articolazione e memorizzazione senza scorrere un intero paragrafo.</value></data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve"><value>RSVP riduce il movimento degli occhi mantenendo centrata la parola attiva mentre il contesto vicino resta visibile.</value></data>
   <data name="OnboardingLearnBulletTiming" xml:space="preserve"><value>I controlli di velocità e gli indizi temporali TPS aiutano a provare più vicino alla vera cadenza parlata.</value></data>
@@ -589,6 +589,10 @@
   <data name="OnboardingGoLiveBulletProgram" xml:space="preserve"><value>Mantieni un solo feed programma coerente tra anteprima, sorgente attiva e instradamento verso le destinazioni.</value></data>
   <data name="OnboardingGoLiveBulletRecording" xml:space="preserve"><value>Arma la registrazione locale e monitora lo stato della sessione senza fingere che un backend server stia facendo il lavoro.</value></data>
   <data name="OnboardingGoLiveBulletRouting" xml:space="preserve"><value>Usa Go Live quando sei pronto a passare dalla prova all’instradamento e alla cattura di produzione.</value></data>
+  <data name="SettingsAboutOnboardingCardTitle" xml:space="preserve"><value>Introduzione</value></data>
+  <data name="OnboardingRestartTour" xml:space="preserve"><value>Riapri il tour</value></data>
+  <data name="OnboardingReopenTitle" xml:space="preserve"><value>Riapri il tour guidato</value></data>
+  <data name="OnboardingReopenBody" xml:space="preserve"><value>Usalo quando vuoi rivedere PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter e Go Live.</value></data>
   <data name="EditorFindOpen" xml:space="preserve"><value>Trova</value></data>
   <data name="EditorFindPlaceholder" xml:space="preserve"><value>Cerca nello script</value></data>
   <data name="EditorFindPrevious" xml:space="preserve"><value>Precedente</value></data>

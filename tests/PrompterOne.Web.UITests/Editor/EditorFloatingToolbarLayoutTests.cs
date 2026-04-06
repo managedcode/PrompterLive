@@ -7,7 +7,6 @@ namespace PrompterOne.Web.UITests;
 [Collection(EditorAuthoringCollection.Name)]
 public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
 {
-    private const string SegmentLineSelector = ".ed-src-line-segment";
     private readonly record struct LayoutBounds(double Y, double Height);
     private readonly record struct ToolbarAnchor(double Left, double Top);
     private readonly StandaloneAppFixture _fixture = fixture;
@@ -47,7 +46,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
         try
         {
             await GotoEditorAndWaitForSourceAsync(page);
-            await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedScript);
+            await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedMultilineScript);
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var start = state.Text.IndexOf(BrowserTestConstants.Editor.TypedMultilineSelectionStart, StringComparison.Ordinal);
             var endTokenStart = state.Text.IndexOf(BrowserTestConstants.Editor.TypedMultilineSelectionEnd, start, StringComparison.Ordinal);
@@ -60,19 +59,22 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
             var geometry = await page.GetByTestId(UiTestIds.Editor.SourceHighlight).EvaluateAsync<SelectionGeometry>(
                 """
-                (element, selector) => {
-                    const firstSegmentLine = element.querySelector(selector);
-                    if (!firstSegmentLine) {
-                        throw new Error("Unable to locate the first rendered segment line.");
+                (element, probeText) => {
+                    const firstSelectedLine = Array
+                        .from(element.children)
+                        .find(node => (node.textContent ?? '').includes(probeText));
+
+                    if (!firstSelectedLine) {
+                        throw new Error(`Unable to locate the rendered source line that contains "${probeText}".`);
                     }
 
-                    const rect = firstSegmentLine.getBoundingClientRect();
+                    const rect = firstSelectedLine.getBoundingClientRect();
                     return {
                         selectionTop: rect.top
                     };
                 }
                 """,
-                SegmentLineSelector);
+                BrowserTestConstants.Editor.TypedMultilineSelectionProbeLine);
 
             var floatingBar = page.GetByTestId(UiTestIds.Editor.FloatingBar);
             await Expect(floatingBar).ToBeVisibleAsync();

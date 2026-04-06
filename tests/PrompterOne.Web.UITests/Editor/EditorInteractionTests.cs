@@ -478,7 +478,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
             await Expect(colorMenu).ToBeVisibleAsync();
 
-            await EditorMonacoDriver.ClickAsync(page);
+            await EditorMonacoDriver.ClickUncoveredStageAreaAsync(page);
             await Expect(colorMenu).ToBeHiddenAsync();
         }
         finally

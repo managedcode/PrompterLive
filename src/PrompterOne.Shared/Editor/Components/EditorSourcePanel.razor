@@ -139,9 +139,9 @@
 
             @if (ShouldRenderFloatingBar)
             {
-                <span class="ed-float-bar"
-                      data-testid="@UiTestIds.Editor.FloatingBar"
-                      style="@FloatingBarStyle">
+                <div class="ed-float-bar"
+                     data-testid="@UiTestIds.Editor.FloatingBar"
+                     style="@FloatingBarStyle">
                     @for (var groupIndex = 0; groupIndex < FloatingActionGroups.Count; groupIndex++)
                     {
                         var group = FloatingActionGroups[groupIndex];
@@ -163,9 +163,8 @@
 
                     @if (OpenFloatingMenu is { } floatingMenu)
                     {
-                        <span class="@GetFloatingMenuCss(floatingMenu)"
-                              data-testid="@floatingMenu.PanelTestId"
-                              >
+                        <div class="@GetFloatingMenuCss(floatingMenu)"
+                             data-testid="@floatingMenu.PanelTestId">
                             @for (var groupIndex = 0; groupIndex < floatingMenu.DropdownGroups.Count; groupIndex++)
                             {
                                 var dropdownGroup = floatingMenu.DropdownGroups[groupIndex];
@@ -174,7 +173,7 @@
                                     <div class="efb-drop-sep"></div>
                                 }
                                 <span class="efb-dropdown-label">@dropdownGroup.Label</span>
-                                <span class="efb-menu-list">
+                                <div class="efb-menu-list">
                                     @foreach (var action in dropdownGroup.Actions)
                                     {
                                         <EditorActionButton Action="@action"
@@ -182,11 +181,11 @@
                                                             TooltipCssClass="@GetTooltipCssClass(EditorToolbarTooltipPlacement.FloatingMenu)"
                                                             TooltipPlacementValue="@GetTooltipPlacementValue(EditorToolbarTooltipPlacement.FloatingMenu)" />
                                     }
-                                </span>
+                                </div>
                             }
-                        </span>
+                        </div>
                     }
-                </span>
+                </div>
             }
         </div>
 

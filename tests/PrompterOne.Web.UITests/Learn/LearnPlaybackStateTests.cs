@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -165,14 +166,14 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
     private static async Task<ProgressState> ReadProgressStateAsync(IPage page)
     {
         var progressLabel = await page.GetByTestId(UiTestIds.Learn.ProgressLabel).TextContentAsync() ?? string.Empty;
-        var parts = progressLabel.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var currentWordNumber = parts.Length >= 2 && int.TryParse(parts[1], out var parsedCurrentWord)
-            ? parsedCurrentWord
-            : 0;
-        var totalWordCount = parts.Length >= 4 && int.TryParse(parts[3], out var parsedTotalWordCount)
-            ? parsedTotalWordCount
-            : 0;
-        return new ProgressState(currentWordNumber, totalWordCount);
+        var match = BrowserTestConstants.Regexes.LearnProgressLabel.Match(progressLabel);
+        Assert.True(
+            match.Success,
+            $"Expected Learn progress label to match the current progress contract, but found '{progressLabel}'.");
+
+        return new ProgressState(
+            int.Parse(match.Groups["current"].Value, CultureInfo.InvariantCulture),
+            int.Parse(match.Groups["total"].Value, CultureInfo.InvariantCulture));
     }
     private static Task<ToggleIconState> ReadToggleIconStateAsync(IPage page) =>
         page.EvaluateAsync<ToggleIconState>(

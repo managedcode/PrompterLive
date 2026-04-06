@@ -338,8 +338,14 @@
             return measure(mirror, style);
         }
         finally {
-            if (mirror.parentNode) {
-                mirror.parentNode.removeChild(mirror);
+            if (typeof mirror.remove === "function") {
+                mirror.remove();
+            }
+            else {
+                const parent = mirror.parentNode;
+                if (parent) {
+                    parent.removeChild(mirror);
+                }
             }
         }
     }

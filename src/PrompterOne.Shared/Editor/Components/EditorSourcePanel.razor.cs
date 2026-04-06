@@ -24,6 +24,8 @@ public partial class EditorSourcePanel : IAsyncDisposable
     private ElementReference _semanticSnapshotRef;
     private ElementReference _textareaRef;
     private bool _hasPendingLocalInputText;
+    private bool _hasPendingLocalSelection;
+    private EditorSelectionRange _lastLocalSelectionRange = EditorSelectionRange.Empty;
     private bool _lastRenderedCanRedo;
     private bool _lastRenderedCanUndo;
     private string? _lastRenderedErrorMessage;
@@ -82,16 +84,22 @@ public partial class EditorSourcePanel : IAsyncDisposable
         var isLocalTextEcho = _hasPendingLocalInputText &&
                               textChanged &&
                               string.Equals(Text, _lastTypedText, StringComparison.Ordinal);
+        var isLocalSelectionEcho = _hasPendingLocalSelection && Selection.Range == _lastLocalSelectionRange;
         var selectionChanged = Selection.Range != _lastRenderedSelection.Range;
         var selectionNeedsRender = Selection.HasSelection || _lastRenderedSelection.HasSelection;
 
         _skipNextRender = _surfaceInteropReady && isLocalTextEcho && !selectionNeedsRender;
         _syncOverlayAfterRender |= textChanged;
-        _syncSurfaceAfterRender |= textChanged || (selectionChanged && selectionNeedsRender);
+        _syncSurfaceAfterRender |= textChanged || (selectionChanged && selectionNeedsRender && !isLocalSelectionEcho);
 
         if (!isLocalTextEcho)
         {
             _hasPendingLocalInputText = false;
+        }
+
+        if (isLocalSelectionEcho || selectionChanged)
+        {
+            _hasPendingLocalSelection = false;
         }
 
         _visibleCanUndo = CanUndo;
@@ -156,8 +164,9 @@ public partial class EditorSourcePanel : IAsyncDisposable
             return;
         }
 
+        TrackLocalSelectionEcho(selection);
         await OnSelectionChanged.InvokeAsync(selection);
-        _syncSurfaceAfterRender = true;
+        _syncSurfaceAfterRender = false;
         _skipNextRender = false;
         StateHasChanged();
     }
@@ -227,6 +236,7 @@ public partial class EditorSourcePanel : IAsyncDisposable
             return;
         }
 
+        TrackLocalSelectionEcho(selection);
         if (dismissMenus)
         {
             RequestFloatingBarReanchor();
@@ -241,7 +251,7 @@ public partial class EditorSourcePanel : IAsyncDisposable
         if (requestComponentRender)
         {
             _skipNextRender = false;
-            _syncSurfaceAfterRender = Selection.HasSelection || selection.HasSelection;
+            _syncSurfaceAfterRender = false;
             StateHasChanged();
         }
     }
@@ -356,6 +366,12 @@ public partial class EditorSourcePanel : IAsyncDisposable
             Logger.LogDebug(exception, failureMessage);
             return false;
         }
+    }
+
+    private void TrackLocalSelectionEcho(EditorSelectionViewModel selection)
+    {
+        _lastLocalSelectionRange = selection.Range;
+        _hasPendingLocalSelection = true;
     }
 
     private static bool IsExpectedInteropException(Exception exception) =>

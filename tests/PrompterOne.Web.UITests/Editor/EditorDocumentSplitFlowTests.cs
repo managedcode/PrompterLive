@@ -10,9 +10,9 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
     private const string EpisodeTwoCardId = "untitled-script-split-02-episode-2-how-systems-talk-to-each-other";
     private const string EpisodeTwoTitle = "Episode 2 - How Systems Talk to Each Other";
     private const string SplitFeedbackBadge = "From ##";
-    private const string SplitFeedbackActionLabel = "Open In Library";
+    private const string SplitFeedbackActionLabel = "Open in Library";
     private const string SplitFeedbackDestination = "New scripts were saved to the library.";
-    private const string SplitFeedbackDraftNote = "This draft stayed open here so you can keep editing.";
+    private const string SplitFeedbackDraftNote = "The current draft stayed open.";
     private const string SplitFeedbackSummary = "2 new scripts created.";
     private const string SplitFeedbackTitle = "Split complete";
     private const string SplitSource =

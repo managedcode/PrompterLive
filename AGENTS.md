@@ -360,6 +360,8 @@ Repo-specific design rules:
 - Learn rehearsal speed MUST default to about 250 WPM and stay user-adjustable upward from that baseline; shipping a 300 WPM startup default is too aggressive.
 - First-run onboarding MUST be dismissible, reopenable by the user, and after either completion or dismissal it must return the user to the main Library screen instead of leaving them on a feature route.
 - Go Live `ON AIR` badges and preview live dots MUST appear only while recording or streaming is actually active; idle selected or armed sources must stay visually non-live.
+- The global `Go Live` entry in shell/header chrome MUST be one reusable Blazor component with one consistent layout, spacing, and icon treatment across all routed screens; do not let pages restyle or fork their own variants.
+- The global `Go Live` entry MUST stay neutral when idle: red icon accents or live-danger treatment are forbidden until recording or streaming is actually active.
 - Go Live chrome MUST stay operational and generic; do not surface the loaded script title or script preview subtitle in the Go Live header/session bar just because a script is open.
 - Go Live back navigation MUST return to the actual previous in-app screen when known, and only fall back to library when there is no valid in-app return target; it must never hardcode teleprompter as the back target.
 - Go Live local recording MUST capture the same composed program feed that the active live/record session publishes; recording a black frame or a different source than the current program feed is a regression.

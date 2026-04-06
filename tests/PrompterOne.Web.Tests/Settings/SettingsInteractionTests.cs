@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using PrompterOne.Core.Models.Media;
@@ -214,6 +215,20 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Contains(PrompterStorageDefaults.BrowserContainerDisplayPrefix, markup, StringComparison.Ordinal);
         Assert.Contains(Text(UiTextKey.SettingsFilesScriptsAutoSave), markup, StringComparison.Ordinal);
         Assert.Contains(Text(UiTextKey.SettingsFilesScriptsHistory), markup, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AboutSection_RestartTourButton_NavigatesToLibraryWithOnboardingRequest()
+    {
+        var cut = Render<SettingsPage>();
+        var navigation = Services.GetRequiredService<NavigationManager>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.AboutOnboardingRestart, cut.Markup, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Settings.AboutOnboardingRestart).Click();
+
+        cut.WaitForAssertion(() =>
+            Assert.EndsWith(AppRoutes.LibraryWithOnboarding(), navigation.Uri, StringComparison.Ordinal));
     }
 
     [Fact]

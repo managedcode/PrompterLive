@@ -3,6 +3,8 @@ namespace PrompterOne.Shared.Contracts;
 public static class AppRoutes
 {
     public const string ScriptIdQueryKey = "id";
+    public const string OnboardingQueryKey = "onboarding";
+    public const string OnboardingQueryValue = "1";
     public const string Root = "/";
     public const string Library = "/library";
     public const string Editor = "/editor";
@@ -22,9 +24,16 @@ public static class AppRoutes
 
     public static string GoLiveWithId(string scriptId) => BuildScoped(GoLive, scriptId);
 
+    public static string LibraryWithOnboarding() => BuildQuery(Library, OnboardingQueryKey, OnboardingQueryValue);
+
     private static string BuildScoped(string route, string scriptId)
     {
-        if (string.IsNullOrWhiteSpace(scriptId))
+        return BuildQuery(route, ScriptIdQueryKey, scriptId);
+    }
+
+    private static string BuildQuery(string route, string key, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
         {
             return route;
         }
@@ -32,8 +41,8 @@ public static class AppRoutes
         return string.Concat(
             route,
             QuerySeparator,
-            ScriptIdQueryKey,
+            key,
             KeyValueSeparator,
-            Uri.EscapeDataString(scriptId));
+            Uri.EscapeDataString(value));
     }
 }

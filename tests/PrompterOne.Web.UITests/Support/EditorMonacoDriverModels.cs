@@ -19,6 +19,8 @@ internal sealed class EditorMonacoState
     public EditorMonacoSelection Selection { get; set; } = new();
 
     public string Text { get; set; } = string.Empty;
+
+    public EditorMonacoVisibleRange? VisibleRange { get; set; }
 }
 
 internal sealed class EditorMonacoLayout
@@ -47,6 +49,13 @@ internal sealed class EditorMonacoSelection
     public double? ToolbarLeft { get; set; }
 
     public double? ToolbarTop { get; set; }
+}
+
+internal sealed class EditorMonacoVisibleRange
+{
+    public int EndLineNumber { get; set; }
+
+    public int StartLineNumber { get; set; }
 }
 
 internal sealed class EditorMonacoCompletionList

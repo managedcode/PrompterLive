@@ -82,11 +82,16 @@
 
     .rd-mirror-controls {
         left: 8px;
-        gap: 6px;
+        min-width: auto;
+        gap: 4px;
+        padding: 6px 4px;
     }
 
     .rd-align-controls {
-        gap: 5px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: auto;
+        gap: 4px;
     }
 
     .rd-sliders {
@@ -111,7 +116,20 @@
     }
 
     .rd-mirror-btn {
+        width: 30px;
+        height: 30px;
         font-size: 11px;
+        border-radius: 8px;
+    }
+
+    .rd-align-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .rd-align-icon {
+        width: 14px;
+        height: 14px;
     }
 
     .rd-controls {

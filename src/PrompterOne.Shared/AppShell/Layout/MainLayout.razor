@@ -1,6 +1,7 @@
 @namespace PrompterOne.Shared.Layout
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Forms
+@using PrompterOne.Shared.AppShell.Components
 @using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Localization
 
@@ -67,14 +68,23 @@
                            @oninput="HandleLibrarySearchInputAsync"
                            data-testid="@UiTestIds.Header.LibrarySearch" />
                 </div>
+            }
+
+            <GoLiveShellButton Label="@Text(UiTextKey.HeaderGoLive)"
+                               Status="@GoLiveIndicatorStatus"
+                               LiveState="@GoLiveIndicatorState"
+                               OnClick="HandleOpenGoLiveClickAsync"
+                               TestId="@UiTestIds.Header.GoLive" />
+
+            @if (ShowLibraryActions)
+            {
                 <button type="button"
-                        class="btn-golive-header"
-                        @onclick="HandleOpenGoLiveClickAsync"
-                        data-live-state="@GoLiveIndicatorState"
-                        data-testid="@UiTestIds.Header.GoLive">
-                    <span class="btn-golive-dot" aria-hidden="true"></span>
-                    <UiIcon Kind="UiIconKind.Video" Size="15" />
-                    <span class="app-header-action-label">@Text(UiTextKey.HeaderGoLive)</span>
+                        class="btn-ghost"
+                        @onclick="HandleOpenOnboardingAsync"
+                        title="@Text(UiTextKey.OnboardingRestartTour)"
+                        aria-label="@Text(UiTextKey.OnboardingRestartTour)"
+                        data-testid="@UiTestIds.Header.Onboarding">
+                    <UiIcon Kind="UiIconKind.HelpCircle" Size="15" />
                 </button>
                 <div class="app-header-file-action"
                      data-testid="@UiTestIds.Header.LibraryOpenScript">
@@ -99,25 +109,6 @@
                         data-testid="@UiTestIds.Header.LibraryNewScript">
                     <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderNewScript)</span>
-                </button>
-            }
-            else
-            {
-                <button type="button"
-                        class="btn-live-shell"
-                        @onclick="HandleOpenGoLiveClickAsync"
-                        data-live-state="@GoLiveIndicatorState"
-                        data-testid="@UiTestIds.Header.GoLive">
-                    <span class="btn-live-shell-icon" aria-hidden="true">
-                        <UiIcon Kind="UiIconKind.Broadcast" Size="15" />
-                    </span>
-                    <span class="btn-live-shell-copy">
-                        <span class="btn-live-shell-label">@Text(UiTextKey.HeaderGoLive)</span>
-                        @if (GoLiveSessionState.HasActiveSession)
-                        {
-                            <span class="btn-live-shell-status">@GoLiveIndicatorCopy</span>
-                        }
-                    </span>
                 </button>
             }
 

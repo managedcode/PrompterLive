@@ -625,7 +625,7 @@
     <value>Concluir tour</value>
   </data>
   <data name="OnboardingStepLibrary" xml:space="preserve">
-    <value>Biblioteca</value>
+    <value>PrompterOne</value>
   </data>
   <data name="OnboardingStepEditor" xml:space="preserve">
     <value>Editor</value>
@@ -640,13 +640,13 @@
     <value>Go Live</value>
   </data>
   <data name="OnboardingWelcomeEyebrow" xml:space="preserve">
-    <value>PROMPTER NO NAVEGADOR</value>
+    <value>COMO FUNCIONA</value>
   </data>
   <data name="OnboardingWelcomeTitle" xml:space="preserve">
-    <value>Conheça o PrompterOne</value>
+    <value>Como o PrompterOne funciona</value>
   </data>
   <data name="OnboardingWelcomeBody" xml:space="preserve">
-    <value>O PrompterOne mantém o mesmo roteiro da biblioteca ao ensaio, à leitura ao vivo e à transmissão sem sair do navegador.</value>
+    <value>O PrompterOne mantém o mesmo roteiro da escrita ao ensaio, à leitura ao vivo e à transmissão sem sair do navegador.</value>
   </data>
   <data name="OnboardingWelcomeBulletSearch" xml:space="preserve">
     <value>Use a busca da biblioteca para encontrar roteiros por título, nome do arquivo ou texto dentro do roteiro.</value>
@@ -661,7 +661,7 @@
     <value>AUTORIA TPS</value>
   </data>
   <data name="OnboardingEditorTitle" xml:space="preserve">
-    <value>Escreva no Editor</value>
+    <value>Escreva a fonte TPS</value>
   </data>
   <data name="OnboardingEditorBody" xml:space="preserve">
     <value>O editor é onde você molda o TPS, o formato TelePrompterScript baseado em Markdown que carrega estrutura, timing, emoções, pausas e pistas de entrega em texto simples.</value>
@@ -679,7 +679,7 @@
     <value>ENSAIO RSVP</value>
   </data>
   <data name="OnboardingLearnTitle" xml:space="preserve">
-    <value>Treine com Learn</value>
+    <value>Ensaie com RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
     <value>O Learn usa RSVP, ou Rapid Serial Visual Presentation, para mostrar palavras em um ritmo focado e assim treinar cadência, articulação e retenção sem varrer um parágrafo inteiro.</value>
@@ -728,6 +728,18 @@
   </data>
   <data name="OnboardingGoLiveBulletRouting" xml:space="preserve">
     <value>Use Go Live quando estiver pronto para passar do ensaio ao roteamento e à captura de produção.</value>
+  </data>
+  <data name="SettingsAboutOnboardingCardTitle" xml:space="preserve">
+    <value>Introdução</value>
+  </data>
+  <data name="OnboardingRestartTour" xml:space="preserve">
+    <value>Reiniciar tour</value>
+  </data>
+  <data name="OnboardingReopenTitle" xml:space="preserve">
+    <value>Reabrir o tour guiado</value>
+  </data>
+  <data name="OnboardingReopenBody" xml:space="preserve">
+    <value>Use isso quando quiser rever PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter e Go Live.</value>
   </data>
   <data name="EditorFindOpen" xml:space="preserve">
     <value>Buscar</value>

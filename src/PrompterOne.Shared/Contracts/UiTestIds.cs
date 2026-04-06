@@ -18,7 +18,12 @@ public static class UiTestIds
         public const string EditorRead = "header-editor-read";
         public const string EditorSaveFile = "header-editor-save-file";
         public const string GoLive = "header-go-live";
+        public const string GoLiveDot = "header-go-live-dot";
+        public const string GoLiveIcon = "header-go-live-icon";
+        public const string GoLiveLabel = "header-go-live-label";
+        public const string GoLiveStatus = "header-go-live-status";
         public const string Home = "header-home";
+        public const string Onboarding = "header-onboarding";
         public const string LibraryBreadcrumbCurrent = "header-library-breadcrumb-current";
         public const string LibraryNewScript = "header-library-new-script";
         public const string LibraryOpenScript = "header-library-open-script";
@@ -357,6 +362,8 @@ public static class UiTestIds
         public const string AboutCompanyGitHub = "settings-about-company-github";
         public const string AboutCompanyWebsite = "settings-about-company-website";
         public const string AboutPanel = "settings-about-panel";
+        public const string AboutOnboardingCard = "settings-about-onboarding-card";
+        public const string AboutOnboardingRestart = "settings-about-onboarding-restart";
         public const string AboutProductGitHub = "settings-about-product-github";
         public const string AboutTpsGitHub = "settings-about-tps-github";
         public const string AboutProductWebsite = "settings-about-product-website";

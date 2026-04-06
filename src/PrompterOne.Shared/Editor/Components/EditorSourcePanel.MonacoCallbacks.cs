@@ -49,6 +49,7 @@ public partial class EditorSourcePanel
             RequestFloatingBarReanchor();
         }
 
+        TrackLocalSelectionEcho(selection);
         await OnSelectionChanged.InvokeAsync(selection);
         var shouldRender = payload.DismissMenus ||
                            selection.HasSelection ||
@@ -64,7 +65,7 @@ public partial class EditorSourcePanel
         // A preceding local text echo may have marked the next render as skippable,
         // but selection UI like the floating bar must still repaint immediately.
         _skipNextRender = false;
-        _syncSurfaceAfterRender = selection.HasSelection || Selection.HasSelection;
+        _syncSurfaceAfterRender = false;
         StateHasChanged();
     }
 }

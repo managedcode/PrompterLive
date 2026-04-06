@@ -9,6 +9,20 @@
     <p class="set-section-desc">@AboutSectionDescription</p>
 
     <div class="set-device-list">
+        <SettingsExpandableCard Title="@OnboardingCardTitle"
+                                Subtitle="@OnboardingCardSubtitle"
+                                IconTone="UiIconSurfaceTone.Sky"
+                                TestId="@UiTestIds.Settings.AboutOnboardingCard"
+                                IsOpen="@IsCardOpen(OnboardingCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(OnboardingCardId))">
+            <UiIcon Kind="UiIconKind.HelpCircle" Size="17" />
+            <p class="set-card-copy">@OnboardingCardCopy</p>
+            <button type="button"
+                    class="btn-ghost set-card-cta"
+                    @onclick="OpenOnboarding"
+                    data-testid="@UiTestIds.Settings.AboutOnboardingRestart">@OnboardingCardAction</button>
+        </SettingsExpandableCard>
+
         <SettingsExpandableCard Title="@AppCardTitle"
                                 Subtitle="@AppCardSubtitle"
                                 SubtitleTestId="@UiTestIds.Settings.AboutVersion"

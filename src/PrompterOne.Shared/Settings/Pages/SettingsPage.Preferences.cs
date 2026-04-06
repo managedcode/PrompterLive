@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Localization;
+using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 
@@ -20,6 +21,7 @@ public partial class SettingsPage
         "recording-general",
         "ai-claude-api",
         "appearance-theme",
+        "about-onboarding",
         "about-app",
         "about-team"
     };
@@ -215,6 +217,12 @@ public partial class SettingsPage
         _pagePreferences = _pagePreferences with { LanguageCulture = cultureName };
         await PersistPreferencesAsync();
         Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    private Task HandleOpenOnboardingAsync()
+    {
+        Navigation.NavigateTo(AppRoutes.LibraryWithOnboarding());
+        return Task.CompletedTask;
     }
 
     private static string BuildToggleCssClass(bool isOn) =>

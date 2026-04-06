@@ -45,7 +45,10 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
                 .ToHaveTextAsync(BrowserTestConstants.Folders.AllScriptsName);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.GoLiveHeaderClass);
+                .ToHaveAttributeAsync(BrowserTestConstants.GoLive.LiveStateAttributeName, GoLiveIndicatorStates.Idle);
+            await Expect(page.GetByTestId(UiTestIds.Header.GoLiveDot)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.GoLiveLabel)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.GoLiveStatus)).ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.Library.FolderChips)).ToHaveCountAsync(0);
 
             var presentationsFolder = page.GetByTestId(BrowserTestConstants.Elements.PresentationsFolder);

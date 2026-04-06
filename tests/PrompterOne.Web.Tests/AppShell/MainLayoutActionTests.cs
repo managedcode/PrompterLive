@@ -14,6 +14,7 @@ namespace PrompterOne.Web.Tests;
 public sealed class MainLayoutActionTests : BunitContext
 {
     private const string EnglishExportLabel = "Export";
+    private const string EnglishGoLiveLabel = "Go Live";
     private const string EnglishImportLabel = "Import";
     private const string SupportedImportAcceptValue = ScriptDocumentFileTypes.AcceptValue;
     private const string UkrainianExportLabel = "Експорт";
@@ -66,7 +67,16 @@ public sealed class MainLayoutActionTests : BunitContext
         var cut = Render<MainLayout>(parameters => parameters
             .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
 
-        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.GoLive)));
+        cut.WaitForAssertion(() =>
+        {
+            var goLive = cut.FindByTestId(UiTestIds.Header.GoLive);
+
+            Assert.Equal(GoLiveIndicatorStates.Idle, goLive.GetAttribute("data-live-state"));
+            Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveDot)));
+            Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveIcon)));
+            Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveLabel)));
+            Assert.Null(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveStatus)));
+        });
     }
 
     [Fact]
@@ -86,7 +96,10 @@ public sealed class MainLayoutActionTests : BunitContext
             var openScriptInput = cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptInput);
             var newScript = cut.FindByTestId(UiTestIds.Header.LibraryNewScript);
 
-            Assert.Contains("btn-golive-header", goLive.ClassName, StringComparison.Ordinal);
+            Assert.Equal(
+                EnglishGoLiveLabel,
+                goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveLabel))?.TextContent.Trim());
+            Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveDot)));
             Assert.Contains("btn-create", newScript.ClassName, StringComparison.Ordinal);
             Assert.Equal(SupportedImportAcceptValue, openScriptInput.GetAttribute("accept"));
             Assert.Contains(EnglishImportLabel, openScript.TextContent, StringComparison.Ordinal);

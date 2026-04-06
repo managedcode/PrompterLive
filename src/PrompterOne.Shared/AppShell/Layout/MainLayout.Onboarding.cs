@@ -19,24 +19,18 @@ public partial class MainLayout
     {
         var preferences = await SettingsStore.LoadAsync<SettingsPagePreferences>(SettingsPagePreferences.StorageKey)
             ?? SettingsPagePreferences.Default;
-        if (preferences.HasSeenOnboarding)
+        if (preferences.HasSeenOnboarding && !IsOnboardingReopenRequested(Navigation.Uri))
         {
             _showOnboarding = false;
             return;
         }
 
-        var featuredScriptId = await ResolveOnboardingScriptIdAsync();
-        _onboardingSteps = AppOnboardingCatalog.Build(featuredScriptId);
-        _onboardingStepIndex = ResolveOnboardingStepIndex(Navigation.Uri);
-        _showOnboarding = true;
-        await InvokeAsync(StateHasChanged);
+        await ShowOnboardingAsync();
     }
 
     private async Task HandleOnboardingDismissAsync()
     {
-        await PersistOnboardingSeenAsync();
-        _showOnboarding = false;
-        await InvokeAsync(StateHasChanged);
+        await CompleteOnboardingAsync();
     }
 
     private Task HandleOnboardingBackAsync() =>
@@ -46,13 +40,16 @@ public partial class MainLayout
     {
         if (_onboardingStepIndex >= _onboardingSteps.Count - 1)
         {
-            await PersistOnboardingSeenAsync();
-            _showOnboarding = false;
-            await InvokeAsync(StateHasChanged);
+            await CompleteOnboardingAsync();
             return;
         }
 
         await NavigateOnboardingAsync(_onboardingStepIndex + 1);
+    }
+
+    private async Task HandleOpenOnboardingAsync()
+    {
+        await ShowOnboardingAsync();
     }
 
     private Task HandleOnboardingStepSelectedAsync(AppOnboardingStepId stepId)
@@ -142,6 +139,26 @@ public partial class MainLayout
             SettingsPagePreferences.StorageKey,
             preferences with { HasSeenOnboarding = true });
     }
+
+    private async Task ShowOnboardingAsync()
+    {
+        var featuredScriptId = await ResolveOnboardingScriptIdAsync();
+        _onboardingSteps = AppOnboardingCatalog.Build(featuredScriptId);
+        _onboardingStepIndex = ResolveOnboardingStepIndex(Navigation.Uri);
+        _showOnboarding = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CompleteOnboardingAsync()
+    {
+        await PersistOnboardingSeenAsync();
+        _showOnboarding = false;
+        Navigation.NavigateTo(AppRoutes.Library);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static bool IsOnboardingReopenRequested(string uri) =>
+        string.Equals(ResolveQueryValue(uri, AppRoutes.OnboardingQueryKey), AppRoutes.OnboardingQueryValue, StringComparison.Ordinal);
 
     private static string GetNormalizedAppRoute(string uri)
     {

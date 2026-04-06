@@ -78,16 +78,20 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private string GoLiveIndicatorCopy => GoLiveIndicatorState switch
     {
-        RecordingStateValue => Text(UiTextKey.HeaderGoLiveIndicatorRecording),
-        StreamingStateValue => Text(UiTextKey.HeaderGoLiveIndicatorStreaming),
+        GoLiveIndicatorStates.Recording => Text(UiTextKey.HeaderGoLiveIndicatorRecording),
+        GoLiveIndicatorStates.Streaming => Text(UiTextKey.HeaderGoLiveIndicatorStreaming),
         _ => Text(UiTextKey.HeaderGoLiveIndicatorReady)
     };
 
     private string GoLiveIndicatorState => GoLiveSessionState.IsRecordingActive
-        ? RecordingStateValue
+        ? GoLiveIndicatorStates.Recording
         : GoLiveSessionState.IsStreamActive
-            ? StreamingStateValue
-            : IdleStateValue;
+            ? GoLiveIndicatorStates.Streaming
+            : GoLiveIndicatorStates.Idle;
+
+    private string GoLiveIndicatorStatus => GoLiveSessionState.HasActiveSession
+        ? GoLiveIndicatorCopy
+        : string.Empty;
 
     private DateTimeOffset? GoLiveStartedAt => GoLiveSessionState.IsRecordingActive
         ? GoLiveSessionState.RecordingStartedAt ?? GoLiveSessionState.StreamStartedAt
@@ -120,10 +124,6 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
             ? AppRoutes.GoLive
             : AppRoutes.GoLiveWithId(GoLiveSessionState.ScriptId)
         : Shell.GetGoLiveRoute();
-
-    private const string IdleStateValue = "idle";
-    private const string RecordingStateValue = "recording";
-    private const string StreamingStateValue = "streaming";
 
     private static string FormatSessionElapsed(DateTimeOffset? startedAt)
     {
@@ -183,8 +183,19 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         Shell.TrackNavigation(e.Location);
         SyncShellStateWithCurrentRoute(e.Location);
         SyncOnboardingStepWithCurrentRoute(e.Location);
+        _ = HandleOnboardingLocationChangedAsync(e.Location);
         _ = InvokeAsync(TrackCurrentPageViewAsync);
         StateHasChanged();
+    }
+
+    private async Task HandleOnboardingLocationChangedAsync(string location)
+    {
+        if (!IsOnboardingReopenRequested(location) || ShowOnboarding)
+        {
+            return;
+        }
+
+        await ShowOnboardingAsync();
     }
 
     private void SyncShellStateWithCurrentRoute(string uri)

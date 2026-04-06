@@ -862,13 +862,13 @@
     <value>Go Live</value>
   </data>
   <data name="OnboardingWelcomeEyebrow" xml:space="preserve">
-    <value>PROMPTEUR DANS LE NAVIGATEUR</value>
+    <value>COMMENT ÇA FONCTIONNE</value>
   </data>
   <data name="OnboardingWelcomeTitle" xml:space="preserve">
-    <value>Découvrez PrompterOne</value>
+    <value>Comment fonctionne PrompterOne</value>
   </data>
   <data name="OnboardingWelcomeBody" xml:space="preserve">
-    <value>PrompterOne garde un même script depuis la bibliothèque jusqu’à la répétition, la lecture en direct et la mise à l’antenne, sans quitter le navigateur.</value>
+    <value>PrompterOne garde un même script depuis l’écriture jusqu’à la répétition, la lecture en direct et la mise à l’antenne, sans quitter le navigateur.</value>
   </data>
   <data name="OnboardingWelcomeBulletSearch" xml:space="preserve">
     <value>Utilisez la recherche de la bibliothèque pour trouver des scripts par titre, nom de fichier ou texte contenu dans le script.</value>
@@ -883,7 +883,7 @@
     <value>AUTEUR TPS</value>
   </data>
   <data name="OnboardingEditorTitle" xml:space="preserve">
-    <value>Écrivez dans l’éditeur</value>
+    <value>Écrire le TPS source</value>
   </data>
   <data name="OnboardingEditorBody" xml:space="preserve">
     <value>L’éditeur est l’endroit où vous façonnez TPS, le format TelePrompterScript basé sur Markdown qui transporte structure, timing, émotions, pauses et indications de diction en texte brut.</value>
@@ -901,7 +901,7 @@
     <value>RÉPÉTITION RSVP</value>
   </data>
   <data name="OnboardingLearnTitle" xml:space="preserve">
-    <value>Entraînez-vous avec Learn</value>
+    <value>Répéter avec RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
     <value>Learn utilise RSVP, ou Rapid Serial Visual Presentation, pour montrer les mots dans un rythme focalisé afin de travailler le tempo, l’articulation et la mémorisation sans balayer un paragraphe entier.</value>
@@ -919,7 +919,7 @@
     <value>LECTURE EN DIRECT</value>
   </data>
   <data name="OnboardingTeleprompterTitle" xml:space="preserve">
-    <value>Lisez sur le prompteur</value>
+    <value>Lire sur le téléprompteur</value>
   </data>
   <data name="OnboardingTeleprompterBody" xml:space="preserve">
     <value>Le prompteur transforme le même script TPS en surface de lecture en direct avec guides focaux, alignement, commandes miroir, changement d’orientation et mouvement de lecture en temps réel.</value>
@@ -950,6 +950,18 @@
   </data>
   <data name="OnboardingGoLiveBulletRouting" xml:space="preserve">
     <value>Utilisez Go Live quand vous êtes prêt à passer de la répétition au routage de production et à la capture.</value>
+  </data>
+  <data name="SettingsAboutOnboardingCardTitle" xml:space="preserve">
+    <value>Découverte</value>
+  </data>
+  <data name="OnboardingRestartTour" xml:space="preserve">
+    <value>Relancer la visite</value>
+  </data>
+  <data name="OnboardingReopenTitle" xml:space="preserve">
+    <value>Rouvrir la visite guidée</value>
+  </data>
+  <data name="OnboardingReopenBody" xml:space="preserve">
+    <value>Utilise-la quand tu veux revoir PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter et Go Live.</value>
   </data>
   <data name="EditorFindOpen" xml:space="preserve">
     <value>Rechercher</value>

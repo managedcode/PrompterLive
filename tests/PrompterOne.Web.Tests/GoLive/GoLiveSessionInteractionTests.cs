@@ -51,10 +51,13 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
-        var session = Services.GetRequiredService<GoLiveSessionService>().State;
-        Assert.True(session.IsStreamActive);
-        Assert.Equal(AppTestData.Camera.SecondSourceId, session.ActiveSourceId);
-        Assert.Equal(AppTestData.Camera.SideCamera, session.ActiveSourceLabel);
+        cut.WaitForAssertion(() =>
+        {
+            var session = Services.GetRequiredService<GoLiveSessionService>().State;
+            Assert.True(session.IsStreamActive);
+            Assert.Equal(AppTestData.Camera.SecondSourceId, session.ActiveSourceId);
+            Assert.Equal(AppTestData.Camera.SideCamera, session.ActiveSourceLabel);
+        });
     }
 
     [Fact]
@@ -167,14 +170,23 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
+        cut.WaitForAssertion(() =>
+        {
+            Assert.True(Services.GetRequiredService<GoLiveSessionService>().State.IsStreamActive);
+            Assert.Contains(
+                _harness.JsRuntime.Invocations,
+                invocation => string.Equals(invocation, GoLiveOutputInteropMethodNames.StartVdoNinjaSession, StringComparison.Ordinal));
+        });
+
         var invocationCountBeforeSwitch = _harness.JsRuntime.Invocations.Count;
 
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
         cut.FindByTestId(UiTestIds.GoLive.TakeToAir).Click();
 
-        Assert.Contains(
-            _harness.JsRuntime.Invocations.Skip(invocationCountBeforeSwitch),
-            invocation => string.Equals(invocation, GoLiveOutputInteropMethodNames.UpdateSessionDevices, StringComparison.Ordinal));
+        cut.WaitForAssertion(() =>
+            Assert.Contains(
+                _harness.JsRuntime.Invocations.Skip(invocationCountBeforeSwitch),
+                invocation => string.Equals(invocation, GoLiveOutputInteropMethodNames.UpdateSessionDevices, StringComparison.Ordinal)));
     }
 
     [Fact]

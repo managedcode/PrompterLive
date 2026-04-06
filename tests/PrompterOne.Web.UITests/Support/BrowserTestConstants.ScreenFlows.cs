@@ -164,12 +164,12 @@ internal static partial class BrowserTestConstants
         public const string OnboardingLearnStep = "03-learn";
         public const string OnboardingTeleprompterStep = "04-teleprompter";
         public const string OnboardingGoLiveStep = "05-go-live";
-        public const string OnboardingEnglishWelcomeTitle = "Meet PrompterOne";
-        public const string OnboardingEditorTitle = "Write in the Editor";
-        public const string OnboardingLearnTitle = "Train with Learn";
-        public const string OnboardingTeleprompterTitle = "Read on the Teleprompter";
+        public const string OnboardingEnglishWelcomeTitle = "How PrompterOne works";
+        public const string OnboardingEditorTitle = "Write the TPS source";
+        public const string OnboardingLearnTitle = "Rehearse with RSVP";
+        public const string OnboardingTeleprompterTitle = "Read on the teleprompter";
         public const string OnboardingGoLiveTitle = "Run the show in Go Live";
-        public const string OnboardingUkrainianWelcomeTitle = "Ознайомтеся з PrompterOne";
+        public const string OnboardingUkrainianWelcomeTitle = "Як працює PrompterOne";
         public const string OnboardingUkrainianDismiss = "Не цікаво";
     }
 

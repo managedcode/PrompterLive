@@ -187,7 +187,12 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
             return;
         }
 
-        applySelection(state, proxy.selectionStart ?? 0, proxy.selectionEnd ?? 0, false);
+        applySelection(
+            state,
+            proxy.selectionStart ?? 0,
+            proxy.selectionEnd ?? 0,
+            false,
+            proxy.selectionDirection ?? "none");
     };
 
     proxy.addEventListener("select", proxySelectionHandler);
@@ -453,6 +458,13 @@ function createHarnessState(state, options) {
     const model = state.editor.getModel();
     const layoutInfo = state.editor.getLayoutInfo();
     const minimapMetrics = measureMinimapMetrics(state);
+    const visibleRanges = state.editor.getVisibleRanges();
+    const primaryVisibleRange = visibleRanges.length
+        ? {
+            endLineNumber: visibleRanges[0].endLineNumber,
+            startLineNumber: visibleRanges[0].startLineNumber
+        }
+        : null;
     return {
         decorationClasses: state.lastDecorationClasses?.length
             ? state.lastDecorationClasses
@@ -471,7 +483,8 @@ function createHarnessState(state, options) {
         ready: state.host.getAttribute(options.editorReadyAttributeName) === "true",
         scrollTop: state.editor.getScrollTop(),
         selection: createSelectionState(state),
-        text: state.editor.getValue()
+        text: state.editor.getValue(),
+        visibleRange: primaryVisibleRange
     };
 }
 
@@ -1190,41 +1203,95 @@ function createLineDecoration(monaco, lineNumber, lineClassName) {
     };
 }
 
-function applySelection(state, start, end, revealSelection) {
+function revealSelectionInViewport(state, scrollType) {
+    const selection = state.editor.getSelection();
+    if (!selection) {
+        return;
+    }
+
+    const lineNumber = selection.startLineNumber;
+    const position = {
+        column: selection.endColumn,
+        lineNumber: selection.endLineNumber
+    };
+
+    if (typeof state.editor.revealLineInCenterIfOutsideViewport === "function") {
+        state.editor.revealLineInCenterIfOutsideViewport(lineNumber, scrollType);
+    }
+    else if (typeof state.editor.revealLineInCenter === "function") {
+        state.editor.revealLineInCenter(lineNumber, scrollType);
+    }
+
+    if (typeof state.editor.revealPositionInCenterIfOutsideViewport === "function") {
+        state.editor.revealPositionInCenterIfOutsideViewport(position, scrollType);
+    }
+    else if (typeof state.editor.revealPositionInCenter === "function") {
+        state.editor.revealPositionInCenter(position, scrollType);
+    }
+
+    if (typeof state.editor.revealRangeInCenterIfOutsideViewport === "function") {
+        state.editor.revealRangeInCenterIfOutsideViewport(selection, scrollType);
+    }
+    else {
+        state.editor.revealRangeInCenter(selection, scrollType);
+    }
+}
+
+function inferSelectionDirection(start, end) {
+    if (start === end) {
+        return "none";
+    }
+
+    return start > end ? "backward" : "forward";
+}
+
+function normalizeSelectionDirection(direction, start, end) {
+    if (direction === "backward" || direction === "forward") {
+        return direction;
+    }
+
+    return inferSelectionDirection(start, end);
+}
+
+function applySelection(state, start, end, revealSelection, selectionDirection) {
     const model = state.editor.getModel();
     if (!model) {
         return;
     }
 
-    const safeStart = Math.max(0, Math.min(start, model.getValueLength()));
-    const safeEnd = Math.max(safeStart, Math.min(end, model.getValueLength()));
-    const startPosition = model.getPositionAt(safeStart);
-    const endPosition = model.getPositionAt(safeEnd);
-    const range = new state.monaco.Range(
-        startPosition.lineNumber,
-        startPosition.column,
-        endPosition.lineNumber,
-        endPosition.column);
+    const maxOffset = model.getValueLength();
+    const safeStart = Math.max(0, Math.min(start, maxOffset));
+    const safeEnd = Math.max(0, Math.min(end, maxOffset));
+    const direction = normalizeSelectionDirection(selectionDirection, safeStart, safeEnd);
+    const orderedStart = Math.min(safeStart, safeEnd);
+    const orderedEnd = Math.max(safeStart, safeEnd);
+    const anchorOffset = direction === "backward" ? orderedEnd : orderedStart;
+    const focusOffset = direction === "backward" ? orderedStart : orderedEnd;
+    const anchorPosition = model.getPositionAt(anchorOffset);
+    const focusPosition = model.getPositionAt(focusOffset);
     const preservedScrollTop = state.editor.getScrollTop();
     const preservedScrollLeft = state.editor.getScrollLeft();
 
-    state.editor.setSelection({
-        endColumn: endPosition.column,
-        endLineNumber: endPosition.lineNumber,
-        startColumn: startPosition.column,
-        startLineNumber: startPosition.lineNumber
-    });
+    state.editor.setSelection(new state.monaco.Selection(
+        anchorPosition.lineNumber,
+        anchorPosition.column,
+        focusPosition.lineNumber,
+        focusPosition.column));
 
     if (revealSelection) {
         const scrollType = state.monaco.editor.ScrollType.Immediate;
         state.editor.focus();
-        if (typeof state.editor.revealRangeInCenterIfOutsideViewport === "function") {
-            state.editor.revealRangeInCenterIfOutsideViewport(range, scrollType);
-        }
-        else {
-            state.editor.revealRangeInCenter(range, scrollType);
-        }
+        revealSelectionInViewport(state, scrollType);
         state.editor.render();
+        requestAnimationFrame(() => {
+            const currentState = hostStates.get(state.host);
+            if (!currentState) {
+                return;
+            }
+
+            revealSelectionInViewport(currentState, scrollType);
+            currentState.editor.render();
+        });
     }
     else {
         state.editor.focus();
@@ -1239,10 +1306,18 @@ function applySelection(state, start, end, revealSelection) {
 
 function syncProxyFromEditor(state) {
     const selection = createSelectionState(state);
+    const proxyStart = Math.min(selection.start, selection.end);
+    const proxyEnd = Math.max(selection.start, selection.end);
+    const proxyDirection = normalizeSelectionDirection(selection.direction, selection.start, selection.end);
     state.proxy.value = state.editor.getValue();
     state.suppressProxySelection = true;
-    state.proxy.selectionStart = selection.start;
-    state.proxy.selectionEnd = selection.end;
+    state.proxy.selectionStart = proxyStart;
+    state.proxy.selectionEnd = proxyEnd;
+    try {
+        state.proxy.selectionDirection = proxyDirection;
+    }
+    catch {
+    }
     state.suppressProxySelection = false;
 }
 
@@ -1263,8 +1338,17 @@ function createSelectionState(state) {
         return createEmptySelectionState();
     }
 
-    const start = model.getOffsetAt(selection.getStartPosition());
-    const end = model.getOffsetAt(selection.getEndPosition());
+    const anchorPosition = {
+        column: selection.selectionStartColumn,
+        lineNumber: selection.selectionStartLineNumber
+    };
+    const focusPosition = {
+        column: selection.positionColumn,
+        lineNumber: selection.positionLineNumber
+    };
+    const start = model.getOffsetAt(anchorPosition);
+    const end = model.getOffsetAt(focusPosition);
+    const direction = normalizeSelectionDirection(selection.getDirection?.(), start, end);
     const visiblePosition = state.editor.getScrolledVisiblePosition(selection.getStartPosition());
     const rawToolbarTop = visiblePosition ? Math.max(44, (visiblePosition.top ?? 0) + 10) : 44;
     const rawToolbarLeft = visiblePosition ? (visiblePosition.left ?? 0) + ((visiblePosition.width ?? 0) / 2) : 0;
@@ -1272,9 +1356,10 @@ function createSelectionState(state) {
     const toolbarLeft = Number.isFinite(rawToolbarLeft) ? rawToolbarLeft : 0;
 
     return {
-        column: selection.getPosition().column,
+        column: focusPosition.column,
+        direction,
         end,
-        line: selection.getPosition().lineNumber,
+        line: focusPosition.lineNumber,
         start,
         toolbarLeft,
         toolbarTop
@@ -1284,6 +1369,7 @@ function createSelectionState(state) {
 function createEmptySelectionState() {
     return {
         column: 1,
+        direction: "none",
         end: 0,
         line: 1,
         start: 0,

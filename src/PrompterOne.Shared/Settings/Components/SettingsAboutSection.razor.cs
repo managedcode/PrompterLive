@@ -12,6 +12,7 @@ public partial class SettingsAboutSection
     private const string CompanyCardId = "about-company";
     private const string OpenSourceCardId = "about-open-source";
     private const string ResourcesCardId = "about-resources";
+    private const string OnboardingCardId = "about-onboarding";
 
     private const string AboutSectionDescriptionKey = "SettingsAboutSectionDescription";
     private const string AutomaticUpdatesLabelKey = "SettingsAboutAutomaticUpdatesLabel";
@@ -50,6 +51,10 @@ public partial class SettingsAboutSection
     private const string ReleasesLinkDescriptionKey = "SettingsAboutReleasesLinkDescription";
     private const string IssuesLinkLabelKey = "SettingsAboutIssuesLinkLabel";
     private const string IssuesLinkDescriptionKey = "SettingsAboutIssuesLinkDescription";
+    private const string OnboardingCardTitleKey = "SettingsAboutOnboardingCardTitle";
+    private const string OnboardingCardActionKey = "OnboardingRestartTour";
+    private const string OnboardingCardBodyKey = "OnboardingReopenBody";
+    private const string OnboardingCardSubtitleKey = "OnboardingReopenTitle";
 
     [Inject] private IAppVersionProvider AppVersionProvider { get; set; } = null!;
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
@@ -57,6 +62,7 @@ public partial class SettingsAboutSection
     [Parameter] public string DisplayStyle { get; set; } = string.Empty;
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
     [Parameter] public EventCallback<string> ToggleCard { get; set; }
+    [Parameter] public EventCallback OpenOnboarding { get; set; }
 
     private string AboutSectionDescription => Text(AboutSectionDescriptionKey);
     private string AboutSectionTitle => Text(UiTextKey.SettingsNavAbout);
@@ -96,6 +102,10 @@ public partial class SettingsAboutSection
     ];
     private string FooterText => Text(FooterTextKey);
     private string LicensedStatusLabel => Text(LicensedStatusLabelKey);
+    private string OnboardingCardAction => Text(OnboardingCardActionKey);
+    private string OnboardingCardCopy => Text(OnboardingCardBodyKey);
+    private string OnboardingCardSubtitle => Text(OnboardingCardSubtitleKey);
+    private string OnboardingCardTitle => Text(OnboardingCardTitleKey);
     private IReadOnlyList<AboutItem> Libraries =>
     [
         new("Inter", Text(InterDescriptionKey), "OFL"),

@@ -41,6 +41,27 @@ public sealed class RsvpTextProcessorTimelineTests
         Assert.Equal(PlainTextReadingDefaultSpeed, segment.Speed);
         Assert.Equal("Hello", processed.AllWords[0]);
     }
+
+    [Fact]
+    public void ParseScript_TpsSourceDoesNotLeakFrontMatterHeadersOrInlineTagMarkupIntoReadableWords()
+    {
+        var sample = CoreTestSeedData.CreateDocuments()
+            .Single(document => string.Equals(document.Id, CoreTestSeedData.Scripts.DemoId, StringComparison.Ordinal));
+
+        var processed = _processor.ParseScript(sample.Text);
+
+        Assert.NotEmpty(processed.AllWords);
+        Assert.Equal("Good", processed.AllWords[0]);
+        Assert.Contains("welcome", processed.AllWords, StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain(
+            processed.AllWords,
+            word => word.Contains('[', StringComparison.Ordinal) ||
+                    word.Contains(']', StringComparison.Ordinal) ||
+                    word.Contains("---", StringComparison.Ordinal) ||
+                    word.Contains("title:", StringComparison.OrdinalIgnoreCase) ||
+                    word.Contains("140WPM", StringComparison.OrdinalIgnoreCase) ||
+                    word.Contains("Speaker:", StringComparison.OrdinalIgnoreCase));
+    }
 }
 
 internal static class RsvpTextProcessorTimelineTestSource

@@ -130,6 +130,22 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.SettingsAppearanceUiDensityLabel), cut.Markup);
     }
 
+    [Fact]
+    public void SettingsAboutSection_RendersLocalizedOnboardingReopenCopy_WhenCurrentCultureIsGerman()
+    {
+        using var _ = new CultureScope(AppCultureCatalog.GermanCultureName);
+
+        var cut = Render<SettingsAboutSection>(parameters => parameters
+            .Add(component => component.DisplayStyle, string.Empty)
+            .Add(component => component.IsCardOpen, static _ => true)
+            .Add(component => component.ToggleCard, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask)));
+
+        Assert.Contains(Text(UiTextKey.SettingsAboutOnboardingCardTitle), cut.Markup);
+        Assert.Contains(Text(UiTextKey.OnboardingReopenTitle), cut.Markup);
+        Assert.Contains(Text(UiTextKey.OnboardingReopenBody), cut.Markup);
+        Assert.Contains(Text(UiTextKey.OnboardingRestartTour), cut.Markup);
+    }
+
     private string Text(UiTextKey key) =>
         Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key.ToString()];
 

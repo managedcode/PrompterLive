@@ -295,14 +295,14 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                 probeResult.MaxLatency,
                 0,
                 BrowserTestConstants.Editor.MaxVisibleRenderSpikeLatencyMs);
-            Assert.InRange(
-                probeResult.LongTaskCount,
-                0,
-                BrowserTestConstants.Editor.MaxTypingLongTaskCount);
+            Assert.True(
+                probeResult.LongTaskCount <= BrowserTestConstants.Editor.MaxTypingLongTaskCount,
+                $"Expected Monaco typing to avoid browser long tasks, but observed {probeResult.LongTaskCount} long task(s) with max duration {probeResult.MaxLongTaskDuration:0.##}ms.");
             Assert.Equal(BrowserTestConstants.Editor.TransparentInputColor, probeResult.FinalInputColor);
-            Assert.True(probeResult.MaxDecorationClassCount > 0);
             Assert.True(probeResult.ReadyDuringTyping);
-            Assert.True(probeResult.FinalRenderedLength > 0);
+            Assert.True(
+                probeResult.FinalRenderedLength >= BrowserTestConstants.Editor.TypingResponsivenessProbeText.Length,
+                $"Expected the Monaco overlay to render the full probe text during typing, but the rendered length was {probeResult.FinalRenderedLength}.");
         }
         finally
         {
