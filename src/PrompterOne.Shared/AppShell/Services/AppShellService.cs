@@ -29,7 +29,8 @@ public sealed class AppShellService
             WpmLabel: string.Empty,
             BreadcrumbLabel: breadcrumbLabel,
             SearchText: nextSearchText,
-            ScriptId: string.Empty));
+            ScriptId: string.Empty,
+            TeleprompterPlaybackActive: false));
     }
 
     public void ShowEditor(string title, string? scriptId) =>
@@ -39,7 +40,15 @@ public sealed class AppShellService
         SetScriptScopedState(AppShellScreen.Learn, title, subtitle, wpmLabel, scriptId);
 
     public void ShowTeleprompter(string title, string subtitle, string? scriptId) =>
-        SetScriptScopedState(AppShellScreen.Teleprompter, title, subtitle, string.Empty, scriptId);
+        SetState(new AppShellState(
+            Screen: AppShellScreen.Teleprompter,
+            Title: title,
+            Subtitle: subtitle,
+            WpmLabel: string.Empty,
+            BreadcrumbLabel: string.Empty,
+            SearchText: string.Empty,
+            ScriptId: scriptId ?? string.Empty,
+            TeleprompterPlaybackActive: State.Screen == AppShellScreen.Teleprompter && State.TeleprompterPlaybackActive));
 
     public void ShowGoLive(string title, string subtitle, string? scriptId) =>
         SetScriptScopedState(
@@ -57,7 +66,18 @@ public sealed class AppShellService
             WpmLabel: string.Empty,
             BreadcrumbLabel: string.Empty,
             SearchText: string.Empty,
-            ScriptId: string.Empty));
+            ScriptId: string.Empty,
+            TeleprompterPlaybackActive: false));
+
+    public void SetTeleprompterPlaybackActive(bool isActive)
+    {
+        if (State.Screen != AppShellScreen.Teleprompter || State.TeleprompterPlaybackActive == isActive)
+        {
+            return;
+        }
+
+        SetState(State with { TeleprompterPlaybackActive = isActive });
+    }
 
     public void UpdateLibrarySearch(string searchText)
     {
@@ -131,7 +151,8 @@ public sealed class AppShellService
             WpmLabel: wpmLabel,
             BreadcrumbLabel: string.Empty,
             SearchText: string.Empty,
-            ScriptId: scriptId ?? string.Empty));
+            ScriptId: scriptId ?? string.Empty,
+            TeleprompterPlaybackActive: false));
     }
 
     private void SetState(AppShellState nextState)

@@ -135,7 +135,7 @@ public partial class TeleprompterPage
 
             await Task.Delay(ReaderFirstWordDelayMilliseconds, cancellationToken);
 
-            _isReaderPlaying = true;
+            SetReaderPlaybackState(true);
             await ActivateReaderWordAsync(0, alignBeforeActivation: true);
             _ = RunReaderPlaybackLoopAsync(GetCurrentWordDelayMilliseconds(), cancellationToken);
         }
@@ -262,7 +262,7 @@ public partial class TeleprompterPage
     {
         StopReaderPlaybackLoop(keepPlaybackState: true);
         _readerPlaybackCts = new CancellationTokenSource();
-        _isReaderPlaying = true;
+        SetReaderPlaybackState(true);
         _ = RunReaderPlaybackLoopAsync(initialDelayMilliseconds, _readerPlaybackCts.Token);
     }
 
@@ -276,8 +276,14 @@ public partial class TeleprompterPage
 
         if (!keepPlaybackState)
         {
-            _isReaderPlaying = false;
+            SetReaderPlaybackState(false);
         }
+    }
+
+    private void SetReaderPlaybackState(bool isPlaying)
+    {
+        _isReaderPlaying = isPlaying;
+        Shell.SetTeleprompterPlaybackActive(isPlaying);
     }
 
     private async Task RunReaderPlaybackLoopAsync(int initialDelayMilliseconds, CancellationToken cancellationToken)

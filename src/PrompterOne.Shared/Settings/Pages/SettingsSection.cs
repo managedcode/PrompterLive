@@ -10,6 +10,7 @@ public enum SettingsSection
     Recording,
     Ai,
     Appearance,
+    Language,
     Shortcuts,
     About
 }

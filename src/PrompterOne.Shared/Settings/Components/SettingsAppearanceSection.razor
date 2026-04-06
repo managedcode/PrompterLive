@@ -56,13 +56,6 @@
                         }
                     </div>
                 </div>
-                <div class="set-field">
-                    <label>@Text(UiTextKey.SettingsAppearanceLanguageLabel)</label>
-                    <SettingsSelect Value="@SelectedLanguageCulture"
-                                   Options="@LanguageOptions"
-                                   OnChange="OnLanguageChanged"
-                                   TestId="@UiTestIds.Settings.LanguageSelect" />
-                </div>
             </div>
         </SettingsExpandableCard>
 
@@ -231,7 +224,6 @@
     [Parameter] public string ColorScheme { get; set; } = string.Empty;
     [Parameter] public string DisplayStyle { get; set; } = string.Empty;
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
-    [Parameter] public string SelectedLanguageCulture { get; set; } = string.Empty;
     [Parameter] public bool MirrorTeleprompterText { get; set; }
     [Parameter] public bool ReduceMotion { get; set; }
     [Parameter] public bool ShowShortcutOverlay { get; set; }
@@ -247,24 +239,15 @@
     [Parameter] public EventCallback ToggleShowWordHighlight { get; set; }
     [Parameter] public EventCallback<string> UpdateAccentColor { get; set; }
     [Parameter] public EventCallback<string> UpdateColorScheme { get; set; }
-    [Parameter] public EventCallback<string> UpdateLanguageCulture { get; set; }
     [Parameter] public EventCallback<string> UpdateTeleprompterFont { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> UpdateTeleprompterFontSize { get; set; }
     [Parameter] public EventCallback<string> UpdateTeleprompterTextColor { get; set; }
     [Parameter] public EventCallback<string> UpdateUiDensity { get; set; }
 
-    private static readonly IReadOnlyList<SettingsSelectOption> LanguageOptions = PrompterOne.Core.Localization.AppCultureCatalog
-        .SupportedCultureDefinitionsInDisplayOrder
-        .Select(culture => new SettingsSelectOption(culture.CultureName, culture.DisplayName))
-        .ToArray();
-
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 
     private void OnFontChanged(ChangeEventArgs args) =>
         UpdateTeleprompterFont.InvokeAsync(args.Value?.ToString() ?? string.Empty);
-
-    private void OnLanguageChanged(ChangeEventArgs args) =>
-        UpdateLanguageCulture.InvokeAsync(args.Value?.ToString() ?? string.Empty);
 
     private sealed record ThemeOption(string Value, string Label, SettingsOptionPreviewKind PreviewKind);
 

@@ -21,6 +21,7 @@ public partial class SettingsPage
         "recording-general",
         "ai-claude-api",
         "appearance-theme",
+        "language-preferences",
         "about-onboarding",
         "about-app",
         "about-team"

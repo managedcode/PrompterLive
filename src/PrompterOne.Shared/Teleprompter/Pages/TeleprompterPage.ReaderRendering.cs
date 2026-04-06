@@ -7,13 +7,14 @@ public partial class TeleprompterPage
 {
     private const string ActiveCssClass = "active";
     private const string ReaderCameraTintCssClass = "rd-camera-tint";
+    private const string ReaderBackButtonCssClass = "rd-back";
     private const string ReaderCardActiveCssClass = "rd-card-active";
     private const string ReaderCardCssClass = "rd-card";
     private const string ReaderCardNextCssClass = "rd-card-next";
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
     private const string ReaderAlignmentButtonCssClass = "rd-align-btn";
     private const int ReaderCenterOpticalInsetPixels = 0;
-    private const int ReaderComfortableContentMaxWidth = 940;
+    private const int ReaderComfortableContentMaxWidth = 1080;
     private const int ReaderComfortablePortraitContentMaxWidth = 760;
     private const string ReaderContentMaxWidthVariableName = "--rd-content-max-width";
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
@@ -86,6 +87,9 @@ public partial class TeleprompterPage
 
     private string BuildCameraCssClass() =>
         BuildClassList(_cameraLayer.CssClass, _isReaderCameraActive ? ActiveCssClass : null);
+
+    private string BuildReaderBackButtonCssClass() =>
+        BuildClassList(ReaderBackButtonCssClass, _isReaderPlaying ? ReaderReadingActiveCssClass : null);
 
     private string BuildCameraTintCssClass() =>
         BuildClassList(ReaderCameraTintCssClass, _isReaderCameraActive ? ActiveCssClass : null);

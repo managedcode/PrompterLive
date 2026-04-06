@@ -26,7 +26,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderForwardStep = 1;
     private const int ReaderGuideActiveDurationMilliseconds = 800;
     private const int ReaderMaxFontSize = 56;
-    private const int ReaderMaxTextWidth = 1100;
+    private const int ReaderMaxTextWidth = 1240;
     private const int ReaderMaxFocalPointPercent = 55;
     private const int ReaderMinFontSize = 24;
     private const int ReaderMinTextWidth = 400;
@@ -172,7 +172,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
         _activeReaderCardIndex = 0;
         _activeReaderWordIndex = -1;
-        _isReaderPlaying = false;
+        SetReaderPlaybackState(false);
         _isReaderCountdownActive = false;
         _isReaderFullscreenActive = false;
         _countdownValue = null;

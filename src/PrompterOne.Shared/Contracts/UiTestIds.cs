@@ -373,6 +373,7 @@ public static class UiTestIds
         public const string AboutVersion = "settings-about-version";
         public const string AppearancePanel = "settings-appearance-panel";
         public const string AiPanel = "settings-ai-panel";
+        public const string LanguagePanel = "settings-language-panel";
         public const string LanguageSelect = "settings-language-select";
         public const string CameraFrameRate = "settings-camera-frame-rate";
         public const string CameraPreviewCard = "settings-camera-preview-card";
@@ -403,6 +404,7 @@ public static class UiTestIds
         public const string NavAbout = "settings-nav-about";
         public const string NavAi = "settings-nav-ai";
         public const string NavAppearance = "settings-nav-appearance";
+        public const string NavLanguage = "settings-nav-language";
         public const string NavCameras = "settings-nav-cameras";
         public const string NavCloud = "settings-nav-cloud";
         public const string NavFiles = "settings-nav-files";

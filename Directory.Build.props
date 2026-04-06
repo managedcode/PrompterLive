@@ -1,11 +1,10 @@
 <Project>
   <PropertyGroup>
     <PrompterOneTargetFramework>net10.0</PrompterOneTargetFramework>
-    <PrompterOneVersionMajorMinor>0.1</PrompterOneVersionMajorMinor>
+    <PrompterOneVersionMajorMinor>0.2</PrompterOneVersionMajorMinor>
     <PrompterOneBuildNumber Condition="'$(PrompterOneBuildNumber)' == '' and '$(GITHUB_RUN_NUMBER)' != ''">$(GITHUB_RUN_NUMBER)</PrompterOneBuildNumber>
     <PrompterOneBuildNumber Condition="'$(PrompterOneBuildNumber)' == ''">0</PrompterOneBuildNumber>
     <PrompterOneVersionPrefix>$(PrompterOneVersionMajorMinor).$(PrompterOneBuildNumber)</PrompterOneVersionPrefix>
-    <PrompterOneAssemblyVersion>0.1.0.0</PrompterOneAssemblyVersion>
     <PrompterOneFileVersion>$(PrompterOneVersionPrefix).0</PrompterOneFileVersion>
 
     <TargetFramework Condition="'$(TargetFramework)' == ''">$(PrompterOneTargetFramework)</TargetFramework>
@@ -14,7 +13,7 @@
     <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
     <CodeAnalysisTreatWarningsAsErrors Condition="'$(CodeAnalysisTreatWarningsAsErrors)' == ''">true</CodeAnalysisTreatWarningsAsErrors>
     <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
-
+    
     <VersionPrefix Condition="'$(VersionPrefix)' == ''">$(PrompterOneVersionPrefix)</VersionPrefix>
     <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(PrompterOneAssemblyVersion)</AssemblyVersion>

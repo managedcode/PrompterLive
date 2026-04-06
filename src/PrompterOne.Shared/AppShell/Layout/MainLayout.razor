@@ -7,7 +7,7 @@
 
 @if (ShowAppHeader)
 {
-    <header class="@(IsLibraryScreen ? "app-header app-header-library" : "app-header")">
+    <header class="@BuildAppHeaderCssClass()">
         <button type="button"
                 class="app-header-left app-header-home"
                 @onclick="HandleHomeClickAsync"
@@ -73,6 +73,7 @@
             <GoLiveShellButton Label="@Text(UiTextKey.HeaderGoLive)"
                                Status="@GoLiveIndicatorStatus"
                                LiveState="@GoLiveIndicatorState"
+                               Subdued="@IsTeleprompterPlaybackChromeMuted"
                                OnClick="HandleOpenGoLiveClickAsync"
                                TestId="@UiTestIds.Header.GoLive" />
 
@@ -173,7 +174,7 @@
 @if (ShowGoLiveWidget)
 {
     <button type="button"
-            class="app-live-widget"
+            class="@BuildGoLiveWidgetCssClass()"
             @onclick="HandleOpenGoLiveClickAsync"
             data-live-state="@GoLiveIndicatorState"
             data-testid="@UiTestIds.Header.LiveWidget">

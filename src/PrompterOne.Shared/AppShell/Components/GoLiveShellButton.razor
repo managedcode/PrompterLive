@@ -30,12 +30,15 @@
 
 @code {
     private const string BaseCssClass = "go-live-shell-button";
+    private const string SubduedCssClass = "go-live-shell-button--subdued";
 
     private string AccessibleLabel => string.IsNullOrWhiteSpace(Status)
         ? Label
         : string.Join(' ', new[] { Label, Status });
 
-    private string CssClass => BaseCssClass;
+    private string CssClass => Subdued
+        ? $"{BaseCssClass} {SubduedCssClass}"
+        : BaseCssClass;
 
     private bool ShowStatus => !string.IsNullOrWhiteSpace(Status);
 
@@ -43,6 +46,7 @@
     [Parameter] public string LiveState { get; set; } = GoLiveIndicatorStates.Idle;
     [Parameter] public EventCallback OnClick { get; set; }
     [Parameter] public string Status { get; set; } = string.Empty;
+    [Parameter] public bool Subdued { get; set; }
     [Parameter] public string TestId { get; set; } = string.Empty;
 
     private Task HandleClick() => OnClick.InvokeAsync();

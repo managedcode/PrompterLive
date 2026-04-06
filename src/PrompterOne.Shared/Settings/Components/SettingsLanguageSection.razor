@@ -1,0 +1,59 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Core.Localization
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Settings.Models
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section class="set-section set-panel"
+         id="set-language"
+         style="@DisplayStyle"
+         data-testid="@UiTestIds.Settings.LanguagePanel">
+    <h3 class="set-section-title">@Text(UiTextKey.SettingsAppearanceLanguageLabel)</h3>
+    <p class="set-section-desc">@Text(UiTextKey.SettingsLanguageSectionDescription)</p>
+
+    <div class="set-device-list">
+        <SettingsExpandableCard Title="@Text(UiTextKey.SettingsAppearanceLanguageLabel)"
+                                Subtitle="@SelectedLanguageLabel"
+                                IconTone="UiIconSurfaceTone.Gold"
+                                IsOpen="@IsCardOpen(LanguageCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(LanguageCardId))">
+            <UiIcon Kind="UiIconKind.Message" Size="17" />
+            <div class="set-device-fields">
+                <div class="set-field">
+                    <label>@Text(UiTextKey.SettingsAppearanceLanguageLabel)</label>
+                    <SettingsSelect Value="@SelectedLanguageCulture"
+                                    Options="@LanguageOptions"
+                                    OnChange="OnLanguageChanged"
+                                    TestId="@UiTestIds.Settings.LanguageSelect" />
+                </div>
+            </div>
+        </SettingsExpandableCard>
+    </div>
+</section>
+
+@code {
+    private const string LanguageCardId = "language-preferences";
+
+    private static readonly IReadOnlyList<SettingsSelectOption> LanguageOptions = AppCultureCatalog
+        .SupportedCultureDefinitionsInDisplayOrder
+        .Select(culture => new SettingsSelectOption(culture.CultureName, culture.DisplayName))
+        .ToArray();
+
+    private string SelectedLanguageLabel =>
+        LanguageOptions.FirstOrDefault(option => string.Equals(option.Value, SelectedLanguageCulture, StringComparison.Ordinal))?.Label
+        ?? SelectedLanguageCulture;
+
+    [Parameter] public string DisplayStyle { get; set; } = string.Empty;
+    [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
+    [Parameter] public string SelectedLanguageCulture { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ToggleCard { get; set; }
+    [Parameter] public EventCallback<string> UpdateLanguageCulture { get; set; }
+
+    private Task OnLanguageChanged(ChangeEventArgs args) =>
+        UpdateLanguageCulture.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}

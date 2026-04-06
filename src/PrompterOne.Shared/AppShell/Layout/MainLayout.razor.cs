@@ -12,6 +12,11 @@ namespace PrompterOne.Shared.Layout;
 
 public partial class MainLayout : LayoutComponentBase, IDisposable
 {
+    private const string AppHeaderCssClass = "app-header";
+    private const string AppHeaderLibraryCssClass = "app-header-library";
+    private const string AppHeaderReaderMutedCssClass = "app-header--reader-muted";
+    private const string GoLiveWidgetCssClass = "app-live-widget";
+    private const string GoLiveWidgetReaderMutedCssClass = "app-live-widget--reader-muted";
     private const string GoLiveWidgetIdleElapsed = "00:00:00";
     private const string RouteChangedLogTemplate = "Route changed to {Location}.";
     private static readonly TimeSpan GoLiveWidgetRefreshInterval = TimeSpan.FromSeconds(1);
@@ -61,6 +66,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private bool HasTrackedScriptContext => !string.IsNullOrWhiteSpace(ShellState.ScriptId);
 
     private bool ShowHeaderSubtitle => !string.IsNullOrWhiteSpace(HeaderSubtitle);
+
+    private bool IsTeleprompterPlaybackChromeMuted =>
+        ShellState.Screen == AppShellScreen.Teleprompter && ShellState.TeleprompterPlaybackActive;
 
     private string HeaderSubtitle => ShellState.Screen switch
     {
@@ -124,6 +132,17 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
             ? AppRoutes.GoLive
             : AppRoutes.GoLiveWithId(GoLiveSessionState.ScriptId)
         : Shell.GetGoLiveRoute();
+
+    private string BuildAppHeaderCssClass() =>
+        BuildClassList(
+            AppHeaderCssClass,
+            IsLibraryScreen ? AppHeaderLibraryCssClass : null,
+            IsTeleprompterPlaybackChromeMuted ? AppHeaderReaderMutedCssClass : null);
+
+    private string BuildGoLiveWidgetCssClass() =>
+        BuildClassList(
+            GoLiveWidgetCssClass,
+            IsTeleprompterPlaybackChromeMuted ? GoLiveWidgetReaderMutedCssClass : null);
 
     private static string FormatSessionElapsed(DateTimeOffset? startedAt)
     {
@@ -374,6 +393,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         _goLiveWidgetRefreshCancellationTokenSource = null;
         _goLiveWidgetRefreshTask = null;
     }
+
+    private static string BuildClassList(params string?[] classNames) =>
+        string.Join(' ', classNames.Where(className => !string.IsNullOrWhiteSpace(className)));
 
     public void Dispose()
     {

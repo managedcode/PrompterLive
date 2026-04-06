@@ -9,7 +9,8 @@ public sealed record AppShellState(
     string WpmLabel,
     string BreadcrumbLabel,
     string SearchText,
-    string ScriptId)
+    string ScriptId,
+    bool TeleprompterPlaybackActive)
 {
     public static AppShellState Default { get; } = new(
         Screen: AppShellScreen.Library,
@@ -18,5 +19,6 @@ public sealed record AppShellState(
         WpmLabel: string.Empty,
         BreadcrumbLabel: string.Empty,
         SearchText: string.Empty,
-        ScriptId: string.Empty);
+        ScriptId: string.Empty,
+        TeleprompterPlaybackActive: false);
 }
