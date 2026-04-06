@@ -35,7 +35,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture) : IClass
         try
         {
             await page.GotoAsync(BrowserTestConstants.Routes.Settings);
-            await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
+            await page.GetByTestId(UiTestIds.Settings.NavLanguage).ClickAsync();
             await page.GetByTestId(UiTestIds.Settings.LanguageSelect).ClickAsync();
             await page.GetByTestId(UiTestIds.Settings.SelectOption(UiTestIds.Settings.LanguageSelect, BrowserTestConstants.Localization.FrenchCultureName)).ClickAsync();
             await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);

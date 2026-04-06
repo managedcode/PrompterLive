@@ -105,7 +105,9 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.CamerasPanel));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.MicsPanel));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.AppearancePanel));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.LanguagePanel));
             Assert.Contains(Text(UiTextKey.SettingsNavCloud), cut.Markup);
+            Assert.Contains(Text(UiTextKey.SettingsNavLanguage), cut.Markup);
             Assert.Contains(Text(UiTextKey.SettingsCamerasSectionDescription), cut.Markup);
             Assert.Contains(Text(UiTextKey.SettingsMicrophonesMuteWhenNotInGoLive), cut.Markup);
             Assert.Contains(Text(UiTextKey.SettingsAppearanceTeleprompterTitle), cut.Markup);

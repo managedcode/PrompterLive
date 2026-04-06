@@ -97,37 +97,21 @@ public sealed class LocalizationRenderingTests : BunitContext
     }
 
     [Fact]
-    public void SettingsAppearanceSection_RendersGermanLabels_WhenCurrentCultureIsGerman()
+    public void SettingsLanguageSection_RendersGermanLabels_WhenCurrentCultureIsGerman()
     {
         using var _ = new CultureScope(AppCultureCatalog.GermanCultureName);
 
-        var cut = Render<SettingsAppearanceSection>(parameters => parameters
+        var cut = Render<SettingsLanguageSection>(parameters => parameters
             .Add(component => component.DisplayStyle, string.Empty)
             .Add(component => component.IsCardOpen, static _ => true)
-            .Add(component => component.ColorScheme, SettingsAppearanceValues.DarkColorScheme)
-            .Add(component => component.AccentColor, SettingsAppearanceValues.DefaultAccentColor)
             .Add(component => component.SelectedLanguageCulture, AppCultureCatalog.GermanCultureName)
-            .Add(component => component.TeleprompterFont, "Inter (Default)")
-            .Add(component => component.TeleprompterFontSize, 48)
-            .Add(component => component.TeleprompterTextColor, "#FFFFFF")
-            .Add(component => component.UiDensity, SettingsAppearanceValues.DefaultDensity)
             .Add(component => component.ToggleCard, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateColorScheme, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateAccentColor, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateLanguageCulture, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateTeleprompterFont, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateTeleprompterFontSize, EventCallback.Factory.Create<ChangeEventArgs>(this, _ => Task.CompletedTask))
-            .Add(component => component.UpdateTeleprompterTextColor, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.ToggleMirrorTeleprompterText, EventCallback.Factory.Create(this, () => Task.CompletedTask))
-            .Add(component => component.ToggleShowWordHighlight, EventCallback.Factory.Create(this, () => Task.CompletedTask))
-            .Add(component => component.UpdateUiDensity, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
-            .Add(component => component.ToggleReduceMotion, EventCallback.Factory.Create(this, () => Task.CompletedTask))
-            .Add(component => component.ToggleShowShortcutOverlay, EventCallback.Factory.Create(this, () => Task.CompletedTask)));
+            .Add(component => component.UpdateLanguageCulture, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask)));
 
-        Assert.Contains(Text(UiTextKey.SettingsAppearanceSectionTitle), cut.Markup);
         Assert.Contains(Text(UiTextKey.SettingsAppearanceLanguageLabel), cut.Markup);
-        Assert.Contains(Text(UiTextKey.SettingsAppearanceThemeDark), cut.Markup);
-        Assert.Contains(Text(UiTextKey.SettingsAppearanceUiDensityLabel), cut.Markup);
+        Assert.Contains(Text(UiTextKey.SettingsLanguageSectionDescription), cut.Markup);
+        Assert.Contains(Text(UiTextKey.SettingsAppearanceLanguageLabel), cut.Markup);
+        Assert.Contains(AppCultureCatalog.GermanDisplayName, cut.Markup);
     }
 
     [Fact]

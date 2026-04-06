@@ -180,6 +180,9 @@
   <data name="SettingsNavAppearance" xml:space="preserve">
     <value>Вигляд</value>
   </data>
+  <data name="SettingsNavLanguage" xml:space="preserve">
+    <value>Мова</value>
+  </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Скорочення</value>
   </data>
@@ -221,6 +224,9 @@
   </data>
   <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
     <value>Налаштуйте вигляд застосунку та читача телесуфлера.</value>
+  </data>
+  <data name="SettingsLanguageSectionDescription" xml:space="preserve">
+    <value>Оберіть мову, яка використовується в PrompterOne. Після перемикання застосунок перезавантажиться.</value>
   </data>
   <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
     <value>Тема</value>

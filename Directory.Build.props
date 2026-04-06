@@ -13,7 +13,7 @@
     <EnableNETAnalyzers Condition="'$(EnableNETAnalyzers)' == ''">true</EnableNETAnalyzers>
     <CodeAnalysisTreatWarningsAsErrors Condition="'$(CodeAnalysisTreatWarningsAsErrors)' == ''">true</CodeAnalysisTreatWarningsAsErrors>
     <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
-    
+
     <VersionPrefix Condition="'$(VersionPrefix)' == ''">$(PrompterOneVersionPrefix)</VersionPrefix>
     <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
     <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(PrompterOneAssemblyVersion)</AssemblyVersion>

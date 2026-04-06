@@ -371,6 +371,28 @@ public sealed class SettingsInteractionTests : BunitContext
     }
 
     [Fact]
+    public void LanguageSection_PersistsSelectedCulture_FromDirectSettingsNavigation()
+    {
+        var cut = Render<SettingsPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.NavLanguage, cut.Markup, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Settings.NavLanguage).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.LanguagePanel));
+            Assert.Contains(Text(UiTextKey.SettingsLanguageSectionDescription), cut.Markup, StringComparison.Ordinal);
+        });
+
+        cut.SelectSettingsOption(UiTestIds.Settings.LanguageSelect, AppCultureCatalog.FrenchCultureName);
+
+        var savedPreferences = _harness.JsRuntime.GetSavedValue<SettingsPagePreferences>(SettingsPagePreferences.StorageKey);
+
+        Assert.Equal(AppCultureCatalog.FrenchCultureName, savedPreferences.LanguageCulture);
+    }
+
+    [Fact]
     public void AboutSection_RendersInjectedAppVersionMetadata_AndOfficialManagedCodeLinks()
     {
         var cut = Render<SettingsPage>();

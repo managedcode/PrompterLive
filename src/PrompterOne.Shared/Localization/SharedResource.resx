@@ -180,6 +180,9 @@
   <data name="SettingsNavAppearance" xml:space="preserve">
     <value>Appearance</value>
   </data>
+  <data name="SettingsNavLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Shortcuts</value>
   </data>
@@ -221,6 +224,9 @@
   </data>
   <data name="SettingsAppearanceSectionDescription" xml:space="preserve">
     <value>Customize the look and feel of the app and the teleprompter reader.</value>
+  </data>
+  <data name="SettingsLanguageSectionDescription" xml:space="preserve">
+    <value>Choose the language used across PrompterOne. The app reloads after you switch.</value>
   </data>
   <data name="SettingsAppearanceThemeTitle" xml:space="preserve">
     <value>Theme</value>
