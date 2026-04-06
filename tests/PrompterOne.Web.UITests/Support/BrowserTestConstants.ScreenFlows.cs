@@ -51,8 +51,8 @@ internal static partial class BrowserTestConstants
         public const string ToolbarDropdownAlignmentTopStep = "01-top-voice-menu-left-cluster";
         public const string ToolbarDropdownAlignmentFloatingStep = "02-floating-voice-menu-left-cluster";
         public const double MinimumDateFieldWidthPx = 150;
-        public const int TooltipEarlyCheckDelayMs = 120;
-        public const int TooltipSettleDelayMs = 560;
+        public const int TooltipEarlyCheckDelayMs = 180;
+        public const int TooltipSettleDelayMs = 720;
         public const int FloatingSemanticDotCount = 2;
         public const double MinimumSemanticColorDistance = 18;
         public const double MinimumSemanticGroupColorDistance = 60;

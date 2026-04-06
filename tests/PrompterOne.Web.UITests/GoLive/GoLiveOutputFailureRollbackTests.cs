@@ -63,6 +63,10 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
             await page.EvaluateAsync(BuildLiveKitConnectFailurePatchScript());
 
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.LiveKitRollbackHarnessReadyScript,
+                null,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await WaitForRuntimeSessionClearedAsync(page);
 
             var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);

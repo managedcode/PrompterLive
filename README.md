@@ -48,18 +48,19 @@ No PrompterOne backend. No desktop install. No account wall. Open the app, start
 
 ## What Works Today
 
-- **Library**: browse scripts, create folders, move documents, sort by multiple columns, and jump straight into edit, Learn, or Teleprompter flows from the same card.
-- **Editor**: author real TPS with metadata hydration, structure-aware navigation, floating formatting controls, syntax-aware rendering, and responsive large-draft typing.
+- **Library**: browse scripts, create folders, move documents, search by title, file name, and script content, then jump straight into edit, Learn, or Teleprompter flows from the same card.
+- **Editor**: author real TPS with Monaco-native syntax support, metadata hydration, structure-aware navigation, floating formatting controls, in-document find, syntax-aware rendering, browser-local autosave/history, and responsive large-draft typing.
 - **Learn**: rehearse with ORP-aligned RSVP, context rails, phrase-aware timing, WPM controls, stepping, looping, and punctuation-safe word progression.
 - **Teleprompter**: read with persisted font and width controls, focal-line positioning, horizontal and vertical mirror toggles, orientation switching, browser fullscreen, segmented progress, and optional camera background.
-- **Settings**: manage appearance, media permissions, camera and microphone setup, sync offsets, recording defaults, cloud snapshot targets, and transport credentials from one routed screen.
+- **Go Live onboarding**: walk the first-run flow with a localized tour that explains TPS, RSVP, the editor, Learn, Teleprompter, and Go Live, then reopen that tour later from Settings.
+- **Settings**: manage appearance, browser language, media permissions, camera and microphone setup, sync offsets, recording defaults, cloud snapshot targets, transport credentials, and onboarding restart from one routed screen.
 - **Go Live**: run the browser-owned studio shell and save the composed program feed locally with decodable video and audio while remote transport and destination routing continue to expand.
 
 ## What You Get
 
 ### Script Library
 
-The operating desk for the rest of the app. The library keeps starter scripts and your own documents in browser storage, supports nested folders, and lets you branch straight into editing, rehearsal, or reading from the same card. It is built for quick route switching instead of export-import churn.
+The operating desk for the rest of the app. The library keeps starter scripts and your own documents in browser storage, supports nested folders, lets you search by title, file name, or body text, and branches straight into editing, rehearsal, or reading from the same card. It is built for quick route switching instead of export-import churn.
 
 ![Library](docs/screenshots/readme/library.png)
 
@@ -69,9 +70,17 @@ The operating desk for the rest of the app. The library keeps starter scripts an
 
 This is not a plain textarea. The editor understands **TPS** (Teleprompter Script), so you can write in segments, blocks, pacing markers, emphasis, emotion tags, pronunciation guides, pause cues, and speed modifiers directly in the source. Front matter is parsed into the metadata rail and kept out of the visible body instead of lingering inline.
 
-The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, and syntax-aware highlighting over the live source. Recent UI work tightened dropdown behavior, tooltip behavior, date-field layout, and large-draft responsiveness so the editor remains usable on both polished demo scripts and very large seeded drafts.
+The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, in-document find, import and export actions, browser-local autosave with revision history, and syntax-aware highlighting over the live source. Recent UI work moved TPS authoring fully onto the Monaco editor surface, tightened dropdown and tooltip behavior, cleaned up gutter spacing, and kept large-draft responsiveness intact on both polished demo scripts and very large seeded drafts.
 
 ![Editor](docs/screenshots/readme/editor.png)
+
+---
+
+### First-Run Onboarding
+
+The app now opens with a guided first-run tour instead of expecting you to infer the workflow from the chrome. It explains what PrompterOne is for, why TPS exists, what RSVP rehearsal does, how the editor differs from Learn and Teleprompter, and what Go Live is responsible for in the browser-owned studio flow.
+
+The tour is localized, can be dismissed if you already know the app, and can be reopened later from Settings when you need the full product map again.
 
 ---
 
@@ -113,13 +122,13 @@ Distribution targets such as YouTube, Twitch, and custom RTMP are capability-gat
 
 ### Settings
 
-Settings holds the operational state for the rest of the app: appearance, browser language, cloud snapshot targets, camera selection with preview, microphone setup with live meters, delay and sync offsets, output quality profiles, recording defaults, and transport credentials. Theme changes and layout preferences persist, and appearance changes propagate across tabs instead of drifting out of sync.
+Settings holds the operational state for the rest of the app: appearance, browser language, cloud snapshot targets, camera selection with preview, microphone setup with live meters, delay and sync offsets, output quality profiles, recording defaults, transport credentials, and onboarding restart. Theme changes and layout preferences persist, and appearance changes propagate across tabs instead of drifting out of sync.
 
 ---
 
 ### Localization
 
-PrompterOne negotiates the initial language from your browser and remembers your explicit choice after that. Localized chrome and persisted user override are part of the browser runtime, not post-build demo copy.
+PrompterOne negotiates the initial language from your browser and remembers your explicit choice after that. Localized chrome, the first-run onboarding flow, and the persisted user override are part of the browser runtime, not post-build demo copy. The remaining hardcoded-string audit is still being finished, so localization is broad already but not yet fully complete across every surface.
 
 ## The Full Flow
 
@@ -140,12 +149,13 @@ PrompterOne is in **active alpha**: the core authoring, rehearsal, reader, and l
 | Area | Status | Current reality |
 | --- | :---: | --- |
 | **Library** | ✅ | Script browsing, folder organization, create and move flows, workflow launchers, persisted browser storage |
-| **Editor** | ✅ | TPS authoring, front-matter hydration, metadata rail, floating formatting controls, syntax-aware rendering, responsive large-draft typing |
+| **Editor** | ✅ | Monaco-native TPS authoring, front-matter hydration, metadata rail, floating formatting controls, in-document find, local autosave/history, syntax-aware rendering, responsive large-draft typing |
 | **Learn** | ✅ | ORP-aligned RSVP, phrase-aware timing, context rails, WPM controls, stepping, looping, punctuation-safe progression |
 | **Teleprompter** | ✅ | Reader width and font controls, focal positioning, horizontal and vertical mirror toggles, orientation toggle, browser fullscreen, segmented progress, persisted layout |
-| **Settings** | ✅ | Appearance sync, media permissions, camera and mic setup, delay offsets, recording defaults, cloud snapshot forms, transport configuration |
+| **Onboarding** | ✅ | Localized first-run walkthrough plus Settings-driven tour restart |
+| **Settings** | ✅ | Appearance sync, browser language, media permissions, camera and mic setup, delay offsets, recording defaults, cloud snapshot forms, transport configuration |
 | **Local recording** | ✅ | Browser-side recording of the composed program feed with decodable video and audio |
-| **Localization** | ✅ | Browser-negotiated chrome with persisted manual override |
+| **Localization** | 🟡 | Browser-negotiated chrome, localized onboarding, and persisted manual override ship now; the remaining string audit is still being finished |
 | **Go Live studio shell** | ✅ | Source rails, scene switching, preview/program layout, runtime telemetry, session chrome, browser-owned operator workflow |
 | **VDO.Ninja transport** | 🟡 | Real transport-aware browser integration, with operational polish still expanding |
 | **LiveKit transport** | 🟡 | Real transport-aware browser integration and guest-path work, with operational polish still expanding |
@@ -162,7 +172,7 @@ These are product directions, not release-date promises.
 **Near term:**
 - Remote publish polish for VDO.Ninja and LiveKit transport flows
 - Broader cloud portability for scripts, settings, and snapshots
-- Better first-run onboarding across the write, rehearse, read, and record workflow
+- Finish the remaining localization audit across routed screens and editor chrome
 - More public documentation and real-world workflow examples
 
 **After that:**

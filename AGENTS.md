@@ -338,6 +338,7 @@ Repo-specific design rules:
 - Runtime analytics and session-replay scripts must be owned through a product adapter/service layer, not ad-hoc inline screen code, and development or debug runs must not send telemetry to Google Analytics or Microsoft Clarity.
 - Teleprompter TPS speed modifiers MUST affect both playback timing and subtle word- or phrase-level letter spacing, so slower spans open up slightly and faster spans tighten slightly without hurting readability.
 - Teleprompter default reader width MUST start at the maximum readable width from the design unless the user explicitly narrows it; shipping a visibly narrower default is a regression.
+- Teleprompter desktop reading surfaces may use a wider text zone than the current narrow column when readability still holds; overly cramped line width on large screens is a regression.
 - Teleprompter speed styling MUST produce a visible but tasteful letter-spacing or kerning change: slower text opens up slightly and faster text tightens slightly, not a no-op.
 - Teleprompter reader word styling MUST mirror TPS/editor inline semantics: explicit inline TPS tags control per-word emphasis and color, while section or block emotion sets card context and must not recolor every reader word.
 - Learn, RSVP, and Teleprompter reading surfaces MUST render spoken words only; raw TPS control tags, front matter fragments, and metadata tokens must never leak into the visible reading text.
@@ -349,6 +350,7 @@ Repo-specific design rules:
 - Teleprompter focus treatment MUST stay visually calm: the active focus word may be emphasized, but surrounding text should be gently dimmed instead of creating a bright moving blot, fake box, or attention-grabbing patch that flies up and down.
 - Teleprompter emotion styling may tint the surface or accents, but reader text itself MUST stay easy to read and must not become harsh, over-bright, or saturated enough to hurt readability.
 - Teleprompter progress and control chrome MUST stay visually subdued during reading, especially on strong emotion-tinted surfaces; bright gold fills, shells, or buttons that pull attention away from the script are regressions.
+- Teleprompter playback-active chrome in the top corners, including `Go Live` and exit/back buttons, MUST dim once reading starts; bright header actions that compete with the focal line are regressions.
 - Teleprompter back navigation MUST stay as visible and readable as the rest of the page controls; a dim or low-contrast back button on the reader screen is a regression.
 - Teleprompter MUST expose both horizontal and vertical mirror toggles on the reader screen so tablet or reflected-glass setups can flip the output without leaving the route or editing CSS manually.
 - Teleprompter MUST expose an in-reader orientation toggle, matching the phone control pattern, so operators can switch the text flow direction directly on the reader screen without leaving playback.

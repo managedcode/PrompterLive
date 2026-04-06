@@ -1,4 +1,4 @@
-.ed-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--glass-bg-light);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:var(--glass-border);border-radius:var(--radius-xl);box-shadow:var(--glass-shadow),var(--glass-inset);}
+.ed-main{--ed-line-number-gap:10px;--ed-toolbar-tooltip-reveal-delay:.44s;flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--glass-bg-light);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:var(--glass-border);border-radius:var(--radius-xl);box-shadow:var(--glass-shadow),var(--glass-inset);}
 .ed-toolbar{display:flex;align-items:stretch;padding:4px 12px;border-bottom:1px solid var(--border-subtle);background:var(--gold-03);flex-shrink:0;gap:0;overflow:visible;scrollbar-width:none;border-radius:var(--radius-xl) var(--radius-xl) 0 0;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;position:relative;z-index:4;}
 .ed-toolbar::-webkit-scrollbar{display:none;}
 .ed-toolbar-tools{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;padding-left:12px;}
@@ -99,7 +99,7 @@
 .ed-main ::deep .tb-emo-item:focus-visible{background:rgba(212,176,112,.05);border-color:rgba(223,187,124,.16);color:var(--text-1);}
 .tb-has-dropdown{gap:3px;}
 .tb-drop-sep{height:1px;background:var(--gold-08);margin:4px 0;}
-.ed-main ::deep .ed-toolbar-tooltip{position:absolute;white-space:normal;max-width:280px;min-width:156px;width:max-content;font-size:12px;line-height:1.4;font-weight:500;color:var(--text-1);background:linear-gradient(180deg, rgba(9,13,22,.985), rgba(10,15,24,.995));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(223,187,124,.32);padding:10px 13px;border-radius:10px;pointer-events:none;opacity:0;visibility:hidden;box-shadow:0 16px 36px rgba(0,0,0,.52),0 0 0 1px rgba(255,223,153,.10),inset 0 1px 0 rgba(255,255,255,.05);z-index:340;font-family:var(--font-sans);text-align:left;transition:opacity .18s ease,visibility 0s linear .32s;}
+.ed-main ::deep .ed-toolbar-tooltip{position:absolute;white-space:normal;max-width:280px;min-width:156px;width:max-content;font-size:12px;line-height:1.4;font-weight:500;color:var(--text-1);background:linear-gradient(180deg, rgba(9,13,22,.985), rgba(10,15,24,.995));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(223,187,124,.32);padding:10px 13px;border-radius:10px;pointer-events:none;opacity:0;visibility:hidden;box-shadow:0 16px 36px rgba(0,0,0,.52),0 0 0 1px rgba(255,223,153,.10),inset 0 1px 0 rgba(255,255,255,.05);z-index:340;font-family:var(--font-sans);text-align:left;transition:opacity .18s ease,visibility 0s linear var(--ed-toolbar-tooltip-reveal-delay);}
 .ed-main ::deep .ed-toolbar-tooltip--toolbar{left:50%;top:calc(100% + 12px);bottom:auto;transform:translate(-50%,-4px);}
 .ed-main ::deep .ed-toolbar-tooltip--floating{left:50%;bottom:calc(100% + 12px);transform:translate(-50%,4px);}
 .ed-main ::deep .ed-toolbar-tooltip--menu,
@@ -109,7 +109,7 @@
 .ed-main ::deep .efb-btn[data-tip]:hover > .ed-toolbar-tooltip,
 .ed-main ::deep .efb-btn[data-tip]:focus-visible > .ed-toolbar-tooltip,
 .ed-main ::deep .efb-menu-item[data-tip]:hover > .ed-toolbar-tooltip,
-.ed-main ::deep .efb-menu-item[data-tip]:focus-visible > .ed-toolbar-tooltip{opacity:1;visibility:visible;transition-delay:.32s,0s;}
+.ed-main ::deep .efb-menu-item[data-tip]:focus-visible > .ed-toolbar-tooltip{opacity:1;visibility:visible;transition-delay:var(--ed-toolbar-tooltip-reveal-delay),0s;}
 .ed-main ::deep .tb-tip:hover > .ed-toolbar-tooltip--toolbar,
 .ed-main ::deep .tb-tip:focus-visible > .ed-toolbar-tooltip--toolbar{transform:translate(-50%,0);}
 .ed-main ::deep .efb-btn[data-tip]:hover > .ed-toolbar-tooltip--floating,
@@ -339,8 +339,10 @@ body.theme-light .ed-main ::deep .efb-menu-item:hover {
 .ed-main ::deep .monaco-editor .line-numbers{
     font-family:var(--mono) !important;
     font-size:14px !important;
+    box-sizing:border-box;
     color:#6A7B75 !important;
     letter-spacing:.03em;
+    padding-right:var(--ed-line-number-gap) !important;
     opacity:.68;
 }
 .ed-main ::deep .monaco-editor .minimap{

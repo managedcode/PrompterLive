@@ -40,6 +40,7 @@
 - Editor dropdown rows must stay compact menu rows, not stacks of tall rounded mini-cards; overlays may feel premium, but menu items still need fast scannable list rhythm.
 - Dropdown item content across `PrompterOne.Shared` must align from the left edge as one readable cluster; do not push tags, shortcuts, or meta copy to a fake right column inside menu rows.
 - Tooltip surfaces across the app must feel intentional and premium: compact, aligned, clearly separated from the background, and positioned so they do not clip, overlap, or awkwardly fight the control that owns them.
+- Editor header toolbar tooltips must reveal more slowly than dropdown intent so quick menu interactions open the dropdown without competing hover tooltip paint.
 - Repeated menus, dropdowns, tooltips, badges, icon rows, image wrappers, and similar visual chrome must be standardized as reusable Blazor components with owning styles; routed pages and catalog files must compose those components instead of embedding bespoke markup or inline visual logic.
 - Shared shell chrome such as the global `Go Live` entry must live behind one reusable Blazor component; routed pages must not fork their own spacing, icon color, or idle/active variants.
 - Editor TPS menus in `PrompterOne.Shared` must use one spec-driven grouping and command inventory across top toolbar, floating toolbar, and Monaco authoring help; if a TPS tag or header pattern is supported, every relevant editor command surface must expose it coherently.

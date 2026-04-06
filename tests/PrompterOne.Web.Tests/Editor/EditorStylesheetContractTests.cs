@@ -6,6 +6,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class EditorStylesheetContractTests
 {
+    private const int ExpectedLineNumberGapPx = 10;
+    private const string ExpectedToolbarTooltipRevealDelay = ".44s";
     private const string HighlightAndInputRule = ".ed-source-highlight,\n.ed-source-input";
     private static readonly string ComponentStylesheetPath = Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory,
@@ -128,6 +130,47 @@ public sealed class EditorStylesheetContractTests
 
         Assert.Contains("border-left:1pxsolidvar(--gold-06);", minimapRule, StringComparison.Ordinal);
         Assert.Contains("border-radius:8px;", sliderRule, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EditorLineNumbers_ReserveVisibleGapBeforeSourceText()
+    {
+        var editorRule = NormalizeCssRule(GetRuleBlock(".ed-main"));
+        var lineNumbersRule = NormalizeCssRule(GetRuleBlock(".ed-main ::deep .monaco-editor .line-numbers"));
+
+        Assert.Contains(
+            $"--ed-line-number-gap:{ExpectedLineNumberGapPx}px;",
+            editorRule,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "box-sizing:border-box;",
+            lineNumbersRule,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "padding-right:var(--ed-line-number-gap)!important;",
+            lineNumbersRule,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EditorToolbarTooltips_WaitLongEnoughToAvoidCompetingWithDropdownIntent()
+    {
+        var editorRule = NormalizeCssRule(GetRuleBlock(".ed-main"));
+        var tooltipRule = NormalizeCssRule(GetRuleBlock(".ed-main ::deep .ed-toolbar-tooltip"));
+        var visibleTooltipRule = NormalizeCssRule(GetRuleBlock(".ed-main ::deep .efb-menu-item[data-tip]:focus-visible > .ed-toolbar-tooltip"));
+
+        Assert.Contains(
+            $"--ed-toolbar-tooltip-reveal-delay:{ExpectedToolbarTooltipRevealDelay};",
+            editorRule,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "transition:opacity.18sease,visibility0slinearvar(--ed-toolbar-tooltip-reveal-delay);",
+            tooltipRule,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "transition-delay:var(--ed-toolbar-tooltip-reveal-delay),0s;",
+            visibleTooltipRule,
+            StringComparison.Ordinal);
     }
 
     private static string GetRuleBlock(string selector)

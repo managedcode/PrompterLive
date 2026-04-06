@@ -266,6 +266,8 @@ internal static partial class BrowserTestConstants
         public const double FloatingBarMinGapAboveSelectionPx = 4;
         public const double GutterMinimumWidthPx = 36;
         public const double GutterMaximumWidthPx = 88;
+        public const double MinimumLineNumberTextGapPx = 6;
+        public const double MaximumLineNumberTextGapPx = 18;
         public const double MinimapMinimumWidthPx = 64;
         public const double MinimapStageEdgeTolerancePx = 18;
         public const double MinimumContentLeftWithLineNumbersPx = 36;
@@ -500,6 +502,8 @@ internal static partial class BrowserTestConstants
         public const string GetLiveKitHarnessScript = "() => window.__prompterOneLiveKitHarness";
         public const string LiveKitHarnessReadyScript =
             "() => Boolean(window.__prompterOneLiveKitHarness && window.__prompterOneLiveKitHarness.connectCalls.length >= 1 && window.__prompterOneLiveKitHarness.publishCalls.some(call => call.kind === 'video') && window.__prompterOneLiveKitHarness.publishCalls.some(call => call.kind === 'audio'))";
+        public const string LiveKitRollbackHarnessReadyScript =
+            "() => Boolean(window.__prompterOneLiveKitHarness && window.__prompterOneLiveKitHarness.connectCalls.length === 1 && window.__prompterOneLiveKitHarness.disconnectCount === 1)";
         public const string GetRuntimeStateScript = "sessionId => window.PrompterOneGoLiveOutput.getSessionState(sessionId)";
         public const string RecordingRuntimeActiveScript =
             "sessionId => Boolean(window.PrompterOneGoLiveOutput.getSessionState(sessionId)?.recording?.active)";
