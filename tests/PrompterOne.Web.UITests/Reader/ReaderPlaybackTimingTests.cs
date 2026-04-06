@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text.Json;
 using Microsoft.Playwright;
 using PrompterOne.Core.Models.Workspace;
@@ -6,12 +7,13 @@ using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Storage;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const int LearnMinimumWordDurationMilliseconds = 60;
     private const string LearnWordSelector = "[data-testid='learn-word']";
     private const string ReaderTimingRecorderKey = "__prompterOneReaderTimingRecorder";
@@ -33,7 +35,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
         BrowserTestConstants.ReaderTiming.BaseWpm
     ];
 
-    [Fact]
+    [Test]
     public Task TeleprompterTimingProbe_PlaybackSequenceMatchesRenderedWordTimingMetadata() =>
         RunPageAsync(async page =>
         {
@@ -46,8 +48,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
 
             var samples = await WaitForRecordedSamplesAsync(page, BrowserTestConstants.ReaderTiming.WordCount);
 
-            Assert.Equal(BrowserTestConstants.ReaderTiming.ExpectedWords, samples.Select(sample => sample.Word).ToArray());
-            Assert.Equal(TeleprompterEffectiveWpmSequence, samples.Select(sample => sample.EffectiveWpm).ToArray());
+            await Assert.That(samples.Select(sample => sample.Word).ToArray()).IsEquivalentTo(BrowserTestConstants.ReaderTiming.ExpectedWords, CollectionOrdering.Matching);
+            await Assert.That(samples.Select(sample => sample.EffectiveWpm).ToArray()).IsEquivalentTo(TeleprompterEffectiveWpmSequence, CollectionOrdering.Matching);
 
             for (var sampleIndex = 1; sampleIndex < samples.Count; sampleIndex++)
             {
@@ -56,14 +58,11 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 var observedDelay = currentSample.AtMs - previousSample.AtMs;
                 var expectedDelay = previousSample.DurationMs + previousSample.PauseMs;
 
-                Assert.InRange(
-                    observedDelay,
-                    expectedDelay - BrowserTestConstants.ReaderTiming.TeleprompterTimingToleranceMs,
-                    expectedDelay + BrowserTestConstants.ReaderTiming.TeleprompterTimingToleranceMs);
+                await Assert.That(observedDelay).IsBetween(expectedDelay - BrowserTestConstants.ReaderTiming.TeleprompterTimingToleranceMs,expectedDelay + BrowserTestConstants.ReaderTiming.TeleprompterTimingToleranceMs);
             }
         });
 
-    [Fact]
+    [Test]
     public Task LearnTimingProbe_PlaybackSequenceMatchesExpectedWordByWordTiming() =>
         RunPageAsync(async page =>
         {
@@ -73,11 +72,11 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.ReaderTiming.BaseWpm,
                 BrowserTestConstants.ReaderTiming.WordCount);
 
-            Assert.Equal(BrowserTestConstants.ReaderTiming.ExpectedWords, samples.Select(sample => sample.Word).ToArray());
-            AssertLearnTimingMatches(samples, LearnExpectations);
+            await Assert.That(samples.Select(sample => sample.Word).ToArray()).IsEquivalentTo(BrowserTestConstants.ReaderTiming.ExpectedWords, CollectionOrdering.Matching);
+            await AssertLearnTimingMatches(samples, LearnExpectations);
         });
 
-    [Fact]
+    [Test]
     public Task LearnTimingProbe_UserSpeedChange_ChangesWordByWordTiming() =>
         RunPageAsync(async page =>
         {
@@ -92,17 +91,15 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.ReaderTiming.LearnFastWpm,
                 BrowserTestConstants.ReaderTiming.WordCount);
 
-            Assert.Equal(BrowserTestConstants.ReaderTiming.ExpectedWords, slowSamples.Select(sample => sample.Word).ToArray());
-            Assert.Equal(BrowserTestConstants.ReaderTiming.ExpectedWords, fastSamples.Select(sample => sample.Word).ToArray());
+            await Assert.That(slowSamples.Select(sample => sample.Word).ToArray()).IsEquivalentTo(BrowserTestConstants.ReaderTiming.ExpectedWords, CollectionOrdering.Matching);
+            await Assert.That(fastSamples.Select(sample => sample.Word).ToArray()).IsEquivalentTo(BrowserTestConstants.ReaderTiming.ExpectedWords, CollectionOrdering.Matching);
 
-            AssertLearnTimingMatches(slowSamples, LearnSlowExpectations);
-            AssertLearnTimingMatches(fastSamples, LearnFastExpectations);
+            await AssertLearnTimingMatches(slowSamples, LearnSlowExpectations);
+            await AssertLearnTimingMatches(fastSamples, LearnFastExpectations);
 
             var slowPlaybackSpanMs = ReadPlaybackSpanMilliseconds(slowSamples);
             var fastPlaybackSpanMs = ReadPlaybackSpanMilliseconds(fastSamples);
-            Assert.True(
-                fastPlaybackSpanMs <= slowPlaybackSpanMs - BrowserTestConstants.ReaderTiming.MinimumSpeedProbePlaybackDeltaMs,
-                $"Expected {BrowserTestConstants.ReaderTiming.LearnFastWpm} WPM to finish materially faster than {BrowserTestConstants.ReaderTiming.LearnSlowWpm} WPM. Slow span: {slowPlaybackSpanMs} ms. Fast span: {fastPlaybackSpanMs} ms.");
+            await Assert.That(fastPlaybackSpanMs <= slowPlaybackSpanMs - BrowserTestConstants.ReaderTiming.MinimumSpeedProbePlaybackDeltaMs).IsTrue().Because($"Expected {BrowserTestConstants.ReaderTiming.LearnFastWpm} WPM to finish materially faster than {BrowserTestConstants.ReaderTiming.LearnSlowWpm} WPM. Slow span: {slowPlaybackSpanMs} ms. Fast span: {fastPlaybackSpanMs} ms.");
         });
 
     private static IReadOnlyList<LearnTimingExpectation> BuildLearnExpectations(string scriptFileName, int targetWpm)
@@ -228,7 +225,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
         await Expect(page.GetByTestId(UiTestIds.Learn.Page))
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await Expect(page.GetByTestId(UiTestIds.Learn.Word)).ToBeVisibleAsync();
-        Assert.Equal(BrowserTestConstants.ReaderTiming.FirstWord, await ReadNormalizedLearnWordAsync(page));
+        await Assert.That(await ReadNormalizedLearnWordAsync(page)).IsEqualTo(BrowserTestConstants.ReaderTiming.FirstWord);
         await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
             .ToHaveTextAsync(targetWpm.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
@@ -253,7 +250,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                     WordsPerMinute: targetWpm))
             });
 
-    private static void AssertLearnTimingMatches(
+    private static async Task AssertLearnTimingMatches(
         IReadOnlyList<RecordedWordSample> samples,
         IReadOnlyList<LearnTimingExpectation> expectations)
     {
@@ -267,11 +264,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 ? BrowserTestConstants.ReaderTiming.LearnStartupTimingToleranceMs
                 : BrowserTestConstants.ReaderTiming.LearnTimingToleranceMs;
 
-            Assert.Equal(expected.Word, previousSample.Word);
-            Assert.InRange(
-                observedDelay,
-                expectedDelay - toleranceMilliseconds,
-                expectedDelay + toleranceMilliseconds);
+            await Assert.That(previousSample.Word).IsEqualTo(expected.Word);
+            await Assert.That(observedDelay).IsBetween(expectedDelay - toleranceMilliseconds,expectedDelay + toleranceMilliseconds);
         }
     }
 
@@ -323,10 +317,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             """,
             ReaderTimingRecorderKey);
 
-        Assert.NotNull(samples);
-        Assert.True(
-            samples.Length >= expectedSampleCount,
-            $"Expected at least {expectedSampleCount} recorded word samples, but captured {samples.Length}.");
+        await Assert.That(samples).IsNotNull();
+        await Assert.That(samples.Length >= expectedSampleCount).IsTrue().Because($"Expected at least {expectedSampleCount} recorded word samples, but captured {samples.Length}.");
 
         return samples.Take(expectedSampleCount).ToArray();
     }

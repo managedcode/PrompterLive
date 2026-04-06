@@ -1,9 +1,11 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture)
 {
     private const string LiveBadgeLabel = "On air";
     private const string LiveCardCssClass = "gl-cam-onair";
@@ -11,7 +13,7 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
 
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_IdleSession_DoesNotShowOnAirBadgeOrLivePreviewDot()
     {
         var page = await _fixture.NewPageAsync();
@@ -32,19 +34,13 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
             await Expect(activeSourceBadge)
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.IdleStateValue);
             await Expect(activeSourceBadge).Not.ToContainTextAsync(LiveBadgeLabel);
-            Assert.DoesNotContain(
-                LiveCardCssClass,
-                await activeSourceCard.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty,
-                StringComparison.Ordinal);
+            await Assert.That(await activeSourceCard.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty).DoesNotContain(LiveCardCssClass);
 
             await Expect(previewLiveDot)
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.IdleStateValue);
-            Assert.DoesNotContain(
-                LiveDotCssClass,
-                await previewLiveDot.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty,
-                StringComparison.Ordinal);
+            await Assert.That(await previewLiveDot.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty).DoesNotContain(LiveDotCssClass);
             var previewDotBackground = await previewLiveDot.EvaluateAsync<string>("element => getComputedStyle(element).backgroundColor");
-            Assert.DoesNotContain(BrowserTestConstants.GoLive.IdleDotColorChannel, previewDotBackground, StringComparison.Ordinal);
+            await Assert.That(previewDotBackground).DoesNotContain(BrowserTestConstants.GoLive.IdleDotColorChannel);
         }
         finally
         {
@@ -52,7 +48,7 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_RecordingSession_ShowsOnAirBadgeAndLivePreviewDot()
     {
         var page = await _fixture.NewPageAsync();
@@ -76,17 +72,11 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture) 
             await Expect(activeSourceBadge)
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
             await Expect(activeSourceBadge).ToContainTextAsync(LiveBadgeLabel);
-            Assert.Contains(
-                LiveCardCssClass,
-                await activeSourceCard.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty,
-                StringComparison.Ordinal);
+            await Assert.That(await activeSourceCard.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty).Contains(LiveCardCssClass);
 
             await Expect(previewLiveDot)
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
-            Assert.Contains(
-                LiveDotCssClass,
-                await previewLiveDot.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty,
-                StringComparison.Ordinal);
+            await Assert.That(await previewLiveDot.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty).Contains(LiveDotCssClass);
         }
         finally
         {

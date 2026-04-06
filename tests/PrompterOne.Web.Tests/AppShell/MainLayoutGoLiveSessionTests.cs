@@ -11,7 +11,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class MainLayoutGoLiveSessionTests : BunitContext
 {
-    [Fact]
+    [Test]
     public void MainLayout_HidesSharedHeader_OnGoLiveScreen()
     {
         _ = TestHarnessFactory.Create(this);
@@ -25,7 +25,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_ShowsPersistentWidget_WhenLiveSessionIsActiveOutsideGoLive()
     {
         _ = TestHarnessFactory.Create(this);
@@ -42,7 +42,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
         cut.Markup.Contains(AppTestData.Camera.FrontCamera, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_LiveWidget_UsesOperationalMetadataInsteadOfScriptSubtitle()
     {
         _ = TestHarnessFactory.Create(this);
@@ -66,7 +66,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_LiveWidget_FallsBackToGenericGoLiveLabel_WhenNoSourceLabelExists()
     {
         _ = TestHarnessFactory.Create(this);
@@ -87,7 +87,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Header.LiveWidgetTitle).TextContent.Trim()));
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_MarksGoLiveIndicator_AsRecording_WhenRecordingSessionIsActive()
     {
         _ = TestHarnessFactory.Create(this);
@@ -102,7 +102,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-live-state")));
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_MarksGoLiveIndicator_AsStreaming_WhenStreamSessionIsActive()
     {
         _ = TestHarnessFactory.Create(this);

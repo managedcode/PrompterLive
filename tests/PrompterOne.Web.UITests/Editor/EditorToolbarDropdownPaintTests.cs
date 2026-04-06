@@ -1,17 +1,19 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
 public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const double MenuProbeInsetPx = 24;
     private const string ScenarioName = "editor-toolbar-dropdown-paint";
 
-    [Fact]
+    [Test]
     public Task EditorToolbar_DropdownMenus_RenderAboveEditorSurface_AndReceivePointerHits() =>
         RunPageAsync(async page =>
         {
@@ -68,16 +70,14 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
                     ScenarioName,
                     BuildStepName(scenarioIndex, scenario.TriggerTestId));
 
-                Assert.NotNull(hitTest);
-                Assert.True(
-                    hitTest!.HitInsideMenu,
-                    $"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-testid '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
+                await Assert.That(hitTest).IsNotNull();
+                await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-testid '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
 
                 scenarioIndex++;
             }
         });
 
-    [Fact]
+    [Test]
     public Task EditorToolbar_FloatingDropdownMenus_RenderAboveEditorSurface_AndReceivePointerHits() =>
         RunPageAsync(async page =>
         {
@@ -137,10 +137,8 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
                     ScenarioName,
                     BuildStepName(scenarioIndex, scenario.TriggerTestId));
 
-                Assert.NotNull(hitTest);
-                Assert.True(
-                    hitTest!.HitInsideMenu,
-                    $"Expected floating dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-testid '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
+                await Assert.That(hitTest).IsNotNull();
+                await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected floating dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-testid '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
 
                 scenarioIndex++;
             }

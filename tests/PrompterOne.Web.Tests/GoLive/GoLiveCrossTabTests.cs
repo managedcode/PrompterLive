@@ -18,7 +18,7 @@ public sealed class GoLiveCrossTabTests : BunitContext
     private const string RecordingStateValue = "recording";
     private const string RemoteInstanceId = "remote-tab";
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartRecording_PublishesGoLiveSessionChangedMessage()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -41,7 +41,7 @@ public sealed class GoLiveCrossTabTests : BunitContext
         Assert.Equal(AppTestData.Camera.FrontCamera, payload.ActiveSourceLabel);
     }
 
-    [Fact]
+    [Test]
     public async Task GoLiveSessionService_RespondsToRemoteStateRequest_WhenSessionIsActive()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -73,7 +73,7 @@ public sealed class GoLiveCrossTabTests : BunitContext
         Assert.Equal(AppTestData.Camera.FrontCamera, payload.ActiveSourceLabel);
     }
 
-    [Fact]
+    [Test]
     public async Task MainLayout_UpdatesGoLiveIndicator_WhenAnotherTabChangesGoLiveSessionState()
     {
         var harness = TestHarnessFactory.Create(this);

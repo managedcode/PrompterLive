@@ -7,7 +7,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class SettingsHotkeyInventoryTests : BunitContext
 {
-    [Fact]
+    [Test]
     public void SettingsPage_ShortcutsSection_RendersEveryCatalogGroupAndAction()
     {
         TestHarnessFactory.Create(this);

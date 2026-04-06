@@ -13,6 +13,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class LocalizationRenderingTests : BunitContext
 {
     public LocalizationRenderingTests()
@@ -20,7 +21,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void LibrarySidebar_RendersUkrainianLabels_WhenCurrentCultureIsUkrainian()
     {
         using var _ = new CultureScope(AppCultureCatalog.UkrainianCultureName);
@@ -37,7 +38,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.LibrarySettings), cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void LibraryFolderCreateModal_RendersFrenchLabels_WhenCurrentCultureIsFrench()
     {
         using var _ = new CultureScope(AppCultureCatalog.FrenchCultureName);
@@ -56,7 +57,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.CommonCancel), cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void DiagnosticsBanner_RendersItalianDismissLabel_WhenCurrentCultureIsItalian()
     {
         using var _ = new CultureScope(AppCultureCatalog.ItalianCultureName);
@@ -68,7 +69,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.DiagnosticsDismiss), cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void LoggingErrorBoundary_RendersLocalizedFatalActions_WhenCurrentCultureIsFrench()
     {
         using var _ = new CultureScope(AppCultureCatalog.FrenchCultureName);
@@ -81,7 +82,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.DiagnosticsFatalTitle), cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void GoLiveHero_RendersLocalizedDefaults_WhenCurrentCultureIsUkrainian()
     {
         using var _ = new CultureScope(AppCultureCatalog.UkrainianCultureName);
@@ -95,7 +96,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(Text(UiTextKey.HeaderRead), cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void SettingsLanguageSection_RendersGermanLabels_WhenCurrentCultureIsGerman()
     {
         using var _ = new CultureScope(AppCultureCatalog.GermanCultureName);
@@ -116,7 +117,7 @@ public sealed class LocalizationRenderingTests : BunitContext
         Assert.Contains(germanDisplayName, cut.Markup);
     }
 
-    [Fact]
+    [Test]
     public void SettingsAboutSection_RendersLocalizedOnboardingReopenCopy_WhenCurrentCultureIsGerman()
     {
         using var _ = new CultureScope(AppCultureCatalog.GermanCultureName);

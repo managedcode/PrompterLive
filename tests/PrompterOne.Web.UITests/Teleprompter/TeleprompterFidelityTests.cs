@@ -1,10 +1,12 @@
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
 {
     private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const int ImmediateAlignmentFollowUpDelayMilliseconds = 180;
@@ -17,7 +19,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
     private const string StandaloneCommaWord = ",";
     private const string TrailingCommaWord = "exposed,";
 
-    [Fact]
+    [Test]
     public async Task TeleprompterLeadership_RepositionsReadingLineWhenFocalPointChanges()
     {
         var page = await fixture.NewPageAsync();
@@ -51,7 +53,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterScreen_UsesSingleFullBleedBackgroundCameraLayer()
     {
         var page = await fixture.NewPageAsync();
@@ -80,7 +82,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
                 }
                 """);
 
-            Assert.True(isFullBleed);
+            await Assert.That(isFullBleed).IsTrue();
         }
         finally
         {
@@ -88,7 +90,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterDemo_KeepsParagraphStableWhenFirstWordsAdvance()
     {
         var page = await fixture.NewPageAsync();
@@ -112,7 +114,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterDemo_KeepsParagraphStableWhenFontSizeChanges()
     {
         var page = await fixture.NewPageAsync();
@@ -137,7 +139,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterDemo_ActivatesNextWordDirectlyOnFocalGuideWithoutVisibleSettling()
     {
         var page = await fixture.NewPageAsync();
@@ -160,18 +162,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
             await page.WaitForTimeoutAsync(ImmediateAlignmentFollowUpDelayMilliseconds);
             var settledDelta = await MeasureVerticalCenterDeltaAsync(focalGuide, activeWord);
 
-            Assert.InRange(
-                Math.Abs(immediateDelta),
-                0d,
-                BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
-            Assert.InRange(
-                Math.Abs(settledDelta),
-                0d,
-                BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
-            Assert.InRange(
-                Math.Abs(immediateDelta - settledDelta),
-                0d,
-                ParagraphMotionTolerancePixels);
+            await Assert.That(Math.Abs(immediateDelta)).IsBetween(0d,BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+            await Assert.That(Math.Abs(settledDelta)).IsBetween(0d,BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+            await Assert.That(Math.Abs(immediateDelta - settledDelta)).IsBetween(0d,ParagraphMotionTolerancePixels);
         }
         finally
         {
@@ -179,7 +172,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterSecurityIncident_UsesMaximumWidthAndContinuousEmphasisWithoutStandaloneCommaWords()
     {
         var page = await fixture.NewPageAsync();
@@ -204,9 +197,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
                 .Locator(".rd-w")
                 .AllTextContentsAsync();
 
-            Assert.True(clusterWrapWidth > LegacyMaximumReaderWidthPixels);
-            Assert.Contains(TrailingCommaWord, responseWords);
-            Assert.DoesNotContain(StandaloneCommaWord, responseWords);
+            await Assert.That(clusterWrapWidth > LegacyMaximumReaderWidthPixels).IsTrue();
+            await Assert.That(responseWords).Contains(TrailingCommaWord);
+            await Assert.That(responseWords).DoesNotContain(StandaloneCommaWord);
         }
         finally
         {
@@ -241,10 +234,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
             await page.WaitForTimeoutAsync(BrowserTestConstants.Teleprompter.AlignmentPollDelayMs);
         }
 
-        Assert.InRange(
-            Math.Abs(lastDelta),
-            0,
-            BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+        await Assert.That(Math.Abs(lastDelta)).IsBetween(0,BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
     }
 
     private static async Task<double> MeasureVerticalCenterDeltaAsync(
@@ -254,8 +244,8 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         var focalGuideBox = await focalGuide.BoundingBoxAsync();
         var wordBox = await word.BoundingBoxAsync();
 
-        Assert.NotNull(focalGuideBox);
-        Assert.NotNull(wordBox);
+        await Assert.That(focalGuideBox).IsNotNull();
+        await Assert.That(wordBox).IsNotNull();
 
         return (focalGuideBox.Y + (focalGuideBox.Height / 2d)) -
             (wordBox.Y + (wordBox.Height / 2d));
@@ -271,13 +261,10 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
         var settled = await CaptureParagraphMotionSampleAsync(page);
 
-        Assert.False(string.IsNullOrWhiteSpace(immediate.ActiveText));
-        Assert.Equal(immediate.ActiveText, settled.ActiveText);
-        Assert.InRange(Math.Abs(immediate.TextTop - settled.TextTop), 0d, ParagraphMotionTolerancePixels);
-        Assert.InRange(
-            Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta),
-            0d,
-            ParagraphMotionTolerancePixels);
+        await Assert.That(string.IsNullOrWhiteSpace(immediate.ActiveText)).IsFalse();
+        await Assert.That(settled.ActiveText).IsEqualTo(immediate.ActiveText);
+        await Assert.That(Math.Abs(immediate.TextTop - settled.TextTop)).IsBetween(0d,ParagraphMotionTolerancePixels);
+        await Assert.That(Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta)).IsBetween(0d,ParagraphMotionTolerancePixels);
     }
 
     private static async Task AssertParagraphMotionStableAfterFontSizeChangeAsync(
@@ -290,13 +277,10 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
         await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
         var settled = await CaptureParagraphMotionSampleAsync(page);
 
-        Assert.False(string.IsNullOrWhiteSpace(immediate.ActiveText));
-        Assert.Equal(immediate.ActiveText, settled.ActiveText);
-        Assert.InRange(Math.Abs(immediate.TextTop - settled.TextTop), 0d, ParagraphMotionTolerancePixels);
-        Assert.InRange(
-            Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta),
-            0d,
-            ParagraphMotionTolerancePixels);
+        await Assert.That(string.IsNullOrWhiteSpace(immediate.ActiveText)).IsFalse();
+        await Assert.That(settled.ActiveText).IsEqualTo(immediate.ActiveText);
+        await Assert.That(Math.Abs(immediate.TextTop - settled.TextTop)).IsBetween(0d,ParagraphMotionTolerancePixels);
+        await Assert.That(Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta)).IsBetween(0d,ParagraphMotionTolerancePixels);
     }
 
     private static Task<ReaderParagraphMotionSample> CaptureParagraphMotionSampleAsync(Microsoft.Playwright.IPage page) =>

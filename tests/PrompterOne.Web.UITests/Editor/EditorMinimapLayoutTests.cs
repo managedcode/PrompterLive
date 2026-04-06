@@ -1,14 +1,16 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorMinimapLayoutTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorMinimapLayoutTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_MonacoMinimapStaysVisibleInsideEditorStage()
     {
         var page = await _fixture.NewPageAsync();
@@ -30,17 +32,9 @@ public sealed class EditorMinimapLayoutTests(StandaloneAppFixture fixture) : ICl
             var minimapBounds = await GetRequiredBoundingBoxAsync(minimap);
             var stageRight = stageBounds.X + stageBounds.Width;
 
-            Assert.True(
-                state.Layout.MinimapWidth >= BrowserTestConstants.Editor.MinimapMinimumWidthPx,
-                $"Expected Monaco minimap width to be at least {BrowserTestConstants.Editor.MinimapMinimumWidthPx}px, but was {state.Layout.MinimapWidth:0.##}px.");
-            Assert.InRange(
-                minimapBounds.X - stageBounds.X,
-                0,
-                stageBounds.Width);
-            Assert.InRange(
-                stageRight - (minimapBounds.X + minimapBounds.Width),
-                0,
-                BrowserTestConstants.Editor.MinimapStageEdgeTolerancePx);
+            await Assert.That(state.Layout.MinimapWidth >= BrowserTestConstants.Editor.MinimapMinimumWidthPx).IsTrue().Because($"Expected Monaco minimap width to be at least {BrowserTestConstants.Editor.MinimapMinimumWidthPx}px, but was {state.Layout.MinimapWidth:0.##}px.");
+            await Assert.That(minimapBounds.X - stageBounds.X).IsBetween(0,stageBounds.Width);
+            await Assert.That(stageRight - (minimapBounds.X + minimapBounds.Width)).IsBetween(0,BrowserTestConstants.Editor.MinimapStageEdgeTolerancePx);
         }
         finally
         {

@@ -1,10 +1,12 @@
 using System.Text.Json;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
 {
     private const string DownloadMode = "download";
     private const string EditedScript =
@@ -27,7 +29,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture) : ICla
 
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_SaveFile_UsesFilePickerAndWritesCanonicalTpsDocument()
     {
         var page = await _fixture.NewPageAsync();
@@ -44,13 +46,13 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture) : ICla
             var savedFile = await WaitForSavedFileAsync(page, FilePickerMode);
             var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
 
-            Assert.Equal(FilePickerMode, savedFile.GetProperty("mode").GetString());
-            Assert.Equal(ExpectedDocumentName, savedFile.GetProperty("fileName").GetString());
-            Assert.Equal(1, savedFile.GetProperty("pickerCallCount").GetInt32());
-            Assert.True(savedFile.GetProperty("hasBlob").GetBoolean());
-            Assert.StartsWith("---", savedText, StringComparison.Ordinal);
-            Assert.Contains(SavedFileTitleLine, savedText, StringComparison.Ordinal);
-            Assert.Contains(EditedScript, savedText, StringComparison.Ordinal);
+            await Assert.That(savedFile.GetProperty("mode").GetString()).IsEqualTo(FilePickerMode);
+            await Assert.That(savedFile.GetProperty("fileName").GetString()).IsEqualTo(ExpectedDocumentName);
+            await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
+            await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
+            await Assert.That(savedText).StartsWith("---");
+            await Assert.That(savedText).Contains(SavedFileTitleLine);
+            await Assert.That(savedText).Contains(EditedScript);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(EditedScript);
         }
         finally
@@ -59,7 +61,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture) : ICla
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_SaveFile_FallsBackToDownloadWhenSavePickerIsUnavailable()
     {
         var page = await _fixture.NewPageAsync();
@@ -77,11 +79,11 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture) : ICla
             var savedFile = await WaitForSavedFileAsync(page, DownloadMode);
             var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
 
-            Assert.Equal(DownloadMode, savedFile.GetProperty("mode").GetString());
-            Assert.Equal(0, savedFile.GetProperty("pickerCallCount").GetInt32());
-            Assert.Equal(1, savedFile.GetProperty("downloadCallCount").GetInt32());
-            Assert.Equal(ExpectedDocumentName, savedFile.GetProperty("fileName").GetString());
-            Assert.Contains(EditedScript, savedText, StringComparison.Ordinal);
+            await Assert.That(savedFile.GetProperty("mode").GetString()).IsEqualTo(DownloadMode);
+            await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(0);
+            await Assert.That(savedFile.GetProperty("downloadCallCount").GetInt32()).IsEqualTo(1);
+            await Assert.That(savedFile.GetProperty("fileName").GetString()).IsEqualTo(ExpectedDocumentName);
+            await Assert.That(savedText).Contains(EditedScript);
         }
         finally
         {

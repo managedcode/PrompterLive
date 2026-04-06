@@ -1,10 +1,12 @@
 using System.Text.Json;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixture)
 {
     private const int ExpectedCallCount = 1;
     private const int LiveKitPlatformKindValue = 0;
@@ -12,7 +14,7 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
 
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartStream_VdoNinjaPublishFailure_RollsBackProgramSession()
     {
         var page = await _fixture.NewPageAsync();
@@ -35,12 +37,12 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
 
             var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetVdoNinjaHarnessScript);
 
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("connectCalls").GetArrayLength());
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("joinRoomCalls").GetArrayLength());
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("publishCalls").GetArrayLength());
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("leaveRoomCount").GetInt32());
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("disconnectCount").GetInt32());
-            Assert.Equal(0, harnessState.GetProperty("stopPublishingCount").GetInt32());
+            await Assert.That(harnessState.GetProperty("connectCalls").GetArrayLength()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("joinRoomCalls").GetArrayLength()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("publishCalls").GetArrayLength()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("leaveRoomCount").GetInt32()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("disconnectCount").GetInt32()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("stopPublishingCount").GetInt32()).IsEqualTo(0);
         }
         finally
         {
@@ -48,7 +50,7 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartStream_LiveKitConnectFailure_RollsBackProgramSession()
     {
         var page = await _fixture.NewPageAsync();
@@ -71,8 +73,8 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
 
             var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);
 
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("connectCalls").GetArrayLength());
-            Assert.Equal(ExpectedCallCount, harnessState.GetProperty("disconnectCount").GetInt32());
+            await Assert.That(harnessState.GetProperty("connectCalls").GetArrayLength()).IsEqualTo(ExpectedCallCount);
+            await Assert.That(harnessState.GetProperty("disconnectCount").GetInt32()).IsEqualTo(ExpectedCallCount);
         }
         finally
         {
@@ -147,7 +149,7 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.DiagnosticPollDelayMs);
         }
 
-        Assert.Fail($"Go Live runtime session did not clear. LastState={SerializeJsonState(lastRuntimeState)}");
+        Assert.Fail("Unexpected execution path.");
     }
 
     private static string SerializeJsonState(JsonElement? state) =>

@@ -1,14 +1,16 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LocalizationFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task LibraryScreen_UsesBrowserGermanCulture_ForLocalizedChrome()
     {
         var page = await _fixture.NewPageAsync();
@@ -27,7 +29,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture) : IClass
         }
     }
 
-    [Fact]
+    [Test]
     public async Task SettingsLanguageSelection_PersistsFrenchCulture_AfterReload()
     {
         var page = await _fixture.NewPageAsync();
@@ -60,7 +62,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture) : IClass
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryScreen_FallsBackToEnglish_WhenBrowserCultureIsRussian()
     {
         var page = await _fixture.NewPageAsync();

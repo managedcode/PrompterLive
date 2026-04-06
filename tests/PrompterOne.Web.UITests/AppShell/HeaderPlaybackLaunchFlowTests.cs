@@ -1,12 +1,13 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class HeaderPlaybackLaunchFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+    : AppUiTestBase(fixture){
+    [Test]
     public Task LibraryCardPlaybackActions_OpenScopedReaderRoutes_AndHeaderBackReturnsToEditor() =>
         RunPageAsync(async page =>
         {
@@ -64,7 +65,7 @@ public sealed class HeaderPlaybackLaunchFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.AppShellFlow.TeleprompterBackStep);
         });
 
-    [Fact]
+    [Test]
     public Task GoLiveSettingsFlow_HeaderBackReturnsToOriginStudioRoute() =>
         RunPageAsync(async page =>
         {

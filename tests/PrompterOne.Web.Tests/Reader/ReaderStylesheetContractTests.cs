@@ -17,7 +17,7 @@ public sealed class ReaderStylesheetContractTests
     private static readonly string TeleprompterStylesheetPath = ResolvePath("../../../../../src/PrompterOne.Shared/wwwroot/design/teleprompter.css");
     private static readonly string HostIndexPath = ResolvePath("../../../../../src/PrompterOne.Web/wwwroot/index.html");
 
-    [Fact]
+    [Test]
     public void LearnAndTeleprompterFeatureStyles_AreNotBundledIntoSharedManifest()
     {
         var sharedStylesheet = File.ReadAllText(SharedStylesheetPath);
@@ -28,7 +28,7 @@ public sealed class ReaderStylesheetContractTests
         Assert.DoesNotContain(ReaderControlsImport, sharedStylesheet, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void LearnStylesheet_ContainsOnlyLearnFeatureImports()
     {
         var learnStylesheet = File.ReadAllText(LearnStylesheetPath);
@@ -39,7 +39,7 @@ public sealed class ReaderStylesheetContractTests
         Assert.DoesNotContain(ReaderControlsImport, learnStylesheet, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterStylesheet_ContainsOnlyTeleprompterFeatureImports()
     {
         var teleprompterStylesheet = File.ReadAllText(TeleprompterStylesheetPath);
@@ -50,7 +50,7 @@ public sealed class ReaderStylesheetContractTests
         Assert.Contains(ReaderControlsImport, teleprompterStylesheet, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void LearnPage_UsesRouteOwnedStylesheet_AndTeleprompterUsesHostLoadedStylesheet()
     {
         var learnPage = File.ReadAllText(LearnPagePath);

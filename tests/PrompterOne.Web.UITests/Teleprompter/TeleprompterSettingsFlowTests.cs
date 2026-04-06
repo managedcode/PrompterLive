@@ -1,14 +1,15 @@
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 
-    [Fact]
+    [Test]
     public Task TeleprompterAndSettingsScreens_RespondToCoreControls() =>
         RunPageAsync(async page =>
         {
@@ -17,7 +18,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
             await VerifyTeleprompterCameraAutostartAsync(page, readerCameraWasOn);
         });
 
-    [Fact]
+    [Test]
     public Task Teleprompter_UsesStoredPrimaryCameraAsBackgroundLayer() =>
         RunPageAsync(async page =>
         {
@@ -163,9 +164,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         var aiAfterSelection = await GetRequiredBoundingBoxAsync(aiNavItem);
         var appearanceAfterSelection = await GetRequiredBoundingBoxAsync(appearanceNavItem);
-        AssertDimensionStable(aiBeforeSelection.Width, aiAfterSelection.Width);
-        AssertDimensionStable(aiBeforeSelection.Height, aiAfterSelection.Height);
-        AssertDimensionStable(appearanceBeforeSelection.Y, appearanceAfterSelection.Y);
+        await AssertDimensionStable(aiBeforeSelection.Width, aiAfterSelection.Width);
+        await AssertDimensionStable(aiBeforeSelection.Height, aiAfterSelection.Height);
+        await AssertDimensionStable(appearanceBeforeSelection.Y, appearanceAfterSelection.Y);
 
         var openAiProvider = page.GetByTestId(UiTestIds.Settings.AiProvider(BrowserTestConstants.SettingsFlow.OpenAiProviderId));
         await openAiProvider.ClickAsync();
@@ -224,16 +225,15 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         var slidersOpacity = await GetOpacityAsync(page.GetByTestId(UiTestIds.Teleprompter.Sliders));
         var edgeInfoOpacity = await GetOpacityAsync(page.GetByTestId(UiTestIds.Teleprompter.EdgeInfo));
 
-        Assert.True(controlsOpacity >= BrowserTestConstants.TeleprompterFlow.ControlsMinimumOpacity);
-        Assert.True(slidersOpacity >= BrowserTestConstants.TeleprompterFlow.SlidersMinimumOpacity);
-        Assert.True(edgeInfoOpacity >= BrowserTestConstants.TeleprompterFlow.EdgeInfoMinimumOpacity);
+        await Assert.That(controlsOpacity >= BrowserTestConstants.TeleprompterFlow.ControlsMinimumOpacity).IsTrue();
+        await Assert.That(slidersOpacity >= BrowserTestConstants.TeleprompterFlow.SlidersMinimumOpacity).IsTrue();
+        await Assert.That(edgeInfoOpacity >= BrowserTestConstants.TeleprompterFlow.EdgeInfoMinimumOpacity).IsTrue();
     }
 
-    private static void AssertDimensionStable(double before, double after) =>
-        Assert.InRange(
-            Math.Abs(before - after),
-            0,
-            BrowserTestConstants.SettingsFlow.NavItemLayoutTolerancePx);
+    private static async Task AssertDimensionStable(double before, double after)
+    {
+        await Assert.That(Math.Abs(before - after)).IsBetween(0, BrowserTestConstants.SettingsFlow.NavItemLayoutTolerancePx);
+    }
 
     private static Task<double> GetOpacityAsync(Microsoft.Playwright.ILocator locator) =>
         locator.EvaluateAsync<double>(
@@ -268,7 +268,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderCameraInitDelayMs);
         var hasVideoTrack = await page.Locator($"#{UiDomIds.Teleprompter.Camera}").EvaluateAsync<bool>(
             "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0");
-        Assert.True(hasVideoTrack);
+        await Assert.That(hasVideoTrack).IsTrue();
     }
 
     private static async Task<string> ResolveCameraDeviceIdAsync(Microsoft.Playwright.IPage page) =>

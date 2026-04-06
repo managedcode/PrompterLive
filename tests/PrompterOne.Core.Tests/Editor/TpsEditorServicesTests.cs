@@ -8,7 +8,7 @@ public sealed class TpsEditorServicesTests
     private readonly TpsFrontMatterDocumentService _frontMatter = new();
     private readonly TpsTextEditor _textEditor = new();
 
-    [Fact]
+    [Test]
     public void WrapSelection_WrapsExistingSelectionWithProvidedTokens()
     {
         var source = "Good morning everyone";
@@ -25,7 +25,7 @@ public sealed class TpsEditorServicesTests
         Assert.Equal(result.Selection.Start + "morning".Length, result.Selection.End);
     }
 
-    [Fact]
+    [Test]
     public void WrapSelection_UsesPlaceholderWhenNoSelectionExists()
     {
         var result = _textEditor.WrapSelection(
@@ -40,7 +40,7 @@ public sealed class TpsEditorServicesTests
         Assert.Equal(result.Selection.Start + "text".Length, result.Selection.End);
     }
 
-    [Fact]
+    [Test]
     public void InsertAtSelection_ReplacesCurrentSelectionAndMovesCaret()
     {
         var source = "Hello welcome";
@@ -55,7 +55,7 @@ public sealed class TpsEditorServicesTests
         Assert.Equal("Hello [pause:2s]".Length, result.Selection.Start);
     }
 
-    [Fact]
+    [Test]
     public void Upsert_RewritesCanonicalFrontMatterAndPreservesBody()
     {
         var source =
@@ -91,7 +91,7 @@ public sealed class TpsEditorServicesTests
         Assert.Contains("## [Intro|Speaker:Alex|warm]", document.Body, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void Parse_ReadsCanonicalDurationAndNestedSpeedOffsetsOnly()
     {
         var source =

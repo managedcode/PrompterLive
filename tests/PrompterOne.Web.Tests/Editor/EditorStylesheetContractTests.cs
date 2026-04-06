@@ -28,7 +28,7 @@ public sealed class EditorStylesheetContractTests
         AppContext.BaseDirectory,
         "../../../../../src/PrompterOne.Shared/wwwroot/design/styles.css"));
 
-    [Fact]
+    [Test]
     public void EditorSurface_UsesSharedMetricSafeTypographyForHighlightAndInput()
     {
         var normalizedRule = NormalizeCssRule(GetRuleBlock(HighlightAndInputRule));
@@ -41,14 +41,14 @@ public sealed class EditorStylesheetContractTests
         Assert.Contains("overflow-wrap:anywhere;", normalizedRule, StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData(".ed-main ::deep .ed-src-line-segment")]
-    [InlineData(".ed-main ::deep .ed-src-line-block")]
-    [InlineData(".ed-main ::deep .mk-pause")]
-    [InlineData(".ed-main ::deep .mk-hl")]
-    [InlineData(".ed-main ::deep .mk-phonetic")]
-    [InlineData(".ed-main ::deep .mk-special")]
-    [InlineData(".ed-main ::deep .mk-edit")]
+    [Test]
+    [Arguments(".ed-main ::deep .ed-src-line-segment")]
+    [Arguments(".ed-main ::deep .ed-src-line-block")]
+    [Arguments(".ed-main ::deep .mk-pause")]
+    [Arguments(".ed-main ::deep .mk-hl")]
+    [Arguments(".ed-main ::deep .mk-phonetic")]
+    [Arguments(".ed-main ::deep .mk-special")]
+    [Arguments(".ed-main ::deep .mk-edit")]
     public void EditorHighlightRules_DoNotChangeTextMetrics(string selector)
     {
         var rule = GetRuleBlock(selector);
@@ -59,9 +59,9 @@ public sealed class EditorStylesheetContractTests
         Assert.DoesNotContain("letter-spacing", rule, StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData(".ed-main ::deep .h-mark", "font-size")]
-    [InlineData(".ed-main ::deep .h-sep", "margin")]
+    [Test]
+    [Arguments(".ed-main ::deep .h-mark", "font-size")]
+    [Arguments(".ed-main ::deep .h-sep", "margin")]
     public void HeaderTokenRules_AvoidSyntheticSpacing(string selector, string forbiddenDeclaration)
     {
         var rule = GetRuleBlock(selector);
@@ -69,7 +69,7 @@ public sealed class EditorStylesheetContractTests
         Assert.DoesNotContain(forbiddenDeclaration, rule, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void EditorSupportAssets_AreIsolatedFromGlobalShellAssets()
     {
         var componentStylesheet = File.ReadAllText(ComponentStylesheetPath);
@@ -104,7 +104,7 @@ public sealed class EditorStylesheetContractTests
         Assert.DoesNotContain("_content/PrompterOne.Shared/prompterone-browser.js", hostIndex, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void EditorFloatingToolbar_UsesSharedCssVariableInsteadOfJsMagicNumber()
     {
         var componentStylesheet = File.ReadAllText(ComponentStylesheetPath);
@@ -122,7 +122,7 @@ public sealed class EditorStylesheetContractTests
         Assert.DoesNotContain("floatingToolbarAnchorMinTopPx", editorSupportScript, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void EditorMinimapChrome_StaysContainedInsideEditorSurface()
     {
         var minimapRule = NormalizeCssRule(GetRuleBlock(".ed-main ::deep .monaco-editor .minimap"));
@@ -132,7 +132,7 @@ public sealed class EditorStylesheetContractTests
         Assert.Contains("border-radius:8px;", sliderRule, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void EditorLineNumbers_ReserveVisibleGapBeforeSourceText()
     {
         var editorRule = NormalizeCssRule(GetRuleBlock(".ed-main"));
@@ -152,7 +152,7 @@ public sealed class EditorStylesheetContractTests
             StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void EditorToolbarTooltips_WaitLongEnoughToAvoidCompetingWithDropdownIntent()
     {
         var editorRule = NormalizeCssRule(GetRuleBlock(".ed-main"));

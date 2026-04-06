@@ -7,7 +7,7 @@ public sealed class TpsStructureEditorTests
 {
     private readonly TpsStructureEditor _editor = new();
 
-    [Fact]
+    [Test]
     public void TryRead_ReadsOrderIndependentSegmentHeaderFields()
     {
         const string source = """
@@ -27,7 +27,7 @@ public sealed class TpsStructureEditorTests
         Assert.Equal("0:00-0:30", snapshot.Timing);
     }
 
-    [Fact]
+    [Test]
     public void Update_RewritesBlockHeaderInCanonicalOrder()
     {
         const string source = """

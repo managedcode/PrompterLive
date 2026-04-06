@@ -13,9 +13,10 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class DiagnosticsTests : BunitContext
 {
-    [Fact]
+    [Test]
     public async Task UiDiagnosticsService_LogsRecoverableFailureAndStoresBannerEntry()
     {
         Services.AddLocalization();
@@ -50,7 +51,7 @@ public sealed class DiagnosticsTests : BunitContext
                 entry.Message.Contains("UI operation Library load failed.", StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Test]
     public void DiagnosticsBanner_RendersRecoverableMessageAndDismissesIt()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.EnglishCultureName);
@@ -77,7 +78,7 @@ public sealed class DiagnosticsTests : BunitContext
         GC.KeepAlive(harness);
     }
 
-    [Fact]
+    [Test]
     public void LoggingErrorBoundary_ShowsFatalFallbackAndLogsCriticalError()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.EnglishCultureName);

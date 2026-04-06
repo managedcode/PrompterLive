@@ -27,7 +27,7 @@ public sealed class EditorStructureSidebarTests : BunitContext
         TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void EditorStructureSidebar_SplitButtonsInvokeExpectedModes_AndRenderSplitFeedback()
     {
         var requestedModes = new List<TpsDocumentSplitMode>();

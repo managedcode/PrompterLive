@@ -11,6 +11,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class MainLayoutActionTests : BunitContext
 {
     private const string EnglishExportLabel = "Export";
@@ -21,9 +22,9 @@ public sealed class MainLayoutActionTests : BunitContext
     private const string UkrainianExportLabel = "Експорт";
     private const string UkrainianImportLabel = "Імпорт";
 
-    [Theory]
-    [InlineData(AppRoutes.Learn, AppTestData.Scripts.QuantumId)]
-    [InlineData(AppRoutes.Teleprompter, AppTestData.Scripts.QuantumId)]
+    [Test]
+    [Arguments(AppRoutes.Learn, AppTestData.Scripts.QuantumId)]
+    [Arguments(AppRoutes.Teleprompter, AppTestData.Scripts.QuantumId)]
     public void MainLayout_HeaderBack_UsesScopedEditorRoute_ForPlaybackScreens(string route, string scriptId)
     {
         _ = TestHarnessFactory.Create(this);
@@ -38,7 +39,7 @@ public sealed class MainLayoutActionTests : BunitContext
         Assert.EndsWith(AppRoutes.EditorWithId(scriptId), navigation.Uri, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_HeaderBack_UsesOriginRoute_ForSettingsScreen()
     {
         _ = TestHarnessFactory.Create(this);
@@ -56,9 +57,9 @@ public sealed class MainLayoutActionTests : BunitContext
         Assert.EndsWith(AppRoutes.GoLiveWithId(AppTestData.Scripts.DemoId), navigation.Uri, StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData(AppRoutes.Library)]
-    [InlineData(AppRoutes.Settings)]
+    [Test]
+    [Arguments(AppRoutes.Library)]
+    [Arguments(AppRoutes.Settings)]
     public void MainLayout_RendersGoLiveAction_OnEveryNonGoLiveScreen(string route)
     {
         _ = TestHarnessFactory.Create(this);
@@ -80,7 +81,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_TeleprompterPlayback_MutesSharedHeaderChrome()
     {
         _ = TestHarnessFactory.Create(this);
@@ -109,7 +110,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_LibraryHeaderMatchesReferenceActionOrder()
     {
         _ = TestHarnessFactory.Create(this);
@@ -144,7 +145,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_LibraryHeader_UsesSharedBrandAndIconPrimitives()
     {
         _ = TestHarnessFactory.Create(this);
@@ -167,9 +168,9 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Theory]
-    [InlineData(AppRoutes.Settings)]
-    [InlineData(AppRoutes.Editor)]
+    [Test]
+    [Arguments(AppRoutes.Settings)]
+    [Arguments(AppRoutes.Editor)]
     public void MainLayout_OpenScriptAction_IsHidden_OnNonLibraryScreens(string route)
     {
         _ = TestHarnessFactory.Create(this);
@@ -186,7 +187,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_OpenScriptAction_UsesStableDialogButtonAndInputDomId()
     {
         _ = TestHarnessFactory.Create(this);
@@ -211,7 +212,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_SaveFileAction_RendersOnEditorScreen_AndTriggersCoordinator()
     {
         _ = TestHarnessFactory.Create(this);
@@ -245,9 +246,9 @@ public sealed class MainLayoutActionTests : BunitContext
         Assert.Equal(1, saveRequestCount);
     }
 
-    [Theory]
-    [InlineData(AppRoutes.Library)]
-    [InlineData(AppRoutes.Settings)]
+    [Test]
+    [Arguments(AppRoutes.Library)]
+    [Arguments(AppRoutes.Settings)]
     public void MainLayout_SaveFileAction_IsHidden_OnNonEditorScreens(string route)
     {
         _ = TestHarnessFactory.Create(this);
@@ -261,7 +262,7 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorSaveFile))));
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_ActiveGenericGoLiveSession_UsesPlainGoLiveRoute_InsteadOfCurrentEditorScriptScope()
     {
         _ = TestHarnessFactory.Create(this);
@@ -293,7 +294,7 @@ public sealed class MainLayoutActionTests : BunitContext
         Assert.DoesNotContain(AppRoutes.ScriptIdQueryKey, navigation.Uri, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_LibraryImportAction_RendersLocalizedCopy_WhenCurrentCultureIsUkrainian()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.UkrainianCultureName);
@@ -314,7 +315,7 @@ public sealed class MainLayoutActionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_EditorExportAction_RendersLocalizedCopy_WhenCurrentCultureIsUkrainian()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.UkrainianCultureName);

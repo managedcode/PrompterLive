@@ -2,10 +2,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
     private static readonly JsonSerializerOptions SnapshotJsonOptions = new()
@@ -13,7 +15,7 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
         PropertyNameCaseInsensitive = true
     };
 
-    [Fact]
+    [Test]
     public async Task RuntimeTelemetry_TracksPageViewsAndShellActions_InProductionMode()
     {
         var page = await _fixture.NewPageAsync();
@@ -36,13 +38,11 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var createScriptSnapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(
-                createScriptSnapshot.Initializations,
-                entry => entry.RuntimeEnabled && entry.HostEnabled && !entry.DebugEnabled && entry.SentryConfigured && entry.SentryRuntimeEnabled);
-            Assert.Contains(createScriptSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Library, StringComparison.Ordinal));
-            Assert.Contains(createScriptSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
-            Assert.Contains(createScriptSnapshot.Events, entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.CreateScript, StringComparison.Ordinal));
-            AssertBlockedVendorLoads(createScriptSnapshot);
+            await Assert.That(createScriptSnapshot.Initializations).Contains(entry => entry.RuntimeEnabled && entry.HostEnabled && !entry.DebugEnabled && entry.SentryConfigured && entry.SentryRuntimeEnabled);
+            await Assert.That(createScriptSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Library, StringComparison.Ordinal));
+            await Assert.That(createScriptSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
+            await Assert.That(createScriptSnapshot.Events).Contains(entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.CreateScript, StringComparison.Ordinal));
+            await AssertBlockedVendorLoads(createScriptSnapshot);
 
             await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
@@ -60,10 +60,10 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var learnSnapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(learnSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
-            Assert.Contains(learnSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Learn, StringComparison.Ordinal));
-            Assert.Contains(learnSnapshot.Events, entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenLearn, StringComparison.Ordinal));
-            AssertBlockedVendorLoads(learnSnapshot);
+            await Assert.That(learnSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
+            await Assert.That(learnSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Learn, StringComparison.Ordinal));
+            await Assert.That(learnSnapshot.Events).Contains(entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenLearn, StringComparison.Ordinal));
+            await AssertBlockedVendorLoads(learnSnapshot);
 
             await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
@@ -81,10 +81,10 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var readSnapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(readSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
-            Assert.Contains(readSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Teleprompter, StringComparison.Ordinal));
-            Assert.Contains(readSnapshot.Events, entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenRead, StringComparison.Ordinal));
-            AssertBlockedVendorLoads(readSnapshot);
+            await Assert.That(readSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Editor, StringComparison.Ordinal));
+            await Assert.That(readSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Teleprompter, StringComparison.Ordinal));
+            await Assert.That(readSnapshot.Events).Contains(entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenRead, StringComparison.Ordinal));
+            await AssertBlockedVendorLoads(readSnapshot);
 
             await page.GotoAsync(BrowserTestConstants.Routes.Library);
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
@@ -102,10 +102,10 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var goLiveSnapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(goLiveSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Library, StringComparison.Ordinal));
-            Assert.Contains(goLiveSnapshot.PageViews, entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.GoLive, StringComparison.Ordinal));
-            Assert.Contains(goLiveSnapshot.Events, entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenGoLive, StringComparison.Ordinal));
-            AssertBlockedVendorLoads(goLiveSnapshot);
+            await Assert.That(goLiveSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.Library, StringComparison.Ordinal));
+            await Assert.That(goLiveSnapshot.PageViews).Contains(entry => string.Equals(entry.ScreenName, AppRuntimeTelemetry.Pages.GoLive, StringComparison.Ordinal));
+            await Assert.That(goLiveSnapshot.Events).Contains(entry => string.Equals(entry.EventName, AppRuntimeTelemetry.Events.OpenGoLive, StringComparison.Ordinal));
+            await AssertBlockedVendorLoads(goLiveSnapshot);
         }
         finally
         {
@@ -113,7 +113,7 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task RuntimeTelemetry_DoesNotTrack_WhenWasmDebugQueryIsEnabled()
     {
         var page = await _fixture.NewPageAsync();
@@ -133,12 +133,10 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
 
             var snapshot = await ReadSnapshotAsync(page);
 
-            Assert.Contains(
-                snapshot.Initializations,
-                entry => entry.DebugEnabled && !entry.RuntimeEnabled && entry.HostEnabled && entry.SentryConfigured && !entry.SentryRuntimeEnabled);
-            Assert.Empty(snapshot.PageViews);
-            Assert.Empty(snapshot.Events);
-            Assert.Empty(snapshot.VendorLoads);
+            await Assert.That(snapshot.Initializations).Contains(entry => entry.DebugEnabled && !entry.RuntimeEnabled && entry.HostEnabled && entry.SentryConfigured && !entry.SentryRuntimeEnabled);
+            await Assert.That(snapshot.PageViews).IsEmpty();
+            await Assert.That(snapshot.Events).IsEmpty();
+            await Assert.That(snapshot.VendorLoads).IsEmpty();
         }
         finally
         {
@@ -187,10 +185,10 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
             ?? new TelemetryHarnessSnapshot();
     }
 
-    private static void AssertBlockedVendorLoads(TelemetryHarnessSnapshot snapshot)
+    private static async Task AssertBlockedVendorLoads(TelemetryHarnessSnapshot snapshot)
     {
-        Assert.Contains(snapshot.VendorLoads, entry => string.Equals(entry.Provider, BrowserTestConstants.Telemetry.GoogleAnalyticsProvider, StringComparison.Ordinal) && entry.Blocked);
-        Assert.Contains(snapshot.VendorLoads, entry => string.Equals(entry.Provider, BrowserTestConstants.Telemetry.ClarityProvider, StringComparison.Ordinal) && entry.Blocked);
+        await Assert.That(snapshot.VendorLoads).Contains(entry => string.Equals(entry.Provider, BrowserTestConstants.Telemetry.GoogleAnalyticsProvider, StringComparison.Ordinal) && entry.Blocked);
+        await Assert.That(snapshot.VendorLoads).Contains(entry => string.Equals(entry.Provider, BrowserTestConstants.Telemetry.ClarityProvider, StringComparison.Ordinal) && entry.Blocked);
     }
 
     public sealed class TelemetryHarnessSnapshot

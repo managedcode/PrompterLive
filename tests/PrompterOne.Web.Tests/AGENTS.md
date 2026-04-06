@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-`PrompterOne.Web.Tests` verifies routed Razor screens with bUnit.
+`PrompterOne.Web.Tests` verifies routed Razor screens with bUnit under TUnit.
 
 ## Entry Points
 
@@ -30,7 +30,7 @@
 
 ## Project-Local Commands
 
-- `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
+- `dotnet test --project ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
 
 ## Applicable Skills
 

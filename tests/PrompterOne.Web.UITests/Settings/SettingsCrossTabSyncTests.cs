@@ -1,14 +1,16 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class SettingsCrossTabSyncTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class SettingsCrossTabSyncTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task SettingsAppearance_PropagatesThemeChangesAcrossTabsInSharedContext()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.SettingsFlow.CrossTabThemeScenario);

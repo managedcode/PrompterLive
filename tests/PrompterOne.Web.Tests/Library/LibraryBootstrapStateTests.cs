@@ -7,7 +7,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class LibraryBootstrapStateTests : Bunit.BunitContext
 {
-    [Fact]
+    [Test]
     public void LibraryPage_RendersRuntimeStartupSeeds_WhenHarnessSkipsTestFixtures()
     {
         TestHarnessFactory.Create(this, seedLibraryData: false);

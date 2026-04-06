@@ -1,15 +1,18 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingToolbarUsesTwoSemanticDotsAndDistinctTriggerColors()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarSemanticScenario);
@@ -89,16 +92,16 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                     topVoiceTestId = UiTestIds.Editor.ColorTrigger
                 });
 
-            Assert.Equal(BrowserTestConstants.EditorFlow.FloatingSemanticDotCount, metrics.FloatingDotCount);
-            Assert.False(metrics.LoudUsesDot);
-            Assert.True(metrics.LoudUsesSvg);
-            Assert.True(metrics.VoiceColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance);
-            Assert.True(metrics.EmotionColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance);
-            Assert.True(metrics.TopGroupColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticGroupColorDistance);
-            Assert.True(metrics.FloatingGroupColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticGroupColorDistance);
-            Assert.True(metrics.PauseColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance);
-            Assert.True(metrics.SpeedColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance);
-            Assert.True(metrics.InsertColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance);
+            await Assert.That(metrics.FloatingDotCount).IsEqualTo(BrowserTestConstants.EditorFlow.FloatingSemanticDotCount);
+            await Assert.That(metrics.LoudUsesDot).IsFalse();
+            await Assert.That(metrics.LoudUsesSvg).IsTrue();
+            await Assert.That(metrics.VoiceColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance).IsTrue();
+            await Assert.That(metrics.EmotionColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance).IsTrue();
+            await Assert.That(metrics.TopGroupColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticGroupColorDistance).IsTrue();
+            await Assert.That(metrics.FloatingGroupColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticGroupColorDistance).IsTrue();
+            await Assert.That(metrics.PauseColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance).IsTrue();
+            await Assert.That(metrics.SpeedColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance).IsTrue();
+            await Assert.That(metrics.InsertColorDistance >= BrowserTestConstants.EditorFlow.MinimumSemanticColorDistance).IsTrue();
         }
         finally
         {
@@ -106,7 +109,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_VoiceDropdown_UsesEvenRowRhythm_AndClearSurfaceBorder()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarSurfaceScenario);
@@ -177,12 +180,12 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                     clearTestId = UiTestIds.Editor.ColorClear
                 });
 
-            Assert.True(metrics.MenuWidth >= BrowserTestConstants.EditorFlow.MinimumDropdownSurfaceWidthPx);
-            Assert.True(metrics.MaxRowHeight <= BrowserTestConstants.EditorFlow.MaximumDropdownCompactRowHeightPx);
-            Assert.True(metrics.RowHeightDelta <= BrowserTestConstants.EditorFlow.MaximumDropdownRowHeightDeltaPx);
-            Assert.True(metrics.BorderAlpha >= BrowserTestConstants.EditorFlow.MinimumDropdownSurfaceBorderAlpha);
-            Assert.True(metrics.BorderContrast > 0);
-            Assert.Equal(BrowserTestConstants.EditorFlow.VoiceClearLabel, metrics.ClearLabel);
+            await Assert.That(metrics.MenuWidth >= BrowserTestConstants.EditorFlow.MinimumDropdownSurfaceWidthPx).IsTrue();
+            await Assert.That(metrics.MaxRowHeight <= BrowserTestConstants.EditorFlow.MaximumDropdownCompactRowHeightPx).IsTrue();
+            await Assert.That(metrics.RowHeightDelta <= BrowserTestConstants.EditorFlow.MaximumDropdownRowHeightDeltaPx).IsTrue();
+            await Assert.That(metrics.BorderAlpha >= BrowserTestConstants.EditorFlow.MinimumDropdownSurfaceBorderAlpha).IsTrue();
+            await Assert.That(metrics.BorderContrast > 0).IsTrue();
+            await Assert.That(metrics.ClearLabel).IsEqualTo(BrowserTestConstants.EditorFlow.VoiceClearLabel);
         }
         finally
         {
@@ -190,7 +193,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_EmotionDropdown_UsesCompactMenuRows()
     {
         var page = await _fixture.NewPageAsync();
@@ -235,8 +238,8 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                     }
                 });
 
-            Assert.True(metrics.MaxRowHeight <= BrowserTestConstants.EditorFlow.MaximumDropdownCompactRowHeightPx);
-            Assert.True(metrics.RowHeightDelta <= BrowserTestConstants.EditorFlow.MaximumDropdownRowHeightDeltaPx);
+            await Assert.That(metrics.MaxRowHeight <= BrowserTestConstants.EditorFlow.MaximumDropdownCompactRowHeightPx).IsTrue();
+            await Assert.That(metrics.RowHeightDelta <= BrowserTestConstants.EditorFlow.MaximumDropdownRowHeightDeltaPx).IsTrue();
         }
         finally
         {
@@ -244,7 +247,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_DropdownRows_LeftAlignMetaClusters_InToolbarAndFloatingMenus()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarDropdownAlignmentScenario);
@@ -270,9 +273,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                 BrowserTestConstants.EditorFlow.ToolbarDropdownAlignmentTopStep);
 
             var topMetrics = await ReadDropdownClusterMetricsAsync(page, UiTestIds.Editor.ColorEnergy);
-            Assert.True(
-                topMetrics.LabelMetaGap <= BrowserTestConstants.EditorFlow.MaximumDropdownInlineMetaGapPx,
-                $"Expected the top toolbar voice dropdown to keep label and meta in one left-aligned cluster, but the gap was {topMetrics.LabelMetaGap:0.##}px.");
+            await Assert.That(topMetrics.LabelMetaGap <= BrowserTestConstants.EditorFlow.MaximumDropdownInlineMetaGapPx).IsTrue().Because($"Expected the top toolbar voice dropdown to keep label and meta in one left-aligned cluster, but the gap was {topMetrics.LabelMetaGap:0.##}px.");
 
             await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.TransformativeMoment);
@@ -287,9 +288,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                 BrowserTestConstants.EditorFlow.ToolbarDropdownAlignmentFloatingStep);
 
             var floatingMetrics = await ReadDropdownClusterMetricsAsync(page, UiTestIds.Editor.FloatingVoiceEnergy);
-            Assert.True(
-                floatingMetrics.LabelMetaGap <= BrowserTestConstants.EditorFlow.MaximumDropdownInlineMetaGapPx,
-                $"Expected the floating voice dropdown to keep label and meta in one left-aligned cluster, but the gap was {floatingMetrics.LabelMetaGap:0.##}px.");
+            await Assert.That(floatingMetrics.LabelMetaGap <= BrowserTestConstants.EditorFlow.MaximumDropdownInlineMetaGapPx).IsTrue().Because($"Expected the floating voice dropdown to keep label and meta in one left-aligned cluster, but the gap was {floatingMetrics.LabelMetaGap:0.##}px.");
         }
         finally
         {

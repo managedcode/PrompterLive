@@ -1,11 +1,12 @@
 using System.Globalization;
 using PrompterOne.Shared.Contracts;
-using Xunit.Sdk;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
 {
     private const string HiddenOpacity = "0";
     private const string HiddenVisibility = "hidden";
@@ -17,7 +18,7 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
     private const string StartupWord = "Good";
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_DemoStartup_HidesFocusRowUntilOrpLayoutIsReady()
     {
         var page = await _fixture.NewPageAsync();
@@ -44,19 +45,17 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
                 .Where(sample => string.Equals(sample.Text, StartupWord, StringComparison.Ordinal))
                 .ToArray();
 
-            Assert.NotEmpty(trace);
-            Assert.NotEmpty(startupWordSamples);
+            await Assert.That(trace).IsNotEmpty();
+            await Assert.That(startupWordSamples).IsNotEmpty();
 
-            Assert.Contains(
-                trace,
-                sample =>
+            await Assert.That(trace).Contains(sample =>
                     string.Equals(sample.LayoutReady, LayoutReadyFalseValue, StringComparison.Ordinal) &&
                     string.Equals(sample.RowOpacity, HiddenOpacity, StringComparison.Ordinal) &&
                     string.Equals(sample.RowVisibility, HiddenVisibility, StringComparison.Ordinal));
 
             var readyStartupWordSample = await WaitForStableLearnLayoutAsync(page);
-            Assert.Equal(LayoutReadyTrueValue, readyStartupWordSample.LayoutReady);
-            Assert.InRange(readyStartupWordSample.OrpDeltaPx, 0, MaxReadyOrpDeltaPx);
+            await Assert.That(readyStartupWordSample.LayoutReady).IsEqualTo(LayoutReadyTrueValue);
+            await Assert.That(readyStartupWordSample.OrpDeltaPx).IsBetween(0,MaxReadyOrpDeltaPx);
         }
         finally
         {
@@ -179,7 +178,7 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture) : I
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.DiagnosticPollDelayMs);
         }
 
-        throw new XunitException(
+        throw new InvalidOperationException(
             $"Learn layout did not stabilize. LayoutReady: {lastSample?.LayoutReady ?? "<null>"}; RowOpacity: {lastSample?.RowOpacity ?? "<null>"}; RowVisibility: {lastSample?.RowVisibility ?? "<null>"}; OrpDeltaPx: {(lastSample is null ? "<null>" : lastSample.OrpDeltaPx.ToString(CultureInfo.InvariantCulture))}; Text: {lastSample?.Text ?? "<null>"}.");
     }
 

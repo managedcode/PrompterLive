@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Project: `PrompterOne`
-Stack: `.NET 10`, Blazor WebAssembly, Razor Class Library, xUnit, bUnit, Playwright
+Stack: `.NET 10`, Blazor WebAssembly, Razor Class Library, TUnit, bUnit, Playwright
 
 ## Current Shape
 
@@ -97,29 +97,31 @@ Rule format:
 - Script discovery and authoring surfaces must support real search by script name and script content; Library/script pages and editor flows must not force manual browsing when the user needs to find files or text inside files.
 - Public web hosting is split by role: the standalone PrompterOne app in this repo must publish on `app.prompter.one`, while the marketing landing site for `prompter.one` lives in the separate `PrompterOne-LandingPage` repository.
 - For deploy-only, domain, CI, or static-site hosting tasks, do not spend time on unrelated app/browser test suites unless the user explicitly asks or the runtime behavior itself changes; prefer workflow, build, and publish-config validation only.
+- Repo-wide .NET SDK and test-runner selection belong in the root `global.json`; do not split `global.json` test-runner opt-ins per project or subfolder once the user asks for a global test-platform policy.
 
 ## Rules to Follow (Mandatory)
 
 ### Commands
 
 - `build`: `dotnet build ./PrompterOne.slnx -warnaserror`
-- `test`: `dotnet test ./PrompterOne.slnx`
+- `test`: `dotnet test --project ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj && dotnet test --project ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj && dotnet test --project ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
 - `format`: `dotnet format ./PrompterOne.slnx`
-- `coverage`: `dotnet test ./PrompterOne.slnx --collect:"XPlat Code Coverage"`
+- `coverage`: `dotnet test --project ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj -- --coverage --coverage-output-format cobertura && dotnet test --project ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj -- --coverage --coverage-output-format cobertura && dotnet test --project ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj -- --coverage --coverage-output-format cobertura`
 
 For this `.NET` repo:
 
-- tests run on `VSTest` through `Microsoft.NET.Test.Sdk`
+- all automated test projects run on `TUnit` and native `Microsoft.Testing.Platform`
 - `format` is direct `dotnet format`, not `--verify-no-changes` and not a wrapper
-- coverage uses the VSTest `coverlet.collector` / `XPlat Code Coverage` collector
+- coverage uses TUnit's native `--coverage` support
 - `LangVersion` is not pinned; use the SDK default unless the repo intentionally changes it later
+- `--no-build` is forbidden in local commands, docs, and CI; always let `dotnet test` build the active inputs so stale WASM or stale test binaries cannot hide regressions
 
 Useful focused commands:
 
 - app run: `cd ./src/PrompterOne.Web && dotnet run`
-- core tests: `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
-- component tests: `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
-- ui tests: `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
+- core tests: `dotnet test --project ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- component tests: `dotnet test --project ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
+- ui tests: `dotnet test --project ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
 - playwright browser install: `node ./tests/PrompterOne.Web.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
 - Build the relevant project immediately before starting a local dev server so `dotnet run` cannot serve stale WASM assets or binaries.
 
@@ -128,9 +130,8 @@ Browser test execution rules:
 - Use one `dotnet test` process at a time for the browser suite.
 - The browser suite self-hosts the built WASM assets on a dynamically assigned loopback HTTP origin.
 - Each browser-suite host startup MUST request a fresh OS-assigned loopback port via `http://127.0.0.1:0`. Never pin or reuse a fixed browser-test port across runs.
-- Inside that single process, the browser suite may run up to `4` parallel xUnit workers.
+- Inside that single process, the browser suite may run up to `4` parallel TUnit workers.
 - Do not run `PrompterOne.Web.UITests` in parallel with another `dotnet build` or `dotnet test` command.
-- If a prior build already ran, prefer `dotnet test ... --no-build` for the browser suite.
 - Do not add Python or ad-hoc runner scripts to bootstrap browser verification. The repo test commands must self-host the app and execute the flows end to end on their own.
 - Browser UI scenarios are the primary acceptance gate for this repo. Component and core tests are supporting layers, not the release bar.
 - Major user flows MUST be covered by long Playwright scenarios that execute real browser interactions end to end.
@@ -287,7 +288,7 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 - Repository or module coverage must not decrease without an explicit written exception. Coverage after the change must stay at least at the previous baseline or improve.
 - Coverage is for finding gaps, not gaming a number. Coverage numbers do not replace scenario coverage or user-flow verification.
 - The task is not done until the full relevant test suite is green, not only the newly added tests.
-- For this `.NET` repo, do not mix VSTest and Microsoft.Testing.Platform assumptions. The active model is VSTest.
+- For this `.NET` repo, do not mix VSTest and Microsoft.Testing.Platform assumptions. The active model is native `Microsoft.Testing.Platform` through `TUnit`.
 - After changing production code, run the repo-defined quality pass: format, build, focused tests when useful, broader tests, coverage, and any configured extra gates.
 
 ### Code and Design
@@ -440,6 +441,7 @@ Ask first:
 - thin WASM host boundaries
 - browser-realistic UI verification
 - domain logic that stays reusable and serializable
+- `Shouldly` as the default assertion layer when migrating or writing `.NET` tests, with framework-native assertions kept only where they provide a clear runner or browser-integration benefit
 - one extra proactive hardening pass after a broad audit or release-critical task, even when the first CI run is already green, so lingering UX or lifecycle issues are caught before the user has to ask again
 
 ### Dislikes
@@ -454,6 +456,10 @@ Ask first:
 - progress updates that imply a fix is done before there is concrete implementation and verification evidence; keep status factual and let the user verify final behavior personally
 - automated test or coverage runs for UI-behavior fixes before the user has manually checked the change locally; wait for the user's confirmation before resuming automation
 - CI `dotnet test` steps configured with verbose or detailed console loggers that flood the logs with info output; prefer the default or otherwise minimal output that surfaces warnings and errors without noise
+- browser-suite CI runs that effectively serialize the Playwright workload and drift into `40+` minute executions; keep real TUnit parallelism enabled and fix bottlenecks or flaky blockers instead of accepting that runtime
+- test suites configured below the highest safe parallelism for the current hardware and shared-resource profile; keep tests as parallel as practical and serialize only the classes or groups that genuinely contend on shared browser or timing-sensitive state
+- any continued xUnit ownership of the repo test stack; when the user asks for TUnit, remove xUnit packages and attributes instead of leaving a mixed long-term setup behind
+- any use of `--no-build` in repo commands, docs, or CI; test runs must rebuild against the current source and current WASM assets every time
 - mixed-language root README or public entry docs; keep them English-only unless the user explicitly asks otherwise
 - any reintroduction of a repo-local `design/` prototype folder as a parallel source of truth; the shipped Blazor UI must be the only product reference
 - fake `display_*` or other presentation-only script metrics that override real TPS-derived words, segments, speed, or duration in user-facing UI

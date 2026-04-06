@@ -1,11 +1,12 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LibrarySearchFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LibrarySearchFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
+    [Test]
     public Task LibraryScreen_SearchMatchesFileNamesAndScriptContent() =>
         RunPageAsync(async page =>
         {

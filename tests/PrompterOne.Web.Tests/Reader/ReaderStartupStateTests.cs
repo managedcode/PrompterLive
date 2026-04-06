@@ -9,7 +9,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class ReaderStartupStateTests : Bunit.BunitContext
 {
-    [Fact]
+    [Test]
     public void LearnPage_DoesNotRenderPlaceholderCopyBeforeScriptLoadCompletes()
     {
         TestHarnessFactory.Create(this, jsInvocationDelay: ReaderStartupTestDelays.JavascriptLoadDelay);
@@ -22,7 +22,7 @@ public sealed class ReaderStartupStateTests : Bunit.BunitContext
         Assert.DoesNotContain(ReaderStartupPlaceholderTexts.LearnNextPhrase, cut.Markup, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_DoesNotRenderPlaceholderCopyBeforeScriptLoadCompletes()
     {
         TestHarnessFactory.Create(this, jsInvocationDelay: ReaderStartupTestDelays.JavascriptLoadDelay);

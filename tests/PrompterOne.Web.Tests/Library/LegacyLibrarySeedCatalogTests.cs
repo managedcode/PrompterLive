@@ -4,7 +4,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class LegacyLibrarySeedCatalogTests
 {
-    [Fact]
+    [Test]
     public void IsLegacyDocument_DoesNotTreatTestScopedSeedFilesAsRuntimeLegacyContent()
     {
         var document = new BrowserStoredScriptDocumentDto
@@ -17,7 +17,7 @@ public sealed class LegacyLibrarySeedCatalogTests
         Assert.False(LegacyLibrarySeedCatalog.IsLegacyDocument(document));
     }
 
-    [Fact]
+    [Test]
     public void IsLegacyDocument_TreatsRemovedRuntimeSeedIdsAsLegacyContent()
     {
         var document = new BrowserStoredScriptDocumentDto

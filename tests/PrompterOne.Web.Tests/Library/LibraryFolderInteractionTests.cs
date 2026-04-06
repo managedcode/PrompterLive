@@ -18,7 +18,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_CreatesFolderInsideSelectedParent()
     {
         var cut = Render<LibraryPage>();
@@ -47,7 +47,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         Assert.Equal(AppTestData.Folders.PresentationsId, createdFolder.ParentId);
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_CancelsFolderOverlay_WithoutCreatingFolder()
     {
         var cut = Render<LibraryPage>();
@@ -69,7 +69,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         Assert.DoesNotContain(folders, folder => folder.Name == AppTestData.Folders.Roadshows);
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_MovesScriptIntoFolder_AndUpdatesVisibleCards()
     {
         var roadshowsFolder = await _harness.FolderRepository.CreateAsync(
@@ -98,7 +98,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_ClickingSurface_DismissesOpenCardMenu()
     {
         var cut = Render<LibraryPage>();
@@ -116,7 +116,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.False(GetCardMenuWrap(cut, AppTestData.Scripts.DemoId).ClassList.Contains(OpenClassName)));
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_SelectsSidebarFolder_AndFiltersCards()
     {
         var cut = Render<LibraryPage>();
@@ -135,7 +135,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_SelectingNestedParentFolder_TogglesItsChildrenInSidebar()
     {
         const string nestedFolderName = "Launch Decks";
@@ -167,7 +167,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.DoesNotContain(UiTestIds.Library.Folder(nestedFolder.Id), cut.Markup, StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_RestoresPersistedFolderSelectionAfterReload()
     {
         await _harness.FolderRepository.InitializeAsync(AppTestLibrarySeedData.CreateFolders());

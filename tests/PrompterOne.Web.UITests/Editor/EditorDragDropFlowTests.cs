@@ -1,10 +1,11 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string DocumentSeparator = "\n\n";
     private const string DropImportMessage = "Unable to import this script.";
     private const string DropUnsupportedDetail = "Drop a .tps, .tps.md, .md.tps, .md, or .txt file onto the editor.";
@@ -49,7 +50,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
     private const string UnsupportedFileName = "unsupported-drop.docx";
     private const string UnsupportedFileText = "This drop should be rejected.";
 
-    [Fact]
+    [Test]
     public Task EditorScreen_DropOnEmptyDraft_ReplacesTextAndSupportsUndoRedo() =>
         RunPageAsync(async page =>
         {
@@ -73,7 +74,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(ReplaceVisibleBody);
         });
 
-    [Fact]
+    [Test]
     public Task EditorScreen_DropOnExistingDraft_AppendsVisibleBodyAndSupportsUndoRedo() =>
         RunPageAsync(async page =>
         {
@@ -89,8 +90,8 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
 
             await Expect(sourceInput).ToHaveValueAsync(expectedText);
             var appendedText = await sourceInput.InputValueAsync();
-            Assert.DoesNotContain("title:", appendedText, StringComparison.Ordinal);
-            Assert.DoesNotContain("---", appendedText, StringComparison.Ordinal);
+            await Assert.That(appendedText).DoesNotContain("title:");
+            await Assert.That(appendedText).DoesNotContain("---");
 
             await EditorMonacoDriver.FocusAsync(page);
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Undo);
@@ -101,7 +102,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
             await Expect(sourceInput).ToHaveValueAsync(expectedText);
         });
 
-    [Fact]
+    [Test]
     public Task EditorScreen_DropRejectsUnsupportedExtensions_AndKeepsDraftUnchanged() =>
         RunPageAsync(async page =>
         {

@@ -1,11 +1,12 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string BackgroundColorProperty = "backgroundColor";
     private const string ColorProperty = "color";
     private const string ScenarioName = "editor-light-theme-surface";
@@ -17,7 +18,7 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
 
     private readonly record struct CssColor(double R, double G, double B, double A);
 
-    [Fact]
+    [Test]
     public Task EditorScreen_LightTheme_UsesReadableMainPanelsAndMonacoSurface() =>
         RunPageAsync(async page =>
         {
@@ -54,22 +55,12 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
             var titleColor = await ReadCssColorAsync(title, ColorProperty);
             var state = await EditorMonacoDriver.GetStateAsync(page);
 
-            Assert.Contains(BrowserTestConstants.Editor.BodyHeading, state.Text, StringComparison.Ordinal);
-            Assert.True(
-                HasMinimumChannels(toolbarBackground, MinimumToolbarSurfaceChannel),
-                $"Expected the light-theme editor toolbar surface to stay light, but got rgba({toolbarBackground.R:0.##}, {toolbarBackground.G:0.##}, {toolbarBackground.B:0.##}, {toolbarBackground.A:0.##}).");
-            Assert.True(
-                HasMinimumChannels(metadataBackground, MinimumMetadataSurfaceChannel),
-                $"Expected the light-theme editor metadata surface to stay light, but got rgba({metadataBackground.R:0.##}, {metadataBackground.G:0.##}, {metadataBackground.B:0.##}, {metadataBackground.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(titleColor, MaximumReadableTextChannel),
-                $"Expected the light-theme editor title text to stay readable, but got rgba({titleColor.R:0.##}, {titleColor.G:0.##}, {titleColor.B:0.##}, {titleColor.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(renderedLineColor, MaximumReadableTextChannel),
-                $"Expected the light-theme Monaco text to stay readable, but got rgba({renderedLineColor.R:0.##}, {renderedLineColor.G:0.##}, {renderedLineColor.B:0.##}, {renderedLineColor.A:0.##}).");
-            Assert.True(
-                state.Layout.MinimapWidth >= BrowserTestConstants.Editor.MinimapMinimumWidthPx,
-                $"Expected the Monaco minimap to stay visible in light theme, but its width was {state.Layout.MinimapWidth:0.##}px.");
+            await Assert.That(state.Text).Contains(BrowserTestConstants.Editor.BodyHeading);
+            await Assert.That(HasMinimumChannels(toolbarBackground, MinimumToolbarSurfaceChannel)).IsTrue().Because($"Expected the light-theme editor toolbar surface to stay light, but got rgba({toolbarBackground.R:0.##}, {toolbarBackground.G:0.##}, {toolbarBackground.B:0.##}, {toolbarBackground.A:0.##}).");
+            await Assert.That(HasMinimumChannels(metadataBackground, MinimumMetadataSurfaceChannel)).IsTrue().Because($"Expected the light-theme editor metadata surface to stay light, but got rgba({metadataBackground.R:0.##}, {metadataBackground.G:0.##}, {metadataBackground.B:0.##}, {metadataBackground.A:0.##}).");
+            await Assert.That(HasMaximumChannels(titleColor, MaximumReadableTextChannel)).IsTrue().Because($"Expected the light-theme editor title text to stay readable, but got rgba({titleColor.R:0.##}, {titleColor.G:0.##}, {titleColor.B:0.##}, {titleColor.A:0.##}).");
+            await Assert.That(HasMaximumChannels(renderedLineColor, MaximumReadableTextChannel)).IsTrue().Because($"Expected the light-theme Monaco text to stay readable, but got rgba({renderedLineColor.R:0.##}, {renderedLineColor.G:0.##}, {renderedLineColor.B:0.##}, {renderedLineColor.A:0.##}).");
+            await Assert.That(state.Layout.MinimapWidth >= BrowserTestConstants.Editor.MinimapMinimumWidthPx).IsTrue().Because($"Expected the Monaco minimap to stay visible in light theme, but its width was {state.Layout.MinimapWidth:0.##}px.");
 
             await UiScenarioArtifacts.CapturePageAsync(page, ScenarioName, FullEditorStep);
             await UiScenarioArtifacts.CaptureLocatorAsync(stage, ScenarioName, SourceStageStep);

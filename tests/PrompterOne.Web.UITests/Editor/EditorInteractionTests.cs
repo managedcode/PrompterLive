@@ -1,15 +1,18 @@
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ShowsFloatingBarAndAppliesFormattingToSelectedSourceText()
     {
         var page = await _fixture.NewPageAsync();
@@ -25,7 +28,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
 
             var value = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            Assert.Contains(BrowserTestConstants.Editor.EmphasisFragment, value, StringComparison.Ordinal);
+            await Assert.That(value).Contains(BrowserTestConstants.Editor.EmphasisFragment);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync(BrowserTestConstants.Editor.EmphasisFragment);
         }
         finally
@@ -34,7 +37,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_UndoAndRedoWorkFromToolbarAndKeyboard()
     {
         var page = await _fixture.NewPageAsync();
@@ -73,7 +76,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingToolbarShowsAiAndPersistsSelectionFormatting()
     {
         var page = await _fixture.NewPageAsync();
@@ -104,7 +107,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingEmotionMenuAppliesSelectedEmotion()
     {
         var page = await _fixture.NewPageAsync();
@@ -129,7 +132,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingMenusExposeExpandedTpsSurface()
     {
         const string scenarioName = "editor-floating-tps-surface";
@@ -157,7 +160,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingVoiceMenuAppliesWhisperCue()
     {
         var page = await _fixture.NewPageAsync();
@@ -182,7 +185,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingEmotionMenuAppliesDeliveryModeCue()
     {
         var page = await _fixture.NewPageAsync();
@@ -207,7 +210,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingPauseSpeedAndInsertMenusApplyExtendedTpsCues()
     {
         var page = await _fixture.NewPageAsync();
@@ -245,7 +248,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_DoesNotRenderLegacyStructureInspectorPanel()
     {
         var page = await _fixture.NewPageAsync();
@@ -264,7 +267,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HidesFrontMatterFromVisibleEditorBody()
     {
         var page = await _fixture.NewPageAsync();
@@ -275,10 +278,10 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
 
             var visibleSource = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            Assert.DoesNotContain("---", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("title:", visibleSource, StringComparison.Ordinal);
-            Assert.DoesNotContain("author:", visibleSource, StringComparison.Ordinal);
-            Assert.Contains("## [Intro|140WPM|warm]", visibleSource, StringComparison.Ordinal);
+            await Assert.That(visibleSource).DoesNotContain("---");
+            await Assert.That(visibleSource).DoesNotContain("title:");
+            await Assert.That(visibleSource).DoesNotContain("author:");
+            await Assert.That(visibleSource).Contains("## [Intro|140WPM|warm]");
         }
         finally
         {
@@ -286,7 +289,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_MetadataDurationPersistsAfterReload()
     {
         var page = await _fixture.NewPageAsync();
@@ -313,7 +316,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Editor.Duration)).ToHaveValueAsync(BrowserTestConstants.Editor.DisplayDuration);
 
             var visibleSource = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            Assert.DoesNotContain(BrowserTestConstants.Editor.DurationField, visibleSource, StringComparison.Ordinal);
+            await Assert.That(visibleSource).DoesNotContain(BrowserTestConstants.Editor.DurationField);
         }
         finally
         {
@@ -321,7 +324,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ClickableMenusAndAiButtonsApplyCommands()
     {
         var page = await _fixture.NewPageAsync();
@@ -359,8 +362,8 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
 
             var valueAfterAi = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            Assert.NotEqual(valueBeforeAi, valueAfterAi);
-            Assert.Contains(BrowserTestConstants.Editor.SimplifiedMoment, valueAfterAi, StringComparison.Ordinal);
+            await Assert.That(valueAfterAi).IsNotEqualTo(valueBeforeAi);
+            await Assert.That(valueAfterAi).Contains(BrowserTestConstants.Editor.SimplifiedMoment);
         }
         finally
         {
@@ -368,7 +371,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_TopToolbarShowsVisibleStructureButtons()
     {
         var page = await _fixture.NewPageAsync();
@@ -394,7 +397,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FullToolbarSurfaceSupportsExtendedCommands()
     {
         var page = await _fixture.NewPageAsync();
@@ -444,7 +447,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ToolbarDropdownsCloseCentrallyAcrossCommandsAndOutsideClicks()
     {
         var page = await _fixture.NewPageAsync();

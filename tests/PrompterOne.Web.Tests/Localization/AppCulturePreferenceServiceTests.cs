@@ -10,6 +10,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class AppCulturePreferenceServiceTests : BunitContext
 {
     private readonly TestJsRuntime _jsRuntime;
@@ -24,10 +25,10 @@ public sealed class AppCulturePreferenceServiceTests : BunitContext
         _settingsStore = Services.GetRequiredService<IUserSettingsStore>();
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeAsync_UsesSavedPreferenceBeforeBrowserCulture()
     {
-        using var _ = new CultureResetScope();
+        using var _ = new CultureScope();
         _jsRuntime.SetBrowserLanguages("de-DE", "en-US");
         await _settingsStore.SaveAsync(
             SettingsPagePreferences.StorageKey,
@@ -40,10 +41,10 @@ public sealed class AppCulturePreferenceServiceTests : BunitContext
         Assert.Equal(AppCultureCatalog.FrenchCultureName, _jsRuntime.DocumentLanguage);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeAsync_UsesSupportedBrowserCulture_WhenUserPreferenceIsMissing()
     {
-        using var _ = new CultureResetScope();
+        using var _ = new CultureScope();
         _jsRuntime.SetBrowserLanguages("de-DE", "en-US");
 
         await _service.InitializeAsync();
@@ -52,10 +53,10 @@ public sealed class AppCulturePreferenceServiceTests : BunitContext
         Assert.Equal(AppCultureCatalog.GermanCultureName, _jsRuntime.DocumentLanguage);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeAsync_MigratesLegacyCultureSetting_WhenTypedPreferenceIsMissing()
     {
-        using var _ = new CultureResetScope();
+        using var _ = new CultureScope();
         _jsRuntime.SavedValues[BrowserStorageKeys.CultureSetting] = AppCultureCatalog.GermanCultureName;
         _jsRuntime.SetBrowserLanguages("en-US");
 
@@ -69,21 +70,5 @@ public sealed class AppCulturePreferenceServiceTests : BunitContext
         Assert.Equal(AppCultureCatalog.GermanCultureName, _jsRuntime.DocumentLanguage);
         Assert.DoesNotContain(BrowserStorageKeys.CultureSetting, _jsRuntime.SavedValues.Keys);
         Assert.DoesNotContain(BrowserStorageKeys.CultureSetting, _jsRuntime.SavedJsonValues.Keys);
-    }
-
-    private sealed class CultureResetScope : IDisposable
-    {
-        private readonly CultureInfo _originalCulture = CultureInfo.CurrentCulture;
-        private readonly CultureInfo _originalUiCulture = CultureInfo.CurrentUICulture;
-        private readonly CultureInfo? _originalDefaultCulture = CultureInfo.DefaultThreadCurrentCulture;
-        private readonly CultureInfo? _originalDefaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
-
-        public void Dispose()
-        {
-            CultureInfo.CurrentCulture = _originalCulture;
-            CultureInfo.CurrentUICulture = _originalUiCulture;
-            CultureInfo.DefaultThreadCurrentCulture = _originalDefaultCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = _originalDefaultUiCulture;
-        }
     }
 }

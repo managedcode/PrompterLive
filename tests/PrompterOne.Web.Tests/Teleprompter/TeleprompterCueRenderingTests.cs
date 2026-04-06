@@ -20,7 +20,7 @@ public sealed class TeleprompterCueRenderingTests : BunitContext
     private const string StressWord = "building.";
     private const string WhisperWord = "secret";
 
-    [Fact]
+    [Test]
     public async Task TeleprompterPage_EmitsCueAttributesAndScaleVariablesForReaderDeliverySemantics()
     {
         var harness = TestHarnessFactory.Create(this, seedLibraryData: false);

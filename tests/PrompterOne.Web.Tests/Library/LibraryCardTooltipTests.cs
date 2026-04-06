@@ -13,7 +13,7 @@ public sealed class LibraryCardTooltipTests : BunitContext
 {
     private static readonly DateTimeOffset UpdatedAt = new(2026, 4, 5, 10, 0, 0, TimeSpan.Zero);
 
-    [Fact]
+    [Test]
     public void LibraryCard_DeleteAction_UsesSharedTooltipSurface()
     {
         TestHarnessFactory.Create(this);

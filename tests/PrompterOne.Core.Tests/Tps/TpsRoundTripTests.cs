@@ -10,7 +10,7 @@ public sealed class TpsRoundTripTests
     private const int MaximumSupportedWpm = 220;
     private const int MinimumSupportedWpm = 80;
 
-    [Fact]
+    [Test]
     public async Task ParseAndExportAsync_RetainsCanonicalMetadataAndFlexibleHeaders()
     {
         var documentReader = CreateDocumentReader();
@@ -59,7 +59,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal("Jordan", block.Speaker);
     }
 
-    [Fact]
+    [Test]
     public void OrpCalculator_SplitsLongWordAtExpectedFocusPoint()
     {
         var calculator = new RsvpOrpCalculator();
@@ -71,7 +71,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal("rompter", split.PostORP);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_PreservesPronunciationAndInlineSpeedResolution()
     {
         var compiled = await CompileAsync(
@@ -98,7 +98,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(0.8f, carefully.Metadata.SpeedMultiplier);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_PreservesRelativeSpeedWhenClosingTagIsFollowedByPunctuation()
     {
         var compiled = await CompileAsync(
@@ -122,7 +122,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(1.1f, flight.Metadata.SpeedMultiplier);
     }
 
-    [Fact]
+    [Test]
     public async Task ParseAsync_UsesLastHeaderParameterAndFallsBackFromInvalidValues()
     {
         var documentReader = CreateDocumentReader();
@@ -152,7 +152,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal("Casey", block.Speaker);
     }
 
-    [Fact]
+    [Test]
     public async Task ParseAsync_UsesArchetypeRecommendedWpmWhenHeaderOmitsExplicitSpeed()
     {
         var documentReader = CreateDocumentReader();
@@ -184,7 +184,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(TpsSpec.ArchetypeRecommendedWpm["educator"], compiledBlock.TargetWPM);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_TracksVolumeDeliveryStressBreathAndHighlight()
     {
         var compiled = await CompileAsync(
@@ -219,7 +219,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(TimeSpan.Zero, breath.DisplayDuration);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_TracksArchetypeArticulationEnergyAndMelodyMetadata()
     {
         var compiled = await CompileAsync(
@@ -250,7 +250,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(4, rhythm.Metadata.MelodyLevel);
     }
 
-    [Fact]
+    [Test]
     public void ParseTps_PreservesExplicitBlockWordsWhenSdkEmitsImplicitLeadBlock()
     {
         var scriptDataFactory = CreateScriptDataFactory();
@@ -283,7 +283,7 @@ public sealed class TpsRoundTripTests
         Assert.DoesNotContain("Opening", blockWords);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_LeavesUnknownTagsLiteralAndTreatsLegacyColorTagsAsText()
     {
         var compiled = await CompileAsync(
@@ -309,7 +309,7 @@ public sealed class TpsRoundTripTests
         Assert.Contains("[custom]tag[/custom]", words);
     }
 
-    [Fact]
+    [Test]
     public async Task ParseAsync_IgnoresLegacyOffsetAliasesAndUsesCanonicalDefaults()
     {
         var documentReader = CreateDocumentReader();
@@ -335,7 +335,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(0.6f, alpha.Metadata.SpeedMultiplier);
     }
 
-    [Fact]
+    [Test]
     public async Task ParseAsync_ClampsBaseWpmToCanonicalRuntimeBounds()
     {
         var documentReader = CreateDocumentReader();
@@ -361,7 +361,7 @@ public sealed class TpsRoundTripTests
         Assert.Equal(MaximumSupportedWpm, data.TargetWpm);
     }
 
-    [Fact]
+    [Test]
     public async Task ParseAsync_IgnoresOutOfRangeHeaderWpmAndFallsBackToClampedBaseWpm()
     {
         var documentReader = CreateDocumentReader();
@@ -386,7 +386,7 @@ public sealed class TpsRoundTripTests
         Assert.Null(block.TargetWPM);
     }
 
-    [Fact]
+    [Test]
     public async Task CompileAsync_AttachesStandalonePunctuationTokensToAdjacentWords()
     {
         var compiled = await CompileAsync(

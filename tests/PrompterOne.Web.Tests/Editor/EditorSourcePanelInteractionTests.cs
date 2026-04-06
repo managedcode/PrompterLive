@@ -24,7 +24,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public async Task EditorSourcePanel_FloatingToolbarStaysPinnedWhileSelectionRemainsActive()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -37,7 +37,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         Assert.Equal(initialStyle, updatedStyle);
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_TooltipButtonsUseCustomTooltipContractWithoutNativeTitle()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -58,7 +58,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         AssertTooltipContract(floatingMotivationalEmotion, Text(UiTextKey.EditorToolbarTooltipEmotionMotivational));
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_TooltipSurface_IsRenderedWithExpectedContent()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -79,7 +79,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
                 StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_TooltipSurface_UsesStableTooltipRoleAndPlacementContract()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -93,7 +93,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         Assert.Equal("toolbar", toolbarTooltip.GetAttribute("data-tooltip-placement"));
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_FloatingToolbarMenusExposeExtendedTpsAuthoringOptions()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -152,7 +152,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
             Text(UiTextKey.EditorToolbarTooltipInsertBlockArchetype));
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_DropdownRows_RenderSharedLeftAlignedContentClusters()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -167,7 +167,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         AssertMenuActionCluster(cut.FindByTestId(UiTestIds.Editor.FloatingInsertSegmentArchetypeMenu), "Segment", "Archetype aware");
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_AiButtonsAreDisabled_WhenNoProviderIsConfigured()
     {
         var cut = Render<EditorSourcePanelHost>();
@@ -179,7 +179,7 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_AiButtonsAreEnabled_WhenAProviderIsConfigured()
     {
         _harness.JsRuntime.SavedValues[AiProviderSettings.StorageKey] = new AiProviderSettings

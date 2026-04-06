@@ -1,15 +1,16 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class LearnRapidControlStressTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const string RapidControlsScenario = "learn-rapid-controls";
     private const string RapidControlsStep = "01-rapid-controls";
 
-    [Fact]
+    [Test]
     public Task Learn_RapidControlClicks_DoNotTriggerFatalDiagnosticsOrUnhandledErrors() =>
         RunPageAsync(async page =>
         {
@@ -28,8 +29,8 @@ public sealed class LearnRapidControlStressTests(StandaloneAppFixture fixture)
 
             await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Learn.ProgressLabel)).ToBeVisibleAsync();
-            Assert.Equal(0, await page.GetByTestId(UiTestIds.Diagnostics.Fatal).CountAsync());
-            errors.AssertNoCriticalUiErrors();
+            await Assert.That(await page.GetByTestId(UiTestIds.Diagnostics.Fatal).CountAsync()).IsEqualTo(0);
+            await errors.AssertNoCriticalUiErrorsAsync();
 
             await UiScenarioArtifacts.CapturePageAsync(page, RapidControlsScenario, RapidControlsStep);
         });

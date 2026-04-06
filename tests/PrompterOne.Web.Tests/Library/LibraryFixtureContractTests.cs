@@ -17,13 +17,13 @@ public sealed class LibraryFixtureContractTests
         "display_wpm:"
     ];
 
-    [Fact]
+    [Test]
     public void RootPrototypeDesignFolder_IsAbsent()
     {
         Assert.False(Directory.Exists(RootDesignFolder));
     }
 
-    [Fact]
+    [Test]
     public void RepoOwnedTpsFixtures_DoNotContainDisplayMetricOverrides()
     {
         var offenders = FixtureRoots

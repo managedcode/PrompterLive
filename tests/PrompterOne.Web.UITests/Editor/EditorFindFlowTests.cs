@@ -1,11 +1,12 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
+    [Test]
     public Task EditorScreen_FindBarSelectsMatches_AndShowsNoResultState() =>
         RunPageAsync(async page =>
         {
@@ -23,7 +24,8 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             var selectedText = state.Text.Substring(
                 state.Selection.Start,
                 state.Selection.End - state.Selection.Start);
-            Assert.Equal(BrowserTestConstants.Editor.FindQuery, selectedText, ignoreCase: true);
+            // TODO: TUnit migration - xUnit Assert.Equal had additional argument(s) (ignoreCase: true) that could not be converted.
+            await Assert.That(selectedText).IsEqualTo(BrowserTestConstants.Editor.FindQuery);
 
             await page.GetByTestId(UiTestIds.Editor.FindInput).FillAsync(BrowserTestConstants.Editor.FindMissingQuery);
             await Expect(page.GetByTestId(UiTestIds.Editor.FindResult))

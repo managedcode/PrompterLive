@@ -13,7 +13,7 @@ public sealed class GoLiveDestinationRoutingTests
     private const string VdoConnectionId = "vdo-main";
     private const string UnknownSourceId = "scene-cam-missing";
 
-    [Fact]
+    [Test]
     public void Normalize_SeedsMissingTargetsFromProgramFeedSources()
     {
         var streaming = new StreamStudioSettings(
@@ -36,7 +36,7 @@ public sealed class GoLiveDestinationRoutingTests
         Assert.Equal([FirstSourceId], liveKitSources);
     }
 
-    [Fact]
+    [Test]
     public void ToggleSource_UpdatesOnlyRequestedTarget()
     {
         var streaming = GoLiveDestinationRouting.Normalize(
@@ -68,7 +68,7 @@ public sealed class GoLiveDestinationRoutingTests
             GoLiveDestinationRouting.GetSelectedSourceIds(updated, VdoConnectionId, CreateSceneCameras()));
     }
 
-    [Fact]
+    [Test]
     public void Normalize_RemovesUnknownSourcesFromPersistedSelections()
     {
         var streaming = new StreamStudioSettings(
@@ -93,7 +93,7 @@ public sealed class GoLiveDestinationRoutingTests
             GoLiveDestinationRouting.GetSelectedSourceIds(normalized, LiveKitConnectionId, CreateSceneCameras()));
     }
 
-    [Fact]
+    [Test]
     public void Normalize_DoesNotCreateSourceSelectionsForDistributionTargets()
     {
         var streaming = new StreamStudioSettings(

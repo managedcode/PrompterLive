@@ -26,7 +26,7 @@ public sealed class GoLiveLiveIndicatorsTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_IdleSession_KeepsSourceBadgeAndPreviewDotNonLive()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -48,7 +48,7 @@ public sealed class GoLiveLiveIndicatorsTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_RecordingSession_ShowsSourceBadgeAndPreviewDotAsLive()
     {
         SeedSceneState(CreateTwoCameraScene());

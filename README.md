@@ -194,7 +194,7 @@ Or just open [prompter.managed-code.com](https://prompter.managed-code.com/) —
 
 ## Technology
 
-PrompterOne is a standalone [Blazor WebAssembly](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) app on [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). The browser is the runtime: media capture, composition, recording, and transport-aware output happen through browser APIs such as MediaDevices, WebRTC, MediaRecorder, Web Audio, and Canvas. Transport integrations use [LiveKit](https://livekit.io/) and [VDO.Ninja](https://vdo.ninja/). Verification uses [xUnit](https://xunit.net/), [bUnit](https://bunit.dev/), and [Playwright](https://playwright.dev/), with browser scenarios acting as the main release bar. Deployment is a static GitHub Pages build.
+PrompterOne is a standalone [Blazor WebAssembly](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) app on [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). The browser is the runtime: media capture, composition, recording, and transport-aware output happen through browser APIs such as MediaDevices, WebRTC, MediaRecorder, Web Audio, and Canvas. Transport integrations use [LiveKit](https://livekit.io/) and [VDO.Ninja](https://vdo.ninja/). Verification uses [TUnit](https://tunit.dev/), [bUnit](https://bunit.dev/), and [Playwright](https://playwright.dev/), with browser scenarios acting as the main release bar. Deployment is a static GitHub Pages build.
 
 ## For Contributors
 

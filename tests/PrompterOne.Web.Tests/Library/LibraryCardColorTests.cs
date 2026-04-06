@@ -18,7 +18,7 @@ public sealed class LibraryCardColorTests : BunitContext
         TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_UsesCssSafeAccentColorsForEmotionCards()
     {
         var cut = Render<LibraryPage>();

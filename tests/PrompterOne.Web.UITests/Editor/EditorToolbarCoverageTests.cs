@@ -2,16 +2,19 @@ using Microsoft.Playwright;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
 {
     private const int OpenEditorAttemptCount = 2;
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorToolbar_AllMenuTriggersAndAiButtonsExposeExpectedBehavior()
     {
         var page = await _fixture.NewPageAsync();
@@ -54,13 +57,13 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
                 await page.GetByTestId(scenario.TestId).ClickAsync();
                 var afterValue = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-                Assert.NotEqual(beforeValue, afterValue);
-                Assert.Contains(scenario.ExpectedFragment, afterValue, StringComparison.Ordinal);
+                await Assert.That(afterValue).IsNotEqualTo(beforeValue);
+                await Assert.That(afterValue).Contains(scenario.ExpectedFragment);
             }
         }
         catch (Exception exception)
         {
-            throw new Xunit.Sdk.XunitException(
+            throw new InvalidOperationException(
                 $"Toolbar coverage failed with browser errors:{Environment.NewLine}{browserErrors.Describe()}{Environment.NewLine}{exception}");
         }
         finally
@@ -69,7 +72,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorToolbar_AllToolbarCommandButtonsMutateSource()
     {
         var page = await _fixture.NewPageAsync();
@@ -90,12 +93,12 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
                 await page.GetByTestId(scenario.TestId).ClickAsync();
                 var afterValue = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-                AssertCommandMutation(scenario, beforeValue, afterValue);
+                await AssertCommandMutation(scenario, beforeValue, afterValue);
             }
         }
         catch (Exception exception)
         {
-            throw new Xunit.Sdk.XunitException(
+            throw new InvalidOperationException(
                 $"Toolbar command coverage failed with browser errors:{Environment.NewLine}{browserErrors.Describe()}{Environment.NewLine}{exception}");
         }
         finally
@@ -104,7 +107,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorToolbar_AllFloatingCommandButtonsMutateSource()
     {
         var page = await _fixture.NewPageAsync();
@@ -129,11 +132,11 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
                     await page.GetByTestId(scenario.TestId).ClickAsync();
                     var afterValue = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-                    AssertCommandMutation(scenario, beforeValue, afterValue);
+                    await AssertCommandMutation(scenario, beforeValue, afterValue);
                 }
                 catch (Exception exception)
                 {
-                    throw new Xunit.Sdk.XunitException($"Floating toolbar coverage failed for scenario '{scenario.TestId}'.{Environment.NewLine}{exception}");
+                    throw new InvalidOperationException($"Floating toolbar coverage failed for scenario '{scenario.TestId}'.{Environment.NewLine}{exception}");
                 }
             }
         }
@@ -143,9 +146,9 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
         }
     }
 
-    private static void AssertCommandMutation(EditorCommandScenario scenario, string beforeValue, string afterValue)
+    private static async Task AssertCommandMutation(EditorCommandScenario scenario, string beforeValue, string afterValue)
     {
-        Assert.NotEqual(beforeValue, afterValue);
+        await Assert.That(afterValue).IsNotEqualTo(beforeValue);
 
         switch (scenario.Command.Kind)
         {
@@ -155,17 +158,17 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture) : I
                     scenario.Command.PrimaryToken,
                     BrowserTestSource.AlphaToken,
                     scenario.Command.SecondaryToken);
-                Assert.Contains(expectedFragment, afterValue, StringComparison.Ordinal);
+                await Assert.That(afterValue).Contains(expectedFragment);
                 break;
             }
             case EditorCommandKind.ClearColor:
-                Assert.DoesNotContain(BrowserTestSource.ColoredAlphaToken, afterValue, StringComparison.Ordinal);
-                Assert.Contains(BrowserTestSource.AlphaToken, afterValue, StringComparison.Ordinal);
+                await Assert.That(afterValue).DoesNotContain(BrowserTestSource.ColoredAlphaToken);
+                await Assert.That(afterValue).Contains(BrowserTestSource.AlphaToken);
                 break;
             default:
             {
                 var normalizedPrimaryToken = scenario.Command.PrimaryToken.TrimEnd('\r', '\n');
-                Assert.Contains(normalizedPrimaryToken, afterValue, StringComparison.Ordinal);
+                await Assert.That(afterValue).Contains(normalizedPrimaryToken);
                 break;
             }
         }

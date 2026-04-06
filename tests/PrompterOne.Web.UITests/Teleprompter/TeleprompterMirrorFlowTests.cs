@@ -2,12 +2,13 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
+    [Test]
     public Task TeleprompterScreen_ExposesVisibleBackButtonAndMirrorControls() =>
         RunPageAsync(async page =>
         {
@@ -31,8 +32,8 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
             var mirrorButtonColor = await GetComputedStyleValueAsync(mirrorHorizontal, BrowserTestConstants.TeleprompterFlow.ColorProperty);
             var backButtonBackground = await GetComputedStyleValueAsync(backButton, BrowserTestConstants.TeleprompterFlow.BackgroundColorProperty);
 
-            Assert.Equal(mirrorButtonColor, backButtonColor);
-            Assert.NotEqual(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor, backButtonBackground);
+            await Assert.That(backButtonColor).IsEqualTo(mirrorButtonColor);
+            await Assert.That(backButtonBackground).IsNotEqualTo(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor);
 
             await mirrorHorizontal.ClickAsync();
             await Expect(mirrorHorizontal).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);

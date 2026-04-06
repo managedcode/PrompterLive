@@ -1,10 +1,11 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class TeleprompterStylesheetFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class TeleprompterStylesheetFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string HasTeleprompterStylesheetScript = """
         teleprompterHref => {
             const normalizedTargetPath = teleprompterHref.startsWith('/') ? teleprompterHref : `/${teleprompterHref}`;
@@ -20,7 +21,7 @@ public sealed class TeleprompterStylesheetFlowTests(StandaloneAppFixture fixture
         }
         """;
 
-    [Fact]
+    [Test]
     public Task TeleprompterStylesheet_IsRegisteredBeforeTeleprompterRouteEntry() =>
         RunPageAsync(async page =>
         {
@@ -32,7 +33,7 @@ public sealed class TeleprompterStylesheetFlowTests(StandaloneAppFixture fixture
                 HasTeleprompterStylesheetScript,
                 DesignStylesheetPaths.Teleprompter);
 
-            Assert.True(hasTeleprompterStylesheet);
+            await Assert.That(hasTeleprompterStylesheet).IsTrue();
 
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))

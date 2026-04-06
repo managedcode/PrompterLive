@@ -1,16 +1,18 @@
+using System.IO;
 using PrompterOne.Core.Services;
 using PrompterOne.Core.Services.Preview;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LibraryCardMetricsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LibraryCardMetricsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const int DefaultAverageWpm = 140;
     private const string QuantumDocumentName = "test-quantum-computing.tps";
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_QuantumCardShowsRealTpsMetrics() =>
         RunPageAsync(async page =>
         {

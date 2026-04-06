@@ -1,16 +1,18 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LearnControlAlignmentTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LearnControlAlignmentTests(StandaloneAppFixture fixture)
 {
     private const double MaxCenterlineDeltaPx = 4;
     private const double MaxTransportSymmetryDeltaPx = 4;
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_QuantumControls_StayCenteredAndSymmetric()
     {
         var page = await _fixture.NewPageAsync();
@@ -26,16 +28,10 @@ public sealed class LearnControlAlignmentTests(StandaloneAppFixture fixture) : I
 
             var alignment = await MeasureControlAlignmentAsync(page);
 
-            Assert.InRange(Math.Abs(alignment.SpeedCenterPx - alignment.PlayCenterPx), 0, MaxCenterlineDeltaPx);
-            Assert.InRange(Math.Abs(alignment.PlayCenterPx - alignment.ProgressCenterPx), 0, MaxCenterlineDeltaPx);
-            Assert.InRange(
-                Math.Abs(alignment.BackLargeOffsetPx - alignment.ForwardLargeOffsetPx),
-                0,
-                MaxTransportSymmetryDeltaPx);
-            Assert.InRange(
-                Math.Abs(alignment.BackSmallOffsetPx - alignment.ForwardSmallOffsetPx),
-                0,
-                MaxTransportSymmetryDeltaPx);
+            await Assert.That(Math.Abs(alignment.SpeedCenterPx - alignment.PlayCenterPx)).IsBetween(0,MaxCenterlineDeltaPx);
+            await Assert.That(Math.Abs(alignment.PlayCenterPx - alignment.ProgressCenterPx)).IsBetween(0,MaxCenterlineDeltaPx);
+            await Assert.That(Math.Abs(alignment.BackLargeOffsetPx - alignment.ForwardLargeOffsetPx)).IsBetween(0,MaxTransportSymmetryDeltaPx);
+            await Assert.That(Math.Abs(alignment.BackSmallOffsetPx - alignment.ForwardSmallOffsetPx)).IsBetween(0,MaxTransportSymmetryDeltaPx);
         }
         finally
         {

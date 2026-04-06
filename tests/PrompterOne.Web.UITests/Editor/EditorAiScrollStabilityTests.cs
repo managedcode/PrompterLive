@@ -2,14 +2,16 @@ using System.Globalization;
 using System.Text;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_AiAction_DoesNotJumpScrollPositionForVisibleSelection()
     {
         var page = await _fixture.NewPageAsync();
@@ -32,9 +34,7 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture) :
                 targetRange.End);
 
             var before = await EditorMonacoDriver.GetStateAsync(page);
-            Assert.True(
-                before.ScrollTop >= BrowserTestConstants.Editor.AiScrollJumpMinimumStartingScrollTop,
-                $"Expected the editor to be scrolled before the AI action, but scrollTop was {before.ScrollTop:0.##}.");
+            await Assert.That(before.ScrollTop >= BrowserTestConstants.Editor.AiScrollJumpMinimumStartingScrollTop).IsTrue().Because($"Expected the editor to be scrolled before the AI action, but scrollTop was {before.ScrollTop:0.##}.");
 
             await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
             await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
@@ -43,11 +43,8 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture) :
             var after = await EditorMonacoDriver.GetStateAsync(page);
             var value = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains(BrowserTestConstants.Editor.SimplifiedMoment, value, StringComparison.Ordinal);
-            Assert.InRange(
-                Math.Abs(after.ScrollTop - before.ScrollTop),
-                0,
-                BrowserTestConstants.Editor.AiScrollJumpMaximumAllowedDeltaPx);
+            await Assert.That(value).Contains(BrowserTestConstants.Editor.SimplifiedMoment);
+            await Assert.That(Math.Abs(after.ScrollTop - before.ScrollTop)).IsBetween(0,BrowserTestConstants.Editor.AiScrollJumpMaximumAllowedDeltaPx);
         }
         finally
         {
@@ -81,13 +78,19 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture) :
             "Line {0:D3}",
             BrowserTestConstants.Editor.AiScrollJumpTargetLineIndex + 1);
         var lineStart = sourceText.IndexOf(linePrefix, StringComparison.Ordinal);
-        Assert.True(lineStart >= 0, $"Unable to locate the target line prefix \"{linePrefix}\".");
+        if (lineStart < 0)
+        {
+            throw new InvalidOperationException($"Unable to locate the target line prefix \"{linePrefix}\".");
+        }
 
         var targetStart = sourceText.IndexOf(
             BrowserTestConstants.Editor.TransformativeMoment,
             lineStart,
             StringComparison.Ordinal);
-        Assert.True(targetStart >= 0, "Unable to locate the AI simplify target text in the generated editor draft.");
+        if (targetStart < 0)
+        {
+            throw new InvalidOperationException("Unable to locate the AI simplify target text in the generated editor draft.");
+        }
 
         return new AiScrollJumpRange(
             targetStart,

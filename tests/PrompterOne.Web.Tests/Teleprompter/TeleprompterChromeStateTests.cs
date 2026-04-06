@@ -11,7 +11,7 @@ public sealed class TeleprompterChromeStateTests : BunitContext
 {
     private const string ReadingActiveCssClass = "rd-reading-active";
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_PlaybackMarksChromeAsReadingActive()
     {
         TestHarnessFactory.Create(this);

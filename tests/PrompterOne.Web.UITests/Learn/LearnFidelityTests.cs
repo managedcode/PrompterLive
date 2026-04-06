@@ -1,10 +1,12 @@
 using System.Globalization;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
 {
     private const string LayoutReadyAttributeName = "data-rsvp-layout-ready";
     private const double MaxLayoutReadyOrpDeltaPx = 6;
@@ -15,7 +17,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
     private readonly record struct FocusWordSlackMeasurement(double SlackPx);
     private readonly record struct VisibleContextWordGapMeasurement(double LeftWordGapPx, double RightWordGapPx);
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_KeepsOrpLetterCenteredOnReferenceGuide()
     {
         var page = await fixture.NewPageAsync();
@@ -29,14 +31,14 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await WaitForLearnLayoutReadyAsync(page);
 
             var initialDelta = await MeasureOrpDeltaAsync(page);
-            Assert.InRange(initialDelta, 0, 6);
+            await Assert.That(initialDelta).IsBetween(0,6);
 
             await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackDelayMs);
             await WaitForLearnLayoutReadyAsync(page);
 
             var playbackDelta = await MeasureOrpDeltaAsync(page);
-            Assert.InRange(playbackDelta, 0, 6);
+            await Assert.That(playbackDelta).IsBetween(0,6);
         }
         finally
         {
@@ -44,7 +46,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_UsesPhraseTimelineForSecurityIncidentScript()
     {
         var page = await fixture.NewPageAsync();
@@ -71,8 +73,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             var leftContextCount = await CountContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
             var rightContextCount = await CountContextWordsAsync(page, UiDomIds.Learn.ContextRight);
 
-            Assert.Equal(BrowserTestConstants.Learn.ContextWordCount, leftContextCount);
-            Assert.Equal(BrowserTestConstants.Learn.ContextWordCount, rightContextCount);
+            await Assert.That(leftContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
+            await Assert.That(rightContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
         }
         finally
         {
@@ -80,7 +82,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_DemoContextRails_ShowTwoWordsPerSideWithoutRightRailClipping()
     {
         var page = await fixture.NewPageAsync();
@@ -103,27 +105,19 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
             var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
 
-            Assert.Equal(
-                [
+            await Assert.That(leftWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.DemoLeftContextFirstWord,
                     BrowserTestConstants.Learn.DemoLeftContextSecondWord
-                ],
-                leftWords);
-            Assert.Equal(
-                [
+                ], CollectionOrdering.Matching);
+            await Assert.That(rightWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.DemoRightContextFirstWord,
                     BrowserTestConstants.Learn.DemoRightContextSecondWord
-                ],
-                rightWords);
+                ], CollectionOrdering.Matching);
 
             var clip = await MeasureContextRailClipAsync(page);
 
-            Assert.True(
-                clip.LeftClipPx <= BrowserTestConstants.Learn.MaxRailClipPx,
-                $"Expected the left Learn context rail to avoid clipping visible words, but it clipped by {clip.LeftClipPx:0.##}px.");
-            Assert.True(
-                clip.RightClipPx <= BrowserTestConstants.Learn.MaxRailClipPx,
-                $"Expected the right Learn context rail to avoid clipping visible words, but it clipped by {clip.RightClipPx:0.##}px.");
+            await Assert.That(clip.LeftClipPx <= BrowserTestConstants.Learn.MaxRailClipPx).IsTrue().Because($"Expected the left Learn context rail to avoid clipping visible words, but it clipped by {clip.LeftClipPx:0.##}px.");
+            await Assert.That(clip.RightClipPx <= BrowserTestConstants.Learn.MaxRailClipPx).IsTrue().Because($"Expected the right Learn context rail to avoid clipping visible words, but it clipped by {clip.RightClipPx:0.##}px.");
         }
         finally
         {
@@ -131,7 +125,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_KeepsContextRailsSeparatedFromFocusWordOnLeadershipScript()
     {
         var page = await fixture.NewPageAsync();
@@ -150,12 +144,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var gaps = await MeasureContextGapsAsync(page);
 
-            Assert.True(
-                gaps.LeftGapPx >= 0,
-                $"Expected the left context rail to stop before the focus word, but the overlap was {-gaps.LeftGapPx:0.##} px.");
-            Assert.True(
-                gaps.RightGapPx >= 0,
-                $"Expected the right context rail to start after the focus word, but the overlap was {-gaps.RightGapPx:0.##} px.");
+            await Assert.That(gaps.LeftGapPx >= 0).IsTrue().Because($"Expected the left context rail to stop before the focus word, but the overlap was {-gaps.LeftGapPx:0.##} px.");
+            await Assert.That(gaps.RightGapPx >= 0).IsTrue().Because($"Expected the right context rail to start after the focus word, but the overlap was {-gaps.RightGapPx:0.##} px.");
         }
         finally
         {
@@ -163,7 +153,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_KeepsSecurityIncidentContextWordsCloseToFocusedWord()
     {
         var page = await fixture.NewPageAsync();
@@ -185,12 +175,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var gaps = await MeasureVisibleContextWordGapsAsync(page);
 
-            Assert.True(
-                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxVisibleContextWordGapPx,
-                $"Expected the visible left context word gap to stay within {BrowserTestConstants.Learn.MaxVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
-            Assert.True(
-                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxVisibleContextWordGapPx,
-                $"Expected the visible right context word gap to stay within {BrowserTestConstants.Learn.MaxVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+            await Assert.That(gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxVisibleContextWordGapPx).IsTrue().Because($"Expected the visible left context word gap to stay within {BrowserTestConstants.Learn.MaxVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            await Assert.That(gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxVisibleContextWordGapPx).IsTrue().Because($"Expected the visible right context word gap to stay within {BrowserTestConstants.Learn.MaxVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
         }
         finally
         {
@@ -198,7 +184,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_KeepsQuantumContextWordsCloseToFocusedWord()
     {
         var page = await fixture.NewPageAsync();
@@ -220,12 +206,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var gaps = await MeasureVisibleContextWordGapsAsync(page);
 
-            Assert.True(
-                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx,
-                $"Expected the quantum left context word gap to stay within {BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
-            Assert.True(
-                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx,
-                $"Expected the quantum right context word gap to stay within {BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+            await Assert.That(gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx).IsTrue().Because($"Expected the quantum left context word gap to stay within {BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            await Assert.That(gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx).IsTrue().Because($"Expected the quantum right context word gap to stay within {BrowserTestConstants.Learn.MaxQuantumVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
         }
         finally
         {
@@ -233,7 +215,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_LeadershipPreviewState_ShowsCurrentSentenceContextAndCloserContext()
     {
         var page = await fixture.NewPageAsync();
@@ -255,12 +237,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var gaps = await MeasureVisibleContextWordGapsAsync(page);
 
-            Assert.True(
-                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
-                $"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
-            Assert.True(
-                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
-                $"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+            await Assert.That(gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx).IsTrue().Because($"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            await Assert.That(gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx).IsTrue().Because($"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
 
             await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase))
                 .ToContainTextAsync(BrowserTestConstants.Learn.LeadershipCurrentSentencePreviewText);
@@ -271,7 +249,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_LeadershipUncertainState_StaysSentenceLocalAndDropsPunctuation()
     {
         var page = await fixture.NewPageAsync();
@@ -292,28 +270,20 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
                 BrowserTestConstants.Learn.LeadershipCleanSentenceProbeStepLimit);
 
             var gaps = await MeasureVisibleContextWordGapsAsync(page);
-            Assert.True(
-                gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
-                $"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
-            Assert.True(
-                gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx,
-                $"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
+            await Assert.That(gaps.LeftWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx).IsTrue().Because($"Expected the leadership left context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.LeftWordGapPx:0.##}px.");
+            await Assert.That(gaps.RightWordGapPx <= BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx).IsTrue().Because($"Expected the leadership right context word gap to stay within {BrowserTestConstants.Learn.MaxLeadershipVisibleContextWordGapPx}px, but it was {gaps.RightWordGapPx:0.##}px.");
 
             var focusWordOverflowPx = await MeasureFocusWordOverflowAsync(page);
-            Assert.True(
-                focusWordOverflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx,
-                $"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {focusWordOverflowPx:0.##}px.");
+            await Assert.That(focusWordOverflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx).IsTrue().Because($"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {focusWordOverflowPx:0.##}px.");
 
             var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
             var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
 
-            Assert.Equal([BrowserTestConstants.Learn.LeadershipLeftContextWord], leftWords);
-            Assert.Equal(
-                [
+            await Assert.That(leftWords).IsEquivalentTo([BrowserTestConstants.Learn.LeadershipLeftContextWord], CollectionOrdering.Matching);
+            await Assert.That(rightWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.LeadershipRightContextFirstWord,
                     BrowserTestConstants.Learn.LeadershipRightContextSecondWord
-                ],
-                rightWords);
+                ], CollectionOrdering.Matching);
 
             await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase))
                 .ToHaveTextAsync(BrowserTestConstants.Learn.LeadershipCleanSentencePreviewText);
@@ -324,7 +294,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_LongFocusWord_FitsWithoutClipping()
     {
         var page = await fixture.NewPageAsync();
@@ -343,9 +313,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var overflowPx = await MeasureFocusWordOverflowAsync(page);
 
-            Assert.True(
-                overflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx,
-                $"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {overflowPx:0.##}px.");
+            await Assert.That(overflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx).IsTrue().Because($"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {overflowPx:0.##}px.");
         }
         finally
         {
@@ -353,7 +321,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_FocusWord_UsesPackedHorizontalStackAroundOrp()
     {
         var page = await fixture.NewPageAsync();
@@ -372,9 +340,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
 
             var slack = await MeasureFocusWordSlackAsync(page);
 
-            Assert.True(
-                slack.SlackPx <= BrowserTestConstants.Learn.MaxFocusWordSlackPx,
-                $"Expected the Learn focus word to use a packed horizontal stack, but it still had {slack.SlackPx:0.##}px of internal slack.");
+            await Assert.That(slack.SlackPx <= BrowserTestConstants.Learn.MaxFocusWordSlackPx).IsTrue().Because($"Expected the Learn focus word to use a packed horizontal stack, but it still had {slack.SlackPx:0.##}px of internal slack.");
         }
         finally
         {
@@ -382,7 +348,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_WpmIncrease_AcceleratesPlaybackCadence()
     {
         var slowPlaybackDuration = await MeasureLearnPlaybackDurationAsync(
@@ -401,9 +367,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
                     .ToHaveTextAsync(BrowserTestConstants.ReaderTiming.LearnFastWpm.ToString(CultureInfo.InvariantCulture));
             });
 
-        Assert.True(
-            fastPlaybackDuration <= slowPlaybackDuration - BrowserTestConstants.ReaderTiming.MinimumSpeedProbePlaybackDeltaMs,
-            $"Expected higher WPM to finish faster. Slow mode took {slowPlaybackDuration} ms, faster mode took {fastPlaybackDuration} ms.");
+        await Assert.That(fastPlaybackDuration <= slowPlaybackDuration - BrowserTestConstants.ReaderTiming.MinimumSpeedProbePlaybackDeltaMs).IsTrue().Because($"Expected higher WPM to finish faster. Slow mode took {slowPlaybackDuration} ms, faster mode took {fastPlaybackDuration} ms.");
     }
 
     private static Task<double> MeasureOrpDeltaAsync(Microsoft.Playwright.IPage page) =>
@@ -464,7 +428,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             await WaitForLearnLayoutReadyAsync(page);
         }
 
-        Assert.Fail($"Did not reach the learn probe word '{targetWord}' within {stepLimit} steps.");
+        Assert.Fail("Unexpected execution path.");
     }
 
     private static Task WaitForLearnLayoutReadyAsync(Microsoft.Playwright.IPage page) =>
@@ -500,7 +464,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture) : IClassFix
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
         var actualWord = await ReadFocusWordAsync(page);
-        Assert.Equal(expectedWord, actualWord, ignoreCase: true);
+        // TODO: TUnit migration - xUnit Assert.Equal had additional argument(s) (ignoreCase: true) that could not be converted.
+        await Assert.That(actualWord).IsEqualTo(expectedWord);
     }
 
     private static async Task<string> ReadFocusWordAsync(Microsoft.Playwright.IPage page)

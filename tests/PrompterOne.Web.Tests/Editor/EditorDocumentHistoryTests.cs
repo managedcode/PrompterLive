@@ -5,7 +5,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class EditorDocumentHistoryTests
 {
-    [Fact]
+    [Test]
     public void TryUndoAndTryRedo_ReplaySnapshotsInOrder()
     {
         var history = new EditorDocumentHistory();
@@ -24,7 +24,7 @@ public sealed class EditorDocumentHistoryTests
         Assert.Equal(new EditorSelectionRange(16, 16), redoSnapshot.Selection);
     }
 
-    [Fact]
+    [Test]
     public void UpdateSelection_RewritesCurrentSnapshotWithoutAddingHistoryEntries()
     {
         var history = new EditorDocumentHistory();

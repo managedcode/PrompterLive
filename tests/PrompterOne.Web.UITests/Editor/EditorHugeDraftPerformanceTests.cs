@@ -1,13 +1,17 @@
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel]
+public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HugeDraftLoadedFromSeedKeepsFollowupTypingResponsive()
     {
         var page = await _fixture.NewPageAsync();
@@ -54,9 +58,7 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
                         sourceInputTestId = UiTestIds.Editor.SourceInput
                     });
 
-                Assert.True(
-                    editorReady,
-                    $"Huge draft editor did not appear. Url: {debug.Location}; SourceInputs: {debug.SourceInputCount}; Banner: {debug.DiagnosticsBannerVisible}; Fatal: {debug.DiagnosticsFatalVisible}; RouteNotFound: {debug.RouteNotFoundVisible}; Body: {debug.BodySnippet}");
+                await Assert.That(editorReady).IsTrue().Because($"Huge draft editor did not appear. Url: {debug.Location}; SourceInputs: {debug.SourceInputCount}; Banner: {debug.DiagnosticsBannerVisible}; Fatal: {debug.DiagnosticsFatalVisible}; RouteNotFound: {debug.RouteNotFoundVisible}; Body: {debug.BodySnippet}");
             }
 
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
@@ -144,17 +146,13 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
                     overlayTestId = UiTestIds.Editor.SourceHighlight
                 });
 
-            Assert.Equal(expectedLength, result.FinalInputLength);
-            Assert.Equal(expectedLength, result.FinalRenderedLength);
-            Assert.True(result.TypingSampleCount >= 2);
-            Assert.True(
-                result.FollowupMaxLongTaskMs >= 0 &&
-                result.FollowupMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs,
-                $"Huge draft follow-up long task exceeded the acceptance budget. FollowupMaxLongTaskMs: {result.FollowupMaxLongTaskMs}; MaxHugeFollowupLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
-            Assert.True(
-                result.TypingLatencyMs >= 0 &&
-                result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxHugeTypingLatencyMs,
-                $"Huge draft typing latency exceeded the acceptance budget. TypingLatencyMs: {result.TypingLatencyMs}; MaxHugeTypingLatencyMs: {EditorLargeDraftPerformanceTestData.MaxHugeTypingLatencyMs}; FollowupMaxLongTaskMs: {result.FollowupMaxLongTaskMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
+            await Assert.That(result.FinalInputLength).IsEqualTo(expectedLength);
+            await Assert.That(result.FinalRenderedLength).IsEqualTo(expectedLength);
+            await Assert.That(result.TypingSampleCount >= 2).IsTrue();
+            await Assert.That(result.FollowupMaxLongTaskMs >= 0 &&
+                result.FollowupMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs).IsTrue().Because($"Huge draft follow-up long task exceeded the acceptance budget. FollowupMaxLongTaskMs: {result.FollowupMaxLongTaskMs}; MaxHugeFollowupLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxHugeFollowupLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
+            await Assert.That(result.TypingLatencyMs >= 0 &&
+                result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxHugeTypingLatencyMs).IsTrue().Because($"Huge draft typing latency exceeded the acceptance budget. TypingLatencyMs: {result.TypingLatencyMs}; MaxHugeTypingLatencyMs: {EditorLargeDraftPerformanceTestData.MaxHugeTypingLatencyMs}; FollowupMaxLongTaskMs: {result.FollowupMaxLongTaskMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
         }
         finally
         {

@@ -18,7 +18,7 @@ public sealed class EditorSourcePanelFindTests : BunitContext
         _ = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_FindBarOpens_AndReportsMatchCount()
     {
         var cut = Render<EditorSourcePanelFindHost>();
@@ -33,7 +33,7 @@ public sealed class EditorSourcePanelFindTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorSourcePanel_FindBarShowsNoMatchesState()
     {
         var cut = Render<EditorSourcePanelFindHost>();

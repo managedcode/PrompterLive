@@ -2,14 +2,15 @@ using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Storage.Cloud;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private readonly record struct CssColor(double R, double G, double B, double A);
 
-    [Fact]
+    [Test]
     public Task SettingsCloudStorage_PersistsDropboxDraftAcrossReload() =>
         RunPageAsync(async page =>
         {
@@ -62,7 +63,7 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
                 BrowserTestConstants.SettingsFlow.CloudStorageReloadedStep);
         });
 
-    [Fact]
+    [Test]
     public Task SettingsCloudStorage_LightTheme_UsesReadableLightSurfaces() =>
         RunPageAsync(async page =>
         {
@@ -107,24 +108,12 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
             var inputBackground = await ReadCssColorAsync(accountLabelField, "backgroundColor");
             var subtitleColor = await ReadCssColorAsync(oneDriveSubtitle, "color");
 
-            Assert.True(
-                HasMinimumChannels(cardBackground, BrowserTestConstants.SettingsFlow.MinimumLightSurfaceChannel),
-                $"Expected the light-theme cloud card surface to stay light, but got rgba({cardBackground.R:0.##}, {cardBackground.G:0.##}, {cardBackground.B:0.##}, {cardBackground.A:0.##}).");
-            Assert.True(
-                HasMinimumChannels(selectBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel),
-                $"Expected the light-theme provider select surface to stay light, but got rgba({selectBackground.R:0.##}, {selectBackground.G:0.##}, {selectBackground.B:0.##}, {selectBackground.A:0.##}).");
-            Assert.True(
-                HasMinimumChannels(selectPanelBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel),
-                $"Expected the light-theme provider dropdown surface to stay light, but got rgba({selectPanelBackground.R:0.##}, {selectPanelBackground.G:0.##}, {selectPanelBackground.B:0.##}, {selectPanelBackground.A:0.##}).");
-            Assert.True(
-                HasMinimumChannels(inputBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel),
-                $"Expected the light-theme account label field surface to stay light, but got rgba({inputBackground.R:0.##}, {inputBackground.G:0.##}, {inputBackground.B:0.##}, {inputBackground.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(selectOptionColor, BrowserTestConstants.SettingsFlow.MaximumReadableTextChannel),
-                $"Expected the light-theme provider dropdown option text to stay readable, but got rgba({selectOptionColor.R:0.##}, {selectOptionColor.G:0.##}, {selectOptionColor.B:0.##}, {selectOptionColor.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(subtitleColor, BrowserTestConstants.SettingsFlow.MaximumReadableSecondaryTextChannel),
-                $"Expected the light-theme cloud subtitle text to stay readable, but got rgba({subtitleColor.R:0.##}, {subtitleColor.G:0.##}, {subtitleColor.B:0.##}, {subtitleColor.A:0.##}).");
+            await Assert.That(HasMinimumChannels(cardBackground, BrowserTestConstants.SettingsFlow.MinimumLightSurfaceChannel)).IsTrue().Because($"Expected the light-theme cloud card surface to stay light, but got rgba({cardBackground.R:0.##}, {cardBackground.G:0.##}, {cardBackground.B:0.##}, {cardBackground.A:0.##}).");
+            await Assert.That(HasMinimumChannels(selectBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel)).IsTrue().Because($"Expected the light-theme provider select surface to stay light, but got rgba({selectBackground.R:0.##}, {selectBackground.G:0.##}, {selectBackground.B:0.##}, {selectBackground.A:0.##}).");
+            await Assert.That(HasMinimumChannels(selectPanelBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel)).IsTrue().Because($"Expected the light-theme provider dropdown surface to stay light, but got rgba({selectPanelBackground.R:0.##}, {selectPanelBackground.G:0.##}, {selectPanelBackground.B:0.##}, {selectPanelBackground.A:0.##}).");
+            await Assert.That(HasMinimumChannels(inputBackground, BrowserTestConstants.SettingsFlow.MinimumLightFieldChannel)).IsTrue().Because($"Expected the light-theme account label field surface to stay light, but got rgba({inputBackground.R:0.##}, {inputBackground.G:0.##}, {inputBackground.B:0.##}, {inputBackground.A:0.##}).");
+            await Assert.That(HasMaximumChannels(selectOptionColor, BrowserTestConstants.SettingsFlow.MaximumReadableTextChannel)).IsTrue().Because($"Expected the light-theme provider dropdown option text to stay readable, but got rgba({selectOptionColor.R:0.##}, {selectOptionColor.G:0.##}, {selectOptionColor.B:0.##}, {selectOptionColor.A:0.##}).");
+            await Assert.That(HasMaximumChannels(subtitleColor, BrowserTestConstants.SettingsFlow.MaximumReadableSecondaryTextChannel)).IsTrue().Because($"Expected the light-theme cloud subtitle text to stay readable, but got rgba({subtitleColor.R:0.##}, {subtitleColor.G:0.##}, {subtitleColor.B:0.##}, {subtitleColor.A:0.##}).");
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,

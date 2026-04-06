@@ -12,7 +12,7 @@ public sealed class GoLiveKeyboardShortcutTests : BunitContext
 {
     private const string ActiveCssClass = "active";
 
-    [Fact]
+    [Test]
     public void GoLivePage_Hotkeys_ToggleModeAndLayoutChrome()
     {
         TestHarnessFactory.Create(this);

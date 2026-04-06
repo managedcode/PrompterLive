@@ -1,14 +1,17 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_SetTextThenSelectStillRendersFloatingBar()
     {
         var page = await _fixture.NewPageAsync();
@@ -31,7 +34,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_BackwardSelection_KeepsGrowingAcrossRepeatedArrowLeftInput()
     {
         var page = await _fixture.NewPageAsync();
@@ -62,7 +65,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var selectedText = ReadSelectedText(state);
 
-            Assert.Equal(BrowserTestConstants.Editor.ReverseSelectionExpectedText, selectedText);
+            await Assert.That(selectedText).IsEqualTo(BrowserTestConstants.Editor.ReverseSelectionExpectedText);
         }
         finally
         {
@@ -70,7 +73,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_BackwardSelection_CanExtendAcrossLineBreaks()
     {
         var page = await _fixture.NewPageAsync();
@@ -101,10 +104,8 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var selectedText = ReadSelectedText(state);
 
-            Assert.True(
-                selectedText.Length >= BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount,
-                $"Expected backward selection to keep growing across lines, but only selected {selectedText.Length} characters.");
-            Assert.Contains(BrowserTestConstants.Editor.LineFeed, selectedText, StringComparison.Ordinal);
+            await Assert.That(selectedText.Length >= BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount).IsTrue().Because($"Expected backward selection to keep growing across lines, but only selected {selectedText.Length} characters.");
+            await Assert.That(selectedText).Contains(BrowserTestConstants.Editor.LineFeed);
         }
         finally
         {

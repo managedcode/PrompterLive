@@ -2,8 +2,8 @@ using System.Text.Json;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
-using Xunit.Sdk;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
@@ -50,7 +50,7 @@ internal static class EditorMonacoDriver
         }
         catch (Exception exception)
         {
-            throw new XunitException(
+            throw new InvalidOperationException(
                 $"Monaco editor did not become ready within {BrowserTestConstants.Timing.DefaultVisibleTimeoutMs}ms.{Environment.NewLine}" +
                 $"Captured browser diagnostics:{Environment.NewLine}{browserErrors.Describe()}{Environment.NewLine}{exception}");
         }
@@ -70,7 +70,7 @@ internal static class EditorMonacoDriver
     internal static async Task ClickUncoveredStageAreaAsync(IPage page)
     {
         var stageBounds = await SourceStage(page).BoundingBoxAsync();
-        Assert.NotNull(stageBounds);
+        await Assert.That(stageBounds).IsNotNull();
 
         var clickX = Math.Max(0, stageBounds!.Width - BrowserTestConstants.Editor.MenuDismissRightInsetPx);
         var clickY = Math.Max(0, stageBounds.Height * BrowserTestConstants.Editor.MenuDismissClickVerticalFactor);
@@ -98,7 +98,7 @@ internal static class EditorMonacoDriver
     internal static async Task<EditorMonacoState> GetStateAsync(IPage page)
     {
         var state = await InvokeHarnessAsync<EditorMonacoState?>(page, "getState");
-        Assert.NotNull(state);
+        await Assert.That(state).IsNotNull();
         return state!;
     }
 
@@ -110,7 +110,7 @@ internal static class EditorMonacoDriver
             column
         });
 
-        Assert.NotNull(completions);
+        await Assert.That(completions).IsNotNull();
         return completions!;
     }
 
@@ -128,7 +128,7 @@ internal static class EditorMonacoDriver
             lineNumber
         });
 
-        Assert.NotNull(tokenizedLine);
+        await Assert.That(tokenizedLine).IsNotNull();
         return tokenizedLine!;
     }
 
@@ -142,7 +142,7 @@ internal static class EditorMonacoDriver
     {
         var state = await GetStateAsync(page);
         var targetStart = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        Assert.True(targetStart >= 0, $"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        await Assert.That(targetStart >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
         await SetSelectionAsync(page, targetStart, targetStart);
     }
 
@@ -150,7 +150,7 @@ internal static class EditorMonacoDriver
     {
         var state = await GetStateAsync(page);
         var targetStart = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        Assert.True(targetStart >= 0, $"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        await Assert.That(targetStart >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
         var caret = targetStart + targetText.Length;
         await SetSelectionAsync(page, caret, caret);
     }
@@ -186,7 +186,7 @@ internal static class EditorMonacoDriver
     {
         var state = await GetStateAsync(page);
         var start = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        Assert.True(start >= 0, $"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        await Assert.That(start >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
         await SetSelectionAsync(page, start, start + targetText.Length);
     }
 

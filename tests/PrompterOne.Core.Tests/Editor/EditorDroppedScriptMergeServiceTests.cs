@@ -26,7 +26,7 @@ public sealed class EditorDroppedScriptMergeServiceTests
 
     private readonly EditorDroppedScriptMergeService _service = new();
 
-    [Fact]
+    [Test]
     public void Merge_WhenExistingDraftIsEmpty_ReplacesTextAndMovesSelectionToEnd()
     {
         var result = _service.Merge(
@@ -40,7 +40,7 @@ public sealed class EditorDroppedScriptMergeServiceTests
             result.Selection);
     }
 
-    [Fact]
+    [Test]
     public void Merge_WhenExistingDraftHasContent_AppendsDroppedBodyWithSingleBlankGap()
     {
         var result = _service.Merge(
@@ -55,7 +55,7 @@ public sealed class EditorDroppedScriptMergeServiceTests
             result.Selection);
     }
 
-    [Fact]
+    [Test]
     public void Merge_WhenMultipleFilesAreDropped_PreservesDropOrder()
     {
         var result = _service.Merge(

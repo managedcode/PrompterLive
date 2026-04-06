@@ -19,7 +19,7 @@ public sealed class ReaderSettingsSerializationTests
         }
         """;
 
-    [Fact]
+    [Test]
     public void ReaderSettings_DeserializesLegacyPayload_WithDefaultFocalPointPercent()
     {
         var settings = JsonSerializer.Deserialize<ReaderSettings>(LegacyReaderSettingsJson);

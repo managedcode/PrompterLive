@@ -50,7 +50,7 @@ flowchart LR
     Shared["src/PrompterOne.Shared<br/>Razor pages, layout, CSS, JS interop"]
     Core["src/PrompterOne.Core<br/>TPS, RSVP, workspace, media, streaming"]
     Docs["docs/<br/>Architecture + TPS reference + feature docs"]
-    Tests["tests/*<br/>xUnit + bUnit + Playwright"]
+    Tests["tests/*<br/>TUnit + bUnit + Playwright"]
 
     App --> Shared
     Shared --> Core

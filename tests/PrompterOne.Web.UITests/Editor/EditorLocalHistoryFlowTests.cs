@@ -1,12 +1,13 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+    : AppUiTestBase(fixture){
+    [Test]
     public Task EditorScreen_LocalHistoryPersistsAcrossReload_AndRestoresOlderRevision() =>
         RunPageAsync(async page =>
         {
@@ -46,7 +47,7 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(sourceInput).ToHaveValueAsync(firstRevisionText);
         });
 
-    [Fact]
+    [Test]
     public Task EditorScreen_AutosaveToggleControlsWhetherEditsSurviveReload() =>
         RunPageAsync(async page =>
         {

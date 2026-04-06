@@ -1,12 +1,13 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const string GoldAccentSwatchId = "gold";
 
     private readonly record struct ElementBounds(double Left, double Top, double Right, double Bottom);
@@ -17,7 +18,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         double BorderAlpha,
         bool HasShadow);
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_FolderTooltip_UsesReadableSharedSurface() =>
         RunPageAsync(async page =>
         {
@@ -36,7 +37,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TooltipAuditFlow.LibraryFolderStep);
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_CardMenuTooltip_UsesReadableSharedSurface() =>
         RunPageAsync(async page =>
         {
@@ -55,7 +56,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TooltipAuditFlow.LibraryCardMenuStep);
         });
 
-    [Fact]
+    [Test]
     public Task LearnScreen_PlayTooltip_UsesReadableSharedSurface() =>
         RunPageAsync(async page =>
         {
@@ -74,7 +75,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TooltipAuditFlow.LearnPlayStep);
         });
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_PlayTooltip_UsesReadableSharedSurface() =>
         RunPageAsync(async page =>
         {
@@ -93,7 +94,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TooltipAuditFlow.TeleprompterPlayStep);
         });
 
-    [Fact]
+    [Test]
     public Task SettingsAppearance_AccentTooltip_UsesReadableSharedSurface() =>
         RunPageAsync(async page =>
         {
@@ -126,11 +127,11 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         var metrics = await ReadTooltipMetricsAsync(tooltip);
         var overlap = CalculateIntersectionArea(await ReadBoundsAsync(trigger), await ReadBoundsAsync(tooltip));
 
-        Assert.Equal(expectedPlacement, metrics.Placement);
-        Assert.Equal(BrowserTestConstants.TooltipAuditFlow.TextTransformNone, metrics.TextTransform);
-        Assert.True(metrics.BorderAlpha >= BrowserTestConstants.TooltipAuditFlow.MinimumBorderAlpha);
-        Assert.True(metrics.HasShadow);
-        Assert.InRange(overlap, 0, BrowserTestConstants.TooltipAuditFlow.MaximumOverlapPx);
+        await Assert.That(metrics.Placement).IsEqualTo(expectedPlacement);
+        await Assert.That(metrics.TextTransform).IsEqualTo(BrowserTestConstants.TooltipAuditFlow.TextTransformNone);
+        await Assert.That(metrics.BorderAlpha >= BrowserTestConstants.TooltipAuditFlow.MinimumBorderAlpha).IsTrue();
+        await Assert.That(metrics.HasShadow).IsTrue();
+        await Assert.That(overlap).IsBetween(0,BrowserTestConstants.TooltipAuditFlow.MaximumOverlapPx);
     }
 
     private static double CalculateIntersectionArea(ElementBounds left, ElementBounds right)

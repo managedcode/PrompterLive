@@ -30,15 +30,15 @@ public sealed class ScriptImportDescriptorServiceTests
         Services talk over real boundaries.
         """;
 
-    [Theory]
-    [InlineData("episode.tps")]
-    [InlineData("episode.tps.md")]
-    [InlineData("episode.md.tps")]
-    [InlineData("episode.md")]
-    [InlineData("episode.txt")]
-    [InlineData("EPISODE.TPS.MD")]
-    [InlineData("nested/path/episode.tps")]
-    [InlineData("C:\\scripts\\episode.md")]
+    [Test]
+    [Arguments("episode.tps")]
+    [Arguments("episode.tps.md")]
+    [Arguments("episode.md.tps")]
+    [Arguments("episode.md")]
+    [Arguments("episode.txt")]
+    [Arguments("EPISODE.TPS.MD")]
+    [Arguments("nested/path/episode.tps")]
+    [Arguments("C:\\scripts\\episode.md")]
     public void CanImport_ReturnsTrue_ForSupportedScriptFileNames(string fileName)
     {
         var service = new ScriptImportDescriptorService();
@@ -46,11 +46,11 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.True(service.CanImport(fileName));
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("episode")]
-    [InlineData("episode.docx")]
-    [InlineData("episode.tps.bak")]
+    [Test]
+    [Arguments("")]
+    [Arguments("episode")]
+    [Arguments("episode.docx")]
+    [Arguments("episode.tps.bak")]
     public void CanImport_ReturnsFalse_ForUnsupportedScriptFileNames(string fileName)
     {
         var service = new ScriptImportDescriptorService();
@@ -58,7 +58,7 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.False(service.CanImport(fileName));
     }
 
-    [Fact]
+    [Test]
     public void Build_UsesFrontMatterTitle_AndPreservesOriginalSupportedDocumentName()
     {
         var service = new ScriptImportDescriptorService();
@@ -70,7 +70,7 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.Equal(ImportedFrontMatterDocument, descriptor.Text);
     }
 
-    [Fact]
+    [Test]
     public void Build_UsesCompoundFileStem_WhenFrontMatterTitleIsMissing()
     {
         var service = new ScriptImportDescriptorService();
@@ -82,7 +82,7 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.Equal(ImportedBody, descriptor.Text);
     }
 
-    [Fact]
+    [Test]
     public void Build_StripsDirectorySegments_BeforePreservingSupportedDocumentName()
     {
         var service = new ScriptImportDescriptorService();
@@ -93,10 +93,10 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.Equal("System Design.md.tps", descriptor.DocumentName);
     }
 
-    [Theory]
-    [InlineData(".md")]
-    [InlineData(".txt")]
-    [InlineData(".tps")]
+    [Test]
+    [Arguments(".md")]
+    [Arguments(".txt")]
+    [Arguments(".tps")]
     public void Build_UsesUntitledScriptTitle_WhenSupportedFileStemIsEmpty(string fileName)
     {
         var service = new ScriptImportDescriptorService();
@@ -107,10 +107,10 @@ public sealed class ScriptImportDescriptorServiceTests
         Assert.Equal(fileName, descriptor.DocumentName);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("episode")]
-    [InlineData("episode.docx")]
+    [Test]
+    [Arguments("")]
+    [Arguments("episode")]
+    [Arguments("episode.docx")]
     public void Build_ThrowsArgumentException_ForUnsupportedFileName(string fileName)
     {
         var service = new ScriptImportDescriptorService();

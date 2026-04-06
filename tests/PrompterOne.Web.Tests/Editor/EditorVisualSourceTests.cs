@@ -16,7 +16,7 @@ public sealed class EditorVisualSourceTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_HidesFrontMatterFromVisibleSourceSurface()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -37,7 +37,7 @@ public sealed class EditorVisualSourceTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_BodyEditsPreserveMetadataInPersistedDocument()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -68,7 +68,7 @@ public sealed class EditorVisualSourceTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_DoesNotRenderInventedAiPanelSurface()
     {
         Services.GetRequiredService<NavigationManager>()

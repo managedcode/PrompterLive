@@ -4,7 +4,7 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class RsvpEmotionAnalyzerTests
 {
-    [Fact]
+    [Test]
     public void AnalyzeWord_ReturnsExpectedSemanticEmotion()
     {
         var analyzer = new RsvpEmotionAnalyzer();
@@ -14,7 +14,7 @@ public sealed class RsvpEmotionAnalyzerTests
         Assert.Equal("peaceful", analyzer.AnalyzeWord("serenity"));
     }
 
-    [Fact]
+    [Test]
     public void UpdateEmotionForWord_TransitionsAndResetsToDefault()
     {
         var analyzer = new RsvpEmotionAnalyzer();
@@ -29,7 +29,7 @@ public sealed class RsvpEmotionAnalyzerTests
         Assert.Equal("Neutral", analyzer.CurrentEmotion.Name);
     }
 
-    [Fact]
+    [Test]
     public void SetEmotion_IgnoresUnknownKeys()
     {
         var analyzer = new RsvpEmotionAnalyzer();

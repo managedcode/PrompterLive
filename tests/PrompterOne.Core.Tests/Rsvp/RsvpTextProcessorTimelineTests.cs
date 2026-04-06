@@ -8,7 +8,7 @@ public sealed class RsvpTextProcessorTimelineTests
     private const int PlainTextReadingDefaultSpeed = 250;
     private readonly RsvpTextProcessor _processor = new();
 
-    [Fact]
+    [Test]
     public void ParseScript_TpsSampleBuildsPhraseGroupsForLearnTimeline()
     {
         var sample = CoreTestSeedData.CreateDocuments()
@@ -29,7 +29,7 @@ public sealed class RsvpTextProcessorTimelineTests
         Assert.Equal(RsvpTextProcessorTimelineTestSource.ThirdPhraseWord, thirdPhrase.Words[0]);
     }
 
-    [Fact]
+    [Test]
     public void ParseScript_PlainTextUsesSdkImplicitSegmentTitleAndReadingDefaultSpeed()
     {
         const string source = "Hello world.\nThis is still plain text.";
@@ -42,7 +42,7 @@ public sealed class RsvpTextProcessorTimelineTests
         Assert.Equal("Hello", processed.AllWords[0]);
     }
 
-    [Fact]
+    [Test]
     public void ParseScript_TpsSourceDoesNotLeakFrontMatterHeadersOrInlineTagMarkupIntoReadableWords()
     {
         var sample = CoreTestSeedData.CreateDocuments()

@@ -5,7 +5,7 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class MediaSceneServiceTests
 {
-    [Fact]
+    [Test]
     public void SceneService_TracksCamerasAudioBusAndReset()
     {
         var service = new MediaSceneService();

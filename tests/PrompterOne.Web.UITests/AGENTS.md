@@ -31,7 +31,7 @@
 - This suite is the primary acceptance gate for the product.
 - Major workflows must be covered by long scenario tests, not only narrow regression tests.
 - Major scenario tests must save screenshots under `output/playwright/`.
-- This suite resolves its origin at runtime and uses one `dotnet test` process with up to `2` parallel xUnit workers.
+- This suite resolves its origin at runtime and uses one `dotnet test` process with up to `4` parallel TUnit workers.
 - Do not keep separate concurrent `dotnet build` or `dotnet test` processes alive against the same test assets.
 - Prefer `PrompterOne.Shared.Contracts.AppRoutes`, `UiTestIds`, and other named constants over inline route or selector strings.
 - Use dedicated test attributes first. Prefer `data-test-id`, allow `data-test`, and keep existing `data-testid` contracts until a deliberate migration replaces them. Raw text, role-name, and CSS selectors are allowed only when no stable dedicated test hook exists yet and the missing contract is fixed in the same task.
@@ -40,7 +40,7 @@
 ## Project-Local Commands
 
 - `node ./tests/PrompterOne.Web.UITests/bin/Debug/net10.0/.playwright/package/cli.js install chromium`
-- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
+- `dotnet test --project ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
 
 ## Applicable Skills
 

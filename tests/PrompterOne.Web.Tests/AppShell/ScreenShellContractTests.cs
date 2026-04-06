@@ -19,7 +19,7 @@ public sealed class ScreenShellContractTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_RendersInteractiveLibraryShell()
     {
         var cut = Render<LibraryPage>();
@@ -33,7 +33,7 @@ public sealed class ScreenShellContractTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_RendersBodyOnlyEditorAndMetadataRail()
     {
         var cut = Render<EditorPage>();
@@ -54,7 +54,7 @@ public sealed class ScreenShellContractTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LearnPage_RendersCenteredRsvpSurfaceAndInitializesTimeline()
     {
         var cut = Render<LearnPage>();
@@ -76,7 +76,7 @@ public sealed class ScreenShellContractTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RendersSingleBackgroundCameraReaderShell()
     {
         var cut = Render<TeleprompterPage>();
@@ -93,7 +93,7 @@ public sealed class ScreenShellContractTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void SettingsPage_RendersOperationalStudioSections()
     {
         var cut = Render<SettingsPage>();
@@ -116,7 +116,7 @@ public sealed class ScreenShellContractTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_RendersDedicatedLiveRoutingSurface()
     {
         Services.GetRequiredService<NavigationManager>()

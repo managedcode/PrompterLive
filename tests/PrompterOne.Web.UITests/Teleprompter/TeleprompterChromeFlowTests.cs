@@ -2,12 +2,13 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private static readonly Regex FilledSegmentStyleRegex = new(
         BrowserTestConstants.TeleprompterFlow.ProgressFilledStylePattern,
         RegexOptions.Compiled);
@@ -16,7 +17,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
         BrowserTestConstants.TeleprompterFlow.ProgressEmptyStylePattern,
         RegexOptions.Compiled);
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_ExposesOrientationToggle_AndSwitchesReaderOrientation() =>
         RunPageAsync(async page =>
         {
@@ -41,7 +42,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TeleprompterFlow.OrientationPortraitValue);
         });
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_FullscreenToggle_UsesBrowserFullscreenMode() =>
         RunPageAsync(async page =>
         {
@@ -54,11 +55,11 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
             var fullscreenToggle = page.GetByTestId(UiTestIds.Teleprompter.FullscreenToggle);
 
             await Expect(fullscreenToggle).ToBeVisibleAsync();
-            Assert.False(await IsFullscreenActiveAsync(page));
+            await Assert.That(await IsFullscreenActiveAsync(page)).IsFalse();
 
             await fullscreenToggle.ClickAsync();
             await page.WaitForFunctionAsync(BrowserTestConstants.TeleprompterFlow.FullscreenStateScript);
-            Assert.True(await IsFullscreenActiveAsync(page));
+            await Assert.That(await IsFullscreenActiveAsync(page)).IsTrue();
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -67,10 +68,10 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
 
             await fullscreenToggle.ClickAsync();
             await page.WaitForFunctionAsync(BrowserTestConstants.TeleprompterFlow.FullscreenInactiveStateScript);
-            Assert.False(await IsFullscreenActiveAsync(page));
+            await Assert.That(await IsFullscreenActiveAsync(page)).IsFalse();
         });
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_RendersSegmentedProgress_ByBlock() =>
         RunPageAsync(async page =>
         {
@@ -91,7 +92,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
             var totalBlockCount = await ReadTotalBlockCountAsync(page);
             var renderedSegmentCount = await progressSegments.EvaluateAsync<int>("element => element.children.length");
 
-            Assert.Equal(totalBlockCount, renderedSegmentCount);
+            await Assert.That(renderedSegmentCount).IsEqualTo(totalBlockCount);
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
 
@@ -108,7 +109,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TeleprompterFlow.ProgressStep);
         });
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_DesktopProgressShell_KeepsSegmentsInsideItsBorder() =>
         RunPageAsync(async page =>
         {
@@ -128,18 +129,10 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
             var segmentBounds = await MeasureProgressSegmentBoundsAsync(progressTrack);
             var viewportBounds = await ReadViewportBoundsAsync(page);
 
-            Assert.True(
-                shellBounds.X >= -BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
-                $"Expected teleprompter progress shell left edge {shellBounds.X:0.##} to stay inside viewport.");
-            Assert.True(
-                shellBounds.X + shellBounds.Width <= viewportBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
-                $"Expected teleprompter progress shell right edge {shellBounds.X + shellBounds.Width:0.##} to stay within viewport width {viewportBounds.Width:0.##}.");
-            Assert.True(
-                segmentBounds.Left >= shellBounds.X - BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
-                $"Expected teleprompter progress segments left edge {segmentBounds.Left:0.##} to stay inside shell left edge {shellBounds.X:0.##}.");
-            Assert.True(
-                segmentBounds.Right <= shellBounds.X + shellBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx,
-                $"Expected teleprompter progress segments right edge {segmentBounds.Right:0.##} to stay inside shell right edge {shellBounds.X + shellBounds.Width:0.##}.");
+            await Assert.That(shellBounds.X >= -BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx).IsTrue().Because($"Expected teleprompter progress shell left edge {shellBounds.X:0.##} to stay inside viewport.");
+            await Assert.That(shellBounds.X + shellBounds.Width <= viewportBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx).IsTrue().Because($"Expected teleprompter progress shell right edge {shellBounds.X + shellBounds.Width:0.##} to stay within viewport width {viewportBounds.Width:0.##}.");
+            await Assert.That(segmentBounds.Left >= shellBounds.X - BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx).IsTrue().Because($"Expected teleprompter progress segments left edge {segmentBounds.Left:0.##} to stay inside shell left edge {shellBounds.X:0.##}.");
+            await Assert.That(segmentBounds.Right <= shellBounds.X + shellBounds.Width + BrowserTestConstants.TeleprompterFlow.MaxProgressShellOverflowPx).IsTrue().Because($"Expected teleprompter progress segments right edge {segmentBounds.Right:0.##} to stay inside shell right edge {shellBounds.X + shellBounds.Width:0.##}.");
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -194,7 +187,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
 
         return parts.Length == 2 && int.TryParse(parts[1], out var totalBlockCount)
             ? totalBlockCount
-            : throw new Xunit.Sdk.XunitException($"Unable to parse teleprompter block count from '{blockIndicatorText}'.");
+            : throw new InvalidOperationException($"Unable to parse teleprompter block count from '{blockIndicatorText}'.");
     }
 
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);

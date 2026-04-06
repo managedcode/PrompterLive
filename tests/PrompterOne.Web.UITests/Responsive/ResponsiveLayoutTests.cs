@@ -2,28 +2,16 @@ using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    public static TheoryData<ResponsiveViewport> ResponsiveViewports =>
-        BrowserTestConstants.ResponsiveLayout.Viewports.Aggregate(
-            new TheoryData<ResponsiveViewport>(),
-            static (data, viewport) =>
-            {
-                data.Add(viewport);
-                return data;
-            });
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
+    public static IEnumerable<ResponsiveViewport> ResponsiveViewports =>
+        BrowserTestConstants.ResponsiveLayout.Viewports;
 
-    public static TheoryData<ResponsiveViewport> IpadPortraitViewports =>
-        BrowserTestConstants.ResponsiveLayout.IpadPortraitViewports.Aggregate(
-            new TheoryData<ResponsiveViewport>(),
-            static (data, viewport) =>
-            {
-                data.Add(viewport);
-                return data;
-            });
+    public static IEnumerable<ResponsiveViewport> IpadPortraitViewports =>
+        BrowserTestConstants.ResponsiveLayout.IpadPortraitViewports;
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task LibraryRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -38,8 +26,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Header.LibraryOpenScript,
             UiTestIds.Header.LibraryNewScript));
 
-    [Theory]
-    [MemberData(nameof(IpadPortraitViewports))]
+    [Test]
+    [MethodDataSource(nameof(IpadPortraitViewports))]
     public Task LibraryRoute_KeepsHeaderBrandingVisibleAcrossIpadPortraitViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -55,8 +43,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Header.LibraryOpenScript,
             UiTestIds.Header.LibraryNewScript));
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task EditorRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -70,8 +58,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Editor.MainPanel,
             UiTestIds.Editor.SourceInput));
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task LearnRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -85,8 +73,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Learn.PlayToggle,
             UiTestIds.Learn.ProgressLabel));
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task TeleprompterRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -100,8 +88,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Teleprompter.Stage,
             UiTestIds.Teleprompter.Controls));
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task SettingsRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,
@@ -115,8 +103,8 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Settings.NavAbout,
             UiTestIds.Settings.CloudPanel));
 
-    [Theory]
-    [MemberData(nameof(ResponsiveViewports))]
+    [Test]
+    [MethodDataSource(nameof(ResponsiveViewports))]
     public Task GoLiveRoute_KeepsPrimaryControlsVisibleAcrossResponsiveViewports(ResponsiveViewport viewport) =>
         RunPageAsync(page => ResponsiveLayoutAssertions.AssertRouteControlsVisibleAsync(
             page,

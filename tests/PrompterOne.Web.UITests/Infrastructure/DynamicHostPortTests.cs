@@ -1,20 +1,22 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class DynamicHostPortTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class DynamicHostPortTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task NewPageAsync_UsesDynamicLoopbackBaseAddress()
     {
         var baseAddress = new Uri(_fixture.BaseAddress);
 
-        Assert.Equal(Uri.UriSchemeHttp, baseAddress.Scheme);
-        Assert.True(baseAddress.IsLoopback);
-        Assert.InRange(baseAddress.Port, UiTestHostConstants.MinimumDynamicPort, UiTestHostConstants.MaximumTcpPort);
+        await Assert.That(baseAddress.Scheme).IsEqualTo(Uri.UriSchemeHttp);
+        await Assert.That(baseAddress.IsLoopback).IsTrue();
+        await Assert.That(baseAddress.Port).IsBetween(UiTestHostConstants.MinimumDynamicPort,UiTestHostConstants.MaximumTcpPort);
 
         var page = await _fixture.NewPageAsync();
 

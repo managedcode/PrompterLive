@@ -1,14 +1,18 @@
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel]
+public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_LargeDraftPasteKeepsFollowupTypingResponsive()
     {
         var page = await _fixture.NewPageAsync();
@@ -98,17 +102,13 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
                     overlayTestId = UiTestIds.Editor.SourceHighlight
                 });
 
-            Assert.Equal(expectedLength, result.FinalInputLength);
-            Assert.Equal(expectedLength, result.FinalRenderedLength);
-            Assert.True(result.TypingSampleCount >= 2);
-            Assert.True(
-                result.PasteMaxLongTaskMs >= 0 &&
-                result.PasteMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs,
-                $"Large draft paste long-task budget exceeded. PasteMaxLongTaskMs: {result.PasteMaxLongTaskMs}; MaxPasteLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
-            Assert.True(
-                result.TypingLatencyMs >= 0 &&
-                result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxTypingLatencyMs,
-                $"Large draft typing latency exceeded the acceptance budget. TypingLatencyMs: {result.TypingLatencyMs}; MaxTypingLatencyMs: {EditorLargeDraftPerformanceTestData.MaxTypingLatencyMs}; PasteMaxLongTaskMs: {result.PasteMaxLongTaskMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
+            await Assert.That(result.FinalInputLength).IsEqualTo(expectedLength);
+            await Assert.That(result.FinalRenderedLength).IsEqualTo(expectedLength);
+            await Assert.That(result.TypingSampleCount >= 2).IsTrue();
+            await Assert.That(result.PasteMaxLongTaskMs >= 0 &&
+                result.PasteMaxLongTaskMs <= EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs).IsTrue().Because($"Large draft paste long-task budget exceeded. PasteMaxLongTaskMs: {result.PasteMaxLongTaskMs}; MaxPasteLongTaskMs: {EditorLargeDraftPerformanceTestData.MaxPasteLongTaskMs}; TypingLatencyMs: {result.TypingLatencyMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
+            await Assert.That(result.TypingLatencyMs >= 0 &&
+                result.TypingLatencyMs <= EditorLargeDraftPerformanceTestData.MaxTypingLatencyMs).IsTrue().Because($"Large draft typing latency exceeded the acceptance budget. TypingLatencyMs: {result.TypingLatencyMs}; MaxTypingLatencyMs: {EditorLargeDraftPerformanceTestData.MaxTypingLatencyMs}; PasteMaxLongTaskMs: {result.PasteMaxLongTaskMs}; TypingSampleCount: {result.TypingSampleCount}; FinalInputLength: {result.FinalInputLength}; FinalRenderedLength: {result.FinalRenderedLength}.");
         }
         finally
         {
@@ -116,7 +116,7 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_LargeDraftSegmentNavigationMovesCaretAndTargetEpisodeIntoView()
     {
         var page = await _fixture.NewPageAsync();
@@ -192,11 +192,9 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
                     targetHeader = targetSegmentHeader
                 });
 
-            Assert.Equal(result.ExpectedStart, result.SelectionStart);
-            Assert.True(result.ScrollTop > 0);
-            Assert.True(
-                result.TargetVisible,
-                $"Expected the target segment header to stay visible after navigation, but the Monaco visible range did not include the selected line. ScrollTop={result.ScrollTop}; SelectionStart={result.SelectionStart}; ExpectedStart={result.ExpectedStart}; SelectionLine={result.SelectionLine}; VisibleStart={result.VisibleRangeStartLine}; VisibleEnd={result.VisibleRangeEndLine}.");
+            await Assert.That(result.SelectionStart).IsEqualTo(result.ExpectedStart);
+            await Assert.That(result.ScrollTop > 0).IsTrue();
+            await Assert.That(result.TargetVisible).IsTrue().Because($"Expected the target segment header to stay visible after navigation, but the Monaco visible range did not include the selected line. ScrollTop={result.ScrollTop}; SelectionStart={result.SelectionStart}; ExpectedStart={result.ExpectedStart}; SelectionLine={result.SelectionLine}; VisibleStart={result.VisibleRangeStartLine}; VisibleEnd={result.VisibleRangeEndLine}.");
         }
         finally
         {

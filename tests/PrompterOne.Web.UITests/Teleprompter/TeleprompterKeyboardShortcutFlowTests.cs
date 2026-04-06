@@ -1,12 +1,13 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterKeyboardShortcutFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+    : AppUiTestBase(fixture){
+    [Test]
     public Task TeleprompterPage_KeyboardShortcuts_ToggleMirrorAndJustifyAlignment() =>
         RunPageAsync(async page =>
         {

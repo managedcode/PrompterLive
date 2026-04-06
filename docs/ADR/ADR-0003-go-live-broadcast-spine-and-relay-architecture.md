@@ -145,4 +145,4 @@ flowchart LR
 - `dotnet build ./PrompterOne.slnx -warnaserror`
 - `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
 - `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
-- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --no-build --filter "FullyQualifiedName~GoLive"`
+- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~GoLive"`

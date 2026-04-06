@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-`PrompterOne.Core.Tests` verifies the domain layer with xUnit.
+`PrompterOne.Core.Tests` verifies the domain layer with TUnit and Shouldly-backed assertions.
 
 ## Entry Points
 
@@ -24,7 +24,7 @@
 
 ## Project-Local Commands
 
-- `dotnet test ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `dotnet test --project ./tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
 
 ## Applicable Skills
 

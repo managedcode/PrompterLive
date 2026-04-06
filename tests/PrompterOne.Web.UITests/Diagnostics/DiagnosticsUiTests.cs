@@ -1,13 +1,15 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task LibraryScreen_ShowsDiagnosticsBannerWhenFolderCreateFails()
     {
         var page = await _fixture.NewPageAsync();
@@ -63,7 +65,7 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture) : IClassFix
         }
     }
 
-    [Fact]
+    [Test]
     public async Task AppShell_ShowsConnectivityOverlayForOfflineAndOnlineStates()
     {
         var page = await _fixture.NewPageAsync();

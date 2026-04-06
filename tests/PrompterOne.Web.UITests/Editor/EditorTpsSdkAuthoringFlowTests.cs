@@ -1,10 +1,13 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 {
     private const string MinimalDocument = "# TPS Authoring";
     private const string SelectionDocument = """
@@ -14,7 +17,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
         """;
     private const string SelectionToken = "Alpha";
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_InsertMenuAddsArchetypeAwareSegmentHeader()
     {
         var page = await OpenEditorAsync();
@@ -28,7 +31,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
             var source = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains("Archetype:Coach", source, StringComparison.Ordinal);
+            await Assert.That(source).Contains("Archetype:Coach");
         }
         finally
         {
@@ -36,7 +39,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_InsertMenuAddsArchetypeAwareBlockHeader()
     {
         var page = await OpenEditorAsync();
@@ -50,7 +53,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
             var source = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains("Archetype:Educator", source, StringComparison.Ordinal);
+            await Assert.That(source).Contains("Archetype:Educator");
         }
         finally
         {
@@ -58,7 +61,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingVoiceMenuAppliesEnergyTag()
     {
         var page = await OpenEditorAsync();
@@ -74,7 +77,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
             var source = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains("[energy:8]Alpha[/energy]", source, StringComparison.Ordinal);
+            await Assert.That(source).Contains("[energy:8]Alpha[/energy]");
         }
         finally
         {
@@ -82,7 +85,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingVoiceMenuAppliesLegatoTag()
     {
         var page = await OpenEditorAsync();
@@ -98,7 +101,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
             var source = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains("[legato]Alpha[/legato]", source, StringComparison.Ordinal);
+            await Assert.That(source).Contains("[legato]Alpha[/legato]");
         }
         finally
         {
@@ -106,7 +109,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingInsertMenuAddsArchetypeAwareSegmentHeader()
     {
         var page = await OpenEditorAsync();
@@ -122,7 +125,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
             var source = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            Assert.Contains("Archetype:Coach", source, StringComparison.Ordinal);
+            await Assert.That(source).Contains("Archetype:Coach");
         }
         finally
         {

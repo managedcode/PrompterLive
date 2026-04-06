@@ -6,12 +6,13 @@ using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Storage;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const string PersistedFocalPointValue = "37";
     private const string PersistedFontValue = "52";
     private const string PersistedFocalGuideStyle = "top:37%;";
@@ -19,6 +20,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     private const string PersistedTextWidthLabel = "79%";
     private const string PersistedTextWidthValue = "79";
     private const double ReaderFontBaselinePixels = 36d;
+    private const int StoredReaderSettingPrecisionDigits = 4;
     private const string PersistedTextAlignmentValue = BrowserTestConstants.TeleprompterFlow.AlignmentJustifyValue;
     private const string ReaderCardActiveClass = "rd-card-active";
     private const string ReaderCardNextClass = "rd-card-next";
@@ -27,7 +29,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     private static readonly Regex ReaderCardActiveClassRegex = new(@"\brd-card-active\b", RegexOptions.Compiled);
     private static readonly Regex ReaderCardNextClassRegex = new(@"\brd-card-next\b", RegexOptions.Compiled);
 
-    [Fact]
+    [Test]
     public Task Teleprompter_PersistsWidthAndFocalSettingsAcrossReload() =>
         RunPageAsync(async page =>
         {
@@ -52,12 +54,18 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
                 "(storageKey) => localStorage.getItem(storageKey) ?? ''",
                 StoredReaderSettingsKey);
             var storedSettings = JsonSerializer.Deserialize<ReaderSettings>(storedJson);
+            var expectedFontScale = Math.Round(
+                double.Parse(PersistedFontValue, CultureInfo.InvariantCulture) / ReaderFontBaselinePixels,
+                StoredReaderSettingPrecisionDigits);
+            var expectedTextWidth = Math.Round(
+                double.Parse(PersistedTextWidthValue, CultureInfo.InvariantCulture) / 100d,
+                StoredReaderSettingPrecisionDigits);
 
-            Assert.NotNull(storedSettings);
-            Assert.Equal(int.Parse(PersistedFocalPointValue, CultureInfo.InvariantCulture), storedSettings.FocalPointPercent);
-            Assert.Equal(double.Parse(PersistedFontValue, CultureInfo.InvariantCulture) / ReaderFontBaselinePixels, storedSettings.FontScale, 2);
-            Assert.Equal(double.Parse(PersistedTextWidthValue, CultureInfo.InvariantCulture) / 100d, storedSettings.TextWidth, 4);
-            Assert.Equal(ReaderTextAlignment.Justify, storedSettings.TextAlignment);
+            await Assert.That(storedSettings).IsNotNull();
+            await Assert.That(storedSettings.FocalPointPercent).IsEqualTo(int.Parse(PersistedFocalPointValue, CultureInfo.InvariantCulture));
+            await Assert.That(Math.Round(storedSettings.FontScale, StoredReaderSettingPrecisionDigits)).IsEqualTo(expectedFontScale);
+            await Assert.That(Math.Round(storedSettings.TextWidth, StoredReaderSettingPrecisionDigits)).IsEqualTo(expectedTextWidth);
+            await Assert.That(storedSettings.TextAlignment).IsEqualTo(ReaderTextAlignment.Justify);
 
             await page.ReloadAsync();
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
@@ -75,7 +83,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
                 .ToHaveAttributeAsync(BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute, PersistedTextAlignmentValue);
         });
 
-    [Fact]
+    [Test]
     public Task Teleprompter_BackwardBlockJump_ReversesOutgoingCardDirection() =>
         RunPageAsync(async page =>
         {
@@ -100,8 +108,8 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
                 new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
             var secondCardClasses = await secondCard.GetAttributeAsync("class") ?? string.Empty;
-            Assert.Contains(ReaderCardNextClass, secondCardClasses, StringComparison.Ordinal);
-            Assert.DoesNotContain(ReaderCardActiveClass, secondCardClasses, StringComparison.Ordinal);
+            await Assert.That(secondCardClasses).Contains(ReaderCardNextClass);
+            await Assert.That(secondCardClasses).DoesNotContain(ReaderCardActiveClass);
         });
 
     private static Task SetRangeValueAsync(Microsoft.Playwright.ILocator locator, string value) =>

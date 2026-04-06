@@ -1,16 +1,18 @@
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
 {
     private const string CueScenario = "editor-tps-cue-rendering";
     private const string OverlayStepName = "01-editor-cue-overlay";
     private const string MonacoStylingStepName = "02-editor-monaco-styling";
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_RendersCueAwareOverlayContractsForDeliveryPreview()
     {
         UiScenarioArtifacts.ResetScenario(CueScenario);
@@ -59,12 +61,12 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture) : 
                 }
                 """);
 
-            Assert.Equal(TpsVisualCueContracts.VolumeLoud, probe.LoudVolume);
-            Assert.Equal(TpsVisualCueContracts.VolumeSoft, probe.SoftVolume);
-            Assert.Equal(TpsVisualCueContracts.DeliveryModeBuilding, probe.BuildingDelivery);
-            Assert.Equal(TpsVisualCueContracts.StressAttributeValue, probe.StressValue);
-            Assert.False(string.IsNullOrWhiteSpace(probe.LoudScale));
-            Assert.False(string.IsNullOrWhiteSpace(probe.SoftScale));
+            await Assert.That(probe.LoudVolume).IsEqualTo(TpsVisualCueContracts.VolumeLoud);
+            await Assert.That(probe.SoftVolume).IsEqualTo(TpsVisualCueContracts.VolumeSoft);
+            await Assert.That(probe.BuildingDelivery).IsEqualTo(TpsVisualCueContracts.DeliveryModeBuilding);
+            await Assert.That(probe.StressValue).IsEqualTo(TpsVisualCueContracts.StressAttributeValue);
+            await Assert.That(string.IsNullOrWhiteSpace(probe.LoudScale)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(probe.SoftScale)).IsFalse();
 
             await UiScenarioArtifacts.CapturePageAsync(page, CueScenario, OverlayStepName);
         }
@@ -74,7 +76,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_RendersMonacoCueStylesImmediatelyAfterImport()
     {
         UiScenarioArtifacts.ResetScenario(CueScenario);
@@ -149,14 +151,14 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture) : 
                 }
                 """);
 
-            Assert.Equal("Professional", probe.HeaderEmotionText);
-            Assert.Contains("underline", probe.EmphasisTextDecoration, StringComparison.Ordinal);
-            Assert.NotEqual("none", probe.HighlightBackgroundImage);
-            Assert.Equal("inline-block", probe.LoudDisplay);
-            Assert.NotEqual("none", probe.LoudTransform);
-            Assert.Equal("dashed", probe.PronunciationBorderStyle);
-            Assert.False(string.IsNullOrWhiteSpace(probe.PauseColor));
-            Assert.False(string.IsNullOrWhiteSpace(probe.TagColor));
+            await Assert.That(probe.HeaderEmotionText).IsEqualTo("Professional");
+            await Assert.That(probe.EmphasisTextDecoration).Contains("underline");
+            await Assert.That(probe.HighlightBackgroundImage).IsNotEqualTo("none");
+            await Assert.That(probe.LoudDisplay).IsEqualTo("inline-block");
+            await Assert.That(probe.LoudTransform).IsNotEqualTo("none");
+            await Assert.That(probe.PronunciationBorderStyle).IsEqualTo("dashed");
+            await Assert.That(string.IsNullOrWhiteSpace(probe.PauseColor)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(probe.TagColor)).IsFalse();
 
             await UiScenarioArtifacts.CapturePageAsync(page, CueScenario, MonacoStylingStepName);
         }

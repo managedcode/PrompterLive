@@ -1,15 +1,16 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class EditorMetadataTitleFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const string MetadataTitleScenario = "editor-metadata-title";
     private const string MetadataTitleStep = "01-rename-script-title";
 
-    [Fact]
+    [Test]
     public Task EditorScreen_MetadataTitleEditUpdatesHeader_AndKeepsFrontMatterOutOfVisibleSource() =>
         RunPageAsync(async page =>
         {
@@ -33,7 +34,7 @@ public sealed class EditorMetadataTitleFlowTests(StandaloneAppFixture fixture)
             await Expect(titleInput).ToHaveValueAsync(BrowserTestConstants.Editor.RetitledScript);
 
             var visibleSource = await sourceInput.InputValueAsync();
-            Assert.DoesNotContain(BrowserTestConstants.Editor.TitleFieldPrefix, visibleSource, StringComparison.Ordinal);
+            await Assert.That(visibleSource).DoesNotContain(BrowserTestConstants.Editor.TitleFieldPrefix);
 
             await UiScenarioArtifacts.CapturePageAsync(page, MetadataTitleScenario, MetadataTitleStep);
         });

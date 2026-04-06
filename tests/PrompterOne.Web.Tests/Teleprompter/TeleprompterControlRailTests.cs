@@ -21,7 +21,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     private const string OrientationTooltipText = "Rotate the reader between landscape and portrait";
     private const string WidthSliderTooltipText = "Adjust the reader text width";
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RendersFourIconBasedAlignmentButtons()
     {
         TestHarnessFactory.Create(this);
@@ -44,7 +44,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RendersRailTooltipsForControlsAndSliders()
     {
         TestHarnessFactory.Create(this);

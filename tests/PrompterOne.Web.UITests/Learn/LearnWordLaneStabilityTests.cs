@@ -1,10 +1,12 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture)
 {
     private const string LongProbeWord = "hype";
     private const string ShortProbeWord = "It";
@@ -13,7 +15,7 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
     private const double MaxVisibleContextGapDriftPx = 2;
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task LearnScreen_QuantumWordLengthChanges_KeepTheOrpAnchorAndVisibleContextGapsStable()
     {
         var page = await _fixture.NewPageAsync();
@@ -34,18 +36,9 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
             await ExpectFocusWordAsync(page, ShortProbeWord);
             var shortWordLane = await MeasureRsvpLaneAsync(page);
 
-            Assert.InRange(
-                Math.Abs(longWordLane.OrpCenterPx - shortWordLane.OrpCenterPx),
-                0,
-                MaxOrpCenterDriftPx);
-            Assert.InRange(
-                Math.Abs(longWordLane.LeftVisibleGapPx - shortWordLane.LeftVisibleGapPx),
-                0,
-                MaxVisibleContextGapDriftPx);
-            Assert.InRange(
-                Math.Abs(longWordLane.RightVisibleGapPx - shortWordLane.RightVisibleGapPx),
-                0,
-                MaxVisibleContextGapDriftPx);
+            await Assert.That(Math.Abs(longWordLane.OrpCenterPx - shortWordLane.OrpCenterPx)).IsBetween(0,MaxOrpCenterDriftPx);
+            await Assert.That(Math.Abs(longWordLane.LeftVisibleGapPx - shortWordLane.LeftVisibleGapPx)).IsBetween(0,MaxVisibleContextGapDriftPx);
+            await Assert.That(Math.Abs(longWordLane.RightVisibleGapPx - shortWordLane.RightVisibleGapPx)).IsBetween(0,MaxVisibleContextGapDriftPx);
         }
         finally
         {
@@ -99,7 +92,7 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
             await page.GetByTestId(UiTestIds.Learn.StepForward).ClickAsync();
         }
 
-        Assert.Fail($"Did not reach the Learn probe word '{targetWord}' within {stepLimit} steps.");
+        Assert.Fail("Unexpected execution path.");
     }
 
     private static async Task ExpectFocusWordAsync(IPage page, string expectedWord)
@@ -108,7 +101,8 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture) : 
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
         var actualWord = await ReadFocusWordAsync(page);
-        Assert.Equal(expectedWord, actualWord, ignoreCase: true);
+        // TODO: TUnit migration - xUnit Assert.Equal had additional argument(s) (ignoreCase: true) that could not be converted.
+        await Assert.That(actualWord).IsEqualTo(expectedWord);
     }
 
     private static async Task<string> ReadFocusWordAsync(IPage page)

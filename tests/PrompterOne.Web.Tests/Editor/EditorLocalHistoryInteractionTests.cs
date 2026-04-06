@@ -19,7 +19,7 @@ public sealed class EditorLocalHistoryInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_AutosaveDisabled_KeepsTypingLocalOnlyAfterDebounce()
     {
         await Services.GetRequiredService<BrowserFileStorageStore>()
@@ -60,7 +60,7 @@ public sealed class EditorLocalHistoryInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_LocalHistoryRestore_ReappliesOlderAutosavedRevision()
     {
         Services.GetRequiredService<NavigationManager>()

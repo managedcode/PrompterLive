@@ -9,7 +9,7 @@ public sealed class ScriptSessionServiceTests
     private const string UntitledScriptDocumentName = "untitled-script.tps";
     private const string UntitledScriptTitle = "Untitled Script";
 
-    [Fact]
+    [Test]
     public async Task InitializeAsync_DoesNotSeedLibraryAndBuildsEmptyDraft()
     {
         var repository = new InMemoryScriptRepository();
@@ -28,7 +28,7 @@ public sealed class ScriptSessionServiceTests
         Assert.Null(session.State.ErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task NewAsync_CreatesEmptyUntitledDraft()
     {
         var repository = new InMemoryScriptRepository();
@@ -46,7 +46,7 @@ public sealed class ScriptSessionServiceTests
         Assert.Null(session.State.ErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task OpenAsync_LoadsProvidedDocument()
     {
         var repository = new InMemoryScriptRepository();
@@ -64,7 +64,7 @@ public sealed class ScriptSessionServiceTests
         Assert.True(session.State.EstimatedDuration > TimeSpan.Zero);
     }
 
-    [Fact]
+    [Test]
     public async Task SaveAsync_PersistsDraftAndKeepsCurrentSessionState()
     {
         var repository = new InMemoryScriptRepository();

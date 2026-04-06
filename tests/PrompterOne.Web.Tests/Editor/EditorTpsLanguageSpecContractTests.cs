@@ -5,7 +5,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class EditorTpsLanguageSpecContractTests
 {
-    [Fact]
+    [Test]
     public void MonacoTpsCatalog_ContainsTheSameVocabularyAsVendoredSdk()
     {
         var catalog = EditorTpsCatalog.Current;
@@ -19,7 +19,7 @@ public sealed class EditorTpsLanguageSpecContractTests
         Assert.Equal(TpsSpec.EditPointPriorities, catalog.EditPointPriorities, StringComparer.OrdinalIgnoreCase);
     }
 
-    [Fact]
+    [Test]
     public void MonacoTpsCatalog_ProjectsVendoredArchetypeProfiles()
     {
         var catalog = EditorTpsCatalog.Current;

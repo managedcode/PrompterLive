@@ -4,7 +4,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class EditorToolbarCatalogContractTests
 {
-    [Fact]
+    [Test]
     public void TopToolbarDropdowns_FollowVendoredTpsOrder()
     {
         var emotionGroup = FindTopDropdownGroup("emotion", "TPS Emotions");
@@ -37,7 +37,7 @@ public sealed class EditorToolbarCatalogContractTests
             speedGroup.Actions.Select(action => action.Key));
     }
 
-    [Fact]
+    [Test]
     public void FloatingToolbarDropdowns_FollowVendoredTpsOrder()
     {
         var emotionGroup = FindFloatingDropdownGroup(EditorToolbarMenuIds.FloatingEmotion, "TPS Emotions");
@@ -70,7 +70,7 @@ public sealed class EditorToolbarCatalogContractTests
             speedGroup.Actions.Select(action => action.Key));
     }
 
-    [Fact]
+    [Test]
     public void VoiceDropdowns_StayAligned_BetweenTopToolbarAndFloatingToolbar()
     {
         var topVoiceGroups = FindTopSection("voice").DropdownGroups;
@@ -91,7 +91,7 @@ public sealed class EditorToolbarCatalogContractTests
         }
     }
 
-    [Fact]
+    [Test]
     public void FloatingInsertMenu_ExposesTheSameStructureHelpers_AsTopToolbarInsertMenu()
     {
         var topStructureGroup = FindTopDropdownGroup("insert", "Structure");

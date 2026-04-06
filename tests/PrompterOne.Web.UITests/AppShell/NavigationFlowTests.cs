@@ -1,17 +1,19 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
 {
     private const string BackgroundColorProperty = "backgroundColor";
     private const string ColorProperty = "color";
     private const string LiveDangerIconColor = "rgb(255, 138, 138)";
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task ShellHeader_OpensGoLive_FromLibraryAndSettings()
     {
         var page = await _fixture.NewPageAsync();
@@ -38,7 +40,7 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFi
         }
     }
 
-    [Fact]
+    [Test]
     public async Task ScreenNavigation_UsesSpaRoutingWithoutReloadingBrowserContext()
     {
         const string nonce = "spa-nav-stable";
@@ -55,7 +57,7 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFi
             await page.GetByTestId(UiTestIds.Header.EditorLearn).ClickAsync();
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.LearnQuantum));
             await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
-            Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
+            await Assert.That(await page.EvaluateAsync<string>("() => window.__prompterSpaNonce")).IsEqualTo(nonce);
 
             await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
@@ -64,12 +66,12 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFi
             await page.GetByTestId(UiTestIds.Header.EditorRead).ClickAsync();
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.TeleprompterQuantum));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
-            Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
+            await Assert.That(await page.EvaluateAsync<string>("() => window.__prompterSpaNonce")).IsEqualTo(nonce);
 
             await page.GetByTestId(UiTestIds.Teleprompter.Back).ClickAsync();
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.EditorQuantum));
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
-            Assert.Equal(nonce, await page.EvaluateAsync<string>("() => window.__prompterSpaNonce"));
+            await Assert.That(await page.EvaluateAsync<string>("() => window.__prompterSpaNonce")).IsEqualTo(nonce);
         }
         finally
         {
@@ -77,7 +79,7 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFi
         }
     }
 
-    [Fact]
+    [Test]
     public async Task ShellHeader_UsesConsistentNeutralGoLiveChrome_OnLibraryAndSettings()
     {
         var page = await _fixture.NewPageAsync();
@@ -98,11 +100,11 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture) : IClassFi
 
             var settingsChrome = await ReadGoLiveChromeAsync(page);
 
-            Assert.Equal(libraryChrome.ButtonBackground, settingsChrome.ButtonBackground);
-            Assert.Equal(libraryChrome.IconColor, settingsChrome.IconColor);
-            Assert.Equal(libraryChrome.DotBackground, settingsChrome.DotBackground);
-            Assert.NotEqual(LiveDangerIconColor, libraryChrome.IconColor);
-            Assert.NotEqual(LiveDangerIconColor, settingsChrome.IconColor);
+            await Assert.That(settingsChrome.ButtonBackground).IsEqualTo(libraryChrome.ButtonBackground);
+            await Assert.That(settingsChrome.IconColor).IsEqualTo(libraryChrome.IconColor);
+            await Assert.That(settingsChrome.DotBackground).IsEqualTo(libraryChrome.DotBackground);
+            await Assert.That(libraryChrome.IconColor).IsNotEqualTo(LiveDangerIconColor);
+            await Assert.That(settingsChrome.IconColor).IsNotEqualTo(LiveDangerIconColor);
         }
         finally
         {

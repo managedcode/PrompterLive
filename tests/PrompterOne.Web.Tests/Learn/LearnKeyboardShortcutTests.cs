@@ -13,7 +13,7 @@ public sealed class LearnKeyboardShortcutTests : BunitContext
     private const string PressedAttributeName = "aria-pressed";
     private const string TrueValue = "true";
 
-    [Fact]
+    [Test]
     public void LearnPage_EscapeShortcut_NavigatesBackToEditor()
     {
         TestHarnessFactory.Create(this);
@@ -31,7 +31,7 @@ public sealed class LearnKeyboardShortcutTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LearnPage_LShortcut_TogglesLoopPlayback()
     {
         TestHarnessFactory.Create(this);
@@ -51,7 +51,7 @@ public sealed class LearnKeyboardShortcutTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LearnPage_SpaceShortcut_TogglesPlayback()
     {
         TestHarnessFactory.Create(this);

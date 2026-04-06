@@ -1,17 +1,20 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixture)
 {
     private readonly record struct LayoutBounds(double Y, double Height);
     private readonly record struct ToolbarAnchor(double Left, double Top);
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingToolbarKeepsFullHeightWhenSelectionIsActive()
     {
         var page = await _fixture.NewPageAsync();
@@ -27,10 +30,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
 
             var bounds = await GetRequiredBoundingBoxAsync(floatingBar);
-            Assert.InRange(
-                bounds.Height,
-                BrowserTestConstants.Editor.FloatingBarMinHeightPx,
-                double.MaxValue);
+            await Assert.That(bounds.Height).IsBetween(BrowserTestConstants.Editor.FloatingBarMinHeightPx,double.MaxValue);
         }
         finally
         {
@@ -38,7 +38,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingToolbarStaysAboveMultiLineSelection()
     {
         var page = await _fixture.NewPageAsync();
@@ -50,8 +50,8 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var start = state.Text.IndexOf(BrowserTestConstants.Editor.TypedMultilineSelectionStart, StringComparison.Ordinal);
             var endTokenStart = state.Text.IndexOf(BrowserTestConstants.Editor.TypedMultilineSelectionEnd, start, StringComparison.Ordinal);
-            Assert.True(start >= 0);
-            Assert.True(endTokenStart >= 0);
+            await Assert.That(start >= 0).IsTrue();
+            await Assert.That(endTokenStart >= 0).IsTrue();
             await EditorMonacoDriver.SetSelectionAsync(
                 page,
                 start,
@@ -81,10 +81,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
 
             var bounds = await GetRequiredBoundingBoxAsync(floatingBar);
-            Assert.InRange(
-                geometry.SelectionTop - (bounds.Y + bounds.Height),
-                BrowserTestConstants.Editor.FloatingBarMinGapAboveSelectionPx,
-                double.MaxValue);
+            await Assert.That(geometry.SelectionTop - (bounds.Y + bounds.Height)).IsBetween(BrowserTestConstants.Editor.FloatingBarMinGapAboveSelectionPx,double.MaxValue);
         }
         finally
         {
@@ -92,7 +89,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_FloatingToolbarStaysPinnedAfterFloatingFormatAction()
     {
         var page = await _fixture.NewPageAsync();
@@ -128,14 +125,8 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
             var after = await GetRequiredAnchorAsync(floatingBar);
 
-            Assert.InRange(
-                Math.Abs(after.Left - before.Left),
-                0,
-                BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
-            Assert.InRange(
-                Math.Abs(after.Top - before.Top),
-                0,
-                BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
+            await Assert.That(Math.Abs(after.Left - before.Left)).IsBetween(0,BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
+            await Assert.That(Math.Abs(after.Top - before.Top)).IsBetween(0,BrowserTestConstants.Editor.FloatingBarPinnedMaxDriftPx);
         }
         finally
         {

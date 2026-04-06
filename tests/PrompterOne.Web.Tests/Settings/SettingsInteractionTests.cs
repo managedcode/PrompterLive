@@ -38,7 +38,7 @@ public sealed class SettingsInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void ReaderCameraToggle_UpdatesSessionState_AndPersistsSetting()
     {
         var cut = Render<SettingsPage>();
@@ -54,7 +54,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Equal(!initialValue, readerSettings.ShowCameraScene);
     }
 
-    [Fact]
+    [Test]
     public void CloudSection_SaveAndTest_PersistsDropboxPreferences_AndShowsValidationMessage()
     {
         var cut = Render<SettingsPage>();
@@ -79,7 +79,7 @@ public sealed class SettingsInteractionTests : BunitContext
             cut.FindByTestId(UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.Dropbox)).TextContent.Trim());
     }
 
-    [Fact]
+    [Test]
     public void CloudSection_Disconnect_ClearsStoredCredentials_AndResetsSubtitle()
     {
         var preferences = CloudStoragePreferences.CreateDefault();
@@ -118,7 +118,7 @@ public sealed class SettingsInteractionTests : BunitContext
             cut.FindByTestId(UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.Dropbox)).TextContent.Trim());
     }
 
-    [Fact]
+    [Test]
     public void CloudSection_LoadsPrimaryProviderCard_AsOpen()
     {
         var preferences = CloudStoragePreferences.CreateDefault();
@@ -134,7 +134,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void SettingsPage_DoesNotStartMicrophoneMonitor_WhenMicSectionIsInactive()
     {
         var cut = Render<SettingsPage>();
@@ -147,7 +147,7 @@ public sealed class SettingsInteractionTests : BunitContext
             StringComparer.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void MicrophoneDelaySlider_UpdatesAudioBusState()
     {
         var cut = Render<SettingsPage>();
@@ -165,7 +165,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Contains(savedScene.AudioBus.Inputs, input => input.DeviceId == "mic-1" && input.DelayMs == 320);
     }
 
-    [Fact]
+    [Test]
     public void RecordingSection_PersistsRecordingPreferences()
     {
         var cut = Render<SettingsPage>();
@@ -183,7 +183,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Equal(256, savedPreferences.RecordingAudioBitrateKbps);
     }
 
-    [Fact]
+    [Test]
     public void ExactStudioControls_PersistCameraMicAndStreamingPreferences()
     {
         var cut = Render<SettingsPage>();
@@ -203,7 +203,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.False(settings.Microphone.NoiseSuppression);
     }
 
-    [Fact]
+    [Test]
     public void FileStorageSection_RendersBrowserLocalStorageLabels_InsteadOfDesktopPaths()
     {
         var cut = Render<SettingsPage>();
@@ -218,7 +218,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Contains(Text(UiTextKey.SettingsFilesScriptsHistory), markup, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void AboutSection_RestartTourButton_NavigatesToLibraryWithOnboardingRequest()
     {
         var cut = Render<SettingsPage>();
@@ -232,7 +232,7 @@ public sealed class SettingsInteractionTests : BunitContext
             Assert.EndsWith(AppRoutes.LibraryWithOnboarding(), navigation.Uri, StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Test]
     public void AiSection_SaveOpenAiDraft_PersistsLocalConfiguration_AndShowsLocalOnlyMessage()
     {
         var cut = Render<SettingsPage>();
@@ -253,7 +253,7 @@ public sealed class SettingsInteractionTests : BunitContext
             cut.FindByTestId(UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
     }
 
-    [Fact]
+    [Test]
     public void AiSection_RendersProviderSubtitlesFromCurrentSettings()
     {
         _harness.JsRuntime.SavedValues[AiProviderSettings.StorageKey] = new AiProviderSettings
@@ -290,7 +290,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void StreamingPanel_RendersOnlyPersistedTransportConnections()
     {
         _harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = StudioSettings.Default with
@@ -317,7 +317,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void AppearanceThemeChoice_PersistsAndCallsBrowserThemeInterop()
     {
         var cut = Render<SettingsPage>();
@@ -347,7 +347,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Equal(savedPreferences.UiDensity, latestInvocation.Arguments[2]?.ToString());
     }
 
-    [Fact]
+    [Test]
     public void AppearanceSection_UsesSharedPreviewAndSwatchComponents_InsteadOfInlineStyleBlobs()
     {
         var cut = Render<SettingsPage>();
@@ -371,7 +371,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LanguageSection_PersistsSelectedCulture_FromDirectSettingsNavigation()
     {
         var cut = Render<SettingsPage>();
@@ -393,7 +393,7 @@ public sealed class SettingsInteractionTests : BunitContext
         Assert.Equal(AppCultureCatalog.FrenchCultureName, savedPreferences.LanguageCulture);
     }
 
-    [Fact]
+    [Test]
     public void AboutSection_RendersInjectedAppVersionMetadata_AndOfficialManagedCodeLinks()
     {
         var cut = Render<SettingsPage>();
@@ -442,7 +442,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void AboutSection_UsesTypedIconSurfaceClasses_InsteadOfInlineCardIconStyles()
     {
         var cut = Render<SettingsPage>();
@@ -461,7 +461,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void CloudSection_UsesTypedProviderActionComponent_InsteadOfInlineBuilderStyleMarkup()
     {
         var cut = Render<SettingsPage>();
@@ -479,7 +479,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void CameraPreview_AttachesSelectedCameraAfterMediaAccessIsGranted()
     {
         var cut = Render<SettingsPage>();
@@ -501,7 +501,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void CameraDeviceAction_SelectsMatchingPreviewCamera()
     {
         var cut = Render<SettingsPage>();
@@ -532,7 +532,7 @@ public sealed class SettingsInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MicrophoneSection_StartsLiveMeterForSelectedMicrophoneAfterMediaAccessIsGranted()
     {
         var cut = Render<SettingsPage>();

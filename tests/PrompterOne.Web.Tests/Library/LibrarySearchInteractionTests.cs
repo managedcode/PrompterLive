@@ -11,7 +11,7 @@ public sealed class LibrarySearchInteractionTests : BunitContext
     private const string BodySearchQuery = "intuition";
     private const string FileNameSearchQuery = "starter-quantum-computing.tps";
 
-    [Fact]
+    [Test]
     public void LibraryPage_SearchMatchesStoredDocumentName()
     {
         _ = TestHarnessFactory.Create(this);
@@ -28,7 +28,7 @@ public sealed class LibrarySearchInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_SearchMatchesStoredScriptBodyText()
     {
         _ = TestHarnessFactory.Create(this);

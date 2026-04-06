@@ -34,7 +34,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
     private const string PortraitOrientationValue = "portrait";
     private const string RightAlignmentValue = "right";
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RestoresPersistedReaderLayoutSettings()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -84,7 +84,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_PersistsReaderLayoutAndCameraPreferenceChanges()
     {
         var harness = TestHarnessFactory.Create(this);

@@ -11,7 +11,7 @@ public sealed class EditorCueRenderingTests
     private const string StressAttribute = TpsVisualCueContracts.StressAttributeName + "=\"" + TpsVisualCueContracts.StressAttributeValue + "\"";
     private const string XslowAttribute = TpsVisualCueContracts.SpeedAttributeName + "=\"" + TpsVisualCueContracts.SpeedCueXslow + "\"";
 
-    [Fact]
+    [Test]
     public void Render_EmitsStableCueAttributesForVolumeDeliveryStressAndSpeed()
     {
         var markup = EditorMarkupRenderer.Render(

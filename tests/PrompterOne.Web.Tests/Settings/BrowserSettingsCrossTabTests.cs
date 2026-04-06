@@ -12,7 +12,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class BrowserSettingsCrossTabTests : BunitContext
 {
-    [Fact]
+    [Test]
     public async Task BrowserSettingsStore_SaveAsync_PublishesSettingsChangedMessage()
     {
         var jsRuntime = new TestJsRuntime();
@@ -41,7 +41,7 @@ public sealed class BrowserSettingsCrossTabTests : BunitContext
         Assert.Equal(BrowserSettingChangeKinds.Saved, payload.ChangeKind);
     }
 
-    [Fact]
+    [Test]
     public async Task MainLayout_AppliesRemoteThemeChange_WhenAnotherTabUpdatesPreferences()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -82,7 +82,7 @@ public sealed class BrowserSettingsCrossTabTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task SettingsPage_ReloadsAppearanceState_WhenAnotherTabUpdatesPreferences()
     {
         var harness = TestHarnessFactory.Create(this);

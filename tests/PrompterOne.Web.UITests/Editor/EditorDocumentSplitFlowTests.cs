@@ -1,10 +1,11 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string EpisodeOneCardId = "untitled-script-split-01-episode-1-how-to-think-about-systems";
     private const string EpisodeOneTitle = "Episode 1 - How to Think About Systems";
     private const string EpisodeTwoCardId = "untitled-script-split-02-episode-2-how-systems-talk-to-each-other";
@@ -24,7 +25,7 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
         APIs, events, and retries matter. //
         """;
 
-    [Fact]
+    [Test]
     public Task EditorScreen_SplitBySegmentHeadingCreatesLibraryScriptsWithoutReplacingCurrentDraft() =>
         RunPageAsync(async page =>
         {
@@ -50,7 +51,7 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
                 BrowserTestConstants.EditorFlow.SplitFeedbackScenario,
                 BrowserTestConstants.EditorFlow.SplitFeedbackStep);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(SplitSource);
-            Assert.Equal(AppRoutes.Editor, new Uri(page.Url).AbsolutePath);
+            await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(AppRoutes.Editor);
 
             await page.GetByTestId(UiTestIds.Editor.SplitResultOpenLibrary).ClickAsync();
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Library));

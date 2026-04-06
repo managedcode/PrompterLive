@@ -10,7 +10,7 @@ public sealed class TooltipAnchorTests : BunitContext
     private const string OwnerTestId = "tooltip-owner";
     private const string TooltipText = "Tooltip text";
 
-    [Fact]
+    [Test]
     public void TooltipAnchor_DefaultPlacement_RendersSharedTooltipContract()
     {
         var cut = RenderTooltipAnchor(TooltipPlacement.TopCenter);
@@ -25,7 +25,7 @@ public sealed class TooltipAnchorTests : BunitContext
         Assert.Equal(TooltipText, tooltip.TextContent.Trim());
     }
 
-    [Fact]
+    [Test]
     public void TooltipAnchor_LeftPlacement_RendersPlacementAttribute()
     {
         var cut = RenderTooltipAnchor(TooltipPlacement.LeftCenter);

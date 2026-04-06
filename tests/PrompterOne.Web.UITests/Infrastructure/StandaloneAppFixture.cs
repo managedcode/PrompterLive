@@ -1,15 +1,17 @@
+using System.IO;
 using System.Collections.Concurrent;
 using System.Net;
 using Microsoft.Playwright;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed partial class StandaloneAppFixture : IAsyncLifetime
+public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisposable
 {
     private const int MinimumPageCount = 1;
     private const int ServerStartupTimeoutSeconds = 60;
     private const int ServerProbeDelayMilliseconds = 500;
-    private readonly ConcurrentBag<IBrowserContext> _contexts = [];
+    private readonly ConcurrentDictionary<IBrowserContext, byte> _contexts = [];
     private SharedRuntimeHandle? _runtimeHandle;
 
     public string BaseAddress => _runtimeHandle?.BaseAddress ?? throw new InvalidOperationException("UI test runtime is not initialized.");
@@ -22,18 +24,9 @@ public sealed partial class StandaloneAppFixture : IAsyncLifetime
         _runtimeHandle = await SharedRuntime.AcquireAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        while (_contexts.TryTake(out var context))
-        {
-            try
-            {
-                await context.DisposeAsync();
-            }
-            catch
-            {
-            }
-        }
+        await DisposeTrackedContextsAsync();
 
         if (_runtimeHandle is not null)
         {
@@ -44,16 +37,7 @@ public sealed partial class StandaloneAppFixture : IAsyncLifetime
 
     public async Task ResetRuntimeAsync()
     {
-        while (_contexts.TryTake(out var context))
-        {
-            try
-            {
-                await context.DisposeAsync();
-            }
-            catch
-            {
-            }
-        }
+        await DisposeTrackedContextsAsync();
 
         _runtimeHandle = null;
         await SharedRuntime.ResetAsync();
@@ -97,8 +81,33 @@ public sealed partial class StandaloneAppFixture : IAsyncLifetime
             Origin = runtime.BaseAddress
         });
         await ConfigureMediaHarnessAsync(context);
-        _contexts.Add(context);
+        TrackContextLifecycle(context);
         return context;
+    }
+
+    private async Task DisposeTrackedContextsAsync()
+    {
+        foreach (var context in _contexts.Keys)
+        {
+            if (!_contexts.TryRemove(context, out _))
+            {
+                continue;
+            }
+
+            try
+            {
+                await context.DisposeAsync();
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private void TrackContextLifecycle(IBrowserContext context)
+    {
+        _contexts.TryAdd(context, 0);
+        context.Close += (_, _) => _contexts.TryRemove(context, out _);
     }
 
     private async Task<SharedRuntimeHandle> EnsureRuntimeHandleAsync()

@@ -23,7 +23,7 @@ public sealed class AppBootstrapperLearnSettingsTests : BunitContext
         }
         """;
 
-    [Fact]
+    [Test]
     public async Task AppBootstrapper_NormalizesLegacyDefaultLearnSpeed_FromBrowserStorage()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -43,7 +43,7 @@ public sealed class AppBootstrapperLearnSettingsTests : BunitContext
         Assert.False(savedSettings.HasCustomizedWordsPerMinute);
     }
 
-    [Fact]
+    [Test]
     public async Task AppBootstrapper_PreservesCustomizedLegacyLearnSpeed_FromBrowserStorage()
     {
         var harness = TestHarnessFactory.Create(this);

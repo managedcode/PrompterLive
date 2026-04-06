@@ -18,7 +18,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
     private const string LegacyPrimarySceneFallbackLabel = "Camera 1";
     private const string SceneSettingsStorageKey = "prompterone.scene";
 
-    [Fact]
+    [Test]
     public void GoLivePage_RendersLiveCameraPreviewForSelectedSceneCamera()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -40,7 +40,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_RendersEmptyPreviewStateWhenNoSceneCameraExists()
     {
         TestHarnessFactory.Create(
@@ -67,7 +67,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_UsesExplicitNoCameraStateForPrimarySceneChipWhenSceneIsEmpty()
     {
         TestHarnessFactory.Create(
@@ -94,7 +94,7 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_ShowsSingleLocalPreviewHintWhenConcurrentLocalCaptureIsUnavailable()
     {
         var harness = TestHarnessFactory.Create(this);

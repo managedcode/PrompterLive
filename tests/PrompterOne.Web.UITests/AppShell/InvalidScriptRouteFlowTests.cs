@@ -1,19 +1,19 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class InvalidScriptRouteFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    public static TheoryData<string, string, string> MissingPlaybackRoutes =>
-        new()
-        {
-            { BrowserTestConstants.Routes.LearnDemo, BrowserTestConstants.Routes.LearnMissing, UiTestIds.Learn.Page },
-            { BrowserTestConstants.Routes.TeleprompterDemo, BrowserTestConstants.Routes.TeleprompterMissing, UiTestIds.Teleprompter.Page }
-        };
+    : AppUiTestBase(fixture){
+    public static IEnumerable<(string ValidRoute, string MissingRoute, string PageTestId)> MissingPlaybackRoutes =>
+    [
+        (BrowserTestConstants.Routes.LearnDemo, BrowserTestConstants.Routes.LearnMissing, UiTestIds.Learn.Page),
+        (BrowserTestConstants.Routes.TeleprompterDemo, BrowserTestConstants.Routes.TeleprompterMissing, UiTestIds.Teleprompter.Page)
+    ];
 
-    [Fact]
+    [Test]
     public Task EditorRoute_MissingScriptId_ResetsToUntitledBlankDraft() =>
         RunPageAsync(async page =>
         {
@@ -29,8 +29,8 @@ public sealed class InvalidScriptRouteFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
         });
 
-    [Theory]
-    [MemberData(nameof(MissingPlaybackRoutes))]
+    [Test]
+    [MethodDataSource(nameof(MissingPlaybackRoutes))]
     public Task PlaybackRoute_MissingScriptId_DoesNotReusePreviousEditorSession(
         string validRoute,
         string missingRoute,
@@ -51,7 +51,7 @@ public sealed class InvalidScriptRouteFlowTests(StandaloneAppFixture fixture)
             await page.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(AppRoutes.Editor));
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
-            Assert.Equal(AppRoutes.Editor, new Uri(page.Url).AbsolutePath);
-            Assert.True(string.IsNullOrWhiteSpace(new Uri(page.Url).Query));
+            await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(AppRoutes.Editor);
+            await Assert.That(string.IsNullOrWhiteSpace(new Uri(page.Url).Query)).IsTrue();
         });
 }

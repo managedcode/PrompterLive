@@ -12,7 +12,7 @@ public sealed class TeleprompterKeyboardShortcutTests : BunitContext
 {
     private const string ActiveCssClass = "active";
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_EscapeShortcut_NavigatesBackToEditor()
     {
         TestHarnessFactory.Create(this);
@@ -30,7 +30,7 @@ public sealed class TeleprompterKeyboardShortcutTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_Hotkeys_ToggleMirrorAndJustifyAlignment()
     {
         TestHarnessFactory.Create(this);

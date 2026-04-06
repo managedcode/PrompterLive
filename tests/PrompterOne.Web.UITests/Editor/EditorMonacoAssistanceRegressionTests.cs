@@ -1,11 +1,14 @@
 using ManagedCode.Tps;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture fixture)
 {
     private const int TitleLineNumber = 1;
     private const int SegmentLineNumber = 2;
@@ -61,7 +64,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             .Concat(TpsSpec.RelativeSpeedTags.Select(BuildWrapCompletionLabel))
             .ToArray();
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_CompletionsExposeDetailedPayloadsForStructuredTpsSuggestions()
     {
         var page = await OpenEditorAsync();
@@ -79,22 +82,22 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var mediumEditPointCompletion = FindCompletion(completions, MediumEditPointCompletionLabel);
             var lowEditPointCompletion = FindCompletion(completions, LowEditPointCompletionLabel);
 
-            Assert.Equal("Simple pronunciation guide", pronunciationCompletion.Detail);
-            Assert.Contains("readable pronunciation guide", pronunciationCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("[pronunciation:${1:KAM-uhl}]${2:camel}[/pronunciation]", pronunciationCompletion.InsertText);
-            Assert.Equal("Segment header", segmentCompletion.Detail);
-            Assert.Contains("structured TPS segment header", segmentCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("## [${1:Segment Name}|Speaker:${2:Host}|${3:140}WPM|${4:neutral}|${5:0:00-0:30}]", segmentCompletion.InsertText);
-            Assert.Equal("Markdown bold", markdownBoldCompletion.Detail);
-            Assert.Equal("**${1:text}**", markdownBoldCompletion.InsertText);
-            Assert.Equal("Markdown italic", markdownItalicCompletion.Detail);
-            Assert.Equal("*${1:text}*", markdownItalicCompletion.InsertText);
-            Assert.Equal("Timed pause (ms)", millisecondPauseCompletion.Detail);
-            Assert.Contains("milliseconds", millisecondPauseCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("Priority edit point", mediumEditPointCompletion.Detail);
-            Assert.Contains("medium priority", mediumEditPointCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("Priority edit point", lowEditPointCompletion.Detail);
-            Assert.Contains("low priority", lowEditPointCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
+            await Assert.That(pronunciationCompletion.Detail).IsEqualTo("Simple pronunciation guide");
+            await Assert.That(pronunciationCompletion.Documentation).Contains("readable pronunciation guide");
+            await Assert.That(pronunciationCompletion.InsertText).IsEqualTo("[pronunciation:${1:KAM-uhl}]${2:camel}[/pronunciation]");
+            await Assert.That(segmentCompletion.Detail).IsEqualTo("Segment header");
+            await Assert.That(segmentCompletion.Documentation).Contains("structured TPS segment header");
+            await Assert.That(segmentCompletion.InsertText).IsEqualTo("## [${1:Segment Name}|Speaker:${2:Host}|${3:140}WPM|${4:neutral}|${5:0:00-0:30}]");
+            await Assert.That(markdownBoldCompletion.Detail).IsEqualTo("Markdown bold");
+            await Assert.That(markdownBoldCompletion.InsertText).IsEqualTo("**${1:text}**");
+            await Assert.That(markdownItalicCompletion.Detail).IsEqualTo("Markdown italic");
+            await Assert.That(markdownItalicCompletion.InsertText).IsEqualTo("*${1:text}*");
+            await Assert.That(millisecondPauseCompletion.Detail).IsEqualTo("Timed pause (ms)");
+            await Assert.That(millisecondPauseCompletion.Documentation).Contains("milliseconds");
+            await Assert.That(mediumEditPointCompletion.Detail).IsEqualTo("Priority edit point");
+            await Assert.That(mediumEditPointCompletion.Documentation).Contains("medium priority");
+            await Assert.That(lowEditPointCompletion.Detail).IsEqualTo("Priority edit point");
+            await Assert.That(lowEditPointCompletion.Documentation).Contains("low priority");
         }
         finally
         {
@@ -102,7 +105,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_CompletionsExposeNewSdkAuthoringTokensForArchetypesAndVoiceShape()
     {
         var page = await OpenEditorAsync();
@@ -118,19 +121,19 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var staccatoCompletion = FindCompletion(completions, StaccatoCompletionLabel);
             var archetypeSegmentCompletion = FindCompletion(completions, ArchetypeSegmentCompletionLabel);
 
-            Assert.Equal("Energy contour", energyCompletion.Detail);
-            Assert.Contains("1 to 10", energyCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("[energy:${1:8}]${2:text}[/energy]", energyCompletion.InsertText);
-            Assert.Equal("Melody contour", melodyCompletion.Detail);
-            Assert.Contains("pitch variation", melodyCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("[melody:${1:4}]${2:text}[/melody]", melodyCompletion.InsertText);
-            Assert.Contains("legato", legatoCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("staccato", staccatoCompletion.Documentation, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal("Segment header (archetype)", archetypeSegmentCompletion.Detail);
-            Assert.Contains("Archetype:${3:Coach}", archetypeSegmentCompletion.InsertText, StringComparison.Ordinal);
+            await Assert.That(energyCompletion.Detail).IsEqualTo("Energy contour");
+            await Assert.That(energyCompletion.Documentation).Contains("1 to 10");
+            await Assert.That(energyCompletion.InsertText).IsEqualTo("[energy:${1:8}]${2:text}[/energy]");
+            await Assert.That(melodyCompletion.Detail).IsEqualTo("Melody contour");
+            await Assert.That(melodyCompletion.Documentation).Contains("pitch variation");
+            await Assert.That(melodyCompletion.InsertText).IsEqualTo("[melody:${1:4}]${2:text}[/melody]");
+            await Assert.That(legatoCompletion.Documentation).Contains("legato");
+            await Assert.That(staccatoCompletion.Documentation).Contains("staccato");
+            await Assert.That(archetypeSegmentCompletion.Detail).IsEqualTo("Segment header (archetype)");
+            await Assert.That(archetypeSegmentCompletion.InsertText).Contains("Archetype:${3:Coach}");
             foreach (var completionLabel in ExpectedArchetypeSegmentCompletionLabels)
             {
-                Assert.NotNull(FindCompletion(completions, completionLabel));
+                _ = FindCompletion(completions, completionLabel);
             }
         }
         finally
@@ -139,7 +142,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_CompletionsExposeVendoredEmotionVoiceAndDeliveryWrappers()
     {
         var page = await OpenEditorAsync();
@@ -151,7 +154,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
 
             foreach (var expectedLabel in ExpectedVendoredWrapperLabels)
             {
-                Assert.NotNull(FindCompletion(completions, expectedLabel));
+                _ = FindCompletion(completions, expectedLabel);
             }
         }
         finally
@@ -160,7 +163,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_CompletionsStayContextAwareForPauseInsertion()
     {
         var page = await OpenEditorAsync();
@@ -174,12 +177,12 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var mediumPause = FindCompletion(completions, "//");
             var timedPause = FindCompletion(completions, TimedPauseCompletionLabel);
 
-            Assert.Equal("Short pause", shortPause.Detail);
-            Assert.Equal(" / ", shortPause.InsertText);
-            Assert.Equal("Medium pause", mediumPause.Detail);
-            Assert.Equal(" //", mediumPause.InsertText);
-            Assert.Equal("Timed pause", timedPause.Detail);
-            Assert.Contains("seconds or milliseconds", timedPause.Documentation, StringComparison.OrdinalIgnoreCase);
+            await Assert.That(shortPause.Detail).IsEqualTo("Short pause");
+            await Assert.That(shortPause.InsertText).IsEqualTo(" / ");
+            await Assert.That(mediumPause.Detail).IsEqualTo("Medium pause");
+            await Assert.That(mediumPause.InsertText).IsEqualTo(" //");
+            await Assert.That(timedPause.Detail).IsEqualTo("Timed pause");
+            await Assert.That(timedPause.Documentation).Contains("seconds or milliseconds");
         }
         finally
         {
@@ -187,7 +190,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HoverExplainsTitleAndStructuredHeaderMetadata()
     {
         var page = await OpenEditorAsync();
@@ -201,14 +204,14 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var emotionHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "Professional"));
             var timingHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "0:00-0:30"));
 
-            Assert.NotNull(titleHover);
-            Assert.NotNull(wpmHover);
-            Assert.NotNull(emotionHover);
-            Assert.NotNull(timingHover);
-            Assert.Contains(titleHover!.Contents, content => content.Contains("Document title", StringComparison.Ordinal));
-            Assert.Contains(wpmHover!.Contents, content => content.Contains("WPM override", StringComparison.Ordinal));
-            Assert.Contains(emotionHover!.Contents, content => content.Contains("Emotion override", StringComparison.Ordinal));
-            Assert.Contains(timingHover!.Contents, content => content.Contains("Optional timing window", StringComparison.Ordinal));
+            await Assert.That(titleHover).IsNotNull();
+            await Assert.That(wpmHover).IsNotNull();
+            await Assert.That(emotionHover).IsNotNull();
+            await Assert.That(timingHover).IsNotNull();
+            await Assert.That(titleHover!.Contents).Contains(content => content.Contains("Document title", StringComparison.Ordinal));
+            await Assert.That(wpmHover!.Contents).Contains(content => content.Contains("WPM override", StringComparison.Ordinal));
+            await Assert.That(emotionHover!.Contents).Contains(content => content.Contains("Emotion override", StringComparison.Ordinal));
+            await Assert.That(timingHover!.Contents).Contains(content => content.Contains("Optional timing window", StringComparison.Ordinal));
         }
         finally
         {
@@ -216,7 +219,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HoverExplainsEditPointPriorityAndTimedPauseTags()
     {
         var page = await OpenEditorAsync();
@@ -228,11 +231,11 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var editPointHover = await EditorMonacoDriver.GetHoverAsync(page, InlineLineNumber, FindColumn(InlineGuideLine, "[edit_point:high]"));
             var timedPauseHover = await EditorMonacoDriver.GetHoverAsync(page, InlineLineNumber, FindColumn(InlineGuideLine, "[pause:1500ms]"));
 
-            Assert.NotNull(editPointHover);
-            Assert.NotNull(timedPauseHover);
-            Assert.Contains(editPointHover!.Contents, content => content.Contains("Edit point", StringComparison.Ordinal) &&
+            await Assert.That(editPointHover).IsNotNull();
+            await Assert.That(timedPauseHover).IsNotNull();
+            await Assert.That(editPointHover!.Contents).Contains(content => content.Contains("Edit point", StringComparison.Ordinal) &&
                 content.Contains("high", StringComparison.Ordinal));
-            Assert.Contains(timedPauseHover!.Contents, content => content.Contains("Timed pause", StringComparison.Ordinal) &&
+            await Assert.That(timedPauseHover!.Contents).Contains(content => content.Contains("Timed pause", StringComparison.Ordinal) &&
                 content.Contains("1500ms", StringComparison.Ordinal));
         }
         finally
@@ -241,7 +244,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HoverExplainsArchetypeProfilesFromVendoredSdk()
     {
         var page = await OpenEditorAsync();
@@ -252,10 +255,10 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
 
             var archetypeHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(ArchetypeLine, "Archetype:Storyteller"));
 
-            Assert.NotNull(archetypeHover);
-            Assert.Contains(archetypeHover!.Contents, content => content.Contains("Storyteller recommends 125 WPM", StringComparison.Ordinal));
-            Assert.Contains(archetypeHover.Contents, content => content.Contains("energy 4-7", StringComparison.Ordinal));
-            Assert.Contains(archetypeHover.Contents, content => content.Contains("melody 8-10", StringComparison.Ordinal));
+            await Assert.That(archetypeHover).IsNotNull();
+            await Assert.That(archetypeHover!.Contents).Contains(content => content.Contains("Storyteller recommends 125 WPM", StringComparison.Ordinal));
+            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("energy 4-7", StringComparison.Ordinal));
+            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("melody 8-10", StringComparison.Ordinal));
         }
         finally
         {
@@ -263,7 +266,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_TokenizesSimpleHeadersEscapesAndInlineWpmBadges()
     {
         var page = await OpenEditorAsync();
@@ -276,18 +279,18 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var simpleBlockTokens = await EditorMonacoDriver.TokenizeLineAsync(page, SegmentLineNumber);
             var edgeCaseTokens = await EditorMonacoDriver.TokenizeLineAsync(page, 3);
 
-            Assert.Equal(SimpleSegmentLine, simpleSegmentTokens.LineText);
-            Assert.Equal(SimpleBlockLine, simpleBlockTokens.LineText);
-            Assert.Equal(TokenizationLine, edgeCaseTokens.LineText);
-            Assert.Contains(simpleSegmentTokens.Tokens, token => token.Type.Contains("header.segment.hash", StringComparison.Ordinal));
-            Assert.Contains(simpleBlockTokens.Tokens, token => token.Type.Contains("header.block.hash", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("escape.sequence", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("wpm.badge", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("cue.open", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("cue.close", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("markdown.italic", StringComparison.Ordinal));
-            Assert.Contains(edgeCaseTokens.Tokens, token => token.Type.Contains("markdown.bold", StringComparison.Ordinal));
-            Assert.DoesNotContain(edgeCaseTokens.Tokens, token => token.Type.Contains("pause.short", StringComparison.Ordinal));
+            await Assert.That(simpleSegmentTokens.LineText).IsEqualTo(SimpleSegmentLine);
+            await Assert.That(simpleBlockTokens.LineText).IsEqualTo(SimpleBlockLine);
+            await Assert.That(edgeCaseTokens.LineText).IsEqualTo(TokenizationLine);
+            await Assert.That(simpleSegmentTokens.Tokens).Contains(token => token.Type.Contains("header.segment.hash", StringComparison.Ordinal));
+            await Assert.That(simpleBlockTokens.Tokens).Contains(token => token.Type.Contains("header.block.hash", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("escape.sequence", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("wpm.badge", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("cue.open", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("cue.close", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("markdown.italic", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).Contains(token => token.Type.Contains("markdown.bold", StringComparison.Ordinal));
+            await Assert.That(edgeCaseTokens.Tokens).DoesNotContain(token => token.Type.Contains("pause.short", StringComparison.Ordinal));
         }
         finally
         {
@@ -295,7 +298,7 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_HoverExplainsMarkdownItalicSyntax()
     {
         var page = await OpenEditorAsync();
@@ -306,9 +309,9 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
 
             var italicHover = await EditorMonacoDriver.GetHoverAsync(page, 3, FindColumn(TokenizationLine, "*calm*"));
 
-            Assert.NotNull(italicHover);
-            Assert.Contains(italicHover!.Contents, content => content.Contains("Markdown italic", StringComparison.Ordinal));
-            Assert.Contains(italicHover.Contents, content => content.Contains("*text*", StringComparison.Ordinal));
+            await Assert.That(italicHover).IsNotNull();
+            await Assert.That(italicHover!.Contents).Contains(content => content.Contains("Markdown italic", StringComparison.Ordinal));
+            await Assert.That(italicHover.Contents).Contains(content => content.Contains("*text*", StringComparison.Ordinal));
         }
         finally
         {
@@ -329,14 +332,18 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
     private static EditorMonacoCompletionItem FindCompletion(EditorMonacoCompletionList completions, string label)
     {
         var completion = completions.Suggestions.SingleOrDefault(suggestion => string.Equals(suggestion.Label, label, StringComparison.Ordinal));
-        Assert.NotNull(completion);
-        return completion!;
+        return completion
+            ?? throw new InvalidOperationException($"Unable to locate Monaco completion '{label}'.");
     }
 
     private static int FindColumn(string line, string fragment)
     {
         var index = line.IndexOf(fragment, StringComparison.Ordinal);
-        Assert.True(index >= 0, $"Unable to locate \"{fragment}\" inside the Monaco regression probe line.");
+        if (index < 0)
+        {
+            throw new InvalidOperationException($"Unable to locate \"{fragment}\" inside the Monaco regression probe line.");
+        }
+
         return index + HoverInsideTokenOffset;
     }
 

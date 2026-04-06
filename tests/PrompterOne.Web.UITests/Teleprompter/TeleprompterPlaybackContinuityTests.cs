@@ -2,15 +2,16 @@ using System.Globalization;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private readonly record struct ReaderTransitionSample(double OutgoingTop, double IncomingTop);
 
-    [Fact]
+    [Test]
     public Task Teleprompter_PlaybackContinuesAfterManualBlockJump() =>
         RunPageAsync(async page =>
         {
@@ -24,7 +25,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await AssertReaderTimeContinuesAdvancingAsync(page);
         });
 
-    [Fact]
+    [Test]
     public Task Teleprompter_PlaybackContinuesAfterSliderAdjustmentAndAutomaticCardTransition() =>
         RunPageAsync(async page =>
         {
@@ -41,7 +42,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await AssertReaderTimeContinuesAdvancingAsync(page);
         });
 
-    [Fact]
+    [Test]
     public Task Teleprompter_NextBlockTransitionKeepsReaderTextMovingUpwardOnLeadershipScript() =>
         RunPageAsync(async page =>
         {
@@ -63,13 +64,13 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
                 samples.Add(await CaptureReaderTransitionSampleAsync(outgoingCard, incomingCard));
             }
 
-            AssertMovesUpWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing leadership block");
-            AssertMovesUpWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Incoming leadership block");
+            await AssertMovesUpWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing leadership block");
+            await AssertMovesUpWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Incoming leadership block");
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
         });
 
-    [Fact]
+    [Test]
     public Task Teleprompter_PreviousBlockTransition_ReversesAndBringsTheReturningBlockFromAbove() =>
         RunPageAsync(async page =>
         {
@@ -96,8 +97,8 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
                 samples.Add(await CaptureReaderTransitionSampleAsync(outgoingCard, returningCard));
             }
 
-            AssertMovesDownWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing current block");
-            AssertMovesDownWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Returning previous block");
+            await AssertMovesDownWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing current block");
+            await AssertMovesDownWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Returning previous block");
             await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderFirstBlockIndicator);
         });
@@ -148,39 +149,31 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
     private static Task<double> GetElementTopAsync(ILocator locator) =>
         locator.EvaluateAsync<double>("element => element.getBoundingClientRect().top");
 
-    private static void AssertMovesUpWithoutReversal(IReadOnlyList<double> positions, string label)
+    private static async Task AssertMovesUpWithoutReversal(IReadOnlyList<double> positions, string label)
     {
-        Assert.NotEmpty(positions);
+        await Assert.That(positions).IsNotEmpty();
 
         var minimumPosition = positions.Min();
         var totalTravel = positions[0] - minimumPosition;
-        Assert.True(
-            totalTravel >= BrowserTestConstants.Teleprompter.TransitionMinimumTravelPx,
-            $"{label} did not travel upward enough. Samples: {FormatPositions(positions)}");
+        await Assert.That(totalTravel >= BrowserTestConstants.Teleprompter.TransitionMinimumTravelPx).IsTrue().Because($"{label} did not travel upward enough. Samples: {FormatPositions(positions)}");
 
         for (var index = 1; index < positions.Count; index++)
         {
-            Assert.True(
-                positions[index] <= positions[index - 1] + BrowserTestConstants.Teleprompter.TransitionReversalTolerancePx,
-                $"{label} moved back down. Samples: {FormatPositions(positions)}");
+            await Assert.That(positions[index] <= positions[index - 1] + BrowserTestConstants.Teleprompter.TransitionReversalTolerancePx).IsTrue().Because($"{label} moved back down. Samples: {FormatPositions(positions)}");
         }
     }
 
-    private static void AssertMovesDownWithoutReversal(IReadOnlyList<double> positions, string label)
+    private static async Task AssertMovesDownWithoutReversal(IReadOnlyList<double> positions, string label)
     {
-        Assert.NotEmpty(positions);
+        await Assert.That(positions).IsNotEmpty();
 
         var maximumPosition = positions.Max();
         var totalTravel = maximumPosition - positions[0];
-        Assert.True(
-            totalTravel >= BrowserTestConstants.Teleprompter.TransitionMinimumTravelPx,
-            $"{label} did not travel downward enough. Samples: {FormatPositions(positions)}");
+        await Assert.That(totalTravel >= BrowserTestConstants.Teleprompter.TransitionMinimumTravelPx).IsTrue().Because($"{label} did not travel downward enough. Samples: {FormatPositions(positions)}");
 
         for (var index = 1; index < positions.Count; index++)
         {
-            Assert.True(
-                positions[index] >= positions[index - 1] - BrowserTestConstants.Teleprompter.TransitionReversalTolerancePx,
-                $"{label} moved back up. Samples: {FormatPositions(positions)}");
+            await Assert.That(positions[index] >= positions[index - 1] - BrowserTestConstants.Teleprompter.TransitionReversalTolerancePx).IsTrue().Because($"{label} moved back up. Samples: {FormatPositions(positions)}");
         }
     }
 

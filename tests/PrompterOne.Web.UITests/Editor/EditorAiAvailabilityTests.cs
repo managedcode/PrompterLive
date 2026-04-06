@@ -1,13 +1,15 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_AiButtonsAreDisabled_WhenNoProviderIsConfigured()
     {
         var page = await _fixture.NewPageAsync();
@@ -28,7 +30,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture) : IC
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_AiButtonsAreEnabled_WhenAProviderIsConfigured()
     {
         var page = await _fixture.NewPageAsync();
@@ -50,4 +52,3 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture) : IC
         }
     }
 }
-

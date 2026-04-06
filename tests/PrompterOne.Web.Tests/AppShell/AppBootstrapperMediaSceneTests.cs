@@ -16,7 +16,7 @@ public sealed class AppBootstrapperMediaSceneTests : BunitContext
     private const string SanitizedCameraLabel = "Studio Display Camera";
     private const string SanitizedMicrophoneLabel = "Desk Microphone";
 
-    [Fact]
+    [Test]
     public async Task AppBootstrapper_NormalizesPersistedMediaSceneLabels_FromBrowserStorage()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -55,7 +55,7 @@ public sealed class AppBootstrapperMediaSceneTests : BunitContext
         Assert.Equal(SanitizedMicrophoneLabel, persistedState.AudioBus.Inputs.Single().Label);
     }
 
-    [Fact]
+    [Test]
     public async Task AppBootstrapper_PrunesPersistedCameraSources_WithoutDeviceIds()
     {
         var harness = TestHarnessFactory.Create(this);

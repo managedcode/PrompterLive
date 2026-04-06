@@ -11,7 +11,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterSceneTests : BunitContext
 {
-    [Fact]
+    [Test]
     public void TeleprompterPage_UsesSingleBackgroundCameraLayer()
     {
         var harness = TestHarnessFactory.Create(this,
@@ -56,7 +56,7 @@ public sealed class TeleprompterSceneTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RendersReadableWordSpacingInsideReaderCards()
     {
         var harness = TestHarnessFactory.Create(this);

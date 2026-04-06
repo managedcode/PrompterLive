@@ -2,11 +2,12 @@ using System.Globalization;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private sealed class ToggleIconState
     {
         public bool PlayHidden { get; init; }
@@ -14,7 +15,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
     }
     private readonly record struct ProgressState(int CurrentWordNumber, int TotalWordCount);
 
-    [Fact]
+    [Test]
     public Task LearnScreen_PlayToggle_SwapsVisibleIconWhenPlaybackChanges() =>
         RunPageAsync(async page =>
         {
@@ -26,12 +27,12 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
 
             var afterToggle = await ReadToggleIconStateAsync(page);
 
-            Assert.True(beforeToggle.PlayHidden ^ beforeToggle.PauseHidden, "Expected exactly one learn playback icon to be visible before toggling.");
-            Assert.True(afterToggle.PlayHidden ^ afterToggle.PauseHidden, "Expected exactly one learn playback icon to be visible after toggling.");
-            Assert.NotEqual(beforeToggle.PlayHidden, afterToggle.PlayHidden);
-            Assert.NotEqual(beforeToggle.PauseHidden, afterToggle.PauseHidden);
+            await Assert.That(beforeToggle.PlayHidden ^ beforeToggle.PauseHidden).IsTrue().Because("Expected exactly one learn playback icon to be visible before toggling.");
+            await Assert.That(afterToggle.PlayHidden ^ afterToggle.PauseHidden).IsTrue().Because("Expected exactly one learn playback icon to be visible after toggling.");
+            await Assert.That(afterToggle.PlayHidden).IsNotEqualTo(beforeToggle.PlayHidden);
+            await Assert.That(afterToggle.PauseHidden).IsNotEqualTo(beforeToggle.PauseHidden);
         });
-    [Fact]
+    [Test]
     public Task LearnScreen_PhraseBoundary_KeepsLeftContextVisibleAcrossPause() =>
         RunPageAsync(async page =>
         {
@@ -44,20 +45,16 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
             var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
             var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
 
-            Assert.Equal(
-                [
+            await Assert.That(leftWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.PauseBoundaryLeftContextFirstWord,
                     BrowserTestConstants.Learn.PauseBoundaryLeftContextSecondWord
-                ],
-                leftWords);
-            Assert.Equal(
-                [
+                ], CollectionOrdering.Matching);
+            await Assert.That(rightWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.PauseBoundaryRightContextFirstWord,
                     BrowserTestConstants.Learn.PauseBoundaryRightContextSecondWord
-                ],
-                rightWords);
+                ], CollectionOrdering.Matching);
         });
-    [Fact]
+    [Test]
     public Task LearnScreen_PlaybackStopsOnFinalWordWhenLoopIsOff() =>
         RunPageAsync(async page =>
         {
@@ -72,11 +69,11 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
                 page,
                 BrowserTestConstants.Learn.StopAtEndScenarioName,
                 BrowserTestConstants.Learn.StopAtEndStep);
-            Assert.Equal(finalState.TotalWordCount, finalState.CurrentWordNumber);
-            Assert.False(iconState.PlayHidden);
-            Assert.True(iconState.PauseHidden);
+            await Assert.That(finalState.CurrentWordNumber).IsEqualTo(finalState.TotalWordCount);
+            await Assert.That(iconState.PlayHidden).IsFalse();
+            await Assert.That(iconState.PauseHidden).IsTrue();
         });
-    [Fact]
+    [Test]
     public Task LearnScreen_LoopToggle_AllowsPlaybackToWrapFromTheFinalWord() =>
         RunPageAsync(async page =>
         {
@@ -92,9 +89,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
                 page,
                 BrowserTestConstants.Learn.LoopWrapScenarioName,
                 BrowserTestConstants.Learn.LoopWrapStep);
-            Assert.True(
-                wrappedState.CurrentWordNumber < wrappedState.TotalWordCount,
-                $"Expected loop-enabled Learn playback to wrap after the final word, but the progress stayed at {wrappedState.CurrentWordNumber} / {wrappedState.TotalWordCount}.");
+            await Assert.That(wrappedState.CurrentWordNumber < wrappedState.TotalWordCount).IsTrue().Because($"Expected loop-enabled Learn playback to wrap after the final word, but the progress stayed at {wrappedState.CurrentWordNumber} / {wrappedState.TotalWordCount}.");
         });
     private static async Task NavigateToLearnDemoAsync(IPage page)
     {
@@ -142,7 +137,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
             }
             await page.GetByTestId(UiTestIds.Learn.StepForward).ClickAsync();
         }
-        Assert.Fail($"Did not reach the learn probe word '{targetWord}' within {stepLimit} steps.");
+        Assert.Fail("Unexpected execution path.");
     }
     private static async Task<string> ReadFocusWordAsync(IPage page)
     {
@@ -167,9 +162,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
     {
         var progressLabel = await page.GetByTestId(UiTestIds.Learn.ProgressLabel).TextContentAsync() ?? string.Empty;
         var match = BrowserTestConstants.Regexes.LearnProgressLabel.Match(progressLabel);
-        Assert.True(
-            match.Success,
-            $"Expected Learn progress label to match the current progress contract, but found '{progressLabel}'.");
+        await Assert.That(match.Success).IsTrue().Because($"Expected Learn progress label to match the current progress contract, but found '{progressLabel}'.");
 
         return new ProgressState(
             int.Parse(match.Groups["current"].Value, CultureInfo.InvariantCulture),

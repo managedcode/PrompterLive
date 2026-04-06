@@ -9,7 +9,7 @@ public sealed class EditorLocalRevisionStoreTests
     private const string ScriptId = "history-script";
     private static readonly DateTimeOffset BaseTimestamp = new(2026, 4, 5, 12, 0, 0, TimeSpan.Zero);
 
-    [Fact]
+    [Test]
     public async Task RecordAsync_DeduplicatesLatestRevision_AndTrimsOldEntries()
     {
         var store = CreateStore();
@@ -33,7 +33,7 @@ public sealed class EditorLocalRevisionStoreTests
                 StringComparison.Ordinal));
     }
 
-    [Fact]
+    [Test]
     public async Task GetAsync_ReturnsStoredRevisionByIdentifier()
     {
         var store = CreateStore();

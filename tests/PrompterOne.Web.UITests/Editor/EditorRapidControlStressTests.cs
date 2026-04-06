@@ -1,15 +1,16 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class EditorRapidControlStressTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private const string RapidControlsScenario = "editor-rapid-controls";
     private const string RapidControlsStep = "01-rapid-toolbar-history";
 
-    [Fact]
+    [Test]
     public Task Editor_RapidToolbarAndHistoryClicks_DoNotTriggerFatalDiagnosticsOrUnhandledErrors() =>
         RunPageAsync(async page =>
         {
@@ -35,8 +36,8 @@ public sealed class EditorRapidControlStressTests(StandaloneAppFixture fixture)
 
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
-            Assert.Equal(0, await page.GetByTestId(UiTestIds.Diagnostics.Fatal).CountAsync());
-            errors.AssertNoCriticalUiErrors();
+            await Assert.That(await page.GetByTestId(UiTestIds.Diagnostics.Fatal).CountAsync()).IsEqualTo(0);
+            await errors.AssertNoCriticalUiErrorsAsync();
 
             await UiScenarioArtifacts.CapturePageAsync(page, RapidControlsScenario, RapidControlsStep);
         });

@@ -1,32 +1,31 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
-    [Fact]
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
+    [Test]
     public Task EditorScreen_CreatedDateField_UsesThemeAwarePickerChrome_WithoutClipping() =>
         RunPageAsync(async page =>
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.DatePickerScenario);
 
             var darkMetrics = await OpenEditorAndReadDatePickerMetricsAsync(page, BrowserTestConstants.EditorFlow.DatePickerDarkStep);
-            AssertDatePickerMetrics(darkMetrics, BrowserTestConstants.SettingsFlow.DarkTheme);
+            await AssertDatePickerMetrics(darkMetrics, BrowserTestConstants.SettingsFlow.DarkTheme);
 
             await SwitchThemeAsync(page, BrowserTestConstants.SettingsFlow.LightTheme);
             var lightMetrics = await OpenEditorAndReadDatePickerMetricsAsync(page, BrowserTestConstants.EditorFlow.DatePickerLightStep);
-            AssertDatePickerMetrics(lightMetrics, BrowserTestConstants.SettingsFlow.LightTheme);
+            await AssertDatePickerMetrics(lightMetrics, BrowserTestConstants.SettingsFlow.LightTheme);
         });
 
-    private static void AssertDatePickerMetrics(DatePickerMetrics metrics, string expectedTheme)
+    private static async Task AssertDatePickerMetrics(DatePickerMetrics metrics, string expectedTheme)
     {
-        Assert.Equal(expectedTheme, metrics.Theme);
-        Assert.Equal(expectedTheme, metrics.ColorScheme);
-        Assert.True(
-            metrics.InputWidth >= BrowserTestConstants.EditorFlow.MinimumDateFieldWidthPx,
-            $"Expected the editor Created date field to stay wide enough for the full value in theme '{expectedTheme}', but its width was {metrics.InputWidth:0.##}.");
+        await Assert.That(metrics.Theme).IsEqualTo(expectedTheme);
+        await Assert.That(metrics.ColorScheme).IsEqualTo(expectedTheme);
+        await Assert.That(metrics.InputWidth >= BrowserTestConstants.EditorFlow.MinimumDateFieldWidthPx).IsTrue().Because($"Expected the editor Created date field to stay wide enough for the full value in theme '{expectedTheme}', but its width was {metrics.InputWidth:0.##}.");
     }
 
     private static async Task<DatePickerMetrics> OpenEditorAndReadDatePickerMetricsAsync(IPage page, string screenshotStep)

@@ -1,13 +1,15 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task FolderOverlay_IsTranslucent_AndCreationAcceptsTypedInput()
     {
         var page = await _fixture.NewPageAsync();
@@ -21,7 +23,7 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture) 
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
 
             var nameInput = page.GetByTestId(UiTestIds.Library.NewFolderName);
-            Assert.Equal(string.Empty, await nameInput.InputValueAsync());
+            await Assert.That(await nameInput.InputValueAsync()).IsEqualTo(string.Empty);
             await nameInput.ClickAsync();
             await nameInput.PressSequentiallyAsync(BrowserTestConstants.Folders.RoadshowsName);
             await Expect(nameInput).ToHaveValueAsync(BrowserTestConstants.Folders.RoadshowsName);
@@ -36,8 +38,8 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture) 
                     ];
                 }");
 
-            Assert.DoesNotContain("linear-gradient", overlayStyles[1], StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("blur", overlayStyles[2], StringComparison.OrdinalIgnoreCase);
+            await Assert.That(overlayStyles[1]).DoesNotContain("linear-gradient");
+            await Assert.That(overlayStyles[2]).Contains("blur");
 
             await page.GetByTestId(UiTestIds.Library.NewFolderParent).SelectOptionAsync(BrowserTestConstants.Folders.PresentationsId);
             await page.GetByTestId(UiTestIds.Library.NewFolderSubmit).ClickAsync();

@@ -19,10 +19,10 @@ internal sealed class BrowserErrorCollector
         return collector;
     }
 
-    public void AssertNoCriticalUiErrors()
+    public async Task AssertNoCriticalUiErrorsAsync()
     {
-        Assert.DoesNotContain(_pageErrors, IsCriticalUiError);
-        Assert.DoesNotContain(_consoleErrors, IsCriticalUiError);
+        await Assert.That(_pageErrors).DoesNotContain(IsCriticalUiError);
+        await Assert.That(_consoleErrors).DoesNotContain(IsCriticalUiError);
     }
 
     public string Describe() =>

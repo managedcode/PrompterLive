@@ -46,7 +46,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string VisionWord = "vision";
     private const string SoftWord = "Let";
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_UsesReferenceSizedReaderGroupsForSecurityIncident()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -76,7 +76,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_StartsWithMaximumReaderWidthByDefault()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -92,7 +92,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_PropagatesTpsWordFormattingTimingAndPronunciationMetadata()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -130,7 +130,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_UsesCustomFrontMatterSpeedOffsetsAndNormalReset()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -172,7 +172,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_StylesOnlyExplicitInlineTpsEmotionAndColorTags()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -211,7 +211,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_RendersContinuousEmphasisGroupsAndNoStandalonePunctuationWords()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -234,7 +234,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void TeleprompterPage_UsesDarkReaderBackgroundForGreenArchitectureRoute()
     {
         var harness = TestHarnessFactory.Create(this);

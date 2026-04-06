@@ -32,7 +32,7 @@ public sealed class GoLivePageTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_PersistsMultipleDestinationsAndProgramSettings()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -75,7 +75,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_RendersProductionStudioLayoutLandmarks()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -97,7 +97,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_UsesSharedIconsAndPercentFillPrimitives_ForTopbarAndSidebarChrome()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -143,7 +143,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_TopLeftHomeControl_TargetsLibraryRoute()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -161,7 +161,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_BackControl_TargetsPreviousInAppRoute_WhenKnown()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -180,7 +180,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_UsesGenericOperationalTitleInsteadOfLoadedScriptTitle()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -203,7 +203,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_TogglesProgramSourcesAndPersistsScene()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -224,7 +224,7 @@ public sealed class GoLivePageTests : BunitContext
             sceneState.Cameras.Single(camera => camera.SourceId == AppTestData.Camera.FirstSourceId).Transform.IncludeInOutput);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_LoadsPersistedDestinationsFromBrowserStorage()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -270,7 +270,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StreamSidebar_DoesNotRenderHardcodedLocalDestinationCards()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -302,7 +302,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_SelectsSecondCameraForCanvas()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -323,7 +323,7 @@ public sealed class GoLivePageTests : BunitContext
                 cut.FindByTestId(UiTestIds.GoLive.SelectedSourceLabel).TextContent.Trim()));
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_LoadsRemoteGuestSourcesFromEnabledTransportConnections()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -370,7 +370,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_PrunesAnonymousPersistedSources_AndExposesCameraDiagnostics()
     {
         var sceneState = new MediaSceneState(
@@ -411,7 +411,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_RendersStudioParitySurfaceAndRemoteRoomFlow()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -444,7 +444,7 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_ShowsElapsedTimerForActiveRecordingSession()
     {
         SeedSceneState(CreateTwoCameraScene());

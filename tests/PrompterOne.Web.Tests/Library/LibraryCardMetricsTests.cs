@@ -9,7 +9,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class LibraryCardMetricsTests : BunitContext
 {
-    [Fact]
+    [Test]
     public async Task LibraryPage_UsesRealTpsMetricsOnCards_InsteadOfDisplayOverrides()
     {
         TestHarnessFactory.Create(this);

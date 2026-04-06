@@ -10,6 +10,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class MainLayoutOnboardingTests : BunitContext
 {
     private const string EditorTitle = "Shape the script in Editor";
@@ -17,7 +18,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
     private const string UkrainianDismissLabel = "Не цікаво";
     private const string UkrainianWelcomeTitle = "Як працює PrompterOne";
 
-    [Fact]
+    [Test]
     public void MainLayout_FirstRun_RendersOnboardingOverlay()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -38,7 +39,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_OnboardingStaysHidden_WhenPreferenceAlreadySaved()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -56,7 +57,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Onboarding.Surface))));
     }
 
-    [Fact]
+    [Test]
     public async Task MainLayout_DismissingOnboarding_PersistsSeenFlag()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -85,7 +86,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
         Assert.True(savedPreferences!.HasSeenOnboarding);
     }
 
-    [Fact]
+    [Test]
     public async Task MainLayout_FinishingOnboarding_ReturnsToLibrary_AndPersistsSeenFlag()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -115,7 +116,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
         Assert.True(savedPreferences!.HasSeenOnboarding);
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_OnboardingKeepsTpsAndEditorAsDistinctSteps_OnSharedEditorRoute()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -148,7 +149,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_OnboardingCanBeReopened_FromShellButtonAfterCompletion()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -171,7 +172,7 @@ public sealed class MainLayoutOnboardingTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void MainLayout_OnboardingRendersLocalizedCopy_WhenCurrentCultureIsUkrainian()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.UkrainianCultureName);

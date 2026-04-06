@@ -12,7 +12,7 @@ public sealed class LibraryFolderOverlayTests : BunitContext
         TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void LibraryPage_FolderOverlay_StartsWithEmptyDraft_AndKeepsTypedValue()
     {
         var cut = Render<LibraryPage>();

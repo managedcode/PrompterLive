@@ -1,10 +1,12 @@
+using System.IO;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string ImportedBodyOnly =
         """
         ## [Episode 2 - How Systems Talk to Each Other|140WPM|Professional]
@@ -36,7 +38,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     private const string StartupScenarioName = "library-startup";
     private const string StartupScenarioStep = "loaded";
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_NavigatesIntoEditorAndSettings() =>
         RunPageAsync(async page =>
         {
@@ -66,7 +68,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 .ToContainTextAsync(BrowserTestConstants.Library.ModeLabel);
             await demoCard.HoverAsync();
             var hoverBoxShadow = await demoCard.EvaluateAsync<string>("element => getComputedStyle(element).boxShadow");
-            Assert.NotEqual(BrowserTestConstants.Library.HoverBoxShadowNone, hoverBoxShadow);
+            await Assert.That(hoverBoxShadow).IsNotEqualTo(BrowserTestConstants.Library.HoverBoxShadowNone);
             await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(BrowserTestConstants.Library.SearchQuery);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.QuantumCard)).ToContainTextAsync(BrowserTestConstants.Scripts.QuantumTitle);
             await Expect(demoCard).ToBeHiddenAsync();
@@ -98,7 +100,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_NewScriptActionsOpenEmptyEditorDraft() =>
         RunPageAsync(async page =>
         {
@@ -119,7 +121,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_OpenScriptImportsLocalFileAndNavigatesIntoEditor() =>
         RunPageAsync(async page =>
         {
@@ -139,11 +141,8 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 await Expect(page.GetByTestId(UiTestIds.Editor.Profile)).ToHaveValueAsync(ImportedProfile);
                 await Expect(page.GetByTestId(UiTestIds.Editor.Created)).ToHaveValueAsync(ImportedCreatedDate);
 
-                Assert.Equal(AppRoutes.Editor, new Uri(page.Url).AbsolutePath);
-                Assert.Contains(
-                    $"{AppRoutes.ScriptIdQueryKey}=",
-                    new Uri(page.Url).Query,
-                    StringComparison.Ordinal);
+                await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(AppRoutes.Editor);
+                await Assert.That(new Uri(page.Url).Query).Contains($"{AppRoutes.ScriptIdQueryKey}=");
             }
             finally
             {
@@ -151,7 +150,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             }
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_KeepsOnlyOneCardMenuOpen_AndOutsideClickDismissesDropdown() =>
         RunPageAsync(async page =>
         {
@@ -176,7 +175,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             await page.GetByTestId(BrowserTestConstants.Elements.QuantumCard).ClickAsync();
             await Expect(leadershipDropdown).ToBeHiddenAsync();
-            Assert.Equal(BrowserTestConstants.Routes.Library, new Uri(page.Url).AbsolutePath);
+            await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(BrowserTestConstants.Routes.Library);
         });
 
     private static async Task<string> CreateImportedScriptAsync()
@@ -186,7 +185,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         return path;
     }
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_SidebarFoldersFilterCards() =>
         RunPageAsync(async page =>
         {
@@ -211,7 +210,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
         RunPageAsync(async page =>
         {
@@ -228,10 +227,10 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 BrowserTestConstants.Folders.AllScriptsName,
                 StringSplitOptions.None).Length - 1;
 
-            Assert.Equal(1, allScriptsOccurrences);
+            await Assert.That(allScriptsOccurrences).IsEqualTo(1);
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_CreatesFolderAndMovesScript() =>
         RunPageAsync(async page =>
         {
@@ -272,7 +271,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_TouchViewport_ShowsCardMenuWithoutHover_AndHidesBreadcrumb() =>
         RunPageAsync(async page =>
         {
@@ -289,7 +288,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToBeHiddenAsync();
-            Assert.True(demoCardMenuOpacity >= BrowserTestConstants.LibraryFlow.MinimumTouchMenuOpacity);
+            await Assert.That(demoCardMenuOpacity >= BrowserTestConstants.LibraryFlow.MinimumTouchMenuOpacity).IsTrue();
 
             await demoCardMenu.ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)))

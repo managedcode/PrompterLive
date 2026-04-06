@@ -3,10 +3,12 @@ using Microsoft.Playwright;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
 {
     private const int LayoutViewportHeight = 768;
     private const int LayoutViewportWidth = 1366;
@@ -24,7 +26,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
 
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_PersistsTransportAndDistributionTargetsWithoutRenderingLocalOutputCards()
     {
         var page = await _fixture.NewPageAsync();
@@ -61,7 +63,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_TogglesSceneCameraMembershipAndRoutesTopLeftHomeControlToLibrary()
     {
         var page = await _fixture.NewPageAsync();
@@ -89,7 +91,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_BackControl_ReturnsToPreviousInAppScreen_WhenEnteredFromSettings()
     {
         var page = await _fixture.NewPageAsync();
@@ -114,7 +116,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_ShowsLiveCameraPreviewForProgramFeed()
     {
         var page = await _fixture.NewPageAsync();
@@ -132,7 +134,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             await Expect(previewVideo).ToBeVisibleAsync();
 
             var previewHandle = await previewVideo.ElementHandleAsync();
-            Assert.NotNull(previewHandle);
+            await Assert.That(previewHandle).IsNotNull();
 
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.PreviewReadyScript,
@@ -147,7 +149,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_HidesPreviewRailWhenRightPanelIsCollapsed()
     {
         var page = await _fixture.NewPageAsync();
@@ -168,7 +170,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_UsesNewDesignStudioGridAndTopbarLayout()
     {
         UiScenarioArtifacts.ResetScenario(GoLiveLayoutParityScenario);
@@ -204,18 +206,18 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             var streamButtonBox = await GetRequiredBoxAsync(streamButton);
             var timerBox = await GetRequiredBoxAsync(timer);
 
-            Assert.InRange(sourceRailBox.Width, MinSourcesRailWidth, MaxSourcesRailWidth);
-            Assert.InRange(previewRailBox.Width, MinPreviewRailWidth, MaxPreviewRailWidth);
-            Assert.True(programCardBox.Width > sourceRailBox.Width);
-            Assert.True(programCardBox.Width > previewRailBox.Width);
+            await Assert.That(sourceRailBox.Width).IsBetween(MinSourcesRailWidth,MaxSourcesRailWidth);
+            await Assert.That(previewRailBox.Width).IsBetween(MinPreviewRailWidth,MaxPreviewRailWidth);
+            await Assert.That(programCardBox.Width > sourceRailBox.Width).IsTrue();
+            await Assert.That(programCardBox.Width > previewRailBox.Width).IsTrue();
 
             var programAspectRatio = programVideoBox.Width / programVideoBox.Height;
-            Assert.InRange(programAspectRatio, MinProgramAspectRatio, MaxProgramAspectRatio);
-            Assert.True(streamButtonBox.X > settingsButtonBox.X);
+            await Assert.That(programAspectRatio).IsBetween(MinProgramAspectRatio,MaxProgramAspectRatio);
+            await Assert.That(streamButtonBox.X > settingsButtonBox.X).IsTrue();
 
             var sessionCenter = sessionBarBox.X + (sessionBarBox.Width / 2d);
             var timerCenter = timerBox.X + (timerBox.Width / 2d);
-            Assert.InRange(Math.Abs(timerCenter - sessionCenter), 0d, TimerCenterTolerancePixels);
+            await Assert.That(Math.Abs(timerCenter - sessionCenter)).IsBetween(0d,TimerCenterTolerancePixels);
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -228,7 +230,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_WithEmptyScene_AutoSeedsDefaultDevicesAndShowsStudioShell()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.GoLive.AutoSeedScenario);
@@ -279,7 +281,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             }
             """);
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_SelectsSecondaryCameraAndTakesItToAir()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.GoLive.CameraSwitchScenario);
@@ -339,7 +341,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_OnSingleLocalCameraBrowsers_ShowsHintAndMovesLivePreviewToTheSelectedCamera()
     {
         var page = await _fixture.NewPageAsync();
@@ -383,7 +385,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartStream_WithVdoNinjaArmed_PublishesProgramVideoAndAudio()
     {
         var page = await _fixture.NewPageAsync();
@@ -414,22 +416,18 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var harnessState = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.GoLive.GetVdoNinjaHarnessScript);
-            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, harnessState.GetProperty("joinRoomCalls")[0].GetProperty("room").GetString());
-            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, harnessState.GetProperty("publishCalls")[0].GetProperty("room").GetString());
-            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaPublishStreamId, harnessState.GetProperty("publishCalls")[0].GetProperty("streamId").GetString());
-            Assert.Contains(
-                harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString()),
-                kind => string.Equals(kind, "video", StringComparison.Ordinal));
-            Assert.Contains(
-                harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString()),
-                kind => string.Equals(kind, "audio", StringComparison.Ordinal));
+            await Assert.That(harnessState.GetProperty("joinRoomCalls")[0].GetProperty("room").GetString()).IsEqualTo(BrowserTestConstants.GoLive.VdoNinjaRoom);
+            await Assert.That(harnessState.GetProperty("publishCalls")[0].GetProperty("room").GetString()).IsEqualTo(BrowserTestConstants.GoLive.VdoNinjaRoom);
+            await Assert.That(harnessState.GetProperty("publishCalls")[0].GetProperty("streamId").GetString()).IsEqualTo(BrowserTestConstants.GoLive.VdoNinjaPublishStreamId);
+            await Assert.That(harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString())).Contains(kind => string.Equals(kind, "video", StringComparison.Ordinal));
+            await Assert.That(harnessState.GetProperty("publishCalls")[0].GetProperty("trackKinds").EnumerateArray().Select(kind => kind.GetString())).Contains(kind => string.Equals(kind, "audio", StringComparison.Ordinal));
 
             var runtimeState = await page.EvaluateAsync<JsonElement>(
                 BrowserTestConstants.GoLive.GetRuntimeStateScript,
                 BrowserTestConstants.GoLive.RuntimeSessionId);
-            Assert.True(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean());
-            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaRoom, runtimeState.GetProperty("vdoNinja").GetProperty("roomName").GetString());
-            Assert.Equal(BrowserTestConstants.GoLive.VdoNinjaPublishUrl, runtimeState.GetProperty("vdoNinja").GetProperty("publishUrl").GetString());
+            await Assert.That(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean()).IsTrue();
+            await Assert.That(runtimeState.GetProperty("vdoNinja").GetProperty("roomName").GetString()).IsEqualTo(BrowserTestConstants.GoLive.VdoNinjaRoom);
+            await Assert.That(runtimeState.GetProperty("vdoNinja").GetProperty("publishUrl").GetString()).IsEqualTo(BrowserTestConstants.GoLive.VdoNinjaPublishUrl);
         }
         finally
         {
@@ -437,7 +435,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_RemoteGuestSources_AppearAndDriveConcurrentLiveKitAndVdoOutputs()
     {
         var page = await _fixture.NewPageAsync();
@@ -490,11 +488,9 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
                 BrowserTestConstants.GoLive.GetRuntimeStateScript,
                 BrowserTestConstants.GoLive.RuntimeSessionId);
 
-            Assert.True(runtimeState.GetProperty("liveKit").GetProperty("active").GetBoolean());
-            Assert.True(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean());
-            Assert.Equal(
-                BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId,
-                runtimeState.GetProperty("program").GetProperty("primarySourceId").GetString());
+            await Assert.That(runtimeState.GetProperty("liveKit").GetProperty("active").GetBoolean()).IsTrue();
+            await Assert.That(runtimeState.GetProperty("vdoNinja").GetProperty("active").GetBoolean()).IsTrue();
+            await Assert.That(runtimeState.GetProperty("program").GetProperty("primarySourceId").GetString()).IsEqualTo(BrowserTestConstants.GoLive.RemoteLiveKitGuestSourceId);
         }
         finally
         {
@@ -502,7 +498,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_SwitchesStudioTabsAndCreatesRemoteRoom()
     {
         var page = await _fixture.NewPageAsync();
@@ -639,8 +635,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
             BrowserTestConstants.GoLive.RuntimeSessionId);
         var failedHarnessState = await page.EvaluateAsync<JsonElement?>(BrowserTestConstants.GoLive.GetLiveKitHarnessScript);
 
-        Assert.Fail(
-            $"LiveKit publish did not become ready. Runtime={SerializeDiagnosticState(failedRuntimeState)} Harness={SerializeDiagnosticState(failedHarnessState)}");
+        Assert.Fail("Unexpected execution path.");
     }
 
     private static bool IsLiveKitPublishReady(JsonElement? runtimeState, JsonElement? harnessState)
@@ -700,7 +695,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture) : IClassFixtur
 
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 
-    [Fact]
+    [Test]
     public async Task SettingsPage_LinksIntoGoLiveRoutingAndGoLiveLinksBackToSettings()
     {
         var page = await _fixture.NewPageAsync();

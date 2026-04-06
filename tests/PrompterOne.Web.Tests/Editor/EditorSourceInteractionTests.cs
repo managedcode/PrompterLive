@@ -8,6 +8,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class EditorSourceInteractionTests : BunitContext
 {
     private readonly AppHarness _harness;
@@ -17,7 +18,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_UsesVisibleBodyTextareaAndRebuildsStructureWhenSourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -59,7 +60,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_MetadataChangesRewritePersistedFrontMatterWithoutLeakingIntoVisibleBody()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -93,7 +94,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_HistoryButtonsReplaySourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -119,11 +120,17 @@ public sealed class EditorSourceInteractionTests : BunitContext
             Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
         });
 
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Null(cut.FindByTestId(UiTestIds.Editor.Undo).GetAttribute("disabled"));
+        });
+
         cut.FindByTestId(UiTestIds.Editor.Undo).Click();
 
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(initialSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
+            Assert.Null(cut.FindByTestId(UiTestIds.Editor.Redo).GetAttribute("disabled"));
         });
 
         cut.FindByTestId(UiTestIds.Editor.Redo).Click();
@@ -134,7 +141,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_TypingStaysLocalFirstUntilAutosaveDebounce()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -184,7 +191,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         Assert.True(_harness.Session.State.WordCount > initialSessionWordCount);
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_PastedFrontMatterHydratesMetadataAndKeepsVisibleBodyClean()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -248,7 +255,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task EditorPage_KeyboardUndoAndRedoReplaySourceChanges()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -274,7 +281,9 @@ public sealed class EditorSourceInteractionTests : BunitContext
             Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
         });
 
-        sourceEditor.TriggerEvent("onkeydown", new KeyboardEventArgs
+        var currentSourceEditor = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+
+        currentSourceEditor.TriggerEvent("onkeydown", new KeyboardEventArgs
         {
             CtrlKey = true,
             Key = EditorSourceInteractionTestSource.UndoKey
@@ -285,7 +294,9 @@ public sealed class EditorSourceInteractionTests : BunitContext
             Assert.Equal(initialSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
         });
 
-        sourceEditor.TriggerEvent("onkeydown", new KeyboardEventArgs
+        currentSourceEditor = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+
+        currentSourceEditor.TriggerEvent("onkeydown", new KeyboardEventArgs
         {
             CtrlKey = true,
             Key = EditorSourceInteractionTestSource.RedoKey
@@ -297,7 +308,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_VoiceMenuIncludesInlineResetAction()
     {
         Services.GetRequiredService<NavigationManager>()

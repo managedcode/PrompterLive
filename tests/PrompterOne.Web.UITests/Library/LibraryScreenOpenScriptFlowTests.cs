@@ -1,10 +1,12 @@
+using System.IO;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private const string BodyOnlyFileName = "Quarterly Town Hall Notes.txt";
     private const string BodyOnlyTitle = "Quarterly Town Hall Notes";
     private const string BodyOnlyDocument =
@@ -49,7 +51,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
     private const string UnsupportedImportMessage = "Unable to import this script.";
     private const string UnsupportedImportText = "This should be rejected by the import descriptor.";
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_OpenScriptImportsBodyOnlyTextFile_UsingFileNameAsTitle() =>
         RunPageAsync(async page =>
         {
@@ -73,7 +75,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
             }
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_OpenScriptRejectsUnsupportedFileExtension_AndKeepsUserOnLibrary() =>
         RunPageAsync(async page =>
         {
@@ -92,7 +94,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToContainTextAsync(UnsupportedImportMessage);
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToContainTextAsync(UnsupportedImportDetail);
 
-                Assert.Equal(BrowserTestConstants.Routes.Library, new Uri(page.Url).AbsolutePath);
+                await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(BrowserTestConstants.Routes.Library);
             }
             finally
             {
@@ -100,7 +102,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
             }
         });
 
-    [Fact]
+    [Test]
     public Task LibraryScreen_OpenScriptCanImportASecondFile_AfterPickerResets() =>
         RunPageAsync(async page =>
         {
@@ -128,10 +130,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
                 await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(SecondImportTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(SecondImportBody);
-                Assert.Contains(
-                    $"{AppRoutes.ScriptIdQueryKey}=",
-                    new Uri(page.Url).Query,
-                    StringComparison.Ordinal);
+                await Assert.That(new Uri(page.Url).Query).Contains($"{AppRoutes.ScriptIdQueryKey}=");
             }
             finally
             {

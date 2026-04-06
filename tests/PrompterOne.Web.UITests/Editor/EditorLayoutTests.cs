@@ -2,14 +2,16 @@ using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_MetadataRailStaysDockedToRightOfMainPanel()
     {
         var page = await _fixture.NewPageAsync();
@@ -31,18 +33,9 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
             var dockGap = railBounds.X - (mainBounds.X + mainBounds.Width);
             var bottomEdgeDrift = Math.Abs((railBounds.Y + railBounds.Height) - (mainBounds.Y + mainBounds.Height));
 
-            Assert.InRange(
-                Math.Abs(dockGap - BrowserTestConstants.Editor.MetadataRailDockGapPx),
-                0,
-                BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
-            Assert.InRange(
-                Math.Abs(railBounds.Y - mainBounds.Y),
-                0,
-                BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
-            Assert.InRange(
-                bottomEdgeDrift,
-                0,
-                BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
+            await Assert.That(Math.Abs(dockGap - BrowserTestConstants.Editor.MetadataRailDockGapPx)).IsBetween(0,BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
+            await Assert.That(Math.Abs(railBounds.Y - mainBounds.Y)).IsBetween(0,BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
+            await Assert.That(bottomEdgeDrift).IsBetween(0,BrowserTestConstants.Editor.MetadataRailDockTolerancePx);
         }
         finally
         {
@@ -50,7 +43,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_SourceEditorUsesSingleVerticalScrollSurface()
     {
         var page = await _fixture.NewPageAsync();
@@ -112,9 +105,9 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
                 }
                 """);
 
-            Assert.True(stageState.ScrollTop > 0);
-            Assert.Equal(BrowserTestConstants.Editor.MaxSourceScrollHostTopPx, scrollState.HostScrollTop);
-            Assert.Equal("hidden", scrollState.HostOverflowY);
+            await Assert.That(stageState.ScrollTop > 0).IsTrue();
+            await Assert.That(scrollState.HostScrollTop).IsEqualTo(BrowserTestConstants.Editor.MaxSourceScrollHostTopPx);
+            await Assert.That(scrollState.HostOverflowY).IsEqualTo("hidden");
         }
         finally
         {
@@ -122,7 +115,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_CreatedDateFieldShowsVisibleCalendarIcon()
     {
         var page = await _fixture.NewPageAsync();
@@ -144,7 +137,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
                 element => getComputedStyle(element).color
                 """);
 
-            Assert.NotEqual(BrowserTestConstants.Editor.CalendarIconUnexpectedColor, iconColor);
+            await Assert.That(iconColor).IsNotEqualTo(BrowserTestConstants.Editor.CalendarIconUnexpectedColor);
         }
         finally
         {
@@ -152,7 +145,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ToolbarKeepsFarActionsReachableOnPhoneLandscape()
     {
         var page = await _fixture.NewPageAsync();
@@ -181,9 +174,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
                 })
                 """);
 
-            Assert.True(
-                new[] { "auto", "scroll" }.Contains(toolbarState.OverflowX, StringComparer.Ordinal),
-                $"Unexpected toolbar overflow-x value: {toolbarState.OverflowX}");
+            await Assert.That(new[] { "auto", "scroll" }.Contains(toolbarState.OverflowX, StringComparer.Ordinal)).IsTrue().Because($"Unexpected toolbar overflow-x value: {toolbarState.OverflowX}");
 
             await toolbar.EvaluateAsync(
                 """
@@ -198,8 +189,8 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
             var aiOverflowRight = (aiButtonBounds.X + aiButtonBounds.Width) - (toolbarBounds.X + toolbarBounds.Width);
             var aiOverflowLeft = toolbarBounds.X - aiButtonBounds.X;
 
-            Assert.InRange(aiOverflowRight, double.MinValue, BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
-            Assert.InRange(aiOverflowLeft, double.MinValue, BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
+            await Assert.That(aiOverflowRight).IsBetween(double.MinValue,BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
+            await Assert.That(aiOverflowLeft).IsBetween(double.MinValue,BrowserTestConstants.EditorFlow.ToolbarOverflowTolerancePx);
         }
         finally
         {
@@ -207,7 +198,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_UsesAvailableWidthAndMetadataRailCanCollapse()
     {
         var page = await _fixture.NewPageAsync();
@@ -238,12 +229,9 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
                 BrowserTestConstants.EditorFlow.LayoutScenario,
                 BrowserTestConstants.EditorFlow.LayoutExpandedStep);
 
-            Assert.InRange(
-                expandedMetrics.LayoutViewportRightGap,
-                0,
-                BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
-            Assert.False(expandedMetrics.MetadataRailCollapsed);
-            Assert.Equal(BrowserTestConstants.EditorFlow.MetadataRailExpandedChevronDirection, expandedMetrics.MetadataToggleChevronDirection);
+            await Assert.That(expandedMetrics.LayoutViewportRightGap).IsBetween(0,BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
+            await Assert.That(expandedMetrics.MetadataRailCollapsed).IsFalse();
+            await Assert.That(expandedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailExpandedChevronDirection);
 
             await metadataToggle.ClickAsync();
             await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.MetadataRailToggleSettleDelayMs);
@@ -255,19 +243,11 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture) : IClassFixt
                 BrowserTestConstants.EditorFlow.LayoutScenario,
                 BrowserTestConstants.EditorFlow.LayoutCollapsedStep);
 
-            Assert.InRange(
-                collapsedMetrics.LayoutViewportRightGap,
-                0,
-                BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
-            Assert.True(collapsedMetrics.MetadataRailCollapsed);
-            Assert.Equal(BrowserTestConstants.EditorFlow.MetadataRailCollapsedChevronDirection, collapsedMetrics.MetadataToggleChevronDirection);
-            Assert.True(
-                expandedMetrics.MainWidth + BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx <= collapsedMetrics.MainWidth,
-                $"Expected the main editor panel to grow by at least {BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx}px after collapsing metadata, but it changed from {expandedMetrics.MainWidth:0.##} to {collapsedMetrics.MainWidth:0.##}.");
-            Assert.InRange(
-                collapsedMetrics.MetadataRailWidth,
-                0,
-                BrowserTestConstants.Editor.MaximumCollapsedMetadataRailWidthPx);
+            await Assert.That(collapsedMetrics.LayoutViewportRightGap).IsBetween(0,BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
+            await Assert.That(collapsedMetrics.MetadataRailCollapsed).IsTrue();
+            await Assert.That(collapsedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailCollapsedChevronDirection);
+            await Assert.That(expandedMetrics.MainWidth + BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx <= collapsedMetrics.MainWidth).IsTrue().Because($"Expected the main editor panel to grow by at least {BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx}px after collapsing metadata, but it changed from {expandedMetrics.MainWidth:0.##} to {collapsedMetrics.MainWidth:0.##}.");
+            await Assert.That(collapsedMetrics.MetadataRailWidth).IsBetween(0,BrowserTestConstants.Editor.MaximumCollapsedMetadataRailWidthPx);
         }
         finally
         {

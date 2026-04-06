@@ -7,7 +7,7 @@ public sealed class EditorLocalAssistantTests
 {
     private readonly EditorLocalAssistant _assistant = new();
 
-    [Fact]
+    [Test]
     public void Apply_Simplify_RewritesSelectedText()
     {
         const string source = "A transformative workflow can utilize focus.";
@@ -18,7 +18,7 @@ public sealed class EditorLocalAssistantTests
         Assert.Contains("clear workflow can use", result.Text, StringComparison.Ordinal);
     }
 
-    [Fact]
+    [Test]
     public void Apply_AddDeliveryPauses_ReflowsFullTextWhenNoSelection()
     {
         const string source = "Welcome, everyone. We are ready; stay focused.";

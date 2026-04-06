@@ -1,10 +1,13 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
+[System.Obsolete]
 
-[Collection(EditorAuthoringCollection.Name)]
-public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
+public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture)
 {
     private const int TitleLineNumber = 1;
     private const int SegmentLineNumber = 2;
@@ -43,7 +46,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
         "//"
     ];
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_TokenizesSupportedTpsSyntaxWithMonacoLanguage()
     {
         var page = await fixture.NewPageAsync();
@@ -61,24 +64,24 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
             var blockTokens = await EditorMonacoDriver.TokenizeLineAsync(page, BlockLineNumber);
             var inlineTokens = await EditorMonacoDriver.TokenizeLineAsync(page, InlineLineNumber);
 
-            Assert.Equal(TitleLine, titleTokens.LineText);
-            Assert.Equal(SegmentLine, segmentTokens.LineText);
-            Assert.Equal(BlockLine, blockTokens.LineText);
-            Assert.Equal(InlineLine, inlineTokens.LineText);
-            Assert.Contains(titleTokens.Tokens, token => token.Type.Contains("header.title.hash", StringComparison.Ordinal));
-            Assert.Contains(titleTokens.Tokens, token => token.Type.Contains("header.title.body", StringComparison.Ordinal));
-            Assert.Contains(segmentTokens.Tokens, token => token.Type.Contains("header.segment.hash", StringComparison.Ordinal));
-            Assert.Contains(segmentTokens.Tokens, token => token.Type.Contains("header.segment.body", StringComparison.Ordinal));
-            Assert.Contains(blockTokens.Tokens, token => token.Type.Contains("header.block.hash", StringComparison.Ordinal));
-            Assert.Contains(blockTokens.Tokens, token => token.Type.Contains("header.block.body", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("cue.breath", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("cue.editpoint", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("markdown.italic", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("markdown.bold", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("cue.pronunciation", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("pause.short", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("pause.long", StringComparison.Ordinal));
-            Assert.Contains(inlineTokens.Tokens, token => token.Type.Contains("pause.timed", StringComparison.Ordinal));
+            await Assert.That(titleTokens.LineText).IsEqualTo(TitleLine);
+            await Assert.That(segmentTokens.LineText).IsEqualTo(SegmentLine);
+            await Assert.That(blockTokens.LineText).IsEqualTo(BlockLine);
+            await Assert.That(inlineTokens.LineText).IsEqualTo(InlineLine);
+            await Assert.That(titleTokens.Tokens).Contains(token => token.Type.Contains("header.title.hash", StringComparison.Ordinal));
+            await Assert.That(titleTokens.Tokens).Contains(token => token.Type.Contains("header.title.body", StringComparison.Ordinal));
+            await Assert.That(segmentTokens.Tokens).Contains(token => token.Type.Contains("header.segment.hash", StringComparison.Ordinal));
+            await Assert.That(segmentTokens.Tokens).Contains(token => token.Type.Contains("header.segment.body", StringComparison.Ordinal));
+            await Assert.That(blockTokens.Tokens).Contains(token => token.Type.Contains("header.block.hash", StringComparison.Ordinal));
+            await Assert.That(blockTokens.Tokens).Contains(token => token.Type.Contains("header.block.body", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("cue.breath", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("cue.editpoint", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("markdown.italic", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("markdown.bold", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("cue.pronunciation", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("pause.short", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("pause.long", StringComparison.Ordinal));
+            await Assert.That(inlineTokens.Tokens).Contains(token => token.Type.Contains("pause.timed", StringComparison.Ordinal));
         }
         finally
         {
@@ -86,7 +89,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ProvidesMonacoTpsCompletions()
     {
         var page = await fixture.NewPageAsync();
@@ -101,10 +104,10 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
 
             var completions = await EditorMonacoDriver.GetCompletionsAsync(page, CompletionInvokeLineNumber, CompletionInvokeColumn);
 
-            Assert.NotEmpty(completions.Suggestions);
+            await Assert.That(completions.Suggestions).IsNotEmpty();
             foreach (var expectedLabel in ExpectedCompletionLabels)
             {
-                Assert.Contains(completions.Suggestions, suggestion => string.Equals(suggestion.Label, expectedLabel, StringComparison.Ordinal));
+                await Assert.That(completions.Suggestions).Contains(suggestion => string.Equals(suggestion.Label, expectedLabel, StringComparison.Ordinal));
             }
         }
         finally
@@ -113,7 +116,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_ProvidesMonacoHoverHelpForTpsAuthoring()
     {
         var page = await fixture.NewPageAsync();
@@ -132,19 +135,19 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
             var guideHover = await EditorMonacoDriver.GetHoverAsync(page, InlineLineNumber, FindColumn(InlineLine, "development"));
             var markdownHover = await EditorMonacoDriver.GetHoverAsync(page, InlineLineNumber, FindColumn(InlineLine, "**really**"));
 
-            Assert.NotNull(breathHover);
-            Assert.NotNull(speakerHover);
-            Assert.NotNull(pauseHover);
-            Assert.NotNull(guideHover);
-            Assert.NotNull(markdownHover);
-            Assert.Contains(breathHover!.Contents, content => content.Contains("Breath mark", StringComparison.Ordinal) &&
+            await Assert.That(breathHover).IsNotNull();
+            await Assert.That(speakerHover).IsNotNull();
+            await Assert.That(pauseHover).IsNotNull();
+            await Assert.That(guideHover).IsNotNull();
+            await Assert.That(markdownHover).IsNotNull();
+            await Assert.That(breathHover!.Contents).Contains(content => content.Contains("Breath mark", StringComparison.Ordinal) &&
                 content.Contains("natural breath point", StringComparison.OrdinalIgnoreCase));
-            Assert.Contains(speakerHover!.Contents, content => content.Contains("Talent assignment", StringComparison.OrdinalIgnoreCase));
-            Assert.Contains(pauseHover!.Contents, content => content.Contains("Medium pause", StringComparison.Ordinal) &&
+            await Assert.That(speakerHover!.Contents).Contains(content => content.Contains("Talent assignment", StringComparison.OrdinalIgnoreCase));
+            await Assert.That(pauseHover!.Contents).Contains(content => content.Contains("Medium pause", StringComparison.Ordinal) &&
                 content.Contains("600ms", StringComparison.Ordinal));
-            Assert.Contains(guideHover!.Contents, content => content.Contains("Syllable guide", StringComparison.Ordinal) &&
+            await Assert.That(guideHover!.Contents).Contains(content => content.Contains("Syllable guide", StringComparison.Ordinal) &&
                 content.Contains("de-VE-lop-ment", StringComparison.Ordinal));
-            Assert.Contains(markdownHover!.Contents, content => content.Contains("Markdown bold", StringComparison.Ordinal) &&
+            await Assert.That(markdownHover!.Contents).Contains(content => content.Contains("Markdown bold", StringComparison.Ordinal) &&
                 content.Contains("**text**", StringComparison.Ordinal));
         }
         finally
@@ -156,7 +159,11 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
     private static int FindColumn(string line, string fragment)
     {
         var index = line.IndexOf(fragment, StringComparison.Ordinal);
-        Assert.True(index >= 0, $"Unable to locate \"{fragment}\" inside the Monaco assistance probe line.");
+        if (index < 0)
+        {
+            throw new InvalidOperationException($"Unable to locate \"{fragment}\" inside the Monaco assistance probe line.");
+        }
+
         return index + HoverInsideTokenOffset;
     }
 }

@@ -4,7 +4,7 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class TpsSdkBoundaryTests
 {
-    [Fact]
+    [Test]
     public void CoreAssembly_DoesNotShipLocalTpsSpecShadowType()
     {
         var shadowType = typeof(ScriptCompiler).Assembly.GetType("PrompterOne.Core.Services.TpsSpec", throwOnError: false);

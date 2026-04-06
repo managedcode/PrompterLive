@@ -8,7 +8,7 @@ public sealed class TpsDocumentSplitServiceTests
     private readonly TpsDocumentSplitService _service = new();
     private readonly TpsFrontMatterDocumentService _frontMatter = new();
 
-    [Fact]
+    [Test]
     public void Split_BySegmentHeading_CreatesOneChildPerEpisodeAndCarriesCanonicalMetadata()
     {
         var source =
@@ -58,7 +58,7 @@ public sealed class TpsDocumentSplitServiceTests
             });
     }
 
-    [Fact]
+    [Test]
     public void Split_ByTopLevelHeading_KeepsPreambleWithFirstSection()
     {
         var source =
@@ -100,7 +100,7 @@ public sealed class TpsDocumentSplitServiceTests
             });
     }
 
-    [Fact]
+    [Test]
     public void Split_ReturnsEmptyWhenBodyDoesNotContainRequestedHeadingLevel()
     {
         var source =

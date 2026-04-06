@@ -47,11 +47,11 @@ jobs:
 
       - name: Test supporting suites
         run: |
-          dotnet test "$CORE_TEST_PROJECT" --no-build
-          dotnet test "$APP_TEST_PROJECT" --no-build
+          dotnet test --project "$CORE_TEST_PROJECT"
+          dotnet test --project "$APP_TEST_PROJECT"
 
       - name: Test browser suite
-        run: dotnet test "$UI_TEST_PROJECT" --no-build
+        run: dotnet test --project "$UI_TEST_PROJECT"
 
   prepare_release:
     name: Resolve Release Version

@@ -2,17 +2,18 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private static readonly Regex ReadingActiveClassRegex = new(
         $@"\b{BrowserTestConstants.TeleprompterFlow.ReadingActiveCssClass}\b",
         RegexOptions.Compiled);
 
-    [Fact]
+    [Test]
     public Task TeleprompterScreen_ActivePlayback_MutesChromeIntensity() =>
         RunPageAsync(async page =>
         {
@@ -51,24 +52,12 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             var activeHeaderGoLive = await ReadChromeVisualStateAsync(headerGoLive);
             var activeReaderBack = await ReadChromeVisualStateAsync(readerBack);
 
-            Assert.True(
-                initialControls.BackgroundAlpha - activeControls.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction,
-                $"Expected controls background alpha {activeControls.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialControls.BackgroundAlpha:0.###} during active playback.");
-            Assert.True(
-                initialProgress.BackgroundAlpha - activeProgress.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction,
-                $"Expected progress shell background alpha {activeProgress.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialProgress.BackgroundAlpha:0.###} during active playback.");
-            Assert.True(
-                initialEdgeInfo.Opacity - activeEdgeInfo.Opacity >= BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction,
-                $"Expected edge info opacity {activeEdgeInfo.Opacity:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction:0.###} lower than {initialEdgeInfo.Opacity:0.###} during active playback.");
-            Assert.True(
-                initialHeaderBack.BackgroundAlpha - activeHeaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction,
-                $"Expected header back background alpha {activeHeaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderBack.BackgroundAlpha:0.###} during active playback.");
-            Assert.True(
-                initialHeaderGoLive.BackgroundAlpha - activeHeaderGoLive.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction,
-                $"Expected header Go Live background alpha {activeHeaderGoLive.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderGoLive.BackgroundAlpha:0.###} during active playback.");
-            Assert.True(
-                initialReaderBack.BackgroundAlpha - activeReaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction,
-                $"Expected reader back background alpha {activeReaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialReaderBack.BackgroundAlpha:0.###} during active playback.");
+            await Assert.That(initialControls.BackgroundAlpha - activeControls.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction).IsTrue().Because($"Expected controls background alpha {activeControls.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialControls.BackgroundAlpha:0.###} during active playback.");
+            await Assert.That(initialProgress.BackgroundAlpha - activeProgress.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction).IsTrue().Because($"Expected progress shell background alpha {activeProgress.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialProgress.BackgroundAlpha:0.###} during active playback.");
+            await Assert.That(initialEdgeInfo.Opacity - activeEdgeInfo.Opacity >= BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction).IsTrue().Because($"Expected edge info opacity {activeEdgeInfo.Opacity:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction:0.###} lower than {initialEdgeInfo.Opacity:0.###} during active playback.");
+            await Assert.That(initialHeaderBack.BackgroundAlpha - activeHeaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction).IsTrue().Because($"Expected header back background alpha {activeHeaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderBack.BackgroundAlpha:0.###} during active playback.");
+            await Assert.That(initialHeaderGoLive.BackgroundAlpha - activeHeaderGoLive.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction).IsTrue().Because($"Expected header Go Live background alpha {activeHeaderGoLive.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumShellButtonBackgroundAlphaReduction:0.###} lower than {initialHeaderGoLive.BackgroundAlpha:0.###} during active playback.");
+            await Assert.That(initialReaderBack.BackgroundAlpha - activeReaderBack.BackgroundAlpha >= BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction).IsTrue().Because($"Expected reader back background alpha {activeReaderBack.BackgroundAlpha:0.###} to be at least {BrowserTestConstants.TeleprompterFlow.MinimumChromeBackgroundAlphaReduction:0.###} lower than {initialReaderBack.BackgroundAlpha:0.###} during active playback.");
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,

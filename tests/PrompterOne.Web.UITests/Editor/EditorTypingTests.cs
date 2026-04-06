@@ -2,14 +2,17 @@ using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+[NotInParallel(UiTestParallelization.EditorPerformanceConstraintKey)]
+public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_RapidTypingUpdatesStructureAndPersistsAfterReload()
     {
         var page = await _fixture.NewPageAsync();
@@ -42,7 +45,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_KeepsStyledOverlayVisibleAndPreservesClickCaretPlacement()
     {
         var page = await _fixture.NewPageAsync();
@@ -59,10 +62,10 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
             });
 
             var editorSurfaceState = await EditorMonacoDriver.GetStateAsync(page);
-            Assert.InRange(editorSurfaceState.Selection.Start, 0, BrowserTestConstants.Editor.ClickCaretThreshold);
-            Assert.True(editorSurfaceState.Ready);
-            Assert.Equal(EditorMonacoRuntimeContract.EditorEngineAttributeValue, editorSurfaceState.Engine);
-            Assert.True(editorSurfaceState.DecorationClasses.Count > 0);
+            await Assert.That(editorSurfaceState.Selection.Start).IsBetween(0,BrowserTestConstants.Editor.ClickCaretThreshold);
+            await Assert.That(editorSurfaceState.Ready).IsTrue();
+            await Assert.That(editorSurfaceState.Engine).IsEqualTo(EditorMonacoRuntimeContract.EditorEngineAttributeValue);
+            await Assert.That(editorSurfaceState.DecorationClasses.Count > 0).IsTrue();
         }
         finally
         {
@@ -70,7 +73,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_QuantumHeaderEditingKeepsBlockLineStyled()
     {
         var page = await _fixture.NewPageAsync();
@@ -112,8 +115,8 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                     targetText = BrowserTestConstants.Editor.QuantumOverviewBlockHeader
                 });
 
-            Assert.Equal(BrowserTestConstants.Editor.BlockLineCssClass, lineState.ClassName);
-            Assert.Equal(BrowserTestConstants.Editor.QuantumOverviewBlockLineText, lineState.Text);
+            await Assert.That(lineState.ClassName).IsEqualTo(BrowserTestConstants.Editor.BlockLineCssClass);
+            await Assert.That(lineState.Text).IsEqualTo(BrowserTestConstants.Editor.QuantumOverviewBlockLineText);
         }
         finally
         {
@@ -121,7 +124,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_SequentialTypingIntoSourceInputCompletesWithoutTimeout()
     {
         var page = await _fixture.NewPageAsync();
@@ -144,7 +147,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_NewDraftDoesNotReplaceRouteWhileTypingIsStillSettling()
     {
         var page = await _fixture.NewPageAsync();
@@ -159,8 +162,8 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.NewDraftPersistGraceDelayMs);
 
             var graceUri = new Uri(page.Url);
-            Assert.Equal(BrowserTestConstants.Routes.Editor, graceUri.AbsolutePath);
-            Assert.True(string.IsNullOrEmpty(graceUri.Query));
+            await Assert.That(graceUri.AbsolutePath).IsEqualTo(BrowserTestConstants.Routes.Editor);
+            await Assert.That(string.IsNullOrEmpty(graceUri.Query)).IsTrue();
 
             await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.SecondProbeCharacter);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(BrowserTestConstants.Editor.NewDraftProbeText);
@@ -168,8 +171,8 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.NewDraftPersistSettleDelayMs);
 
             var currentUri = new Uri(page.Url);
-            Assert.Equal(BrowserTestConstants.Routes.Editor, currentUri.AbsolutePath);
-            Assert.True(currentUri.Query.Contains(AppRoutes.ScriptIdQueryKey, StringComparison.Ordinal));
+            await Assert.That(currentUri.AbsolutePath).IsEqualTo(BrowserTestConstants.Routes.Editor);
+            await Assert.That(currentUri.Query.Contains(AppRoutes.ScriptIdQueryKey, StringComparison.Ordinal)).IsTrue();
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(BrowserTestConstants.Editor.NewDraftProbeText);
         }
         finally
@@ -178,7 +181,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
         }
     }
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_QuantumTypingKeepsStyledOverlayVisibleResponsive()
     {
         var page = await _fixture.NewPageAsync();
@@ -285,24 +288,14 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture) : IClassFixt
                 }
                 """);
 
-            Assert.True(probeResult.SampleCount > 0);
-            Assert.False(probeResult.SawVisibleInput);
-            Assert.InRange(
-                probeResult.P95Latency,
-                0,
-                BrowserTestConstants.Editor.MaxVisibleRenderP95LatencyMs);
-            Assert.InRange(
-                probeResult.MaxLatency,
-                0,
-                BrowserTestConstants.Editor.MaxVisibleRenderSpikeLatencyMs);
-            Assert.True(
-                probeResult.LongTaskCount <= BrowserTestConstants.Editor.MaxTypingLongTaskCount,
-                $"Expected Monaco typing to avoid browser long tasks, but observed {probeResult.LongTaskCount} long task(s) with max duration {probeResult.MaxLongTaskDuration:0.##}ms.");
-            Assert.Equal(BrowserTestConstants.Editor.TransparentInputColor, probeResult.FinalInputColor);
-            Assert.True(probeResult.ReadyDuringTyping);
-            Assert.True(
-                probeResult.FinalRenderedLength >= BrowserTestConstants.Editor.TypingResponsivenessProbeText.Length,
-                $"Expected the Monaco overlay to render the full probe text during typing, but the rendered length was {probeResult.FinalRenderedLength}.");
+            await Assert.That(probeResult.SampleCount > 0).IsTrue();
+            await Assert.That(probeResult.SawVisibleInput).IsFalse();
+            await Assert.That(probeResult.P95Latency).IsBetween(0,BrowserTestConstants.Editor.MaxVisibleRenderP95LatencyMs);
+            await Assert.That(probeResult.MaxLatency).IsBetween(0,BrowserTestConstants.Editor.MaxVisibleRenderSpikeLatencyMs);
+            await Assert.That(probeResult.LongTaskCount <= BrowserTestConstants.Editor.MaxTypingLongTaskCount).IsTrue().Because($"Expected Monaco typing to avoid browser long tasks, but observed {probeResult.LongTaskCount} long task(s) with max duration {probeResult.MaxLongTaskDuration:0.##}ms.");
+            await Assert.That(probeResult.FinalInputColor).IsEqualTo(BrowserTestConstants.Editor.TransparentInputColor);
+            await Assert.That(probeResult.ReadyDuringTyping).IsTrue();
+            await Assert.That(probeResult.FinalRenderedLength >= BrowserTestConstants.Editor.TypingResponsivenessProbeText.Length).IsTrue().Because($"Expected the Monaco overlay to render the full probe text during typing, but the rendered length was {probeResult.FinalRenderedLength}.");
         }
         finally
         {

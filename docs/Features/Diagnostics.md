@@ -32,5 +32,5 @@ flowchart LR
 ## Verification
 
 - `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --filter "FullyQualifiedName~DiagnosticsTests"`
-- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~DiagnosticsUiTests" --no-build`
+- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~DiagnosticsUiTests"`
 - `dotnet test ./PrompterOne.slnx`

@@ -1,14 +1,16 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task EditorScreen_MonacoLineNumbersRenderInsideVisibleGutter()
     {
         var page = await _fixture.NewPageAsync();
@@ -37,24 +39,13 @@ public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture) : 
             var gutterBounds = await GetRequiredBoundingBoxAsync(gutter);
             var gutterText = (await gutter.TextContentAsync())?.Trim() ?? string.Empty;
 
-            Assert.Contains(BrowserTestConstants.Editor.GutterFirstLineNumberText, gutterText, StringComparison.Ordinal);
-            Assert.InRange(
-                gutterBounds.Width,
-                BrowserTestConstants.Editor.GutterMinimumWidthPx,
-                BrowserTestConstants.Editor.GutterMaximumWidthPx);
-            Assert.InRange(
-                gutterBounds.X - stageBounds.X,
-                0,
-                stageBounds.Width);
-            Assert.True(
-                state.Layout.ContentLeft >= BrowserTestConstants.Editor.MinimumContentLeftWithLineNumbersPx,
-                $"Expected Monaco contentLeft to include the line-number gutter, but it was {state.Layout.ContentLeft:0.##}.");
+            await Assert.That(gutterText).Contains(BrowserTestConstants.Editor.GutterFirstLineNumberText);
+            await Assert.That(gutterBounds.Width).IsBetween(BrowserTestConstants.Editor.GutterMinimumWidthPx,BrowserTestConstants.Editor.GutterMaximumWidthPx);
+            await Assert.That(gutterBounds.X - stageBounds.X).IsBetween(0,stageBounds.Width);
+            await Assert.That(state.Layout.ContentLeft >= BrowserTestConstants.Editor.MinimumContentLeftWithLineNumbersPx).IsTrue().Because($"Expected Monaco contentLeft to include the line-number gutter, but it was {state.Layout.ContentLeft:0.##}.");
 
             var lineNumberGap = await GetLineNumberTextGapAsync(stage);
-            Assert.InRange(
-                lineNumberGap,
-                BrowserTestConstants.Editor.MinimumLineNumberTextGapPx,
-                BrowserTestConstants.Editor.MaximumLineNumberTextGapPx);
+            await Assert.That(lineNumberGap).IsBetween(BrowserTestConstants.Editor.MinimumLineNumberTextGapPx,BrowserTestConstants.Editor.MaximumLineNumberTextGapPx);
         }
         finally
         {

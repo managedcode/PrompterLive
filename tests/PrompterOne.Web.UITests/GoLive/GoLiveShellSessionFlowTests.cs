@@ -1,17 +1,20 @@
+using System.IO;
 using System.Globalization;
 using System.Text.Json;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Settings.Models;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartStream_LeavesPersistentWidgetAndReturnsToActiveSession()
     {
         var page = await _fixture.NewPageAsync();
@@ -55,7 +58,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
 
             var initialTimerLabel = (await page.GetByTestId(UiTestIds.Header.LiveWidgetTimer).TextContentAsync())?.Trim() ?? string.Empty;
             var updatedTimerLabel = await WaitForTextChangeAsync(page, UiTestIds.Header.LiveWidgetTimer, initialTimerLabel);
-            Assert.NotEqual(initialTimerLabel, updatedTimerLabel);
+            await Assert.That(updatedTimerLabel).IsNotEqualTo(initialTimerLabel);
 
             await CaptureScreenshotAsync(page, BrowserTestConstants.GoLive.WidgetReturnScreenshotPath);
             await page.GetByTestId(UiTestIds.Header.LiveWidget).ClickAsync();
@@ -70,7 +73,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartRecording_MarksHeaderIndicatorAsRecordingOutsideStudioRoute()
     {
         var page = await _fixture.NewPageAsync();
@@ -98,7 +101,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_GenericActiveSession_WidgetReturnsToPlainGoLiveRoute_WithoutInjectingEditorScriptId()
     {
         var pages = await _fixture.NewSharedPagesAsync(BrowserTestConstants.GoLive.SharedContextPageCount);
@@ -125,7 +128,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
 
             await secondaryPage.WaitForURLAsync(BrowserTestConstants.Routes.Pattern(BrowserTestConstants.Routes.GoLive));
             await Expect(secondaryPage.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
-            Assert.Equal(BrowserTestConstants.Routes.GoLive, new Uri(secondaryPage.Url).PathAndQuery);
+            await Assert.That(new Uri(secondaryPage.Url).PathAndQuery).IsEqualTo(BrowserTestConstants.Routes.GoLive);
         }
         finally
         {
@@ -133,7 +136,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_RecordingState_PropagatesAcrossSharedTabsAndReturnsToIdleAfterStop()
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.GoLive.CrossTabIndicatorScenario);
@@ -188,7 +191,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartRecording_UsesSelectedProgramSourceAndShowsRecordingMetadata()
     {
         var page = await _fixture.NewPageAsync();
@@ -219,14 +222,14 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             var programState = runtimeState.GetProperty("program");
             var recordingState = runtimeState.GetProperty("recording");
 
-            Assert.Equal(BrowserTestConstants.GoLive.SecondSourceId, programState.GetProperty("primarySourceId").GetString());
-            Assert.Equal(1, programState.GetProperty("videoSourceCount").GetInt32());
-            Assert.True(programState.GetProperty("width").GetInt32() > 0);
-            Assert.True(programState.GetProperty("height").GetInt32() > 0);
-            Assert.False(string.IsNullOrWhiteSpace(recordingState.GetProperty("fileName").GetString()));
-            Assert.False(string.IsNullOrWhiteSpace(recordingState.GetProperty("mimeType").GetString()));
-            Assert.True(recordingState.GetProperty("sizeBytes").GetInt64() > 0);
-            Assert.True(recordingState.GetProperty("videoBitrateKbps").GetInt32() > 0);
+            await Assert.That(programState.GetProperty("primarySourceId").GetString()).IsEqualTo(BrowserTestConstants.GoLive.SecondSourceId);
+            await Assert.That(programState.GetProperty("videoSourceCount").GetInt32()).IsEqualTo(1);
+            await Assert.That(programState.GetProperty("width").GetInt32() > 0).IsTrue();
+            await Assert.That(programState.GetProperty("height").GetInt32() > 0).IsTrue();
+            await Assert.That(string.IsNullOrWhiteSpace(recordingState.GetProperty("fileName").GetString())).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(recordingState.GetProperty("mimeType").GetString())).IsFalse();
+            await Assert.That(recordingState.GetProperty("sizeBytes").GetInt64() > 0).IsTrue();
+            await Assert.That(recordingState.GetProperty("videoBitrateKbps").GetInt32() > 0).IsTrue();
 
             var bitrateMetric = page.GetByTestId(UiTestIds.GoLive.StatusMetric(GoLiveMetricIds.StatusBitrate));
             var outputMetric = page.GetByTestId(UiTestIds.GoLive.StatusMetric(GoLiveMetricIds.StatusOutput));
@@ -238,17 +241,14 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             await Expect(outputMetric).ToContainTextAsync(BrowserTestConstants.GoLive.OutputWidthLabel);
 
             var recordingMetricText = await recordingMetric.TextContentAsync();
-            Assert.False(string.IsNullOrWhiteSpace(recordingMetricText));
-            Assert.Contains(BrowserTestConstants.GoLive.ByteSuffix, recordingMetricText, StringComparison.Ordinal);
+            await Assert.That(string.IsNullOrWhiteSpace(recordingMetricText)).IsFalse();
+            await Assert.That(recordingMetricText).Contains(BrowserTestConstants.GoLive.ByteSuffix);
 
             var runtimeMetricText = await runtimeMetric.TextContentAsync();
-            Assert.False(string.IsNullOrWhiteSpace(runtimeMetricText));
-            Assert.Contains(
-                recordingState.GetProperty("mimeType").GetString()!.Contains(BrowserTestConstants.GoLive.Mp4MimeFragment, StringComparison.OrdinalIgnoreCase)
+            await Assert.That(string.IsNullOrWhiteSpace(runtimeMetricText)).IsFalse();
+            await Assert.That(runtimeMetricText).Contains(recordingState.GetProperty("mimeType").GetString()!.Contains(BrowserTestConstants.GoLive.Mp4MimeFragment, StringComparison.OrdinalIgnoreCase)
                     ? BrowserTestConstants.GoLive.Mp4ContainerLabel
-                    : BrowserTestConstants.GoLive.WebmContainerLabel,
-                runtimeMetricText,
-                StringComparison.Ordinal);
+                    : BrowserTestConstants.GoLive.WebmContainerLabel);
         }
         finally
         {
@@ -256,7 +256,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StartRecording_FilePickerSave_ProducesDecodableProgramVideoAndAudio()
     {
         var page = await _fixture.NewPageAsync();
@@ -291,16 +291,14 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
             var savedAnalysis = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.AnalyzeSavedRecordingScript);
             var savedAnalysisJson = savedAnalysis.GetRawText();
 
-            Assert.True(savedRecording.GetProperty("pickerCallCount").GetInt32() >= 1);
-            Assert.True(savedRecording.GetProperty("sizeBytes").GetInt64() > 0);
-            Assert.True(savedAnalysis.GetProperty("width").GetInt32() > 0, savedAnalysisJson);
-            Assert.True(savedAnalysis.GetProperty("height").GetInt32() > 0, savedAnalysisJson);
-            Assert.True(savedAnalysis.GetProperty("hasAudioTrack").GetBoolean(), savedAnalysisJson);
-            Assert.True(savedAnalysis.GetProperty("hasAudibleAudio").GetBoolean(), savedAnalysisJson);
-            Assert.True(savedAnalysis.GetProperty("hasVisibleVideo").GetBoolean(), savedAnalysisJson);
-            Assert.True(
-                savedAnalysis.GetProperty("nonBlackPixelCount").GetInt32() >= BrowserTestConstants.Media.MinimumVisiblePixelCount,
-                savedAnalysisJson);
+            await Assert.That(savedRecording.GetProperty("pickerCallCount").GetInt32() >= 1).IsTrue();
+            await Assert.That(savedRecording.GetProperty("sizeBytes").GetInt64() > 0).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("width").GetInt32() > 0).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("height").GetInt32() > 0).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("hasAudioTrack").GetBoolean()).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("hasAudibleAudio").GetBoolean()).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("hasVisibleVideo").GetBoolean()).IsTrue();
+            await Assert.That(savedAnalysis.GetProperty("nonBlackPixelCount").GetInt32() >= BrowserTestConstants.Media.MinimumVisiblePixelCount).IsTrue();
         }
         finally
         {
@@ -308,7 +306,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_AudioTab_ShowsLiveMicrophoneProgramAndRecordingLevels()
     {
         var page = await _fixture.NewPageAsync();
@@ -339,8 +337,8 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture) : 
                 BrowserTestConstants.GoLive.RuntimeSessionId);
 
             var audioState = runtimeState.GetProperty("audio");
-            Assert.True(audioState.GetProperty("programLevelPercent").GetInt32() >= BrowserTestConstants.GoLive.MinimumActiveLevelPercent);
-            Assert.True(audioState.GetProperty("recordingLevelPercent").GetInt32() >= BrowserTestConstants.GoLive.MinimumActiveLevelPercent);
+            await Assert.That(audioState.GetProperty("programLevelPercent").GetInt32() >= BrowserTestConstants.GoLive.MinimumActiveLevelPercent).IsTrue();
+            await Assert.That(audioState.GetProperty("recordingLevelPercent").GetInt32() >= BrowserTestConstants.GoLive.MinimumActiveLevelPercent).IsTrue();
 
             await Expect(programChannel)
                 .ToHaveAttributeAsync(BrowserTestConstants.GoLive.LiveStateAttributeName, BrowserTestConstants.GoLive.ActiveStateValue);

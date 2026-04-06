@@ -4,13 +4,13 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class AppCultureCatalogTests
 {
-    [Theory]
-    [InlineData("fr-FR", AppCultureCatalog.FrenchCultureName)]
-    [InlineData("uk-UA", AppCultureCatalog.UkrainianCultureName)]
-    [InlineData("pt-BR", AppCultureCatalog.PortugueseCultureName)]
-    [InlineData("de-DE", AppCultureCatalog.GermanCultureName)]
-    [InlineData("ru-RU", AppCultureCatalog.EnglishCultureName)]
-    [InlineData("", AppCultureCatalog.EnglishCultureName)]
+    [Test]
+    [Arguments("fr-FR", AppCultureCatalog.FrenchCultureName)]
+    [Arguments("uk-UA", AppCultureCatalog.UkrainianCultureName)]
+    [Arguments("pt-BR", AppCultureCatalog.PortugueseCultureName)]
+    [Arguments("de-DE", AppCultureCatalog.GermanCultureName)]
+    [Arguments("ru-RU", AppCultureCatalog.EnglishCultureName)]
+    [Arguments("", AppCultureCatalog.EnglishCultureName)]
     public void ResolveSupportedCulture_NormalizesBrowserCultureNames(string requestedCulture, string expectedCulture)
     {
         var actualCulture = AppCultureCatalog.ResolveSupportedCulture(requestedCulture);
@@ -18,7 +18,7 @@ public sealed class AppCultureCatalogTests
         Assert.Equal(expectedCulture, actualCulture);
     }
 
-    [Fact]
+    [Test]
     public void ResolvePreferredCulture_UsesFirstSupportedCulture_AndBlocksRussian()
     {
         var actualCulture = AppCultureCatalog.ResolvePreferredCulture(["ru-RU", "es-ES", "it-IT"]);
@@ -26,7 +26,7 @@ public sealed class AppCultureCatalogTests
         Assert.Equal(AppCultureCatalog.EnglishCultureName, actualCulture);
     }
 
-    [Fact]
+    [Test]
     public void SupportedCultureDefinitionsInDisplayOrder_ContainsGerman()
     {
         var german = AppCultureCatalog.SupportedCultureDefinitionsInDisplayOrder

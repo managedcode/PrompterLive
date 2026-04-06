@@ -17,7 +17,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_ChangingSourceHeadersRefreshesStructureTreeWithoutLegacyInspector()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -53,7 +53,7 @@ public sealed class EditorStructureAuthoringTests : BunitContext
             StructureRefreshTimeout);
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_ChangingSpeedOffsetsRewritesFrontMatter()
     {
         Services.GetRequiredService<NavigationManager>()

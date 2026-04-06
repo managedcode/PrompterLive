@@ -2,12 +2,13 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture fixture)
-    : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+    : AppUiTestBase(fixture){
     private static readonly Regex ReadingActiveClassRegex = new(
         $@"\b{BrowserTestConstants.TeleprompterFlow.ReadingActiveCssClass}\b",
         RegexOptions.Compiled);
@@ -15,7 +16,7 @@ public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture
     private readonly record struct CssColor(double R, double G, double B, double A);
     private readonly record struct GradientColors(CssColor Start, CssColor End);
 
-    [Fact]
+    [Test]
     public Task TeleprompterSecurityIncident_ActivePlayback_KeepsProgressAndControlsSubdued() =>
         RunPageAsync(async page =>
         {
@@ -61,23 +62,13 @@ public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture
                 BrowserTestConstants.TeleprompterFlow.SecurityIncidentChromeScenarioName,
                 BrowserTestConstants.TeleprompterFlow.SecurityIncidentChromeControlsStep);
 
-            Assert.True(
-                HasMaximumChannels(progressLabelColor, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressLabelChannel),
-                $"Expected the progress label to stay subdued during playback, but got rgba({progressLabelColor.R:0.##}, {progressLabelColor.G:0.##}, {progressLabelColor.B:0.##}, {progressLabelColor.A:0.##}).");
-            Assert.True(
-                HasMaximumChannels(playToggleColor, BrowserTestConstants.TeleprompterFlow.MaximumMutedControlIconChannel),
-                $"Expected the play icon to stay subdued during playback, but got rgba({playToggleColor.R:0.##}, {playToggleColor.G:0.##}, {playToggleColor.B:0.##}, {playToggleColor.A:0.##}).");
-            Assert.True(
-                playToggleBackground.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedPlayButtonBackgroundAlpha,
-                $"Expected the play button background alpha to stay at or below {BrowserTestConstants.TeleprompterFlow.MaximumMutedPlayButtonBackgroundAlpha:0.##}, but got {playToggleBackground.A:0.##}.");
-            Assert.True(
-                HasMaximumChannels(progressFillColors.Start, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillChannel) &&
-                HasMaximumChannels(progressFillColors.End, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillChannel),
-                $"Expected the progress fill gradient to stay muted during playback, but got start rgba({progressFillColors.Start.R:0.##}, {progressFillColors.Start.G:0.##}, {progressFillColors.Start.B:0.##}, {progressFillColors.Start.A:0.##}) and end rgba({progressFillColors.End.R:0.##}, {progressFillColors.End.G:0.##}, {progressFillColors.End.B:0.##}, {progressFillColors.End.A:0.##}).");
-            Assert.True(
-                progressFillColors.Start.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha &&
-                progressFillColors.End.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha,
-                $"Expected the progress fill alpha to stay at or below {BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha:0.##}, but got start {progressFillColors.Start.A:0.##} and end {progressFillColors.End.A:0.##}.");
+            await Assert.That(HasMaximumChannels(progressLabelColor, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressLabelChannel)).IsTrue().Because($"Expected the progress label to stay subdued during playback, but got rgba({progressLabelColor.R:0.##}, {progressLabelColor.G:0.##}, {progressLabelColor.B:0.##}, {progressLabelColor.A:0.##}).");
+            await Assert.That(HasMaximumChannels(playToggleColor, BrowserTestConstants.TeleprompterFlow.MaximumMutedControlIconChannel)).IsTrue().Because($"Expected the play icon to stay subdued during playback, but got rgba({playToggleColor.R:0.##}, {playToggleColor.G:0.##}, {playToggleColor.B:0.##}, {playToggleColor.A:0.##}).");
+            await Assert.That(playToggleBackground.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedPlayButtonBackgroundAlpha).IsTrue().Because($"Expected the play button background alpha to stay at or below {BrowserTestConstants.TeleprompterFlow.MaximumMutedPlayButtonBackgroundAlpha:0.##}, but got {playToggleBackground.A:0.##}.");
+            await Assert.That(HasMaximumChannels(progressFillColors.Start, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillChannel) &&
+                HasMaximumChannels(progressFillColors.End, BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillChannel)).IsTrue().Because($"Expected the progress fill gradient to stay muted during playback, but got start rgba({progressFillColors.Start.R:0.##}, {progressFillColors.Start.G:0.##}, {progressFillColors.Start.B:0.##}, {progressFillColors.Start.A:0.##}) and end rgba({progressFillColors.End.R:0.##}, {progressFillColors.End.G:0.##}, {progressFillColors.End.B:0.##}, {progressFillColors.End.A:0.##}).");
+            await Assert.That(progressFillColors.Start.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha &&
+                progressFillColors.End.A <= BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha).IsTrue().Because($"Expected the progress fill alpha to stay at or below {BrowserTestConstants.TeleprompterFlow.MaximumMutedProgressFillAlpha:0.##}, but got start {progressFillColors.Start.A:0.##} and end {progressFillColors.End.A:0.##}.");
         });
 
     private static bool HasMaximumChannels(CssColor color, double maximum) =>

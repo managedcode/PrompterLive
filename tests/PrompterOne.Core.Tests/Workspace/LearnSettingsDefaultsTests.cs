@@ -4,7 +4,7 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class LearnSettingsDefaultsTests
 {
-    [Fact]
+    [Test]
     public void LearnSettings_DefaultConstructor_UsesWorkspaceDefaults()
     {
         var settings = new LearnSettings();

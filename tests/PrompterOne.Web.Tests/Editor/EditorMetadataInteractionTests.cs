@@ -17,7 +17,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_UpdatesFrontMatterWhenMetadataChanges()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -67,7 +67,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_BlankMetadataTitleFallsBackToUntitledScript()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -94,7 +94,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void EditorPage_MetadataRailToggleCollapsesAndExpands()
     {
         Services.GetRequiredService<NavigationManager>()

@@ -1,15 +1,17 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixture)
 {
     private const string CueScenario = "teleprompter-tps-cue-rendering";
     private const int InspirationCardIndex = 6;
     private const string StepName = "01-teleprompter-cue-rendering";
 
-    [Fact]
+    [Test]
     public async Task TeleprompterDemo_RendersTypographyDrivenCueVariablesForVolumeAndBuilding()
     {
         UiScenarioArtifacts.ResetScenario(CueScenario);
@@ -51,14 +53,14 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 }
                 """);
 
-            Assert.Equal(TpsVisualCueContracts.VolumeSoft, probe.SoftVolume);
-            Assert.Equal(TpsVisualCueContracts.VolumeLoud, probe.LoudVolume);
-            Assert.Equal(TpsVisualCueContracts.DeliveryModeBuilding, probe.FirstBuildingDelivery);
-            Assert.Equal(TpsVisualCueContracts.DeliveryModeBuilding, probe.LastBuildingDelivery);
-            Assert.False(string.IsNullOrWhiteSpace(probe.SoftScale));
-            Assert.False(string.IsNullOrWhiteSpace(probe.LoudScale));
-            Assert.False(string.IsNullOrWhiteSpace(probe.FirstBuildingScale));
-            Assert.False(string.IsNullOrWhiteSpace(probe.LastBuildingScale));
+            await Assert.That(probe.SoftVolume).IsEqualTo(TpsVisualCueContracts.VolumeSoft);
+            await Assert.That(probe.LoudVolume).IsEqualTo(TpsVisualCueContracts.VolumeLoud);
+            await Assert.That(probe.FirstBuildingDelivery).IsEqualTo(TpsVisualCueContracts.DeliveryModeBuilding);
+            await Assert.That(probe.LastBuildingDelivery).IsEqualTo(TpsVisualCueContracts.DeliveryModeBuilding);
+            await Assert.That(string.IsNullOrWhiteSpace(probe.SoftScale)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(probe.LoudScale)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(probe.FirstBuildingScale)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(probe.LastBuildingScale)).IsFalse();
 
             await UiScenarioArtifacts.CapturePageAsync(page, CueScenario, StepName);
         }

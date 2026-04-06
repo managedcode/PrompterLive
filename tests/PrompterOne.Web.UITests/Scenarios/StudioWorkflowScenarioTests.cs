@@ -2,14 +2,16 @@ using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task StudioWorkflow_LibraryToEditorAuthoring_CapturesArtifacts()
     {
         var page = await _fixture.NewPageAsync();
@@ -28,7 +30,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task StudioWorkflow_LearnAndTeleprompterReader_CapturesArtifacts()
     {
         var page = await _fixture.NewPageAsync();
@@ -48,7 +50,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task StudioWorkflow_NewScriptStartsEmpty_CapturesArtifacts()
     {
         var page = await _fixture.NewPageAsync();
@@ -65,7 +67,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture) : 
         }
     }
 
-    [Fact]
+    [Test]
     public async Task StudioWorkflow_SettingsAndGoLiveStudio_CapturesArtifacts()
     {
         var page = await _fixture.NewPageAsync();

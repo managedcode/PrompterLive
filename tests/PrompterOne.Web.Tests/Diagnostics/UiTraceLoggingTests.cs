@@ -11,7 +11,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class UiTraceLoggingTests : BunitContext
 {
-    [Fact]
+    [Test]
     public void MainLayout_LogsRouteChanges_WithoutShellBridgeInterop()
     {
         var logProvider = new RecordingLoggerProvider();
@@ -39,7 +39,7 @@ public sealed class UiTraceLoggingTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public async Task LibraryPage_LogsFolderSelection_OverlayActions_AndFolderCreation()
     {
         var logProvider = new RecordingLoggerProvider();

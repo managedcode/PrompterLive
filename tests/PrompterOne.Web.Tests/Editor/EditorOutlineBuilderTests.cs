@@ -11,7 +11,7 @@ public sealed class EditorOutlineBuilderTests
     private readonly TpsFrontMatterDocumentService _frontMatter = new();
     private readonly TpsScriptDataFactory _scriptDataFactory = new();
 
-    [Fact]
+    [Test]
     public void Build_MapsOutlineNavigationToRawSourceCharacterOffsets()
     {
         var source = AppTestLibrarySeedData.CreateDocuments()

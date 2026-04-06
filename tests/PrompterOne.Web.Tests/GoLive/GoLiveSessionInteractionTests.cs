@@ -13,6 +13,7 @@ using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
+[NotInParallel]
 public sealed class GoLiveSessionInteractionTests : BunitContext
 {
     private const int RecordingAudioBitrateKbps = 256;
@@ -29,7 +30,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         _harness = TestHarnessFactory.Create(this);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartStream_UsesSelectedCameraAsActiveProgramSource()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -60,7 +61,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_Load_HidesLocalOutputTogglesFromRuntimeSidebar()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -74,7 +75,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartStream_WithVdoNinjaArmed_CallsVdoNinjaOutputInterop()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -95,11 +96,14 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
-        Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
-        Assert.DoesNotContain(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
+            Assert.DoesNotContain(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+        });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartStream_WithLiveKitArmed_CallsLiveKitOutputInterop_WhenVdoNinjaIsNotConfigured()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -120,10 +124,11 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
-        Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+        cut.WaitForAssertion(() =>
+            Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations));
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartStream_WithVdoNinjaAndLiveKitArmed_StartsBothPublishTransports()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -145,11 +150,14 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
         cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
 
-        Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
-        Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(GoLiveOutputInteropMethodNames.StartVdoNinjaSession, _harness.JsRuntime.Invocations);
+            Assert.Contains(GoLiveOutputInteropMethodNames.StartLiveKitSession, _harness.JsRuntime.Invocations);
+        });
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_SwitchProgramSource_WhileVdoNinjaActive_RefreshesOutputSessionDevices()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -176,11 +184,16 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
             Assert.Contains(
                 _harness.JsRuntime.Invocations,
                 invocation => string.Equals(invocation, GoLiveOutputInteropMethodNames.StartVdoNinjaSession, StringComparison.Ordinal));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)));
         });
 
         var invocationCountBeforeSwitch = _harness.JsRuntime.Invocations.Count;
 
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
+        cut.WaitForAssertion(() =>
+            Assert.Equal(
+                AppTestData.Camera.SecondSourceId,
+                Services.GetRequiredService<GoLiveSessionService>().State.SelectedSourceId));
         cut.FindByTestId(UiTestIds.GoLive.TakeToAir).Click();
 
         cut.WaitForAssertion(() =>
@@ -189,7 +202,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
                 invocation => string.Equals(invocation, GoLiveOutputInteropMethodNames.UpdateSessionDevices, StringComparison.Ordinal)));
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartRecording_WithRecordingArmed_CallsLocalRecordingInterop()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -213,7 +226,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         Assert.True(Services.GetRequiredService<GoLiveSessionService>().State.IsRecordingActive);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartStream_WithRelayOnlyDestination_DoesNotMarkSessionLive()
     {
         SeedSceneState(CreateTwoCameraScene());
@@ -238,7 +251,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         Assert.False(session.IsStreamActive);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartRecording_PassesSceneCompositionAndExportPreferencesToRecordingInterop()
     {
         SeedSceneState(CreateSceneWithTwoAudioInputs());
@@ -287,7 +300,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         Assert.True(request.Recording.PreferFilePicker);
     }
 
-    [Fact]
+    [Test]
     public void GoLivePage_StartRecording_WithPictureInPictureLayout_KeepsOverlaySourcesRenderable()
     {
         SeedSceneState(CreateSceneWithTwoAudioInputs());

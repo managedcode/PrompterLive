@@ -5,7 +5,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class UiIconRenderingTests : BunitContext
 {
-    [Fact]
+    [Test]
     public void HelpCircle_UsesRoundedQuestionStrokeAndFilledDot()
     {
         var cut = Render<UiIcon>(parameters => parameters

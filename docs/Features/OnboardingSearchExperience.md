@@ -98,6 +98,6 @@ sequenceDiagram
 
 - `dotnet build ./PrompterOne.slnx -warnaserror`
 - `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --filter "FullyQualifiedName~MainLayoutOnboardingTests|FullyQualifiedName~LibrarySearchInteractionTests|FullyQualifiedName~EditorSourcePanelFindTests"`
-- `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --no-build --filter "FullyQualifiedName~ScreenShellContractTests|FullyQualifiedName~MainLayoutActionTests|FullyQualifiedName~EditorSourcePanelInteractionTests|FullyQualifiedName~Library"`
-- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --no-build --filter "FullyQualifiedName~OnboardingFlowTests|FullyQualifiedName~LibrarySearchFlowTests|FullyQualifiedName~EditorFindFlowTests"`
-- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --no-build --filter "FullyQualifiedName~OnboardingFlowTests|FullyQualifiedName~LibraryScreenFlowTests|FullyQualifiedName~LibrarySearchFlowTests|FullyQualifiedName~EditorFindFlowTests|FullyQualifiedName~EditorToolbarSemanticVisualTests|FullyQualifiedName~LocalizationFlowTests"`
+- `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --filter "FullyQualifiedName~ScreenShellContractTests|FullyQualifiedName~MainLayoutActionTests|FullyQualifiedName~EditorSourcePanelInteractionTests|FullyQualifiedName~Library"`
+- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~OnboardingFlowTests|FullyQualifiedName~LibrarySearchFlowTests|FullyQualifiedName~EditorFindFlowTests"`
+- `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~OnboardingFlowTests|FullyQualifiedName~LibraryScreenFlowTests|FullyQualifiedName~LibrarySearchFlowTests|FullyQualifiedName~EditorFindFlowTests|FullyQualifiedName~EditorToolbarSemanticVisualTests|FullyQualifiedName~LocalizationFlowTests"`

@@ -1,10 +1,12 @@
 using System.Text.Json;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class GoLiveMediaCleanupLifecycleTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class GoLiveMediaCleanupLifecycleTests(StandaloneAppFixture fixture)
 {
     private const string BrowserMediaInteropNamespace = "BrowserMediaInterop";
     private const string CleanupHarnessGlobal = "__prompterOneGoLiveCleanupHarness";
@@ -54,7 +56,7 @@ public sealed class GoLiveMediaCleanupLifecycleTests(StandaloneAppFixture fixtur
 
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task GoLivePage_StopAndRestart_ReleaseSharedCameraCapturesAndStopMicTracks()
     {
         var page = await _fixture.NewPageAsync();
@@ -175,12 +177,12 @@ public sealed class GoLiveMediaCleanupLifecycleTests(StandaloneAppFixture fixtur
             var restartVideoRequestCount = cleanupResult.GetProperty("restartVideoRequestCount").GetInt32();
             var restartAudioRequestCount = cleanupResult.GetProperty("restartAudioRequestCount").GetInt32();
 
-            Assert.True(firstVideoRequestCount > 0);
-            Assert.True(firstAudioRequestCount > 0);
-            Assert.True(cleanupState.GetProperty("releaseSharedCameraTrackCalls").GetInt32() >= firstVideoRequestCount);
-            Assert.True(cleanupState.GetProperty("audioTrackStopCalls").GetInt32() >= firstAudioRequestCount);
-            Assert.True(restartVideoRequestCount > firstVideoRequestCount);
-            Assert.True(restartAudioRequestCount > firstAudioRequestCount);
+            await Assert.That(firstVideoRequestCount > 0).IsTrue();
+            await Assert.That(firstAudioRequestCount > 0).IsTrue();
+            await Assert.That(cleanupState.GetProperty("releaseSharedCameraTrackCalls").GetInt32() >= firstVideoRequestCount).IsTrue();
+            await Assert.That(cleanupState.GetProperty("audioTrackStopCalls").GetInt32() >= firstAudioRequestCount).IsTrue();
+            await Assert.That(restartVideoRequestCount > firstVideoRequestCount).IsTrue();
+            await Assert.That(restartAudioRequestCount > firstAudioRequestCount).IsTrue();
         }
         finally
         {

@@ -47,22 +47,22 @@ internal static class ResponsiveLayoutAssertions
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
         var box = await locator.BoundingBoxAsync();
-        Assert.NotNull(box);
+        await Assert.That(box).IsNotNull();
 
         var bounds = box!;
         var tolerance = BrowserTestConstants.ResponsiveLayout.ViewportEdgeTolerancePx;
 
-        Assert.True(
-            bounds.X >= -tolerance && bounds.X <= viewport.Width,
-            $"Element '{controlTestId}' left edge {bounds.X} was outside viewport width {viewport.Width} on {routeName} for {viewport.Name}.");
-        Assert.True(
-            bounds.Y >= -tolerance && bounds.Y <= viewport.Height,
-            $"Element '{controlTestId}' top edge {bounds.Y} was outside viewport height {viewport.Height} on {routeName} for {viewport.Name}.");
-        Assert.True(
-            bounds.X + bounds.Width <= viewport.Width + tolerance,
-            $"Element '{controlTestId}' right edge {bounds.X + bounds.Width} exceeded viewport width {viewport.Width} on {routeName} for {viewport.Name}.");
-        Assert.True(
-            bounds.Y + bounds.Height <= viewport.Height + tolerance,
-            $"Element '{controlTestId}' bottom edge {bounds.Y + bounds.Height} exceeded viewport height {viewport.Height} on {routeName} for {viewport.Name}.");
+        await Assert.That(bounds.X >= -tolerance && bounds.X <= viewport.Width)
+            .IsTrue()
+            .Because($"Element '{controlTestId}' left edge {bounds.X} was outside viewport width {viewport.Width} on {routeName} for {viewport.Name}.");
+        await Assert.That(bounds.Y >= -tolerance && bounds.Y <= viewport.Height)
+            .IsTrue()
+            .Because($"Element '{controlTestId}' top edge {bounds.Y} was outside viewport height {viewport.Height} on {routeName} for {viewport.Name}.");
+        await Assert.That(bounds.X + bounds.Width <= viewport.Width + tolerance)
+            .IsTrue()
+            .Because($"Element '{controlTestId}' right edge {bounds.X + bounds.Width} exceeded viewport width {viewport.Width} on {routeName} for {viewport.Name}.");
+        await Assert.That(bounds.Y + bounds.Height <= viewport.Height + tolerance)
+            .IsTrue()
+            .Because($"Element '{controlTestId}' bottom edge {bounds.Y + bounds.Height} exceeded viewport height {viewport.Height} on {routeName} for {viewport.Name}.");
     }
 }

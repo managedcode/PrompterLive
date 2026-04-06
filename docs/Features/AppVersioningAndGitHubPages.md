@@ -64,9 +64,9 @@ flowchart LR
 
 - `actionlint .github/workflows/*.yml`
 - `.github/workflows/pr-validation.yml` runs `dotnet build PrompterOne.slnx -warnaserror`
-- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj --no-build`
-- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --no-build`
-- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --no-build`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj`
+- `.github/workflows/pr-validation.yml` runs `dotnet test tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj`
 - `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata"`
 - `dotnet test ./tests/PrompterOne.Web.Tests/PrompterOne.Web.Tests.csproj --filter "FullyQualifiedName~SettingsInteractionTests.AboutSection_RendersInjectedAppVersionMetadata_AndOfficialManagedCodeLinks"`
 - `dotnet test ./tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj --filter "FullyQualifiedName~TeleprompterSettingsFlowTests.TeleprompterAndSettingsScreens_RespondToCoreControls"`

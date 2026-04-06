@@ -3,14 +3,15 @@ using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture), IClassFixture<StandaloneAppFixture>
-{
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture){
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    [Fact]
+    [Test]
     public Task FirstRunOnboarding_WalksAcrossCoreProductRoutes_AndStaysDismissedAfterCompletion() =>
         RunPageAsync(async page =>
         {
@@ -66,7 +67,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
         });
 
-    [Fact]
+    [Test]
     public Task FirstRunOnboarding_DismissReturnsToLibrary_AndStaysHiddenAfterReload() =>
         RunPageAsync(async page =>
         {
@@ -84,7 +85,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
         });
 
-    [Fact]
+    [Test]
     public Task OnboardingReopen_FromSettings_ReturnsToLibraryWithOverlay() =>
         RunPageAsync(async page =>
         {
@@ -105,7 +106,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeHiddenAsync();
         });
 
-    [Fact]
+    [Test]
     public Task FirstRunOnboarding_UsesUkrainianBrowserCulture_ForLocalizedCopy() =>
         RunPageAsync(async page =>
         {

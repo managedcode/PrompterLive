@@ -1,13 +1,15 @@
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
+using System.Threading.Tasks;
 
 namespace PrompterOne.Web.UITests;
 
-public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) : IClassFixture<StandaloneAppFixture>
+[ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
+public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
-    [Fact]
+    [Test]
     public async Task SettingsScreen_RequestsSyntheticAudioAndVideoPermissions()
     {
         var page = await _fixture.NewPageAsync();
@@ -38,19 +40,13 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
             var devices = await page.EvaluateAsync<SyntheticMediaDeviceState[]>(
                 BrowserTestConstants.Media.ListDevicesScript);
 
-            Assert.Contains(
-                devices,
-                device => string.Equals(device.DeviceId, BrowserTestConstants.Media.PrimaryCameraId, StringComparison.Ordinal)
+            await Assert.That(devices).Contains(device => string.Equals(device.DeviceId, BrowserTestConstants.Media.PrimaryCameraId, StringComparison.Ordinal)
                     && string.Equals(device.Kind, BrowserTestConstants.Media.VideoInputKind, StringComparison.Ordinal)
                     && string.Equals(device.Label, BrowserTestConstants.Media.PrimaryCameraLabel, StringComparison.Ordinal));
-            Assert.Contains(
-                devices,
-                device => string.Equals(device.DeviceId, BrowserTestConstants.Media.SecondaryCameraId, StringComparison.Ordinal)
+            await Assert.That(devices).Contains(device => string.Equals(device.DeviceId, BrowserTestConstants.Media.SecondaryCameraId, StringComparison.Ordinal)
                     && string.Equals(device.Kind, BrowserTestConstants.Media.VideoInputKind, StringComparison.Ordinal)
                     && string.Equals(device.Label, BrowserTestConstants.Media.SecondaryCameraLabel, StringComparison.Ordinal));
-            Assert.Contains(
-                devices,
-                device => string.Equals(device.DeviceId, BrowserTestConstants.Media.PrimaryMicrophoneId, StringComparison.Ordinal)
+            await Assert.That(devices).Contains(device => string.Equals(device.DeviceId, BrowserTestConstants.Media.PrimaryMicrophoneId, StringComparison.Ordinal)
                     && string.Equals(device.Kind, BrowserTestConstants.Media.AudioInputKind, StringComparison.Ordinal)
                     && string.Equals(device.Label, BrowserTestConstants.Media.PrimaryMicrophoneLabel, StringComparison.Ordinal));
 
@@ -93,7 +89,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterCameraToggle_AttachesSyntheticBackgroundVideoStream()
     {
         var page = await _fixture.NewPageAsync();
@@ -115,13 +111,13 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
                 BrowserTestConstants.Media.GetElementStateScript,
                 UiDomIds.Teleprompter.Camera);
 
-            Assert.True(state.HasElement);
-            Assert.True(state.HasStream);
-            Assert.Equal(BrowserTestConstants.Media.ExpectedVideoTrackCount, state.VideoTrackCount);
-            Assert.Equal(0, state.AudioTrackCount);
-            Assert.NotNull(state.Metadata);
-            Assert.True(state.Metadata!.IsSynthetic);
-            Assert.Equal(BrowserTestConstants.Media.PrimaryCameraId, state.Metadata.VideoDeviceId);
+            await Assert.That(state.HasElement).IsTrue();
+            await Assert.That(state.HasStream).IsTrue();
+            await Assert.That(state.VideoTrackCount).IsEqualTo(BrowserTestConstants.Media.ExpectedVideoTrackCount);
+            await Assert.That(state.AudioTrackCount).IsEqualTo(0);
+            await Assert.That(state.Metadata).IsNotNull();
+            await Assert.That(state.Metadata!.IsSynthetic).IsTrue();
+            await Assert.That(state.Metadata.VideoDeviceId).IsEqualTo(BrowserTestConstants.Media.PrimaryCameraId);
 
             await TeleprompterCameraDriver.EnsureDisabledAsync(page);
         }
@@ -131,7 +127,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
         }
     }
 
-    [Fact]
+    [Test]
     public async Task TeleprompterCameraToggle_RequestsAccessWhenDeviceIdentityIsUnavailableOnFirstLoad()
     {
         var page = await _fixture.NewPageAsync();
@@ -154,9 +150,9 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
                 BrowserTestConstants.Media.GetElementStateScript,
                 UiDomIds.Teleprompter.Camera);
 
-            Assert.True(state.HasStream);
-            Assert.NotNull(state.Metadata);
-            Assert.Equal(BrowserTestConstants.Media.PrimaryCameraId, state.Metadata!.VideoDeviceId);
+            await Assert.That(state.HasStream).IsTrue();
+            await Assert.That(state.Metadata).IsNotNull();
+            await Assert.That(state.Metadata!.VideoDeviceId).IsEqualTo(BrowserTestConstants.Media.PrimaryCameraId);
         }
         finally
         {
@@ -165,7 +161,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
         }
     }
 
-    [Fact]
+    [Test]
     public async Task SettingsScreen_BlankBrowserDeviceLabels_DoNotRenderFabricatedFallbackNames()
     {
         var page = await _fixture.NewPageAsync();
@@ -212,10 +208,10 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var primaryCameraCardText = await primaryCameraCard.TextContentAsync() ?? string.Empty;
-            Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryCameraLabel, primaryCameraCardText, StringComparison.Ordinal);
-            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedCameraLabel, primaryCameraCardText, StringComparison.Ordinal);
-            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel, primaryCameraCardText, StringComparison.Ordinal);
-            Assert.True(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel).TextContentAsync()));
+            await Assert.That(primaryCameraCardText).DoesNotContain(BrowserTestConstants.Media.PrimaryCameraLabel);
+            await Assert.That(primaryCameraCardText).DoesNotContain(BrowserTestConstants.Media.FabricatedCameraLabel);
+            await Assert.That(primaryCameraCardText).DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel);
+            await Assert.That(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel).TextContentAsync())).IsTrue();
 
             await page.GetByTestId(UiTestIds.Settings.NavMics).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.MicsPanel)).ToBeVisibleAsync();
@@ -237,10 +233,10 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var primaryMicrophoneCardText = await primaryMicrophoneCard.TextContentAsync() ?? string.Empty;
-            Assert.DoesNotContain(BrowserTestConstants.Media.PrimaryMicrophoneLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
-            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedMicrophoneLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
-            Assert.DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel, primaryMicrophoneCardText, StringComparison.Ordinal);
-            Assert.True(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.MicPreviewLabel).TextContentAsync()));
+            await Assert.That(primaryMicrophoneCardText).DoesNotContain(BrowserTestConstants.Media.PrimaryMicrophoneLabel);
+            await Assert.That(primaryMicrophoneCardText).DoesNotContain(BrowserTestConstants.Media.FabricatedMicrophoneLabel);
+            await Assert.That(primaryMicrophoneCardText).DoesNotContain(BrowserTestConstants.Media.FabricatedUnnamedDeviceLabel);
+            await Assert.That(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.MicPreviewLabel).TextContentAsync())).IsTrue();
         }
         finally
         {
@@ -248,7 +244,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
         }
     }
 
-    [Fact]
+    [Test]
     public async Task GoLivePreview_SwitchesBetweenSyntheticSceneCameras()
     {
         var page = await _fixture.NewPageAsync();
@@ -295,11 +291,11 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture) :
                 BrowserTestConstants.Media.GetElementStateScript,
                 UiDomIds.GoLive.PreviewVideo);
 
-            Assert.True(state.HasStream);
-            Assert.Equal(BrowserTestConstants.Media.ExpectedVideoTrackCount, state.VideoTrackCount);
-            Assert.Equal(0, state.AudioTrackCount);
-            Assert.NotNull(state.Metadata);
-            Assert.Equal(BrowserTestConstants.Media.SecondaryCameraId, state.Metadata!.VideoDeviceId);
+            await Assert.That(state.HasStream).IsTrue();
+            await Assert.That(state.VideoTrackCount).IsEqualTo(BrowserTestConstants.Media.ExpectedVideoTrackCount);
+            await Assert.That(state.AudioTrackCount).IsEqualTo(0);
+            await Assert.That(state.Metadata).IsNotNull();
+            await Assert.That(state.Metadata!.VideoDeviceId).IsEqualTo(BrowserTestConstants.Media.SecondaryCameraId);
         }
         finally
         {

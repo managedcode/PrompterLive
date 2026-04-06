@@ -7,7 +7,7 @@ namespace PrompterOne.Core.Tests;
 
 public sealed class GoLiveModuleRegistryTests
 {
-    [Fact]
+    [Test]
     public void Registry_ResolvesSourceAndOutputModulesBySharedIds()
     {
         var registry = new GoLiveModuleRegistry(
@@ -21,7 +21,7 @@ public sealed class GoLiveModuleRegistryTests
         Assert.NotNull(registry.ResolveOutput(GoLiveTargetCatalog.TargetIds.VdoNinja));
     }
 
-    [Fact]
+    [Test]
     public void Registry_ExposesConcurrentPublishCapabilitiesForLiveOutputs()
     {
         var registry = new GoLiveModuleRegistry(
@@ -39,7 +39,7 @@ public sealed class GoLiveModuleRegistryTests
         Assert.True(descriptors[GoLiveTargetCatalog.TargetIds.VdoNinja].Capabilities.SupportsPublishUrl);
     }
 
-    [Fact]
+    [Test]
     public void Catalog_CreatesTransportConnectionsAndTargetsWithNewProfiles()
     {
         var liveKit = StreamingPlatformCatalog.CreateTransportConnection(StreamingPlatformKind.LiveKit);
