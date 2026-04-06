@@ -84,11 +84,11 @@ public partial class TeleprompterPage
 
     private async Task HandleReaderTextWidthInputAsync(ChangeEventArgs args)
     {
-        _readerTextWidth = ParseReaderControlValue(
+        _readerTextWidthPercent = ParseReaderControlValue(
             args.Value,
-            ReaderMinTextWidth,
-            ReaderMaxTextWidth,
-            _readerTextWidth);
+            ReaderMinTextWidthPercent,
+            ReaderMaxTextWidthPercent,
+            _readerTextWidthPercent);
         RequestReaderAlignment();
         await PersistCurrentReaderLayoutAsync();
         _areWidthGuidesActive = true;

@@ -28,7 +28,7 @@ internal static partial class BrowserTestConstants
         public const string LearnPlaybackStep = "02-learn-playback";
         public const string TeleprompterInitialStep = "03-teleprompter-initial";
         public const string TeleprompterCameraStep = "04-teleprompter-camera";
-        public const string TeleprompterWidth = "900";
+        public const string TeleprompterWidth = "82";
         public const string TeleprompterFocal = "35";
     }
 

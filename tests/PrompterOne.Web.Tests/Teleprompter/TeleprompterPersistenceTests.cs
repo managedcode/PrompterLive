@@ -14,19 +14,20 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 {
     private const int PersistedFocalPointPercent = 42;
     private const int PersistedFontSize = 40;
-    private const int PersistedTextWidthPixels = 900;
+    private const int PersistedTextWidthPercent = 79;
+    private const string PersistedTextWidthLabel = "79%";
     private const string EnabledCameraAttribute = "true";
     private const string HorizontalMirrorTransform = "scaleX(-1)";
     private const string VerticalMirrorTransform = "scaleY(-1)";
     private const int UpdatedFocalPointPercent = 37;
     private const int UpdatedFontSize = 52;
-    private const int UpdatedTextWidthPixels = 980;
+    private const int UpdatedTextWidthPercent = 82;
+    private const string UpdatedTextWidthLabel = "82%";
     private const double ReaderFontBaselinePixels = 36d;
-    private const double ReaderWidthBaselinePixels = 1240d;
     private const double PersistedFontScale = PersistedFontSize / ReaderFontBaselinePixels;
     private const double UpdatedFontScale = UpdatedFontSize / ReaderFontBaselinePixels;
-    private const double PersistedTextWidthRatio = PersistedTextWidthPixels / ReaderWidthBaselinePixels;
-    private const double UpdatedTextWidthRatio = UpdatedTextWidthPixels / ReaderWidthBaselinePixels;
+    private const double PersistedTextWidthRatio = PersistedTextWidthPercent / 100d;
+    private const double UpdatedTextWidthRatio = UpdatedTextWidthPercent / 100d;
     private const string DisabledCameraAttribute = "false";
     private const string JustifyAlignmentValue = "justify";
     private const string PortraitOrientationTransform = "rotate(90deg)";
@@ -53,7 +54,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(
-                PersistedTextWidthPixels.ToString(CultureInfo.InvariantCulture),
+                PersistedTextWidthLabel,
                 cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
             Assert.Equal(
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
@@ -64,6 +65,9 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Equal(
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
                 cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).GetAttribute("value"));
+            Assert.Equal(
+                PersistedTextWidthPercent.ToString(CultureInfo.InvariantCulture),
+                cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
             Assert.Equal(
                 $"top:{PersistedFocalPointPercent}%;",
                 cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
@@ -92,7 +96,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Teleprompter.WidthSlider, cut.Markup, StringComparison.Ordinal));
 
         cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).Input(UpdatedFontSize);
-        cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).Input(UpdatedTextWidthPixels);
+        cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).Input(UpdatedTextWidthPercent);
         cut.FindByTestId(UiTestIds.Teleprompter.FocalSlider).Input(UpdatedFocalPointPercent);
         cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).Click();
         cut.FindByTestId(UiTestIds.Teleprompter.MirrorVerticalToggle).Click();
@@ -110,7 +114,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 
             Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontLabel}").TextContent.Trim(), CultureInfo.InvariantCulture));
             Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontValue}").TextContent.Trim(), CultureInfo.InvariantCulture));
-            Assert.Equal(UpdatedTextWidthPixels, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim(), CultureInfo.InvariantCulture));
+            Assert.Equal(UpdatedTextWidthLabel, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
             Assert.Equal($"top:{UpdatedFocalPointPercent}%;", cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
             var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
             Assert.Equal(

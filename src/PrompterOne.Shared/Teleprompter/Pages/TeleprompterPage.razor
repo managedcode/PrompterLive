@@ -232,15 +232,15 @@
                     <input type="range"
                            class="rd-vslider"
                            id="rd-width-slider"
-                           min="@ReaderMinTextWidth"
-                           max="@ReaderMaxTextWidth"
-                           value="@_readerTextWidth"
+                           min="@ReaderMinTextWidthPercent"
+                           max="@ReaderMaxTextWidthPercent"
+                           value="@_readerTextWidthPercent"
                            @oninput="HandleReaderTextWidthInputAsync"
                            @onkeydown:stopPropagation="true"
                            aria-label="@ReaderWidthSliderTitle"
                            data-testid="@UiTestIds.Teleprompter.WidthSlider"
                            data-test-id="@UiTestIds.Teleprompter.WidthSlider">
-                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.WidthValue">@_readerTextWidth</span>
+                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.WidthValue">@BuildReaderWidthLabel()</span>
                 </div>
                 <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)"
                       class="@BuildRailTooltipCssClass(placeOnRightSide: false)"
@@ -252,7 +252,8 @@
 
             <div class="rd-stage"
                  id="@UiDomIds.Teleprompter.Stage"
-                 data-testid="@UiTestIds.Teleprompter.Stage">
+                 data-testid="@UiTestIds.Teleprompter.Stage"
+                 style="@BuildReaderStageStyle()">
                 <div class="rd-center-guide"></div>
                 <div class="@BuildFocalGuideCssClass()"
                      id="@UiDomIds.Teleprompter.FocalGuide"

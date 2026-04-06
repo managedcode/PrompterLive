@@ -20,7 +20,9 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const int InspirationCardIndex = 6;
     private const double MinimumVisibleFastLetterSpacingEm = -0.024d;
     private const double MinimumVisibleSlowLetterSpacingEm = 0.045d;
-    private const string MaximumReaderWidth = "1240";
+    private const string MaximumReaderWidthLabel = "100%";
+    private const string MaximumReaderWidthValue = "100";
+    private const string MaximumReaderWidthScaleStyle = "--rd-stage-width-scale:1";
     private const string NeutralWord = "Good";
     private const int OpeningCardIndex = 0;
     private const int PurposeCardIndex = 1;
@@ -84,9 +86,9 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Equal(MaximumReaderWidth, cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
-            Assert.Equal(MaximumReaderWidth, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
-            Assert.Contains($"max-width:{MaximumReaderWidth}px;", cut.Find($"#{UiDomIds.Teleprompter.ClusterWrap}").GetAttribute("style"), StringComparison.Ordinal);
+            Assert.Equal(MaximumReaderWidthValue, cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
+            Assert.Equal(MaximumReaderWidthLabel, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
+            Assert.Contains(MaximumReaderWidthScaleStyle, cut.FindByTestId(UiTestIds.Teleprompter.Stage).GetAttribute("style"), StringComparison.Ordinal);
         });
     }
 

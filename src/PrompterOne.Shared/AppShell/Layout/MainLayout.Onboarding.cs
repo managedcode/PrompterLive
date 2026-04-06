@@ -104,6 +104,13 @@ public partial class MainLayout
         }
 
         var currentRoute = GetNormalizedAppRoute(uri);
+        if (_onboardingStepIndex >= 0 &&
+            _onboardingStepIndex < _onboardingSteps.Count &&
+            string.Equals(_onboardingSteps[_onboardingStepIndex].Route, currentRoute, StringComparison.Ordinal))
+        {
+            return _onboardingStepIndex;
+        }
+
         var routeIndex = _onboardingSteps
             .Select((step, index) => (step.Route, index))
             .FirstOrDefault(candidate => string.Equals(candidate.Route, currentRoute, StringComparison.Ordinal))

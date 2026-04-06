@@ -93,6 +93,7 @@ Rule format:
 - Product localization must be complete across all supported UI languages: audit hardcoded user-facing strings with an explicit inventory file, move them into shared localization catalogs, and include tooltip text in the same localization pass instead of leaving tooltip copy or chrome labels hardcoded.
 - PrompterOne must ship a first-run onboarding flow that explains the product basics, TPS, RSVP, Editor, Learn, Teleprompter, and Go Live in-app; the walkthrough must appear on first launch until the user explicitly completes or dismisses it, persist that choice locally, and be fully localized across all supported UI languages.
 - The onboarding flow must include a dedicated TPS explainer step or page, separate from the generic editor step, that tells users what TPS is, why it exists, and how PrompterOne uses it.
+- The dedicated TPS onboarding step must explain TPS in concrete beginner terms: what the format is, why it exists, how PrompterOne uses it across Editor/Learn/Teleprompter/Go Live, and where users can continue with the official TPS site or glossary.
 - Script discovery and authoring surfaces must support real search by script name and script content; Library/script pages and editor flows must not force manual browsing when the user needs to find files or text inside files.
 
 ## Rules to Follow (Mandatory)

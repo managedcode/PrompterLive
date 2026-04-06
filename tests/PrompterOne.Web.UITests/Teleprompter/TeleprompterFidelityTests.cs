@@ -8,8 +8,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
 {
     private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const int ImmediateAlignmentFollowUpDelayMilliseconds = 180;
-    private const string MaximumReaderWidthCss = "1240px";
-    private const string MaximumReaderWidthValue = "1240";
+    private const double LegacyMaximumReaderWidthPixels = 1240d;
+    private const string MaximumReaderWidthLabel = "100%";
+    private const string MaximumReaderWidthValue = "100";
     private const int ParagraphMotionSettleDelayMilliseconds = 450;
     private const double ParagraphMotionTolerancePixels = 4d;
     private const int SecurityIncidentResponseCardIndex = 2;
@@ -185,22 +186,25 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture) : IC
 
         try
         {
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.TeleprompterFlow.SecurityIncidentViewportWidth,
+                BrowserTestConstants.TeleprompterFlow.SecurityIncidentViewportHeight);
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterSecurityIncident);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(MaximumReaderWidthValue);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(MaximumReaderWidthValue);
+            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(MaximumReaderWidthLabel);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0)))
                 .ToHaveClassAsync(new Regex($@"\b{ContinuousEmphasisCssClass}\b"));
 
             var clusterWrapWidth = await page.Locator($"#{UiDomIds.Teleprompter.ClusterWrap}")
-                .EvaluateAsync<string>("element => getComputedStyle(element).maxWidth");
+                .EvaluateAsync<double>("element => element.getBoundingClientRect().width");
             var responseWords = await page.GetByTestId(UiTestIds.Teleprompter.CardText(SecurityIncidentResponseCardIndex))
                 .Locator(".rd-w")
                 .AllTextContentsAsync();
 
-            Assert.Equal(MaximumReaderWidthCss, clusterWrapWidth);
+            Assert.True(clusterWrapWidth > LegacyMaximumReaderWidthPixels);
             Assert.Contains(TrailingCommaWord, responseWords);
             Assert.DoesNotContain(StandaloneCommaWord, responseWords);
         }

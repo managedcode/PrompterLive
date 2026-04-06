@@ -253,7 +253,7 @@ internal static partial class BrowserTestConstants
         public const string NeutralWord = "Good";
         public const string ProductLaunchProfessionalWord = "transformative";
         public const string ProductLaunchHighlightWord = "solution";
-        public const string WidthAfterChange = "900";
+        public const string WidthAfterChange = "82%";
         public const string ProductLaunchRhetoricalWord = "focus";
         public const string ProductLaunchSlowWord = "elephant";
         public const string ProductLaunchTeleprompterWord = "teleprompter";
@@ -281,7 +281,7 @@ internal static partial class BrowserTestConstants
         public const string StyleAttribute = "style";
         public const string TrueText = "true";
         public const string WidthInputScript =
-            "element => { element.value = '900'; element.dispatchEvent(new Event('input', { bubbles: true })); }";
+            "element => { element.value = '82'; element.dispatchEvent(new Event('input', { bubbles: true })); }";
         public const string HasVideoTrackScript =
             "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0";
         public const string ResolveCameraDeviceScript =

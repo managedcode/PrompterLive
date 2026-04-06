@@ -13,10 +13,7 @@ public partial class TeleprompterPage
     private const string ReaderCardNextCssClass = "rd-card-next";
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
     private const string ReaderAlignmentButtonCssClass = "rd-align-btn";
-    private const int ReaderCenterOpticalInsetPixels = 0;
-    private const int ReaderComfortableContentMaxWidth = 1080;
-    private const int ReaderComfortablePortraitContentMaxWidth = 760;
-    private const string ReaderContentMaxWidthVariableName = "--rd-content-max-width";
+    private const double ReaderContentWidthScaleFactor = 0.92d;
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
     private const string ReaderCountdownCssClass = "rd-countdown";
     private const string ReaderGradientCssClass = "rd-gradient";
@@ -28,15 +25,18 @@ public partial class TeleprompterPage
     private const string ReaderHorizontalGuideCssClass = "rd-guide-h";
     private const string ReaderMirrorButtonCssClass = "rd-mirror-btn";
     private const string ReaderMirrorHorizontalTransform = "scaleX(-1)";
-    private const string ReaderOpticalInsetVariableName = "--rd-text-optical-inset";
     private const string ReaderOrientationLandscapeValue = "landscape";
     private const string ReaderOrientationPortraitTransform = "rotate(90deg)";
     private const string ReaderOrientationPortraitValue = "portrait";
+    private const string ReaderPercentSuffix = "%";
     private const string ReaderTextAlignmentCenterValue = "center";
     private const string ReaderTextAlignmentJustifyValue = "justify";
     private const string ReaderTextAlignmentLeftValue = "left";
     private const string ReaderTextAlignmentRightValue = "right";
     private const string ReaderMirrorTransformOrigin = "center center";
+    private const string ReaderStageContentScaleVariableName = "--rd-stage-content-scale";
+    private const string ReaderStageShellWidthVariableName = "--rd-stage-shell-width";
+    private const string ReaderStageWidthScaleVariableName = "--rd-stage-width-scale";
     private const string ReaderMirrorVerticalTransform = "scaleY(-1)";
     private const string ReaderVerticalGuideCssClass = "rd-guide-v";
     private const string ReaderVerticalGuideLeftCssClass = "rd-guide-v-l";
@@ -130,27 +130,28 @@ public partial class TeleprompterPage
     private string BuildFocalGuideStyle() =>
         $"top:{_readerFocalPointPercent.ToString(CultureInfo.InvariantCulture)}%;";
 
+    private string BuildReaderStageStyle()
+    {
+        var widthScale = BuildReaderWidthScale(_readerTextWidthPercent).ToString("0.####", CultureInfo.InvariantCulture);
+        var contentScale = BuildReaderContentScale(_readerTextWidthPercent).ToString("0.####", CultureInfo.InvariantCulture);
+        return $"{ReaderStageWidthScaleVariableName}:{widthScale};{ReaderStageContentScaleVariableName}:{contentScale};";
+    }
+
     private string BuildWidthGuideCssClass(bool isLeft) =>
         BuildClassList(
             ReaderVerticalGuideCssClass,
             isLeft ? ReaderVerticalGuideLeftCssClass : ReaderVerticalGuideRightCssClass,
             _areWidthGuidesActive ? ActiveCssClass : null);
 
-    private string BuildWidthGuideStyle(bool isLeft)
-    {
-        var halfWidth = (_readerTextWidth / 2d).ToString("0.##", CultureInfo.InvariantCulture);
-        var sign = isLeft ? '-' : '+';
-        return $"left:calc(50% {sign} {halfWidth}px);";
-    }
+    private static string BuildWidthGuideStyle(bool isLeft) =>
+        isLeft
+            ? $"left:calc(50% - (var({ReaderStageShellWidthVariableName}) / 2));"
+            : $"left:calc(50% + (var({ReaderStageShellWidthVariableName}) / 2));";
 
     private string BuildClusterWrapStyle()
     {
-        var contentMaxWidth = ResolveReaderContentMaxWidth();
         var styleParts = new List<string>
         {
-            $"max-width:{_readerTextWidth.ToString(CultureInfo.InvariantCulture)}px",
-            $"{ReaderContentMaxWidthVariableName}:{contentMaxWidth.ToString(CultureInfo.InvariantCulture)}px",
-            $"{ReaderOpticalInsetVariableName}:{ResolveReaderTextOpticalInset(contentMaxWidth).ToString(CultureInfo.InvariantCulture)}px",
             $"--rd-font-size:{_readerFontSize.ToString(CultureInfo.InvariantCulture)}px"
         };
         var readerTransform = BuildReaderTransform();
@@ -164,23 +165,14 @@ public partial class TeleprompterPage
         return string.Join(';', styleParts) + ';';
     }
 
-    private int ResolveReaderContentMaxWidth()
-    {
-        var contentMaxWidth = Math.Min(_readerTextWidth, ReaderComfortableContentMaxWidth);
-        return _readerTextOrientation == ReaderTextOrientation.Portrait
-            ? Math.Min(contentMaxWidth, ReaderComfortablePortraitContentMaxWidth)
-            : contentMaxWidth;
-    }
+    private string BuildReaderWidthLabel() =>
+        $"{_readerTextWidthPercent.ToString(CultureInfo.InvariantCulture)}{ReaderPercentSuffix}";
 
-    private int ResolveReaderTextOpticalInset(int contentMaxWidth)
-    {
-        if (_readerTextAlignment is ReaderTextAlignment.Center or ReaderTextAlignment.Justify)
-        {
-            return ReaderCenterOpticalInsetPixels;
-        }
+    private static double BuildReaderWidthScale(int textWidthPercent) =>
+        Math.Clamp(textWidthPercent / (double)ReaderMaxTextWidthPercent, ReaderMinTextWidthPercent / 100d, 1d);
 
-        return Math.Clamp((int)Math.Round(contentMaxWidth * 0.06d, MidpointRounding.AwayFromZero), 28, 64);
-    }
+    private static double BuildReaderContentScale(int textWidthPercent) =>
+        Math.Round(BuildReaderWidthScale(textWidthPercent) * ReaderContentWidthScaleFactor, 4, MidpointRounding.AwayFromZero);
 
     private string BuildReaderTransform()
     {

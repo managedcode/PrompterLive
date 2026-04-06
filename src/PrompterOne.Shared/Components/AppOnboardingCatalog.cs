@@ -19,8 +19,22 @@ internal static class AppOnboardingCatalog
                 UiTextKey.OnboardingWelcomeBulletModes,
                 UiTextKey.OnboardingWelcomeBulletLocal
             ],
-            UiTextKey.OnboardingOpenEditor,
+            UiTextKey.OnboardingOpenTps,
             AppRoutes.Library),
+        CreateStep(
+            AppOnboardingStepId.Tps,
+            UiIconKind.CodeArrows,
+            UiTextKey.OnboardingStepTps,
+            UiTextKey.OnboardingTpsEyebrow,
+            UiTextKey.OnboardingTpsTitle,
+            UiTextKey.OnboardingTpsBody,
+            [
+                UiTextKey.OnboardingTpsBulletFormat,
+                UiTextKey.OnboardingTpsBulletRuntime,
+                UiTextKey.OnboardingTpsBulletGlossary
+            ],
+            UiTextKey.OnboardingOpenEditor,
+            AppRoutes.EditorWithId(scriptId)),
         CreateStep(
             AppOnboardingStepId.Editor,
             UiIconKind.DocumentLines,

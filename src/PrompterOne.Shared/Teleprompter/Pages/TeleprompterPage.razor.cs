@@ -26,12 +26,12 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderForwardStep = 1;
     private const int ReaderGuideActiveDurationMilliseconds = 800;
     private const int ReaderMaxFontSize = 56;
-    private const int ReaderMaxTextWidth = 1240;
     private const int ReaderMaxFocalPointPercent = 55;
+    private const int ReaderMaxTextWidthPercent = 100;
     private const int ReaderMinFontSize = 24;
-    private const int ReaderMinTextWidth = 400;
     private const int ReaderMinFocalPointPercent = 15;
-    private const int DefaultReaderTextWidth = ReaderMaxTextWidth;
+    private const int ReaderMinTextWidthPercent = 35;
+    private const int DefaultReaderTextWidthPercent = ReaderMaxTextWidthPercent;
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private CameraPreviewInterop CameraPreviewInterop { get; set; } = null!;
@@ -71,7 +71,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private int _activeReaderWordIndex;
     private int _readerFontSize = DefaultReaderFontSize;
     private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
-    private int _readerTextWidth = DefaultReaderTextWidth;
+    private int _readerTextWidthPercent = DefaultReaderTextWidthPercent;
     private ReaderTextAlignment _readerTextAlignment = ReaderSettingsDefaults.TextAlignment;
     private ReaderTextOrientation _readerTextOrientation = ReaderSettingsDefaults.TextOrientation;
     private int _totalDurationMilliseconds = 1000;
@@ -167,7 +167,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         _readerFocalPointPercent = NormalizeReaderFocalPointPercent(SessionService.State.ReaderSettings.FocalPointPercent);
         _isReaderMirrorHorizontal = SessionService.State.ReaderSettings.MirrorText;
         _isReaderMirrorVertical = SessionService.State.ReaderSettings.MirrorVertical;
-        _readerTextWidth = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
+        _readerTextWidthPercent = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
         _readerTextAlignment = NormalizeReaderTextAlignment(SessionService.State.ReaderSettings.TextAlignment);
         _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
         _activeReaderCardIndex = 0;
@@ -283,8 +283,11 @@ public partial class TeleprompterPage : IAsyncDisposable
 
     private static int NormalizeReaderTextWidth(double textWidthRatio)
     {
-        var safeRatio = textWidthRatio > 0 ? textWidthRatio : (double)DefaultReaderTextWidth / ReaderMaxTextWidth;
-        return Math.Clamp((int)Math.Round(ReaderMaxTextWidth * safeRatio), ReaderMinTextWidth, ReaderMaxTextWidth);
+        var safeRatio = textWidthRatio > 0 ? textWidthRatio : ReaderSettingsDefaults.TextWidth;
+        return Math.Clamp(
+            (int)Math.Round(ReaderMaxTextWidthPercent * safeRatio),
+            ReaderMinTextWidthPercent,
+            ReaderMaxTextWidthPercent);
     }
 
     private static int NormalizeReaderFocalPointPercent(int focalPointPercent)
