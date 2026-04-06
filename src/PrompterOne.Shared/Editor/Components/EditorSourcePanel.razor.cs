@@ -225,7 +225,10 @@ public partial class EditorSourcePanel : IAsyncDisposable
         }
     }
 
-    private async Task RefreshSelectionAsync(bool dismissMenus, bool requestComponentRender = true)
+    private async Task RefreshSelectionAsync(
+        bool dismissMenus,
+        bool requestComponentRender = true,
+        bool preserveExistingSelectionWhenEmpty = false)
     {
         var selection = await RunSelectionInteropAsync(
             () => MonacoInterop.GetSelectionAsync(_editorHostRef),
@@ -234,6 +237,20 @@ public partial class EditorSourcePanel : IAsyncDisposable
         if (selection is null)
         {
             return;
+        }
+
+        if (preserveExistingSelectionWhenEmpty && !selection.HasSelection)
+        {
+            var proxySelection = await RunSelectionInteropAsync(
+                () => SemanticInterop.GetSelectionAsync(_textareaRef),
+                RefreshSelectionFailureMessage);
+            selection = proxySelection is { HasSelection: true }
+                ? proxySelection
+                : Selection.HasSelection
+                    ? Selection
+                    : _floatingBarAnchor.HasSelection
+                        ? _floatingBarAnchor
+                        : selection;
         }
 
         TrackLocalSelectionEcho(selection);

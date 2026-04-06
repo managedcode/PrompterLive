@@ -10,7 +10,6 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
     [Fact]
     public async Task EditorScreen_HugeDraftLoadedFromSeedKeepsFollowupTypingResponsive()
     {
-        await _fixture.ResetRuntimeAsync();
         var page = await _fixture.NewPageAsync();
 
         try

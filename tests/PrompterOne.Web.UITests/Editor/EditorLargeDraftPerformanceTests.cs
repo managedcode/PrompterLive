@@ -11,7 +11,6 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
     [Fact]
     public async Task EditorScreen_LargeDraftPasteKeepsFollowupTypingResponsive()
     {
-        await _fixture.ResetRuntimeAsync();
         var page = await _fixture.NewPageAsync();
 
         try

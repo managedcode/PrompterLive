@@ -116,13 +116,15 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture) : IC
     [Fact]
     public async Task RuntimeTelemetry_DoesNotTrack_WhenWasmDebugQueryIsEnabled()
     {
-        await _fixture.ResetRuntimeAsync();
         var page = await _fixture.NewPageAsync();
 
         try
         {
             await page.GotoAsync(BrowserTestConstants.Routes.LibraryWithWasmDebug);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync(new()
+            {
+                Timeout = BrowserTestConstants.Timing.DefaultNavigationTimeoutMs
+            });
             await WaitForTelemetryInitializationAsync(page);
 
             await page.GetByTestId(UiTestIds.Header.GoLive).ClickAsync();

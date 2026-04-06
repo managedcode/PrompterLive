@@ -222,8 +222,8 @@ export async function syncEditorState(host, text, selectionStart, selectionEnd) 
     state.suppressSelectionNotification = true;
 
     const model = state.editor.getModel();
-    if (model && model.getValue() !== nextText) {
-        model.setValue(nextText);
+    if (model) {
+        replaceModelTextPreservingViewport(state, nextText);
     }
 
     applySelection(state, selectionStart ?? 0, selectionEnd ?? 0, false);
@@ -409,8 +409,8 @@ function ensureHarness(options) {
             const state = getRequiredHarnessState(testId);
             const model = state.editor.getModel();
             const nextText = text ?? emptyValue;
-            if (model && model.getValue() !== nextText) {
-                model.setValue(nextText);
+            if (model) {
+                replaceModelTextPreservingViewport(state, nextText);
             }
 
             return createHarnessState(state, options);
@@ -1253,6 +1253,37 @@ function normalizeSelectionDirection(direction, start, end) {
     return inferSelectionDirection(start, end);
 }
 
+function captureEditorScrollPosition(state) {
+    return {
+        scrollLeft: state.editor.getScrollLeft(),
+        scrollTop: state.editor.getScrollTop()
+    };
+}
+
+function restoreEditorScrollPosition(state, scrollPosition) {
+    state.editor.setScrollPosition(scrollPosition, state.monaco.editor.ScrollType.Immediate);
+}
+
+function replaceModelTextPreservingViewport(state, nextText) {
+    const model = state.editor.getModel();
+    if (!model || model.getValue() === nextText) {
+        return false;
+    }
+
+    const preservedScrollPosition = captureEditorScrollPosition(state);
+    model.setValue(nextText);
+    restoreEditorScrollPosition(state, preservedScrollPosition);
+    requestAnimationFrame(() => {
+        const currentState = hostStates.get(state.host);
+        if (!currentState) {
+            return;
+        }
+
+        restoreEditorScrollPosition(currentState, preservedScrollPosition);
+    });
+    return true;
+}
+
 function applySelection(state, start, end, revealSelection, selectionDirection) {
     const model = state.editor.getModel();
     if (!model) {
@@ -1269,8 +1300,7 @@ function applySelection(state, start, end, revealSelection, selectionDirection) 
     const focusOffset = direction === "backward" ? orderedStart : orderedEnd;
     const anchorPosition = model.getPositionAt(anchorOffset);
     const focusPosition = model.getPositionAt(focusOffset);
-    const preservedScrollTop = state.editor.getScrollTop();
-    const preservedScrollLeft = state.editor.getScrollLeft();
+    const preservedScrollPosition = captureEditorScrollPosition(state);
 
     state.editor.setSelection(new state.monaco.Selection(
         anchorPosition.lineNumber,
@@ -1295,10 +1325,7 @@ function applySelection(state, start, end, revealSelection, selectionDirection) 
     }
     else {
         state.editor.focus();
-        state.editor.setScrollPosition({
-            scrollLeft: preservedScrollLeft,
-            scrollTop: preservedScrollTop
-        }, state.monaco.editor.ScrollType.Immediate);
+        restoreEditorScrollPosition(state, preservedScrollPosition);
     }
 
     syncProxyFromEditor(state);

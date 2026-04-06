@@ -254,7 +254,6 @@ internal static partial class BrowserTestConstants
         public const string AiScrollJumpLineTemplate = "Line {0:D3} carries the transformative moment for AI simplify.";
         public const int AiScrollJumpLineCount = 140;
         public const int AiScrollJumpTargetLineIndex = 90;
-        public const int AiScrollJumpPageDownCount = 35;
         public const int AiScrollJumpSettleDelayMs = 500;
         public const double AiScrollJumpMinimumStartingScrollTop = 1000;
         public const double AiScrollJumpMaximumAllowedDeltaPx = 64;
