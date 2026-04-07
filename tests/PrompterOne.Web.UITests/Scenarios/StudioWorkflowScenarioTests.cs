@@ -268,7 +268,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture)
             },
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-        var sourceButtons = page.Locator($"[data-testid^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']");
+        var sourceButtons = page.Locator($"[data-test^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']");
         if (await sourceButtons.CountAsync() < 2)
         {
             await page.GetByTestId(UiTestIds.GoLive.AddSource).ClickAsync();

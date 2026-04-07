@@ -1,4 +1,5 @@
 using PrompterOne.Shared.Components;
+using PrompterOne.Shared.Components.Settings;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Settings.Components;
 

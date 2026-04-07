@@ -4,7 +4,7 @@
 <section class="set-section set-panel"
          id="set-about"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.AboutPanel">
+         data-test="@UiTestIds.Settings.AboutPanel">
     <h3 class="set-section-title">@AboutSectionTitle</h3>
     <p class="set-section-desc">@AboutSectionDescription</p>
 
@@ -20,7 +20,7 @@
             <button type="button"
                     class="btn-ghost set-card-cta"
                     @onclick="OpenOnboarding"
-                    data-testid="@UiTestIds.Settings.AboutOnboardingRestart">@OnboardingCardAction</button>
+                    data-test="@UiTestIds.Settings.AboutOnboardingRestart">@OnboardingCardAction</button>
         </SettingsExpandableCard>
 
         <SettingsExpandableCard Title="@AppCardTitle"
@@ -52,7 +52,7 @@
                        href="@link.Href"
                        target="_blank"
                        rel="noreferrer"
-                       data-testid="@link.TestId">
+                       data-test="@link.TestId">
                         <div class="set-about-link-copy">
                             <label>@link.Label</label>
                             <span class="set-about-link-meta">@link.Description</span>
@@ -80,7 +80,7 @@
                        href="@link.Href"
                        target="_blank"
                        rel="noreferrer"
-                       data-testid="@link.TestId">
+                       data-test="@link.TestId">
                         <div class="set-about-link-copy">
                             <label>@link.Label</label>
                             <span class="set-about-link-meta">@link.Description</span>
@@ -126,7 +126,7 @@
                        href="@link.Href"
                        target="_blank"
                        rel="noreferrer"
-                       data-testid="@link.TestId">
+                       data-test="@link.TestId">
                         <div class="set-about-link-copy">
                             <label>@link.Label</label>
                             <span class="set-about-link-meta">@link.Description</span>

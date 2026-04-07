@@ -5,7 +5,7 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="app-onboarding" data-testid="@UiTestIds.Onboarding.Surface">
+<div class="app-onboarding" data-test="@UiTestIds.Onboarding.Surface">
     <div class="app-onboarding__scrim"></div>
 
     <section class="app-onboarding__panel"
@@ -19,22 +19,22 @@
             <div class="app-onboarding__copy">
                 <p id="@UiDomIds.AppShell.OnboardingEyebrow"
                    class="app-onboarding__eyebrow"
-                   data-testid="@UiTestIds.Onboarding.Eyebrow">@Text(CurrentStep.EyebrowKey)</p>
+                   data-test="@UiTestIds.Onboarding.Eyebrow">@Text(CurrentStep.EyebrowKey)</p>
                 <h2 id="@UiDomIds.AppShell.OnboardingTitle"
                     class="app-onboarding__title"
-                    data-testid="@UiTestIds.Onboarding.Title">@Text(CurrentStep.TitleKey)</h2>
+                    data-test="@UiTestIds.Onboarding.Title">@Text(CurrentStep.TitleKey)</h2>
                 <p class="app-onboarding__body"
-                   data-testid="@UiTestIds.Onboarding.Body">@Text(CurrentStep.BodyKey)</p>
+                   data-test="@UiTestIds.Onboarding.Body">@Text(CurrentStep.BodyKey)</p>
             </div>
             <button type="button"
                     class="app-onboarding__dismiss"
                     @onclick="OnDismissRequested"
-                    data-testid="@UiTestIds.Onboarding.Dismiss">@Text(UiTextKey.OnboardingDismiss)</button>
+                    data-test="@UiTestIds.Onboarding.Dismiss">@Text(UiTextKey.OnboardingDismiss)</button>
         </header>
 
         <div class="app-onboarding__progress-shell">
             <span class="app-onboarding__progress"
-                  data-testid="@UiTestIds.Onboarding.Progress">@ProgressLabel</span>
+                  data-test="@UiTestIds.Onboarding.Progress">@ProgressLabel</span>
 
             <div class="app-onboarding__steps">
                 @foreach (var step in Steps)
@@ -42,7 +42,7 @@
                     <button type="button"
                             class="@GetStepCss(step)"
                             @onclick="() => OnStepSelected.InvokeAsync(step.StepId)"
-                            data-testid="@UiTestIds.Onboarding.Step(ToStepKey(step.StepId))">
+                            data-test="@UiTestIds.Onboarding.Step(ToStepKey(step.StepId))">
                         <UiIcon Kind="@step.IconKind" Size="14" StrokeWidth="2.2m" />
                         <span>@Text(step.StepLabelKey)</span>
                     </button>
@@ -65,11 +65,11 @@
                     class="app-onboarding__secondary"
                     @onclick="OnBackRequested"
                     disabled="@(!CanGoBack)"
-                    data-testid="@UiTestIds.Onboarding.Back">@Text(UiTextKey.OnboardingBack)</button>
+                    data-test="@UiTestIds.Onboarding.Back">@Text(UiTextKey.OnboardingBack)</button>
             <button type="button"
                     class="app-onboarding__primary"
                     @onclick="OnNextRequested"
-                    data-testid="@UiTestIds.Onboarding.Next">@Text(CurrentStep.ActionKey)</button>
+                    data-test="@UiTestIds.Onboarding.Next">@Text(CurrentStep.ActionKey)</button>
         </footer>
     </section>
 </div>

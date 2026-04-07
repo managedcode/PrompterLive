@@ -278,6 +278,44 @@ public partial class TeleprompterPage
             _ => null
         };
 
+    private IReadOnlyDictionary<string, object> BuildReaderPauseDataAttributes(ReaderPauseViewModel pause) =>
+        new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [UiDataAttributes.Teleprompter.DurationMilliseconds] = pause.DurationMs
+        };
+
+    private IReadOnlyDictionary<string, object> BuildReaderTimeDataAttributes() =>
+        new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [UiDataAttributes.Teleprompter.TotalMilliseconds] = _totalDurationMilliseconds,
+            [UiDataAttributes.Teleprompter.TotalSeconds] = _totalSeconds
+        };
+
+    private IReadOnlyDictionary<string, object> BuildReaderWordDataAttributes(
+        ReaderWordViewModel word,
+        int cardIndex,
+        int chunkIndex,
+        int wordIndex)
+    {
+        var attributes = new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [UiDataAttributes.Teleprompter.DurationMilliseconds] = word.DurationMs,
+            [UiDataAttributes.Teleprompter.EffectiveWordsPerMinute] = word.EffectiveWpm,
+            [UiDataAttributes.Teleprompter.PauseMilliseconds] = word.PauseAfterMs
+        };
+
+        AddOptionalDataAttribute(
+            attributes,
+            UiDataAttributes.Teleprompter.Pronunciation,
+            word.PronunciationGuide);
+        AddOptionalDataAttribute(
+            attributes,
+            UiDataAttributes.Teleprompter.WordState,
+            BuildReaderWordStateDataAttribute(cardIndex, chunkIndex, wordIndex));
+
+        return attributes;
+    }
+
     private string ResolveReaderCardCssClass(int index) =>
         index == _activeReaderCardIndex
             ? ReaderCardActiveCssClass
@@ -330,6 +368,17 @@ public partial class TeleprompterPage
     private string BuildElapsedLabel() => _elapsedLabel;
 
     private static string BuildBooleanDataAttribute(bool value) => value ? "true" : "false";
+
+    private static void AddOptionalDataAttribute(
+        IDictionary<string, object> attributes,
+        string attributeName,
+        string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            attributes[attributeName] = value;
+        }
+    }
 
     private static string BuildReaderProgressSegmentFlexWeight(ReaderCardViewModel card) =>
         card.WidthPercentString.EndsWith("%", StringComparison.Ordinal)

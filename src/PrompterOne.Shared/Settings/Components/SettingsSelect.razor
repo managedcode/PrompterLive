@@ -8,7 +8,7 @@
      @onclick:stopPropagation="true">
     <button type="button"
             class="ss-trigger set-select"
-            data-testid="@TestId"
+            data-test="@TestId"
             value="@Value"
             aria-expanded="@_open"
             @onclick="Toggle">
@@ -21,13 +21,13 @@
     @if (_open)
     {
         <div class="ss-panel"
-             data-testid="@GetPanelTestId()">
+             data-test="@GetPanelTestId()">
             @foreach (var option in Options)
             {
                 var isSelected = string.Equals(option.Value, Value, StringComparison.Ordinal);
                 <button type="button"
                         class="ss-option @(isSelected ? SelectedOptionClass : null)"
-                        data-testid="@GetOptionTestId(option.Value)"
+                        data-test="@GetOptionTestId(option.Value)"
                         @onmousedown:preventDefault="true"
                         @onclick="() => SelectOption(option.Value)">
                     @if (isSelected)

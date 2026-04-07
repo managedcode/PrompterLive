@@ -1,6 +1,6 @@
 @namespace PrompterOne.Shared.Components.GoLive
 
-<article class="live-card live-destination-card" data-testid="@CardTestId">
+<article class="live-card live-destination-card" data-test="@CardTestId">
     <div class="live-card-header">
         <div>
             <h3 class="live-card-title">@Title</h3>
@@ -9,7 +9,7 @@
         <button type="button"
                 class="set-toggle @(IsEnabled ? "on" : null)"
                 @onclick="HandleToggleAsync"
-                data-testid="@ToggleTestId">
+                data-test="@ToggleTestId">
             <div class="set-toggle-thumb"></div>
         </button>
     </div>

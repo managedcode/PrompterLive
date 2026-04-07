@@ -180,38 +180,36 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
 
             var primaryCameraCard = page.GetByTestId(UiTestIds.Settings.CameraDevice(BrowserTestConstants.Media.PrimaryCameraId));
             var primaryCameraLabel = page.GetByTestId(UiTestIds.Settings.CameraDeviceLabel(BrowserTestConstants.Media.PrimaryCameraId));
+            var cameraPreviewLabel = page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel);
             await Expect(primaryCameraCard).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.CameraPreviewVideo)).ToBeVisibleAsync();
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementTextIsBlankScript,
-                UiTestIds.Settings.CameraDeviceLabel(BrowserTestConstants.Media.PrimaryCameraId),
+            await Expect(primaryCameraLabel).ToHaveTextAsync(
+                BrowserTestConstants.Media.BlankTextRegex,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementTextIsBlankScript,
-                UiTestIds.Settings.CameraPreviewLabel,
+            await Expect(cameraPreviewLabel).ToHaveTextAsync(
+                BrowserTestConstants.Media.BlankTextRegex,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Assert.That(string.IsNullOrWhiteSpace(await primaryCameraLabel.TextContentAsync())).IsTrue();
-            await Assert.That(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.CameraPreviewLabel).TextContentAsync())).IsTrue();
+            await Assert.That(string.IsNullOrWhiteSpace(await cameraPreviewLabel.TextContentAsync())).IsTrue();
 
             await page.GetByTestId(UiTestIds.Settings.NavMics).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.MicsPanel)).ToBeVisibleAsync();
 
             var primaryMicrophoneCard = page.GetByTestId(UiTestIds.Settings.MicDevice(BrowserTestConstants.Media.PrimaryMicrophoneId));
             var primaryMicrophoneLabel = page.GetByTestId(UiTestIds.Settings.MicDeviceLabel(BrowserTestConstants.Media.PrimaryMicrophoneId));
+            var microphonePreviewLabel = page.GetByTestId(UiTestIds.Settings.MicPreviewLabel);
             await Expect(primaryMicrophoneCard).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.MicPreviewMeter)).ToBeVisibleAsync();
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementTextIsBlankScript,
-                UiTestIds.Settings.MicDeviceLabel(BrowserTestConstants.Media.PrimaryMicrophoneId),
+            await Expect(primaryMicrophoneLabel).ToHaveTextAsync(
+                BrowserTestConstants.Media.BlankTextRegex,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.Media.ElementTextIsBlankScript,
-                UiTestIds.Settings.MicPreviewLabel,
+            await Expect(microphonePreviewLabel).ToHaveTextAsync(
+                BrowserTestConstants.Media.BlankTextRegex,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Assert.That(string.IsNullOrWhiteSpace(await primaryMicrophoneLabel.TextContentAsync())).IsTrue();
-            await Assert.That(string.IsNullOrWhiteSpace(await page.GetByTestId(UiTestIds.Settings.MicPreviewLabel).TextContentAsync())).IsTrue();
+            await Assert.That(string.IsNullOrWhiteSpace(await microphonePreviewLabel.TextContentAsync())).IsTrue();
         }
         finally
         {

@@ -13,7 +13,7 @@
              role="status"
              aria-live="assertive"
              data-state="@Connectivity.State"
-             data-testid="@UiTestIds.Diagnostics.Connectivity">
+             data-test="@UiTestIds.Diagnostics.Connectivity">
         <div class="app-shell-card app-shell-card-status">
             <span class="app-shell-eyebrow">@Text(UiTextKey.DiagnosticsConnectivityEyebrow)</span>
             <h2 id="@UiDomIds.Diagnostics.ConnectivityTitle">@Connectivity.Title</h2>
@@ -23,12 +23,12 @@
                         id="@UiDomIds.Diagnostics.ConnectivityRetry"
                         class="app-shell-btn app-shell-btn-primary"
                         @onclick="HandleRetry"
-                        data-testid="@UiTestIds.Diagnostics.ConnectivityRetry">@Text(UiTextKey.DiagnosticsConnectivityRetryNow)</button>
+                        data-test="@UiTestIds.Diagnostics.ConnectivityRetry">@Text(UiTextKey.DiagnosticsConnectivityRetryNow)</button>
                 <button type="button"
                         id="@UiDomIds.Diagnostics.ConnectivityDismiss"
                         class="app-shell-btn"
                         @onclick="HandleDismiss"
-                        data-testid="@UiTestIds.Diagnostics.ConnectivityDismiss">@Text(UiTextKey.DiagnosticsDismiss)</button>
+                        data-test="@UiTestIds.Diagnostics.ConnectivityDismiss">@Text(UiTextKey.DiagnosticsDismiss)</button>
             </div>
         </div>
     </section>

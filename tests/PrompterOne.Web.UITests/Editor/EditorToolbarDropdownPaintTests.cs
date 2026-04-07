@@ -72,7 +72,7 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
         var hitTest = await page.EvaluateAsync<DropdownHitTestResult>(
             """
             args => {
-                const menu = document.querySelector(`[data-testid="${args.panelTestId}"]`);
+                const menu = document.querySelector(`[data-test="${args.panelTestId}"]`);
                 if (!menu) {
                     return null;
                 }
@@ -84,7 +84,7 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
 
                 return {
                     hitInsideMenu: !!hitElement && (hitElement === menu || menu.contains(hitElement)),
-                    hitTestId: hitElement?.getAttribute('data-testid') ?? '',
+                    hitTestId: hitElement?.getAttribute('data-test') ?? '',
                     hitTagName: hitElement?.tagName ?? '',
                     hitClassName: hitElement?.className ?? '',
                     menuHeight: rect.height,
@@ -106,7 +106,7 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
             BuildStepName(scenario.ScenarioIndex, scenario.TriggerTestId));
 
         await Assert.That(hitTest).IsNotNull();
-        await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-testid '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
+        await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-test '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
     }
 
     private sealed class DropdownHitTestResult

@@ -13,7 +13,7 @@
      @ref="_screenRoot"
      @onkeydown="HandleLearnKeyDownAsync"
      @onkeydown:preventDefault="true"
-     data-testid="@UiTestIds.Learn.Page">
+     data-test="@UiTestIds.Learn.Page">
     <div class="rsvp">
         <div class="rsvp-progress">
             <UiPercentFill id="@UiDomIds.Learn.ProgressFill"
@@ -24,7 +24,7 @@
         <div class="rsvp-display"
              @ref="_displayRoot"
              data-rsvp-layout-ready="@BuildLayoutReadyAttributeValue()"
-             data-testid="@UiTestIds.Learn.Display">
+             data-test="@UiTestIds.Learn.Display">
             <div style="@BuildPendingLayoutHiddenStyle()">
                 <div class="rsvp-crosshair">
                     <UiCrosshairGuide />
@@ -32,7 +32,7 @@
 
                 <div class="rsvp-h-row" @ref="_focusRow">
                     <div class="rsvp-lane rsvp-lane-left">
-                        <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-testid="@UiTestIds.Learn.ContextLeft">
+                        <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-test="@UiTestIds.Learn.ContextLeft">
                             @foreach (var word in _leftContextWords)
                             {
                                 <span>@word</span>
@@ -42,11 +42,11 @@
 
                     <div class="rsvp-focus-shell"
                          id="@UiDomIds.Learn.WordShell"
-                         data-testid="@UiTestIds.Learn.WordShell">
+                         data-test="@UiTestIds.Learn.WordShell">
                         <div class="rsvp-focus"
                              id="@UiDomIds.Learn.Word"
                              @ref="_focusWord"
-                             data-testid="@UiTestIds.Learn.Word">
+                             data-test="@UiTestIds.Learn.Word">
                             <span class="rsvp-focus-segment rsvp-focus-leading">@_currentWordLeading</span>
                             <span class="rsvp-focus-segment rsvp-focus-orp orp" @ref="_focusOrp">@_currentWordOrp</span>
                             <span class="rsvp-focus-segment rsvp-focus-trailing">@_currentWordTrailing</span>
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="rsvp-lane rsvp-lane-right">
-                        <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-testid="@UiTestIds.Learn.ContextRight">
+                        <div class="rsvp-ctx-right" id="@UiDomIds.Learn.ContextRight" data-test="@UiTestIds.Learn.ContextRight">
                             @foreach (var word in _rightContextWords)
                             {
                                 <span>@word</span>
@@ -63,12 +63,12 @@
                     </div>
                 </div>
 
-                <div class="rsvp-orp-line" data-testid="@UiTestIds.Learn.OrpLine"></div>
+                <div class="rsvp-orp-line" data-test="@UiTestIds.Learn.OrpLine"></div>
             </div>
 
             <div class="rsvp-phrase">
                 <span class="rsvp-phrase-label">@Text(UiTextKey.LearnNext)</span>
-                <p id="@UiDomIds.Learn.NextPhrase" data-testid="@UiTestIds.Learn.NextPhrase">@_nextPhrase</p>
+                <p id="@UiDomIds.Learn.NextPhrase" data-test="@UiTestIds.Learn.NextPhrase">@_nextPhrase</p>
             </div>
 
             <div class="rsvp-pause-track">
@@ -82,14 +82,14 @@
                     <button class="rsvp-btn"
                             @onclick="DecreaseRsvpSpeedAsync"
                             aria-label="@DecreaseSpeedTooltip"
-                            data-testid="@UiTestIds.Learn.SpeedDown"><UiIcon Kind="UiIconKind.Minus" Size="18" StrokeWidth="2.5m" /></button>
+                            data-test="@UiTestIds.Learn.SpeedDown"><UiIcon Kind="UiIconKind.Minus" Size="18" StrokeWidth="2.5m" /></button>
                 </TooltipAnchor>
-                <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed" data-testid="@UiTestIds.Learn.SpeedValue" data-test-id="@UiTestIds.Learn.SpeedValue">@_speed</span><small>@Text(UiTextKey.CommonWpm)</small></div>
+                <div class="rsvp-speed-num"><span id="@UiDomIds.Learn.Speed" data-test="@UiTestIds.Learn.SpeedValue">@_speed</span><small>@Text(UiTextKey.CommonWpm)</small></div>
                 <TooltipAnchor OwnerTestId="@UiTestIds.Learn.SpeedUp" Text="@IncreaseSpeedTooltip">
                     <button class="rsvp-btn"
                             @onclick="IncreaseRsvpSpeedAsync"
                             aria-label="@IncreaseSpeedTooltip"
-                            data-testid="@UiTestIds.Learn.SpeedUp"><UiIcon Kind="UiIconKind.Plus" Size="18" StrokeWidth="2.5m" /></button>
+                            data-test="@UiTestIds.Learn.SpeedUp"><UiIcon Kind="UiIconKind.Plus" Size="18" StrokeWidth="2.5m" /></button>
                 </TooltipAnchor>
             </div>
             <div class="rsvp-play-band">
@@ -99,13 +99,13 @@
                         <button class="rsvp-btn"
                                 @onclick="StepRsvpBackwardLargeAsync"
                                 aria-label="@BackFiveWordsTooltip"
-                                data-testid="@UiTestIds.Learn.StepBackwardLarge"><UiIcon Kind="UiIconKind.SkipBackward" Size="18" /></button>
+                                data-test="@UiTestIds.Learn.StepBackwardLarge"><UiIcon Kind="UiIconKind.SkipBackward" Size="18" /></button>
                     </TooltipAnchor>
                     <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepBackward" Text="@BackOneWordTooltip">
                         <button class="rsvp-btn rsvp-btn-sm"
                                 @onclick="StepRsvpBackwardAsync"
                                 aria-label="@BackOneWordTooltip"
-                                data-testid="@UiTestIds.Learn.StepBackward"><UiIcon Kind="UiIconKind.ChevronLeft" Size="14" StrokeWidth="2.5m" /></button>
+                                data-test="@UiTestIds.Learn.StepBackward"><UiIcon Kind="UiIconKind.ChevronLeft" Size="14" StrokeWidth="2.5m" /></button>
                     </TooltipAnchor>
                     <TooltipAnchor OwnerTestId="@UiTestIds.Learn.PlayToggle" Text="@PlayToggleTooltip">
                         <button class="rsvp-play"
@@ -113,7 +113,7 @@
                                 @onclick="ToggleRsvpPlaybackAsync"
                                 aria-label="@PlayToggleTooltip"
                                 aria-pressed="@(_isPlaying ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
-                                data-testid="@UiTestIds.Learn.PlayToggle">
+                                data-test="@UiTestIds.Learn.PlayToggle">
                             <span data-toggle-icon="play" hidden="@_isPlaying">
                                 <UiIcon Kind="UiIconKind.Play" Size="28" />
                             </span>
@@ -126,13 +126,13 @@
                         <button class="rsvp-btn rsvp-btn-sm"
                                 @onclick="StepRsvpForwardAsync"
                                 aria-label="@ForwardOneWordTooltip"
-                                data-testid="@UiTestIds.Learn.StepForward"><UiIcon Kind="UiIconKind.ChevronRight" Size="14" StrokeWidth="2.5m" /></button>
+                                data-test="@UiTestIds.Learn.StepForward"><UiIcon Kind="UiIconKind.ChevronRight" Size="14" StrokeWidth="2.5m" /></button>
                     </TooltipAnchor>
                     <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepForwardLarge" Text="@ForwardFiveWordsTooltip">
                         <button class="rsvp-btn"
                                 @onclick="StepRsvpForwardLargeAsync"
                                 aria-label="@ForwardFiveWordsTooltip"
-                                data-testid="@UiTestIds.Learn.StepForwardLarge"><UiIcon Kind="UiIconKind.SkipForward" Size="18" /></button>
+                                data-test="@UiTestIds.Learn.StepForwardLarge"><UiIcon Kind="UiIconKind.SkipForward" Size="18" /></button>
                     </TooltipAnchor>
                 </div>
                 <TooltipAnchor OwnerTestId="@UiTestIds.Learn.LoopToggle" Text="@LoopToggleButtonTitle">
@@ -140,14 +140,14 @@
                             @onclick="ToggleLoopPlaybackAsync"
                             aria-label="@LoopToggleButtonTitle"
                             aria-pressed="@(_isLoopEnabled ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
-                            data-testid="@UiTestIds.Learn.LoopToggle">
+                            data-test="@UiTestIds.Learn.LoopToggle">
                         <UiIcon Kind="UiIconKind.Loop" Size="18" StrokeWidth="2.2m" />
                     </button>
                 </TooltipAnchor>
             </div>
             <div class="rsvp-pos"
                  id="@UiDomIds.Learn.ProgressLabel"
-                 data-testid="@UiTestIds.Learn.ProgressLabel">@_progressLabel</div>
+                 data-test="@UiTestIds.Learn.ProgressLabel">@_progressLabel</div>
         </div>
     </div>
 </div>

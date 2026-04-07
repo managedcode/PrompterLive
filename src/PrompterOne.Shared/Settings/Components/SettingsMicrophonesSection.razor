@@ -10,7 +10,7 @@
 <section class="set-section set-panel"
          id="set-mics"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.MicsPanel">
+         data-test="@UiTestIds.Settings.MicsPanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsNavMicrophones)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsMicrophonesSectionDescription)</p>
 
@@ -28,7 +28,7 @@
     <div class="set-device-list">
         @if (Microphones.Count == 0)
         {
-            <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoMics">
+            <div class="set-empty-card" data-test="@UiTestIds.Settings.NoMics">
                 @Text(UiTextKey.SettingsMicrophonesNoDevicesVisible)
             </div>
         }
@@ -38,7 +38,7 @@
             {
                 var primaryAudioInput = GetAudioInput(SelectedMicrophone);
                 var primaryEnabled = IsMicrophoneEnabled(SelectedMicrophone);
-                <div data-testid="@UiTestIds.Settings.MicDevice(SelectedMicrophone.DeviceId)">
+                <div data-test="@UiTestIds.Settings.MicDevice(SelectedMicrophone.DeviceId)">
                     <SettingsMicrophoneLevelCard AccessGranted="@MicrophoneAccessGranted"
                                                  DeviceLabelTestId="@UiTestIds.Settings.MicDeviceLabel(SelectedMicrophone.DeviceId)"
                                                  IsActive="@IsSectionActive"
@@ -68,7 +68,7 @@
                                                step="1"
                                                value="@MicrophoneSettings.InputLevelPercent"
                                                @oninput="UpdatePrimaryMicLevel"
-                                               data-testid="@UiTestIds.Settings.MicLevel" />
+                                               data-test="@UiTestIds.Settings.MicLevel" />
                                     </div>
                                 </div>
                                 <div class="set-field">
@@ -81,7 +81,7 @@
                                                step="10"
                                                value="@primaryAudioInput.DelayMs"
                                                @oninput="args => UpdateAudioDelayAsync(SelectedMicrophone, args)"
-                                               data-testid="@UiTestIds.Settings.MicDelay(SelectedMicrophone.DeviceId)" />
+                                               data-test="@UiTestIds.Settings.MicDelay(SelectedMicrophone.DeviceId)" />
                                         <span class="set-delay-hint">@Text(UiTextKey.SettingsMicrophonesAudioDelayHint)</span>
                                     </div>
                                 </div>
@@ -89,7 +89,7 @@
                                     <label>@Text(UiTextKey.SettingsMicrophonesNoiseSuppression)</label>
                                     <div class="@BuildToggleCssClass(MicrophoneSettings.NoiseSuppression)"
                                          @onclick="ToggleNoiseSuppression"
-                                         data-testid="@UiTestIds.Settings.NoiseSuppression">
+                                         data-test="@UiTestIds.Settings.NoiseSuppression">
                                         <div class="set-toggle-thumb"></div>
                                     </div>
                                 </div>
@@ -97,7 +97,7 @@
                                     <label>@Text(UiTextKey.SettingsMicrophonesEchoCancellation)</label>
                                     <div class="@BuildToggleCssClass(MicrophoneSettings.EchoCancellation)"
                                          @onclick="ToggleEchoCancellation"
-                                         data-testid="@UiTestIds.Settings.EchoCancellation">
+                                         data-test="@UiTestIds.Settings.EchoCancellation">
                                         <div class="set-toggle-thumb"></div>
                                     </div>
                                 </div>
@@ -112,7 +112,7 @@
                 var inputState = GetAudioInput(microphone);
                 var isEnabled = IsMicrophoneEnabled(microphone);
                 <div @onclick="() => SelectPrimaryMicrophone.InvokeAsync(microphone)"
-                     data-testid="@UiTestIds.Settings.MicDevice(microphone.DeviceId)">
+                     data-test="@UiTestIds.Settings.MicDevice(microphone.DeviceId)">
                     <SettingsMicrophoneLevelCard AccessGranted="@MicrophoneAccessGranted"
                                                  DeviceLabelTestId="@UiTestIds.Settings.MicDeviceLabel(microphone.DeviceId)"
                                                  IsActive="@(IsSectionActive && isEnabled)"
@@ -160,7 +160,7 @@
                                                    step="10"
                                                    value="@inputState.DelayMs"
                                                    @oninput="args => UpdateAudioDelayAsync(microphone, args)"
-                                                   data-testid="@UiTestIds.Settings.MicDelay(microphone.DeviceId)" />
+                                                   data-test="@UiTestIds.Settings.MicDelay(microphone.DeviceId)" />
                                             <span class="set-delay-hint">@Text(UiTextKey.SettingsMicrophonesAudioDelayHint)</span>
                                         </div>
                                     </div>

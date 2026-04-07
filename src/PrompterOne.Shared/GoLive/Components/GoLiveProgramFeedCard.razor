@@ -9,7 +9,7 @@
 <section class="gl-program-monitor-shell"
          data-live-state="@LiveState">
     <div class="gl-monitor gl-monitor-program"
-         data-testid="@UiTestIds.GoLive.ProgramCard">
+         data-test="@UiTestIds.GoLive.ProgramCard">
         <div class="gl-monitor-label-top gl-label-canvas">
             <span>@EffectiveTitle</span>
         </div>
@@ -26,7 +26,7 @@
             </OverlayContent>
             <EmptyContent>
                 <div class="gl-preview-empty"
-                     data-testid="@UiTestIds.GoLive.ProgramEmpty">
+                     data-test="@UiTestIds.GoLive.ProgramEmpty">
                     <div class="gl-empty-title">@Text(SettingsCameraPreviewText.NoCameraTitleKey)</div>
                     <div class="gl-empty-copy">@Text(SettingsCameraPreviewText.NoCameraDescriptionKey)</div>
                 </div>
@@ -36,15 +36,15 @@
         <div class="gl-monitor-bottom">
             <span class="gl-monitor-res">@ProgramResolutionLabel</span>
             <span class="gl-monitor-source"
-                  data-testid="@UiTestIds.GoLive.Stage">
-                <span data-testid="@UiTestIds.GoLive.SelectedSourceLabel">@SelectedSourceLabel</span>
+                  data-test="@UiTestIds.GoLive.Stage">
+                <span data-test="@UiTestIds.GoLive.SelectedSourceLabel">@SelectedSourceLabel</span>
             </span>
             <span class="gl-monitor-fps">@StageFrameRateLabel</span>
         </div>
     </div>
 
     <span class="gl-visually-hidden"
-          data-testid="@UiTestIds.GoLive.ActiveSourceLabel">@ActiveSourceLabel</span>
+          data-test="@UiTestIds.GoLive.ActiveSourceLabel">@ActiveSourceLabel</span>
 </section>
 
 @code {

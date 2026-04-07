@@ -10,7 +10,7 @@
         <article class="dcard"
                 style="--emo:@card.AccentColor"
                  @onclick="() => HandleCardClickAsync(card.Id)"
-                 data-testid="@card.TestId">
+                 data-test="@card.TestId">
             <div class="@GetCardMenuWrapClass(card.Id)"
                  @onclick:stopPropagation="true">
                 <TooltipAnchor OwnerTestId="@UiTestIds.Library.CardMenu(card.Id)"
@@ -19,7 +19,7 @@
                     <button class="dcard-menu-btn"
                             type="button"
                             aria-label="@Text(UiTextKey.TooltipMoreScriptActions)"
-                            data-testid="@UiTestIds.Library.CardMenu(card.Id)"
+                            data-test="@UiTestIds.Library.CardMenu(card.Id)"
                             @onclick:stopPropagation="true"
                             @onclick="() => ToggleCardMenu(card.Id)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -30,7 +30,7 @@
                     </button>
                 </TooltipAnchor>
                 <div class="dcard-dropdown"
-                     data-testid="@UiTestIds.Library.CardMenuDropdown(card.Id)"
+                     data-test="@UiTestIds.Library.CardMenuDropdown(card.Id)"
                      @onclick:stopPropagation="true">
                     <button type="button"
                             @onclick:stopPropagation="true"
@@ -44,7 +44,7 @@
                     <button type="button"
                             @onclick:stopPropagation="true"
                             @onclick="() => HandleDuplicateScriptAsync(card.Id)"
-                            data-testid="@UiTestIds.Library.CardDuplicate(card.Id)">
+                            data-test="@UiTestIds.Library.CardDuplicate(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" />
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
@@ -54,7 +54,7 @@
                     <div class="dcard-dropdown-group">
                         <div class="dcard-dropdown-label">@Text(UiTextKey.CommonMoveToEllipsis)</div>
                         <button type="button"
-                                data-testid="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
+                                data-test="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
                                 @onclick:stopPropagation="true"
                                 @onclick="() => HandleMoveScriptAsync(card.Id, null)">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -66,7 +66,7 @@
                         @foreach (var folder in FolderOptions)
                         {
                             <button type="button"
-                                    data-testid="@UiTestIds.Library.Move(card.Id, folder.Id)"
+                                    data-test="@UiTestIds.Library.Move(card.Id, folder.Id)"
                                     @onclick:stopPropagation="true"
                                     @onclick="() => HandleMoveScriptAsync(card.Id, folder.Id)">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,7 +89,7 @@
                     </button>
                 </div>
             </div>
-            <div class="dcard-inner" data-testid="@UiTestIds.Library.CardSurface(card.Id)">
+            <div class="dcard-inner" data-test="@UiTestIds.Library.CardSurface(card.Id)">
                 <div class="dcard-cover @card.CoverClass">
                     <div class="dcover-orb dcover-orb1"></div>
                     <div class="dcover-orb dcover-orb2"></div>
@@ -97,14 +97,14 @@
                     <div class="dcover-meta">
                         <span class="dcover-emo">@card.Emotion</span>
                         <span>@card.ModeLabel</span>
-                        <span data-testid="@UiTestIds.Library.CardDuration(card.Id)">@card.DurationLabel</span>
+                        <span data-test="@UiTestIds.Library.CardDuration(card.Id)">@card.DurationLabel</span>
                     </div>
                 </div>
                 <div class="dcard-data">
                     <div class="ddata-row">
-                        <span data-testid="@UiTestIds.Library.CardWpm(card.Id)">@card.AverageWpm @Text(UiTextKey.CommonWpm)</span>
-                        <span data-testid="@UiTestIds.Library.CardWordCount(card.Id)">@Format(UiTextKey.LibraryCardWordsFormat, card.WordCount)</span>
-                        <span data-testid="@UiTestIds.Library.CardSegmentCount(card.Id)">@BuildSegmentCountLabel(card.SegmentCount)</span>
+                        <span data-test="@UiTestIds.Library.CardWpm(card.Id)">@card.AverageWpm @Text(UiTextKey.CommonWpm)</span>
+                        <span data-test="@UiTestIds.Library.CardWordCount(card.Id)">@Format(UiTextKey.LibraryCardWordsFormat, card.WordCount)</span>
+                        <span data-test="@UiTestIds.Library.CardSegmentCount(card.Id)">@BuildSegmentCountLabel(card.SegmentCount)</span>
                     </div>
                     <div class="ddata-foot">
                         <span>@card.Author</span>
@@ -115,7 +115,7 @@
                     <button class="dcard-act"
                             @onclick:stopPropagation="true"
                             @onclick="() => OnLearnScript.InvokeAsync(card.Id)"
-                            data-testid="@UiTestIds.Library.CardLearn(card.Id)">
+                            data-test="@UiTestIds.Library.CardLearn(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
@@ -125,7 +125,7 @@
                     <button class="dcard-act dcard-act-go"
                             @onclick:stopPropagation="true"
                             @onclick="() => OnReadScript.InvokeAsync(card.Id)"
-                            data-testid="@UiTestIds.Library.CardRead(card.Id)">
+                            data-test="@UiTestIds.Library.CardRead(card.Id)">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="5,3 19,12 5,21" />
                         </svg>
@@ -136,8 +136,8 @@
         </article>
     }
 
-    <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-testid="@UiTestIds.Library.CreateScript">
-        <div class="dcard-create-inner" data-testid="@UiTestIds.Library.CreateScriptSurface">
+    <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-test="@UiTestIds.Library.CreateScript">
+        <div class="dcard-create-inner" data-test="@UiTestIds.Library.CreateScriptSurface">
             <div class="dcreate-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -150,8 +150,8 @@
 
     <article class="dcard dcard-create dcard-create-folder"
              @onclick="HandleStartCreateFolderAsync"
-             data-testid="@UiTestIds.Library.FolderCreateTile">
-        <div class="dcard-create-inner" data-testid="@UiTestIds.Library.FolderCreateTileSurface">
+             data-test="@UiTestIds.Library.FolderCreateTile">
+        <div class="dcard-create-inner" data-test="@UiTestIds.Library.FolderCreateTileSurface">
             <div class="dcreate-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />

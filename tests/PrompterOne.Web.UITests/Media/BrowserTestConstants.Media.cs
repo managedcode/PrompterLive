@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Web.UITests;
@@ -73,10 +74,7 @@ internal static partial class BrowserTestConstants
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()""";
         public static string AnalyzeSavedRecordingScript =>
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].analyzeSavedRecording()""";
-        public const string ElementTextIsBlankScript =
-            """
-            testId => ((document.querySelector(`[data-testid="${testId}"]`)?.textContent ?? "").trim().length === 0)
-            """;
+        public static Regex BlankTextRegex { get; } = new(@"^\s*$", RegexOptions.Compiled);
         public static string ResetSavedRecordingScript =>
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].reset()""";
         public static string SavedRecordingReadyScript =>

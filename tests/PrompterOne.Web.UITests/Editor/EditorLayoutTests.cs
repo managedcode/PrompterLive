@@ -73,7 +73,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
                         throw new Error("Monaco scroll harness state is unavailable.");
                     }
 
-                    const host = document.querySelector(`[data-testid="${args.testId}"]`);
+                    const host = document.querySelector(`[data-test="${args.testId}"]`);
                     if (!(host instanceof HTMLElement)) {
                         throw new Error("Monaco scroll host is unavailable.");
                     }
@@ -275,10 +275,10 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
         await page.EvaluateAsync<EditorLayoutMetrics>(
             """
             ({ layoutTestId, mainTestId, railTestId, toggleTestId }) => {
-                const layout = document.querySelector(`[data-testid="${layoutTestId}"]`);
-                const main = document.querySelector(`[data-testid="${mainTestId}"]`);
-                const rail = document.querySelector(`[data-testid="${railTestId}"]`);
-                const toggle = document.querySelector(`[data-testid="${toggleTestId}"]`);
+                const layout = document.querySelector(`[data-test="${layoutTestId}"]`);
+                const main = document.querySelector(`[data-test="${mainTestId}"]`);
+                const rail = document.querySelector(`[data-test="${railTestId}"]`);
+                const toggle = document.querySelector(`[data-test="${toggleTestId}"]`);
 
                 if (!(layout instanceof HTMLElement) || !(main instanceof HTMLElement) || !(rail instanceof HTMLElement) || !(toggle instanceof HTMLElement)) {
                     throw new Error("Editor layout metrics target is unavailable.");

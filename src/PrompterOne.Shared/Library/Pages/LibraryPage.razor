@@ -6,7 +6,7 @@
 
 <div id="screen-library"
      class="screen active"
-     data-testid="@UiTestIds.Library.Page"
+     data-test="@UiTestIds.Library.Page"
      @onclick="HandleLibrarySurfaceClick">
     <LibrarySidebar Folders="_folderNodes"
                     AllScriptCount="_allCards.Count"
@@ -17,19 +17,19 @@
     <main class="lib-main">
         <div class="lib-scroll">
             <div class="lib-sort-bar">
-                <span class="sort-label" data-testid="@UiTestIds.Library.SortLabel">@Text(UiTextKey.LibrarySortBy)</span>
+                <span class="sort-label" data-test="@UiTestIds.Library.SortLabel">@Text(UiTextKey.LibrarySortBy)</span>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
                         @onclick="() => SetSortMode(LibrarySortMode.Name)"
-                        data-testid="@UiTestIds.Library.SortName">@Text(UiTextKey.LibrarySortName)</button>
+                        data-test="@UiTestIds.Library.SortName">@Text(UiTextKey.LibrarySortName)</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Date)"
                         @onclick="() => SetSortMode(LibrarySortMode.Date)"
-                        data-testid="@UiTestIds.Library.SortDate">@Text(UiTextKey.LibrarySortDate)</button>
+                        data-test="@UiTestIds.Library.SortDate">@Text(UiTextKey.LibrarySortDate)</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Duration)"
                         @onclick="() => SetSortMode(LibrarySortMode.Duration)"
-                        data-testid="@UiTestIds.Library.SortDuration">@Text(UiTextKey.LibrarySortDuration)</button>
+                        data-test="@UiTestIds.Library.SortDuration">@Text(UiTextKey.LibrarySortDuration)</button>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Wpm)"
                         @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
-                        data-testid="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
+                        data-test="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
             </div>
 
             <LibraryCardsGrid Cards="_cards"

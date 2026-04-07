@@ -6,7 +6,7 @@
 
 @if (Diagnostics.Current is { IsFatal: false } diagnostic)
 {
-    <section class="diag-banner" role="alert" data-testid="@UiTestIds.Diagnostics.Banner">
+    <section class="diag-banner" role="alert" data-test="@UiTestIds.Diagnostics.Banner">
         <div class="diag-banner-copy">
             <span class="diag-banner-title">@diagnostic.Title</span>
             <p class="diag-banner-message">@diagnostic.Message</p>
@@ -15,7 +15,7 @@
         <button class="diag-banner-dismiss"
                 type="button"
                 @onclick="HandleDismiss"
-                data-testid="@UiTestIds.Diagnostics.Dismiss">
+                data-test="@UiTestIds.Diagnostics.Dismiss">
             @Localizer[UiTextKey.DiagnosticsDismiss.ToString()]
         </button>
     </section>

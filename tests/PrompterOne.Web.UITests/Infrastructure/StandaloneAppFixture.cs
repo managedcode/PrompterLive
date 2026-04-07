@@ -223,6 +223,7 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
             await _server.StartAsync();
             await WaitForServerAsync(_server.BaseAddress);
             _playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+            _playwright.Selectors.SetTestIdAttribute(BrowserTestConstants.Html.DataTestAttribute);
             _browser = await CreateBrowserAsync(_playwright);
         }
 

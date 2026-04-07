@@ -30,14 +30,14 @@
         <div class="set-path-field set-path-field-actions">
             <button class="set-btn-golden set-btn-sm"
                     type="button"
-                    data-testid="@SaveTestId"
+                    data-test="@SaveTestId"
                     @onclick="Save"
                     @onclick:stopPropagation="true">
                 @Text(UiTextKey.CommonSaveLocally)
             </button>
             <button class="set-btn-outline set-btn-sm"
                     type="button"
-                    data-testid="@ClearTestId"
+                    data-test="@ClearTestId"
                     @onclick="Clear"
                     @onclick:stopPropagation="true">
                 @Text(UiTextKey.CommonClear)
@@ -47,7 +47,7 @@
         @if (!string.IsNullOrWhiteSpace(Message))
         {
             <p class="set-card-copy"
-               data-testid="@MessageTestId">
+               data-test="@MessageTestId">
                 @Message
             </p>
         }

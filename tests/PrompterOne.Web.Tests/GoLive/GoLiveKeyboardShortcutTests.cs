@@ -32,7 +32,7 @@ public sealed class GoLiveKeyboardShortcutTests : BunitContext
                 StringComparison.Ordinal);
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.BracketLeft });
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.SourceRail}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.SourceRail}']"));
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.FLower });
             Assert.Contains(

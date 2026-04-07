@@ -37,21 +37,32 @@ public partial class EditorPage
             SplitDraftMessage,
             async () =>
             {
-                var sourceDocument = await sourceDocumentTask;
-                var baseDocumentName = ResolveBaseDocumentName(sourceDocument);
+                CancelAutosave();
+                _splitOperationInProgress = true;
 
-                foreach (var splitDocument in splitDocuments)
+                try
                 {
-                    _ = await ScriptRepository.SaveAsync(
-                        splitDocument.Title,
-                        splitDocument.Text,
-                        documentName: BuildSplitDocumentName(baseDocumentName, splitDocument),
-                        existingId: null,
-                        folderId: sourceDocument?.FolderId);
-                }
+                    var sourceDocument = await sourceDocumentTask;
+                    var baseDocumentName = ResolveBaseDocumentName(sourceDocument);
 
-                _splitFeedback = BuildSplitFeedback(splitDocuments, sourceDocument, mode);
-                await InvokeAsync(StateHasChanged);
+                    foreach (var splitDocument in splitDocuments)
+                    {
+                        _ = await ScriptRepository.SaveAsync(
+                            splitDocument.Title,
+                            splitDocument.Text,
+                            documentName: BuildSplitDocumentName(baseDocumentName, splitDocument),
+                            existingId: null,
+                            folderId: sourceDocument?.FolderId);
+                    }
+
+                    _splitFeedback = BuildSplitFeedback(splitDocuments, sourceDocument, mode);
+                    await InvokeAsync(StateHasChanged);
+                }
+                finally
+                {
+                    _splitOperationInProgress = false;
+                    QueueAutosave();
+                }
             });
     }
 
@@ -117,6 +128,11 @@ public partial class EditorPage
 
     private string BuildSplitDestinationNote(StoredScriptDocument? sourceDocument)
     {
+        if (_currentDraftSessionStartedUntitled)
+        {
+            return Text(UiTextKey.EditorSplitSavedToLibrary);
+        }
+
         if (sourceDocument is null)
         {
             return Text(UiTextKey.EditorSplitSavedToLibrary);

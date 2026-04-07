@@ -16,12 +16,12 @@ internal static class BrowserTestLibrarySeedData
         {
             HasSeenOnboarding = true
         }, JsonOptions);
-        var documentLibraryKey = JsonSerializer.Serialize("prompterone.library.v1");
-        var documentSeedVersionKey = JsonSerializer.Serialize("prompterone.library.seed-version");
-        var folderLibraryKey = JsonSerializer.Serialize("prompterone.folders.v1");
-        var folderSeedVersionKey = JsonSerializer.Serialize("prompterone.folders.seed-version");
-        var settingsKey = JsonSerializer.Serialize("prompterone.settings.prompterone.settings-page");
-        var materializationVersion = JsonSerializer.Serialize("2026-04-01-browser-library-materialized-v1");
+        var documentLibraryKey = JsonSerializer.Serialize(BrowserStorageKeys.DocumentLibrary);
+        var documentSeedVersionKey = JsonSerializer.Serialize(BrowserStorageKeys.DocumentSeedVersion);
+        var folderLibraryKey = JsonSerializer.Serialize(BrowserStorageKeys.FolderLibrary);
+        var folderSeedVersionKey = JsonSerializer.Serialize(BrowserStorageKeys.FolderSeedVersion);
+        var settingsKey = JsonSerializer.Serialize(string.Concat(BrowserStorageKeys.SettingsPrefix, SettingsPagePreferences.StorageKey));
+        var materializationVersion = JsonSerializer.Serialize(BrowserStorageKeys.LibraryMaterializationVersion);
 
         return $$"""
             (() => {

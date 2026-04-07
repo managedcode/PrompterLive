@@ -23,11 +23,11 @@
 @inject IMediaSceneService MediaSceneService
 @inject IScriptSessionService SessionService
 
-<div id="screen-settings" class="screen active" data-testid="@UiTestIds.Settings.Page">
+<div id="screen-settings" class="screen active" data-test="@UiTestIds.Settings.Page">
     <div class="set-layout">
         <div class="set-sidebar">
             <div class="set-back-row">
-                <h2 class="set-title" data-testid="@UiTestIds.Settings.Title">@Text(UiTextKey.SettingsTitle)</h2>
+                <h2 class="set-title" data-test="@UiTestIds.Settings.Title">@Text(UiTextKey.SettingsTitle)</h2>
             </div>
             <SettingsSidebarNavigation Items="@NavigationItems"
                                        ActiveSection="@_activeSection"
@@ -102,7 +102,7 @@
             <section class="set-section set-panel"
                      id="set-streaming"
                      style="@GetSectionDisplayStyle(SettingsSection.Streaming)"
-                     data-testid="@UiTestIds.Settings.StreamingPanel">
+                     data-test="@UiTestIds.Settings.StreamingPanel">
                 <h3 class="set-section-title">@Text(UiTextKey.SettingsStreamingSectionTitle)</h3>
                 <p class="set-section-desc">@Text(UiTextKey.SettingsStreamingSectionDescription)</p>
 

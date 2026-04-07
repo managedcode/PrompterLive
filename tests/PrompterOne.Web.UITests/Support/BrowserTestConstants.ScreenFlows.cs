@@ -1,3 +1,6 @@
+using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Storage;
+
 namespace PrompterOne.Web.UITests;
 
 internal static partial class BrowserTestConstants
@@ -300,10 +303,13 @@ internal static partial class BrowserTestConstants
                 return devices.find(device => device.kind === 'videoinput')?.deviceId ?? 'default';
             }
             """;
-        public const string SeedStoredSceneScript =
-            """
+        private static string ReaderStorageKey => string.Concat(BrowserStorageKeys.SettingsPrefix, BrowserAppSettingsKeys.ReaderSettings);
+        private static string SceneStorageKey => string.Concat(BrowserStorageKeys.SettingsPrefix, BrowserAppSettingsKeys.SceneSettings);
+        private static string StudioStorageKey => string.Concat(BrowserStorageKeys.SettingsPrefix, StudioSettingsStore.StorageKey);
+
+        public static string SeedStoredSceneScript => $$"""
             ({ cameraDeviceId }) => {
-                localStorage.setItem('prompterone.settings.prompterone.reader', JSON.stringify({
+                localStorage.setItem('{{ReaderStorageKey}}', JSON.stringify({
                     CountdownSeconds: 3,
                     FontScale: 1,
                     TextWidth: 1,
@@ -314,7 +320,7 @@ internal static partial class BrowserTestConstants
                     ShowCameraScene: true
                 }));
 
-                localStorage.setItem('prompterone.settings.prompterone.scene', JSON.stringify({
+                localStorage.setItem('{{SceneStorageKey}}', JSON.stringify({
                     Cameras: [
                         {
                             SourceId: 'scene-cam-a',
@@ -362,7 +368,7 @@ internal static partial class BrowserTestConstants
                     }
                 }));
 
-                localStorage.setItem('prompterone.settings.prompterone.studio', JSON.stringify({
+                localStorage.setItem('{{StudioStorageKey}}', JSON.stringify({
                     Camera: {
                         DefaultCameraId: cameraDeviceId,
                         Resolution: 0,

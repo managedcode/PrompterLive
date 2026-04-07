@@ -7,11 +7,11 @@
 @inject IStringLocalizer<SharedResource> Localizer
 
 <section class="live-destination-sources"
-         data-testid="@UiTestIds.Settings.StreamingProviderSourcePicker(TargetId)">
+         data-test="@UiTestIds.Settings.StreamingProviderSourcePicker(TargetId)">
     <div class="live-destination-sources-header">
         <span class="set-section-label">@Text(SettingsStreamingText.SourcePickerSectionLabel)</span>
         <span class="live-status @(SelectedCount > 0 ? ReadyCssClass : PendingCssClass)"
-              data-testid="@UiTestIds.Settings.StreamingProviderSourceSummary(TargetId)">
+              data-test="@UiTestIds.Settings.StreamingProviderSourceSummary(TargetId)">
             @SourceSummary
         </span>
     </div>
@@ -19,7 +19,7 @@
     @if (Sources.Count == 0)
     {
         <div class="set-empty-card live-destination-sources-empty"
-             data-testid="@UiTestIds.Settings.StreamingSourcePickerEmpty">
+             data-test="@UiTestIds.Settings.StreamingSourcePickerEmpty">
             @Text(SettingsStreamingText.SourcePickerEmptyStateMessage)
         </div>
     }
@@ -31,7 +31,7 @@
                 var isSelected = SelectedSourceIdSet.Contains(source.SourceId);
                 <button type="button"
                         class="live-destination-source-chip @(isSelected ? ChipEnabledCssClass : null)"
-                        data-testid="@UiTestIds.Settings.StreamingProviderSourceToggle(TargetId, source.SourceId)"
+                        data-test="@UiTestIds.Settings.StreamingProviderSourceToggle(TargetId, source.SourceId)"
                         @onclick="() => ToggleSource.InvokeAsync(source.SourceId)">
                     <span class="live-destination-source-name">@FormatSourceLabel(source)</span>
                     <span class="live-destination-source-state">@(isSelected ? Text(SettingsStreamingText.SourcePickerSelectedLabel) : Text(SettingsStreamingText.SourcePickerAvailableLabel))</span>

@@ -10,7 +10,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveSegment.Name"
-               data-testid="@UiTestIds.Editor.ActiveSegmentName"
+               data-test="@UiTestIds.Editor.ActiveSegmentName"
                @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.Name), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
@@ -20,14 +20,14 @@
                value="@GetNumericValue(ActiveSegment.TargetWpm)"
                min="80"
                max="600"
-               data-testid="@UiTestIds.Editor.ActiveSegmentWpm"
+               data-test="@UiTestIds.Editor.ActiveSegmentWpm"
                @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.TargetWpm), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
         <label>@Text(UiTextKey.CommonEmotion)</label>
         <select class="ed-meta-select"
                 value="@ActiveSegment.EmotionLabel"
-                data-testid="@UiTestIds.Editor.ActiveSegmentEmotion"
+                data-test="@UiTestIds.Editor.ActiveSegmentEmotion"
                 @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.EmotionLabel), eventArgs.Value?.ToString() ?? string.Empty)">
             @foreach (var option in EditorEmotionCatalog.Options)
             {
@@ -40,7 +40,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveSegment.Speaker"
-               data-testid="@UiTestIds.Editor.ActiveSegmentSpeaker"
+               data-test="@UiTestIds.Editor.ActiveSegmentSpeaker"
                @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.Speaker), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
 
@@ -52,7 +52,7 @@
                    type="text"
                    value="@ActiveSegment.Timing"
                    placeholder="0:00-0:00"
-                   data-testid="@UiTestIds.Editor.ActiveSegmentTiming"
+                   data-test="@UiTestIds.Editor.ActiveSegmentTiming"
                    @onchange="eventArgs => OnSegmentChanged(nameof(EditorStructureHeaderEditorViewModel.Timing), eventArgs.Value?.ToString() ?? string.Empty)" />
         </div>
     }
@@ -63,7 +63,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveBlock.Name"
-               data-testid="@UiTestIds.Editor.ActiveBlockName"
+               data-test="@UiTestIds.Editor.ActiveBlockName"
                @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.Name), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
@@ -73,14 +73,14 @@
                value="@GetNumericValue(ActiveBlock.TargetWpm)"
                min="80"
                max="600"
-               data-testid="@UiTestIds.Editor.ActiveBlockWpm"
+               data-test="@UiTestIds.Editor.ActiveBlockWpm"
                @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.TargetWpm), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
     <div class="ed-meta-field">
         <label>@Text(UiTextKey.CommonEmotion)</label>
         <select class="ed-meta-select"
                 value="@ActiveBlock.EmotionLabel"
-                data-testid="@UiTestIds.Editor.ActiveBlockEmotion"
+                data-test="@UiTestIds.Editor.ActiveBlockEmotion"
                 @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.EmotionLabel), eventArgs.Value?.ToString() ?? string.Empty)">
             <option value="">@Text(UiTextKey.CommonInherit)</option>
             @foreach (var option in EditorEmotionCatalog.Options)
@@ -94,7 +94,7 @@
         <input class="ed-meta-input"
                type="text"
                value="@ActiveBlock.Speaker"
-               data-testid="@UiTestIds.Editor.ActiveBlockSpeaker"
+               data-test="@UiTestIds.Editor.ActiveBlockSpeaker"
                @onchange="eventArgs => OnBlockChanged(nameof(EditorStructureHeaderEditorViewModel.Speaker), eventArgs.Value?.ToString() ?? string.Empty)" />
     </div>
 </div>

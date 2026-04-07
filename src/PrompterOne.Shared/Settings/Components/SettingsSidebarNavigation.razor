@@ -12,7 +12,7 @@
         <button type="button"
                 class="@BuildItemCssClass(item)"
                 @onclick="@(() => OnSelect.InvokeAsync(item.Section))"
-                data-testid="@item.TestId">
+                data-test="@item.TestId">
             <UiIcon Kind="@item.Icon" Size="16" />
             @Text(item.LabelKey)
         </button>

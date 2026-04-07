@@ -19,8 +19,8 @@ public sealed class TooltipAnchorTests : BunitContext
 
         Assert.Equal(UiDomIds.Tooltip.Surface(OwnerTestId), tooltip.Id);
         Assert.Equal("tooltip", tooltip.GetAttribute("role"));
-        Assert.Equal(UiTestIds.Tooltip.Surface(OwnerTestId), tooltip.GetAttribute("data-testid"));
-        Assert.Equal(UiTestIds.Tooltip.Surface(OwnerTestId), tooltip.GetAttribute("data-test-id"));
+        Assert.Equal(UiTestIds.Tooltip.Surface(OwnerTestId), tooltip.GetAttribute("data-test"));
+        Assert.Equal(UiTestIds.Tooltip.Surface(OwnerTestId), tooltip.GetAttribute("data-test"));
         Assert.Equal("top", tooltip.GetAttribute("data-tooltip-placement"));
         Assert.Equal(TooltipText, tooltip.TextContent.Trim());
     }

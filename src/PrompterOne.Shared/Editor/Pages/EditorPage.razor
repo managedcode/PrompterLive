@@ -4,7 +4,7 @@
 
 <div id="screen-editor"
      class="screen active"
-     data-testid="@UiTestIds.Editor.Page">
+     data-test="@UiTestIds.Editor.Page">
     @if (!_isEditorReady)
     {
         <div class="app-loading-shell" aria-busy="true">
@@ -13,7 +13,7 @@
     }
     else
     {
-        <div class="ed-layout" data-testid="@UiTestIds.Editor.Layout">
+        <div class="ed-layout" data-test="@UiTestIds.Editor.Layout">
             <EditorStructureSidebar Segments="@_segments"
                                     ActiveSegmentIndex="@_activeSegmentIndex"
                                     ActiveBlockIndex="@_activeBlockIndex"

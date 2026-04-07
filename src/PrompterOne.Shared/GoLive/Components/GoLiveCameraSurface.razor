@@ -5,7 +5,7 @@
 
 <div class="@ContainerClass"
      id="@ContainerDomIdOrNull"
-     data-testid="@ContainerTestIdOrNull">
+     data-test="@ContainerTestIdOrNull">
     @if (HasCamera)
     {
         <video id="@VideoElementId"
@@ -14,7 +14,7 @@
                autoplay
                playsinline
                muted="@Muted"
-               data-testid="@VideoTestIdOrNull"></video>
+               data-test="@VideoTestIdOrNull"></video>
 
         @if (OverlayContent is not null)
         {

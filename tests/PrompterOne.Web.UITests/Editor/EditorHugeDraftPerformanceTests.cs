@@ -43,10 +43,10 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
                     """
                     (args) => ({
                         location: window.location.href,
-                        diagnosticsBannerVisible: Boolean(document.querySelector(`[data-testid="${args.diagnosticsBannerTestId}"]`)),
-                        diagnosticsFatalVisible: Boolean(document.querySelector(`[data-testid="${args.diagnosticsFatalTestId}"]`)),
+                        diagnosticsBannerVisible: Boolean(document.querySelector(`[data-test="${args.diagnosticsBannerTestId}"]`)),
+                        diagnosticsFatalVisible: Boolean(document.querySelector(`[data-test="${args.diagnosticsFatalTestId}"]`)),
                         routeNotFoundVisible: Boolean((document.body?.innerText ?? '').includes(args.routeNotFoundText)),
-                        sourceInputCount: document.querySelectorAll(`[data-testid="${args.sourceInputTestId}"]`).length,
+                        sourceInputCount: document.querySelectorAll(`[data-test="${args.sourceInputTestId}"]`).length,
                         bodySnippet: (document.body?.innerText ?? '').slice(0, 500)
                     })
                     """,
@@ -66,7 +66,7 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
             await page.WaitForFunctionAsync(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
                     return (input?.value.length ?? 0) >= args.minimumVisibleLength;
                 }
                 """,
@@ -80,8 +80,8 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
             await page.EvaluateAsync(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     if (!input || !overlay) {
                         throw new Error("Unable to initialize the huge draft performance probe.");
                     }
@@ -123,8 +123,8 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
             var result = await page.EvaluateAsync<HugeDraftProbeResult>(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     const probe = window.__editorHugeDraftProbe;
                     if (!input || !overlay || !probe) {
                         throw new Error("Huge draft performance probe result is unavailable.");

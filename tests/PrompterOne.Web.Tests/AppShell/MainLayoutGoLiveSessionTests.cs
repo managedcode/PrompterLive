@@ -21,7 +21,7 @@ public sealed class MainLayoutGoLiveSessionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Header.GoLive}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.Header.GoLive}']"));
         });
     }
 

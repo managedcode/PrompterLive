@@ -7,8 +7,8 @@
 @inject EditorInterop SemanticInterop
 @inject EditorMonacoInterop MonacoInterop
 
-<div class="ed-main" data-testid="@UiTestIds.Editor.MainPanel">
-    <div class="ed-toolbar" data-testid="@UiTestIds.Editor.Toolbar">
+<div class="ed-main" data-test="@UiTestIds.Editor.MainPanel">
+    <div class="ed-toolbar" data-test="@UiTestIds.Editor.Toolbar">
         @for (var sectionIndex = 0; sectionIndex < ToolbarSections.Count; sectionIndex++)
         {
             var toolbarSection = ToolbarSections[sectionIndex];
@@ -28,7 +28,7 @@
 
                 @if (toolbarSection.HasDropdown)
                 {
-                    <div class="@GetToolbarDropdownCss(toolbarSection)" data-testid="@toolbarSection.DropdownTestId">
+                    <div class="@GetToolbarDropdownCss(toolbarSection)" data-test="@toolbarSection.DropdownTestId">
                         @for (var groupIndex = 0; groupIndex < toolbarSection.DropdownGroups.Count; groupIndex++)
                         {
                             var dropdownGroup = toolbarSection.DropdownGroups[groupIndex];
@@ -62,7 +62,7 @@
                     class="ed-find-toggle"
                     @onclick="ToggleFindBarAsync"
                     aria-expanded="@(_showFindBar ? "true" : "false")"
-                    data-testid="@UiTestIds.Editor.FindToggle">
+                    data-test="@UiTestIds.Editor.FindToggle">
                 <UiIcon Kind="UiIconKind.Search" Size="14" />
                 <span>@L(UiTextKey.EditorFindOpen)</span>
             </button>
@@ -71,7 +71,7 @@
 
     @if (_showFindBar)
     {
-        <div class="ed-find-bar" data-testid="@UiTestIds.Editor.FindBar">
+        <div class="ed-find-bar" data-test="@UiTestIds.Editor.FindBar">
             <label class="ed-find-input-shell">
                 <UiIcon Kind="UiIconKind.Search" Size="14" />
                 <input class="ed-find-input"
@@ -80,12 +80,12 @@
                        placeholder="@L(UiTextKey.EditorFindPlaceholder)"
                        aria-label="@L(UiTextKey.EditorFindPlaceholder)"
                        @oninput="OnFindQueryInputAsync"
-                       data-testid="@UiTestIds.Editor.FindInput" />
+                       data-test="@UiTestIds.Editor.FindInput" />
             </label>
 
             @if (ShouldRenderFindResult)
             {
-                <span class="ed-find-result" data-testid="@UiTestIds.Editor.FindResult">@FindResultLabel</span>
+                <span class="ed-find-result" data-test="@UiTestIds.Editor.FindResult">@FindResultLabel</span>
             }
 
             <div class="ed-find-actions">
@@ -93,37 +93,37 @@
                         class="ed-find-nav"
                         @onclick="NavigateToPreviousFindMatchAsync"
                         disabled="@(!CanNavigateFindMatches)"
-                        data-testid="@UiTestIds.Editor.FindPrevious">@L(UiTextKey.EditorFindPrevious)</button>
+                        data-test="@UiTestIds.Editor.FindPrevious">@L(UiTextKey.EditorFindPrevious)</button>
                 <button type="button"
                         class="ed-find-nav"
                         @onclick="NavigateToNextFindMatchAsync"
                         disabled="@(!CanNavigateFindMatches)"
-                        data-testid="@UiTestIds.Editor.FindNext">@L(UiTextKey.EditorFindNext)</button>
+                        data-test="@UiTestIds.Editor.FindNext">@L(UiTextKey.EditorFindNext)</button>
                 <button type="button"
                         class="ed-find-close"
                         @onclick="CloseFindBarAsync"
-                        data-testid="@UiTestIds.Editor.FindClose">@L(UiTextKey.EditorFindClose)</button>
+                        data-test="@UiTestIds.Editor.FindClose">@L(UiTextKey.EditorFindClose)</button>
             </div>
         </div>
     }
 
     <div class="ed-content ed-source-shell"
-         data-testid="@UiTestIds.Editor.SourceScrollHost">
+         data-test="@UiTestIds.Editor.SourceScrollHost">
         <div class="ed-source-stage">
             <div class="ed-source-monaco"
                  @ref="_editorHostRef"
-                 data-testid="@UiTestIds.Editor.SourceStage"
+                 data-test="@UiTestIds.Editor.SourceStage"
                  data-editor-ready="false"></div>
             <div class="ed-source-highlight"
                  @ref="_semanticSnapshotRef"
-                 data-testid="@UiTestIds.Editor.SourceHighlight">
+                 data-test="@UiTestIds.Editor.SourceHighlight">
                 @if (!_surfaceInteropReady)
                 {
                     @TpsSourceHighlighter.Render(Text)
                 }
             </div>
             <textarea class="ed-source-input"
-                      data-testid="@UiTestIds.Editor.SourceInput"
+                      data-test="@UiTestIds.Editor.SourceInput"
                       spellcheck="false"
                       autocapitalize="off"
                       autocomplete="off"
@@ -140,7 +140,7 @@
             @if (ShouldRenderFloatingBar)
             {
                 <div class="ed-float-bar"
-                     data-testid="@UiTestIds.Editor.FloatingBar"
+                     data-test="@UiTestIds.Editor.FloatingBar"
                      style="@FloatingBarStyle">
                     @for (var groupIndex = 0; groupIndex < FloatingActionGroups.Count; groupIndex++)
                     {
@@ -164,7 +164,7 @@
                     @if (OpenFloatingMenu is { } floatingMenu)
                     {
                         <div class="@GetFloatingMenuCss(floatingMenu)"
-                             data-testid="@floatingMenu.PanelTestId">
+                             data-test="@floatingMenu.PanelTestId">
                             @for (var groupIndex = 0; groupIndex < floatingMenu.DropdownGroups.Count; groupIndex++)
                             {
                                 var dropdownGroup = floatingMenu.DropdownGroups[groupIndex];
@@ -191,7 +191,7 @@
 
         @if (!string.IsNullOrWhiteSpace(ErrorMessage))
         {
-            <div class="ed-source-error" data-testid="@UiTestIds.Editor.Error">@ErrorMessage</div>
+            <div class="ed-source-error" data-test="@UiTestIds.Editor.Error">@ErrorMessage</div>
         }
     </div>
 

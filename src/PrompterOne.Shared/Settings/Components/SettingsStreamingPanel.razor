@@ -21,13 +21,13 @@
                    class="set-input"
                    value="@ProgramCapture.BitrateKbps"
                    @oninput="BitrateChanged"
-                   data-testid="@UiTestIds.Settings.StreamingBitrate" />
+                   data-test="@UiTestIds.Settings.StreamingBitrate" />
         </div>
         <div class="set-field set-field-toggle">
             <label>@Text(SettingsStreamingText.ShowTextOverlayLabel)</label>
             <div class="set-toggle @(ProgramCapture.ShowTextOverlay ? OnCssClass : null)"
                  @onclick="ToggleTextOverlay"
-                 data-testid="@UiTestIds.Settings.StreamingTextOverlay">
+                 data-test="@UiTestIds.Settings.StreamingTextOverlay">
                 <div class="set-toggle-thumb"></div>
             </div>
         </div>
@@ -35,7 +35,7 @@
             <label>@Text(SettingsStreamingText.IncludeCameraInOutputLabel)</label>
             <div class="set-toggle @(ProgramCapture.IncludeCameraInOutput ? OnCssClass : null)"
                  @onclick="ToggleIncludeCamera"
-                 data-testid="@UiTestIds.Settings.StreamingIncludeCamera">
+                 data-test="@UiTestIds.Settings.StreamingIncludeCamera">
                 <div class="set-toggle-thumb"></div>
             </div>
         </div>
@@ -76,7 +76,7 @@
     <h4 class="set-sub-title">@Text(SettingsStreamingText.TransportConnectionsTitle)</h4>
     <button class="set-btn-outline set-btn-sm"
             type="button"
-            data-testid="@UiTestIds.Settings.StreamingTransportAdd"
+            data-test="@UiTestIds.Settings.StreamingTransportAdd"
             @onclick="ToggleTransportConnectionMenu">
         <UiIcon Kind="UiIconKind.Plus"
                 Size="12"
@@ -90,7 +90,7 @@
     {
         <button class="set-add-source-opt"
                 type="button"
-                data-testid="@UiTestIds.Settings.StreamingTransportAddOption(platform.IdPrefix)"
+                data-test="@UiTestIds.Settings.StreamingTransportAddOption(platform.IdPrefix)"
                 @onclick="@(() => AddTransportConnectionAndOpenCardAsync(platform.Kind))">
             @platform.DisplayName
         </button>
@@ -117,7 +117,7 @@
     <h4 class="set-sub-title">@Text(SettingsStreamingText.DistributionTargetsTitle)</h4>
     <button class="set-btn-outline set-btn-sm"
             type="button"
-            data-testid="@UiTestIds.Settings.StreamingDistributionAdd"
+            data-test="@UiTestIds.Settings.StreamingDistributionAdd"
             @onclick="ToggleDistributionTargetMenu">
         <UiIcon Kind="UiIconKind.Plus"
                 Size="12"
@@ -131,7 +131,7 @@
     {
         <button class="set-add-source-opt"
                 type="button"
-                data-testid="@UiTestIds.Settings.StreamingDistributionAddOption(platform.IdPrefix)"
+                data-test="@UiTestIds.Settings.StreamingDistributionAddOption(platform.IdPrefix)"
                 @onclick="@(() => AddDistributionTargetAndOpenCardAsync(platform.Kind))">
             @platform.DisplayName
         </button>

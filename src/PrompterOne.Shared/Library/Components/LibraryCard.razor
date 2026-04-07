@@ -2,10 +2,10 @@
 @using Microsoft.Extensions.Localization
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
-<article class="glass-card library-card" data-testid="@Summary.RowAutomationId" @onclick="OpenAsync">
+<article class="glass-card library-card" data-test="@Summary.RowAutomationId" @onclick="OpenAsync">
     <div class="library-card-cover">
         <span class="library-card-badge">@Text(UiTextKey.LibraryCardBadgeTps)</span>
-        <h3 data-testid="@Summary.TitleAutomationId">@Summary.Title</h3>
+        <h3 data-test="@Summary.TitleAutomationId">@Summary.Title</h3>
         <p>@Format(UiTextKey.LibraryCardWordsFormat, Summary.WordCount)</p>
     </div>
 
@@ -16,13 +16,13 @@
         </div>
 
         <div class="library-card-actions">
-            <button class="action-btn" data-testid="@($"{Summary.LoadAutomationId}-learn")" @onclick:stopPropagation="true" @onclick="LearnAsync">@Text(UiTextKey.LibraryCardLearn)</button>
-            <button class="action-btn action-btn-primary" data-testid="@($"{Summary.LoadAutomationId}-read")" @onclick:stopPropagation="true" @onclick="ReadAsync">@Text(UiTextKey.LibraryCardRead)</button>
+            <button class="action-btn" data-test="@($"{Summary.LoadAutomationId}-learn")" @onclick:stopPropagation="true" @onclick="LearnAsync">@Text(UiTextKey.LibraryCardLearn)</button>
+            <button class="action-btn action-btn-primary" data-test="@($"{Summary.LoadAutomationId}-read")" @onclick:stopPropagation="true" @onclick="ReadAsync">@Text(UiTextKey.LibraryCardRead)</button>
             <TooltipAnchor OwnerTestId="@($"{Summary.LoadAutomationId}-delete")"
                            Placement="TooltipPlacement.LeftCenter"
                            Text="@Text(UiTextKey.TooltipDeleteScript)">
                 <button class="icon-btn"
-                        data-testid="@($"{Summary.LoadAutomationId}-delete")"
+                        data-test="@($"{Summary.LoadAutomationId}-delete")"
                         aria-label="@Text(UiTextKey.TooltipDeleteScript)"
                         @onclick:stopPropagation="true"
                         @onclick="DeleteAsync">×</button>

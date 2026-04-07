@@ -7,23 +7,23 @@
         title="@AccessibleLabel"
         aria-label="@AccessibleLabel"
         data-live-state="@LiveState"
-        data-testid="@TestId"
+        data-test="@TestId"
         @onclick="HandleClick">
     <span class="go-live-shell-button__signal" aria-hidden="true">
         <span class="go-live-shell-button__dot"
-              data-testid="@UiTestIds.Header.GoLiveDot"></span>
+              data-test="@UiTestIds.Header.GoLiveDot"></span>
         <span class="go-live-shell-button__icon"
-              data-testid="@UiTestIds.Header.GoLiveIcon">
+              data-test="@UiTestIds.Header.GoLiveIcon">
             <UiIcon Kind="UiIconKind.Video" Size="15" />
         </span>
     </span>
     <span class="go-live-shell-button__copy">
         <span class="go-live-shell-button__label"
-              data-testid="@UiTestIds.Header.GoLiveLabel">@Label</span>
+              data-test="@UiTestIds.Header.GoLiveLabel">@Label</span>
         @if (ShowStatus)
         {
             <span class="go-live-shell-button__status"
-                  data-testid="@UiTestIds.Header.GoLiveStatus">@Status</span>
+                  data-test="@UiTestIds.Header.GoLiveStatus">@Status</span>
         }
     </span>
 </button>

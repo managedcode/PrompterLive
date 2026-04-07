@@ -1,11 +1,11 @@
 @namespace PrompterOne.Shared.Components.GoLive
 @using PrompterOne.Shared.Services
 
-<section class="live-destination-sources" data-testid="@UiTestIds.GoLive.ProviderSourcePicker(TargetId)">
+<section class="live-destination-sources" data-test="@UiTestIds.GoLive.ProviderSourcePicker(TargetId)">
     <div class="live-destination-sources-header">
         <span class="set-section-label">@SectionLabel</span>
         <span class="live-status @(SelectedCount > 0 ? ReadyCssClass : PendingCssClass)"
-              data-testid="@UiTestIds.GoLive.ProviderSourceSummary(TargetId)">
+              data-test="@UiTestIds.GoLive.ProviderSourceSummary(TargetId)">
             @SourceSummary
         </span>
     </div>
@@ -13,7 +13,7 @@
     @if (Sources.Count == 0)
     {
         <div class="set-empty-card live-destination-sources-empty"
-             data-testid="@UiTestIds.GoLive.SourcePickerEmpty">
+             data-test="@UiTestIds.GoLive.SourcePickerEmpty">
             @EmptyStateMessage
         </div>
     }
@@ -25,7 +25,7 @@
                 var isSelected = SelectedSourceIdSet.Contains(source.SourceId);
                 <button type="button"
                         class="live-destination-source-chip @(isSelected ? ChipEnabledCssClass : null)"
-                        data-testid="@UiTestIds.GoLive.ProviderSourceToggle(TargetId, source.SourceId)"
+                        data-test="@UiTestIds.GoLive.ProviderSourceToggle(TargetId, source.SourceId)"
                         @onclick="() => ToggleSource.InvokeAsync(source.SourceId)">
                     <span class="live-destination-source-name">@FormatSourceLabel(source)</span>
                     <span class="live-destination-source-state">@(isSelected ? SelectedLabel : AvailableLabel)</span>

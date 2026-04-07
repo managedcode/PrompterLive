@@ -373,8 +373,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<double>(
             """
             () => {
-                const line = document.querySelector('[data-testid="learn-orp-line"]');
-                const orp = document.querySelector('[data-testid="learn-word"] .orp');
+                const line = document.querySelector('[data-test="learn-orp-line"]');
+                const orp = document.querySelector('[data-test="learn-word"] .orp');
                 if (!line || !orp) {
                     return 999;
                 }
@@ -434,9 +434,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.WaitForFunctionAsync(
             """
             args => {
-                const display = document.querySelector(`[data-testid="${args.displayTestId}"]`);
-                const line = document.querySelector(`[data-testid="${args.lineTestId}"]`);
-                const orp = document.querySelector(`[data-testid="${args.wordTestId}"] .orp`);
+                const display = document.querySelector(`[data-test="${args.displayTestId}"]`);
+                const line = document.querySelector(`[data-test="${args.lineTestId}"]`);
+                const orp = document.querySelector(`[data-test="${args.wordTestId}"] .orp`);
                 if (display?.getAttribute(args.layoutReadyAttributeName) !== args.layoutReadyValue || !line || !orp) {
                     return false;
                 }
@@ -527,7 +527,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         await page.WaitForFunctionAsync(
             """
             probe => {
-                const element = document.querySelector(`[data-testid="${probe.progressLabelTestId}"]`);
+                const element = document.querySelector(`[data-test="${probe.progressLabelTestId}"]`);
                 const text = element?.textContent ?? '';
                 const match = new RegExp(probe.progressPattern).exec(text);
                 return match !== null && Number(match[1]) >= probe.targetWordNumber;
@@ -558,9 +558,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<ContextGapMeasurement>(
             """
             () => {
-                const left = document.querySelector('[data-testid="learn-context-left"]');
-                const focus = document.querySelector('[data-testid="learn-word"]');
-                const right = document.querySelector('[data-testid="learn-context-right"]');
+                const left = document.querySelector('[data-test="learn-context-left"]');
+                const focus = document.querySelector('[data-test="learn-word"]');
+                const right = document.querySelector('[data-test="learn-context-right"]');
                 if (!left || !focus || !right) {
                     return { leftGapPx: -999, rightGapPx: -999 };
                 }
@@ -580,9 +580,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<VisibleContextWordGapMeasurement>(
             """
             ids => {
-                const left = document.querySelector(`[data-testid="${ids.left}"]`);
-                const focus = document.querySelector(`[data-testid="${ids.focus}"]`);
-                const right = document.querySelector(`[data-testid="${ids.right}"]`);
+                const left = document.querySelector(`[data-test="${ids.left}"]`);
+                const focus = document.querySelector(`[data-test="${ids.focus}"]`);
+                const right = document.querySelector(`[data-test="${ids.right}"]`);
                 const leftWord = left?.lastElementChild;
                 const rightWord = right?.firstElementChild;
                 if (!leftWord || !focus || !rightWord) {
@@ -610,8 +610,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<ContextRailClipMeasurement>(
             """
             ids => {
-                const leftRail = document.querySelector(`[data-testid="${ids.left}"]`);
-                const rightRail = document.querySelector(`[data-testid="${ids.right}"]`);
+                const leftRail = document.querySelector(`[data-test="${ids.left}"]`);
+                const rightRail = document.querySelector(`[data-test="${ids.right}"]`);
                 if (!leftRail || !rightRail) {
                     return { leftClipPx: 999, rightClipPx: 999 };
                 }
@@ -645,7 +645,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<FocusWordSlackMeasurement>(
             """
             ids => {
-                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const word = document.querySelector(`[data-test="${ids.word}"]`);
                 const leading = word?.querySelector('.rsvp-focus-leading');
                 const orp = word?.querySelector('.rsvp-focus-orp');
                 const trailing = word?.querySelector('.rsvp-focus-trailing');
@@ -672,8 +672,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<double>(
             """
             ids => {
-                const display = document.querySelector(`[data-testid="${ids.display}"]`);
-                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const display = document.querySelector(`[data-test="${ids.display}"]`);
+                const word = document.querySelector(`[data-test="${ids.word}"]`);
                 const leading = word?.querySelector('.rsvp-focus-leading');
                 const trailing = word?.querySelector('.rsvp-focus-trailing');
                 if (!display || !word || !leading || !trailing) {

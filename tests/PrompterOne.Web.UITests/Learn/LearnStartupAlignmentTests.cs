@@ -95,10 +95,10 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
                         return;
                     }
 
-                    const display = document.querySelector(`[data-testid="${learnDisplayTestId}"]`);
+                    const display = document.querySelector(`[data-test="${learnDisplayTestId}"]`);
                     const row = display?.querySelector('.rsvp-h-row');
-                    const line = document.querySelector(`[data-testid="${learnLineTestId}"]`);
-                    const word = document.querySelector(`[data-testid="${learnWordTestId}"]`);
+                    const line = document.querySelector(`[data-test="${learnLineTestId}"]`);
+                    const word = document.querySelector(`[data-test="${learnWordTestId}"]`);
                     const orp = word?.querySelector('.orp');
                     if (!display || !row) {
                         return;
@@ -185,10 +185,10 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<LearnStartupTraceSample>(
             """
             args => {
-                const display = document.querySelector(`[data-testid="${args.displayTestId}"]`);
+                const display = document.querySelector(`[data-test="${args.displayTestId}"]`);
                 const row = display?.querySelector('.rsvp-h-row');
-                const line = document.querySelector(`[data-testid="${args.lineTestId}"]`);
-                const word = document.querySelector(`[data-testid="${args.wordTestId}"]`);
+                const line = document.querySelector(`[data-test="${args.lineTestId}"]`);
+                const word = document.querySelector(`[data-test="${args.wordTestId}"]`);
                 const orp = word?.querySelector('.orp');
                 const rowStyles = row ? getComputedStyle(row) : null;
                 const lineRect = line?.getBoundingClientRect();

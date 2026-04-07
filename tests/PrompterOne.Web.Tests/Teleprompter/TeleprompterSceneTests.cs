@@ -6,6 +6,7 @@ using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Tests;
+using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Web.Tests;
 
@@ -39,7 +40,7 @@ public sealed class TeleprompterSceneTests : BunitContext
             PrimaryMicrophoneLabel: "Broadcast mic",
             AudioBus: new AudioBusState([new AudioInputState("mic-1", "Broadcast mic")])));
 
-        harness.JsRuntime.SavedValues["prompterone.studio"] = new StudioSettings(
+        harness.JsRuntime.SavedValues[StudioSettingsStore.StorageKey] = new StudioSettings(
             new CameraStudioSettings(DefaultCameraId: "cam-2"),
             new MicrophoneStudioSettings(DefaultMicrophoneId: "mic-1"),
             new StreamStudioSettings());
@@ -49,7 +50,7 @@ public sealed class TeleprompterSceneTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Contains("id=\"rd-camera\"", cut.Markup);
-            Assert.Contains("data-testid=\"teleprompter-camera-layer-primary\"", cut.Markup);
+            Assert.Contains("data-test=\"teleprompter-camera-layer-primary\"", cut.Markup);
             Assert.Contains("data-camera-device-id=\"cam-2\"", cut.Markup);
             Assert.DoesNotContain("rd-camera-overlay-", cut.Markup, StringComparison.Ordinal);
             Assert.DoesNotContain("data-camera-role=\"overlay\"", cut.Markup, StringComparison.Ordinal);

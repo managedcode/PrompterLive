@@ -98,10 +98,12 @@ Rule format:
 - Public web hosting is split by role: the standalone PrompterOne app in this repo must publish on `app.prompter.one`, while the marketing landing site for `prompter.one` lives in the separate `PrompterOne-LandingPage` repository.
 - For deploy-only, domain, CI, or static-site hosting tasks, do not spend time on unrelated app/browser test suites unless the user explicitly asks or the runtime behavior itself changes; prefer workflow, build, and publish-config validation only.
 - Repo-wide .NET SDK and test-runner selection belong in the root `global.json`; do not split `global.json` test-runner opt-ins per project or subfolder once the user asks for a global test-platform policy.
+- Browser and component tests must use one selector format only: `data-test`; do not mix `data-testid`, `data-test-id`, or any other test-attribute naming variant.
 - Repo-wide quality audits and agent-generated review handoff artifacts must be written as root-level task files so other coding agents can pick them up quickly; do not bury those temporary audit results under `docs/` unless the task is explicitly about durable product documentation.
 - Repo-wide cleanup and review passes must explicitly inventory forbidden implementation string literals, `MarkupString` or raw-HTML UI composition, duplicated JS/CSS patterns, architecture-boundary drift, and `foreach`-driven test scenarios that should become isolated TUnit cases.
 - Repo-wide audits should use multiple independent reviewers with distinct focuses when the tooling is available, including external CLI reviewers such as Claude and Copilot plus internal agents, and all review outputs should be captured in root-level task files before remediation starts.
 - Legacy, dead, duplicate, or speculative code paths should be deleted aggressively instead of being preserved behind compatibility instincts; if code has no clear runtime owner or authoritative contract, remove it rather than keep it as “just in case” ballast.
+- For repo-wide remediation passes, keep an explicit root-level accounting of fixed versus remaining feedback items, finish the code fixes first, and only then run and stabilize the test suites; do not bounce back into verification mid-remediation unless the user explicitly asks.
 
 ## Rules to Follow (Mandatory)
 
@@ -154,9 +156,11 @@ Do not hijack shared user dev ports for agent-run preview servers. The user's st
 
 Selector and constant rules:
 
-- UI contracts MUST expose stable dedicated test hooks for any flow covered by automated tests. Prefer `data-test-id` for new contracts, allow `data-test`, and keep existing `data-testid` stable until a deliberate migration replaces it.
+- UI contracts MUST expose stable dedicated test hooks for any flow covered by automated tests, and the only allowed hook format is `data-test`.
 - Browser and component tests MUST prefer dedicated test attributes over text, role-name, CSS-class, or DOM-shape selectors.
 - If a stable dedicated test hook exists, raw `GetByText`, `GetByRole(... Name = ...)`, `.Locator(".class")`, and literal attribute selectors are forbidden.
+- Browser and component tests MUST NOT use style-driven selectors at all (for example `.Locator(".class")`, descendant class chains, or CSS-state probes) when a dedicated `data-test` hook can represent that state.
+- Browser-test JavaScript snippets MUST read elements through dedicated `data-test` contracts passed from C# constants; do not use raw `document.querySelector(...)` selectors that target classes, styles, or DOM shape.
 - Routes, route patterns, test ids, DOM ids, storage keys, keyboard shortcuts, seeded values, wait durations, and other repeated test inputs MUST come from named constants.
 - URLs in tests MUST come from shared route helpers or constants, never inline literals.
 - Magic numbers in tests are forbidden. Put timeouts, delays, counts, percentages, and seeded numeric inputs behind named constants.

@@ -21,8 +21,8 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
             var splitActionLivesInMetadataRail = await page.EvaluateAsync<bool>(
                 """
                 args => {
-                    const metadataRail = document.querySelector(`[data-testid="${args.metadataRailTestId}"]`);
-                    const splitAction = document.querySelector(`[data-testid="${args.splitActionTestId}"]`);
+                    const metadataRail = document.querySelector(`[data-test="${args.metadataRailTestId}"]`);
+                    const splitAction = document.querySelector(`[data-test="${args.splitActionTestId}"]`);
                     return Boolean(metadataRail && splitAction && metadataRail.contains(splitAction));
                 }
                 """,

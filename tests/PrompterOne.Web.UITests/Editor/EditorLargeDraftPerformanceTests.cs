@@ -30,8 +30,8 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             await page.EvaluateAsync(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     const harness = window[args.harnessGlobalName];
                     if (!input || !overlay || !harness) {
                         throw new Error("Unable to initialize the large draft performance probe.");
@@ -79,8 +79,8 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             var result = await page.EvaluateAsync<LargeDraftProbeResult>(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     const probe = window.__editorLargeDraftProbe;
                     if (!input || !overlay || !probe) {
                         throw new Error("Large draft performance probe result is unavailable.");
@@ -137,7 +137,7 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             await page.WaitForFunctionAsync(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
                     const harness = window[args.harnessGlobalName];
                     const state = harness?.getState(args.stageTestId);
                     if (!input || !state?.visibleRange || !state?.selection) {
@@ -163,7 +163,7 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
             var result = await page.EvaluateAsync<LargeDraftNavigationResult>(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
                     const harness = window[args.harnessGlobalName];
                     if (!input || !harness) {
                         throw new Error("Large draft navigation probe result is unavailable.");

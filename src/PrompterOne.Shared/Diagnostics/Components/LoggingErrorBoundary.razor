@@ -9,15 +9,15 @@
 }
 else
 {
-    <section class="diag-fatal-shell" role="alertdialog" aria-modal="true" data-testid="@UiTestIds.Diagnostics.Fatal">
+    <section class="diag-fatal-shell" role="alertdialog" aria-modal="true" data-test="@UiTestIds.Diagnostics.Fatal">
         <div class="diag-fatal-card">
             <span class="diag-fatal-eyebrow">Diagnostics</span>
             <h1>@CurrentDiagnostic?.Title</h1>
             <p>@CurrentDiagnostic?.Message</p>
             <div class="diag-fatal-detail">@CurrentDiagnostic?.Detail</div>
             <div class="diag-fatal-actions">
-                <button class="diag-fatal-btn" type="button" @onclick="HandleRecover" data-testid="@UiTestIds.Diagnostics.Retry">@Localizer[UiTextKey.DiagnosticsRetry.ToString()]</button>
-                <button class="diag-fatal-btn diag-fatal-btn-primary" type="button" @onclick="HandleReturnHome" data-testid="@UiTestIds.Diagnostics.Home">@Localizer[UiTextKey.DiagnosticsLibrary.ToString()]</button>
+                <button class="diag-fatal-btn" type="button" @onclick="HandleRecover" data-test="@UiTestIds.Diagnostics.Retry">@Localizer[UiTextKey.DiagnosticsRetry.ToString()]</button>
+                <button class="diag-fatal-btn diag-fatal-btn-primary" type="button" @onclick="HandleReturnHome" data-test="@UiTestIds.Diagnostics.Home">@Localizer[UiTextKey.DiagnosticsLibrary.ToString()]</button>
             </div>
         </div>
     </section>

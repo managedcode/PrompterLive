@@ -2,16 +2,16 @@
 @using PrompterOne.Shared.Components
 
 <section class="gl-program-tools"
-         data-testid="@UiTestIds.GoLive.SceneControls">
+         data-test="@UiTestIds.GoLive.SceneControls">
     <div class="gl-scenes-bar"
-         data-testid="@UiTestIds.GoLive.SceneBar">
+         data-test="@UiTestIds.GoLive.SceneBar">
         <div class="gl-scenes-list">
             @foreach (var scene in Scenes)
             {
                 var isActive = string.Equals(scene.Id, ActiveSceneId, StringComparison.Ordinal);
                 <button type="button"
                         class="gl-scene-chip @(isActive ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.SceneChip(scene.Id)"
+                        data-test="@UiTestIds.GoLive.SceneChip(scene.Id)"
                         @onclick="() => SelectScene.InvokeAsync(scene.Id)">
                     <span class="gl-scene-chip-icon">
                         <UiIcon Kind="@GetSceneIconKind(scene.Kind)" Size="12" />
@@ -33,19 +33,19 @@
             <span class="gl-tools-label">Layout</span>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Full ? "active" : null)"
-                    data-testid="@UiTestIds.GoLive.LayoutFull"
+                    data-test="@UiTestIds.GoLive.LayoutFull"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Full)">
                 <UiIcon Kind="UiIconKind.LayoutFull" Size="14" />
             </button>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.Split ? "active" : null)"
-                    data-testid="@UiTestIds.GoLive.LayoutSplit"
+                    data-test="@UiTestIds.GoLive.LayoutSplit"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.Split)">
                 <UiIcon Kind="UiIconKind.LayoutSplit" Size="14" />
             </button>
             <button type="button"
                     class="gl-scene-btn @(ActiveLayout == GoLiveSceneLayout.PictureInPicture ? "active" : null)"
-                    data-testid="@UiTestIds.GoLive.LayoutPictureInPicture"
+                    data-test="@UiTestIds.GoLive.LayoutPictureInPicture"
                     @onclick="() => SelectLayout.InvokeAsync(GoLiveSceneLayout.PictureInPicture)">
                 <UiIcon Kind="UiIconKind.PictureInPicture" Size="14" />
             </button>
@@ -63,7 +63,7 @@
                     @onclick="() => SelectTransitionKind.InvokeAsync(GoLiveTransitionKind.Wipe)">Wipe</button>
             <button type="button"
                     class="gl-take-btn"
-                    data-testid="@UiTestIds.GoLive.TakeToAir"
+                    data-test="@UiTestIds.GoLive.TakeToAir"
                     @onclick="TakeToAir">
                 <UiIcon Kind="UiIconKind.ArrowRight" Size="16" StrokeWidth="2.5m" />
                 <span>@TakeToAirLabel.ToUpperInvariant()</span>

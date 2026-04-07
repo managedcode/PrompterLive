@@ -172,7 +172,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
         page.EvaluateAsync<ToggleIconState>(
             $$"""
             () => {
-                const button = document.querySelector('[data-testid="{{UiTestIds.Learn.PlayToggle}}"]');
+                const button = document.querySelector('[data-test="{{UiTestIds.Learn.PlayToggle}}"]');
                 const playIcon = button?.querySelector('[data-toggle-icon="play"]');
                 const pauseIcon = button?.querySelector('[data-toggle-icon="pause"]');
                 return {

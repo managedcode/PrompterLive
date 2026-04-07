@@ -11,27 +11,27 @@
         <button type="button"
                 class="app-header-left app-header-home"
                 @onclick="HandleHomeClickAsync"
-                data-testid="@UiTestIds.Header.Home">
+                data-test="@UiTestIds.Header.Home">
             <div class="logo-icon">
                 <AppBrandMark />
             </div>
-            <span class="app-logo-text" data-testid="@UiTestIds.Header.Brand">PrompterOne</span>
+            <span class="app-logo-text" data-test="@UiTestIds.Header.Brand">PrompterOne</span>
         </button>
-        <div class="app-header-center" data-testid="@UiTestIds.Header.Center">
+        <div class="app-header-center" data-test="@UiTestIds.Header.Center">
             @if (IsLibraryScreen)
             {
                 <div class="lib-breadcrumb">
                     @if (IsLibraryRootBreadcrumb)
                     {
                         <span class="bc-item bc-current"
-                              data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                              data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
                     }
                     else
                     {
                         <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
                         <span class="bc-sep">/</span>
                         <span class="bc-item bc-current"
-                              data-testid="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                              data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
                     }
                 </div>
             }
@@ -42,31 +42,31 @@
                     <button type="button"
                             class="btn-back"
                             @onclick="HandleBackClickAsync"
-                            data-testid="@UiTestIds.Header.Back">
+                            data-test="@UiTestIds.Header.Back">
                         <UiIcon Kind="UiIconKind.ChevronLeft" Size="18" />
                     </button>
                 }
 
-                <span class="top-bar-title" data-testid="@UiTestIds.Header.Title">@HeaderTitle</span>
+                <span class="top-bar-title" data-test="@UiTestIds.Header.Title">@HeaderTitle</span>
 
                 @if (ShowHeaderSubtitle)
                 {
                     <span id="@(ShellState.Screen == AppShellScreen.Teleprompter ? UiDomIds.Teleprompter.HeaderSegment : null)"
                           class="app-header-subtitle"
-                          data-testid="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
+                          data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
                 }
             }
         </div>
         <div class="app-header-right">
             @if (ShowLibraryActions)
             {
-                <div class="lib-search" data-testid="@UiTestIds.Header.LibrarySearchSurface">
+                <div class="lib-search" data-test="@UiTestIds.Header.LibrarySearchSurface">
                     <UiIcon Kind="UiIconKind.Search" Size="15" />
                     <input type="text"
                            value="@ShellState.SearchText"
                            placeholder="@Text(UiTextKey.HeaderSearchPlaceholder)"
                            @oninput="HandleLibrarySearchInputAsync"
-                           data-testid="@UiTestIds.Header.LibrarySearch" />
+                           data-test="@UiTestIds.Header.LibrarySearch" />
                 </div>
             }
 
@@ -84,11 +84,11 @@
                         @onclick="HandleOpenOnboardingAsync"
                         title="@Text(UiTextKey.OnboardingRestartTour)"
                         aria-label="@Text(UiTextKey.OnboardingRestartTour)"
-                        data-testid="@UiTestIds.Header.Onboarding">
+                        data-test="@UiTestIds.Header.Onboarding">
                     <UiIcon Kind="UiIconKind.HelpCircle" Size="15" />
                 </button>
                 <div class="app-header-file-action"
-                     data-testid="@UiTestIds.Header.LibraryOpenScript">
+                     data-test="@UiTestIds.Header.LibraryOpenScript">
                     <button type="button"
                             class="btn-ghost btn-open-script"
                             aria-haspopup="dialog"
@@ -102,12 +102,12 @@
                                aria-label="@Text(UiTextKey.HeaderOpenScript)"
                                accept="@SupportedOpenScriptAcceptValue"
                                OnChange="HandleOpenScriptAsync"
-                               data-testid="@UiTestIds.Header.LibraryOpenScriptInput" />
+                               data-test="@UiTestIds.Header.LibraryOpenScriptInput" />
                 </div>
                 <button type="button"
                         class="btn-create"
                         @onclick="HandleCreateScriptClickAsync"
-                        data-testid="@UiTestIds.Header.LibraryNewScript">
+                        data-test="@UiTestIds.Header.LibraryNewScript">
                     <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderNewScript)</span>
                 </button>
@@ -118,7 +118,7 @@
                 <button type="button"
                         class="btn-ghost"
                         @onclick="HandleSaveFileClickAsync"
-                        data-testid="@UiTestIds.Header.EditorSaveFile">
+                        data-test="@UiTestIds.Header.EditorSaveFile">
                     <UiIcon Kind="UiIconKind.SaveFile" Size="15" />
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderSaveFile)</span>
                 </button>
@@ -129,7 +129,7 @@
                 <button type="button"
                         class="btn-ghost"
                         @onclick="HandleOpenLearnClickAsync"
-                        data-testid="@UiTestIds.Header.EditorLearn">
+                        data-test="@UiTestIds.Header.EditorLearn">
                     <UiIcon Kind="UiIconKind.BookOpen" Size="15" />
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderLearn)</span>
                 </button>
@@ -139,7 +139,7 @@
             {
                 <span id="@UiDomIds.Learn.HeaderWpmBadge"
                       class="top-bar-title app-header-wpm"
-                      data-testid="@UiTestIds.Header.Wpm">@ShellState.WpmLabel</span>
+                      data-test="@UiTestIds.Header.Wpm">@ShellState.WpmLabel</span>
             }
 
             @if (ShowReadAction)
@@ -147,7 +147,7 @@
                 <button type="button"
                         class="btn-gold"
                         @onclick="HandleOpenReadClickAsync"
-                        data-testid="@UiTestIds.Header.EditorRead">
+                        data-test="@UiTestIds.Header.EditorRead">
                     <UiIcon Kind="UiIconKind.Play" Size="15" />
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderRead)</span>
                 </button>
@@ -177,22 +177,22 @@
             class="@BuildGoLiveWidgetCssClass()"
             @onclick="HandleOpenGoLiveClickAsync"
             data-live-state="@GoLiveIndicatorState"
-            data-testid="@UiTestIds.Header.LiveWidget">
-        <div class="app-live-widget-preview" data-testid="@UiTestIds.Header.LiveWidgetPreview">
+            data-test="@UiTestIds.Header.LiveWidget">
+        <div class="app-live-widget-preview" data-test="@UiTestIds.Header.LiveWidgetPreview">
             <div class="app-live-widget-overlay"></div>
             <div class="app-live-widget-meta">
                 <span class="app-live-widget-live-pill">@GoLiveWidgetStateLabel</span>
                 <span class="app-live-widget-timer"
-                      data-testid="@UiTestIds.Header.LiveWidgetTimer">@GoLiveWidgetElapsed</span>
+                      data-test="@UiTestIds.Header.LiveWidgetTimer">@GoLiveWidgetElapsed</span>
             </div>
         </div>
 
         <div class="app-live-widget-copy">
             <span class="app-live-widget-eyebrow">@GoLiveIndicatorCopy</span>
             <strong class="app-live-widget-title"
-                    data-testid="@UiTestIds.Header.LiveWidgetTitle">@GoLiveWidgetTitle</strong>
+                    data-test="@UiTestIds.Header.LiveWidgetTitle">@GoLiveWidgetTitle</strong>
             <span class="app-live-widget-detail"
-                  data-testid="@UiTestIds.Header.LiveWidgetDetail">@GoLiveWidgetDetail</span>
+                  data-test="@UiTestIds.Header.LiveWidgetDetail">@GoLiveWidgetDetail</span>
         </div>
     </button>
 }

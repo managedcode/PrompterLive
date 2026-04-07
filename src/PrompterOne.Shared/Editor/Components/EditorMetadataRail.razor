@@ -6,7 +6,7 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="ed-right" data-testid="@UiTestIds.Editor.MetadataRail" data-collapsed="@GetCollapsedAttributeValue()">
+<div class="ed-right" data-test="@UiTestIds.Editor.MetadataRail" data-collapsed="@GetCollapsedAttributeValue()">
     <div class="ed-meta-header">
         @if (!IsCollapsed)
         {
@@ -20,7 +20,7 @@
                 aria-label="@ToggleLabel"
                 data-chevron-direction="@GetToggleChevronDirection()"
                 @onclick="() => ToggleRequested.InvokeAsync()"
-                data-testid="@UiTestIds.Editor.MetadataRailToggle">
+                data-test="@UiTestIds.Editor.MetadataRailToggle">
             <UiIcon Kind="@(IsCollapsed ? UiIconKind.ChevronLeft : UiIconKind.ChevronRight)"
                     Size="14"
                     StrokeWidth="2.2m" />
@@ -36,13 +36,13 @@
         <div class="ed-meta-actions">
             <button type="button"
                     class="ed-meta-action"
-                    data-testid="@UiTestIds.Editor.SplitTopLevel"
+                    data-test="@UiTestIds.Editor.SplitTopLevel"
                     @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.TopLevelHeading)">
                 @Text(UiTextKey.EditorSplitTopLevel)
             </button>
             <button type="button"
                     class="ed-meta-action"
-                    data-testid="@UiTestIds.Editor.SplitSegment"
+                    data-test="@UiTestIds.Editor.SplitSegment"
                     @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.SegmentHeading)">
                 @Text(UiTextKey.EditorSplitSegment)
             </button>
@@ -60,14 +60,14 @@
                    class="ed-meta-input"
                    value="@Title"
                    @onchange="OnTitleChange"
-                   data-testid="@UiTestIds.Editor.Title" />
+                   data-test="@UiTestIds.Editor.Title" />
         </div>
         <div class="ed-meta-field">
             <label>@Text(UiTextKey.CommonProfile)</label>
             <select class="ed-meta-select"
                     value="@Profile"
                     @onchange="OnProfileChange"
-                    data-testid="@UiTestIds.Editor.Profile">
+                    data-test="@UiTestIds.Editor.Profile">
                 <option value="Actor">@Text(UiTextKey.CommonActor)</option>
                 <option value="RSVP">@Text(UiTextKey.CommonRsvp)</option>
             </select>
@@ -80,7 +80,7 @@
                    min="80"
                    max="600"
                    @onchange="OnBaseWpmChange"
-                   data-testid="@UiTestIds.Editor.BaseWpm" />
+                   data-test="@UiTestIds.Editor.BaseWpm" />
         </div>
         <div class="ed-meta-field">
             <label>@Text(UiTextKey.CommonDuration)</label>
@@ -88,7 +88,7 @@
                    class="ed-meta-input"
                    value="@Duration"
                    @onchange="OnDurationChange"
-                   data-testid="@UiTestIds.Editor.Duration" />
+                   data-test="@UiTestIds.Editor.Duration" />
         </div>
         <div class="ed-meta-field">
             <label>@Text(UiTextKey.CommonAuthor)</label>
@@ -96,7 +96,7 @@
                    class="ed-meta-input"
                    value="@Author"
                    @onchange="OnAuthorChange"
-                   data-testid="@UiTestIds.Editor.Author" />
+                   data-test="@UiTestIds.Editor.Author" />
         </div>
         <div class="ed-meta-field">
             <label>@Text(UiTextKey.CommonCreated)</label>
@@ -105,8 +105,8 @@
                        class="ed-meta-input ed-meta-date-input"
                        value="@CreatedDate"
                        @onchange="OnCreatedDateChange"
-                       data-testid="@UiTestIds.Editor.Created" />
-                <span class="ed-meta-date-icon" data-testid="@UiTestIds.Editor.CreatedIcon" aria-hidden="true">
+                       data-test="@UiTestIds.Editor.Created" />
+                <span class="ed-meta-date-icon" data-test="@UiTestIds.Editor.CreatedIcon" aria-hidden="true">
                     <UiIcon Kind="UiIconKind.Calendar" Size="14" StrokeWidth="1.8m" />
                 </span>
             </div>
@@ -117,7 +117,7 @@
                    class="ed-meta-input"
                    value="@Version"
                    @onchange="OnVersionChange"
-                   data-testid="@UiTestIds.Editor.Version" />
+                   data-test="@UiTestIds.Editor.Version" />
         </div>
 
         <div class="ed-section-label ed-meta-subsection">@Text(UiTextKey.EditorMetadataSpeedOffsetsSection)</div>
@@ -128,7 +128,7 @@
                        class="ed-meta-input ed-meta-num"
                        value="@XslowOffset"
                        @onchange="OnXslowOffsetChange"
-                       data-testid="@UiTestIds.Editor.SpeedXslow" />
+                       data-test="@UiTestIds.Editor.SpeedXslow" />
                 <span class="ed-meta-unit ed-meta-unit--xslow">%</span>
             </div>
         </div>
@@ -139,7 +139,7 @@
                        class="ed-meta-input ed-meta-num"
                        value="@SlowOffset"
                        @onchange="OnSlowOffsetChange"
-                       data-testid="@UiTestIds.Editor.SpeedSlow" />
+                       data-test="@UiTestIds.Editor.SpeedSlow" />
                 <span class="ed-meta-unit ed-meta-unit--slow">%</span>
             </div>
         </div>
@@ -150,7 +150,7 @@
                        class="ed-meta-input ed-meta-num"
                        value="@FastOffset"
                        @onchange="OnFastOffsetChange"
-                       data-testid="@UiTestIds.Editor.SpeedFast" />
+                       data-test="@UiTestIds.Editor.SpeedFast" />
                 <span class="ed-meta-unit ed-meta-unit--fast">%</span>
             </div>
         </div>
@@ -161,7 +161,7 @@
                        class="ed-meta-input ed-meta-num"
                        value="@XfastOffset"
                        @onchange="OnXfastOffsetChange"
-                       data-testid="@UiTestIds.Editor.SpeedXfast" />
+                       data-test="@UiTestIds.Editor.SpeedXfast" />
                 <span class="ed-meta-unit ed-meta-unit--xfast">%</span>
             </div>
         </div>
@@ -173,28 +173,28 @@
         <div class="ed-stat"><span>@Text(UiTextKey.CommonBlocks)</span><b>@Status.BlockCount</b></div>
 
         <div class="ed-section-label ed-meta-subsection">@LocalFileSectionLabel</div>
-        <div class="ed-stat" data-testid="@UiTestIds.Editor.LocalHistoryStatus"><span>@AutoSaveLabel</span><b>@GetAutoSaveStateLabel()</b></div>
+        <div class="ed-stat" data-test="@UiTestIds.Editor.LocalHistoryStatus"><span>@AutoSaveLabel</span><b>@GetAutoSaveStateLabel()</b></div>
         <div class="ed-stat"><span>@HistoryLabel</span><b>@GetHistoryCountLabel()</b></div>
         <p class="ed-meta-note">@GetLocalFileNote()</p>
 
         @if (LocalHistory.Count == 0)
         {
-            <p class="ed-meta-empty" data-testid="@UiTestIds.Editor.LocalHistoryEmpty">@EmptyHistoryLabel</p>
+            <p class="ed-meta-empty" data-test="@UiTestIds.Editor.LocalHistoryEmpty">@EmptyHistoryLabel</p>
         }
         else
         {
-            <div class="ed-local-history" data-testid="@UiTestIds.Editor.LocalHistoryPanel">
+            <div class="ed-local-history" data-test="@UiTestIds.Editor.LocalHistoryPanel">
                 @for (var index = 0; index < LocalHistory.Count; index++)
                 {
                     var revision = LocalHistory[index];
-                    <div class="ed-local-history-item" data-testid="@UiTestIds.Editor.LocalHistoryItem(index)">
+                    <div class="ed-local-history-item" data-test="@UiTestIds.Editor.LocalHistoryItem(index)">
                         <div class="ed-local-history-copy">
                             <span class="ed-local-history-time">@revision.SavedAtLabel</span>
                             <span class="ed-local-history-file">@revision.DocumentName</span>
                         </div>
                         <button type="button"
                                 class="ed-local-history-restore"
-                                data-testid="@UiTestIds.Editor.LocalHistoryRestore(index)"
+                                data-test="@UiTestIds.Editor.LocalHistoryRestore(index)"
                                 @onclick="() => LocalHistoryRestoreRequested.InvokeAsync(revision.Id)">
                             @RestoreLabel
                         </button>

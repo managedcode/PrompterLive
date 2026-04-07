@@ -4,13 +4,13 @@
 
 <div class="lib-modal-backdrop"
      @onclick="HandleCancelCreateFolderAsync"
-     data-testid="@UiTestIds.Library.NewFolderOverlay">
+     data-test="@UiTestIds.Library.NewFolderOverlay">
     <section class="lib-modal-card lib-folder-modal"
              role="dialog"
              aria-modal="true"
              aria-labelledby="library-folder-modal-title"
              @onclick:stopPropagation="true"
-             data-testid="@UiTestIds.Library.NewFolderCard">
+             data-test="@UiTestIds.Library.NewFolderCard">
         <div class="lib-folder-modal-header">
             <div class="dcreate-icon lib-folder-modal-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -20,7 +20,7 @@
                 </svg>
             </div>
             <div class="lib-folder-modal-copy">
-                <h2 id="library-folder-modal-title" data-testid="@UiTestIds.Library.NewFolderTitle">@Text(UiTextKey.LibraryCreateFolderTitle)</h2>
+                <h2 id="library-folder-modal-title" data-test="@UiTestIds.Library.NewFolderTitle">@Text(UiTextKey.LibraryCreateFolderTitle)</h2>
                 <p>@Text(UiTextKey.LibraryCreateFolderDescription)</p>
             </div>
         </div>
@@ -33,14 +33,14 @@
                        @oninput="HandleFolderNameInput"
                        placeholder="@Text(UiTextKey.LibraryFolderPlaceholder)"
                        autofocus
-                       data-testid="@UiTestIds.Library.NewFolderName" />
+                       data-test="@UiTestIds.Library.NewFolderName" />
             </label>
             <label class="folder-form-label">
                 <span>@Text(UiTextKey.CommonParent)</span>
                 <select class="folder-form-select"
                         value="@FolderDraftParentId"
                         @onchange="HandleFolderParentChange"
-                        data-testid="@UiTestIds.Library.NewFolderParent">
+                        data-test="@UiTestIds.Library.NewFolderParent">
                     <option value="@LibrarySelectionKeys.Root">@Text(UiTextKey.CommonTopLevel)</option>
                     @foreach (var folder in FolderOptions)
                     {
@@ -54,11 +54,11 @@
             <button class="dcard-act"
                     type="button"
                     @onclick="HandleCancelCreateFolderAsync"
-                    data-testid="@UiTestIds.Library.NewFolderCancel">@Text(UiTextKey.CommonCancel)</button>
+                    data-test="@UiTestIds.Library.NewFolderCancel">@Text(UiTextKey.CommonCancel)</button>
             <button class="dcard-act dcard-act-go"
                     type="button"
                     @onclick="HandleSubmitCreateFolderAsync"
-                    data-testid="@UiTestIds.Library.NewFolderSubmit">@Text(UiTextKey.CommonCreate)</button>
+                    data-test="@UiTestIds.Library.NewFolderSubmit">@Text(UiTextKey.CommonCreate)</button>
         </div>
     </section>
 </div>

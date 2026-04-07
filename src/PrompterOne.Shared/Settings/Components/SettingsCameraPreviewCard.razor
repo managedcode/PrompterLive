@@ -9,7 +9,7 @@
 @inject Microsoft.Extensions.Logging.ILogger<SettingsCameraPreviewCard> Logger
 
 <section class="set-camera-preview-panel"
-         data-testid="@UiTestIds.Settings.CameraPreviewCard">
+         data-test="@UiTestIds.Settings.CameraPreviewCard">
     <div class="set-camera-preview-feed">
         @if (CanPreview)
         {
@@ -19,7 +19,7 @@
                    autoplay
                    playsinline
                    muted
-                   data-testid="@UiTestIds.Settings.CameraPreviewVideo"></video>
+                   data-test="@UiTestIds.Settings.CameraPreviewVideo"></video>
             <span class="set-camera-preview-label">
                 <span class="live-dot"></span>
                 @Text(SettingsCameraPreviewText.EyebrowKey)
@@ -28,7 +28,7 @@
         else
         {
             <div class="set-camera-preview-empty"
-                 data-testid="@UiTestIds.Settings.CameraPreviewEmpty">
+                 data-test="@UiTestIds.Settings.CameraPreviewEmpty">
                 <UiIcon Kind="UiIconKind.Camera"
                         Size="28"
                         StrokeWidth="1.7m" />
@@ -39,7 +39,7 @@
 
     <div class="set-camera-preview-info">
         <span class="set-camera-preview-name"
-              data-testid="@UiTestIds.Settings.CameraPreviewLabel">
+              data-test="@UiTestIds.Settings.CameraPreviewLabel">
             @(CanPreview ? CameraLabel : EmptyTitle)
         </span>
         <span class="set-camera-preview-meta">

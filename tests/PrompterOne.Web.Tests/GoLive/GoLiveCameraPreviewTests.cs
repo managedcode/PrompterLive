@@ -9,14 +9,14 @@ using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
 public sealed class GoLiveCameraPreviewTests : BunitContext
 {
-    private const string LegacyPrimarySceneFallbackLabel = "Camera 1";
-    private const string SceneSettingsStorageKey = "prompterone.scene";
+    private const string SceneSettingsStorageKey = BrowserAppSettingsKeys.SceneSettings;
 
     [Test]
     public void GoLivePage_RendersLiveCameraPreviewForSelectedSceneCamera()
@@ -89,8 +89,9 @@ public sealed class GoLiveCameraPreviewTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var primarySceneChip = cut.FindByTestId(UiTestIds.GoLive.SceneChip(GoLiveText.Surface.PrimarySceneId));
-            Assert.Contains(Text(GoLiveText.Session.CameraFallbackLabel), primarySceneChip.TextContent, StringComparison.Ordinal);
-            Assert.DoesNotContain(LegacyPrimarySceneFallbackLabel, primarySceneChip.TextContent, StringComparison.Ordinal);
+            Assert.Equal(
+                Text(GoLiveText.Session.CameraFallbackLabel),
+                primarySceneChip.TextContent.Trim());
         });
     }
 

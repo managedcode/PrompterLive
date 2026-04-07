@@ -8,7 +8,7 @@ internal static class RapidControlDriver
         page.EvaluateAsync(
             """
             args => {
-                const selector = `[data-testid="${args.testId}"]`;
+                const selector = `[data-test="${args.testId}"]`;
                 const element = document.querySelector(selector);
                 if (!(element instanceof HTMLElement)) {
                     throw new Error(`Unable to find rapid-click target: ${args.testId}`);

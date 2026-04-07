@@ -13,7 +13,7 @@
                 var segmentIsActive = segment.Index == ActiveSegmentIndex;
                 <button class="@GetSegmentCss(segment, segmentIsActive)"
                         data-nav="seg-@segment.Index"
-                        data-testid="@UiTestIds.Editor.SegmentNavigation(segment.Index)"
+                        data-test="@UiTestIds.Editor.SegmentNavigation(segment.Index)"
                         type="button"
                         @onclick="() => OnNavigate.InvokeAsync(new EditorNavigationTarget(segment.Index, null, segment.StartIndex, segment.EndIndex))">
                     <div class="ed-tree-dot"></div>
@@ -26,7 +26,7 @@
                         var blockIsActive = segment.Index == ActiveSegmentIndex && block.Index == ActiveBlockIndex;
                         <button class="ed-tree-block @(blockIsActive ? "active" : null)"
                                 data-nav="blk-@segment.Index-@block.Index"
-                                data-testid="@UiTestIds.Editor.BlockNavigation(segment.Index, block.Index)"
+                                data-test="@UiTestIds.Editor.BlockNavigation(segment.Index, block.Index)"
                                 type="button"
                                 @onclick="() => OnNavigate.InvokeAsync(new EditorNavigationTarget(segment.Index, block.Index, block.StartIndex, block.EndIndex))">
                             <span>@block.Name</span>

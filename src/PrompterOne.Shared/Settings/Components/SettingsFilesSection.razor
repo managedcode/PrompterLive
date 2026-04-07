@@ -9,7 +9,7 @@
 <section class="set-section set-panel"
          id="set-files"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.FilesPanel">
+         data-test="@UiTestIds.Settings.FilesPanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsFilesSectionTitle)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsFilesSectionDescription)</p>
 
@@ -33,7 +33,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@ScriptsAutoSaveLabel</label>
                     <div class="@BuildToggleCssClass(_settings.FileAutoSaveEnabled)"
-                         data-testid="@UiTestIds.Settings.FileAutoSave"
+                         data-test="@UiTestIds.Settings.FileAutoSave"
                          @onclick="ToggleAutoSaveAsync"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>
@@ -42,7 +42,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@ScriptsHistoryLabel</label>
                     <div class="@BuildToggleCssClass(_settings.FileBackupCopiesEnabled)"
-                         data-testid="@UiTestIds.Settings.FileBackupCopies"
+                         data-test="@UiTestIds.Settings.FileBackupCopies"
                          @onclick="ToggleBackupCopiesAsync"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>

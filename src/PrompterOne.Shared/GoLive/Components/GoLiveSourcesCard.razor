@@ -12,7 +12,7 @@
         <button type="button"
                 class="gl-add-src-btn"
                 disabled="@(!CanAddCamera)"
-                data-testid="@UiTestIds.GoLive.AddSource"
+                data-test="@UiTestIds.GoLive.AddSource"
                 @onclick="AddCamera">
             <UiIcon Kind="UiIconKind.Plus" Size="14" />
         </button>
@@ -21,13 +21,13 @@
     @if (ShowSingleLocalPreviewHint)
     {
         <div class="gl-preview-limit-hint"
-             data-testid="@UiTestIds.GoLive.SingleLocalPreviewHint">
+             data-test="@UiTestIds.GoLive.SingleLocalPreviewHint">
             @SingleLocalPreviewHint
         </div>
     }
 
     <div class="gl-src-list"
-         data-testid="@UiTestIds.GoLive.SourcesCard">
+         data-test="@UiTestIds.GoLive.SourcesCard">
         @if (Sources.Count == 0)
         {
             <div class="gl-empty-panel">@EmptyStateMessage</div>
@@ -39,10 +39,10 @@
                 var surfaceCamera = ResolveSurfaceCamera(source);
                 <article class="@GetSourceCardCssClass(source)"
                          @attributes="GetSourceDiagnostics(source)"
-                         data-testid="@UiTestIds.GoLive.SourceCamera(source.SourceId)">
+                         data-test="@UiTestIds.GoLive.SourceCamera(source.SourceId)">
                     <button type="button"
                             class="gl-cam-main"
-                            data-testid="@UiTestIds.GoLive.SourceCameraSelect(source.SourceId)"
+                            data-test="@UiTestIds.GoLive.SourceCameraSelect(source.SourceId)"
                             @onclick="() => SelectSource.InvokeAsync(source.SourceId)">
                         <GoLiveCameraSurface Camera="@surfaceCamera"
                                              ContainerClass="gl-cam-thumb"
@@ -52,7 +52,7 @@
                                 @if (surfaceCamera is not null)
                                 {
                                     <span class="@GetSourceBadgeCssClass(source)"
-                                          data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
+                                          data-test="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
                                           data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
                                 }
                             </OverlayContent>
@@ -61,7 +61,7 @@
                                 {
                                     <div class="gl-cam-thumb-limited">
                                         <span class="@GetSourceBadgeCssClass(source)"
-                                              data-testid="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
+                                              data-test="@UiTestIds.GoLive.SourceCameraBadge(source.SourceId)"
                                               data-live-state="@GetSourceIndicatorState(source)">@GetSourceBadge(source)</span>
                                         <span class="gl-cam-thumb-limited-copy">@Text(GoLiveText.Surface.SingleLocalCameraPreviewPlaceholderLabel)</span>
                                     </div>
@@ -80,7 +80,7 @@
                     <button type="button"
                             class="gl-cam-action"
                             @onclick="() => ToggleSource.InvokeAsync(source.SourceId)"
-                            data-testid="@UiTestIds.GoLive.SourceCameraAction(source.DeviceId)">
+                            data-test="@UiTestIds.GoLive.SourceCameraAction(source.DeviceId)">
                         @(source.Transform.IncludeInOutput ? Text(RemoveLabelKey) : Text(AddLabelKey))
                     </button>
                 </article>
@@ -90,7 +90,7 @@
         @foreach (var utilitySource in UtilitySources)
         {
             <article class="@GetUtilityCardCssClass(utilitySource)"
-                     data-testid="@UiTestIds.GoLive.UtilitySource(utilitySource.Id)">
+                     data-test="@UiTestIds.GoLive.UtilitySource(utilitySource.Id)">
                 <div class="gl-cam-thumb gl-cam-thumb-utility">
                     <span class="gl-utility-badge">@utilitySource.BadgeLabel</span>
                 </div>

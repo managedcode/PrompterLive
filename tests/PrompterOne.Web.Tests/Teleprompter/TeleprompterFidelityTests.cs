@@ -56,7 +56,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var groups = cut.FindAll($"{BunitTestSelectors.BuildTestIdSelector(UiTestIds.Teleprompter.Card(0))} [data-testid^='{UiTestIds.Teleprompter.CardGroupPrefix(0)}']");
+            var groups = cut.FindAll($"{BunitTestSelectors.BuildTestIdSelector(UiTestIds.Teleprompter.Card(0))} [data-test^='{UiTestIds.Teleprompter.CardGroupPrefix(0)}']");
             var groupTexts = groups.Select(group => group.TextContent).ToArray();
 
             Assert.NotEmpty(groups);
@@ -110,7 +110,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
             Assert.Contains("tps-xslow", slowWord.ClassName, StringComparison.Ordinal);
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
-            Assert.Equal("90", slowWord.GetAttribute("data-effective-wpm"));
+            Assert.Equal("90", slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
@@ -121,11 +121,11 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
             Assert.Contains("tps-rhetorical", rhetoricalWord.ClassName, StringComparison.Ordinal);
 
-            Assert.Equal("ˈviʒən", visionWord.GetAttribute("data-pronunciation"));
+            Assert.Equal("ˈviʒən", visionWord.GetAttribute(UiDataAttributes.Teleprompter.Pronunciation));
             Assert.Null(visionWord.GetAttribute("title"));
 
-            Assert.Equal("TELE-promp-ter", teleprompterWord.GetAttribute("data-pronunciation"));
-            Assert.Equal("180", teleprompterWord.GetAttribute("data-effective-wpm"));
+            Assert.Equal("TELE-promp-ter", teleprompterWord.GetAttribute(UiDataAttributes.Teleprompter.Pronunciation));
+            Assert.Equal("180", teleprompterWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(teleprompterWord.GetAttribute("title"));
         });
     }
@@ -147,12 +147,12 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var normalWordClassName = normalWord.ClassName ?? string.Empty;
 
             Assert.Contains("tps-slow", slowWord.ClassName, StringComparison.Ordinal);
-            Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute("data-effective-wpm"));
+            Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
-            Assert.Equal("140", normalWord.GetAttribute("data-effective-wpm"));
+            Assert.Equal("140", normalWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.False(normalWordClassName.Contains("tps-slow", StringComparison.Ordinal));
             Assert.False(normalWordClassName.Contains("tps-fast", StringComparison.Ordinal));
             Assert.Null(normalWord.GetAttribute("style"));

@@ -89,7 +89,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
             var lineState = await page.EvaluateAsync<HeaderLineState>(
                 """
                 (args) => {
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     if (!overlay) {
                         throw new Error("Unable to inspect the quantum header line.");
                     }
@@ -196,8 +196,8 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
             await page.EvaluateAsync(
                 """
                 (args) => {
-                    const input = document.querySelector(`[data-testid="${args.inputTestId}"]`);
-                    const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                    const input = document.querySelector(`[data-test="${args.inputTestId}"]`);
+                    const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                     const harness = window[args.harnessGlobalName];
                     if (!input || !overlay) {
                         throw new Error("Unable to attach the editor typing probe.");

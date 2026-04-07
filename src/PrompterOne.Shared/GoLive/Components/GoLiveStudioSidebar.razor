@@ -10,15 +10,15 @@
     <div class="gl-tab-bar">
         <button type="button"
                 class="gl-tab @(ActiveTab == GoLiveStudioTab.Stream ? "active" : null)"
-                data-testid="@UiTestIds.GoLive.StreamTab"
+                data-test="@UiTestIds.GoLive.StreamTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Stream)">@Text(GoLiveText.Sidebar.StreamTabLabel)</button>
         <button type="button"
                 class="gl-tab @(ActiveTab == GoLiveStudioTab.Audio ? "active" : null)"
-                data-testid="@UiTestIds.GoLive.AudioTab"
+                data-test="@UiTestIds.GoLive.AudioTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Audio)">@Text(GoLiveText.Sidebar.AudioTabLabel)</button>
         <button type="button"
                 class="gl-tab @(ActiveTab == GoLiveStudioTab.Room ? "active" : null)"
-                data-testid="@UiTestIds.GoLive.RoomTab"
+                data-test="@UiTestIds.GoLive.RoomTab"
                 @onclick="() => SelectTab.InvokeAsync(GoLiveStudioTab.Room)">@Text(GoLiveText.Sidebar.RoomTabLabel)</button>
     </div>
 
@@ -32,10 +32,10 @@
                         @foreach (var destination in Destinations)
                         {
                             <article class="gl-destination-card"
-                                     data-testid="@UiTestIds.GoLive.ProviderCard(destination.Id)">
+                                     data-test="@UiTestIds.GoLive.ProviderCard(destination.Id)">
                                 <button type="button"
                                         class="gl-dest-row @(destination.IsEnabled ? "on" : null)"
-                                        data-testid="@UiTestIds.GoLive.DestinationToggle(destination.Id)"
+                                        data-test="@UiTestIds.GoLive.DestinationToggle(destination.Id)"
                                         @onclick="() => ToggleDestination.InvokeAsync(destination.Id)">
                                     <span class="gl-dest-platform-dot @destination.Tone"></span>
                                     <span class="gl-dest-info">
@@ -61,7 +61,7 @@
                         @foreach (var metric in StatusMetrics)
                         {
                             <div class="gl-stat-item"
-                                 data-testid="@UiTestIds.GoLive.StatusMetric(metric.Id)">
+                                 data-test="@UiTestIds.GoLive.StatusMetric(metric.Id)">
                                 <span class="gl-stat-val">@metric.Value</span>
                                 <span class="gl-stat-lbl">@metric.Label</span>
                             </div>
@@ -75,7 +75,7 @@
                         @foreach (var metric in RuntimeMetrics)
                         {
                             <div class="gl-stat-item"
-                                 data-testid="@UiTestIds.GoLive.RuntimeMetric(metric.Id)">
+                                 data-test="@UiTestIds.GoLive.RuntimeMetric(metric.Id)">
                                 <span class="gl-stat-val">@metric.Value</span>
                                 <span class="gl-stat-lbl">@metric.Label</span>
                             </div>
@@ -87,7 +87,7 @@
         else if (ActiveTab == GoLiveStudioTab.Audio)
         {
             <div class="gl-tab-content active"
-                 data-testid="@UiTestIds.GoLive.AudioMixer">
+                 data-test="@UiTestIds.GoLive.AudioMixer">
                 <div class="gl-audio-mixer">
                     <div class="gl-mix-scale">
                         <span>-60</span>
@@ -104,7 +104,7 @@
                         <div class="gl-mix-ch"
                              data-live-level="@channel.LevelPercent"
                              data-live-state="@(channel.LevelPercent > 0 ? ActiveMeterStateValue : GoLiveText.Session.IdleStateValue)"
-                             data-testid="@UiTestIds.GoLive.AudioChannel(channel.Id)">
+                             data-test="@UiTestIds.GoLive.AudioChannel(channel.Id)">
                             <div class="gl-mix-ch-top">
                                 <span class="gl-mix-name">@channel.Name</span>
                                 <span class="gl-mix-db-val">@channel.DetailLabel</span>
@@ -144,7 +144,7 @@
                 @if (!IsRoomActive)
                 {
                     <div class="gl-room-empty"
-                         data-testid="@UiTestIds.GoLive.RoomEmpty">
+                         data-test="@UiTestIds.GoLive.RoomEmpty">
                         <div class="gl-room-empty-icon">
                             <UiIcon Kind="UiIconKind.Users" Size="32" StrokeWidth="1.5m" />
                         </div>
@@ -152,7 +152,7 @@
                         <div class="gl-room-empty-desc">@Text(GoLiveText.Sidebar.RoomDescription)</div>
                         <button type="button"
                                 class="gl-room-create-btn"
-                                data-testid="@UiTestIds.GoLive.CreateRoom"
+                                data-test="@UiTestIds.GoLive.CreateRoom"
                                 @onclick="CreateRoom">
                             <UiIcon Kind="UiIconKind.Plus" Size="14" StrokeWidth="2.5m" />
                             <span>@Text(GoLiveText.Sidebar.CreateRoomLabel)</span>
@@ -162,13 +162,13 @@
                 else
                 {
                     <div class="gl-room-active"
-                         data-testid="@UiTestIds.GoLive.RoomActive">
+                         data-test="@UiTestIds.GoLive.RoomActive">
                         <div class="gl-room-header-bar">
                             <div class="gl-room-live-badge">@Text(GoLiveText.Sidebar.LiveBadgeLabel)</div>
                             <span class="gl-room-code-val">@RoomCode</span>
                             <button type="button"
                                     class="gl-room-invite-btn"
-                                    data-testid="@UiTestIds.GoLive.RoomInvite">
+                                    data-test="@UiTestIds.GoLive.RoomInvite">
                                 <UiIcon Kind="UiIconKind.UserPlus" Size="12" />
                                 <span>@Text(GoLiveText.Sidebar.InviteLabel)</span>
                             </button>
@@ -205,7 +205,7 @@
                                 @foreach (var participant in Participants)
                                 {
                                     <article class="gl-part-row"
-                                             data-testid="@UiTestIds.GoLive.RoomParticipant(participant.Id)">
+                                             data-test="@UiTestIds.GoLive.RoomParticipant(participant.Id)">
                                         <div class="gl-part-avatar">@participant.Initial</div>
                                         <span class="gl-part-name">@participant.Name</span>
                                         <span class="gl-part-role">@participant.Role</span>

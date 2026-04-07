@@ -35,7 +35,7 @@ internal static class EditorMonacoDriver
             await page.WaitForFunctionAsync(
                 """
                 (args) => {
-                    const host = document.querySelector(`[data-testid="${args.testId}"]`);
+                    const host = document.querySelector(`[data-test="${args.testId}"]`);
                     return host?.getAttribute(args.readyAttributeName) === args.readyValue;
                 }
                 """,
@@ -261,7 +261,7 @@ internal static class EditorMonacoDriver
         await page.WaitForFunctionAsync(
             """
             (args) => {
-                const overlay = document.querySelector(`[data-testid="${args.overlayTestId}"]`);
+                const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
                 return Number.parseInt(overlay?.dataset?.renderedLength ?? '-1', 10) === args.expectedLength;
             }
             """,
@@ -277,7 +277,7 @@ internal static class EditorMonacoDriver
         page.EvaluateAsync(
             """
             async (args) => {
-                const target = document.querySelector(`[data-testid="${args.testId}"]`);
+                const target = document.querySelector(`[data-test="${args.testId}"]`);
                 if (!target) {
                     throw new Error("Unable to resolve the editor drop target.");
                 }

@@ -3,7 +3,7 @@
 
 <section id="@UiDomIds.GoLive.PreviewCard"
          class="gl-preview-section"
-         data-testid="@UiTestIds.GoLive.PreviewCard">
+         data-test="@UiTestIds.GoLive.PreviewCard">
     <div class="gl-monitor gl-monitor-preview">
         <GoLiveCameraSurface Camera="@Camera"
                              ContainerClass="gl-monitor-feed gl-preview-feed"
@@ -15,14 +15,14 @@
                 <div class="gl-preview-overlay">
                     <div class="gl-preview-caption">
                         <span class="gl-preview-label">@Title</span>
-                        <strong data-testid="@UiTestIds.GoLive.PreviewSourceLabel">@CameraLabel</strong>
+                        <strong data-test="@UiTestIds.GoLive.PreviewSourceLabel">@CameraLabel</strong>
                     </div>
                 </div>
             </OverlayContent>
             <EmptyContent>
                 <div id="@UiDomIds.GoLive.PreviewEmpty"
                      class="gl-preview-empty"
-                     data-testid="@UiTestIds.GoLive.PreviewEmpty">
+                     data-test="@UiTestIds.GoLive.PreviewEmpty">
                     <div class="gl-preview-empty-title">@ResolvedEmptyTitle</div>
                     <div class="gl-preview-empty-copy">@ResolvedEmptyDescription</div>
                 </div>
@@ -30,7 +30,7 @@
         </GoLiveCameraSurface>
         <div class="gl-air-dot-wrap">
             <span class="gl-air-dot @(ShowLiveDot ? LiveDotCssClass : null)"
-                  data-testid="@UiTestIds.GoLive.PreviewLiveDot"
+                  data-test="@UiTestIds.GoLive.PreviewLiveDot"
                   data-live-state="@PreviewIndicatorState"></span>
         </div>
     </div>

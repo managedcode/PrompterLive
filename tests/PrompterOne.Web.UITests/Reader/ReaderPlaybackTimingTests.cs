@@ -14,7 +14,6 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
     private const int LearnMinimumWordDurationMilliseconds = 60;
-    private const string LearnWordSelector = "[data-testid='learn-word']";
     private const string ReaderTimingRecorderKey = "__prompterOneReaderTimingRecorder";
     private const string TimingProbeScriptFileName = "test-reader-timing.tps";
 
@@ -171,7 +170,10 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             """
             config => {
                 const recorder = {
+                    durationAttributeName: config.durationAttributeName,
+                    effectiveWpmAttributeName: config.effectiveWpmAttributeName,
                     lastWord: null,
+                    pauseAttributeName: config.pauseAttributeName,
                     pollIntervalMs: config.pollIntervalMs,
                     samples: [],
                     selector: config.selector,
@@ -193,9 +195,9 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                     recorder.lastWord = word;
                     recorder.samples.push({
                         atMs: Math.round(performance.now() - recorder.startMs),
-                        durationMs: Number(node.dataset.ms ?? 0),
-                        effectiveWpm: Number(node.dataset.effectiveWpm ?? 0),
-                        pauseMs: Number(node.dataset.pauseMs ?? 0),
+                        durationMs: Number(node.getAttribute(recorder.durationAttributeName) ?? 0),
+                        effectiveWpm: Number(node.getAttribute(recorder.effectiveWpmAttributeName) ?? 0),
+                        pauseMs: Number(node.getAttribute(recorder.pauseAttributeName) ?? 0),
                         word
                     });
                 };
@@ -208,6 +210,9 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             new
             {
                 key = ReaderTimingRecorderKey,
+                durationAttributeName = UiDataAttributes.Teleprompter.DurationMilliseconds,
+                effectiveWpmAttributeName = UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
+                pauseAttributeName = UiDataAttributes.Teleprompter.PauseMilliseconds,
                 pollIntervalMs = BrowserTestConstants.ReaderTiming.CapturePollIntervalMs,
                 selector
             });
@@ -227,7 +232,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
         await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
             .ToHaveTextAsync(targetWpm.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
-        await InstallWordRecorderAsync(page, LearnWordSelector);
+        await InstallWordRecorderAsync(page, UiTestIds.Learn.Word);
         await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();
 
         return await WaitForRecordedSamplesAsync(page, expectedSampleCount);
@@ -289,17 +294,12 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
 
     private static async Task<IReadOnlyList<RecordedWordSample>> WaitForRecordedSamplesAsync(IPage page, int expectedSampleCount)
     {
-        var startTime = DateTime.UtcNow;
-        while (DateTime.UtcNow - startTime < TimeSpan.FromMilliseconds(BrowserTestConstants.ReaderTiming.SampleCaptureTimeoutMs))
-        {
-            var sampleCount = await ReadRecordedSampleCountAsync(page);
-            if (sampleCount >= expectedSampleCount)
-            {
-                break;
-            }
-
-            await page.WaitForTimeoutAsync(BrowserTestConstants.ReaderTiming.CapturePollIntervalMs);
-        }
+        await page.WaitForFunctionAsync(
+            """
+            ([key, expectedCount]) => (window[key]?.samples?.length ?? 0) >= expectedCount
+            """,
+            new object[] { ReaderTimingRecorderKey, expectedSampleCount },
+            new() { Timeout = BrowserTestConstants.ReaderTiming.SampleCaptureTimeoutMs });
 
         var samples = await page.EvaluateAsync<RecordedWordSample[]>(
             """
@@ -320,13 +320,6 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
 
         return samples.Take(expectedSampleCount).ToArray();
     }
-
-    private static Task<int> ReadRecordedSampleCountAsync(IPage page) =>
-        page.EvaluateAsync<int>(
-            """
-            key => window[key]?.samples?.length ?? 0
-            """,
-            ReaderTimingRecorderKey);
 
     private sealed record LearnTimingExpectation(string Word, int DurationMs, int PauseMs);
 

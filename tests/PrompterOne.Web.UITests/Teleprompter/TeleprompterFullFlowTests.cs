@@ -11,7 +11,6 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
     private const int ClosingCardIndex = 7;
     private const int OpeningCardIndex = 0;
     private const int PurposeCardIndex = 1;
-    private const string ReaderNextCardCssClass = "rd-card-next";
     private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const int InspirationCardIndex = 6;
@@ -127,7 +126,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         await Assert.That(professionalWord.Classes).DoesNotContain("tps-warm");
 
         await Assert.That(highlightWord.Classes).Contains("tps-highlight");
-        await Assert.That(highlightWord.CardClasses).Contains(ReaderNextCardCssClass);
+        await Assert.That(highlightWord.CardState).IsEqualTo(UiDataAttributes.Teleprompter.NextState);
         await Assert.That(highlightWord.BackgroundColor).IsEqualTo(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor);
 
         await Assert.That(slowWord.Classes).Contains("tps-xslow");
@@ -208,31 +207,38 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
     {
         var probe = await page.GetByTestId(UiTestIds.Teleprompter.CardText(cardIndex)).EvaluateAsync<ReaderWordProbe>(
             """
-            (element, expectedWord) => {
+            (element, args) => {
                 const word = Array.from(element.querySelectorAll('.rd-w'))
-                    .find(node => node.textContent?.trim() === expectedWord);
+                    .find(node => node.textContent?.trim() === args.expectedWord);
 
                 if (!(word instanceof HTMLElement)) {
                     return null;
                 }
 
                 const computed = window.getComputedStyle(word);
-                const card = word.closest('.rd-card');
+                const card = word.closest(`[${args.cardStateAttributeName}]`);
                 return {
                     classes: word.className,
-                    cardClasses: card instanceof HTMLElement ? card.className : '',
+                    cardState: card instanceof HTMLElement ? card.getAttribute(args.cardStateAttributeName) ?? '' : '',
                     style: word.getAttribute('style') ?? '',
                     title: word.getAttribute('title') ?? '',
-                    pronunciation: word.getAttribute('data-pronunciation') ?? '',
-                    effectiveWpm: word.getAttribute('data-effective-wpm') ?? '',
-                    durationMs: word.getAttribute('data-ms') ?? '',
+                    pronunciation: word.getAttribute(args.pronunciationAttributeName) ?? '',
+                    effectiveWpm: word.getAttribute(args.effectiveWpmAttributeName) ?? '',
+                    durationMs: word.getAttribute(args.durationAttributeName) ?? '',
                     letterSpacing: computed.letterSpacing ?? '',
                     color: computed.color ?? '',
                     backgroundColor: computed.backgroundColor ?? ''
                 };
             }
             """,
-            wordText);
+            new
+            {
+                cardStateAttributeName = UiDataAttributes.Teleprompter.CardState,
+                durationAttributeName = UiDataAttributes.Teleprompter.DurationMilliseconds,
+                effectiveWpmAttributeName = UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
+                expectedWord = wordText,
+                pronunciationAttributeName = UiDataAttributes.Teleprompter.Pronunciation
+            });
 
         await Assert.That(probe).IsNotNull();
         return probe!;
@@ -254,7 +260,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
     private sealed class ReaderWordProbe
     {
         public string Classes { get; set; } = string.Empty;
-        public string CardClasses { get; set; } = string.Empty;
+        public string CardState { get; set; } = string.Empty;
         public string Style { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Pronunciation { get; set; } = string.Empty;

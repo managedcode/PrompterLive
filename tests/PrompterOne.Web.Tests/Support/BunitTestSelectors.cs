@@ -6,7 +6,7 @@ namespace PrompterOne.Web.Tests;
 
 internal static class BunitTestSelectors
 {
-    private const string DataTestIdAttributeName = "data-testid";
+    private const string DataTestIdAttributeName = "data-test";
     private const string SelectorOpen = "[";
     private const string AttributeValuePrefix = "='";
     private const string AttributeValueSuffix = "']";

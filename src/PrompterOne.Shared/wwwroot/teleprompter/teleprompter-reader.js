@@ -2,7 +2,6 @@
     const computedMatrixPrefix = "matrix(";
     const computedMatrix3dPrefix = "matrix3d(";
     const noneTransformValue = "none";
-    const readerCardSelector = ".rd-card";
     const teleprompterReaderNamespace = "TeleprompterReaderInterop";
 
     function parseTransformTranslateY(transformValue) {
@@ -84,15 +83,21 @@
         return element instanceof HTMLElement ? element : null;
     }
 
+    function resolveReaderCard(targetWord, cardStateAttributeName) {
+        if (!(targetWord instanceof HTMLElement) || typeof cardStateAttributeName !== "string" || cardStateAttributeName.length === 0) {
+            return null;
+        }
+
+        return targetWord.closest(`[${cardStateAttributeName}]`);
+    }
+
     window[teleprompterReaderNamespace] = {
-        measureClusterOffset(stageId, textId, targetWordId, focalPointPercent, neutralizeCard) {
+        measureClusterOffset(stageId, textId, targetWordId, focalPointPercent, neutralizeCard, cardStateAttributeName) {
             const stage = document.getElementById(stageId);
             const text = document.getElementById(textId);
             const targetWord = document.getElementById(targetWordId);
             const card = Boolean(neutralizeCard)
-                ? targetWord instanceof HTMLElement
-                    ? targetWord.closest(readerCardSelector)
-                    : null
+                ? resolveReaderCard(targetWord, cardStateAttributeName)
                 : null;
 
             if (!(stage instanceof HTMLElement) || !(text instanceof HTMLElement) || !(targetWord instanceof HTMLElement)) {

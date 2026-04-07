@@ -1,12 +1,12 @@
 @namespace PrompterOne.Shared.Components.Library
 @if (Chips.Count > 0)
 {
-    <div class="lib-folders" data-testid="@UiTestIds.Library.FolderChips">
+    <div class="lib-folders" data-test="@UiTestIds.Library.FolderChips">
         @foreach (var chip in Chips)
         {
             <button class="@BuildChipCssClass(chip)"
                     @onclick="() => OnSelectFolder.InvokeAsync(chip.Id)"
-                    data-testid="@chip.TestId">
+                    data-test="@chip.TestId">
                 <span>@chip.Name</span>
                 <span class="folder-count">@chip.TotalCount</span>
             </button>

@@ -10,7 +10,7 @@
 @inject MicrophoneLevelInterop MicrophoneLevelInterop
 
 <section class="@CardCssClass"
-         data-testid="@CardTestId">
+         data-test="@CardTestId">
     <div class="set-device-header">
         <div class="set-device-preview set-mic-preview @(CanRenderMonitor && IsEnabled ? string.Empty : "set-mic-off")">
             <UiIcon Kind="UiIconKind.Microphone"
@@ -24,8 +24,8 @@
         </div>
         <div class="set-device-info">
             <span class="set-device-name"
-                  data-testid="@LabelTestId">
-                <span data-testid="@DeviceLabelTestId">
+                  data-test="@LabelTestId">
+                <span data-test="@DeviceLabelTestId">
                     @(CanRenderMonitor ? MicrophoneLabel : EmptyTitle)
                 </span>
             </span>
@@ -49,7 +49,7 @@
              class="set-vu-meter"
              data-live-level="@_levelPercent"
              data-live-state="@MonitorState"
-             data-testid="@MeterTestId">
+             data-test="@MeterTestId">
             <div class="set-vu-track">
                 <div class="set-vu-fill" style="@MonitorFillStyle"></div>
                 <div class="set-vu-peak" style="@MonitorPeakStyle"></div>
@@ -60,7 +60,7 @@
     else
     {
         <div class="set-empty-card"
-             data-testid="@EmptyTestId">
+             data-test="@EmptyTestId">
             <div>
                 <div class="set-account-name">@EmptyTitle</div>
                 <div class="live-card-desc">@EmptyDescription</div>

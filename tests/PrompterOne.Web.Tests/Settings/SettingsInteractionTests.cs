@@ -21,8 +21,8 @@ public sealed class SettingsInteractionTests : BunitContext
     private const string FakeEngineerName = "Anna Petrenko";
     private const string FakeFounderName = "Mykola Kovalenko";
     private const string FakeInfrastructureName = "Dmytro Shevchenko";
-    private const string ReaderSettingsKey = "prompterone.reader";
-    private const string SceneSettingsKey = "prompterone.scene";
+    private const string ReaderSettingsKey = BrowserAppSettingsKeys.ReaderSettings;
+    private const string SceneSettingsKey = BrowserAppSettingsKeys.SceneSettings;
     private const string DropboxLabel = "Managed Dropbox";
     private const string DropboxValidationMessage = "Dropbox requires an access token or a refresh token with app key.";
     private const string NotConnectedLabel = "Not connected";
@@ -312,8 +312,8 @@ public sealed class SettingsInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.LiveKit)));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)}']"));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.Settings.StreamingProviderCard(GoLiveTargetCatalog.TargetIds.Twitch)}']"));
         });
     }
 
@@ -475,7 +475,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
             Assert.NotNull(actionRow);
             Assert.DoesNotContain("style=", actionRow!.OuterHtml, StringComparison.OrdinalIgnoreCase);
-            Assert.NotNull(providerCard.QuerySelector("[data-testid='" + UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.OneDrive) + "']"));
+            Assert.NotNull(providerCard.QuerySelector("[data-test='" + UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.OneDrive) + "']"));
         });
     }
 

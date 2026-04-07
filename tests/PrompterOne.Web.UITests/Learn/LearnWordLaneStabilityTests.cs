@@ -49,10 +49,10 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture)
         page.EvaluateAsync<RsvpLaneMeasurement>(
             """
             ids => {
-                const word = document.querySelector(`[data-testid="${ids.word}"]`);
+                const word = document.querySelector(`[data-test="${ids.word}"]`);
                 const orp = word?.querySelector('.orp');
-                const leftRail = document.querySelector(`[data-testid="${ids.left}"]`);
-                const rightRail = document.querySelector(`[data-testid="${ids.right}"]`);
+                const leftRail = document.querySelector(`[data-test="${ids.left}"]`);
+                const rightRail = document.querySelector(`[data-test="${ids.right}"]`);
                 const leftWord = leftRail?.lastElementChild;
                 const rightWord = rightRail?.firstElementChild;
                 if (!word || !orp || !leftWord || !rightWord) {

@@ -5,7 +5,7 @@
 @inject IStringLocalizer<SharedResource> Localizer
 
 <article class="@CardCssClass"
-         data-testid="@CardTestId"
+         data-test="@CardTestId"
          @onclick="OnCardToggle">
     <div class="set-dest-header">
         <div class="@IconCssClass">
@@ -38,7 +38,7 @@
         <div class="set-field set-field-toggle">
             <label>@Text(UiTextKey.SettingsStreamingArmDestination)</label>
             <div class="set-toggle @(IsEnabled ? OnCssClass : null)"
-                 data-testid="@ToggleTestId"
+                 data-test="@ToggleTestId"
                  @onclick="ToggleEnabled"
                  @onclick:stopPropagation="true">
                 <div class="set-toggle-thumb"></div>

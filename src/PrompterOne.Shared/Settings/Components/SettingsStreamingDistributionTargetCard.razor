@@ -29,7 +29,7 @@
                    class="set-input"
                    value="@Target.Name"
                    @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.Name, GetValue(args))))"
-                   data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.Name)" />
+                   data-test="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.Name)" />
         </div>
     }
 
@@ -49,7 +49,7 @@
                     var isSelected = BoundConnectionIds.Contains(connection.Id, StringComparer.Ordinal);
                     <button type="button"
                             class="live-destination-source-chip @(isSelected ? "on" : null)"
-                            data-testid="@UiTestIds.Settings.StreamingDistributionTransport(Target.Id, connection.Id)"
+                            data-test="@UiTestIds.Settings.StreamingDistributionTransport(Target.Id, connection.Id)"
                             @onclick="() => ToggleBoundTransport.InvokeAsync((Target.Id, connection.Id))">
                         <span class="live-destination-source-name">@connection.Name</span>
                         <span class="live-destination-source-state">@(isSelected ? Text(SettingsStreamingText.BoundTransportSelectedLabel) : Text(SettingsStreamingText.BoundTransportAvailableLabel))</span>
@@ -65,7 +65,7 @@
                class="set-input"
                value="@Target.RtmpUrl"
                @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.RtmpUrl, GetValue(args))))"
-               data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.RtmpUrl)" />
+               data-test="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.RtmpUrl)" />
     </div>
     <div class="set-field">
         <label>@Text(SettingsStreamingText.StreamKeyLabel)</label>
@@ -73,13 +73,13 @@
                class="set-input"
                value="@Target.StreamKey"
                @oninput="@(args => UpdateField.InvokeAsync((Target.Id, StreamingDestinationFieldIds.StreamKey, GetValue(args))))"
-               data-testid="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.StreamKey)" />
+               data-test="@UiTestIds.Settings.StreamingDistributionField(Target.Id, StreamingDestinationFieldIds.StreamKey)" />
     </div>
 
     <div class="set-field">
         <button type="button"
                 class="set-btn-outline set-btn-sm"
-                data-testid="@UiTestIds.Settings.StreamingDistributionRemove(Target.Id)"
+                data-test="@UiTestIds.Settings.StreamingDistributionRemove(Target.Id)"
                 @onclick="@(() => RemoveTarget.InvokeAsync(Target.Id))">
             @Text(SettingsStreamingText.RemoveDestinationLabel)
         </button>

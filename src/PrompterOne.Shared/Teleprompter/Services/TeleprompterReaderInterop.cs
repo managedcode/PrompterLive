@@ -1,4 +1,5 @@
 using Microsoft.JSInterop;
+using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Shared.Services;
 
@@ -18,7 +19,8 @@ public sealed class TeleprompterReaderInterop(IJSRuntime jsRuntime)
             textId,
             targetWordId,
             focalPointPercent,
-            neutralizeCard);
+            neutralizeCard,
+            UiDataAttributes.Teleprompter.CardState);
 
     public ValueTask<bool> ToggleFullscreenAsync(string elementId) =>
         _jsRuntime.InvokeAsync<bool>(

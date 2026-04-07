@@ -10,7 +10,6 @@ public partial class SettingsPage
 {
     private const string PersistPreferencesOperation = "Settings save preferences";
     private const string PersistPreferencesMessage = "Unable to save general settings.";
-    private const string ActiveCssClass = "active";
     private const string OnCssClass = "on";
     private const string SetToggleCssClass = "set-toggle";
 

@@ -11,23 +11,23 @@
      @ref="_screenRoot"
      @onkeydown="HandleGoLiveKeyDownAsync"
      @onkeydown:preventDefault="true"
-     data-testid="@UiTestIds.GoLive.Page">
+     data-test="@UiTestIds.GoLive.Page">
     <div class="gl-studio">
         <section class="gl-topbar"
-                 data-testid="@UiTestIds.GoLive.SessionBar">
+                 data-test="@UiTestIds.GoLive.SessionBar">
             <div class="gl-topbar-left">
                 <a class="gl-back-btn"
                    href="@BackRoute"
-                   data-testid="@UiTestIds.GoLive.Back">
+                   data-test="@UiTestIds.GoLive.Back">
                     <UiIcon Kind="UiIconKind.ChevronLeft" Size="16" />
                     <span>@Text(GoLiveText.Chrome.BackLabel)</span>
                 </a>
                 <span class="gl-title"
-                      data-testid="@UiTestIds.GoLive.ScreenTitle">@ScreenTitle</span>
+                      data-test="@UiTestIds.GoLive.ScreenTitle">@ScreenTitle</span>
                 <span class="gl-badge @SessionBadgeCssClass">@PrimarySessionBadge</span>
                 <button type="button"
                         class="gl-panel-toggle @(ShowLeftRail ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.LeftPanelToggle"
+                        data-test="@UiTestIds.GoLive.LeftPanelToggle"
                         @onclick="ToggleLeftRailAsync">
                     <UiIcon Kind="UiIconKind.PanelLeft" Size="14" />
                 </button>
@@ -35,19 +35,19 @@
 
             <div class="gl-topbar-center">
                 <div class="gl-timer @(IsLiveSessionActive ? "active" : null)"
-                     data-testid="@UiTestIds.GoLive.SessionTimer">@ProgramTimerLabel</div>
+                     data-test="@UiTestIds.GoLive.SessionTimer">@ProgramTimerLabel</div>
             </div>
 
             <div class="gl-topbar-right">
                 <button type="button"
                         class="gl-panel-toggle @(_fullProgramView ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.FullProgramToggle"
+                        data-test="@UiTestIds.GoLive.FullProgramToggle"
                         @onclick="ToggleFullProgramViewAsync">
                     <UiIcon Kind="UiIconKind.Expand" Size="14" />
                 </button>
                 <button type="button"
                         class="gl-panel-toggle @(ShowRightRail ? "active" : null)"
-                        data-testid="@UiTestIds.GoLive.RightPanelToggle"
+                        data-test="@UiTestIds.GoLive.RightPanelToggle"
                         @onclick="ToggleRightRailAsync">
                     <UiIcon Kind="UiIconKind.PanelRight" Size="14" />
                 </button>
@@ -55,14 +55,14 @@
                 <div class="gl-mode-switch">
                     <button type="button"
                             class="gl-mode-btn gl-mode-director @(_activeStudioMode == GoLiveStudioMode.Director ? "active" : null)"
-                            data-testid="@UiTestIds.GoLive.ModeDirector"
+                            data-test="@UiTestIds.GoLive.ModeDirector"
                             @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Director)">
                         <UiIcon Kind="UiIconKind.Users" Size="12" />
                         <span>@Text(GoLiveText.Chrome.DirectorModeLabel)</span>
                     </button>
                     <button type="button"
                             class="gl-mode-btn gl-mode-studio @(_activeStudioMode == GoLiveStudioMode.Studio ? "active" : null)"
-                            data-testid="@UiTestIds.GoLive.ModeStudio"
+                            data-test="@UiTestIds.GoLive.ModeStudio"
                             @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Studio)">
                         <UiIcon Kind="UiIconKind.Monitor" Size="12" />
                         <span>@Text(GoLiveText.Chrome.StudioModeLabel)</span>
@@ -70,13 +70,13 @@
                 </div>
                 <a class="gl-settings-btn"
                    href="@AppRoutes.Settings"
-                   data-testid="@UiTestIds.GoLive.OpenSettings">
+                   data-test="@UiTestIds.GoLive.OpenSettings">
                     <UiIcon Kind="UiIconKind.Settings" Size="16" />
                 </a>
                 <button type="button"
                         class="gl-rec-btn @(GoLiveSession.State.IsRecordingActive ? "active" : null)"
                         disabled="@(!CanControlProgram)"
-                        data-testid="@UiTestIds.GoLive.StartRecording"
+                        data-test="@UiTestIds.GoLive.StartRecording"
                         @onclick="ToggleRecordingSessionAsync">
                     <span class="gl-rec-dot"></span>
                     <span>@Text(GoLiveText.Session.RecordingIndicatorLabel)</span>
@@ -84,7 +84,7 @@
                 <button type="button"
                         class="gl-stream-btn @(GoLiveSession.State.IsStreamActive ? "active" : null)"
                         disabled="@(!CanControlProgram)"
-                        data-testid="@UiTestIds.GoLive.StartStream"
+                        data-test="@UiTestIds.GoLive.StartStream"
                         @onclick="ToggleStreamSessionAsync">
                     <span class="gl-stream-icon">
                         <UiIcon Kind="UiIconKind.Broadcast" Size="16" />
@@ -98,7 +98,7 @@
             @if (ShowLeftRail)
             {
                 <aside class="gl-sources"
-                       data-testid="@UiTestIds.GoLive.SourceRail">
+                       data-test="@UiTestIds.GoLive.SourceRail">
                     <GoLiveSourcesCard Sources="@VisibleSceneCameras"
                                        ActiveSourceId="@ActiveCamera?.SourceId"
                                        LiveSourceIds="@LiveSourceIds"
@@ -144,7 +144,7 @@
             @if (ShowRightRail)
             {
                 <aside class="gl-sidebar-right"
-                       data-testid="@UiTestIds.GoLive.PreviewRail">
+                       data-test="@UiTestIds.GoLive.PreviewRail">
                     <GoLiveCameraPreviewCard Camera="@LivePreviewCamera"
                                              Description="@ActiveSessionLabel"
                                              EmptyDescription="@LivePreviewEmptyDescription"

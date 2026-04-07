@@ -70,7 +70,8 @@ public partial class EditorPage
                     StageDraftIdentity(savedDocument.Id, savedDocument.DocumentName);
                 }
 
-                _preserveSplitFeedbackOnNextLoad = _splitFeedback is not null;
+                _pendingAutosaveSelfNavigationScriptId = savedDocument.Id;
+                _preserveSplitFeedbackOnNextLoad = _splitFeedback is not null || _splitOperationInProgress;
                 ScriptId = savedDocument.Id;
                 Navigation.NavigateTo($"/editor?id={Uri.EscapeDataString(savedDocument.Id)}", replace: true);
             }

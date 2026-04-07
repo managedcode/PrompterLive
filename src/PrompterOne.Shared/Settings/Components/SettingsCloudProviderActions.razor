@@ -3,27 +3,27 @@
 <div class="set-path-field set-path-field-actions">
     <button type="button"
             class="set-btn-golden"
-            data-testid="@ConnectTestId"
+            data-test="@ConnectTestId"
             @onclick="Connect">
         @ConnectLabel
     </button>
     <button type="button"
             class="set-btn-outline set-btn-sm"
-            data-testid="@ExportTestId"
+            data-test="@ExportTestId"
             disabled="@(!IsConnected)"
             @onclick="Export">
         @ExportLabel
     </button>
     <button type="button"
             class="set-btn-outline set-btn-sm"
-            data-testid="@ImportTestId"
+            data-test="@ImportTestId"
             disabled="@(!IsConnected)"
             @onclick="Import">
         @ImportLabel
     </button>
     <button type="button"
             class="set-btn-outline set-btn-sm set-danger-action"
-            data-testid="@DisconnectTestId"
+            data-test="@DisconnectTestId"
             disabled="@(!IsConnected)"
             @onclick="Disconnect">
         @DisconnectLabel
@@ -32,7 +32,7 @@
 
 @if (!string.IsNullOrWhiteSpace(Message))
 {
-    <p class="set-card-copy" data-testid="@MessageTestId">@Message</p>
+    <p class="set-card-copy" data-test="@MessageTestId">@Message</p>
 }
 
 @code {

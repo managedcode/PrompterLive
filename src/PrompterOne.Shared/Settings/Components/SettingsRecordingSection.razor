@@ -8,7 +8,7 @@
 <section class="set-section set-panel"
          id="set-recording"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.RecordingPanel">
+         data-test="@UiTestIds.Settings.RecordingPanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsRecordingSectionTitle)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsRecordingSectionDescription)</p>
 
@@ -23,7 +23,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@Text(UiTextKey.SettingsRecordingAutoRecordWhenStreaming)</label>
                     <div class="set-toggle @(AutoRecordWhenStreaming ? "on" : null)"
-                         data-testid="@UiTestIds.Settings.RecordingAutoRecord"
+                         data-test="@UiTestIds.Settings.RecordingAutoRecord"
                          @onclick="ToggleAutoRecordWhenStreaming"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>
@@ -32,7 +32,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@Text(UiTextKey.SettingsRecordingSplitHourly)</label>
                     <div class="set-toggle @(SplitRecordingHourly ? "on" : null)"
-                         data-testid="@UiTestIds.Settings.RecordingSplit"
+                         data-test="@UiTestIds.Settings.RecordingSplit"
                          @onclick="ToggleSplitRecordingHourly"
                          @onclick:stopPropagation="true">
                         <div class="set-toggle-thumb"></div>
@@ -92,7 +92,7 @@
                     <input type="number"
                            class="set-input"
                            value="@RecordingVideoBitrateKbps"
-                           data-testid="@UiTestIds.Settings.RecordingVideoBitrate"
+                           data-test="@UiTestIds.Settings.RecordingVideoBitrate"
                            @oninput="UpdateVideoBitrate" />
                 </div>
             </div>
@@ -123,7 +123,7 @@
                         <input type="number"
                                class="set-input"
                                value="@RecordingAudioBitrateKbps"
-                               data-testid="@UiTestIds.Settings.RecordingAudioBitrate"
+                               data-test="@UiTestIds.Settings.RecordingAudioBitrate"
                                @oninput="UpdateAudioBitrate" />
                     </div>
                     <div class="set-field">

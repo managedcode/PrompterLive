@@ -1,7 +1,7 @@
 @namespace PrompterOne.Shared.Components.Library
 <a class="@BuildCssClass()"
    @onclick="HandleSelectAsync"
-   data-testid="@Node.TestId">
+   data-test="@Node.TestId">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         @if (Node.ShowChevron && Node.IsExpanded)
         {

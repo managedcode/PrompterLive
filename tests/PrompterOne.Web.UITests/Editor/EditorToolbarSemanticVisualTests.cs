@@ -49,19 +49,19 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                         distance(
                             selectChannels(window.getComputedStyle(firstNode ?? document.body)[propertyName]),
                             selectChannels(window.getComputedStyle(secondNode ?? document.body)[propertyName]));
-                    const byTestId = testId => document.querySelector(`[data-testid="${testId}"]`);
+                    const byTestId = testId => document.querySelector(`[data-test="${testId}"]`);
 
-                    const loudButton = element.querySelector(`[data-testid="${args.loudTestId}"]`);
-                    const voiceButton = element.querySelector(`[data-testid="${args.floatingVoiceTestId}"]`);
-                    const emotionButton = element.querySelector(`[data-testid="${args.floatingEmotionTestId}"]`);
+                    const loudButton = element.querySelector(`[data-test="${args.loudTestId}"]`);
+                    const voiceButton = element.querySelector(`[data-test="${args.floatingVoiceTestId}"]`);
+                    const emotionButton = element.querySelector(`[data-test="${args.floatingEmotionTestId}"]`);
                     const topVoiceButton = byTestId(args.topVoiceTestId);
                     const topEmotionButton = byTestId(args.topEmotionTestId);
                     const topPauseButton = byTestId(args.topPauseTestId);
-                    const floatingPauseButton = element.querySelector(`[data-testid="${args.floatingPauseTestId}"]`);
+                    const floatingPauseButton = element.querySelector(`[data-test="${args.floatingPauseTestId}"]`);
                     const topSpeedButton = byTestId(args.topSpeedTestId);
-                    const floatingSpeedButton = element.querySelector(`[data-testid="${args.floatingSpeedTestId}"]`);
+                    const floatingSpeedButton = element.querySelector(`[data-test="${args.floatingSpeedTestId}"]`);
                     const topInsertButton = byTestId(args.topInsertTestId);
-                    const floatingInsertButton = element.querySelector(`[data-testid="${args.floatingInsertTestId}"]`);
+                    const floatingInsertButton = element.querySelector(`[data-test="${args.floatingInsertTestId}"]`);
 
                     return {
                         floatingDotCount: element.querySelectorAll('.ed-action-dot').length,
@@ -147,11 +147,11 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                             ? 0
                             : Math.abs(left[0] - right[0]) + Math.abs(left[1] - right[1]) + Math.abs(left[2] - right[2]);
                     const heights = args.itemTestIds
-                        .map(testId => document.querySelector(`[data-testid="${testId}"]`))
+                        .map(testId => document.querySelector(`[data-test="${testId}"]`))
                         .filter(Boolean)
                         .map(item => item.getBoundingClientRect().height);
                     const styles = window.getComputedStyle(element);
-                    const clearAction = document.querySelector(`[data-testid="${args.clearTestId}"]`);
+                    const clearAction = document.querySelector(`[data-test="${args.clearTestId}"]`);
                     const clearLabel = Array.from(clearAction?.querySelectorAll('.ed-action-leading, .ed-action-label, .ed-action-meta') ?? [])
                         .map(node => node.textContent?.replace(/\s+/g, ' ').trim() ?? '')
                         .filter(Boolean)
@@ -216,7 +216,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                 """
                 (element, args) => {
                     const heights = args.itemTestIds
-                        .map(testId => document.querySelector(`[data-testid="${testId}"]`))
+                        .map(testId => document.querySelector(`[data-test="${testId}"]`))
                         .filter(Boolean)
                         .map(item => item.getBoundingClientRect().height);
 
@@ -300,7 +300,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
         page.EvaluateAsync<DropdownAlignmentMetrics>(
             """
             (args) => {
-                const item = document.querySelector(`[data-testid="${args.itemTestId}"]`);
+                const item = document.querySelector(`[data-test="${args.itemTestId}"]`);
                 const label = item?.querySelector('.ed-action-label');
                 const meta = item?.querySelector('.ed-action-meta');
 

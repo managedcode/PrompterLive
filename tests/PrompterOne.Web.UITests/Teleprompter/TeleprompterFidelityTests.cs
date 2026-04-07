@@ -69,7 +69,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             var isFullBleed = await page.EvaluateAsync<bool>(
                 $$"""
                 () => {
-                    const camera = document.querySelector('[data-testid="teleprompter-camera-layer-primary"]');
+                    const camera = document.querySelector('[data-test="teleprompter-camera-layer-primary"]');
                     const shell = document.querySelector('{{BrowserTestConstants.Elements.TeleprompterShellSelector}}');
                     if (!(camera instanceof HTMLElement) || !(shell instanceof HTMLElement)) {
                         return false;

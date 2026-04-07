@@ -11,7 +11,7 @@
 <section class="set-section set-panel"
          id="set-cameras"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.CamerasPanel">
+         data-test="@UiTestIds.Settings.CamerasPanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsNavCameras)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsCamerasSectionDescription)</p>
 
@@ -19,7 +19,7 @@
         <h4 class="set-sub-title">@Text(UiTextKey.SettingsCamerasDeviceAccessTitle)</h4>
         <button class="set-btn-outline set-btn-sm"
                 @onclick="RequestMediaAccess"
-                data-testid="@UiTestIds.Settings.RequestMedia">
+                data-test="@UiTestIds.Settings.RequestMedia">
             @MediaAccessActionLabel
         </button>
     </div>
@@ -28,7 +28,7 @@
         <div class="set-cameras-list">
             @if (Cameras.Count == 0)
             {
-                <div class="set-empty-card" data-testid="@UiTestIds.Settings.NoCameras">
+                <div class="set-empty-card" data-test="@UiTestIds.Settings.NoCameras">
                     @Text(UiTextKey.SettingsCamerasNoDevicesVisible)
                 </div>
             }
@@ -42,7 +42,7 @@
                     var isPreview = IsPreviewCamera(camera);
                     <article class="@BuildCameraCardCssClass(isEnabled, isPreview)"
                              @onclick="() => SelectCameraPreview.InvokeAsync(camera)"
-                             data-testid="@UiTestIds.Settings.CameraDevice(camera.DeviceId)">
+                             data-test="@UiTestIds.Settings.CameraDevice(camera.DeviceId)">
                         <div class="set-device-header">
                             <div class="set-device-preview set-cam-preview">
                                 <div class="@BuildCameraFeedCssClass(isEnabled)"></div>
@@ -58,13 +58,13 @@
                             </div>
                             <div class="set-device-info">
                                 <span class="set-device-name"
-                                      data-testid="@UiTestIds.Settings.CameraDeviceLabel(camera.DeviceId)">@MediaDeviceLabelSanitizer.Sanitize(camera.Label)</span>
+                                      data-test="@UiTestIds.Settings.CameraDeviceLabel(camera.DeviceId)">@MediaDeviceLabelSanitizer.Sanitize(camera.Label)</span>
                                 <span class="set-device-meta">@BuildCameraMeta(camera, isPrimary)</span>
                             </div>
                             <div class="set-device-actions" @onclick:stopPropagation="true">
                                 <div class="@BuildToggleCssClass(isEnabled)"
                                      @onclick="() => ToggleCameraSelection.InvokeAsync(camera)"
-                                     data-testid="@UiTestIds.Settings.CameraDeviceAction(camera.DeviceId)">
+                                     data-test="@UiTestIds.Settings.CameraDeviceAction(camera.DeviceId)">
                                     <div class="set-toggle-thumb"></div>
                                 </div>
                             </div>
@@ -84,7 +84,7 @@
                                         <label>@Text(UiTextKey.SettingsCamerasMirrorHorizontal)</label>
                                         <div class="@BuildToggleCssClass(sceneCamera.Transform.MirrorHorizontal)"
                                              @onclick="() => ToggleSceneMirror.InvokeAsync(sceneCamera.SourceId)"
-                                             data-testid="@BuildMirrorTestId(isPrimary, sceneCamera.SourceId)">
+                                             data-test="@BuildMirrorTestId(isPrimary, sceneCamera.SourceId)">
                                             <div class="set-toggle-thumb"></div>
                                         </div>
                                     </div>
@@ -92,7 +92,7 @@
                                         <label>@Text(UiTextKey.SettingsCamerasAutoStartOnRead)</label>
                                         <div class="@BuildToggleCssClass(ReaderCameraEnabled)"
                                              @onclick="ToggleReaderCameraScene"
-                                             data-testid="@(isPrimary ? UiTestIds.Settings.ReaderCameraToggle : null)">
+                                             data-test="@(isPrimary ? UiTestIds.Settings.ReaderCameraToggle : null)">
                                             <div class="set-toggle-thumb"></div>
                                         </div>
                                     </div>
@@ -102,7 +102,7 @@
                                         disabled="@isPrimary"
                                         @onclick="() => SetPrimaryCamera.InvokeAsync(camera)"
                                         @onclick:stopPropagation="true"
-                                        data-testid="@UiTestIds.Settings.CameraPrimaryAction(camera.DeviceId)">
+                                        data-test="@UiTestIds.Settings.CameraPrimaryAction(camera.DeviceId)">
                                     <UiIcon Kind="UiIconKind.Eye" Size="12" />
                                     @(isPrimary ? Text(UiTextKey.SettingsCamerasPrimaryButton) : Text(UiTextKey.SettingsCamerasSetPrimaryButton))
                                 </button>

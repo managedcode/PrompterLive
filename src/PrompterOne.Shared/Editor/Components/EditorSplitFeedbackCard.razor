@@ -4,24 +4,24 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="ed-sidebar-note ed-sidebar-note-split ed-meta-split-feedback" data-testid="@UiTestIds.Editor.SplitStatus">
+<div class="ed-sidebar-note ed-sidebar-note-split ed-meta-split-feedback" data-test="@UiTestIds.Editor.SplitStatus">
     <div class="ed-sidebar-note-head">
         <div>
-            <div class="ed-sidebar-note-kicker" data-testid="@UiTestIds.Editor.SplitResultTitle">@Feedback.Title</div>
-            <div class="ed-sidebar-note-summary" data-testid="@UiTestIds.Editor.SplitResultSummary">@Feedback.Summary</div>
+            <div class="ed-sidebar-note-kicker" data-test="@UiTestIds.Editor.SplitResultTitle">@Feedback.Title</div>
+            <div class="ed-sidebar-note-summary" data-test="@UiTestIds.Editor.SplitResultSummary">@Feedback.Summary</div>
         </div>
-        <span class="ed-sidebar-note-badge" data-testid="@UiTestIds.Editor.SplitResultBadge">@Feedback.HeadingBadge</span>
+        <span class="ed-sidebar-note-badge" data-test="@UiTestIds.Editor.SplitResultBadge">@Feedback.HeadingBadge</span>
     </div>
 
-    <p class="ed-sidebar-note-copy" data-testid="@UiTestIds.Editor.SplitResultLibrary">@Feedback.DestinationNote</p>
-    <p class="ed-sidebar-note-copy ed-sidebar-note-copy-muted" data-testid="@UiTestIds.Editor.SplitResultCurrentDraft">@Feedback.DraftNote</p>
+    <p class="ed-sidebar-note-copy" data-test="@UiTestIds.Editor.SplitResultLibrary">@Feedback.DestinationNote</p>
+    <p class="ed-sidebar-note-copy ed-sidebar-note-copy-muted" data-test="@UiTestIds.Editor.SplitResultCurrentDraft">@Feedback.DraftNote</p>
 
     @if (Feedback.CreatedTitles.Count > 0)
     {
-        <div class="ed-sidebar-note-list" data-testid="@UiTestIds.Editor.SplitResultList">
+        <div class="ed-sidebar-note-list" data-test="@UiTestIds.Editor.SplitResultList">
             @for (var index = 0; index < Feedback.CreatedTitles.Count; index++)
             {
-                <div class="ed-sidebar-note-item" data-testid="@UiTestIds.Editor.SplitResultItem(index)">
+                <div class="ed-sidebar-note-item" data-test="@UiTestIds.Editor.SplitResultItem(index)">
                     <span class="ed-sidebar-note-item-index">@($"{index + 1:00}")</span>
                     <span class="ed-sidebar-note-item-title">@Feedback.CreatedTitles[index]</span>
                 </div>
@@ -31,11 +31,11 @@
 
     @if (Feedback.AdditionalCount > 0)
     {
-        <div class="ed-sidebar-note-more" data-testid="@UiTestIds.Editor.SplitResultMore">@Format(UiTextKey.EditorSplitMoreInLibraryFormat, Feedback.AdditionalCount)</div>
+        <div class="ed-sidebar-note-more" data-test="@UiTestIds.Editor.SplitResultMore">@Format(UiTextKey.EditorSplitMoreInLibraryFormat, Feedback.AdditionalCount)</div>
     }
 
     <button class="ed-sidebar-note-link"
-            data-testid="@UiTestIds.Editor.SplitResultOpenLibrary"
+            data-test="@UiTestIds.Editor.SplitResultOpenLibrary"
             type="button"
             @onclick="() => OpenLibraryRequested.InvokeAsync()">
         @Feedback.OpenLibraryLabel

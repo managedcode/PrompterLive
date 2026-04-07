@@ -42,10 +42,31 @@ public partial class EditorPage
     private async Task EnsureSessionLoadedAsync()
     {
         var requestedScriptId = ScriptRouteSessionLoader.ResolveRequestedScriptId(ScriptId, Navigation.Uri);
+        UpdateDraftSessionOrigin(requestedScriptId);
         if (!string.IsNullOrWhiteSpace(requestedScriptId))
         {
             await LoadScriptFromQueryAsync(requestedScriptId);
         }
+    }
+
+    private void UpdateDraftSessionOrigin(string? requestedScriptId)
+    {
+        if (string.IsNullOrWhiteSpace(requestedScriptId))
+        {
+            _currentDraftSessionStartedUntitled = true;
+            _pendingAutosaveSelfNavigationScriptId = null;
+            return;
+        }
+
+        if (_currentDraftSessionStartedUntitled &&
+            string.Equals(requestedScriptId, _pendingAutosaveSelfNavigationScriptId, StringComparison.Ordinal))
+        {
+            _pendingAutosaveSelfNavigationScriptId = null;
+            return;
+        }
+
+        _currentDraftSessionStartedUntitled = false;
+        _pendingAutosaveSelfNavigationScriptId = null;
     }
 
     private async Task LoadScriptFromQueryAsync(string requestedScriptId)

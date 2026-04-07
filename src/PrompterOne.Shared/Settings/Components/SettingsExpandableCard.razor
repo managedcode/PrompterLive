@@ -2,7 +2,7 @@
 @using PrompterOne.Shared.Components
 
 <article class="@CardCssClass"
-         data-testid="@TestId"
+         data-test="@TestId"
          @onclick="OnToggle">
     <div class="set-dest-header">
         <UiIconSurface Tone="@IconTone"
@@ -65,7 +65,7 @@
     private static IReadOnlyDictionary<string, object> EmptyAttributes { get; } =
         new Dictionary<string, object>(StringComparer.Ordinal);
 
-    private const string DataTestIdAttributeName = "data-testid";
+    private const string DataTestIdAttributeName = "data-test";
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 

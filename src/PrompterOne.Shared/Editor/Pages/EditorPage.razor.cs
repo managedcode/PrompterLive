@@ -45,6 +45,7 @@ public partial class EditorPage
     private readonly TpsFrontMatterDocumentService _frontMatterService = new();
     private CancellationTokenSource? _draftAnalysisCancellationSource;
     private CancellationTokenSource? _autosaveCancellationSource;
+    private bool _currentDraftSessionStartedUntitled;
     private long _draftRevision;
     private bool _isEditorReady;
     private bool _loadState = true;
@@ -60,11 +61,13 @@ public partial class EditorPage
     private DateTimeOffset? _lastLocalSaveAt;
     private string _profile = DefaultProfileActor;
     private bool _preserveSplitFeedbackOnNextLoad;
+    private string? _pendingAutosaveSelfNavigationScriptId;
     private string _screenTitle = ScriptWorkspaceState.UntitledScriptTitle;
     private EditorSelectionViewModel _selection = EditorSelectionViewModel.Empty;
     private IReadOnlyList<EditorOutlineSegmentViewModel> _segments = [];
     private bool _skipNextRenderFromTyping;
     private EditorSplitFeedbackViewModel? _splitFeedback;
+    private bool _splitOperationInProgress;
     private EditorSourcePanel? _sourcePanel;
     private string _sourceText = string.Empty;
     private EditorDraftMetrics _draftMetrics = EditorDraftMetrics.Empty;

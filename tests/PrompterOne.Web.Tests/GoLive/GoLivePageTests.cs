@@ -11,6 +11,7 @@ using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
@@ -23,7 +24,7 @@ public sealed class GoLivePageTests : BunitContext
     private const string SourcesRailClass = "gl-sources";
     private const string PreviewRailClass = "gl-sidebar-right";
     private const string SceneBarClass = "gl-scenes-bar";
-    private const string SceneSettingsStorageKey = "prompterone.scene";
+    private const string SceneSettingsStorageKey = BrowserAppSettingsKeys.SceneSettings;
 
     private readonly AppHarness _harness;
 
@@ -126,10 +127,10 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.FindByTestId(UiTestIds.GoLive.RoomTab).Click();
         cut.WaitForState(() =>
-            cut.FindAll($"[data-testid='{UiTestIds.GoLive.CreateRoom}']").Count > 0 ||
-            cut.FindAll($"[data-testid='{UiTestIds.GoLive.RoomInvite}']").Count > 0);
+            cut.FindAll($"[data-test='{UiTestIds.GoLive.CreateRoom}']").Count > 0 ||
+            cut.FindAll($"[data-test='{UiTestIds.GoLive.RoomInvite}']").Count > 0);
 
-        var createRoomButtons = cut.FindAll($"[data-testid='{UiTestIds.GoLive.CreateRoom}']");
+        var createRoomButtons = cut.FindAll($"[data-test='{UiTestIds.GoLive.CreateRoom}']");
         if (createRoomButtons.Count > 0)
         {
             createRoomButtons[0].Click();
@@ -215,11 +216,11 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.GoLive.SourcesCard, cut.Markup, StringComparison.Ordinal));
         cut.WaitForAssertion(() =>
-            Assert.NotEmpty(cut.FindAll($"[data-testid^='{UiTestIds.GoLive.SourceCamera(string.Empty)}']")));
+            Assert.NotEmpty(cut.FindAll($"[data-test^='{UiTestIds.GoLive.SourceCamera(string.Empty)}']")));
 
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraAction(AppTestData.Camera.FirstDeviceId)).Click();
 
-        var sceneState = _harness.JsRuntime.GetSavedValue<MediaSceneState>("prompterone.scene");
+        var sceneState = _harness.JsRuntime.GetSavedValue<MediaSceneState>(BrowserAppSettingsKeys.SceneSettings);
         Assert.False(
             sceneState.Cameras.Single(camera => camera.SourceId == AppTestData.Camera.FirstSourceId).Transform.IncludeInOutput);
     }
@@ -298,7 +299,7 @@ public sealed class GoLivePageTests : BunitContext
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.VdoNinja)));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
         });
     }
 
@@ -313,7 +314,7 @@ public sealed class GoLivePageTests : BunitContext
         var cut = Render<GoLivePage>();
 
         cut.WaitForAssertion(() =>
-            Assert.Equal(2, cut.FindAll($"[data-testid^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']").Count));
+            Assert.Equal(2, cut.FindAll($"[data-test^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']").Count));
 
         cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
 
@@ -404,7 +405,7 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var sourceCards = cut.FindAll($"article[data-testid^='{UiTestIds.GoLive.SourceCamera(string.Empty)}']");
+            var sourceCards = cut.FindAll($"article[data-test^='{UiTestIds.GoLive.SourceCamera(string.Empty)}']");
             Assert.Equal(2, sourceCards.Count);
             Assert.DoesNotContain(sourceCards, card => string.IsNullOrWhiteSpace(card.GetAttribute(UiTestIds.GoLive.SourceIdAttribute)));
             Assert.DoesNotContain(sourceCards, card => string.IsNullOrWhiteSpace(card.GetAttribute(UiTestIds.GoLive.SourceDeviceIdAttribute)));
@@ -426,7 +427,7 @@ public sealed class GoLivePageTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ModeDirector));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SceneControls));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.StreamTab));
-            Assert.Empty(cut.FindAll($"[data-testid='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Recording)}']"));
         });
 
         cut.FindByTestId(UiTestIds.GoLive.RoomTab).Click();

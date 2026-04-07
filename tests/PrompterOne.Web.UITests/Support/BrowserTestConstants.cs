@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Testing;
 
 namespace PrompterOne.Web.UITests;
@@ -22,6 +23,7 @@ internal static partial class BrowserTestConstants
     public static class Html
     {
         public const string ClassAttribute = "class";
+        public const string DataTestAttribute = "data-test";
         public const string ValueAttribute = "value";
         public static readonly char[] ClassSeparator = [' '];
     }
@@ -136,7 +138,7 @@ internal static partial class BrowserTestConstants
         public const string ActiveCardSelector =
             $"[{UiDataAttributes.Teleprompter.CardState}='{UiDataAttributes.Teleprompter.ActiveState}']";
         public const string ActiveWordSelector =
-            $"[{UiDataAttributes.Teleprompter.CardState}='{UiDataAttributes.Teleprompter.ActiveState}'] [{UiDataAttributes.Teleprompter.WordState}='{UiDataAttributes.Teleprompter.ActiveState}']";
+            $"[{UiDataAttributes.Teleprompter.WordState}='{UiDataAttributes.Teleprompter.ActiveState}']";
         public const int TransitionProbeIntervalMs = 50;
         public const int TransitionProbeSampleCount = 28;
         public const double TransitionReversalTolerancePx = 6;
@@ -320,7 +322,7 @@ internal static partial class BrowserTestConstants
         public const string AutoSeedStudioStep = "01-default-studio-shell";
         public const string ActiveStateValue = "active";
         public const string IdleDotColorChannel = "239, 68, 68";
-        public const string LiveStateAttributeName = "data-live-state";
+        public const string LiveStateAttributeName = UiDataAttributes.Live.State;
         public const string ScreenTitle = "Go Live";
         public const string CameraSwitchScenario = "go-live-camera-switch";
         public const string CameraSwitchStep = "01-secondary-on-air";
@@ -338,7 +340,7 @@ internal static partial class BrowserTestConstants
         public const string LiveKitServer = "wss://livekit.example.com";
         public const string LiveKitTransportId = "livekit";
         public const string LiveKitToken = "lk-test-token";
-        public const string LiveLevelAttributeName = "data-live-level";
+        public const string LiveLevelAttributeName = UiDataAttributes.Live.Level;
         public const string MicChannelId = "mic";
         public const int MinimumActiveLevelPercent = 1;
         public const string Mp4ContainerLabel = "MP4";
@@ -357,7 +359,7 @@ internal static partial class BrowserTestConstants
         public const string RecordingChannelId = "recording";
         public const int SharedContextPageCount = 2;
         public const string RuntimeSessionId = "go-live-program";
-        public const string SceneStorageKey = "prompterone.settings.prompterone.scene";
+        public static readonly string SceneStorageKey = string.Concat(BrowserStorageKeys.SettingsPrefix, BrowserAppSettingsKeys.SceneSettings);
         public const string SecondSourceId = "scene-cam-b";
         public const string SideCameraLabel = "Side camera";
         public const string StreamingStateValue = "streaming";
@@ -797,7 +799,7 @@ internal static partial class BrowserTestConstants
             }
             """;
         public const string PreviewReadyScript = "(element) => Boolean(element && element.srcObject && element.readyState >= 2)";
-        public const string StoredStudioSettingsKey = "prompterone.settings." + StudioSettingsStore.StorageKey;
+        public static readonly string StoredStudioSettingsKey = string.Concat(BrowserStorageKeys.SettingsPrefix, StudioSettingsStore.StorageKey);
         public const string TwitchUrl = "rtmp://live.twitch.tv/app";
         public const string TwitchKey = "twitch_stream_key";
         public const string YoutubeUrl = "rtmps://a.rtmp.youtube.com/live2";
@@ -813,12 +815,12 @@ internal static partial class BrowserTestConstants
         public const string FolderCreateFailureToggleGlobal = "__prompterFailFolderCreate";
         public const string ForcedFailureDetail = "Forced diagnostics failure from browser test.";
         public const string CreateFolderFailure = "Unable to create this folder.";
-        public const string FolderStorageKey = "prompterone.folders.v1";
+        public const string FolderStorageKey = BrowserStorageKeys.FolderLibrary;
     }
 
     public static class Localization
     {
-        public const string CultureStorageKey = "prompterone.settings.culture";
+        public const string CultureStorageKey = BrowserStorageKeys.CultureSetting;
         public const string EnglishSortByLabel = "Sort by";
         public const string FrenchCultureName = "fr";
         public const string FrenchCreateFolderTitle = "Créer un dossier";

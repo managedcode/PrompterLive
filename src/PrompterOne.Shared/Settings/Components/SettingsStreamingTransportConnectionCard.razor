@@ -31,7 +31,7 @@
                class="set-input"
                value="@Connection.Name"
                @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.Name, GetValue(args))))"
-               data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Name)" />
+               data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Name)" />
     </div>
 
     <div class="set-field">
@@ -56,7 +56,7 @@
                        class="set-input"
                        value="@Connection.ServerUrl"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.ServerUrl, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ServerUrl)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ServerUrl)" />
             </div>
             <div class="set-field">
                 <label>@Text(SettingsStreamingText.RoomNameLabel)</label>
@@ -64,7 +64,7 @@
                        class="set-input"
                        value="@Connection.RoomName"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
             </div>
             <div class="set-field">
                 <label>@Text(SettingsStreamingText.TokenLabel)</label>
@@ -72,7 +72,7 @@
                        class="set-input"
                        value="@Connection.Token"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.Token, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Token)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.Token)" />
             </div>
             break;
         case StreamingPlatformKind.VdoNinja:
@@ -82,7 +82,7 @@
                        class="set-input"
                        value="@Connection.BaseUrl"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.BaseUrl, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.BaseUrl)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.BaseUrl)" />
             </div>
             <div class="set-field">
                 <label>@Text(SettingsStreamingText.RoomNameLabel)</label>
@@ -90,7 +90,7 @@
                        class="set-input"
                        value="@Connection.RoomName"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.RoomName, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.RoomName)" />
             </div>
             <div class="set-field">
                 <label>@Text(SettingsStreamingText.PublishUrlLabel)</label>
@@ -98,7 +98,7 @@
                        class="set-input"
                        value="@Connection.PublishUrl"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.PublishUrl, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.PublishUrl)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.PublishUrl)" />
             </div>
             <div class="set-field">
                 <label>@Text(SettingsStreamingText.ViewUrlLabel)</label>
@@ -106,7 +106,7 @@
                        class="set-input"
                        value="@Connection.ViewUrl"
                        @oninput="@(args => UpdateField.InvokeAsync((Connection.Id, StreamingDestinationFieldIds.ViewUrl, GetValue(args))))"
-                       data-testid="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ViewUrl)" />
+                       data-test="@UiTestIds.Settings.StreamingTransportField(Connection.Id, StreamingDestinationFieldIds.ViewUrl)" />
             </div>
             break;
     }
@@ -114,7 +114,7 @@
     <div class="set-field">
         <button type="button"
                 class="set-btn-outline set-btn-sm"
-                data-testid="@UiTestIds.Settings.StreamingTransportRemove(Connection.Id)"
+                data-test="@UiTestIds.Settings.StreamingTransportRemove(Connection.Id)"
                 @onclick="@(() => RemoveConnection.InvokeAsync(Connection.Id))">
             @Text(SettingsStreamingText.RemoveDestinationLabel)
         </button>

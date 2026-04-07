@@ -6,6 +6,7 @@ using PrompterOne.Core.Models.Media;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
 using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
@@ -14,10 +15,8 @@ public sealed class GoLiveLiveIndicatorsTests : BunitContext
 {
     private const string IdleStateValue = "idle";
     private const string LiveBadgeLabel = "On air";
-    private const string LiveCardCssClass = "gl-cam-onair";
-    private const string LiveDotCssClass = "gl-air-dot-live";
     private const string RecordingStateValue = "recording";
-    private const string SceneSettingsStorageKey = "prompterone.scene";
+    private const string SceneSettingsStorageKey = BrowserAppSettingsKeys.SceneSettings;
 
     private readonly AppHarness _harness;
 
@@ -37,14 +36,11 @@ public sealed class GoLiveLiveIndicatorsTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var activeSourceBadge = cut.FindByTestId(UiTestIds.GoLive.SourceCameraBadge(AppTestData.Camera.FirstSourceId));
-            var activeSourceCard = cut.FindByTestId(UiTestIds.GoLive.SourceCamera(AppTestData.Camera.FirstSourceId));
             var previewLiveDot = cut.FindByTestId(UiTestIds.GoLive.PreviewLiveDot);
 
             Assert.Equal(IdleStateValue, activeSourceBadge.GetAttribute("data-live-state") ?? string.Empty);
             Assert.DoesNotContain(LiveBadgeLabel, activeSourceBadge.TextContent, StringComparison.Ordinal);
-            Assert.DoesNotContain(LiveCardCssClass, activeSourceCard.ClassName ?? string.Empty, StringComparison.Ordinal);
             Assert.Equal(IdleStateValue, previewLiveDot.GetAttribute("data-live-state") ?? string.Empty);
-            Assert.DoesNotContain(LiveDotCssClass, previewLiveDot.ClassName ?? string.Empty, StringComparison.Ordinal);
         });
     }
 
@@ -63,15 +59,12 @@ public sealed class GoLiveLiveIndicatorsTests : BunitContext
         {
             var sessionState = Services.GetRequiredService<GoLiveSessionService>().State;
             var activeSourceBadge = cut.FindByTestId(UiTestIds.GoLive.SourceCameraBadge(AppTestData.Camera.FirstSourceId));
-            var activeSourceCard = cut.FindByTestId(UiTestIds.GoLive.SourceCamera(AppTestData.Camera.FirstSourceId));
             var previewLiveDot = cut.FindByTestId(UiTestIds.GoLive.PreviewLiveDot);
 
             Assert.True(sessionState.IsRecordingActive);
             Assert.Equal(RecordingStateValue, activeSourceBadge.GetAttribute("data-live-state") ?? string.Empty);
             Assert.Contains(LiveBadgeLabel, activeSourceBadge.TextContent, StringComparison.Ordinal);
-            Assert.Contains(LiveCardCssClass, activeSourceCard.ClassName ?? string.Empty, StringComparison.Ordinal);
             Assert.Equal(RecordingStateValue, previewLiveDot.GetAttribute("data-live-state") ?? string.Empty);
-            Assert.Contains(LiveDotCssClass, previewLiveDot.ClassName ?? string.Empty, StringComparison.Ordinal);
         });
     }
 

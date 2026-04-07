@@ -248,7 +248,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.GoLive.ProgramCard)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.PreviewCard)).ToBeVisibleAsync();
 
-            var sourceCards = page.Locator($"[data-testid^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']");
+            var sourceCards = page.Locator($"[data-test^='{UiTestIds.GoLive.SourceCameraSelect(string.Empty)}']");
             await Expect(sourceCards.First).ToContainTextAsync(BrowserTestConstants.Media.PrimaryCameraLabel);
 
             await page.GetByTestId(UiTestIds.GoLive.AudioTab).ClickAsync();

@@ -10,7 +10,7 @@
 <section class="set-section set-panel"
          id="set-appearance"
          style="@DisplayStyle"
-         data-testid="@UiTestIds.Settings.AppearancePanel">
+         data-test="@UiTestIds.Settings.AppearancePanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsAppearanceSectionTitle)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsAppearanceSectionDescription)</p>
 
@@ -28,7 +28,7 @@
                         @foreach (var option in ThemeOptions)
                         {
                             <label class="@(option.Value == ColorScheme ? "set-theme-opt active" : "set-theme-opt")"
-                                   data-testid="@UiTestIds.Settings.ThemeOption(option.Value)"
+                                   data-test="@UiTestIds.Settings.ThemeOption(option.Value)"
                                    @onclick:stopPropagation="true">
                                 <input type="radio"
                                        name="theme"
