@@ -36,7 +36,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
             var probe = await highlight.EvaluateAsync<EditorCueProbe>(
                 $$"""
                 host => {
-                    const nodes = [...host.querySelectorAll('[{{BrowserTestConstants.Html.DataTestAttribute}}]')];
+                    const nodes = [...host.querySelectorAll('*')];
                     const loud = nodes.find(node =>
                         node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeLoud}}');
                     const soft = nodes.find(node =>

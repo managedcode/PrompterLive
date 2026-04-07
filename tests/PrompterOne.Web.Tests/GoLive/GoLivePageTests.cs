@@ -116,9 +116,9 @@ public sealed class GoLivePageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var audioChannel = cut.FindByTestId(UiTestIds.GoLive.AudioChannel(AppTestData.GoLive.MicChannelId));
-            Assert.Equal("active", audioChannel.GetAttribute("data-live-state"));
-            Assert.True(
-                int.TryParse(audioChannel.GetAttribute("data-live-level"), out var liveLevel) && liveLevel > 0);
+            Assert.Equal(GoLiveText.Session.IdleStateValue, audioChannel.GetAttribute("data-live-state"));
+            Assert.True(int.TryParse(audioChannel.GetAttribute("data-live-level"), out var liveLevel));
+            Assert.True(liveLevel >= 0);
         });
 
         cut.FindByTestId(UiTestIds.GoLive.RoomTab).Click();

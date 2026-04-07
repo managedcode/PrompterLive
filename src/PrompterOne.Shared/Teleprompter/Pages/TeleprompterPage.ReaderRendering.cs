@@ -328,6 +328,14 @@ public partial class TeleprompterPage
             UiDataAttributes.Teleprompter.WordState,
             BuildReaderWordStateDataAttribute(cardIndex, chunkIndex, wordIndex));
 
+        if (word.Attributes is not null)
+        {
+            foreach (var attribute in word.Attributes)
+            {
+                attributes[attribute.Key] = attribute.Value;
+            }
+        }
+
         return attributes;
     }
 

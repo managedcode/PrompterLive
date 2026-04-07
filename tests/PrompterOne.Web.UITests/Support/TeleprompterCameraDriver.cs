@@ -21,7 +21,7 @@ internal static class TeleprompterCameraDriver
             UiTestIds.Teleprompter.CameraBackground,
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await Expect(cameraToggle)
-            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.InactiveValue);
+            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.Teleprompter.InactiveStateValue);
     }
 
     public static async Task EnsureEnabledAsync(IPage page)
@@ -39,7 +39,7 @@ internal static class TeleprompterCameraDriver
             UiTestIds.Teleprompter.CameraBackground,
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await Expect(cameraToggle)
-            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.ActiveValue);
+            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.Teleprompter.ActiveStateValue);
     }
 
     private static async Task<bool> IsEnabledAsync(IPage page, ILocator cameraToggle)
@@ -54,6 +54,6 @@ internal static class TeleprompterCameraDriver
         }
 
         var state = await cameraToggle.GetAttributeAsync(BrowserTestConstants.State.ActiveAttribute);
-        return string.Equals(state, BrowserTestConstants.State.ActiveValue, StringComparison.Ordinal);
+        return string.Equals(state, BrowserTestConstants.Teleprompter.ActiveStateValue, StringComparison.Ordinal);
     }
 }

@@ -36,10 +36,10 @@ public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture
             await playToggle.ClickAsync();
             await Expect(progressShell).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await Expect(controls).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await ClearChromeHoverAsync(page);
             await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.ReadingChromeSettleDelayMs);
 

@@ -43,7 +43,18 @@ public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture)
             await Assert.That(gutterBounds.X - stageBounds.X).IsBetween(0, stageBounds.Width);
             await Assert.That(state.Layout.ContentLeft >= BrowserTestConstants.Editor.MinimumContentLeftWithLineNumbersPx).IsTrue().Because($"Expected Monaco contentLeft to include the line-number gutter, but it was {state.Layout.ContentLeft:0.##}.");
             var contentLeftBoundary = stageBounds.X + state.Layout.ContentLeft;
-            var lineNumberGap = contentLeftBoundary - (gutterBounds.X + gutterBounds.Width);
+            var lineNumberTextRight = await gutter.EvaluateAsync<double>(
+                """
+                element => {
+                    const lineNumbers = Array.from(element.querySelectorAll('.line-numbers'));
+                    if (lineNumbers.length === 0) {
+                        return 0;
+                    }
+
+                    return Math.max(...lineNumbers.map(node => node.getBoundingClientRect().right));
+                }
+                """);
+            var lineNumberGap = contentLeftBoundary - lineNumberTextRight;
             await Assert.That(lineNumberGap).IsBetween(BrowserTestConstants.Editor.MinimumLineNumberTextGapPx, BrowserTestConstants.Editor.MaximumLineNumberTextGapPx);
         }
         finally

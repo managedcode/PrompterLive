@@ -38,7 +38,7 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
             await mirrorHorizontal.ClickAsync();
             await Expect(mirrorHorizontal).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await Expect(clusterWrap).ToHaveAttributeAsync(
                 BrowserTestConstants.TeleprompterFlow.StyleAttribute,
                 new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.MirrorHorizontalTransform), RegexOptions.Compiled));
@@ -46,7 +46,7 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
             await mirrorVertical.ClickAsync();
             await Expect(mirrorVertical).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await Expect(clusterWrap).ToHaveAttributeAsync(
                 BrowserTestConstants.TeleprompterFlow.StyleAttribute,
                 new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.MirrorVerticalTransform), RegexOptions.Compiled));

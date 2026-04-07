@@ -138,7 +138,9 @@ internal static partial class BrowserTestConstants
 
     public static class Teleprompter
     {
+        public const string ActiveStateValue = "true";
         public const int AlignmentPollDelayMs = 50;
+        public const string InactiveStateValue = "false";
         public const int AlignmentTolerancePx = 6;
         public const string AdjustedFocalPointPercent = "45";
         public static readonly Regex AdjustedFocalGuideStyle = new("top:\\s*45%", RegexOptions.Compiled);

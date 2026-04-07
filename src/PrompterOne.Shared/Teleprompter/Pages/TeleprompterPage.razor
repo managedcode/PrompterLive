@@ -335,7 +335,8 @@
                         <div class="@BuildReaderCardCssClass(entry.index)"
                              data-reader-card-state="@BuildReaderCardStateDataAttribute(entry.index)"
                              data-test="@entry.card.TestId">
-                            <div class="rd-cluster rd-cluster-active">
+                            <div class="rd-cluster rd-cluster-active"
+                                 data-test="@UiTestIds.Teleprompter.CardCluster(entry.index)">
                                 <div class="rd-cluster-emotion">
                                     <span class="rd-emo-dot" style="background:@entry.card.AccentColor"></span>
                                     <span class="rd-emo-name">@entry.card.EmotionLabel</span>
@@ -362,7 +363,6 @@
                                                     <span class="@BuildReaderWordCssClass(entry.index, chunkIndex, wordIndex)"
                                                           id="@UiDomIds.Teleprompter.CardWord(entry.index, chunkIndex, wordIndex)"
                                                           @attributes="BuildReaderWordDataAttributes(word, entry.index, chunkIndex, wordIndex)"
-                                                          @attributes="word.Attributes"
                                                           style="@word.Style"
                                                           data-test="@BuildReaderWordTestId(entry.index, chunkIndex, wordIndex)">@word.Text</span>
                                                     @if (wordIndex < group.Words.Count - 1)

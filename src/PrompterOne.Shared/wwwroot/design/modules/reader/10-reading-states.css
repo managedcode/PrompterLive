@@ -50,7 +50,8 @@
 
 /* Active cluster — no visible border, text floats over gradient */
 .rd-cluster-active {
-    padding: 36px 48px;
+    padding: 36px 0;
+    box-sizing: border-box;
     background: transparent;
     border: none;
     border-radius: 0;

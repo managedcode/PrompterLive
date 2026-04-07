@@ -35,8 +35,13 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                             return null;
                         }
 
-                        const clusterWrap = element.closest(`[data-test="${args.clusterWrapTestId}"]`);
+                        const clusterWrap = document.querySelector(`[data-test="${args.clusterWrapTestId}"]`);
                         if (!(clusterWrap instanceof HTMLElement)) {
+                            return null;
+                        }
+
+                        const activeCluster = document.querySelector(`[data-test="${args.activeClusterTestId}"]`);
+                        if (!(activeCluster instanceof HTMLElement)) {
                             return null;
                         }
 
@@ -76,12 +81,14 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                         });
                         const computedStyle = window.getComputedStyle(element);
                         const clusterWrapStyle = window.getComputedStyle(clusterWrap);
+                        const activeClusterStyle = window.getComputedStyle(activeCluster);
 
                         return {
                             lineCount: lineRects.length,
                             textAlign: computedStyle.textAlign,
                             textWrap: computedStyle.textWrap,
                             paddingInlineStartPx: parseFloat(computedStyle.paddingInlineStart || "0"),
+                            activeClusterPaddingInlinePx: parseFloat(activeClusterStyle.paddingInlineStart || "0"),
                             clusterWrapPaddingInlinePx: parseFloat(clusterWrapStyle.paddingInlineStart || "0"),
                             maxCenterOffsetPx: Math.max(...centerOffsets),
                             averageCenterOffsetPx: centerOffsets.reduce((sum, value) => sum + value, 0) / centerOffsets.length
@@ -90,6 +97,7 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                     """,
                     new
                     {
+                        activeClusterTestId = UiTestIds.Teleprompter.CardCluster(OpeningCardIndex),
                         clusterWrapTestId = UiTestIds.Teleprompter.ClusterWrap,
                         stageTestId = UiTestIds.Teleprompter.Stage
                     });
@@ -98,6 +106,7 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
             await Assert.That(balance.TextAlign).IsEqualTo(BrowserTestConstants.TeleprompterFlow.AlignmentLeftValue);
             await Assert.That(balance.TextWrap).IsEqualTo(BrowserTestConstants.TeleprompterFlow.TextWrapPrettyValue);
             await Assert.That(balance.LineCount >= BrowserTestConstants.TeleprompterFlow.MinimumBalancedTextLineCount).IsTrue().Because($"Expected at least {BrowserTestConstants.TeleprompterFlow.MinimumBalancedTextLineCount} visible text lines, but found {balance.LineCount}.");
+            await Assert.That(balance.ActiveClusterPaddingInlinePx).IsBetween(0, BrowserTestConstants.TeleprompterFlow.MaximumActiveClusterInlinePaddingPx);
             await Assert.That(balance.PaddingInlineStartPx).IsBetween(BrowserTestConstants.TeleprompterFlow.MinimumOpticalInsetPx, double.MaxValue);
             await Assert.That(balance.PaddingInlineStartPx).IsBetween(0, BrowserTestConstants.TeleprompterFlow.MaximumOpticalInsetPx);
             await Assert.That(balance.ClusterWrapPaddingInlinePx).IsBetween(0, BrowserTestConstants.TeleprompterFlow.MaximumClusterWrapPaddingPx);
@@ -114,6 +123,8 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
         public string TextWrap { get; init; } = string.Empty;
 
         public double PaddingInlineStartPx { get; init; }
+
+        public double ActiveClusterPaddingInlinePx { get; init; }
 
         public double ClusterWrapPaddingInlinePx { get; init; }
 

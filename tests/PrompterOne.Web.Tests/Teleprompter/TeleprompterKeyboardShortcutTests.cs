@@ -10,7 +10,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterKeyboardShortcutTests : BunitContext
 {
-    private const string ActiveStateValue = "active";
+    private const string ActiveStateValue = "true";
 
     [Test]
     public void TeleprompterPage_EscapeShortcut_NavigatesBackToEditor()

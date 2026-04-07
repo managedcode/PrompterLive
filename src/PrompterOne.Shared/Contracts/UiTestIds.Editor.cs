@@ -1,0 +1,158 @@
+namespace PrompterOne.Shared.Contracts;
+
+public static partial class UiTestIds
+{
+    public static class Editor
+    {
+        public const string ActiveBlockEmotion = "editor-active-block-emotion";
+        public const string ActiveBlockName = "editor-active-block-name";
+        public const string ActiveBlockSpeaker = "editor-active-block-speaker";
+        public const string ActiveBlockWpm = "editor-active-block-wpm";
+        public const string ActiveSegmentEmotion = "editor-active-segment-emotion";
+        public const string ActiveSegmentName = "editor-active-segment-name";
+        public const string ActiveSegmentSpeaker = "editor-active-segment-speaker";
+        public const string ActiveSegmentTiming = "editor-active-segment-timing";
+        public const string ActiveSegmentWpm = "editor-active-segment-wpm";
+        public const string Ai = "editor-ai";
+        public const string Author = "editor-author";
+        public const string BaseWpm = "editor-base-wpm";
+        public const string Bold = "editor-bold";
+        public const string ColorClear = "editor-color-clear";
+        public const string ColorGuide = "editor-color-guide";
+        public const string ColorGreen = "editor-color-green";
+        public const string ColorEnergy = "editor-color-energy";
+        public const string ColorLegato = "editor-color-legato";
+        public const string ColorLoud = ColorGreen;
+        public const string ColorMelody = "editor-color-melody";
+        public const string ColorSoft = "editor-color-soft";
+        public const string ColorStaccato = "editor-color-staccato";
+        public const string ColorStress = "editor-color-stress";
+        public const string ColorTrigger = "editor-color-trigger";
+        public const string ColorWhisper = "editor-color-whisper";
+        public const string Created = "editor-created";
+        public const string CreatedIcon = "editor-created-icon";
+        public const string Duration = "editor-duration";
+        public const string EmotionMotivational = "editor-emotion-motivational";
+        public const string EmotionProfessional = "editor-emotion-professional";
+        public const string EmotionTrigger = "editor-emotion-trigger";
+        public const string Error = "editor-error";
+        public const string FindBar = "editor-find-bar";
+        public const string FindClose = "editor-find-close";
+        public const string FindInput = "editor-find-input";
+        public const string FindNext = "editor-find-next";
+        public const string FindPrevious = "editor-find-previous";
+        public const string FindResult = "editor-find-result";
+        public const string FindToggle = "editor-find-toggle";
+        public const string FloatingAi = "editor-floating-ai";
+        public const string FloatingBar = "editor-floating-bar";
+        public const string FloatingDeliverySarcasm = "editor-float-delivery-sarcasm";
+        public const string FloatingEmotion = "editor-float-emotion";
+        public const string FloatingEmotionMenu = "editor-floating-emotion-menu";
+        public const string FloatingEmotionMotivational = "editor-float-emotion-motivational";
+        public const string FloatingEmotionProfessional = "editor-float-emotion-professional";
+        public const string FloatingInsert = "editor-floating-insert";
+        public const string FloatingInsertBlockArchetypeMenu = "editor-floating-insert-block-archetype-menu";
+        public const string FloatingInsertBlockMenu = "editor-floating-insert-block-menu";
+        public const string FloatingInsertEditPointMedium = "editor-floating-insert-edit-point-medium";
+        public const string FloatingInsertMenu = "editor-floating-insert-menu";
+        public const string FloatingInsertPronunciation = "editor-floating-insert-pronunciation";
+        public const string FloatingInsertSegmentArchetypeMenu = "editor-floating-insert-segment-archetype-menu";
+        public const string FloatingInsertSegmentMenu = "editor-floating-insert-segment-menu";
+        public const string FloatingPause = "editor-float-pause";
+        public const string FloatingPauseMenu = "editor-floating-pause-menu";
+        public const string FloatingPauseTrigger = "editor-floating-pause-trigger";
+        public const string FloatingPauseTimed = "editor-floating-pause-timed";
+        public const string FloatingSlow = "editor-floating-slow";
+        public const string FloatingSpeedCustomWpm = "editor-floating-speed-custom-wpm";
+        public const string FloatingSpeedMenu = "editor-floating-speed-menu";
+        public const string FloatingSpeedTrigger = "editor-floating-speed-trigger";
+        public const string FloatingVoiceEnergy = "editor-floating-voice-energy";
+        public const string FloatingVoiceLegato = "editor-floating-voice-legato";
+        public const string FloatingVoiceLoud = "editor-float-voice-loud";
+        public const string FloatingVoiceMelody = "editor-floating-voice-melody";
+        public const string FloatingVoice = "editor-floating-voice";
+        public const string FloatingVoiceMenu = "editor-floating-voice-menu";
+        public const string FloatingVoiceStaccato = "editor-floating-voice-staccato";
+        public const string FloatingVoiceWhisper = "editor-floating-voice-whisper";
+        public const string FloatEmphasis = "editor-float-emphasis";
+        public const string FloatStress = "editor-float-stress";
+        public const string FormatHighlight = "editor-format-highlight";
+        public const string FormatTrigger = "editor-format-trigger";
+        public const string InsertBlock = "editor-insert-block";
+        public const string InsertBlockArchetypeMenu = "editor-insert-block-archetype-menu";
+        public const string InsertBlockMenu = "editor-insert-block-menu";
+        public const string InsertSegment = "editor-insert-segment";
+        public const string InsertSegmentArchetypeMenu = "editor-insert-segment-archetype-menu";
+        public const string InsertSegmentMenu = "editor-insert-segment-menu";
+        public const string InsertPronunciation = "editor-insert-pronunciation";
+        public const string InsertTrigger = "editor-insert-trigger";
+        public const string Layout = "editor-layout";
+        public const string MenuColor = "editor-menu-color";
+        public const string MenuEmotion = "editor-menu-emotion";
+        public const string MenuFormat = "editor-menu-format";
+        public const string MenuInsert = "editor-menu-insert";
+        public const string MenuPause = "editor-menu-pause";
+        public const string MenuSpeed = "editor-menu-speed";
+        public const string MainPanel = "editor-main-panel";
+        public const string MetadataRail = "editor-metadata-rail";
+        public const string MetadataRailBody = "editor-metadata-rail-body";
+        public const string MetadataRailToggle = "editor-metadata-rail-toggle";
+        public const string LocalHistoryEmpty = "editor-local-history-empty";
+        public const string LocalHistoryPanel = "editor-local-history-panel";
+        public const string LocalHistoryStatus = "editor-local-history-status";
+        public const string Page = "editor-page";
+        public const string PauseTrigger = "editor-pause-trigger";
+        public const string PauseTwoSeconds = "editor-pause-two-seconds";
+        public const string Profile = "editor-profile";
+        public const string Redo = "editor-redo";
+        public const string SourceHighlight = "editor-source-highlight";
+        public const string SourceInput = "editor-source-input";
+        public const string SourceGutter = "editor-source-gutter";
+        public const string SourceMinimap = "editor-source-minimap";
+        public const string SourceScrollHost = "editor-source-scroll-host";
+        public const string SourceStage = "editor-source-stage";
+        public const string Toolbar = "editor-toolbar";
+        public const string SpeedFast = "editor-speed-fast";
+        public const string SpeedCustomWpm = "editor-speed-custom-wpm";
+        public const string SpeedSlow = "editor-speed-slow";
+        public const string SpeedTrigger = "editor-speed-trigger";
+        public const string SplitSegment = "editor-split-segment";
+        public const string SplitHint = "editor-split-hint";
+        public const string SplitStatus = "editor-split-status";
+        public const string SplitTopLevel = "editor-split-top-level";
+        public const string SplitResultBadge = "editor-split-result-badge";
+        public const string SplitResultCurrentDraft = "editor-split-result-current-draft";
+        public const string SplitResultLibrary = "editor-split-result-library";
+        public const string SplitResultList = "editor-split-result-list";
+        public const string SplitResultMore = "editor-split-result-more";
+        public const string SplitResultOpenLibrary = "editor-split-result-open-library";
+        public const string SplitResultSummary = "editor-split-result-summary";
+        public const string SplitResultTitle = "editor-split-result-title";
+        public const string SpeedXfast = "editor-speed-xfast";
+        public const string SpeedXslow = "editor-speed-xslow";
+        public const string Title = "editor-title";
+        public const string ToolbarTooltip = "editor-toolbar-tooltip";
+        public const string Undo = "editor-undo";
+        public const string Version = "editor-version";
+
+        public static string BlockNavigation(int segmentIndex, int blockIndex) => $"editor-structure-block-{segmentIndex}-{blockIndex}";
+
+        public static string LocalHistoryItem(int index) => $"editor-local-history-item-{index}";
+
+        public static string LocalHistoryRestore(int index) => $"editor-local-history-restore-{index}";
+
+        public static string SplitResultItem(int index) => $"editor-split-result-item-{index}";
+
+        public static string SegmentNavigation(int segmentIndex) => $"editor-structure-segment-{segmentIndex}";
+
+        public static string ToolbarActionLeading(string actionTestId) => $"{actionTestId}-leading";
+
+        public static string ToolbarActionLeadingIcon(string actionTestId) => $"{actionTestId}-leading-icon";
+
+        public static string ToolbarActionLabel(string actionTestId) => $"{actionTestId}-label";
+
+        public static string ToolbarActionMeta(string actionTestId) => $"{actionTestId}-meta";
+
+        public static string ToolbarActionTrailingIcon(string actionTestId) => $"{actionTestId}-trailing-icon";
+    }
+}

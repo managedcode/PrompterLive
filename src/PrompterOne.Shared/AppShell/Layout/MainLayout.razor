@@ -1,167 +1,51 @@
 @namespace PrompterOne.Shared.Layout
 @inherits LayoutComponentBase
-@using Microsoft.AspNetCore.Components.Forms
 @using PrompterOne.Shared.AppShell.Components
-@using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Localization
 
 @if (ShowAppHeader)
 {
-    <header class="@BuildAppHeaderCssClass()"
-            data-test="@UiTestIds.Header.Surface"
-            data-reader-muted="@(IsTeleprompterPlaybackChromeMuted ? EnabledStateValue : DisabledStateValue)">
-        <button type="button"
-                class="app-header-left app-header-home"
-                @onclick="HandleHomeClickAsync"
-                data-test="@UiTestIds.Header.Home">
-            <div class="logo-icon"
-                 data-test="@UiTestIds.Header.HomeBrandMark">
-                <AppBrandMark />
-            </div>
-            <span class="app-logo-text" data-test="@UiTestIds.Header.Brand">PrompterOne</span>
-        </button>
-        <div class="app-header-center" data-test="@UiTestIds.Header.Center">
-            @if (IsLibraryScreen)
-            {
-                <div class="lib-breadcrumb">
-                    @if (IsLibraryRootBreadcrumb)
-                    {
-                        <span class="bc-item bc-current"
-                              data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
-                    }
-                    else
-                    {
-                        <span class="bc-item">@Text(UiTextKey.LibraryAllScripts)</span>
-                        <span class="bc-sep">/</span>
-                        <span class="bc-item bc-current"
-                              data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
-                    }
-                </div>
-            }
-            else
-            {
-                @if (ShowBackButton)
-                {
-                    <button type="button"
-                            class="btn-back"
-                            @onclick="HandleBackClickAsync"
-                            data-test="@UiTestIds.Header.Back">
-                        <UiIcon Kind="UiIconKind.ChevronLeft" Size="18" />
-                    </button>
-                }
-
-                <span class="top-bar-title" data-test="@UiTestIds.Header.Title">@HeaderTitle</span>
-
-                @if (ShowHeaderSubtitle)
-                {
-                    <span id="@(ShellState.Screen == AppShellScreen.Teleprompter ? UiDomIds.Teleprompter.HeaderSegment : null)"
-                          class="app-header-subtitle"
-                          data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
-                }
-            }
-        </div>
-        <div class="app-header-right">
-            @if (ShowLibraryActions)
-            {
-                <div class="lib-search" data-test="@UiTestIds.Header.LibrarySearchSurface">
-                    <UiIcon Kind="UiIconKind.Search" Size="15" />
-                    <input type="text"
-                           value="@ShellState.SearchText"
-                           placeholder="@Text(UiTextKey.HeaderSearchPlaceholder)"
-                           @oninput="HandleLibrarySearchInputAsync"
-                           data-test="@UiTestIds.Header.LibrarySearch" />
-                </div>
-            }
-
-            <GoLiveShellButton Label="@Text(UiTextKey.HeaderGoLive)"
-                               Status="@GoLiveIndicatorStatus"
-                               LiveState="@GoLiveIndicatorState"
-                               Subdued="@IsTeleprompterPlaybackChromeMuted"
-                               OnClick="HandleOpenGoLiveClickAsync"
-                               TestId="@UiTestIds.Header.GoLive" />
-
-            @if (ShowLibraryActions)
-            {
-                <button type="button"
-                        class="btn-ghost"
-                        @onclick="HandleOpenOnboardingAsync"
-                        title="@Text(UiTextKey.OnboardingRestartTour)"
-                        aria-label="@Text(UiTextKey.OnboardingRestartTour)"
-                        data-test="@UiTestIds.Header.Onboarding">
-                    <UiIcon Kind="UiIconKind.HelpCircle" Size="15" />
-                </button>
-                <div class="app-header-file-action"
-                     data-test="@UiTestIds.Header.LibraryOpenScript">
-                    <button type="button"
-                            class="btn-ghost btn-open-script"
-                            data-test="@UiTestIds.Header.LibraryOpenScriptButton"
-                            aria-haspopup="dialog"
-                            @onclick="HandleOpenScriptTriggerAsync">
-                        <span data-test="@UiTestIds.Header.LibraryOpenScriptIcon">
-                            <UiIcon Kind="UiIconKind.DocumentImport" Size="16" />
-                        </span>
-                        <span class="app-header-action-label">@Text(UiTextKey.HeaderOpenScript)</span>
-                    </button>
-                    <InputFile @key="_openScriptPickerVersion"
-                               id="@UiDomIds.AppShell.LibraryOpenScriptInput"
-                               class="app-header-file-input"
-                               aria-label="@Text(UiTextKey.HeaderOpenScript)"
-                               accept="@SupportedOpenScriptAcceptValue"
-                               OnChange="HandleOpenScriptAsync"
-                               data-test="@UiTestIds.Header.LibraryOpenScriptInput" />
-                </div>
-                <button type="button"
-                        class="btn-create"
-                        @onclick="HandleCreateScriptClickAsync"
-                        data-test="@UiTestIds.Header.LibraryNewScript">
-                    <span data-test="@UiTestIds.Header.LibraryNewScriptIcon">
-                        <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
-                    </span>
-                    <span class="app-header-action-label">@Text(UiTextKey.HeaderNewScript)</span>
-                </button>
-            }
-
-            @if (ShowSaveFileAction)
-            {
-                <button type="button"
-                        class="btn-ghost"
-                        @onclick="HandleSaveFileClickAsync"
-                        data-test="@UiTestIds.Header.EditorSaveFile">
-                    <UiIcon Kind="UiIconKind.SaveFile" Size="15" />
-                    <span class="app-header-action-label">@Text(UiTextKey.HeaderSaveFile)</span>
-                </button>
-            }
-
-            @if (ShowLearnAction)
-            {
-                <button type="button"
-                        class="btn-ghost"
-                        @onclick="HandleOpenLearnClickAsync"
-                        data-test="@UiTestIds.Header.EditorLearn">
-                    <UiIcon Kind="UiIconKind.BookOpen" Size="15" />
-                    <span class="app-header-action-label">@Text(UiTextKey.HeaderLearn)</span>
-                </button>
-            }
-
-            @if (ShowLearnWpmBadge)
-            {
-                <span id="@UiDomIds.Learn.HeaderWpmBadge"
-                      class="top-bar-title app-header-wpm"
-                      data-test="@UiTestIds.Header.Wpm">@ShellState.WpmLabel</span>
-            }
-
-            @if (ShowReadAction)
-            {
-                <button type="button"
-                        class="btn-gold"
-                        @onclick="HandleOpenReadClickAsync"
-                        data-test="@UiTestIds.Header.EditorRead">
-                    <UiIcon Kind="UiIconKind.Play" Size="15" />
-                    <span class="app-header-action-label">@Text(UiTextKey.HeaderRead)</span>
-                </button>
-            }
-        </div>
-    </header>
+    <MainLayoutHeader CssClass="@BuildAppHeaderCssClass()"
+                      HeaderSubtitle="@HeaderSubtitle"
+                      HeaderSubtitleDomId="@(ShellState.Screen == AppShellScreen.Teleprompter ? UiDomIds.Teleprompter.HeaderSegment : null)"
+                      HeaderTitle="@HeaderTitle"
+                      IsLibraryRootBreadcrumb="@IsLibraryRootBreadcrumb"
+                      IsLibraryScreen="@IsLibraryScreen"
+                      IsReaderMuted="@IsTeleprompterPlaybackChromeMuted"
+                      LearnLabel="@Text(UiTextKey.HeaderLearn)"
+                      LibraryAllScriptsLabel="@Text(UiTextKey.LibraryAllScripts)"
+                      LibraryBreadcrumbCurrentLabel="@LibraryBreadcrumbCurrentLabel"
+                      GoLiveLabel="@Text(UiTextKey.HeaderGoLive)"
+                      GoLiveState="@GoLiveIndicatorState"
+                      GoLiveStatus="@GoLiveIndicatorStatus"
+                      NewScriptLabel="@Text(UiTextKey.HeaderNewScript)"
+                      OnBackClick="HandleBackClickAsync"
+                      OnCreateScriptClick="HandleCreateScriptClickAsync"
+                      OnHomeClick="HandleHomeClickAsync"
+                      OnLibrarySearchInput="HandleLibrarySearchInputAsync"
+                      OnOpenGoLive="HandleOpenGoLiveClickAsync"
+                      OnOpenLearnClick="HandleOpenLearnClickAsync"
+                      OnOpenOnboarding="HandleOpenOnboardingAsync"
+                      OnOpenReadClick="HandleOpenReadClickAsync"
+                      OnOpenScript="HandleOpenScriptAsync"
+                      OnOpenScriptTrigger="HandleOpenScriptTriggerAsync"
+                      OnSaveFileClick="HandleSaveFileClickAsync"
+                      OpenScriptLabel="@Text(UiTextKey.HeaderOpenScript)"
+                      OpenScriptPickerVersion="@_openScriptPickerVersion"
+                      ReadLabel="@Text(UiTextKey.HeaderRead)"
+                      RestartTourLabel="@Text(UiTextKey.OnboardingRestartTour)"
+                      SaveFileLabel="@Text(UiTextKey.HeaderSaveFile)"
+                      SearchPlaceholder="@Text(UiTextKey.HeaderSearchPlaceholder)"
+                      SearchText="@ShellState.SearchText"
+                      ShowBackButton="@ShowBackButton"
+                      ShowHeaderSubtitle="@ShowHeaderSubtitle"
+                      ShowLearnAction="@ShowLearnAction"
+                      ShowLearnWpmBadge="@ShowLearnWpmBadge"
+                      ShowLibraryActions="@ShowLibraryActions"
+                      ShowReadAction="@ShowReadAction"
+                      ShowSaveFileAction="@ShowSaveFileAction"
+                      SupportedOpenScriptAcceptValue="@SupportedOpenScriptAcceptValue"
+                      WpmLabel="@ShellState.WpmLabel" />
 }
 
 <PrompterOne.Shared.Components.Diagnostics.DiagnosticsBanner />
@@ -181,31 +65,12 @@
 
 @if (ShowGoLiveWidget)
 {
-    <button type="button"
-            class="@BuildGoLiveWidgetCssClass()"
-            @onclick="HandleOpenGoLiveClickAsync"
-            data-live-state="@GoLiveIndicatorState"
-            data-test="@UiTestIds.Header.LiveWidget">
-        <div class="app-live-widget-preview" data-test="@UiTestIds.Header.LiveWidgetPreview">
-            <div class="app-live-widget-overlay"></div>
-            <div class="app-live-widget-meta">
-                <span class="app-live-widget-live-pill">@GoLiveWidgetStateLabel</span>
-                <span class="app-live-widget-timer"
-                      data-test="@UiTestIds.Header.LiveWidgetTimer">@GoLiveWidgetElapsed</span>
-            </div>
-        </div>
-
-        <div class="app-live-widget-copy">
-            <span class="app-live-widget-eyebrow">@GoLiveIndicatorCopy</span>
-            <strong class="app-live-widget-title"
-                    data-test="@UiTestIds.Header.LiveWidgetTitle">@GoLiveWidgetTitle</strong>
-            <span class="app-live-widget-detail"
-                  data-test="@UiTestIds.Header.LiveWidgetDetail">@GoLiveWidgetDetail</span>
-        </div>
-    </button>
-}
-
-@code {
-    private const string DisabledStateValue = "false";
-    private const string EnabledStateValue = "true";
+    <MainLayoutGoLiveWidget CssClass="@BuildGoLiveWidgetCssClass()"
+                            Detail="@GoLiveWidgetDetail"
+                            Elapsed="@GoLiveWidgetElapsed"
+                            IndicatorCopy="@GoLiveIndicatorCopy"
+                            LiveState="@GoLiveIndicatorState"
+                            OnClick="HandleOpenGoLiveClickAsync"
+                            StateLabel="@GoLiveWidgetStateLabel"
+                            Title="@GoLiveWidgetTitle" />
 }

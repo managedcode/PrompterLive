@@ -9,8 +9,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterChromeStateTests : BunitContext
 {
-    private const string ActiveStateValue = "active";
-    private const string InactiveStateValue = "inactive";
+    private const string ActiveStateValue = "true";
+    private const string InactiveStateValue = "false";
 
     [Test]
     public void TeleprompterPage_PlaybackMarksChromeAsReadingActive()

@@ -64,13 +64,13 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         {
             await Expect(cameraToggle).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.InactiveValue);
+                BrowserTestConstants.Teleprompter.InactiveStateValue);
         }
         else
         {
             await Expect(cameraToggle).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
         }
 
         await page.GetByTestId(UiTestIds.Teleprompter.WidthSlider).EvaluateAsync(BrowserTestConstants.TeleprompterFlow.WidthInputScript);
@@ -237,7 +237,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
     private static async Task<bool> HasActiveStateAsync(Microsoft.Playwright.ILocator locator)
     {
         var state = await locator.GetAttributeAsync(BrowserTestConstants.State.ActiveAttribute);
-        return string.Equals(state, BrowserTestConstants.State.ActiveValue, StringComparison.Ordinal);
+        return string.Equals(state, BrowserTestConstants.Teleprompter.ActiveStateValue, StringComparison.Ordinal);
     }
 
     private static async Task AssertTeleprompterChromeVisibilityAsync(Microsoft.Playwright.IPage page)

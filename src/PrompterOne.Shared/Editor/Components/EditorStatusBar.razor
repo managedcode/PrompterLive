@@ -1,0 +1,21 @@
+@namespace PrompterOne.Shared.Components.Editor
+
+<div class="ed-statusbar">
+    <span>@LineColumnLabel</span>
+    <span>@Profile</span>
+    <span>@BaseWpmLabel</span>
+    <span>@SegmentsLabel</span>
+    <span>@WordCountLabel</span>
+    <span>@DurationLabel</span>
+    <span>@VersionLabel</span>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string BaseWpmLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string DurationLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LineColumnLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Profile { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SegmentsLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string VersionLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string WordCountLabel { get; set; } = string.Empty;
+}

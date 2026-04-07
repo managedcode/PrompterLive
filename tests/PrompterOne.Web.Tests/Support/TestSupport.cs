@@ -158,6 +158,8 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<BrowserConnectivityInterop>();
         context.Services.AddSingleton<BrowserConnectivityService>();
         context.Services.AddSingleton<UiDiagnosticsService>();
+        context.Services.AddScoped<MediaRuntimeContractService>();
+        context.Services.AddScoped<ThemeRuntimeContractService>();
         context.Services.AddSingleton<IGoLiveSourceModule, LiveKitSourceModule>();
         context.Services.AddSingleton<IGoLiveSourceModule, VdoNinjaSourceModule>();
         context.Services.AddSingleton<IGoLiveOutputModule, LocalRecordingOutputModule>();

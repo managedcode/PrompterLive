@@ -134,7 +134,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         await Assert.That(softWord.EmotionCue).IsNotEqualTo("motivational");
         await Assert.That(urgentWord.EmotionCue).IsEqualTo("urgent");
         await Assert.That(urgentWord.EmotionCue).IsNotEqualTo("energetic");
-        await Assert.That(rhetoricalWord.EmotionCue).IsEqualTo("rhetorical");
+        await Assert.That(rhetoricalWord.DeliveryCue).IsEqualTo("rhetorical");
         await Assert.That(teleprompterWord.EmotionCue).IsNotEqualTo("energetic");
 
         await Assert.That(visionWord.Pronunciation).IsEqualTo(BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionPronunciation);

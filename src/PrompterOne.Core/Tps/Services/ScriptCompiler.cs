@@ -17,7 +17,9 @@ public sealed class ScriptCompiler(TpsExporter exporter)
     {
         ArgumentNullException.ThrowIfNull(document);
 
-        var source = await _exporter.ExportAsync(document).ConfigureAwait(false);
+        var source = !string.IsNullOrWhiteSpace(document.RawSource)
+            ? document.RawSource
+            : await _exporter.ExportAsync(document).ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(source))
         {
             return new CompiledScript

@@ -7,135 +7,17 @@
 <div class="dcards-grid">
     @foreach (var card in Cards)
     {
-        <article class="dcard"
-                style="--emo:@card.AccentColor"
-                 @onclick="() => HandleCardClickAsync(card.Id)"
-                 data-test="@card.TestId">
-            <div class="@GetCardMenuWrapClass(card.Id)"
-                 data-expanded="@GetCardMenuExpandedState(card.Id)"
-                 data-test="@UiTestIds.Library.CardMenuWrap(card.Id)"
-                 @onclick:stopPropagation="true">
-                <TooltipAnchor OwnerTestId="@UiTestIds.Library.CardMenu(card.Id)"
-                               Placement="TooltipPlacement.LeftCenter"
-                               Text="@Text(UiTextKey.TooltipMoreScriptActions)">
-                    <button class="dcard-menu-btn"
-                            type="button"
-                            aria-label="@Text(UiTextKey.TooltipMoreScriptActions)"
-                            data-test="@UiTestIds.Library.CardMenu(card.Id)"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => ToggleCardMenu(card.Id)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <circle cx="12" cy="5" r="2" />
-                            <circle cx="12" cy="12" r="2" />
-                            <circle cx="12" cy="19" r="2" />
-                        </svg>
-                    </button>
-                </TooltipAnchor>
-                <div class="dcard-dropdown"
-                     data-test="@UiTestIds.Library.CardMenuDropdown(card.Id)"
-                     @onclick:stopPropagation="true">
-                    <button type="button"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => HandleOpenScriptAsync(card.Id)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                        @Text(UiTextKey.CommonRename)
-                    </button>
-                    <button type="button"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => HandleDuplicateScriptAsync(card.Id)"
-                            data-test="@UiTestIds.Library.CardDuplicate(card.Id)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        @Text(UiTextKey.CommonDuplicate)
-                    </button>
-                    <div class="dcard-dropdown-group">
-                        <div class="dcard-dropdown-label">@Text(UiTextKey.CommonMoveToEllipsis)</div>
-                        <button type="button"
-                                data-test="@UiTestIds.Library.Move(card.Id, LibrarySelectionKeys.None)"
-                                @onclick:stopPropagation="true"
-                                @onclick="() => HandleMoveScriptAsync(card.Id, null)">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="6" y1="6" x2="18" y2="18" />
-                                <line x1="6" y1="18" x2="18" y2="6" />
-                            </svg>
-                            @Text(UiTextKey.CommonNoFolder)
-                        </button>
-                        @foreach (var folder in FolderOptions)
-                        {
-                            <button type="button"
-                                    data-test="@UiTestIds.Library.Move(card.Id, folder.Id)"
-                                    @onclick:stopPropagation="true"
-                                    @onclick="() => HandleMoveScriptAsync(card.Id, folder.Id)">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                                </svg>
-                                @folder.Label
-                            </button>
-                        }
-                    </div>
-                    <div class="dcard-dropdown-sep"></div>
-                    <button type="button"
-                            class="dcard-dropdown-danger"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => HandleDeleteScriptAsync(card.Id)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3,6 5,6 21,6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
-                        @Text(UiTextKey.CommonDelete)
-                    </button>
-                </div>
-            </div>
-            <div class="dcard-inner" data-test="@UiTestIds.Library.CardSurface(card.Id)">
-                <div class="dcard-cover @card.CoverClass">
-                    <div class="dcover-orb dcover-orb1"></div>
-                    <div class="dcover-orb dcover-orb2"></div>
-                    <h3 class="dcard-title">@card.Title</h3>
-                    <div class="dcover-meta">
-                        <span class="dcover-emo">@card.Emotion</span>
-                        <span>@card.ModeLabel</span>
-                        <span data-test="@UiTestIds.Library.CardDuration(card.Id)">@card.DurationLabel</span>
-                    </div>
-                </div>
-                <div class="dcard-data">
-                    <div class="ddata-row">
-                        <span data-test="@UiTestIds.Library.CardWpm(card.Id)">@card.AverageWpm @Text(UiTextKey.CommonWpm)</span>
-                        <span data-test="@UiTestIds.Library.CardWordCount(card.Id)">@Format(UiTextKey.LibraryCardWordsFormat, card.WordCount)</span>
-                        <span data-test="@UiTestIds.Library.CardSegmentCount(card.Id)">@BuildSegmentCountLabel(card.SegmentCount)</span>
-                    </div>
-                    <div class="ddata-foot">
-                        <span>@card.Author</span>
-                        <span>@card.UpdatedLabel</span>
-                    </div>
-                </div>
-                <div class="dcard-actions">
-                    <button class="dcard-act"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => OnLearnScript.InvokeAsync(card.Id)"
-                            data-test="@UiTestIds.Library.CardLearn(card.Id)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                        </svg>
-                        @Text(UiTextKey.LibraryCardLearn)
-                    </button>
-                    <button class="dcard-act dcard-act-go"
-                            @onclick:stopPropagation="true"
-                            @onclick="() => OnReadScript.InvokeAsync(card.Id)"
-                            data-test="@UiTestIds.Library.CardRead(card.Id)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="5,3 19,12 5,21" />
-                        </svg>
-                        @Text(UiTextKey.LibraryCardRead)
-                    </button>
-                </div>
-            </div>
-        </article>
+        <LibraryScriptCard Card="@card"
+                           FolderOptions="@FolderOptions"
+                           IsMenuOpen="@IsCardMenuOpen(card.Id)"
+                           OnCardClick="@(() => HandleCardClickAsync(card.Id))"
+                           OnDeleteScript="@(() => HandleDeleteScriptAsync(card.Id))"
+                           OnDuplicateScript="@(() => HandleDuplicateScriptAsync(card.Id))"
+                           OnLearnScript="@(() => OnLearnScript.InvokeAsync(card.Id))"
+                           OnMoveScript="@(folderId => HandleMoveScriptAsync(card.Id, folderId))"
+                           OnOpenScript="@(() => HandleOpenScriptAsync(card.Id))"
+                           OnReadScript="@(() => OnReadScript.InvokeAsync(card.Id))"
+                           OnToggleMenu="@(() => ToggleCardMenu(card.Id))" />
     }
 
     <article class="dcard dcard-create" @onclick="HandleCreateScriptAsync" data-test="@UiTestIds.Library.CreateScript">
@@ -167,10 +49,6 @@
 </div>
 
 @code {
-    private const string CardMenuWrapClass = "dcard-menu-wrap";
-    private const string CardMenuWrapOpenClass = CardMenuWrapClass + " open";
-    private const string ExpandedStateClosedValue = "closed";
-    private const string ExpandedStateOpenValue = "open";
     private string? _openCardMenuId;
 
     [Parameter, EditorRequired] public IReadOnlyList<LibraryCardViewModel> Cards { get; set; } = [];
@@ -206,15 +84,8 @@
         ClearOpenCardMenu();
     }
 
-    private string GetCardMenuWrapClass(string cardId) =>
-        string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
-            ? CardMenuWrapOpenClass
-            : CardMenuWrapClass;
-
-    private string GetCardMenuExpandedState(string cardId) =>
-        string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
-            ? ExpandedStateOpenValue
-            : ExpandedStateClosedValue;
+    private bool IsCardMenuOpen(string cardId) =>
+        string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal);
 
     private void ToggleCardMenu(string cardId)
     {
@@ -272,14 +143,5 @@
         return true;
     }
 
-    private string BuildSegmentCountLabel(int segmentCount) =>
-        segmentCount == 1
-            ? Text(UiTextKey.LibraryCardOneSegment)
-            : Format(UiTextKey.LibraryCardSegmentsFormat, segmentCount);
-
     private int _lastDismissMenuRevision;
-
-    private string Format(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
-
-    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

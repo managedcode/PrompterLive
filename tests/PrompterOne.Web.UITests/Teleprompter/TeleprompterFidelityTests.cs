@@ -216,7 +216,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
         await TeleprompterCameraDriver.EnsureEnabledAsync(page);
         await Expect(cameraLayer).ToHaveAttributeAsync(
             BrowserTestConstants.State.ActiveAttribute,
-            BrowserTestConstants.State.ActiveValue);
+            BrowserTestConstants.Teleprompter.ActiveStateValue);
     }
 
     private static async Task AssertGuideAlignmentAsync(

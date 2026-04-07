@@ -37,13 +37,13 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
 
             await Expect(controls).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await Expect(progressShell).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await Expect(edgeInfo).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
-                BrowserTestConstants.State.ActiveValue);
+                BrowserTestConstants.Teleprompter.ActiveStateValue);
             await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.ReadingChromeSettleDelayMs);
 
             var activeControls = await ReadChromeVisualStateAsync(controls);

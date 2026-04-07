@@ -71,40 +71,18 @@
 
     @if (_showFindBar)
     {
-        <div class="ed-find-bar" data-test="@UiTestIds.Editor.FindBar">
-            <label class="ed-find-input-shell">
-                <UiIcon Kind="UiIconKind.Search" Size="14" />
-                <input class="ed-find-input"
-                       type="text"
-                       value="@_findQuery"
-                       placeholder="@L(UiTextKey.EditorFindPlaceholder)"
-                       aria-label="@L(UiTextKey.EditorFindPlaceholder)"
-                       @oninput="OnFindQueryInputAsync"
-                       data-test="@UiTestIds.Editor.FindInput" />
-            </label>
-
-            @if (ShouldRenderFindResult)
-            {
-                <span class="ed-find-result" data-test="@UiTestIds.Editor.FindResult">@FindResultLabel</span>
-            }
-
-            <div class="ed-find-actions">
-                <button type="button"
-                        class="ed-find-nav"
-                        @onclick="NavigateToPreviousFindMatchAsync"
-                        disabled="@(!CanNavigateFindMatches)"
-                        data-test="@UiTestIds.Editor.FindPrevious">@L(UiTextKey.EditorFindPrevious)</button>
-                <button type="button"
-                        class="ed-find-nav"
-                        @onclick="NavigateToNextFindMatchAsync"
-                        disabled="@(!CanNavigateFindMatches)"
-                        data-test="@UiTestIds.Editor.FindNext">@L(UiTextKey.EditorFindNext)</button>
-                <button type="button"
-                        class="ed-find-close"
-                        @onclick="CloseFindBarAsync"
-                        data-test="@UiTestIds.Editor.FindClose">@L(UiTextKey.EditorFindClose)</button>
-            </div>
-        </div>
+        <EditorFindBar CanNavigate="@CanNavigateFindMatches"
+                       CloseLabel="@L(UiTextKey.EditorFindClose)"
+                       NextLabel="@L(UiTextKey.EditorFindNext)"
+                       OnClose="CloseFindBarAsync"
+                       OnInput="OnFindQueryInputAsync"
+                       OnNext="NavigateToNextFindMatchAsync"
+                       OnPrevious="NavigateToPreviousFindMatchAsync"
+                       Placeholder="@L(UiTextKey.EditorFindPlaceholder)"
+                       PreviousLabel="@L(UiTextKey.EditorFindPrevious)"
+                       Query="@_findQuery"
+                       ResultLabel="@FindResultLabel"
+                       ShowResult="@ShouldRenderFindResult" />
     }
 
     <div class="ed-content ed-source-shell"
@@ -195,13 +173,11 @@
         }
     </div>
 
-    <div class="ed-statusbar">
-        <span>@StatusLineShortLabel @Status.Line, @StatusColumnShortLabel @Status.Column</span>
-        <span>@Status.Profile</span>
-        <span>@Status.BaseWpm @L(UiTextKey.CommonWpm)</span>
-        <span>@StatusSegmentsLabel</span>
-        <span>@StatusWordCountLabel</span>
-        <span>~@Status.Duration</span>
-        <span>@StatusVersionLabel</span>
-    </div>
+    <EditorStatusBar BaseWpmLabel="@($"{Status.BaseWpm} {L(UiTextKey.CommonWpm)}")"
+                     DurationLabel="@($"~{Status.Duration}")"
+                     LineColumnLabel="@($"{StatusLineShortLabel} {Status.Line}, {StatusColumnShortLabel} {Status.Column}")"
+                     Profile="@Status.Profile"
+                     SegmentsLabel="@StatusSegmentsLabel"
+                     VersionLabel="@StatusVersionLabel"
+                     WordCountLabel="@StatusWordCountLabel" />
 </div>

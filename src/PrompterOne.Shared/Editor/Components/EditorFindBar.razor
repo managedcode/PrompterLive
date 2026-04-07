@@ -1,0 +1,59 @@
+@namespace PrompterOne.Shared.Components.Editor
+
+<div class="ed-find-bar" data-test="@UiTestIds.Editor.FindBar">
+    <label class="ed-find-input-shell">
+        <UiIcon Kind="UiIconKind.Search" Size="14" />
+        <input class="ed-find-input"
+               type="text"
+               value="@Query"
+               placeholder="@Placeholder"
+               aria-label="@Placeholder"
+               @oninput="HandleInputAsync"
+               data-test="@UiTestIds.Editor.FindInput" />
+    </label>
+
+    @if (ShowResult)
+    {
+        <span class="ed-find-result" data-test="@UiTestIds.Editor.FindResult">@ResultLabel</span>
+    }
+
+    <div class="ed-find-actions">
+        <button type="button"
+                class="ed-find-nav"
+                @onclick="HandlePreviousAsync"
+                disabled="@(!CanNavigate)"
+                data-test="@UiTestIds.Editor.FindPrevious">@PreviousLabel</button>
+        <button type="button"
+                class="ed-find-nav"
+                @onclick="HandleNextAsync"
+                disabled="@(!CanNavigate)"
+                data-test="@UiTestIds.Editor.FindNext">@NextLabel</button>
+        <button type="button"
+                class="ed-find-close"
+                @onclick="HandleCloseAsync"
+                data-test="@UiTestIds.Editor.FindClose">@CloseLabel</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool CanNavigate { get; set; }
+    [Parameter] public bool ShowResult { get; set; }
+    [Parameter, EditorRequired] public string CloseLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string NextLabel { get; set; } = string.Empty;
+    [Parameter] public EventCallback<ChangeEventArgs> OnInput { get; set; }
+    [Parameter] public EventCallback OnNext { get; set; }
+    [Parameter] public EventCallback OnPrevious { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter, EditorRequired] public string Placeholder { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string PreviousLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Query { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ResultLabel { get; set; } = string.Empty;
+
+    private Task HandleCloseAsync() => OnClose.InvokeAsync();
+
+    private Task HandleInputAsync(ChangeEventArgs args) => OnInput.InvokeAsync(args);
+
+    private Task HandleNextAsync() => OnNext.InvokeAsync();
+
+    private Task HandlePreviousAsync() => OnPrevious.InvokeAsync();
+}

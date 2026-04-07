@@ -329,8 +329,10 @@ public sealed class SettingsInteractionTests : BunitContext
             string.Equals(record.Identifier, AppTestData.Theme.ApplySettingsInvocation, StringComparison.Ordinal));
 
         cut.FindByTestId(UiTestIds.Settings.NavAppearance).Click();
-        cut.FindByTestId(UiTestIds.Settings.ThemeOption(AppTestData.Theme.LightColorScheme))
-            .Click();
+        var themeOption = cut.FindByTestId(UiTestIds.Settings.ThemeOption(AppTestData.Theme.LightColorScheme));
+        var themeInput = themeOption.QuerySelector("input")
+            ?? throw new InvalidOperationException("Expected appearance theme option to render an input.");
+        themeInput.Change(new ChangeEventArgs { Value = AppTestData.Theme.LightColorScheme });
 
         var savedPreferences = _harness.JsRuntime.GetSavedValue<SettingsPagePreferences>(SettingsPagePreferences.StorageKey);
         Assert.Equal(SettingsAppearanceValues.LightColorScheme, savedPreferences.ColorScheme);

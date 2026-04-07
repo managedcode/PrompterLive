@@ -1,0 +1,227 @@
+@namespace PrompterOne.Shared.AppShell.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Contracts
+
+<header class="@CssClass"
+        data-test="@UiTestIds.Header.Surface"
+        data-reader-muted="@(IsReaderMuted ? EnabledStateValue : DisabledStateValue)">
+    <button type="button"
+            class="app-header-left app-header-home"
+            @onclick="HandleHomeClickAsync"
+            data-test="@UiTestIds.Header.Home">
+        <div class="logo-icon"
+             data-test="@UiTestIds.Header.HomeBrandMark">
+            <AppBrandMark />
+        </div>
+        <span class="app-logo-text" data-test="@UiTestIds.Header.Brand">PrompterOne</span>
+    </button>
+    <div class="app-header-center" data-test="@UiTestIds.Header.Center">
+        @if (IsLibraryScreen)
+        {
+            <div class="lib-breadcrumb">
+                @if (IsLibraryRootBreadcrumb)
+                {
+                    <span class="bc-item bc-current"
+                          data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                }
+                else
+                {
+                    <span class="bc-item">@LibraryAllScriptsLabel</span>
+                    <span class="bc-sep">/</span>
+                    <span class="bc-item bc-current"
+                          data-test="@UiTestIds.Header.LibraryBreadcrumbCurrent">@LibraryBreadcrumbCurrentLabel</span>
+                }
+            </div>
+        }
+        else
+        {
+            @if (ShowBackButton)
+            {
+                <button type="button"
+                        class="btn-back"
+                        @onclick="HandleBackClickAsync"
+                        data-test="@UiTestIds.Header.Back">
+                    <UiIcon Kind="UiIconKind.ChevronLeft" Size="18" />
+                </button>
+            }
+
+            <span class="top-bar-title" data-test="@UiTestIds.Header.Title">@HeaderTitle</span>
+
+            @if (ShowHeaderSubtitle)
+            {
+                <span id="@HeaderSubtitleDomId"
+                      class="app-header-subtitle"
+                      data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
+            }
+        }
+    </div>
+    <div class="app-header-right">
+        @if (ShowLibraryActions)
+        {
+            <div class="lib-search" data-test="@UiTestIds.Header.LibrarySearchSurface">
+                <UiIcon Kind="UiIconKind.Search" Size="15" />
+                <input type="text"
+                       value="@SearchText"
+                       placeholder="@SearchPlaceholder"
+                       @oninput="HandleLibrarySearchInputAsync"
+                       data-test="@UiTestIds.Header.LibrarySearch" />
+            </div>
+        }
+
+        <GoLiveShellButton Label="@GoLiveLabel"
+                           Status="@GoLiveStatus"
+                           LiveState="@GoLiveState"
+                           Subdued="@IsReaderMuted"
+                           OnClick="OnOpenGoLive"
+                           TestId="@UiTestIds.Header.GoLive" />
+
+        @if (ShowLibraryActions)
+        {
+            <button type="button"
+                    class="btn-ghost"
+                    @onclick="HandleOpenOnboardingAsync"
+                    title="@RestartTourLabel"
+                    aria-label="@RestartTourLabel"
+                    data-test="@UiTestIds.Header.Onboarding">
+                <UiIcon Kind="UiIconKind.HelpCircle" Size="15" />
+            </button>
+            <div class="app-header-file-action"
+                 data-test="@UiTestIds.Header.LibraryOpenScript">
+                <button type="button"
+                        class="btn-ghost btn-open-script"
+                        data-test="@UiTestIds.Header.LibraryOpenScriptButton"
+                        aria-haspopup="dialog"
+                        @onclick="HandleOpenScriptTriggerAsync">
+                    <span data-test="@UiTestIds.Header.LibraryOpenScriptIcon">
+                        <UiIcon Kind="UiIconKind.DocumentImport" Size="16" />
+                    </span>
+                    <span class="app-header-action-label">@OpenScriptLabel</span>
+                </button>
+                <InputFile @key="OpenScriptPickerVersion"
+                           id="@UiDomIds.AppShell.LibraryOpenScriptInput"
+                           class="app-header-file-input"
+                           aria-label="@OpenScriptLabel"
+                           accept="@SupportedOpenScriptAcceptValue"
+                           OnChange="HandleOpenScriptAsync"
+                           data-test="@UiTestIds.Header.LibraryOpenScriptInput" />
+            </div>
+            <button type="button"
+                    class="btn-create"
+                    @onclick="HandleCreateScriptClickAsync"
+                    data-test="@UiTestIds.Header.LibraryNewScript">
+                <span data-test="@UiTestIds.Header.LibraryNewScriptIcon">
+                    <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
+                </span>
+                <span class="app-header-action-label">@NewScriptLabel</span>
+            </button>
+        }
+
+        @if (ShowSaveFileAction)
+        {
+            <button type="button"
+                    class="btn-ghost"
+                    @onclick="HandleSaveFileClickAsync"
+                    data-test="@UiTestIds.Header.EditorSaveFile">
+                <UiIcon Kind="UiIconKind.SaveFile" Size="15" />
+                <span class="app-header-action-label">@SaveFileLabel</span>
+            </button>
+        }
+
+        @if (ShowLearnAction)
+        {
+            <button type="button"
+                    class="btn-ghost"
+                    @onclick="HandleOpenLearnClickAsync"
+                    data-test="@UiTestIds.Header.EditorLearn">
+                <UiIcon Kind="UiIconKind.BookOpen" Size="15" />
+                <span class="app-header-action-label">@LearnLabel</span>
+            </button>
+        }
+
+        @if (ShowLearnWpmBadge)
+        {
+            <span id="@UiDomIds.Learn.HeaderWpmBadge"
+                  class="top-bar-title app-header-wpm"
+                  data-test="@UiTestIds.Header.Wpm">@WpmLabel</span>
+        }
+
+        @if (ShowReadAction)
+        {
+            <button type="button"
+                    class="btn-gold"
+                    @onclick="HandleOpenReadClickAsync"
+                    data-test="@UiTestIds.Header.EditorRead">
+                <UiIcon Kind="UiIconKind.Play" Size="15" />
+                <span class="app-header-action-label">@ReadLabel</span>
+            </button>
+        }
+    </div>
+</header>
+
+@code {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
+
+    [Parameter, EditorRequired] public string CssClass { get; set; } = string.Empty;
+    [Parameter] public bool IsReaderMuted { get; set; }
+    [Parameter] public bool IsLibraryRootBreadcrumb { get; set; }
+    [Parameter] public bool IsLibraryScreen { get; set; }
+    [Parameter] public bool ShowBackButton { get; set; }
+    [Parameter] public bool ShowHeaderSubtitle { get; set; }
+    [Parameter] public bool ShowLearnAction { get; set; }
+    [Parameter] public bool ShowLearnWpmBadge { get; set; }
+    [Parameter] public bool ShowLibraryActions { get; set; }
+    [Parameter] public bool ShowReadAction { get; set; }
+    [Parameter] public bool ShowSaveFileAction { get; set; }
+    [Parameter] public int OpenScriptPickerVersion { get; set; }
+    [Parameter] public string? HeaderSubtitleDomId { get; set; }
+    [Parameter, EditorRequired] public string HeaderSubtitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HeaderTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LearnLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LibraryAllScriptsLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LibraryBreadcrumbCurrentLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string GoLiveLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string GoLiveState { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string GoLiveStatus { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string NewScriptLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string OpenScriptLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ReadLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string RestartTourLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SaveFileLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SearchPlaceholder { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SearchText { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SupportedOpenScriptAcceptValue { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string WpmLabel { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnBackClick { get; set; }
+    [Parameter] public EventCallback OnCreateScriptClick { get; set; }
+    [Parameter] public EventCallback OnHomeClick { get; set; }
+    [Parameter] public EventCallback OnOpenGoLive { get; set; }
+    [Parameter] public EventCallback OnOpenLearnClick { get; set; }
+    [Parameter] public EventCallback OnOpenOnboarding { get; set; }
+    [Parameter] public EventCallback OnOpenReadClick { get; set; }
+    [Parameter] public EventCallback OnOpenScriptTrigger { get; set; }
+    [Parameter] public EventCallback OnSaveFileClick { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnLibrarySearchInput { get; set; }
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnOpenScript { get; set; }
+
+    private Task HandleBackClickAsync() => OnBackClick.InvokeAsync();
+
+    private Task HandleCreateScriptClickAsync() => OnCreateScriptClick.InvokeAsync();
+
+    private Task HandleHomeClickAsync() => OnHomeClick.InvokeAsync();
+
+    private Task HandleLibrarySearchInputAsync(ChangeEventArgs args) => OnLibrarySearchInput.InvokeAsync(args);
+
+    private Task HandleOpenLearnClickAsync() => OnOpenLearnClick.InvokeAsync();
+
+    private Task HandleOpenOnboardingAsync() => OnOpenOnboarding.InvokeAsync();
+
+    private Task HandleOpenReadClickAsync() => OnOpenReadClick.InvokeAsync();
+
+    private Task HandleOpenScriptAsync(InputFileChangeEventArgs args) => OnOpenScript.InvokeAsync(args);
+
+    private Task HandleOpenScriptTriggerAsync() => OnOpenScriptTrigger.InvokeAsync();
+
+    private Task HandleSaveFileClickAsync() => OnSaveFileClick.InvokeAsync();
+}

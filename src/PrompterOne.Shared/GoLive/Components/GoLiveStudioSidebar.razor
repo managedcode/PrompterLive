@@ -35,6 +35,7 @@
                                      data-test="@UiTestIds.GoLive.ProviderCard(destination.Id)">
                                 <button type="button"
                                         class="gl-dest-row @(destination.IsEnabled ? "on" : null)"
+                                        data-enabled="@(destination.IsEnabled ? EnabledStateValue : DisabledStateValue)"
                                         data-test="@UiTestIds.GoLive.DestinationToggle(destination.Id)"
                                         @onclick="() => ToggleDestination.InvokeAsync(destination.Id)">
                                     <span class="gl-dest-platform-dot @destination.Tone"></span>
@@ -226,6 +227,8 @@
 
 @code {
     private const string ActiveMeterStateValue = "active";
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
 
     [Parameter] public GoLiveStudioTab ActiveTab { get; set; }
     [Parameter] public IReadOnlyList<GoLiveAudioChannelViewModel> AudioChannels { get; set; } = [];

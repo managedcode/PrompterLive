@@ -1,0 +1,38 @@
+@namespace PrompterOne.Shared.AppShell.Components
+@using PrompterOne.Shared.Contracts
+
+<button type="button"
+        class="@CssClass"
+        @onclick="HandleClickAsync"
+        data-live-state="@LiveState"
+        data-test="@UiTestIds.Header.LiveWidget">
+    <div class="app-live-widget-preview" data-test="@UiTestIds.Header.LiveWidgetPreview">
+        <div class="app-live-widget-overlay"></div>
+        <div class="app-live-widget-meta">
+            <span class="app-live-widget-live-pill">@StateLabel</span>
+            <span class="app-live-widget-timer"
+                  data-test="@UiTestIds.Header.LiveWidgetTimer">@Elapsed</span>
+        </div>
+    </div>
+
+    <div class="app-live-widget-copy">
+        <span class="app-live-widget-eyebrow">@IndicatorCopy</span>
+        <strong class="app-live-widget-title"
+                data-test="@UiTestIds.Header.LiveWidgetTitle">@Title</strong>
+        <span class="app-live-widget-detail"
+              data-test="@UiTestIds.Header.LiveWidgetDetail">@Detail</span>
+    </div>
+</button>
+
+@code {
+    [Parameter, EditorRequired] public string CssClass { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Detail { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Elapsed { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string IndicatorCopy { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LiveState { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string StateLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private Task HandleClickAsync() => OnClick.InvokeAsync();
+}

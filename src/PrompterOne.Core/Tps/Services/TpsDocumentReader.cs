@@ -19,10 +19,12 @@ public sealed class TpsDocumentReader
         var normalizedText = TpsSourceNormalizer.NormalizeLineEndings(tpsContent);
         if (string.IsNullOrWhiteSpace(normalizedText))
         {
-            return new TpsDocument();
+            return new TpsDocument { RawSource = string.Empty };
         }
 
         var result = TpsRuntime.Parse(normalizedText);
-        return TpsSdkMapper.ToLocalDocument(result.Document);
+        var document = TpsSdkMapper.ToLocalDocument(result.Document);
+        document.RawSource = normalizedText;
+        return document;
     }
 }
