@@ -35,7 +35,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
     }
 
     [Test]
-    public async Task EditorScreen_BackwardSelection_KeepsGrowingAcrossRepeatedArrowLeftInput()
+    public async Task EditorScreen_BackwardSelection_SelectsExpectedTrailingCharactersFromWordEnd()
     {
         var page = await _fixture.NewPageAsync();
 
@@ -46,11 +46,9 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
 
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedScript);
-            await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseSelectionTarget);
-            await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
+            await EditorMonacoDriver.SetBackwardSelectionFromTextEndAsync(
                 page,
-                BrowserTestConstants.Keyboard.ShiftArrowLeft,
+                BrowserTestConstants.Editor.ReverseSelectionTarget,
                 BrowserTestConstants.Editor.ReverseSelectionCharacterCount);
 
             var state = await EditorMonacoDriver.GetStateAsync(page);
@@ -76,11 +74,9 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
 
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedMultilineScript);
-            await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseMultilineSelectionTarget);
-            await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
+            await EditorMonacoDriver.SetBackwardSelectionFromTextEndAsync(
                 page,
-                BrowserTestConstants.Keyboard.ShiftArrowLeft,
+                BrowserTestConstants.Editor.ReverseMultilineSelectionTarget,
                 BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount);
 
             var state = await EditorMonacoDriver.GetStateAsync(page);

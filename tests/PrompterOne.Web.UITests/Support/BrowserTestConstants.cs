@@ -902,8 +902,6 @@ internal static partial class BrowserTestConstants
         public const string Undo = "ControlOrMeta+Z";
         public const string Redo = "ControlOrMeta+Shift+Z";
         public const string Shift = "Shift";
-        public const string ShiftArrowLeft = "Shift+ArrowLeft";
-        public const string ShiftArrowRight = "Shift+ArrowRight";
     }
 
     public static class Routes

@@ -31,6 +31,9 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
                 page,
                 targetRange.Start,
                 targetRange.End);
+            await EditorMonacoDriver.WaitForSelectionLineVisibleAsync(
+                page,
+                BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs);
 
             var before = await EditorMonacoDriver.GetStateAsync(page);
             await Assert.That(before.VisibleRange).IsNotNull();

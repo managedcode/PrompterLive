@@ -97,11 +97,9 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
         try
         {
             await GotoEditorAndWaitForSourceAsync(page);
-            await EditorMonacoDriver.SetCaretAtTextStartAsync(page, BrowserTestConstants.Editor.ToolbarPinnedSelectionTarget);
-            await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
+            await EditorMonacoDriver.SetForwardSelectionFromTextStartAsync(
                 page,
-                BrowserTestConstants.Keyboard.ShiftArrowRight,
+                BrowserTestConstants.Editor.ToolbarPinnedSelectionTarget,
                 BrowserTestConstants.Editor.ToolbarPinnedSelectionCharacterCount);
 
             var floatingBar = page.GetByTestId(UiTestIds.Editor.FloatingBar);

@@ -15,9 +15,6 @@ internal static class EditorMonacoDriver
         PropertyNameCaseInsensitive = true
     };
 
-    private static int GetSelectionLength(EditorMonacoState state) =>
-        Math.Abs(state.Selection.End - state.Selection.Start);
-
     internal static ILocator SourceInput(IPage page) =>
         page.GetByTestId(UiTestIds.Editor.SourceInput);
 
@@ -97,38 +94,6 @@ internal static class EditorMonacoDriver
         _ = await InvokeHarnessAsync<EditorMonacoState>(page, "focus");
     }
 
-    internal static async Task ExpandSelectionWithKeyAsync(IPage page, string key, int repeatCount)
-    {
-        var currentSelectionLength = GetSelectionLength(await GetStateAsync(page));
-
-        for (var index = 0; index < repeatCount; index++)
-        {
-            await page.Keyboard.PressAsync(key);
-            currentSelectionLength += 1;
-
-            await page.WaitForFunctionAsync(
-                """
-                (args) => {
-                    const harness = window[args.harnessGlobalName];
-                    const state = harness?.getState(args.testId);
-                    const selection = state?.selection;
-                    if (!selection) {
-                        return false;
-                    }
-
-                    return Math.abs(selection.end - selection.start) >= args.minimumSelectionLength;
-                }
-                """,
-                new
-                {
-                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                    minimumSelectionLength = currentSelectionLength,
-                    testId = UiTestIds.Editor.SourceStage
-                },
-                new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
-        }
-    }
-
     internal static async Task<EditorMonacoState> GetStateAsync(IPage page)
     {
         var state = await InvokeHarnessAsync<EditorMonacoState?>(page, "getState");
@@ -175,18 +140,33 @@ internal static class EditorMonacoDriver
     internal static async Task SetCaretAtTextStartAsync(IPage page, string targetText)
     {
         var state = await GetStateAsync(page);
-        var targetStart = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        await Assert.That(targetStart >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        var targetStart = FindTextStart(state.Text, targetText);
         await SetSelectionAsync(page, targetStart, targetStart);
     }
 
     internal static async Task SetCaretAtTextEndAsync(IPage page, string targetText)
     {
         var state = await GetStateAsync(page);
-        var targetStart = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        await Assert.That(targetStart >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        var targetStart = FindTextStart(state.Text, targetText);
         var caret = targetStart + targetText.Length;
         await SetSelectionAsync(page, caret, caret);
+    }
+
+    internal static async Task SetForwardSelectionFromTextStartAsync(IPage page, string targetText, int characterCount)
+    {
+        var state = await GetStateAsync(page);
+        var targetStart = FindTextStart(state.Text, targetText);
+        var targetEnd = Math.Min(state.Text.Length, targetStart + characterCount);
+        await SetSelectionAsync(page, targetStart, targetEnd);
+    }
+
+    internal static async Task SetBackwardSelectionFromTextEndAsync(IPage page, string targetText, int characterCount)
+    {
+        var state = await GetStateAsync(page);
+        var targetStart = FindTextStart(state.Text, targetText);
+        var targetEnd = targetStart + targetText.Length;
+        var selectionStart = Math.Max(0, targetEnd - characterCount);
+        await SetSelectionAsync(page, targetEnd, selectionStart);
     }
 
     internal static async Task SetSelectionAsync(IPage page, int start, int end, bool revealSelection = true)
@@ -214,12 +194,17 @@ internal static class EditorMonacoDriver
                 testId = UiTestIds.Editor.SourceStage
             },
             new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+    }
 
-        if (!revealSelection)
-        {
-            return;
-        }
+    internal static async Task SetSelectionByTextAsync(IPage page, string targetText)
+    {
+        var state = await GetStateAsync(page);
+        var start = FindTextStart(state.Text, targetText);
+        await SetSelectionAsync(page, start, start + targetText.Length);
+    }
 
+    internal static async Task WaitForSelectionLineVisibleAsync(IPage page, int timeoutMs)
+    {
         await page.WaitForFunctionAsync(
             """
             (args) => {
@@ -238,15 +223,7 @@ internal static class EditorMonacoDriver
                 harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
                 testId = UiTestIds.Editor.SourceStage
             },
-            new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
-    }
-
-    internal static async Task SetSelectionByTextAsync(IPage page, string targetText)
-    {
-        var state = await GetStateAsync(page);
-        var start = state.Text.IndexOf(targetText, StringComparison.Ordinal);
-        await Assert.That(start >= 0).IsTrue().Because($"Unable to locate \"{targetText}\" in the Monaco editor text.");
-        await SetSelectionAsync(page, start, start + targetText.Length);
+            new() { Timeout = timeoutMs });
     }
 
     internal static async Task SetTextAsync(IPage page, string text)
@@ -358,5 +335,16 @@ internal static class EditorMonacoDriver
                 .OrderBy(property => property.MetadataToken)
                 .Select(property => property.GetValue(payload))
                 .ToArray();
+
+    private static int FindTextStart(string sourceText, string targetText)
+    {
+        var targetStart = sourceText.IndexOf(targetText, StringComparison.Ordinal);
+        if (targetStart < 0)
+        {
+            throw new InvalidOperationException($"Unable to locate \"{targetText}\" in the Monaco editor text.");
+        }
+
+        return targetStart;
+    }
 
 }

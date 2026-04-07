@@ -37,11 +37,29 @@ internal static class UiScenarioArtifacts
         var directory = Path.GetDirectoryName(path) ?? throw new InvalidOperationException("Artifact directory path is unavailable.");
         Directory.CreateDirectory(directory);
 
-        await locator.ScreenshotAsync(new LocatorScreenshotOptions
+        for (var attempt = 1; attempt <= BrowserTestConstants.ScenarioArtifacts.CaptureRetryCount; attempt++)
         {
-            Path = path,
-            Animations = ScreenshotAnimations.Disabled
-        });
+            try
+            {
+                await locator.WaitForAsync(new()
+                {
+                    State = WaitForSelectorState.Visible,
+                    Timeout = BrowserTestConstants.ScenarioArtifacts.CaptureVisibleTimeoutMs
+                });
+                await locator.ScreenshotAsync(new LocatorScreenshotOptions
+                {
+                    Path = path,
+                    Animations = ScreenshotAnimations.Disabled
+                });
+                return;
+            }
+            catch (PlaywrightException exception) when (
+                attempt < BrowserTestConstants.ScenarioArtifacts.CaptureRetryCount &&
+                IsTransientLocatorCaptureFailure(exception))
+            {
+                await Task.Delay(BrowserTestConstants.ScenarioArtifacts.CaptureRetryDelayMs);
+            }
+        }
     }
 
     private static string BuildArtifactPath(string scenarioName, string stepName) =>
@@ -71,5 +89,15 @@ internal static class UiScenarioArtifacts
             BrowserTestConstants.ScenarioArtifacts.Separator);
         var trimmed = normalized.Trim(TrimCharacters);
         return string.IsNullOrWhiteSpace(trimmed) ? DefaultStepName : trimmed;
+    }
+
+    private static bool IsTransientLocatorCaptureFailure(PlaywrightException exception)
+    {
+        return exception.Message.Contains(
+                   BrowserTestConstants.ScenarioArtifacts.DetachedElementMessageFragment,
+                   StringComparison.OrdinalIgnoreCase)
+               || exception.Message.Contains(
+                   BrowserTestConstants.ScenarioArtifacts.UnstableElementMessageFragment,
+                   StringComparison.OrdinalIgnoreCase);
     }
 }

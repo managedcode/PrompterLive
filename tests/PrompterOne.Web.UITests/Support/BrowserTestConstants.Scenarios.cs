@@ -4,11 +4,16 @@ internal static partial class BrowserTestConstants
 {
     public static class ScenarioArtifacts
     {
+        public const int CaptureRetryCount = 3;
+        public const int CaptureRetryDelayMs = 150;
+        public const int CaptureVisibleTimeoutMs = 15_000;
+        public const string DetachedElementMessageFragment = "Element is not attached to the DOM";
         public const string OutputDirectoryName = "output";
         public const string PlaywrightDirectoryName = "playwright";
         public const string ImageExtension = ".png";
         public const string RepositoryRootRelativePath = "../../../../../";
         public const string Separator = "-";
+        public const string UnstableElementMessageFragment = "element is not stable";
     }
 
     public static class StudioWorkflow
