@@ -23,9 +23,35 @@ env:
   UI_TEST_PROJECT: tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj
 
 jobs:
-  validate_release:
-    name: Build And Test
+  validate_supporting_suites:
+    name: Validate Supporting Suites
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Build solution
+        run: dotnet build "$SOLUTION_FILE" -warnaserror
+
+      - name: Test supporting suites
+        run: |
+          dotnet test --project "$CORE_TEST_PROJECT"
+          dotnet test --project "$APP_TEST_PROJECT"
+
+  validate_browser_suite:
+    name: Validate Browser Suite
+    runs-on: macos-latest
+    timeout-minutes: 30
 
     permissions:
       contents: read
@@ -45,17 +71,13 @@ jobs:
       - name: Install Playwright browser
         run: node "$PLAYWRIGHT_CLI" install chromium
 
-      - name: Test supporting suites
-        run: |
-          dotnet test --project "$CORE_TEST_PROJECT"
-          dotnet test --project "$APP_TEST_PROJECT"
-
       - name: Test browser suite
         run: dotnet test --project "$UI_TEST_PROJECT"
-
   prepare_release:
     name: Resolve Release Version
-    needs: validate_release
+    needs:
+      - validate_supporting_suites
+      - validate_browser_suite
     runs-on: ubuntu-latest
     env:
       APP_PROJECT: src/PrompterOne.Web/PrompterOne.Web.csproj
