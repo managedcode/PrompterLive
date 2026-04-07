@@ -92,11 +92,11 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await Expect(input).ToBeVisibleAsync();
 
             await input.ClickAsync();
-            await input.TypeAsync("i");
+            await input.PressSequentiallyAsync("i");
             await Expect(input).ToHaveValueAsync("i");
             await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
 
-            await input.TypeAsync("n");
+            await input.PressSequentiallyAsync("n");
             await Expect(input).ToHaveValueAsync("in");
             await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
 

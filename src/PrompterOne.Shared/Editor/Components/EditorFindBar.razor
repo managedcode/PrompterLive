@@ -8,6 +8,7 @@
                value="@Query"
                placeholder="@Placeholder"
                aria-label="@Placeholder"
+               @ref="_inputRef"
                @oninput="HandleInputAsync"
                data-test="@UiTestIds.Editor.FindInput" />
     </label>
@@ -48,6 +49,9 @@
     [Parameter, EditorRequired] public string PreviousLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string Query { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ResultLabel { get; set; } = string.Empty;
+    private ElementReference _inputRef;
+
+    public ValueTask FocusInputAsync() => _inputRef.FocusAsync();
 
     private Task HandleCloseAsync() => OnClose.InvokeAsync();
 

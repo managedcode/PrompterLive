@@ -7,6 +7,7 @@ namespace PrompterOne.Shared.Components.Editor;
 
 public partial class EditorSourcePanel
 {
+    private const string ApproximateValuePrefix = "~";
     private IReadOnlyList<IReadOnlyList<EditorToolbarActionDescriptor>> _floatingActionGroups = [];
     private IReadOnlyList<EditorFloatingMenuDescriptor> _floatingMenus = [];
     private IReadOnlyList<EditorToolbarSectionDescriptor> _toolbarSections = [];
@@ -24,15 +25,33 @@ public partial class EditorSourcePanel
 
     private string StatusColumnShortLabel => L(UiTextKey.EditorStatusColumnShort);
 
-    private string StatusSegmentsLabel => LF(UiTextKey.EditorStatusSegmentsFormat, Status.SegmentCount);
+    private string StatusProfileLabel => L(UiTextKey.CommonProfile);
 
-    private string StatusVersionLabel => LF(UiTextKey.EditorStatusVersionFormat, Status.Version);
+    private string StatusBaseWpmLabel => L(UiTextKey.CommonBaseWpm);
 
-    private string StatusWordCountLabel => LF(UiTextKey.EditorStatusWordsFormat, Status.WordCount);
+    private string StatusBaseWpmValue => Status.BaseWpm.ToString(CultureInfo.CurrentCulture);
+
+    private string StatusLineValue => Status.Line.ToString(CultureInfo.CurrentCulture);
+
+    private string StatusColumnValue => Status.Column.ToString(CultureInfo.CurrentCulture);
+
+    private string StatusSegmentsLabel => L(UiTextKey.CommonSegments);
+
+    private string StatusSegmentsValue => Status.SegmentCount.ToString(CultureInfo.CurrentCulture);
+
+    private string StatusWordCountLabel => L(UiTextKey.CommonWords);
+
+    private string StatusWordCountValue => string.Concat(ApproximateValuePrefix, Status.WordCount.ToString(CultureInfo.CurrentCulture));
+
+    private string StatusDurationLabel => L(UiTextKey.CommonDuration);
+
+    private string StatusDurationValue => string.Concat(ApproximateValuePrefix, Status.Duration);
+
+    private string StatusVersionLabel => L(UiTextKey.CommonVersion);
+
+    private string StatusVersionValue => Status.Version;
 
     private IReadOnlyList<EditorToolbarSectionDescriptor> ToolbarSections => _toolbarSections;
-
-    private string LF(UiTextKey key, params object[] args) => Localizer[key.ToString(), args];
 
     private string L(UiTextKey key) => Localizer[key.ToString()];
 

@@ -173,11 +173,20 @@
         }
     </div>
 
-    <EditorStatusBar BaseWpmLabel="@($"{Status.BaseWpm} {L(UiTextKey.CommonWpm)}")"
-                     DurationLabel="@($"~{Status.Duration}")"
-                     LineColumnLabel="@($"{StatusLineShortLabel} {Status.Line}, {StatusColumnShortLabel} {Status.Column}")"
-                     Profile="@Status.Profile"
+    <EditorStatusBar BaseWpmLabel="@StatusBaseWpmLabel"
+                     BaseWpmValue="@StatusBaseWpmValue"
+                     ColumnLabel="@StatusColumnShortLabel"
+                     ColumnValue="@StatusColumnValue"
+                     DurationLabel="@StatusDurationLabel"
+                     DurationValue="@StatusDurationValue"
+                     LineLabel="@StatusLineShortLabel"
+                     LineValue="@StatusLineValue"
+                     ProfileLabel="@StatusProfileLabel"
+                     ProfileValue="@Status.Profile"
                      SegmentsLabel="@StatusSegmentsLabel"
+                     SegmentsValue="@StatusSegmentsValue"
                      VersionLabel="@StatusVersionLabel"
-                     WordCountLabel="@StatusWordCountLabel" />
+                     VersionValue="@StatusVersionValue"
+                     WordCountLabel="@StatusWordCountLabel"
+                     WordCountValue="@StatusWordCountValue" />
 </div>

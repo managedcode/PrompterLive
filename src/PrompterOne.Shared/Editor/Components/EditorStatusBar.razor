@@ -1,21 +1,64 @@
 @namespace PrompterOne.Shared.Components.Editor
 
-<div class="ed-statusbar">
-    <span>@LineColumnLabel</span>
-    <span>@Profile</span>
-    <span>@BaseWpmLabel</span>
-    <span>@SegmentsLabel</span>
-    <span>@WordCountLabel</span>
-    <span>@DurationLabel</span>
-    <span>@VersionLabel</span>
+<div class="ed-statusbar" data-test="@UiTestIds.Editor.StatusBar">
+    <div class="ed-statusbar-cluster" data-test="@UiTestIds.Editor.StatusCursor">
+        <span class="ed-statusbar-pair">
+            <span class="ed-statusbar-label">@LineLabel</span>
+            <span class="ed-statusbar-value">@LineValue</span>
+        </span>
+        <span class="ed-statusbar-divider" aria-hidden="true"></span>
+        <span class="ed-statusbar-pair">
+            <span class="ed-statusbar-label">@ColumnLabel</span>
+            <span class="ed-statusbar-value">@ColumnValue</span>
+        </span>
+    </div>
+
+    <div class="ed-statusbar-chip ed-statusbar-chip--accent" data-test="@UiTestIds.Editor.StatusProfile">
+        <span class="ed-statusbar-label">@ProfileLabel</span>
+        <span class="ed-statusbar-value">@ProfileValue</span>
+    </div>
+
+    <div class="ed-statusbar-chip" data-test="@UiTestIds.Editor.StatusBaseWpm">
+        <span class="ed-statusbar-label">@BaseWpmLabel</span>
+        <span class="ed-statusbar-value">@BaseWpmValue</span>
+    </div>
+
+    <div class="ed-statusbar-chip" data-test="@UiTestIds.Editor.StatusSegments">
+        <span class="ed-statusbar-label">@SegmentsLabel</span>
+        <span class="ed-statusbar-value">@SegmentsValue</span>
+    </div>
+
+    <div class="ed-statusbar-chip" data-test="@UiTestIds.Editor.StatusWords">
+        <span class="ed-statusbar-label">@WordCountLabel</span>
+        <span class="ed-statusbar-value">@WordCountValue</span>
+    </div>
+
+    <div class="ed-statusbar-chip" data-test="@UiTestIds.Editor.StatusDuration">
+        <span class="ed-statusbar-label">@DurationLabel</span>
+        <span class="ed-statusbar-value">@DurationValue</span>
+    </div>
+
+    <div class="ed-statusbar-chip ed-statusbar-chip--version" data-test="@UiTestIds.Editor.StatusVersion">
+        <span class="ed-statusbar-label">@VersionLabel</span>
+        <span class="ed-statusbar-value">@VersionValue</span>
+    </div>
 </div>
 
 @code {
     [Parameter, EditorRequired] public string BaseWpmLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string BaseWpmValue { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ColumnLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ColumnValue { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string DurationLabel { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public string LineColumnLabel { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public string Profile { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string DurationValue { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LineLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string LineValue { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ProfileLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ProfileValue { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SegmentsLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SegmentsValue { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string VersionLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string VersionValue { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string WordCountLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string WordCountValue { get; set; } = string.Empty;
 }

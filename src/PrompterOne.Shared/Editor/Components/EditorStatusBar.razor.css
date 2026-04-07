@@ -1,0 +1,58 @@
+.ed-statusbar{display:flex;align-items:center;gap:10px;row-gap:8px;flex-wrap:wrap;padding:10px 20px 14px;border-top:1px solid rgba(223,187,124,.10);background:linear-gradient(180deg, rgba(13,18,28,.84), rgba(10,14,22,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.03);flex-shrink:0;}
+.ed-statusbar-chip,.ed-statusbar-cluster{display:inline-flex;align-items:center;gap:10px;min-height:34px;padding:0 12px;border:1px solid rgba(223,187,124,.14);border-radius:999px;background:rgba(255,255,255,.03);color:var(--text-2);min-width:0;}
+.ed-statusbar-cluster{padding-right:14px;}
+.ed-statusbar-chip--accent{background:rgba(212,176,112,.08);}
+.ed-statusbar-chip--version{margin-left:auto;}
+.ed-statusbar-pair{display:inline-flex;align-items:baseline;gap:6px;min-width:0;}
+.ed-statusbar-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-4);white-space:nowrap;}
+.ed-statusbar-value{font-family:var(--mono);font-size:12px;line-height:1;color:var(--text-1);white-space:nowrap;}
+.ed-statusbar-divider{width:1px;height:14px;background:rgba(223,187,124,.16);flex-shrink:0;}
+
+html[data-theme="light"] .ed-statusbar,
+html.theme-light .ed-statusbar,
+body.theme-light .ed-statusbar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(249, 245, 238, .96));
+    border-top-color: rgba(107, 90, 72, .10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72);
+}
+
+html[data-theme="light"] .ed-statusbar-chip,
+html[data-theme="light"] .ed-statusbar-cluster,
+html.theme-light .ed-statusbar-chip,
+html.theme-light .ed-statusbar-cluster,
+body.theme-light .ed-statusbar-chip,
+body.theme-light .ed-statusbar-cluster {
+    border-color: rgba(139, 115, 85, .14);
+    background: rgba(107, 90, 72, .04);
+    color: #5C4D3D;
+}
+
+html[data-theme="light"] .ed-statusbar-chip--accent,
+html.theme-light .ed-statusbar-chip--accent,
+body.theme-light .ed-statusbar-chip--accent {
+    background: rgba(191, 151, 90, .10);
+}
+
+html[data-theme="light"] .ed-statusbar-label,
+html.theme-light .ed-statusbar-label,
+body.theme-light .ed-statusbar-label {
+    color: rgba(107, 90, 72, .56);
+}
+
+html[data-theme="light"] .ed-statusbar-value,
+html.theme-light .ed-statusbar-value,
+body.theme-light .ed-statusbar-value {
+    color: #2C2418;
+}
+
+html[data-theme="light"] .ed-statusbar-divider,
+html.theme-light .ed-statusbar-divider,
+body.theme-light .ed-statusbar-divider {
+    background: rgba(107, 90, 72, .14);
+}
+
+@media (max-width:768px){
+    .ed-statusbar{padding:10px 14px 12px;border-radius:0;}
+    .ed-statusbar-chip,.ed-statusbar-cluster{padding:0 10px;}
+    .ed-statusbar-chip--version{margin-left:0;}
+}

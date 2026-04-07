@@ -21,6 +21,8 @@ public partial class EditorSourcePanel : IAsyncDisposable
     private EditorMonacoCallbackBridge? _callbackBridge;
     private DotNetObjectReference<EditorMonacoCallbackBridge>? _callbackBridgeReference;
     private ElementReference _editorHostRef;
+    private EditorFindBar? _findBar;
+    private bool _focusFindInputAfterRender;
     private ElementReference _semanticSnapshotRef;
     private ElementReference _textareaRef;
     private bool _hasPendingLocalInputText;
@@ -134,6 +136,12 @@ public partial class EditorSourcePanel : IAsyncDisposable
         {
             _syncOverlayAfterRender = false;
             await SafeRenderOverlayAsync();
+        }
+
+        if (_focusFindInputAfterRender && _showFindBar && _findBar is not null)
+        {
+            _focusFindInputAfterRender = false;
+            await _findBar.FocusInputAsync();
         }
     }
 

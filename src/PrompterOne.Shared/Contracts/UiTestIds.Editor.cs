@@ -120,6 +120,14 @@ public static partial class UiTestIds
         public const string SpeedCustomWpm = "editor-speed-custom-wpm";
         public const string SpeedSlow = "editor-speed-slow";
         public const string SpeedTrigger = "editor-speed-trigger";
+        public const string StatusBar = "editor-status-bar";
+        public const string StatusBaseWpm = "editor-status-base-wpm";
+        public const string StatusCursor = "editor-status-cursor";
+        public const string StatusDuration = "editor-status-duration";
+        public const string StatusProfile = "editor-status-profile";
+        public const string StatusSegments = "editor-status-segments";
+        public const string StatusVersion = "editor-status-version";
+        public const string StatusWords = "editor-status-words";
         public const string SplitSegment = "editor-split-segment";
         public const string SplitHint = "editor-split-hint";
         public const string SplitStatus = "editor-split-status";
