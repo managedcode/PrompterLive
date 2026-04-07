@@ -77,6 +77,35 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
                 BrowserTestConstants.EditorFlow.FindSurfaceStep);
         });
 
+    [Test]
+    public Task EditorScreen_FindBar_KeepsFocusInSearchInputWhileTyping() =>
+        RunPageAsync(async page =>
+        {
+            UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.FindFocusScenario);
+
+            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+
+            var input = page.GetByTestId(UiTestIds.Editor.FindInput);
+
+            await page.GetByTestId(UiTestIds.Editor.FindToggle).ClickAsync();
+            await Expect(input).ToBeVisibleAsync();
+
+            await input.ClickAsync();
+            await input.TypeAsync("i");
+            await Expect(input).ToHaveValueAsync("i");
+            await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
+
+            await input.TypeAsync("n");
+            await Expect(input).ToHaveValueAsync("in");
+            await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
+
+            await UiScenarioArtifacts.CapturePageAsync(
+                page,
+                BrowserTestConstants.EditorFlow.FindFocusScenario,
+                BrowserTestConstants.EditorFlow.FindFocusStep);
+        });
+
     private static async Task<CssColor> ReadCssColorAsync(Microsoft.Playwright.ILocator locator, string propertyName) =>
         await locator.EvaluateAsync<CssColor>(
             """
@@ -109,4 +138,15 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             (element, propertyName) => Number.parseFloat(getComputedStyle(element)[propertyName] || "0")
             """,
             propertyName);
+
+    private static async Task ExpectActiveElementDataTestAsync(Microsoft.Playwright.IPage page, string expectedTestId)
+    {
+        var activeElementTestId = await page.EvaluateAsync<string>(
+            """
+            attributeName => document.activeElement?.getAttribute(attributeName) ?? ""
+            """,
+            BrowserTestConstants.Html.DataTestAttribute);
+
+        await Assert.That(activeElementTestId).IsEqualTo(expectedTestId);
+    }
 }

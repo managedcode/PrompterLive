@@ -153,10 +153,10 @@ public partial class EditorSourcePanel : IAsyncDisposable
         return true;
     }
 
-    public async Task FocusRangeAsync(int start, int end, bool revealSelection = true)
+    public async Task FocusRangeAsync(int start, int end, bool revealSelection = true, bool focusEditor = true)
     {
         var selection = await RunSelectionInteropAsync(
-            () => MonacoInterop.SetSelectionAsync(_editorHostRef, start, end, revealSelection),
+            () => MonacoInterop.SetSelectionAsync(_editorHostRef, start, end, revealSelection, focusEditor),
             FocusSelectionFailureMessage);
 
         if (selection is null)

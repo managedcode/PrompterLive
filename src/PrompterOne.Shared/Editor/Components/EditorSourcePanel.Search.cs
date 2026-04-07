@@ -47,7 +47,7 @@ public partial class EditorSourcePanel
     {
         _findQuery = args.Value?.ToString() ?? string.Empty;
         RefreshFindMatchesForCurrentText();
-        await FocusActiveFindMatchAsync();
+        await FocusActiveFindMatchAsync(focusEditor: false);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -98,11 +98,11 @@ public partial class EditorSourcePanel
 
         var nextIndex = (_findMatchIndex + direction + _findMatches.Count) % _findMatches.Count;
         _findMatchIndex = nextIndex;
-        await FocusActiveFindMatchAsync();
+        await FocusActiveFindMatchAsync(focusEditor: false);
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task FocusActiveFindMatchAsync()
+    private async Task FocusActiveFindMatchAsync(bool focusEditor)
     {
         if (_findMatchIndex < 0 || _findMatchIndex >= _findMatches.Count)
         {
@@ -110,7 +110,7 @@ public partial class EditorSourcePanel
         }
 
         var activeMatch = _findMatches[_findMatchIndex];
-        await FocusRangeAsync(activeMatch.Start, activeMatch.End);
+        await FocusRangeAsync(activeMatch.Start, activeMatch.End, focusEditor: focusEditor);
     }
 
     private void ClearFindState()

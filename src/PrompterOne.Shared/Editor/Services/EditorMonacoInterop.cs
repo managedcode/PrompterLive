@@ -70,7 +70,8 @@ public sealed class EditorMonacoInterop(IJSRuntime jsRuntime) : IDisposable, IAs
         ElementReference host,
         int start,
         int end,
-        bool revealSelection = true)
+        bool revealSelection = true,
+        bool focusEditor = true)
     {
         var module = await GetModuleAsync();
         if (module is null)
@@ -83,7 +84,8 @@ public sealed class EditorMonacoInterop(IJSRuntime jsRuntime) : IDisposable, IAs
             host,
             start,
             end,
-            revealSelection);
+            revealSelection,
+            focusEditor);
 
         return MapSelection(result);
     }

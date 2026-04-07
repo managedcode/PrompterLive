@@ -337,13 +337,13 @@ export function getSelectionState(host) {
     return state ? createSelectionState(state) : createEmptySelectionState();
 }
 
-export function setSelection(host, start, end, revealSelection = true) {
+export function setSelection(host, start, end, revealSelection = true, focusEditor = true) {
     const state = hostStates.get(host);
     if (!state) {
         return createEmptySelectionState();
     }
 
-    applySelection(state, start ?? 0, end ?? 0, revealSelection !== false);
+    applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, undefined, undefined, focusEditor !== false);
     notifySelectionChanged(state, false);
     return createSelectionState(state);
 }
@@ -1473,7 +1473,7 @@ function centerSelectionLineInViewport(state) {
     state.editor.focus();
 }
 
-function applySelection(state, start, end, revealSelection, selectionDirection, preservedScrollPositionOverride) {
+function applySelection(state, start, end, revealSelection, selectionDirection, preservedScrollPositionOverride, focusEditor = true) {
     const model = state.editor.getModel();
     if (!model) {
         return;
@@ -1499,7 +1499,9 @@ function applySelection(state, start, end, revealSelection, selectionDirection, 
 
     if (revealSelection) {
         const scrollType = state.monaco.editor.ScrollType.Immediate;
-        state.editor.focus();
+        if (focusEditor) {
+            state.editor.focus();
+        }
         revealSelectionInViewport(state, scrollType);
         state.editor.render();
         requestAnimationFrame(() => {
@@ -1513,7 +1515,9 @@ function applySelection(state, start, end, revealSelection, selectionDirection, 
         });
     }
     else {
-        state.editor.focus();
+        if (focusEditor) {
+            state.editor.focus();
+        }
         restoreEditorScrollPosition(state, preservedScrollPosition);
     }
 

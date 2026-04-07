@@ -50,6 +50,8 @@ internal static partial class BrowserTestConstants
         public const string ToolbarDropdownAlignmentFloatingStep = "02-floating-voice-menu-left-cluster";
         public const string FindSurfaceScenario = "editor-find-surface";
         public const string FindSurfaceStep = "01-styled-find-bar";
+        public const string FindFocusScenario = "editor-find-focus";
+        public const string FindFocusStep = "02-search-input-keeps-focus";
         public const double MinimumDateFieldWidthPx = 150;
         public const double MinimumFindShellBackgroundAlpha = 0.01;
         public const double MaximumFindButtonBackgroundAlpha = 0.2;
