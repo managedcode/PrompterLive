@@ -31,6 +31,64 @@
          class="ed-meta-body"
          hidden="@IsCollapsed"
          aria-hidden="@IsCollapsed">
+        <div class="ed-section-label ed-meta-priority-label">@Text(UiTextKey.EditorMetadataSplitSection)</div>
+        <p class="ed-meta-note ed-meta-action-note">@Text(UiTextKey.EditorMetadataSplitHint)</p>
+        <div class="ed-meta-actions">
+            <button type="button"
+                    class="ed-meta-action"
+                    data-testid="@UiTestIds.Editor.SplitTopLevel"
+                    @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.TopLevelHeading)">
+                @Text(UiTextKey.EditorSplitTopLevel)
+            </button>
+            <button type="button"
+                    class="ed-meta-action"
+                    data-testid="@UiTestIds.Editor.SplitSegment"
+                    @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.SegmentHeading)">
+                @Text(UiTextKey.EditorSplitSegment)
+            </button>
+        </div>
+
+        @if (SplitFeedback is not null)
+        {
+            <div class="ed-sidebar-note ed-sidebar-note-split ed-meta-split-feedback" data-testid="@UiTestIds.Editor.SplitStatus">
+                <div class="ed-sidebar-note-head">
+                    <div>
+                        <div class="ed-sidebar-note-kicker" data-testid="@UiTestIds.Editor.SplitResultTitle">@SplitFeedback.Title</div>
+                        <div class="ed-sidebar-note-summary" data-testid="@UiTestIds.Editor.SplitResultSummary">@SplitFeedback.Summary</div>
+                    </div>
+                    <span class="ed-sidebar-note-badge" data-testid="@UiTestIds.Editor.SplitResultBadge">@SplitFeedback.HeadingBadge</span>
+                </div>
+
+                <p class="ed-sidebar-note-copy" data-testid="@UiTestIds.Editor.SplitResultLibrary">@SplitFeedback.DestinationNote</p>
+                <p class="ed-sidebar-note-copy ed-sidebar-note-copy-muted" data-testid="@UiTestIds.Editor.SplitResultCurrentDraft">@SplitFeedback.DraftNote</p>
+
+                @if (SplitFeedback.CreatedTitles.Count > 0)
+                {
+                    <div class="ed-sidebar-note-list" data-testid="@UiTestIds.Editor.SplitResultList">
+                        @for (var index = 0; index < SplitFeedback.CreatedTitles.Count; index++)
+                        {
+                            <div class="ed-sidebar-note-item" data-testid="@UiTestIds.Editor.SplitResultItem(index)">
+                                <span class="ed-sidebar-note-item-index">@($"{index + 1:00}")</span>
+                                <span class="ed-sidebar-note-item-title">@SplitFeedback.CreatedTitles[index]</span>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if (SplitFeedback.AdditionalCount > 0)
+                {
+                    <div class="ed-sidebar-note-more" data-testid="@UiTestIds.Editor.SplitResultMore">@Format(UiTextKey.EditorSplitMoreInLibraryFormat, SplitFeedback.AdditionalCount)</div>
+                }
+
+                <button class="ed-sidebar-note-link"
+                        data-testid="@UiTestIds.Editor.SplitResultOpenLibrary"
+                        type="button"
+                        @onclick="() => OpenLibraryRequested.InvokeAsync()">
+                    @SplitFeedback.OpenLibraryLabel
+                </button>
+            </div>
+        }
+
         <div class="ed-meta-field">
             <label>@Text(UiTextKey.CommonTitle)</label>
             <input type="text"
@@ -148,64 +206,6 @@
         <div class="ed-stat"><span>@Text(UiTextKey.CommonEstimatedTime)</span><b>@Status.Duration</b></div>
         <div class="ed-stat"><span>@Text(UiTextKey.CommonSegments)</span><b>@Status.SegmentCount</b></div>
         <div class="ed-stat"><span>@Text(UiTextKey.CommonBlocks)</span><b>@Status.BlockCount</b></div>
-
-        <div class="ed-section-label ed-meta-subsection">@Text(UiTextKey.EditorMetadataSplitSection)</div>
-        <p class="ed-meta-note ed-meta-action-note">@Text(UiTextKey.EditorMetadataSplitHint)</p>
-        <div class="ed-meta-actions">
-            <button type="button"
-                    class="ed-meta-action"
-                    data-testid="@UiTestIds.Editor.SplitTopLevel"
-                    @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.TopLevelHeading)">
-                @Text(UiTextKey.EditorSplitTopLevel)
-            </button>
-            <button type="button"
-                    class="ed-meta-action"
-                    data-testid="@UiTestIds.Editor.SplitSegment"
-                    @onclick="() => SplitRequested.InvokeAsync(TpsDocumentSplitMode.SegmentHeading)">
-                @Text(UiTextKey.EditorSplitSegment)
-            </button>
-        </div>
-
-        @if (SplitFeedback is not null)
-        {
-            <div class="ed-sidebar-note ed-sidebar-note-split ed-meta-split-feedback" data-testid="@UiTestIds.Editor.SplitStatus">
-                <div class="ed-sidebar-note-head">
-                    <div>
-                        <div class="ed-sidebar-note-kicker" data-testid="@UiTestIds.Editor.SplitResultTitle">@SplitFeedback.Title</div>
-                        <div class="ed-sidebar-note-summary" data-testid="@UiTestIds.Editor.SplitResultSummary">@SplitFeedback.Summary</div>
-                    </div>
-                    <span class="ed-sidebar-note-badge" data-testid="@UiTestIds.Editor.SplitResultBadge">@SplitFeedback.HeadingBadge</span>
-                </div>
-
-                <p class="ed-sidebar-note-copy" data-testid="@UiTestIds.Editor.SplitResultLibrary">@SplitFeedback.DestinationNote</p>
-                <p class="ed-sidebar-note-copy ed-sidebar-note-copy-muted" data-testid="@UiTestIds.Editor.SplitResultCurrentDraft">@SplitFeedback.DraftNote</p>
-
-                @if (SplitFeedback.CreatedTitles.Count > 0)
-                {
-                    <div class="ed-sidebar-note-list" data-testid="@UiTestIds.Editor.SplitResultList">
-                        @for (var index = 0; index < SplitFeedback.CreatedTitles.Count; index++)
-                        {
-                            <div class="ed-sidebar-note-item" data-testid="@UiTestIds.Editor.SplitResultItem(index)">
-                                <span class="ed-sidebar-note-item-index">@($"{index + 1:00}")</span>
-                                <span class="ed-sidebar-note-item-title">@SplitFeedback.CreatedTitles[index]</span>
-                            </div>
-                        }
-                    </div>
-                }
-
-                @if (SplitFeedback.AdditionalCount > 0)
-                {
-                    <div class="ed-sidebar-note-more" data-testid="@UiTestIds.Editor.SplitResultMore">@Format(UiTextKey.EditorSplitMoreInLibraryFormat, SplitFeedback.AdditionalCount)</div>
-                }
-
-                <button class="ed-sidebar-note-link"
-                        data-testid="@UiTestIds.Editor.SplitResultOpenLibrary"
-                        type="button"
-                        @onclick="() => OpenLibraryRequested.InvokeAsync()">
-                    @SplitFeedback.OpenLibraryLabel
-                </button>
-            </div>
-        }
 
         <div class="ed-section-label ed-meta-subsection">@LocalFileSectionLabel</div>
         <div class="ed-stat" data-testid="@UiTestIds.Editor.LocalHistoryStatus"><span>@AutoSaveLabel</span><b>@GetAutoSaveStateLabel()</b></div>

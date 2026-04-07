@@ -142,6 +142,10 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
         editor,
         host,
         lastDecorationClasses: [],
+        lastMeaningfulScrollPosition: {
+            scrollLeft: editor.getScrollLeft(),
+            scrollTop: editor.getScrollTop()
+        },
         monaco,
         options,
         proxy,
@@ -158,6 +162,11 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
         editor.onDidChangeCursorSelection(() => notifySelectionChanged(state, false)),
         editor.onDidLayoutChange(() => syncEditorChromeContracts(state)),
         editor.onDidScrollChange(() => {
+            const scrollPosition = captureEditorScrollPosition(state);
+            if (scrollPosition.scrollLeft > 0 || scrollPosition.scrollTop > 0) {
+                state.lastMeaningfulScrollPosition = scrollPosition;
+            }
+
             if (shouldUseVisibleRangeDecorations(state)) {
                 scheduleDecorations(state);
             }
@@ -218,7 +227,7 @@ export async function syncEditorState(host, text, selectionStart, selectionEnd) 
     }
 
     const nextText = text ?? emptyValue;
-    const preservedScrollPosition = captureEditorScrollPosition(state);
+    const preservedScrollPosition = resolvePreservedScrollPosition(state);
     state.suppressTextNotification = true;
     state.suppressSelectionNotification = true;
 
@@ -1279,8 +1288,39 @@ function captureEditorScrollPosition(state) {
     };
 }
 
+function getPrimaryVisibleRange(state) {
+    const visibleRanges = state.editor.getVisibleRanges();
+    return visibleRanges.length ? visibleRanges[0] : null;
+}
+
+function resolvePreservedScrollPosition(state) {
+    const currentScrollPosition = captureEditorScrollPosition(state);
+    if (currentScrollPosition.scrollLeft > 0 || currentScrollPosition.scrollTop > 0) {
+        return currentScrollPosition;
+    }
+
+    const fallbackScrollPosition = state.lastMeaningfulScrollPosition ?? currentScrollPosition;
+    if (!fallbackScrollPosition || fallbackScrollPosition.scrollTop <= currentScrollPosition.scrollTop) {
+        return currentScrollPosition;
+    }
+
+    const selection = createSelectionState(state);
+    const visibleRange = getPrimaryVisibleRange(state);
+    const selectionLine = Math.max(1, selection.line ?? 1);
+    const selectionBelowVisibleRange = visibleRange
+        ? selectionLine > visibleRange.endLineNumber
+        : selectionLine > 1;
+
+    return selectionBelowVisibleRange
+        ? fallbackScrollPosition
+        : currentScrollPosition;
+}
+
 function restoreEditorScrollPosition(state, scrollPosition) {
     state.editor.setScrollPosition(scrollPosition, state.monaco.editor.ScrollType.Immediate);
+    if (scrollPosition.scrollLeft > 0 || scrollPosition.scrollTop > 0) {
+        state.lastMeaningfulScrollPosition = scrollPosition;
+    }
 }
 
 function replaceModelTextPreservingViewport(state, nextText, preservedScrollPosition) {
@@ -1289,7 +1329,7 @@ function replaceModelTextPreservingViewport(state, nextText, preservedScrollPosi
         return false;
     }
 
-    const stableScrollPosition = preservedScrollPosition ?? captureEditorScrollPosition(state);
+    const stableScrollPosition = preservedScrollPosition ?? resolvePreservedScrollPosition(state);
     model.setValue(nextText);
     restoreEditorScrollPosition(state, stableScrollPosition);
     requestAnimationFrame(() => {
@@ -1304,30 +1344,42 @@ function replaceModelTextPreservingViewport(state, nextText, preservedScrollPosi
 }
 
 function centerSelectionLineInViewport(state) {
-    const selection = createSelectionState(state);
-    const lineNumber = Math.max(1, selection.line ?? 1);
+    const selection = state.editor.getSelection();
     const scrollType = state.monaco.editor.ScrollType.Immediate;
 
-    if (typeof state.editor.getTopForLineNumber === "function") {
-        const layoutInfo = state.editor.getLayoutInfo?.();
-        const lineHeight = typeof state.editor.getOption === "function"
-            ? (state.editor.getOption(state.monaco.editor.EditorOption.lineHeight) ?? 0)
-            : 0;
-        const viewportHeight = layoutInfo?.height ?? 0;
-        const lineTop = state.editor.getTopForLineNumber(lineNumber);
-        const centeredScrollTop = Math.max(0, lineTop - Math.max(0, (viewportHeight - lineHeight) / 2));
-
-        state.editor.setScrollPosition(
-            {
-                scrollLeft: state.editor.getScrollLeft(),
-                scrollTop: centeredScrollTop
-            },
-            scrollType);
-    }
-    else {
-        revealSelectionInViewport(state, scrollType);
+    if (!selection) {
+        state.editor.focus();
+        return;
     }
 
+    const lineNumber = Math.max(1, selection.positionLineNumber ?? selection.endLineNumber ?? selection.startLineNumber ?? 1);
+    const position = {
+        column: selection.positionColumn ?? selection.endColumn ?? selection.startColumn ?? 1,
+        lineNumber
+    };
+
+    if (typeof state.editor.revealLineInCenter === "function") {
+        state.editor.revealLineInCenter(lineNumber, scrollType);
+    }
+    else if (typeof state.editor.revealLineInCenterIfOutsideViewport === "function") {
+        state.editor.revealLineInCenterIfOutsideViewport(lineNumber, scrollType);
+    }
+
+    if (typeof state.editor.revealPositionInCenter === "function") {
+        state.editor.revealPositionInCenter(position, scrollType);
+    }
+    else if (typeof state.editor.revealPositionInCenterIfOutsideViewport === "function") {
+        state.editor.revealPositionInCenterIfOutsideViewport(position, scrollType);
+    }
+
+    if (typeof state.editor.revealRangeInCenter === "function") {
+        state.editor.revealRangeInCenter(selection, scrollType);
+    }
+    else if (typeof state.editor.revealRangeInCenterIfOutsideViewport === "function") {
+        state.editor.revealRangeInCenterIfOutsideViewport(selection, scrollType);
+    }
+
+    state.editor.render();
     state.editor.focus();
 }
 
@@ -1347,7 +1399,7 @@ function applySelection(state, start, end, revealSelection, selectionDirection, 
     const focusOffset = direction === "backward" ? orderedStart : orderedEnd;
     const anchorPosition = model.getPositionAt(anchorOffset);
     const focusPosition = model.getPositionAt(focusOffset);
-    const preservedScrollPosition = preservedScrollPositionOverride ?? captureEditorScrollPosition(state);
+    const preservedScrollPosition = preservedScrollPositionOverride ?? resolvePreservedScrollPosition(state);
 
     state.editor.setSelection(new state.monaco.Selection(
         anchorPosition.lineNumber,

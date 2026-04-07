@@ -218,12 +218,35 @@
         inset 0 1px 0 var(--gold-06);
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232,213,176,.28) transparent;
     transition:
         width .22s ease,
         min-width .22s ease,
         padding .22s ease,
         border-color .18s ease,
         box-shadow .18s ease;
+}
+
+.ed-right::-webkit-scrollbar {
+    width: 10px;
+}
+
+.ed-right::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ed-right::-webkit-scrollbar-thumb {
+    background: rgba(232,213,176,.28);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.ed-right::-webkit-scrollbar-thumb:hover {
+    background: rgba(232,213,176,.42);
+    background-clip: padding-box;
 }
 
 .ed-right[data-collapsed="true"] {

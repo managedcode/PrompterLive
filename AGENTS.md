@@ -98,6 +98,9 @@ Rule format:
 - Public web hosting is split by role: the standalone PrompterOne app in this repo must publish on `app.prompter.one`, while the marketing landing site for `prompter.one` lives in the separate `PrompterOne-LandingPage` repository.
 - For deploy-only, domain, CI, or static-site hosting tasks, do not spend time on unrelated app/browser test suites unless the user explicitly asks or the runtime behavior itself changes; prefer workflow, build, and publish-config validation only.
 - Repo-wide .NET SDK and test-runner selection belong in the root `global.json`; do not split `global.json` test-runner opt-ins per project or subfolder once the user asks for a global test-platform policy.
+- Repo-wide quality audits and agent-generated review handoff artifacts must be written as root-level task files so other coding agents can pick them up quickly; do not bury those temporary audit results under `docs/` unless the task is explicitly about durable product documentation.
+- Repo-wide cleanup and review passes must explicitly inventory forbidden implementation string literals, `MarkupString` or raw-HTML UI composition, duplicated JS/CSS patterns, architecture-boundary drift, and `foreach`-driven test scenarios that should become isolated TUnit cases.
+- Repo-wide audits should use multiple independent reviewers with distinct focuses when the tooling is available, including external CLI reviewers such as Claude and Copilot plus internal agents, and all review outputs should be captured in root-level task files before remediation starts.
 
 ## Rules to Follow (Mandatory)
 
@@ -206,6 +209,7 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
   - current state
   - required change
   - constraints and risks
+- For repo-wide review or audit tasks, produce the initial code-review findings and root-level audit artifacts before running broad automated test baselines; use targeted verification after concrete fixes unless the user explicitly asks for the broader baseline upfront.
 - For UI and design-driven work, execute in this order unless an explicit exception is documented:
   - inspect the design reference and current implementation first
   - map the design into the target Blazor structure and wire the intended UI before spending time on test execution
@@ -314,6 +318,7 @@ Local `AGENTS.md` files may tighten these values, but they must not loosen them 
 - Fallback device names, fallback device labels, and other invented media-device placeholders are forbidden in runtime and tests; use real device metadata when it exists, otherwise keep the field empty or assert on explicit no-device state instead of fabricating names.
 - Design boundaries so real behaviour can be tested through public interfaces.
 - The repo-root `.editorconfig` is the source of truth for formatting, naming, style, and analyzer severity. Use nested `.editorconfig` files only when they clearly serve a subtree-specific purpose.
+- Repo-wide cleanup must preserve vertical-slice ownership: fix each issue in the owning feature slice, avoid new cross-cutting dumping grounds, and prefer slice-local reusable abstractions over shared misc helpers.
 
 Repo-specific design rules:
 
@@ -491,6 +496,10 @@ Ask first:
 - visual UI elements should be extracted into reusable Blazor design-system components and then composed into pages; do not assemble repeated chrome, badges, glyph-label rows, or menu-item visuals ad hoc inside page/catalog code
 - page- or catalog-level ownership of dropdown, menu, tooltip, badge, image, or icon-row visuals; standardized interactive chrome must live in reusable Blazor components with their own styles/contracts, and page code may only compose those components
 - ad-hoc one-off UI cleanup without a repo search and explicit inventory of similar offenders first; when this class of design-system debt is touched, audit the whole slice, track the file list in a plan, and close items systematically with tests
+- broad quality reviews that end at a report; when the audit finds concrete code smells or architecture violations, follow through with fixes in the same task unless an explicit blocker is documented
+- repo-wide review or audit requests that start with broad automated test runs before the initial findings are written down; review artifacts and ranked findings must come first unless the user explicitly asks for a test baseline
+- Blazor UI authored as page-sized raw markup blobs or HTML-string composition instead of small reusable Razor components with clear contracts; routed screens should read as composed component trees, not pasted HTML fragments
+- duplicated styling or browser-behavior logic split across CSS, JS, and Razor when one reusable Blazor component or C# contract can own it cleanly
 - runtime dependencies fetched from random external sources instead of vendored release artifacts
 - progress updates that talk about internal skill routing instead of the concrete repo change
 - long exploratory work before producing the concrete vendored files the user explicitly asked for

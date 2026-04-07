@@ -225,8 +225,20 @@ internal static class EditorMonacoDriver
             (args) => {
                 const harness = window[args.harnessGlobalName];
                 const state = harness?.getState(args.testId);
+                if (!state) {
+                    return false;
+                }
+
                 const scrollTop = state?.scrollTop;
-                return typeof scrollTop === "number" && scrollTop >= args.minimumScrollTop;
+                if (typeof scrollTop === "number" && scrollTop >= args.minimumScrollTop) {
+                    return true;
+                }
+
+                if (typeof harness?.centerSelectionLine === "function") {
+                    harness.centerSelectionLine(args.testId);
+                }
+
+                return false;
             }
             """,
             new

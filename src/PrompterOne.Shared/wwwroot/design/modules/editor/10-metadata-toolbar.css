@@ -57,6 +57,10 @@
     margin-top: 18px;
 }
 
+.ed-meta-priority-label {
+    margin-top: 6px;
+}
+
 .ed-right[data-collapsed="true"] .ed-meta-header {
     justify-content: center;
     margin-bottom: 0;
