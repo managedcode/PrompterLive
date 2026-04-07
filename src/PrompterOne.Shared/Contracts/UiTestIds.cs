@@ -221,6 +221,7 @@ public static class UiTestIds
         public const string MenuSpeed = "editor-menu-speed";
         public const string MainPanel = "editor-main-panel";
         public const string MetadataRail = "editor-metadata-rail";
+        public const string MetadataRailBody = "editor-metadata-rail-body";
         public const string MetadataRailToggle = "editor-metadata-rail-toggle";
         public const string LocalHistoryEmpty = "editor-local-history-empty";
         public const string LocalHistoryPanel = "editor-local-history-panel";
@@ -268,18 +269,33 @@ public static class UiTestIds
         public static string SplitResultItem(int index) => $"editor-split-result-item-{index}";
 
         public static string SegmentNavigation(int segmentIndex) => $"editor-structure-segment-{segmentIndex}";
+
+        public static string ToolbarActionLeading(string actionTestId) => $"{actionTestId}-leading";
+
+        public static string ToolbarActionLeadingIcon(string actionTestId) => $"{actionTestId}-leading-icon";
+
+        public static string ToolbarActionLabel(string actionTestId) => $"{actionTestId}-label";
+
+        public static string ToolbarActionMeta(string actionTestId) => $"{actionTestId}-meta";
+
+        public static string ToolbarActionTrailingIcon(string actionTestId) => $"{actionTestId}-trailing-icon";
     }
 
     public static class Learn
     {
+        public const string Crosshair = "learn-crosshair";
         public const string ContextLeft = "learn-context-left";
         public const string ContextRight = "learn-context-right";
         public const string Display = "learn-display";
+        public const string FocusRow = "learn-focus-row";
         public const string LoopToggle = "learn-loop-toggle";
         public const string NextPhrase = "learn-next-phrase";
         public const string OrpLine = "learn-orp-line";
         public const string Page = "learn-page";
+        public const string PauseIcon = "learn-pause-icon";
         public const string PlayToggle = "learn-play-toggle";
+        public const string PlayIcon = "learn-play-icon";
+        public const string ProgressFill = "learn-progress-fill";
         public const string ProgressLabel = "learn-progress-label";
         public const string SpeedValue = "learn-speed-value";
         public const string SpeedDown = "learn-speed-down";
@@ -289,11 +305,15 @@ public static class UiTestIds
         public const string StepForward = "learn-step-forward";
         public const string StepForwardLarge = "learn-step-forward-large";
         public const string Word = "learn-word";
+        public const string WordLeading = "learn-word-leading";
+        public const string WordOrp = "learn-word-orp";
         public const string WordShell = "learn-word-shell";
+        public const string WordTrailing = "learn-word-trailing";
     }
 
     public static class Teleprompter
     {
+        public const string ActiveWord = "teleprompter-active-word";
         public const string Back = "teleprompter-back";
         public const string AlignmentCenter = "teleprompter-alignment-center";
         public const string AlignmentControls = "teleprompter-alignment-controls";
@@ -334,10 +354,22 @@ public static class UiTestIds
         public const string PreviousBlock = "teleprompter-previous-block";
         public const string PreviousWord = "teleprompter-previous-word";
         public const string Progress = "teleprompter-progress";
+        public const string ProgressFill = "teleprompter-progress-fill";
         public const string ProgressLabel = "teleprompter-progress-label";
         public const string ProgressSegments = "teleprompter-progress-segments";
+        public const string SpeedDown = "teleprompter-speed-down";
+        public const string SpeedUp = "teleprompter-speed-up";
+        public const string SpeedValue = "teleprompter-speed-value";
         public const string Sliders = "teleprompter-sliders";
         public const string Stage = "teleprompter-stage";
+        public const string TimeValue = "teleprompter-time";
+        public const string BlockIndicator = "teleprompter-block-indicator";
+        public const string FontLabel = "teleprompter-font-label";
+        public const string FontValue = "teleprompter-font-value";
+        public const string Gradient = "teleprompter-gradient";
+        public const string PauseIcon = "teleprompter-pause-icon";
+        public const string PlayIcon = "teleprompter-play-icon";
+        public const string WidthValue = "teleprompter-width-value";
         public const string WidthSlider = "teleprompter-width-slider";
 
         public static string Card(int index) => $"teleprompter-card-{index}";
@@ -350,6 +382,8 @@ public static class UiTestIds
 
         public static string CardWord(int cardIndex, int groupIndex, int wordIndex) =>
             $"teleprompter-card-word-{cardIndex}-{groupIndex}-{wordIndex}";
+
+        public static string CardWordPrefix(int cardIndex) => $"teleprompter-card-word-{cardIndex}-";
 
         public static string ProgressSegmentFill(int index) => $"teleprompter-progress-segment-fill-{index}";
 

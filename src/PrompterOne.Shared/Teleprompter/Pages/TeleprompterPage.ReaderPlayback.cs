@@ -10,9 +10,9 @@ public partial class TeleprompterPage
     private const int MinimumReaderLoopDelayMilliseconds = 120;
     private const int ReaderCardTransitionMilliseconds = 600;
 
-    private Task DecreaseReaderFontSizeAsync() => ChangeReaderFontSizeAsync(-ReaderFontStep);
+    private Task DecreaseReaderPlaybackSpeedAsync() => ChangeReaderPlaybackSpeedAsync(-ReaderPlaybackSpeedStepWpm);
 
-    private Task IncreaseReaderFontSizeAsync() => ChangeReaderFontSizeAsync(ReaderFontStep);
+    private Task IncreaseReaderPlaybackSpeedAsync() => ChangeReaderPlaybackSpeedAsync(ReaderPlaybackSpeedStepWpm);
 
     private Task StepReaderBackwardAsync() => StepReaderWordAsync(ReaderBackwardStep);
 
@@ -42,6 +42,26 @@ public partial class TeleprompterPage
         _readerFontSize = nextFontSize;
         RequestReaderAlignment(instant: true);
         await PersistCurrentReaderLayoutAsync();
+    }
+
+    private async Task ChangeReaderPlaybackSpeedAsync(int delta)
+    {
+        var nextSpeedWpm = Math.Clamp(
+            _readerPlaybackSpeedWpm + delta,
+            ReaderMinimumPlaybackSpeedWpm,
+            ReaderMaximumPlaybackSpeedWpm);
+        if (nextSpeedWpm == _readerPlaybackSpeedWpm)
+        {
+            return;
+        }
+
+        _readerPlaybackSpeedWpm = nextSpeedWpm;
+        await PersistCurrentReaderLayoutAsync();
+
+        if (_isReaderPlaying)
+        {
+            RestartReaderPlaybackLoop(GetCurrentWordDelayMilliseconds());
+        }
     }
 
     private async Task HandleReaderFontSizeInputAsync(ChangeEventArgs args)
@@ -406,7 +426,7 @@ public partial class TeleprompterPage
             {
                 if (remainingIndex == 0)
                 {
-                    return Math.Max(MinimumReaderLoopDelayMilliseconds, word.DurationMs + word.PauseAfterMs);
+                    return BuildScaledReaderDelayMilliseconds(word.DurationMs + word.PauseAfterMs);
                 }
 
                 remainingIndex--;
@@ -432,4 +452,13 @@ public partial class TeleprompterPage
         _cards.Count == 0
             ? 0
             : (_activeReaderCardIndex + 1) % _cards.Count;
+
+    private int BuildScaledReaderDelayMilliseconds(int rawDelayMilliseconds)
+    {
+        var safeDelay = Math.Max(MinimumReaderLoopDelayMilliseconds, rawDelayMilliseconds);
+        var speedRatio = _readerBaseTpsWpm / (double)_readerPlaybackSpeedWpm;
+        return Math.Max(
+            MinimumReaderLoopDelayMilliseconds,
+            (int)Math.Round(safeDelay * speedRatio, MidpointRounding.AwayFromZero));
+    }
 }

@@ -11,7 +11,7 @@
      @onkeydown:preventDefault="true"
      data-test="@UiTestIds.Teleprompter.Page">
     <div class="rd">
-        <div class="@BuildReaderGradientCssClass()" id="rd-gradient"></div>
+        <div class="@BuildReaderGradientCssClass()" id="rd-gradient" data-test="@UiTestIds.Teleprompter.Gradient"></div>
         <video class="@BuildCameraCssClass()"
                id="@_cameraLayer.ElementId"
                autoplay
@@ -39,35 +39,30 @@
                     <button class="@BuildReaderMirrorButtonCssClass(_isReaderMirrorHorizontal)"
                             @onclick="ToggleReaderMirrorHorizontalAsync"
                             aria-label="@ReaderMirrorHorizontalTitle"
-                            data-test="@UiTestIds.Teleprompter.MirrorHorizontalToggle"
                             data-test="@UiTestIds.Teleprompter.MirrorHorizontalToggle">
                         @ReaderMirrorHorizontalLabel
                     </button>
                     <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipMirrorHorizontalKey)"
                           class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                           role="tooltip"
-                          data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipMirrorHorizontalKey)"
                           data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipMirrorHorizontalKey)">@ReaderMirrorHorizontalTitle</span>
                 </div>
                 <div class="rd-rail-tip-anchor">
                     <button class="@BuildReaderMirrorButtonCssClass(_isReaderMirrorVertical)"
                             @onclick="ToggleReaderMirrorVerticalAsync"
                             aria-label="@ReaderMirrorVerticalTitle"
-                            data-test="@UiTestIds.Teleprompter.MirrorVerticalToggle"
                             data-test="@UiTestIds.Teleprompter.MirrorVerticalToggle">
                         @ReaderMirrorVerticalLabel
                     </button>
                     <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipMirrorVerticalKey)"
                           class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                           role="tooltip"
-                          data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipMirrorVerticalKey)"
                           data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipMirrorVerticalKey)">@ReaderMirrorVerticalTitle</span>
                 </div>
                 <div class="rd-rail-tip-anchor">
                     <button class="@BuildReaderOrientationButtonCssClass()"
                             @onclick="ToggleReaderOrientationAsync"
                             aria-label="@ReaderOrientationTitle"
-                            data-test="@UiTestIds.Teleprompter.OrientationToggle"
                             data-test="@UiTestIds.Teleprompter.OrientationToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                             <path d="M7 3H3v4"></path>
@@ -79,14 +74,12 @@
                     <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipOrientationKey)"
                           class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                           role="tooltip"
-                          data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipOrientationKey)"
                           data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipOrientationKey)">@ReaderOrientationTitle</span>
                 </div>
                 <div class="rd-rail-tip-anchor">
                     <button class="@BuildReaderFullscreenButtonCssClass()"
                             @onclick="ToggleReaderFullscreenAsync"
                             aria-label="@ReaderFullscreenTitle"
-                            data-test="@UiTestIds.Teleprompter.FullscreenToggle"
                             data-test="@UiTestIds.Teleprompter.FullscreenToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                             <polyline points="8,3 3,3 3,8"></polyline>
@@ -98,18 +91,15 @@
                     <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipFullscreenKey)"
                           class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                           role="tooltip"
-                          data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFullscreenKey)"
                           data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFullscreenKey)">@ReaderFullscreenTitle</span>
                 </div>
                 <span class="rd-rail-divider" aria-hidden="true"></span>
                 <div class="rd-align-controls"
-                     data-test="@UiTestIds.Teleprompter.AlignmentControls"
                      data-test="@UiTestIds.Teleprompter.AlignmentControls">
                     <div class="rd-rail-tip-anchor">
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Left)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Left))"
                                 aria-label="@ReaderTextAlignLeftTitle"
-                                data-test="@UiTestIds.Teleprompter.AlignmentLeft"
                                 data-test="@UiTestIds.Teleprompter.AlignmentLeft">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="3" y1="4.5" x2="13" y2="4.5" />
@@ -120,14 +110,12 @@
                         <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipLeftKey)"
                               class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                               role="tooltip"
-                              data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipLeftKey)"
                               data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipLeftKey)">@ReaderTextAlignLeftTitle</span>
                     </div>
                     <div class="rd-rail-tip-anchor">
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Center)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Center))"
                                 aria-label="@ReaderTextAlignCenterTitle"
-                                data-test="@UiTestIds.Teleprompter.AlignmentCenter"
                                 data-test="@UiTestIds.Teleprompter.AlignmentCenter">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="5" y1="4.5" x2="15" y2="4.5" />
@@ -138,14 +126,12 @@
                         <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipCenterKey)"
                               class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                               role="tooltip"
-                              data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipCenterKey)"
                               data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipCenterKey)">@ReaderTextAlignCenterTitle</span>
                     </div>
                     <div class="rd-rail-tip-anchor">
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Right)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Right))"
                                 aria-label="@ReaderTextAlignRightTitle"
-                                data-test="@UiTestIds.Teleprompter.AlignmentRight"
                                 data-test="@UiTestIds.Teleprompter.AlignmentRight">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="7" y1="4.5" x2="17" y2="4.5" />
@@ -156,14 +142,12 @@
                         <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipRightKey)"
                               class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                               role="tooltip"
-                              data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipRightKey)"
                               data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipRightKey)">@ReaderTextAlignRightTitle</span>
                     </div>
                     <div class="rd-rail-tip-anchor">
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Justify)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Justify))"
                                 aria-label="@ReaderTextAlignJustifyTitle"
-                                data-test="@UiTestIds.Teleprompter.AlignmentJustify"
                                 data-test="@UiTestIds.Teleprompter.AlignmentJustify">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="3" y1="4.5" x2="17" y2="4.5" />
@@ -175,7 +159,6 @@
                         <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipJustifyKey)"
                               class="@BuildRailTooltipCssClass(placeOnRightSide: true)"
                               role="tooltip"
-                              data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipJustifyKey)"
                               data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipJustifyKey)">@ReaderTextAlignJustifyTitle</span>
                     </div>
                 </div>
@@ -184,7 +167,10 @@
             <div class="rd-sliders" data-test="@UiTestIds.Teleprompter.Sliders">
                 <div class="rd-rail-tip-anchor">
                 <div class="rd-slider-group">
-                    <span class="rd-slider-icon rd-slider-icon--glyph" aria-hidden="true">T</span>
+                    <span class="rd-slider-icon rd-slider-icon--glyph"
+                          id="@UiDomIds.Teleprompter.FontLabel"
+                          data-test="@UiTestIds.Teleprompter.FontLabel"
+                          aria-hidden="true">T</span>
                     <input type="range"
                            class="rd-vslider"
                            id="@UiDomIds.Teleprompter.FontSlider"
@@ -194,14 +180,12 @@
                            @oninput="HandleReaderFontSizeInputAsync"
                            @onkeydown:stopPropagation="true"
                            aria-label="@ReaderFontSliderTitle"
-                           data-test="@UiTestIds.Teleprompter.FontSlider"
                            data-test="@UiTestIds.Teleprompter.FontSlider">
-                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.FontValue">@_readerFontSize</span>
+                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.FontValue" data-test="@UiTestIds.Teleprompter.FontValue">@_readerFontSize</span>
                 </div>
                 <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)"
                       class="@BuildRailTooltipCssClass(placeOnRightSide: false)"
                       role="tooltip"
-                      data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)"
                       data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey)">@ReaderFontSliderTitle</span>
                 </div>
                 <div class="rd-rail-tip-anchor">
@@ -216,14 +200,12 @@
                            @oninput="HandleReaderFocalPointInputAsync"
                            @onkeydown:stopPropagation="true"
                            aria-label="@ReaderFocalSliderTitle"
-                           data-test="@UiTestIds.Teleprompter.FocalSlider"
                            data-test="@UiTestIds.Teleprompter.FocalSlider">
                     <span class="rd-slider-val" id="rd-focal-val">@_readerFocalPointPercent%</span>
                 </div>
                 <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipFocalKey)"
                       class="@BuildRailTooltipCssClass(placeOnRightSide: false)"
                       role="tooltip"
-                      data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFocalKey)"
                       data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipFocalKey)">@ReaderFocalSliderTitle</span>
                 </div>
                 <div class="rd-rail-tip-anchor">
@@ -238,14 +220,12 @@
                            @oninput="HandleReaderTextWidthInputAsync"
                            @onkeydown:stopPropagation="true"
                            aria-label="@ReaderWidthSliderTitle"
-                           data-test="@UiTestIds.Teleprompter.WidthSlider"
                            data-test="@UiTestIds.Teleprompter.WidthSlider">
-                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.WidthValue">@BuildReaderWidthLabel()</span>
+                    <span class="rd-slider-val" id="@UiDomIds.Teleprompter.WidthValue" data-test="@UiTestIds.Teleprompter.WidthValue">@BuildReaderWidthLabel()</span>
                 </div>
                 <span id="@BuildRailTooltipDomId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)"
                       class="@BuildRailTooltipCssClass(placeOnRightSide: false)"
                       role="tooltip"
-                      data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)"
                       data-test="@BuildRailTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)">@ReaderWidthSliderTitle</span>
                 </div>
             </div>
@@ -305,7 +285,7 @@
                                                           @attributes="BuildReaderWordDataAttributes(word, entry.index, chunkIndex, wordIndex)"
                                                           @attributes="word.Attributes"
                                                           style="@word.Style"
-                                                          data-test="@UiTestIds.Teleprompter.CardWord(entry.index, chunkIndex, wordIndex)">@word.Text</span>
+                                                          data-test="@BuildReaderWordTestId(entry.index, chunkIndex, wordIndex)">@word.Text</span>
                                                     @if (wordIndex < group.Words.Count - 1)
                                                     {
                                                         @(" ")
@@ -336,7 +316,7 @@
             </div>
 
             <div class="@BuildReaderEdgeProgressCssClass()">
-                <div class="rd-edge-fill" id="@UiDomIds.Teleprompter.ProgressFill" style="@BuildReaderProgressStyle()"></div>
+                <div class="rd-edge-fill" id="@UiDomIds.Teleprompter.ProgressFill" data-test="@UiTestIds.Teleprompter.ProgressFill" style="@BuildReaderProgressStyle()"></div>
                 <div class="rd-edge-segs">
                     @foreach (var entry in _cards.Select((card, index) => (card, index)))
                     {
@@ -348,6 +328,7 @@
                     <span class="rd-edge-section" data-test="@UiTestIds.Teleprompter.EdgeSection">@_edgeSectionLabel</span>
                     <span class="rd-time"
                       id="@UiDomIds.Teleprompter.Time"
+                      data-test="@UiTestIds.Teleprompter.TimeValue"
                       @attributes="BuildReaderTimeDataAttributes()">@BuildElapsedLabel()</span>
                 </div>
 
@@ -370,20 +351,20 @@
 
             <div class="@BuildReaderControlsCssClass()" data-test="@UiTestIds.Teleprompter.Controls">
                 <div class="rd-ctrl-group">
-                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.FontDown" Text="@ReaderFontDownTooltip">
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.SpeedDown" Text="@ReaderSpeedDownTooltip">
                         <button class="rd-ctrl-btn"
-                                @onclick="DecreaseReaderFontSizeAsync"
-                                aria-label="@ReaderFontDownTooltip"
-                                data-test="@UiTestIds.Teleprompter.FontDown">
+                                @onclick="DecreaseReaderPlaybackSpeedAsync"
+                                aria-label="@ReaderSpeedDownTooltip"
+                                data-test="@UiTestIds.Teleprompter.SpeedDown">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         </button>
                     </TooltipAnchor>
-                    <span class="rd-ctrl-label" id="@UiDomIds.Teleprompter.FontLabel">@_readerFontSize</span>
-                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.FontUp" Text="@ReaderFontUpTooltip">
+                    <span class="rd-ctrl-label" id="@UiDomIds.Teleprompter.SpeedValue" data-test="@UiTestIds.Teleprompter.SpeedValue">@BuildReaderSpeedLabel()</span>
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.SpeedUp" Text="@ReaderSpeedUpTooltip">
                         <button class="rd-ctrl-btn"
-                                @onclick="IncreaseReaderFontSizeAsync"
-                                aria-label="@ReaderFontUpTooltip"
-                                data-test="@UiTestIds.Teleprompter.FontUp">
+                                @onclick="IncreaseReaderPlaybackSpeedAsync"
+                                aria-label="@ReaderSpeedUpTooltip"
+                                data-test="@UiTestIds.Teleprompter.SpeedUp">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         </button>
                     </TooltipAnchor>
@@ -408,10 +389,10 @@
                                 @onclick="ToggleReaderPlaybackAsync"
                                 aria-label="@ReaderPlayToggleTooltip"
                                 data-test="@UiTestIds.Teleprompter.PlayToggle">
-                            <span data-toggle-icon="play" hidden="@_isReaderPlaying">
+                            <span data-toggle-icon="play" data-test="@UiTestIds.Teleprompter.PlayIcon" hidden="@_isReaderPlaying">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
                             </span>
-                            <span data-toggle-icon="pause" hidden="@(!_isReaderPlaying)">
+                            <span data-toggle-icon="pause" data-test="@UiTestIds.Teleprompter.PauseIcon" hidden="@(!_isReaderPlaying)">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
                             </span>
                         </button>
@@ -431,7 +412,7 @@
                 </div>
 
                 <div class="rd-ctrl-group">
-                    <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator">@BuildBlockIndicatorLabel()</span>
+                    <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator" data-test="@UiTestIds.Teleprompter.BlockIndicator">@BuildBlockIndicatorLabel()</span>
                     <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.CameraToggle" Text="@ReaderCameraTooltip">
                         <button class="@BuildCameraButtonCssClass()"
                                 id="@UiDomIds.Teleprompter.CameraButton"

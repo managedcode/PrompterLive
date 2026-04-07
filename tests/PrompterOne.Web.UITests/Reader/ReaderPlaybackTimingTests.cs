@@ -40,7 +40,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            await InstallWordRecorderAsync(page, BrowserTestConstants.Teleprompter.ActiveWordSelector);
+            await InstallWordRecorderAsync(page, UiTestIds.Teleprompter.ActiveWord);
             await page.GetByTestId(UiTestIds.Teleprompter.PlayToggle).ClickAsync();
 
             var samples = await WaitForRecordedSamplesAsync(page, BrowserTestConstants.ReaderTiming.WordCount);
@@ -165,7 +165,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
     private static bool IsDisplayBoundaryPunctuation(char character) =>
         char.IsPunctuation(character) && character is not '\'' and not '’';
 
-    private static Task InstallWordRecorderAsync(IPage page, string selector) =>
+    private static Task InstallWordRecorderAsync(IPage page, string testId) =>
         page.EvaluateAsync(
             """
             config => {
@@ -176,13 +176,13 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                     pauseAttributeName: config.pauseAttributeName,
                     pollIntervalMs: config.pollIntervalMs,
                     samples: [],
-                    selector: config.selector,
+                    testId: config.testId,
                     startMs: performance.now(),
                     timer: 0
                 };
 
                 const readWord = () => {
-                    const node = document.querySelector(recorder.selector);
+                    const node = document.querySelector(`[data-test="${recorder.testId}"]`);
                     if (!(node instanceof HTMLElement)) {
                         return;
                     }
@@ -214,7 +214,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 effectiveWpmAttributeName = UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
                 pauseAttributeName = UiDataAttributes.Teleprompter.PauseMilliseconds,
                 pollIntervalMs = BrowserTestConstants.ReaderTiming.CapturePollIntervalMs,
-                selector
+                testId
             });
 
     private static async Task<IReadOnlyList<RecordedWordSample>> CaptureLearnSamplesAsync(
@@ -229,7 +229,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await Expect(page.GetByTestId(UiTestIds.Learn.Word)).ToBeVisibleAsync();
         await Assert.That(await ReadNormalizedLearnWordAsync(page)).IsEqualTo(BrowserTestConstants.ReaderTiming.FirstWord);
-        await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+        await Expect(page.GetByTestId(UiTestIds.Learn.SpeedValue))
             .ToHaveTextAsync(targetWpm.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
         await InstallWordRecorderAsync(page, UiTestIds.Learn.Word);

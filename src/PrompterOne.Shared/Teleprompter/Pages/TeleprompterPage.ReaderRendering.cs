@@ -45,6 +45,7 @@ public partial class TeleprompterPage
     private const string ReaderWordActiveCssClass = "rd-now";
     private const string ReaderWordCssClass = "rd-w";
     private const string ReaderWordReadCssClass = "rd-read";
+    private const string ReaderWordsPerMinuteSuffix = "WPM";
 
     private void UpdateReaderDisplayState(bool instantAlignment = false, bool requestAlignment = true)
     {
@@ -278,7 +279,17 @@ public partial class TeleprompterPage
             _ => null
         };
 
-    private IReadOnlyDictionary<string, object> BuildReaderPauseDataAttributes(ReaderPauseViewModel pause) =>
+    private string BuildReaderWordTestId(int cardIndex, int chunkIndex, int wordIndex)
+    {
+        var activeWordTestId = ResolveReaderWordCssClass(cardIndex, chunkIndex, wordIndex) == ReaderWordActiveCssClass
+            ? UiTestIds.Teleprompter.ActiveWord
+            : null;
+
+        return activeWordTestId
+            ?? UiTestIds.Teleprompter.CardWord(cardIndex, chunkIndex, wordIndex);
+    }
+
+    private static IReadOnlyDictionary<string, object> BuildReaderPauseDataAttributes(ReaderPauseViewModel pause) =>
         new Dictionary<string, object>(StringComparer.Ordinal)
         {
             [UiDataAttributes.Teleprompter.DurationMilliseconds] = pause.DurationMs
@@ -300,10 +311,13 @@ public partial class TeleprompterPage
         var attributes = new Dictionary<string, object>(StringComparer.Ordinal)
         {
             [UiDataAttributes.Teleprompter.DurationMilliseconds] = word.DurationMs,
-            [UiDataAttributes.Teleprompter.EffectiveWordsPerMinute] = word.EffectiveWpm,
             [UiDataAttributes.Teleprompter.PauseMilliseconds] = word.PauseAfterMs
         };
 
+        AddOptionalDataAttribute(
+            attributes,
+            UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
+            word.EffectiveWpm);
         AddOptionalDataAttribute(
             attributes,
             UiDataAttributes.Teleprompter.Pronunciation,
@@ -357,6 +371,8 @@ public partial class TeleprompterPage
             ? "0%"
             : $"{BuildProgressPercent():0}% · {_activeReaderCardIndex + 1} / {_cards.Count}";
 
+    private string BuildReaderSpeedLabel() => $"{_readerPlaybackSpeedWpm} {ReaderWordsPerMinuteSuffix}";
+
     private static string BuildReaderProgressSegmentStyle(ReaderCardViewModel card) =>
         $"flex:{BuildReaderProgressSegmentFlexWeight(card)} 1 0;min-width:0;";
 
@@ -377,6 +393,17 @@ public partial class TeleprompterPage
         if (!string.IsNullOrWhiteSpace(value))
         {
             attributes[attributeName] = value;
+        }
+    }
+
+    private static void AddOptionalDataAttribute(
+        IDictionary<string, object> attributes,
+        string attributeName,
+        int? value)
+    {
+        if (value.HasValue)
+        {
+            attributes[attributeName] = value.Value;
         }
     }
 

@@ -27,6 +27,7 @@
                 <span class="gl-badge @SessionBadgeCssClass">@PrimarySessionBadge</span>
                 <button type="button"
                         class="gl-panel-toggle @(ShowLeftRail ? "active" : null)"
+                        data-active="@(ShowLeftRail ? ActiveStateValue : InactiveStateValue)"
                         data-test="@UiTestIds.GoLive.LeftPanelToggle"
                         @onclick="ToggleLeftRailAsync">
                     <UiIcon Kind="UiIconKind.PanelLeft" Size="14" />
@@ -41,12 +42,14 @@
             <div class="gl-topbar-right">
                 <button type="button"
                         class="gl-panel-toggle @(_fullProgramView ? "active" : null)"
+                        data-active="@(_fullProgramView ? ActiveStateValue : InactiveStateValue)"
                         data-test="@UiTestIds.GoLive.FullProgramToggle"
                         @onclick="ToggleFullProgramViewAsync">
                     <UiIcon Kind="UiIconKind.Expand" Size="14" />
                 </button>
                 <button type="button"
                         class="gl-panel-toggle @(ShowRightRail ? "active" : null)"
+                        data-active="@(ShowRightRail ? ActiveStateValue : InactiveStateValue)"
                         data-test="@UiTestIds.GoLive.RightPanelToggle"
                         @onclick="ToggleRightRailAsync">
                     <UiIcon Kind="UiIconKind.PanelRight" Size="14" />
@@ -55,6 +58,7 @@
                 <div class="gl-mode-switch">
                     <button type="button"
                             class="gl-mode-btn gl-mode-director @(_activeStudioMode == GoLiveStudioMode.Director ? "active" : null)"
+                            data-active="@(_activeStudioMode == GoLiveStudioMode.Director ? ActiveStateValue : InactiveStateValue)"
                             data-test="@UiTestIds.GoLive.ModeDirector"
                             @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Director)">
                         <UiIcon Kind="UiIconKind.Users" Size="12" />
@@ -62,6 +66,7 @@
                     </button>
                     <button type="button"
                             class="gl-mode-btn gl-mode-studio @(_activeStudioMode == GoLiveStudioMode.Studio ? "active" : null)"
+                            data-active="@(_activeStudioMode == GoLiveStudioMode.Studio ? ActiveStateValue : InactiveStateValue)"
                             data-test="@UiTestIds.GoLive.ModeStudio"
                             @onclick="() => SelectStudioModeAsync(GoLiveStudioMode.Studio)">
                         <UiIcon Kind="UiIconKind.Monitor" Size="12" />

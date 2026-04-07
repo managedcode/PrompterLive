@@ -195,7 +195,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture)
     {
         await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider), BrowserTestConstants.ReaderWorkflow.TeleprompterWidth);
         await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), BrowserTestConstants.ReaderWorkflow.TeleprompterFocal);
-        await page.GetByTestId(UiTestIds.Teleprompter.FontUp).ClickAsync();
+        await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
         await page.GetByTestId(UiTestIds.Teleprompter.PlayToggle).ClickAsync();
         await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderPlaybackDelayMs);
         await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();

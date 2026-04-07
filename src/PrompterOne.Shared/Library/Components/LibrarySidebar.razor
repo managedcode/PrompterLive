@@ -8,6 +8,7 @@
     <nav class="lib-nav">
         <a class="nav-item @(IsAllSelected ? "active" : null)"
            @onclick="HandleSelectAllAsync"
+           data-active="@(IsAllSelected ? ActiveStateValue : InactiveStateValue)"
            data-test="@UiTestIds.Library.FolderAll">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -69,6 +70,9 @@
 </div>
 
 @code {
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
+
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderNodeViewModel> Folders { get; set; } = [];
 
     [Parameter, EditorRequired] public int AllScriptCount { get; set; }

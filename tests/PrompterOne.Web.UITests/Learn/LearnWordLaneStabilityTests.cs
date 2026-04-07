@@ -50,7 +50,7 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture)
             """
             ids => {
                 const word = document.querySelector(`[data-test="${ids.word}"]`);
-                const orp = word?.querySelector('.orp');
+                const orp = document.querySelector(`[data-test="${ids.orp}"]`);
                 const leftRail = document.querySelector(`[data-test="${ids.left}"]`);
                 const rightRail = document.querySelector(`[data-test="${ids.right}"]`);
                 const leftWord = leftRail?.lastElementChild;
@@ -74,6 +74,7 @@ public sealed class LearnWordLaneStabilityTests(StandaloneAppFixture fixture)
             new
             {
                 word = UiTestIds.Learn.Word,
+                orp = UiTestIds.Learn.WordOrp,
                 left = UiTestIds.Learn.ContextLeft,
                 right = UiTestIds.Learn.ContextRight
             });

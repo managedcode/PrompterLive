@@ -9,6 +9,7 @@
         <button type="button"
                 class="set-toggle @(IsEnabled ? "on" : null)"
                 @onclick="HandleToggleAsync"
+                data-enabled="@(IsEnabled ? EnabledStateValue : DisabledStateValue)"
                 data-test="@ToggleTestId">
             <div class="set-toggle-thumb"></div>
         </button>
@@ -28,6 +29,8 @@
 </article>
 
 @code {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
     private const string LiveStatusCssPending = "pending";
     private const string LiveStatusCssReady = "ready";
 

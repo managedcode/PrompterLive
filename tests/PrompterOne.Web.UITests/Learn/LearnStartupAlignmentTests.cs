@@ -70,6 +70,8 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
                 const learnDisplayTestId = {{ToJsString(UiTestIds.Learn.Display)}};
                 const learnLineTestId = {{ToJsString(UiTestIds.Learn.OrpLine)}};
                 const learnWordTestId = {{ToJsString(UiTestIds.Learn.Word)}};
+                const learnWordOrpTestId = {{ToJsString(UiTestIds.Learn.WordOrp)}};
+                const learnFocusRowTestId = {{ToJsString(UiTestIds.Learn.FocusRow)}};
                 const maxSamples = 16;
                 const maxAnimationFramePasses = maxSamples;
 
@@ -96,10 +98,10 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
                     }
 
                     const display = document.querySelector(`[data-test="${learnDisplayTestId}"]`);
-                    const row = display?.querySelector('.rsvp-h-row');
+                    const row = document.querySelector(`[data-test="${learnFocusRowTestId}"]`);
                     const line = document.querySelector(`[data-test="${learnLineTestId}"]`);
                     const word = document.querySelector(`[data-test="${learnWordTestId}"]`);
-                    const orp = word?.querySelector('.orp');
+                    const orp = document.querySelector(`[data-test="${learnWordOrpTestId}"]`);
                     if (!display || !row) {
                         return;
                     }
@@ -186,10 +188,10 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
             """
             args => {
                 const display = document.querySelector(`[data-test="${args.displayTestId}"]`);
-                const row = display?.querySelector('.rsvp-h-row');
+                const row = document.querySelector(`[data-test="${args.focusRowTestId}"]`);
                 const line = document.querySelector(`[data-test="${args.lineTestId}"]`);
                 const word = document.querySelector(`[data-test="${args.wordTestId}"]`);
-                const orp = word?.querySelector('.orp');
+                const orp = document.querySelector(`[data-test="${args.orpTestId}"]`);
                 const rowStyles = row ? getComputedStyle(row) : null;
                 const lineRect = line?.getBoundingClientRect();
                 const orpRect = orp?.getBoundingClientRect();
@@ -208,8 +210,10 @@ public sealed class LearnStartupAlignmentTests(StandaloneAppFixture fixture)
             new
             {
                 displayTestId = UiTestIds.Learn.Display,
+                focusRowTestId = UiTestIds.Learn.FocusRow,
                 layoutReadyAttributeName = LayoutReadyAttributeName,
                 lineTestId = UiTestIds.Learn.OrpLine,
+                orpTestId = UiTestIds.Learn.WordOrp,
                 wordTestId = UiTestIds.Learn.Word
             });
 

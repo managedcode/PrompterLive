@@ -1,14 +1,17 @@
 @namespace PrompterOne.Shared.Components.Editor
+@using PrompterOne.Shared.Contracts
 
 <span class="ed-action-content">
     @if (Content.HasLeadingIcon)
     {
-        <EditorActionIcon Kind="@Content.LeadingIcon" Tone="@Content.LeadingIconTone" />
+        <span data-test="@UiTestIds.Editor.ToolbarActionLeadingIcon(ActionTestId)">
+            <EditorActionIcon Kind="@Content.LeadingIcon" Tone="@Content.LeadingIconTone" />
+        </span>
     }
 
     @if (Content.HasLeadingText)
     {
-        <span class="@GetLeadingTextCss()">@Content.LeadingText</span>
+        <span class="@GetLeadingTextCss()" data-test="@UiTestIds.Editor.ToolbarActionLeading(ActionTestId)">@Content.LeadingText</span>
     }
 
     @if (Content.HasLabel || Content.HasMetaText)
@@ -16,23 +19,27 @@
         <span class="ed-action-copy">
             @if (Content.HasLabel)
             {
-                <span class="ed-action-label">@Content.Label</span>
+                <span class="ed-action-label" data-test="@UiTestIds.Editor.ToolbarActionLabel(ActionTestId)">@Content.Label</span>
             }
 
             @if (Content.HasMetaText)
             {
-                <small class="ed-action-meta">@Content.MetaText</small>
+                <small class="ed-action-meta" data-test="@UiTestIds.Editor.ToolbarActionMeta(ActionTestId)">@Content.MetaText</small>
             }
         </span>
     }
 
     @if (Content.HasTrailingIcon)
     {
-        <EditorActionIcon Kind="@Content.TrailingIcon" Tone="@Content.TrailingIconTone" />
+        <span data-test="@UiTestIds.Editor.ToolbarActionTrailingIcon(ActionTestId)">
+            <EditorActionIcon Kind="@Content.TrailingIcon" Tone="@Content.TrailingIconTone" />
+        </span>
     }
 </span>
 
 @code {
+    [Parameter] public string ActionTestId { get; set; } = string.Empty;
+
     [Parameter] public EditorActionContentDescriptor Content { get; set; } = new();
 
     private string GetLeadingTextCss()

@@ -108,8 +108,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
 
             Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
             Assert.Equal(EditorMetadataTestSource.RightChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
-            Assert.NotNull(toggle.QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.CreatedIcon).QuerySelector(".ui-icon"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.CreatedIcon));
             Assert.Equal(EditorMetadataTestSource.FalseText, rail.GetAttribute("data-collapsed"));
         });
 
@@ -122,9 +121,8 @@ public sealed class EditorMetadataInteractionTests : BunitContext
 
             Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
             Assert.Equal(EditorMetadataTestSource.LeftChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
-            Assert.NotNull(toggle.QuerySelector(".ui-icon"));
             Assert.Equal(EditorMetadataTestSource.TrueText, rail.GetAttribute("data-collapsed"));
-            Assert.True(cut.Find($"#{UiDomIds.Editor.MetadataRailBody}").HasAttribute("hidden"));
+            Assert.True(cut.FindByTestId(UiTestIds.Editor.MetadataRailBody).HasAttribute("hidden"));
         });
 
         cut.FindByTestId(UiTestIds.Editor.MetadataRailToggle).Click();
@@ -136,9 +134,8 @@ public sealed class EditorMetadataInteractionTests : BunitContext
 
             Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
             Assert.Equal(EditorMetadataTestSource.RightChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
-            Assert.NotNull(toggle.QuerySelector(".ui-icon"));
             Assert.Equal(EditorMetadataTestSource.FalseText, rail.GetAttribute("data-collapsed"));
-            Assert.False(cut.Find($"#{UiDomIds.Editor.MetadataRailBody}").HasAttribute("hidden"));
+            Assert.False(cut.FindByTestId(UiTestIds.Editor.MetadataRailBody).HasAttribute("hidden"));
         });
     }
 

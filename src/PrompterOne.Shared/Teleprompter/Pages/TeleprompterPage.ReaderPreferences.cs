@@ -10,6 +10,7 @@ public partial class TeleprompterPage
         await PersistReaderSettingsAsync(currentSettings => currentSettings with
         {
             FontScale = BuildReaderFontScale(_readerFontSize),
+            ScrollSpeed = BuildReaderScrollSpeedSetting(_readerPlaybackSpeedWpm),
             TextWidth = BuildReaderTextWidthRatio(_readerTextWidthPercent),
             FocalPointPercent = _readerFocalPointPercent,
             MirrorText = _isReaderMirrorHorizontal,
@@ -43,4 +44,7 @@ public partial class TeleprompterPage
 
     private static double BuildReaderTextWidthRatio(int textWidthPercent) =>
         Math.Round(textWidthPercent / (double)ReaderMaxTextWidthPercent, 4, MidpointRounding.AwayFromZero);
+
+    private static double BuildReaderScrollSpeedSetting(int speedWpm) =>
+        Math.Round((double)speedWpm, 2, MidpointRounding.AwayFromZero);
 }

@@ -10,10 +10,6 @@ public partial class TeleprompterPage
 
     private string ReaderCameraTooltip => Text(UiTextKey.TooltipToggleCameraPreview);
 
-    private string ReaderFontDownTooltip => Text(UiTextKey.TooltipSmallerText);
-
-    private string ReaderFontUpTooltip => Text(UiTextKey.TooltipLargerText);
-
     private string ReaderNextBlockTooltip => Text(UiTextKey.TooltipNextBlock);
 
     private string ReaderNextWordTooltip => Text(UiTextKey.TooltipNextWord);
@@ -25,6 +21,10 @@ public partial class TeleprompterPage
     private string ReaderPreviousBlockTooltip => Text(UiTextKey.TooltipPreviousBlock);
 
     private string ReaderPreviousWordTooltip => Text(UiTextKey.TooltipPreviousWord);
+
+    private string ReaderSpeedDownTooltip => Text(UiTextKey.TooltipDecreaseSpeed);
+
+    private string ReaderSpeedUpTooltip => Text(UiTextKey.TooltipIncreaseSpeed);
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

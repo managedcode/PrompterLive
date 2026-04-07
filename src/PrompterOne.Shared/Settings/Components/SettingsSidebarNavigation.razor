@@ -12,6 +12,7 @@
         <button type="button"
                 class="@BuildItemCssClass(item)"
                 @onclick="@(() => OnSelect.InvokeAsync(item.Section))"
+                data-active="@BuildItemActiveState(item)"
                 data-test="@item.TestId">
             <UiIcon Kind="@item.Icon" Size="16" />
             @Text(item.LabelKey)
@@ -27,8 +28,16 @@
     [Parameter] public SettingsSection ActiveSection { get; set; }
     [Parameter] public EventCallback<SettingsSection> OnSelect { get; set; }
 
+    private static string BuildItemActiveState(SettingsSidebarNavigationItem item, SettingsSection activeSection) =>
+        item.Section == activeSection ? ActiveStateValue : InactiveStateValue;
+
+    private string BuildItemActiveState(SettingsSidebarNavigationItem item) =>
+        BuildItemActiveState(item, ActiveSection);
+
     private string BuildItemCssClass(SettingsSidebarNavigationItem item) =>
         item.Section == ActiveSection ? $"{SetNavItemCssClass} {ActiveCssClass}" : SetNavItemCssClass;
 
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

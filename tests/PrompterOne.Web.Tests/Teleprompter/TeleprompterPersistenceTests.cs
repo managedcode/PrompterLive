@@ -12,6 +12,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterPersistenceTests : BunitContext
 {
+    private const int ReaderSpeedStepWpm = 10;
+    private const string WordsPerMinuteSuffix = "WPM";
     private const int PersistedFocalPointPercent = 42;
     private const int PersistedFontSize = 40;
     private const int PersistedTextWidthPercent = 79;
@@ -53,15 +55,16 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
+            var expectedBaseSpeedWpm = harness.Session.State.ScriptData?.TargetWpm ?? 0;
             Assert.Equal(
                 PersistedTextWidthLabel,
-                cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
+                cut.FindByTestId(UiTestIds.Teleprompter.WidthValue).TextContent.Trim());
             Assert.Equal(
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
-                cut.Find($"#{UiDomIds.Teleprompter.FontLabel}").TextContent.Trim());
+                cut.FindByTestId(UiTestIds.Teleprompter.FontValue).TextContent.Trim());
             Assert.Equal(
-                PersistedFontSize.ToString(CultureInfo.InvariantCulture),
-                cut.Find($"#{UiDomIds.Teleprompter.FontValue}").TextContent.Trim());
+                BuildWordsPerMinuteLabel(expectedBaseSpeedWpm),
+                cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal(
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
                 cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).GetAttribute("value"));
@@ -94,10 +97,13 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         var cut = Render<TeleprompterPage>();
 
         cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Teleprompter.WidthSlider, cut.Markup, StringComparison.Ordinal));
+        var baselineSpeedWpm = ParseWordsPerMinuteValue(cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
+        var expectedUpdatedSpeedWpm = baselineSpeedWpm + ReaderSpeedStepWpm;
 
         cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).Input(UpdatedFontSize);
         cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).Input(UpdatedTextWidthPercent);
         cut.FindByTestId(UiTestIds.Teleprompter.FocalSlider).Input(UpdatedFocalPointPercent);
+        cut.FindByTestId(UiTestIds.Teleprompter.SpeedUp).Click();
         cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).Click();
         cut.FindByTestId(UiTestIds.Teleprompter.MirrorVerticalToggle).Click();
         cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).Click();
@@ -112,9 +118,9 @@ public sealed class TeleprompterPersistenceTests : BunitContext
                 ? EnabledCameraAttribute
                 : DisabledCameraAttribute;
 
-            Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontLabel}").TextContent.Trim(), CultureInfo.InvariantCulture));
-            Assert.Equal(UpdatedFontSize, int.Parse(cut.Find($"#{UiDomIds.Teleprompter.FontValue}").TextContent.Trim(), CultureInfo.InvariantCulture));
-            Assert.Equal(UpdatedTextWidthLabel, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
+            Assert.Equal(UpdatedFontSize, int.Parse(cut.FindByTestId(UiTestIds.Teleprompter.FontValue).TextContent.Trim(), CultureInfo.InvariantCulture));
+            Assert.Equal(UpdatedTextWidthLabel, cut.FindByTestId(UiTestIds.Teleprompter.WidthValue).TextContent.Trim());
+            Assert.Equal(BuildWordsPerMinuteLabel(expectedUpdatedSpeedWpm), cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal($"top:{UpdatedFocalPointPercent}%;", cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
             var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
             Assert.Equal(
@@ -130,17 +136,34 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Equal(UpdatedFontScale, savedSettings.FontScale, 2);
             Assert.Equal(UpdatedTextWidthRatio, savedSettings.TextWidth, 4);
             Assert.Equal(UpdatedFocalPointPercent, savedSettings.FocalPointPercent);
+            Assert.Equal(expectedUpdatedSpeedWpm, savedSettings.ScrollSpeed, 2);
             Assert.True(savedSettings.MirrorText);
             Assert.True(savedSettings.MirrorVertical);
             Assert.Equal(ReaderTextAlignment.Justify, savedSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, savedSettings.TextOrientation);
             Assert.Equal(expectedShowCameraScene, savedSettings.ShowCameraScene);
-            Assert.Equal(expectedCameraAttribute, cut.Find($"#{UiDomIds.Teleprompter.Camera}").GetAttribute("data-camera-autostart"));
+            Assert.Equal(expectedCameraAttribute, cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground).GetAttribute("data-camera-autostart"));
             Assert.True(harness.Session.State.ReaderSettings.MirrorText);
             Assert.True(harness.Session.State.ReaderSettings.MirrorVertical);
             Assert.Equal(ReaderTextAlignment.Justify, harness.Session.State.ReaderSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, harness.Session.State.ReaderSettings.TextOrientation);
+            Assert.Equal(expectedUpdatedSpeedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
             Assert.Equal(expectedShowCameraScene, harness.Session.State.ReaderSettings.ShowCameraScene);
         });
+    }
+
+    private static string BuildWordsPerMinuteLabel(int speedWpm) =>
+        $"{speedWpm} {WordsPerMinuteSuffix}";
+
+    private static int ParseWordsPerMinuteValue(string speedText)
+    {
+        var tokens = speedText
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (tokens.Length == 0 || !int.TryParse(tokens[0], out var parsedWpm))
+        {
+            throw new InvalidOperationException($"Unable to parse teleprompter speed value from '{speedText}'.");
+        }
+
+        return parsedWpm;
     }
 }

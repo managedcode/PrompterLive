@@ -18,7 +18,8 @@
         <div class="rsvp-progress">
             <UiPercentFill id="@UiDomIds.Learn.ProgressFill"
                            Class="rsvp-progress-fill"
-                           Percent="@_progressPercent" />
+                           Percent="@_progressPercent"
+                           data-test="@UiTestIds.Learn.ProgressFill" />
         </div>
 
         <div class="rsvp-display"
@@ -27,10 +28,10 @@
              data-test="@UiTestIds.Learn.Display">
             <div style="@BuildPendingLayoutHiddenStyle()">
                 <div class="rsvp-crosshair">
-                    <UiCrosshairGuide />
+                    <UiCrosshairGuide TestId="@UiTestIds.Learn.Crosshair" />
                 </div>
 
-                <div class="rsvp-h-row" @ref="_focusRow">
+                <div class="rsvp-h-row" @ref="_focusRow" data-test="@UiTestIds.Learn.FocusRow">
                     <div class="rsvp-lane rsvp-lane-left">
                         <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-test="@UiTestIds.Learn.ContextLeft">
                             @foreach (var word in _leftContextWords)
@@ -47,9 +48,9 @@
                              id="@UiDomIds.Learn.Word"
                              @ref="_focusWord"
                              data-test="@UiTestIds.Learn.Word">
-                            <span class="rsvp-focus-segment rsvp-focus-leading">@_currentWordLeading</span>
-                            <span class="rsvp-focus-segment rsvp-focus-orp orp" @ref="_focusOrp">@_currentWordOrp</span>
-                            <span class="rsvp-focus-segment rsvp-focus-trailing">@_currentWordTrailing</span>
+                            <span class="rsvp-focus-segment rsvp-focus-leading" data-test="@UiTestIds.Learn.WordLeading">@_currentWordLeading</span>
+                            <span class="rsvp-focus-segment rsvp-focus-orp orp" @ref="_focusOrp" data-test="@UiTestIds.Learn.WordOrp">@_currentWordOrp</span>
+                            <span class="rsvp-focus-segment rsvp-focus-trailing" data-test="@UiTestIds.Learn.WordTrailing">@_currentWordTrailing</span>
                         </div>
                     </div>
 
@@ -114,10 +115,10 @@
                                 aria-label="@PlayToggleTooltip"
                                 aria-pressed="@(_isPlaying ? bool.TrueString.ToLowerInvariant() : bool.FalseString.ToLowerInvariant())"
                                 data-test="@UiTestIds.Learn.PlayToggle">
-                            <span data-toggle-icon="play" hidden="@_isPlaying">
+                            <span data-toggle-icon="play" data-test="@UiTestIds.Learn.PlayIcon" hidden="@_isPlaying">
                                 <UiIcon Kind="UiIconKind.Play" Size="28" />
                             </span>
-                            <span data-toggle-icon="pause" hidden="@(!_isPlaying)">
+                            <span data-toggle-icon="pause" data-test="@UiTestIds.Learn.PauseIcon" hidden="@(!_isPlaying)">
                                 <UiIcon Kind="UiIconKind.Pause" Size="28" />
                             </span>
                         </button>

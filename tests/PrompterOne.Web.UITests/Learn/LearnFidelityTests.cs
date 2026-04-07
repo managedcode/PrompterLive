@@ -26,7 +26,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             await page.GotoAsync(BrowserTestConstants.Routes.LearnQuantum);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await Expect(page.GetByTestId(UiTestIds.Learn.Word).Locator(".orp")).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Learn.WordOrp)).ToBeVisibleAsync();
             await WaitForLearnLayoutReadyAsync(page);
 
             var initialDelta = await MeasureOrpDeltaAsync(page);
@@ -69,8 +69,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase))
                 .ToContainTextAsync(BrowserTestConstants.Learn.NextPhraseFragment);
 
-            var leftContextCount = await CountContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
-            var rightContextCount = await CountContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+            var leftContextCount = await CountContextWordsAsync(page, UiTestIds.Learn.ContextLeft);
+            var rightContextCount = await CountContextWordsAsync(page, UiTestIds.Learn.ContextRight);
 
             await Assert.That(leftContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
             await Assert.That(rightContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
@@ -101,8 +101,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Learn.DemoContextLayoutProbeWord,
                 BrowserTestConstants.Learn.DemoContextLayoutProbeStepLimit);
 
-            var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
-            var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+            var leftWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextLeft);
+            var rightWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextRight);
 
             await Assert.That(leftWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.DemoLeftContextFirstWord,
@@ -275,8 +275,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             var focusWordOverflowPx = await MeasureFocusWordOverflowAsync(page);
             await Assert.That(focusWordOverflowPx <= BrowserTestConstants.Learn.MaxFocusWordOverflowPx).IsTrue().Because($"Expected the Learn focus word to stay inside the visible RSVP lane, but it overflowed by {focusWordOverflowPx:0.##}px.");
 
-            var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
-            var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+            var leftWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextLeft);
+            var rightWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextRight);
 
             await Assert.That(leftWords).IsEquivalentTo([BrowserTestConstants.Learn.LeadershipLeftContextWord], CollectionOrdering.Matching);
             await Assert.That(rightWords).IsEquivalentTo([
@@ -354,7 +354,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             async page =>
             {
                 await DecreaseLearnSpeedAsync(page, BrowserTestConstants.ReaderTiming.LearnSlowWpmAdjustmentClicks);
-                await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+                await Expect(page.GetByTestId(UiTestIds.Learn.SpeedValue))
                     .ToHaveTextAsync(BrowserTestConstants.ReaderTiming.LearnSlowWpm.ToString(CultureInfo.InvariantCulture));
             });
 
@@ -362,7 +362,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             async page =>
             {
                 await IncreaseLearnSpeedAsync(page, BrowserTestConstants.ReaderTiming.LearnFastWpmAdjustmentClicks);
-                await Expect(page.Locator($"#{UiDomIds.Learn.Speed}"))
+                await Expect(page.GetByTestId(UiTestIds.Learn.SpeedValue))
                     .ToHaveTextAsync(BrowserTestConstants.ReaderTiming.LearnFastWpm.ToString(CultureInfo.InvariantCulture));
             });
 
@@ -372,9 +372,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     private static Task<double> MeasureOrpDeltaAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync<double>(
             """
-            () => {
-                const line = document.querySelector('[data-test="learn-orp-line"]');
-                const orp = document.querySelector('[data-test="learn-word"] .orp');
+            ids => {
+                const line = document.querySelector(`[data-test="${ids.line}"]`);
+                const orp = document.querySelector(`[data-test="${ids.orp}"]`);
                 if (!line || !orp) {
                     return 999;
                 }
@@ -385,23 +385,28 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 const orpCenter = orpRect.left + (orpRect.width / 2);
                 return Math.abs(lineCenter - orpCenter);
             }
-            """);
+            """,
+            new
+            {
+                line = UiTestIds.Learn.OrpLine,
+                orp = UiTestIds.Learn.WordOrp
+            });
 
-    private static Task<int> CountContextWordsAsync(Microsoft.Playwright.IPage page, string elementId) =>
+    private static Task<int> CountContextWordsAsync(Microsoft.Playwright.IPage page, string contextTestId) =>
         page.EvaluateAsync<int>(
             """
-            targetId => {
-                const element = document.getElementById(targetId);
+            targetTestId => {
+                const element = document.querySelector(`[data-test="${targetTestId}"]`);
                 return element ? element.children.length : -1;
             }
             """,
-            elementId);
+            contextTestId);
 
-    private static Task<string[]> ReadContextWordsAsync(Microsoft.Playwright.IPage page, string elementId) =>
+    private static Task<string[]> ReadContextWordsAsync(Microsoft.Playwright.IPage page, string contextTestId) =>
         page.EvaluateAsync<string[]>(
             """
-            targetId => {
-                const element = document.getElementById(targetId);
+            targetTestId => {
+                const element = document.querySelector(`[data-test="${targetTestId}"]`);
                 if (!element) {
                     return [];
                 }
@@ -411,7 +416,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                     .filter(text => text.length > 0);
             }
             """,
-            elementId);
+            contextTestId);
 
     private static async Task StepUntilWordAsync(Microsoft.Playwright.IPage page, string targetWord, int stepLimit)
     {
@@ -436,7 +441,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             args => {
                 const display = document.querySelector(`[data-test="${args.displayTestId}"]`);
                 const line = document.querySelector(`[data-test="${args.lineTestId}"]`);
-                const orp = document.querySelector(`[data-test="${args.wordTestId}"] .orp`);
+                const orp = document.querySelector(`[data-test="${args.orpTestId}"]`);
                 if (display?.getAttribute(args.layoutReadyAttributeName) !== args.layoutReadyValue || !line || !orp) {
                     return false;
                 }
@@ -454,7 +459,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 layoutReadyValue = LayoutReadyTrueValue,
                 lineTestId = UiTestIds.Learn.OrpLine,
                 maxOrpDeltaPx = MaxLayoutReadyOrpDeltaPx,
-                wordTestId = UiTestIds.Learn.Word
+                orpTestId = UiTestIds.Learn.WordOrp
             });
 
     private static async Task ExpectFocusWordAsync(Microsoft.Playwright.IPage page, string expectedWord)
@@ -557,10 +562,10 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     private static Task<ContextGapMeasurement> MeasureContextGapsAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync<ContextGapMeasurement>(
             """
-            () => {
-                const left = document.querySelector('[data-test="learn-context-left"]');
-                const focus = document.querySelector('[data-test="learn-word"]');
-                const right = document.querySelector('[data-test="learn-context-right"]');
+            ids => {
+                const left = document.querySelector(`[data-test="${ids.left}"]`);
+                const focus = document.querySelector(`[data-test="${ids.focus}"]`);
+                const right = document.querySelector(`[data-test="${ids.right}"]`);
                 if (!left || !focus || !right) {
                     return { leftGapPx: -999, rightGapPx: -999 };
                 }
@@ -574,7 +579,13 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                     rightGapPx: rightRect.left - focusRect.right
                 };
             }
-            """);
+            """,
+            new
+            {
+                left = UiTestIds.Learn.ContextLeft,
+                focus = UiTestIds.Learn.Word,
+                right = UiTestIds.Learn.ContextRight
+            });
 
     private static Task<VisibleContextWordGapMeasurement> MeasureVisibleContextWordGapsAsync(Microsoft.Playwright.IPage page) =>
         page.EvaluateAsync<VisibleContextWordGapMeasurement>(
@@ -646,9 +657,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             """
             ids => {
                 const word = document.querySelector(`[data-test="${ids.word}"]`);
-                const leading = word?.querySelector('.rsvp-focus-leading');
-                const orp = word?.querySelector('.rsvp-focus-orp');
-                const trailing = word?.querySelector('.rsvp-focus-trailing');
+                const leading = document.querySelector(`[data-test="${ids.leading}"]`);
+                const orp = document.querySelector(`[data-test="${ids.orp}"]`);
+                const trailing = document.querySelector(`[data-test="${ids.trailing}"]`);
                 if (!leading || !orp || !trailing) {
                     return { slackPx: 999 };
                 }
@@ -665,6 +676,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             """,
             new
             {
+                leading = UiTestIds.Learn.WordLeading,
+                orp = UiTestIds.Learn.WordOrp,
+                trailing = UiTestIds.Learn.WordTrailing,
                 word = UiTestIds.Learn.Word
             });
 
@@ -674,8 +688,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             ids => {
                 const display = document.querySelector(`[data-test="${ids.display}"]`);
                 const word = document.querySelector(`[data-test="${ids.word}"]`);
-                const leading = word?.querySelector('.rsvp-focus-leading');
-                const trailing = word?.querySelector('.rsvp-focus-trailing');
+                const leading = document.querySelector(`[data-test="${ids.leading}"]`);
+                const trailing = document.querySelector(`[data-test="${ids.trailing}"]`);
                 if (!display || !word || !leading || !trailing) {
                     return 999;
                 }
@@ -691,6 +705,8 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             new
             {
                 display = UiTestIds.Learn.Display,
+                leading = UiTestIds.Learn.WordLeading,
+                trailing = UiTestIds.Learn.WordTrailing,
                 word = UiTestIds.Learn.Word
             });
 }

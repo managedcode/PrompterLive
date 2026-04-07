@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -14,6 +15,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
     private const string MaximumReaderWidthValue = "100";
     private const int ParagraphMotionSettleDelayMilliseconds = 450;
     private const double ParagraphMotionTolerancePixels = 4d;
+    private const int ReaderFontAdjustmentStep = 4;
     private const int SecurityIncidentResponseCardIndex = 2;
     private const string StandaloneCommaWord = ",";
     private const string TrailingCommaWord = "exposed,";
@@ -63,14 +65,14 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            await Expect(page.Locator(BrowserTestConstants.Elements.CameraOverlaySelector)).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveCountAsync(1);
             await EnsureCameraLayerIsActiveAsync(page);
 
             var isFullBleed = await page.EvaluateAsync<bool>(
                 $$"""
-                () => {
-                    const camera = document.querySelector('[data-test="teleprompter-camera-layer-primary"]');
-                    const shell = document.querySelector('{{BrowserTestConstants.Elements.TeleprompterShellSelector}}');
+                args => {
+                    const camera = document.querySelector(`[data-test="${args.cameraTestId}"]`);
+                    const shell = document.querySelector(`[data-test="${args.shellTestId}"]`);
                     if (!(camera instanceof HTMLElement) || !(shell instanceof HTMLElement)) {
                         return false;
                     }
@@ -79,7 +81,12 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
                     const shellRect = shell.getBoundingClientRect();
                     return cameraRect.width >= shellRect.width * 0.95 && cameraRect.height >= shellRect.height * 0.95;
                 }
-                """);
+                """,
+                new
+                {
+                    cameraTestId = UiTestIds.Teleprompter.CameraBackground,
+                    shellTestId = UiTestIds.Teleprompter.Page
+                });
 
             await Assert.That(isFullBleed).IsTrue();
         }
@@ -128,9 +135,7 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
             await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
 
-            await AssertParagraphMotionStableAfterFontSizeChangeAsync(
-                page,
-                page.GetByTestId(UiTestIds.Teleprompter.FontUp));
+            await AssertParagraphMotionStableAfterFontSizeChangeAsync(page);
         }
         finally
         {
@@ -186,14 +191,13 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(MaximumReaderWidthValue);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(MaximumReaderWidthLabel);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthValue)).ToHaveTextAsync(MaximumReaderWidthLabel);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0)))
                 .ToHaveClassAsync(new Regex($@"\b{ContinuousEmphasisCssClass}\b"));
 
-            var clusterWrapWidth = await page.Locator($"#{UiDomIds.Teleprompter.ClusterWrap}")
+            var clusterWrapWidth = await page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap)
                 .EvaluateAsync<double>("element => element.getBoundingClientRect().width");
-            var responseWords = await page.GetByTestId(UiTestIds.Teleprompter.CardText(SecurityIncidentResponseCardIndex))
-                .Locator(".rd-w")
+            var responseWords = await page.Locator($"[data-test^='{UiTestIds.Teleprompter.CardWordPrefix(SecurityIncidentResponseCardIndex)}']")
                 .AllTextContentsAsync();
 
             await Assert.That(clusterWrapWidth > LegacyMaximumReaderWidthPixels).IsTrue();
@@ -266,11 +270,20 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
         await Assert.That(Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta)).IsBetween(0d, ParagraphMotionTolerancePixels);
     }
 
-    private static async Task AssertParagraphMotionStableAfterFontSizeChangeAsync(
-        Microsoft.Playwright.IPage page,
-        Microsoft.Playwright.ILocator fontSizeButton)
+    private static async Task AssertParagraphMotionStableAfterFontSizeChangeAsync(Microsoft.Playwright.IPage page)
     {
-        await fontSizeButton.ClickAsync();
+        var fontSlider = page.GetByTestId(UiTestIds.Teleprompter.FontSlider);
+        var currentValue = await fontSlider.InputValueAsync();
+        var nextValue = int.Parse(currentValue, CultureInfo.InvariantCulture) + ReaderFontAdjustmentStep;
+        await fontSlider.EvaluateAsync(
+            """
+            (element, value) => {
+                element.value = String(value);
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            """,
+            nextValue);
 
         var immediate = await CaptureParagraphMotionSampleAsync(page);
         await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
@@ -286,8 +299,8 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
         page.GetByTestId(UiTestIds.Teleprompter.Page).EvaluateAsync<ReaderParagraphMotionSample>(
             $$"""
             (element, args) => {
-                const text = element.querySelector('#{{UiDomIds.Teleprompter.CardText(0)}}');
-                const focalGuide = element.querySelector('#{{UiDomIds.Teleprompter.FocalGuide}}');
+                const text = element.querySelector(`[data-test="${args.textTestId}"]`);
+                const focalGuide = element.querySelector(`[data-test="${args.focalGuideTestId}"]`);
                 const activeWord = element.querySelector(args.activeWordSelector);
 
                 if (!(text instanceof HTMLElement) || !(focalGuide instanceof HTMLElement) || !(activeWord instanceof HTMLElement)) {
@@ -308,7 +321,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             """,
             new
             {
-                activeWordSelector = BrowserTestConstants.Teleprompter.ActiveWordSelector
+                focalGuideTestId = UiTestIds.Teleprompter.FocalGuide,
+                activeWordSelector = BrowserTestConstants.Teleprompter.ActiveWordSelector,
+                textTestId = UiTestIds.Teleprompter.CardText(0)
             });
 
     private sealed class ReaderParagraphMotionSample

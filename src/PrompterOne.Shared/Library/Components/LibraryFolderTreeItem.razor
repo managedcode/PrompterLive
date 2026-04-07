@@ -1,6 +1,7 @@
 @namespace PrompterOne.Shared.Components.Library
 <a class="@BuildCssClass()"
    @onclick="HandleSelectAsync"
+   data-active="@(Node.IsSelected ? ActiveStateValue : InactiveStateValue)"
    data-test="@Node.TestId">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         @if (Node.ShowChevron && Node.IsExpanded)
@@ -30,6 +31,9 @@
 }
 
 @code {
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
+
     [Parameter, EditorRequired] public LibraryFolderNodeViewModel Node { get; set; } = null!;
 
     [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }

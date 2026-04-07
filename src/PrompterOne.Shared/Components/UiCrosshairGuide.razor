@@ -1,6 +1,6 @@
 @namespace PrompterOne.Shared.Components
 
-<span class="@CssClassValue" aria-hidden="@AriaHidden">
+<span class="@CssClassValue" aria-hidden="@AriaHidden" data-test="@TestId">
     <span class="ui-crosshair-guide__line ui-crosshair-guide__line--vertical"></span>
     <span class="ui-crosshair-guide__line ui-crosshair-guide__line--horizontal"></span>
     <span class="ui-crosshair-guide__dot"></span>
@@ -11,6 +11,7 @@
 
     [Parameter] public bool AriaHidden { get; set; } = true;
     [Parameter] public string CssClass { get; set; } = string.Empty;
+    [Parameter] public string TestId { get; set; } = string.Empty;
 
     private string CssClassValue =>
         string.IsNullOrWhiteSpace(CssClass) ? BaseCssClass : $"{BaseCssClass} {CssClass}";

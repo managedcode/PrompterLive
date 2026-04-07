@@ -13,6 +13,8 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
+    private const int ReaderSpeedStepWpm = 10;
+    private const string WordsPerMinuteSuffix = "WPM";
     private const string PersistedFocalPointValue = "37";
     private const string PersistedFontValue = "52";
     private const string PersistedFocalGuideStyle = "top:37%;";
@@ -37,9 +39,15 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider), PersistedTextWidthValue);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), PersistedFocalPointValue);
             await page.GetByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
+            var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
+            var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
+            var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
+            var expectedSpeedWpm = baselineSpeedWpm + ReaderSpeedStepWpm;
+            await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
 
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync(PersistedFontValue);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(PersistedTextWidthLabel);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.FontValue)).ToHaveTextAsync(PersistedFontValue);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthValue)).ToHaveTextAsync(PersistedTextWidthLabel);
+            await Expect(speedValue).ToHaveTextAsync(BuildWordsPerMinuteLabel(expectedSpeedWpm));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalGuide)).ToHaveAttributeAsync("style", PersistedFocalGuideStyle);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync("style", new Regex(Regex.Escape(PersistedFontStyleFragment), RegexOptions.Compiled));
@@ -59,6 +67,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Assert.That(storedSettings.FocalPointPercent).IsEqualTo(int.Parse(PersistedFocalPointValue, CultureInfo.InvariantCulture));
             await Assert.That(RoundStoredReaderSetting((decimal)storedSettings.FontScale)).IsEqualTo(expectedFontScale);
             await Assert.That(RoundStoredReaderSetting((decimal)storedSettings.TextWidth)).IsEqualTo(expectedTextWidth);
+            await Assert.That(storedSettings.ScrollSpeed).IsEqualTo(expectedSpeedWpm);
             await Assert.That(storedSettings.TextAlignment).IsEqualTo(ReaderTextAlignment.Justify);
 
             await page.ReloadAsync();
@@ -68,8 +77,9 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FontSlider)).ToHaveValueAsync(PersistedFontValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(PersistedTextWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider)).ToHaveValueAsync(PersistedFocalPointValue);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync(PersistedFontValue);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(PersistedTextWidthLabel);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.FontValue)).ToHaveTextAsync(PersistedFontValue);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthValue)).ToHaveTextAsync(PersistedTextWidthLabel);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedValue)).ToHaveTextAsync(BuildWordsPerMinuteLabel(expectedSpeedWpm));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FocalGuide)).ToHaveAttributeAsync("style", PersistedFocalGuideStyle);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync("style", new Regex(Regex.Escape(PersistedFontStyleFragment), RegexOptions.Compiled));
@@ -92,13 +102,13 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             var secondCard = page.GetByTestId(UiTestIds.Teleprompter.Card(1));
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
             await Expect(secondCard)
                 .ToHaveAttributeAsync(UiDataAttributes.Teleprompter.CardState, UiDataAttributes.Teleprompter.ActiveState);
 
             await page.GetByTestId(UiTestIds.Teleprompter.PreviousBlock).ClickAsync();
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(ReaderFirstBlockIndicator);
             await Expect(firstCard)
                 .ToHaveAttributeAsync(UiDataAttributes.Teleprompter.CardState, UiDataAttributes.Teleprompter.ActiveState);
@@ -121,4 +131,19 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             }
             """,
             value);
+
+    private static string BuildWordsPerMinuteLabel(int speedWpm) =>
+        $"{speedWpm} {WordsPerMinuteSuffix}";
+
+    private static int ParseWordsPerMinuteValue(string speedText)
+    {
+        var tokens = speedText
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (tokens.Length == 0 || !int.TryParse(tokens[0], out var parsedWpm))
+        {
+            throw new InvalidOperationException($"Unable to parse teleprompter speed value from '{speedText}'.");
+        }
+
+        return parsedWpm;
+    }
 }

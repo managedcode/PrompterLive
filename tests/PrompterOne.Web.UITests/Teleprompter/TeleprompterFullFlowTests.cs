@@ -42,7 +42,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TeleprompterFullFlow.Name,
                 BrowserTestConstants.TeleprompterFullFlow.PlaybackStep);
 
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(
                     BrowserTestConstants.Regexes.ReaderSecondBlockIndicator,
                     new() { Timeout = BrowserTestConstants.Timing.ReaderAutomaticTransitionTimeoutMs });
@@ -208,7 +208,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         var probe = await page.GetByTestId(UiTestIds.Teleprompter.CardText(cardIndex)).EvaluateAsync<ReaderWordProbe>(
             """
             (element, args) => {
-                const word = Array.from(element.querySelectorAll('.rd-w'))
+                const word = Array.from(element.querySelectorAll(`[data-test^="${args.wordPrefix}"]`))
                     .find(node => node.textContent?.trim() === args.expectedWord);
 
                 if (!(word instanceof HTMLElement)) {
@@ -237,6 +237,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                 durationAttributeName = UiDataAttributes.Teleprompter.DurationMilliseconds,
                 effectiveWpmAttributeName = UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
                 expectedWord = wordText,
+                wordPrefix = UiTestIds.Teleprompter.CardWordPrefix(cardIndex),
                 pronunciationAttributeName = UiDataAttributes.Teleprompter.Pronunciation
             });
 

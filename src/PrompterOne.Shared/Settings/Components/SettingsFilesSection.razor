@@ -33,6 +33,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@ScriptsAutoSaveLabel</label>
                     <div class="@BuildToggleCssClass(_settings.FileAutoSaveEnabled)"
+                         data-enabled="@(_settings.FileAutoSaveEnabled ? EnabledStateValue : DisabledStateValue)"
                          data-test="@UiTestIds.Settings.FileAutoSave"
                          @onclick="ToggleAutoSaveAsync"
                          @onclick:stopPropagation="true">
@@ -42,6 +43,7 @@
                 <div class="set-field set-field-toggle">
                     <label>@ScriptsHistoryLabel</label>
                     <div class="@BuildToggleCssClass(_settings.FileBackupCopiesEnabled)"
+                         data-enabled="@(_settings.FileBackupCopiesEnabled ? EnabledStateValue : DisabledStateValue)"
                          data-test="@UiTestIds.Settings.FileBackupCopies"
                          @onclick="ToggleBackupCopiesAsync"
                          @onclick:stopPropagation="true">
@@ -104,5 +106,8 @@
 </section>
 
 @code {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
+
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

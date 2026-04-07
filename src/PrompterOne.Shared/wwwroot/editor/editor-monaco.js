@@ -10,7 +10,7 @@ const gutterSelector = ".margin-view-overlays";
 const minimapSelector = ".minimap";
 const numericWpmRegex = /^(?<wpm>\d+)\s*WPM$/i;
 const tagPattern = /\[[^[\]]+\]/g;
-const testIdAttributeName = "data-testid";
+const testIdAttributeName = "data-test";
 const scopeKindRoot = "root";
 const scopeKindNeutral = "neutral";
 const scopeKindStyle = "style";
@@ -522,7 +522,7 @@ function createHarnessState(state, options) {
 }
 
 function getOptionalHarnessState(testId) {
-    const host = document.querySelector(`[data-testid="${testId}"]`);
+    const host = document.querySelector(`[data-test="${testId}"]`);
     return host ? hostStates.get(host) : null;
 }
 

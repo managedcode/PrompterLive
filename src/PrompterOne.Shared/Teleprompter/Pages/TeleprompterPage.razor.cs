@@ -21,16 +21,20 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderCardForwardStep = 1;
     private const int ReaderCountdownPreDelayMilliseconds = 600;
     private const int ReaderCountdownStepMilliseconds = 700;
+    private const int ReaderDefaultPlaybackSpeedWpm = 140;
     private const int ReaderFirstWordDelayMilliseconds = 700;
-    private const int ReaderFontStep = 4;
     private const int ReaderForwardStep = 1;
     private const int ReaderGuideActiveDurationMilliseconds = 800;
-    private const int ReaderMaxFontSize = 56;
+    private const int ReaderMaxFontSize = 70;
     private const int ReaderMaxFocalPointPercent = 55;
+    private const int ReaderMaximumPlaybackSpeedWpm = 500;
     private const int ReaderMaxTextWidthPercent = 100;
-    private const int ReaderMinFontSize = 24;
+    private const int ReaderMinFontSize = 20;
     private const int ReaderMinFocalPointPercent = 15;
+    private const int ReaderMinimumPlaybackSpeedWpm = 100;
     private const int ReaderMinTextWidthPercent = 35;
+    private const int ReaderPlaybackSpeedStepWpm = 10;
+    private const double ReaderLegacyMaximumScrollSpeedMultiplier = 5d;
     private const int DefaultReaderTextWidthPercent = ReaderMaxTextWidthPercent;
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
@@ -71,6 +75,8 @@ public partial class TeleprompterPage : IAsyncDisposable
     private int _activeReaderWordIndex;
     private int _readerFontSize = DefaultReaderFontSize;
     private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
+    private int _readerBaseTpsWpm = ReaderDefaultPlaybackSpeedWpm;
+    private int _readerPlaybackSpeedWpm = ReaderDefaultPlaybackSpeedWpm;
     private int _readerTextWidthPercent = DefaultReaderTextWidthPercent;
     private ReaderTextAlignment _readerTextAlignment = ReaderSettingsDefaults.TextAlignment;
     private ReaderTextOrientation _readerTextOrientation = ReaderSettingsDefaults.TextOrientation;
@@ -165,6 +171,11 @@ public partial class TeleprompterPage : IAsyncDisposable
         _screenTitle = SessionService.State.Title;
         _readerFontSize = NormalizeReaderFontSize(SessionService.State.ReaderSettings.FontScale);
         _readerFocalPointPercent = NormalizeReaderFocalPointPercent(SessionService.State.ReaderSettings.FocalPointPercent);
+        _readerBaseTpsWpm = NormalizeReaderPlaybackSpeedWpm(
+            SessionService.State.ScriptData?.TargetWpm ?? ReaderDefaultPlaybackSpeedWpm);
+        _readerPlaybackSpeedWpm = NormalizeReaderPlaybackSpeedWpm(
+            SessionService.State.ReaderSettings.ScrollSpeed,
+            _readerBaseTpsWpm);
         _isReaderMirrorHorizontal = SessionService.State.ReaderSettings.MirrorText;
         _isReaderMirrorVertical = SessionService.State.ReaderSettings.MirrorVertical;
         _readerTextWidthPercent = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
@@ -294,6 +305,28 @@ public partial class TeleprompterPage : IAsyncDisposable
     {
         var safePercent = focalPointPercent > 0 ? focalPointPercent : DefaultReaderFocalPointPercent;
         return Math.Clamp(safePercent, ReaderMinFocalPointPercent, ReaderMaxFocalPointPercent);
+    }
+
+    private static int NormalizeReaderPlaybackSpeedWpm(double persistedSpeed, int baseSpeedWpm)
+    {
+        if (persistedSpeed <= 0)
+        {
+            return NormalizeReaderPlaybackSpeedWpm(baseSpeedWpm);
+        }
+
+        var resolvedSpeed = persistedSpeed <= ReaderLegacyMaximumScrollSpeedMultiplier
+            ? baseSpeedWpm * persistedSpeed
+            : persistedSpeed;
+
+        return NormalizeReaderPlaybackSpeedWpm((int)Math.Round(resolvedSpeed, MidpointRounding.AwayFromZero));
+    }
+
+    private static int NormalizeReaderPlaybackSpeedWpm(int speedWpm)
+    {
+        return Math.Clamp(
+            speedWpm,
+            ReaderMinimumPlaybackSpeedWpm,
+            ReaderMaximumPlaybackSpeedWpm);
     }
 
     private static ReaderTextAlignment NormalizeReaderTextAlignment(ReaderTextAlignment textAlignment)

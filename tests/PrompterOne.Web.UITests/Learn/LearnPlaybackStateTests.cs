@@ -42,8 +42,8 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
                 BrowserTestConstants.Learn.PauseBoundaryProbeWord,
                 BrowserTestConstants.Learn.PauseBoundaryProbeStepLimit);
 
-            var leftWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextLeft);
-            var rightWords = await ReadContextWordsAsync(page, UiDomIds.Learn.ContextRight);
+            var leftWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextLeft);
+            var rightWords = await ReadContextWordsAsync(page, UiTestIds.Learn.ContextRight);
 
             await Assert.That(leftWords).IsEquivalentTo([
                     BrowserTestConstants.Learn.PauseBoundaryLeftContextFirstWord,
@@ -144,11 +144,11 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
         var rawWord = await page.GetByTestId(UiTestIds.Learn.Word).TextContentAsync();
         return string.Concat((rawWord ?? string.Empty).Where(character => !char.IsWhiteSpace(character)));
     }
-    private static Task<string[]> ReadContextWordsAsync(IPage page, string elementId) =>
+    private static Task<string[]> ReadContextWordsAsync(IPage page, string contextTestId) =>
         page.EvaluateAsync<string[]>(
             """
-            targetId => {
-                const element = document.getElementById(targetId);
+            targetTestId => {
+                const element = document.querySelector(`[data-test="${targetTestId}"]`);
                 if (!element) {
                     return [];
                 }
@@ -157,7 +157,7 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
                     .filter(text => text.length > 0);
             }
             """,
-            elementId);
+            contextTestId);
     private static async Task<ProgressState> ReadProgressStateAsync(IPage page)
     {
         var progressLabel = await page.GetByTestId(UiTestIds.Learn.ProgressLabel).TextContentAsync() ?? string.Empty;
@@ -172,9 +172,8 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
         page.EvaluateAsync<ToggleIconState>(
             $$"""
             () => {
-                const button = document.querySelector('[data-test="{{UiTestIds.Learn.PlayToggle}}"]');
-                const playIcon = button?.querySelector('[data-toggle-icon="play"]');
-                const pauseIcon = button?.querySelector('[data-toggle-icon="pause"]');
+                const playIcon = document.querySelector('[data-test="{{UiTestIds.Learn.PlayIcon}}"]');
+                const pauseIcon = document.querySelector('[data-test="{{UiTestIds.Learn.PauseIcon}}"]');
                 return {
                     playHidden: !!playIcon?.hidden,
                     pauseHidden: !!pauseIcon?.hidden

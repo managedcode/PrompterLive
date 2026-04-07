@@ -40,7 +40,7 @@ public sealed class EditorLearnScreenFlowTests(StandaloneAppFixture fixture) : A
                 .ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle, new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Learn.NextPhrase)).Not.ToHaveTextAsync(string.Empty);
             await page.GetByTestId(UiTestIds.Learn.SpeedUp).ClickAsync();
-            await Expect(page.Locator($"#{UiDomIds.Learn.Speed}")).ToHaveTextAsync(BrowserTestConstants.EditorFlow.LearnSpeedAfterIncrease);
+            await Expect(page.GetByTestId(UiTestIds.Learn.SpeedValue)).ToHaveTextAsync(BrowserTestConstants.EditorFlow.LearnSpeedAfterIncrease);
             await page.GetByTestId(UiTestIds.Learn.StepBackward).ClickAsync();
             await page.GetByTestId(UiTestIds.Learn.StepForward).ClickAsync();
             await page.GetByTestId(UiTestIds.Learn.PlayToggle).ClickAsync();

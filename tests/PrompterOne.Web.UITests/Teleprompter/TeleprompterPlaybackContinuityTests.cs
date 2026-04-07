@@ -19,7 +19,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await StartPlaybackAsync(page);
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
 
             await AssertReaderTimeContinuesAdvancingAsync(page);
@@ -34,7 +34,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), BrowserTestConstants.ReaderWorkflow.TeleprompterFocal);
             await StartPlaybackAsync(page);
 
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(
                     BrowserTestConstants.Regexes.ReaderSecondBlockIndicator,
                     new() { Timeout = BrowserTestConstants.Timing.ReaderAutomaticTransitionTimeoutMs });
@@ -66,7 +66,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
 
             await AssertMovesUpWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing leadership block");
             await AssertMovesUpWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Incoming leadership block");
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
         });
 
@@ -76,7 +76,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
         {
             await OpenLeadershipTeleprompterAsync(page);
             await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderSecondBlockIndicator);
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderTransitionSettleDelayMs);
 
@@ -99,7 +99,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
 
             await AssertMovesDownWithoutReversal(samples.Select(sample => sample.OutgoingTop).ToArray(), "Outgoing current block");
             await AssertMovesDownWithoutReversal(samples.Select(sample => sample.IncomingTop).ToArray(), "Returning previous block");
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}"))
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
                 .ToHaveTextAsync(BrowserTestConstants.Regexes.ReaderFirstBlockIndicator);
         });
 
@@ -121,7 +121,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
     private static async Task AssertReaderTimeContinuesAdvancingAsync(IPage page)
     {
         await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderTransitionSettleDelayMs);
-        var timeLocator = page.Locator($"#{UiDomIds.Teleprompter.Time}");
+        var timeLocator = page.GetByTestId(UiTestIds.Teleprompter.TimeValue);
         var timeAfterTransition = await timeLocator.TextContentAsync() ?? string.Empty;
 
         await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderPostTransitionAdvanceDelayMs);

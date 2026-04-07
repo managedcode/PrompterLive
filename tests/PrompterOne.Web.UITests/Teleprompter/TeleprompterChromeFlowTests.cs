@@ -182,7 +182,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
 
     private static async Task<int> ReadTotalBlockCountAsync(Microsoft.Playwright.IPage page)
     {
-        var blockIndicatorText = await page.Locator($"#{UiDomIds.Teleprompter.BlockIndicator}").TextContentAsync() ?? string.Empty;
+        var blockIndicatorText = await page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator).TextContentAsync() ?? string.Empty;
         var parts = blockIndicatorText.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
         return parts.Length == 2 && int.TryParse(parts[1], out var totalBlockCount)

@@ -7,6 +7,8 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
+    private const int ReaderSpeedStepWpm = 10;
+    private const string WordsPerMinuteSuffix = "WPM";
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 
     [Test]
@@ -29,9 +31,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveCountAsync(1);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-role", "primary");
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-device-id", cameraDeviceId);
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.CameraOverlay(1)}")).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveAttributeAsync("data-camera-role", "primary");
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveAttributeAsync("data-camera-device-id", cameraDeviceId);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveCountAsync(1);
         });
 
     private static async Task VerifyTeleprompterControlsAsync(Microsoft.Playwright.IPage page)
@@ -41,14 +43,18 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.EdgeSection)).ToContainTextAsync(BrowserTestConstants.TeleprompterFlow.OpeningBlock);
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardText(0))).ToContainTextAsync(BrowserTestConstants.TeleprompterFlow.OpeningLine);
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardText(0))).Not.ToContainTextAsync(BrowserTestConstants.TeleprompterFlow.CollapsedOpeningLine);
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync(
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveAttributeAsync(
             BrowserTestConstants.TeleprompterFlow.CameraAutostartAttribute,
             BrowserTestConstants.Regexes.CameraAutoStart);
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.CameraOverlay(1)}")).ToHaveCountAsync(0);
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveCountAsync(1);
         await AssertTeleprompterChromeVisibilityAsync(page);
 
-        await page.GetByTestId(UiTestIds.Teleprompter.FontUp).ClickAsync();
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.FontLabel}")).ToHaveTextAsync(BrowserTestConstants.TeleprompterFlow.FontScaleAfterIncrease);
+        var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
+        var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
+        var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
+
+        await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
+        await Expect(speedValue).ToHaveTextAsync($"{baselineSpeedWpm + ReaderSpeedStepWpm} {WordsPerMinuteSuffix}");
 
         var cameraToggle = page.GetByTestId(UiTestIds.Teleprompter.CameraToggle);
         var cameraWasActive = await HasActiveClassAsync(cameraToggle);
@@ -64,18 +70,18 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         }
 
         await page.GetByTestId(UiTestIds.Teleprompter.WidthSlider).EvaluateAsync(BrowserTestConstants.TeleprompterFlow.WidthInputScript);
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.WidthValue}")).ToHaveTextAsync(BrowserTestConstants.TeleprompterFlow.WidthAfterChange);
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthValue)).ToHaveTextAsync(BrowserTestConstants.TeleprompterFlow.WidthAfterChange);
 
         var playToggle = page.GetByTestId(UiTestIds.Teleprompter.PlayToggle);
         await playToggle.ClickAsync();
         await Expect(playToggle).ToBeVisibleAsync();
         await Expect(playToggle.Locator(BrowserTestConstants.Teleprompter.PauseToggleIconSelector))
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ReaderPlaybackReadyTimeoutMs });
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.Time}"))
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.TimeValue))
             .Not.ToHaveTextAsync(
                 BrowserTestConstants.Regexes.ReaderTimeNotZero,
                 new() { Timeout = BrowserTestConstants.Timing.ReaderPlaybackAdvanceTimeoutMs });
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.ProgressFill}"))
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.ProgressFill))
             .Not.ToHaveAttributeAsync(
                 "style",
                 BrowserTestConstants.Regexes.NonZeroWidth,
@@ -256,7 +262,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
     private static async Task VerifyTeleprompterCameraAutostartAsync(Microsoft.Playwright.IPage page, bool readerCameraWasOn)
     {
         await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
-        await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync(
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveAttributeAsync(
             "data-camera-autostart",
             readerCameraWasOn ? new Regex("false") : new Regex("true"));
 
@@ -266,7 +272,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         }
 
         await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.ReaderCameraInitDelayMs);
-        var hasVideoTrack = await page.Locator($"#{UiDomIds.Teleprompter.Camera}").EvaluateAsync<bool>(
+        var hasVideoTrack = await page.GetByTestId(UiTestIds.Teleprompter.CameraBackground).EvaluateAsync<bool>(
             "element => !!element.srcObject && element.srcObject.getVideoTracks().length > 0");
         await Assert.That(hasVideoTrack).IsTrue();
     }
@@ -304,6 +310,18 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         {
             await Expect(locator).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
         }
+    }
+
+    private static int ParseWordsPerMinuteValue(string speedText)
+    {
+        var tokens = speedText
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (tokens.Length == 0 || !int.TryParse(tokens[0], out var parsedWpm))
+        {
+            throw new InvalidOperationException($"Unable to parse teleprompter speed value from '{speedText}'.");
+        }
+
+        return parsedWpm;
     }
 
     private static async Task<bool> HasOnClassAsync(Microsoft.Playwright.ILocator locator)

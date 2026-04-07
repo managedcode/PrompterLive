@@ -12,6 +12,9 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
 {
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
+
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;

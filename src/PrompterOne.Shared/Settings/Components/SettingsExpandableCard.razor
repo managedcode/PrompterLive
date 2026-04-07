@@ -3,6 +3,7 @@
 
 <article class="@CardCssClass"
          data-test="@TestId"
+         data-expanded="@ExpandedState"
          @onclick="OnToggle">
     <div class="set-dest-header">
         <UiIconSurface Tone="@IconTone"
@@ -62,9 +63,13 @@
                 [DataTestIdAttributeName] = SubtitleTestId
             };
 
+    private string ExpandedState => IsOpen ? ExpandedStateOpenValue : ExpandedStateClosedValue;
+
     private static IReadOnlyDictionary<string, object> EmptyAttributes { get; } =
         new Dictionary<string, object>(StringComparer.Ordinal);
 
+    private const string ExpandedStateClosedValue = "closed";
+    private const string ExpandedStateOpenValue = "open";
     private const string DataTestIdAttributeName = "data-test";
 
     [Parameter] public RenderFragment? ChildContent { get; set; }

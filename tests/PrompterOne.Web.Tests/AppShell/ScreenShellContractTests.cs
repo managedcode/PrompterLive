@@ -69,9 +69,16 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextLeft));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextRight));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ProgressLabel));
-            Assert.NotNull(cut.Find("#" + UiDomIds.Learn.ProgressFill + ".ui-percent-fill"));
-            Assert.NotNull(cut.Find(".rsvp-crosshair .ui-crosshair-guide"));
-            Assert.True(cut.FindAll(".rsvp-bottom .ui-icon").Count >= 7);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ProgressFill));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Crosshair));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.SpeedDown));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.SpeedUp));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackwardLarge));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackward));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.PlayToggle));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForward));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForwardLarge));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.LoopToggle));
             Assert.Equal("0", cut.FindByTestId(UiTestIds.Learn.Page).GetAttribute("tabindex"));
         });
     }

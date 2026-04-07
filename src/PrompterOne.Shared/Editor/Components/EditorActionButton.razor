@@ -10,7 +10,7 @@
         @onmousedown:preventDefault="@Action.PreventMouseDown"
         @onclick="HandleClickAsync">
     <span class="tb-btn-content">
-        <EditorActionContent Content="@Action.Content" />
+        <EditorActionContent ActionTestId="@Action.TestId" Content="@Action.Content" />
     </span>
     <span class="@TooltipCssClass"
           role="tooltip"

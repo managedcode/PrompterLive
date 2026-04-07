@@ -83,6 +83,7 @@ public static class UiDomIds
         public const string HeaderSegment = "rd-header-segment";
         public const string PauseFill = "rd-pause-fill";
         public const string ProgressFill = "rd-progress-fill";
+        public const string SpeedValue = "rd-speed-val";
         public const string Stage = "rd-stage";
         public const string Time = "rd-time";
         public const string WidthGuideLeft = "rd-guide-v-l";

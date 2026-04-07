@@ -138,12 +138,12 @@ internal static partial class BrowserTestConstants
         public const string ActiveCardSelector =
             $"[{UiDataAttributes.Teleprompter.CardState}='{UiDataAttributes.Teleprompter.ActiveState}']";
         public const string ActiveWordSelector =
-            $"[{UiDataAttributes.Teleprompter.WordState}='{UiDataAttributes.Teleprompter.ActiveState}']";
+            $"[{Html.DataTestAttribute}='{UiTestIds.Teleprompter.ActiveWord}']";
         public const int TransitionProbeIntervalMs = 50;
         public const int TransitionProbeSampleCount = 28;
         public const double TransitionReversalTolerancePx = 6;
         public const double TransitionMinimumTravelPx = 80;
-        public const string PauseToggleIconSelector = "[data-toggle-icon='pause']";
+        public const string PauseToggleIconSelector = $"[{Html.DataTestAttribute}='{UiTestIds.Teleprompter.PauseIcon}']";
         public const string ShortcutScenarioName = "teleprompter-keyboard-shortcuts";
         public const string ShortcutStep = "01-mirror-and-justify";
     }
@@ -971,8 +971,8 @@ internal static partial class BrowserTestConstants
 
     public static class Elements
     {
-        public const string CameraOverlaySelector = ".rd-camera-overlay";
-        public const string TeleprompterShellSelector = ".rd";
+        public const string CameraOverlaySelector = $"[{Html.DataTestAttribute}='teleprompter-camera-overlay']";
+        public const string TeleprompterShellSelector = $"[{Html.DataTestAttribute}='{UiTestIds.Teleprompter.Page}']";
         public static string DemoCard => UiTestIds.Library.Card(Scripts.DemoId);
         public static string SecurityIncidentCard => UiTestIds.Library.Card(Scripts.SecurityIncidentId);
         public static string LeadershipCard => UiTestIds.Library.Card(Scripts.LeadershipId);

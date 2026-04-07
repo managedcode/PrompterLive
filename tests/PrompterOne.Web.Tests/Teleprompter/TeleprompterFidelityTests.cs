@@ -63,7 +63,9 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.True(groups.Count >= 4);
             Assert.All(groups, group =>
             {
-                var wordCount = group.QuerySelectorAll(".rd-w").Length;
+                var wordCount = group.TextContent
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Length;
                 Assert.InRange(wordCount, 1, 5);
             });
             Assert.Contains(groupTexts, text => text.Contains("At 04:12 this morning", StringComparison.Ordinal));
@@ -87,7 +89,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(MaximumReaderWidthValue, cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
-            Assert.Equal(MaximumReaderWidthLabel, cut.Find($"#{UiDomIds.Teleprompter.WidthValue}").TextContent.Trim());
+            Assert.Equal(MaximumReaderWidthLabel, cut.FindByTestId(UiTestIds.Teleprompter.WidthValue).TextContent.Trim());
             Assert.Contains(MaximumReaderWidthScaleStyle, cut.FindByTestId(UiTestIds.Teleprompter.Stage).GetAttribute("style"), StringComparison.Ordinal);
         });
     }
@@ -222,8 +224,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var emphasisGroup = cut.FindByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0));
-            var responseWords = cut.FindByTestId(UiTestIds.Teleprompter.CardText(SecurityIncidentResponseCardIndex))
-                .QuerySelectorAll(".rd-w")
+            var responseWords = cut.FindAll($"[data-test^='{UiTestIds.Teleprompter.CardWordPrefix(SecurityIncidentResponseCardIndex)}']")
                 .Select(element => element.TextContent.Trim())
                 .ToArray();
 
@@ -244,7 +245,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var gradient = cut.Find("#rd-gradient");
+            var gradient = cut.FindByTestId(UiTestIds.Teleprompter.Gradient);
             var className = gradient.ClassName ?? string.Empty;
 
             Assert.DoesNotContain("focused", className, StringComparison.Ordinal);
@@ -256,8 +257,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     }
 
     private static AngleSharp.Dom.IElement FindReaderWordByText(IRenderedComponent<TeleprompterPage> cut, int cardIndex, string text) =>
-        cut.FindByTestId(UiTestIds.Teleprompter.CardText(cardIndex))
-            .QuerySelectorAll(".rd-w")
+        cut.FindAll($"[data-test^='{UiTestIds.Teleprompter.CardWordPrefix(cardIndex)}']")
             .Single(element => string.Equals(element.TextContent.Trim(), text, StringComparison.Ordinal));
 
     private static int GetWordDurationMilliseconds(AngleSharp.Dom.IElement word) =>
