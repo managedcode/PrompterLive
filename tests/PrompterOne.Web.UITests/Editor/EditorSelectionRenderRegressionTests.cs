@@ -47,20 +47,11 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
 
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedScript);
             await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseSelectionTarget);
-
-            await page.Keyboard.DownAsync(BrowserTestConstants.Keyboard.Shift);
-
-            try
-            {
-                for (var index = 0; index < BrowserTestConstants.Editor.ReverseSelectionCharacterCount; index++)
-                {
-                    await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.ArrowLeft);
-                }
-            }
-            finally
-            {
-                await page.Keyboard.UpAsync(BrowserTestConstants.Keyboard.Shift);
-            }
+            await EditorMonacoDriver.FocusAsync(page);
+            await EditorMonacoDriver.PressKeyRepeatedlyAsync(
+                page,
+                BrowserTestConstants.Keyboard.ShiftArrowLeft,
+                BrowserTestConstants.Editor.ReverseSelectionCharacterCount);
 
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var selectedText = ReadSelectedText(state);
@@ -86,20 +77,11 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
 
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedMultilineScript);
             await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseMultilineSelectionTarget);
-
-            await page.Keyboard.DownAsync(BrowserTestConstants.Keyboard.Shift);
-
-            try
-            {
-                for (var index = 0; index < BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount; index++)
-                {
-                    await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.ArrowLeft);
-                }
-            }
-            finally
-            {
-                await page.Keyboard.UpAsync(BrowserTestConstants.Keyboard.Shift);
-            }
+            await EditorMonacoDriver.FocusAsync(page);
+            await EditorMonacoDriver.PressKeyRepeatedlyAsync(
+                page,
+                BrowserTestConstants.Keyboard.ShiftArrowLeft,
+                BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount);
 
             var state = await EditorMonacoDriver.GetStateAsync(page);
             var selectedText = ReadSelectedText(state);

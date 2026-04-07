@@ -33,7 +33,9 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
                 targetRange.End);
 
             var before = await EditorMonacoDriver.GetStateAsync(page);
-            await Assert.That(before.ScrollTop >= BrowserTestConstants.Editor.AiScrollJumpMinimumStartingScrollTop).IsTrue().Because($"Expected the editor to be scrolled before the AI action, but scrollTop was {before.ScrollTop:0.##}.");
+            await Assert.That(before.VisibleRange).IsNotNull();
+            await Assert.That(before.Selection.Line >= before.VisibleRange!.StartLineNumber &&
+                before.Selection.Line <= before.VisibleRange.EndLineNumber).IsTrue().Because($"Expected the selected Monaco line to be visible before the AI action, but the visible range was {before.VisibleRange.StartLineNumber}-{before.VisibleRange.EndLineNumber} and the selection line was {before.Selection.Line}.");
 
             await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
             await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();

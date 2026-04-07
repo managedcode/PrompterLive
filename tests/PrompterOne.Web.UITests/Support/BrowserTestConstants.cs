@@ -255,7 +255,6 @@ internal static partial class BrowserTestConstants
         public const int AiScrollJumpLineCount = 140;
         public const int AiScrollJumpTargetLineIndex = 90;
         public const int AiScrollJumpSettleDelayMs = 500;
-        public const double AiScrollJumpMinimumStartingScrollTop = 1000;
         public const double AiScrollJumpMaximumAllowedDeltaPx = 64;
         public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
@@ -903,6 +902,8 @@ internal static partial class BrowserTestConstants
         public const string Undo = "ControlOrMeta+Z";
         public const string Redo = "ControlOrMeta+Shift+Z";
         public const string Shift = "Shift";
+        public const string ShiftArrowLeft = "Shift+ArrowLeft";
+        public const string ShiftArrowRight = "Shift+ArrowRight";
     }
 
     public static class Routes

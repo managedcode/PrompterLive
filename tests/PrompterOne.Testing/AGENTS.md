@@ -8,6 +8,7 @@
 
 - `ShouldlyAssert.cs`
 - `EnvironmentAwareParallelLimitBase.cs`
+- `TestEnvironment.cs`
 
 ## Boundaries
 

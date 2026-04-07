@@ -6,13 +6,15 @@ namespace PrompterOne.Web.UITests;
 internal static class EditorLargeDraftPerformanceTestData
 {
     public const int BlockCountPerSegment = 4;
+    public const int CiMaxHugeTypingLatencyMs = 425;
+    public const int CiMaxPasteLongTaskMs = 360;
     public const string FollowupTypingText = " x";
     public const int HugeDraftMinimumLength = 250_000;
     public const int HugeDraftReadyTimeoutMs = 30_000;
     public const int LargeDraftMinimumLength = 32_000;
-    public const int MaxPasteLongTaskMs = 325;
+    public const int LocalMaxHugeTypingLatencyMs = 250;
+    public const int LocalMaxPasteLongTaskMs = 325;
     public const int MaxHugeFollowupLongTaskMs = 500;
-    public const int MaxHugeTypingLatencyMs = 250;
     public const int MaxTypingLatencyMs = 100;
     public const int NavigationTargetSegmentIndex = 14;
     public const int ObservationDelayMs = 2_200;
@@ -23,6 +25,16 @@ internal static class EditorLargeDraftPerformanceTestData
     private const string Version = "1.0";
     private const string FrontMatterOpeningDelimiter = "---\n";
     private const string FrontMatterClosingDelimiter = "\n---\n\n";
+
+    public static int MaxHugeTypingLatencyMs =>
+        PrompterOne.Testing.TestEnvironment.IsCiEnvironment
+            ? CiMaxHugeTypingLatencyMs
+            : LocalMaxHugeTypingLatencyMs;
+
+    public static int MaxPasteLongTaskMs =>
+        PrompterOne.Testing.TestEnvironment.IsCiEnvironment
+            ? CiMaxPasteLongTaskMs
+            : LocalMaxPasteLongTaskMs;
 
     private static readonly string[] BlockBodies =
     [

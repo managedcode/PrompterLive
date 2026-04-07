@@ -94,6 +94,14 @@ internal static class EditorMonacoDriver
         _ = await InvokeHarnessAsync<EditorMonacoState>(page, "focus");
     }
 
+    internal static async Task PressKeyRepeatedlyAsync(IPage page, string key, int repeatCount)
+    {
+        for (var index = 0; index < repeatCount; index++)
+        {
+            await page.Keyboard.PressAsync(key);
+        }
+    }
+
     internal static async Task<EditorMonacoState> GetStateAsync(IPage page)
     {
         var state = await InvokeHarnessAsync<EditorMonacoState?>(page, "getState");
@@ -176,6 +184,31 @@ internal static class EditorMonacoDriver
                 end,
                 harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
                 start,
+                testId = UiTestIds.Editor.SourceStage
+            },
+            new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+
+        if (!revealSelection)
+        {
+            return;
+        }
+
+        await page.WaitForFunctionAsync(
+            """
+            (args) => {
+                const harness = window[args.harnessGlobalName];
+                const state = harness?.getState(args.testId);
+                const visibleRange = state?.visibleRange;
+                const selectionLine = state?.selection?.line;
+                return Boolean(visibleRange) &&
+                    typeof selectionLine === "number" &&
+                    selectionLine >= visibleRange.startLineNumber &&
+                    selectionLine <= visibleRange.endLineNumber;
+            }
+            """,
+            new
+            {
+                harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
                 testId = UiTestIds.Editor.SourceStage
             },
             new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
