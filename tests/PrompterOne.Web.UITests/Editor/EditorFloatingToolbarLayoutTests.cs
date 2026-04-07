@@ -99,7 +99,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
             await GotoEditorAndWaitForSourceAsync(page);
             await EditorMonacoDriver.SetCaretAtTextStartAsync(page, BrowserTestConstants.Editor.ToolbarPinnedSelectionTarget);
             await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.PressKeyRepeatedlyAsync(
+            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
                 page,
                 BrowserTestConstants.Keyboard.ShiftArrowRight,
                 BrowserTestConstants.Editor.ToolbarPinnedSelectionCharacterCount);

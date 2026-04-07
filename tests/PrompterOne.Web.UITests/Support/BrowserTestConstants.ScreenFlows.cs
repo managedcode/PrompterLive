@@ -20,6 +20,7 @@ internal static partial class BrowserTestConstants
         public const string LineNumbersStep = "01-gutter-visible";
         public const string SplitFeedbackScenario = "editor-split-feedback";
         public const string SplitFeedbackStep = "01-split-result-card";
+        public const int SplitFeedbackVisibleTimeoutMs = 30_000;
         public const string LocalHistoryScenario = "editor-local-history";
         public const string LocalHistorySavedStep = "01-history-populated";
         public const string LocalHistoryRestoredStep = "02-history-restored";

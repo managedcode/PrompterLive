@@ -37,7 +37,10 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
 
             await page.GetByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
 
-            await Expect(page.GetByTestId(UiTestIds.Editor.SplitStatus)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.SplitStatus)).ToBeVisibleAsync(new()
+            {
+                Timeout = BrowserTestConstants.EditorFlow.SplitFeedbackVisibleTimeoutMs
+            });
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultTitle)).ToHaveTextAsync(SplitFeedbackTitle);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultSummary)).ToHaveTextAsync(SplitFeedbackSummary);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultBadge)).ToHaveTextAsync(SplitFeedbackBadge);

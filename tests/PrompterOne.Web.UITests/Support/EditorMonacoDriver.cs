@@ -15,6 +15,9 @@ internal static class EditorMonacoDriver
         PropertyNameCaseInsensitive = true
     };
 
+    private static int GetSelectionLength(EditorMonacoState state) =>
+        Math.Abs(state.Selection.End - state.Selection.Start);
+
     internal static ILocator SourceInput(IPage page) =>
         page.GetByTestId(UiTestIds.Editor.SourceInput);
 
@@ -94,11 +97,35 @@ internal static class EditorMonacoDriver
         _ = await InvokeHarnessAsync<EditorMonacoState>(page, "focus");
     }
 
-    internal static async Task PressKeyRepeatedlyAsync(IPage page, string key, int repeatCount)
+    internal static async Task ExpandSelectionWithKeyAsync(IPage page, string key, int repeatCount)
     {
+        var currentSelectionLength = GetSelectionLength(await GetStateAsync(page));
+
         for (var index = 0; index < repeatCount; index++)
         {
             await page.Keyboard.PressAsync(key);
+            currentSelectionLength += 1;
+
+            await page.WaitForFunctionAsync(
+                """
+                (args) => {
+                    const harness = window[args.harnessGlobalName];
+                    const state = harness?.getState(args.testId);
+                    const selection = state?.selection;
+                    if (!selection) {
+                        return false;
+                    }
+
+                    return Math.abs(selection.end - selection.start) >= args.minimumSelectionLength;
+                }
+                """,
+                new
+                {
+                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                    minimumSelectionLength = currentSelectionLength,
+                    testId = UiTestIds.Editor.SourceStage
+                },
+                new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
         }
     }
 

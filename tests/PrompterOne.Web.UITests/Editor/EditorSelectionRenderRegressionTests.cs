@@ -48,7 +48,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedScript);
             await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseSelectionTarget);
             await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.PressKeyRepeatedlyAsync(
+            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
                 page,
                 BrowserTestConstants.Keyboard.ShiftArrowLeft,
                 BrowserTestConstants.Editor.ReverseSelectionCharacterCount);
@@ -78,7 +78,7 @@ public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fi
             await EditorMonacoDriver.SetTextAsync(page, BrowserTestConstants.Editor.TypedMultilineScript);
             await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.ReverseMultilineSelectionTarget);
             await EditorMonacoDriver.FocusAsync(page);
-            await EditorMonacoDriver.PressKeyRepeatedlyAsync(
+            await EditorMonacoDriver.ExpandSelectionWithKeyAsync(
                 page,
                 BrowserTestConstants.Keyboard.ShiftArrowLeft,
                 BrowserTestConstants.Editor.ReverseMultilineSelectionCharacterCount);
