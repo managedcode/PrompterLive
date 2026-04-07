@@ -14,7 +14,7 @@ public partial class TeleprompterPage
     private const string ReaderCardNextCssClass = "rd-card-next";
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
     private const string ReaderAlignmentButtonCssClass = "rd-align-btn";
-    private const double ReaderContentWidthScaleFactor = 0.92d;
+    private const double ReaderContentWidthScaleFactor = 0.97d;
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
     private const string ReaderCountdownCssClass = "rd-countdown";
     private const string ReaderGradientCssClass = "rd-gradient";

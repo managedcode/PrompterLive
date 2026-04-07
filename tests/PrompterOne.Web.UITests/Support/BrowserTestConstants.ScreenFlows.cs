@@ -199,6 +199,8 @@ internal static partial class BrowserTestConstants
         public const string AlignmentRightValue = "right";
         public const string AlignmentJustifyValue = "justify";
         public const double MinimumOpticalInsetPx = 24;
+        public const double MaximumClusterWrapPaddingPx = 24.5;
+        public const double MaximumOpticalInsetPx = 36.5;
         public const double MaximumFullWidthButtonGapPx = 6;
         public const double MaximumDefaultLeftAverageCenterOffsetPx = 170;
         public const double MaximumDefaultLeftLineCenterOffsetPx = 225;

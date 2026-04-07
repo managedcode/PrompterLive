@@ -28,6 +28,7 @@
                 <label>@Text(UiTextKey.CommonAutoSyncOnSave)</label>
                 <div class="@BuildToggleCssClass(_preferences.AutoSyncOnSave)"
                      @onclick="ToggleAutoSyncOnSaveAsync"
+                     data-enabled="@(_preferences.AutoSyncOnSave ? EnabledStateValue : DisabledStateValue)"
                      data-test="@UiTestIds.Settings.CloudAutoSyncOnSave">
                     <div class="set-toggle-thumb"></div>
                 </div>
@@ -36,6 +37,7 @@
                 <label>@Text(UiTextKey.CommonSyncOnStartup)</label>
                 <div class="@BuildToggleCssClass(_preferences.SyncOnStartup)"
                      @onclick="ToggleSyncOnStartupAsync"
+                     data-enabled="@(_preferences.SyncOnStartup ? EnabledStateValue : DisabledStateValue)"
                      data-test="@UiTestIds.Settings.CloudSyncOnStartup">
                     <div class="set-toggle-thumb"></div>
                 </div>
@@ -127,6 +129,7 @@
                     <label>@Text(UiTextKey.CommonSupportSharedDrives)</label>
                     <div class="@BuildToggleCssClass(_preferences.GoogleDrive.SupportsAllDrives)"
                          @onclick="ToggleGoogleDriveAllDrivesAsync"
+                         data-enabled="@(_preferences.GoogleDrive.SupportsAllDrives ? EnabledStateValue : DisabledStateValue)"
                          data-test="@UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.GoogleDrive, CloudStorageFieldIds.SupportsAllDrives)">
                         <div class="set-toggle-thumb"></div>
                     </div>

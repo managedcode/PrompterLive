@@ -22,6 +22,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const double MinimumVisibleSlowLetterSpacingEm = 0.045d;
     private const string MaximumReaderWidthLabel = "100%";
     private const string MaximumReaderWidthValue = "100";
+    private const string MaximumReaderContentScaleStyle = "--rd-stage-content-scale:0.97";
     private const string MaximumReaderWidthScaleStyle = "--rd-stage-width-scale:1";
     private const string NeutralWord = "Good";
     private const int OpeningCardIndex = 0;
@@ -91,6 +92,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Equal(MaximumReaderWidthValue, cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).GetAttribute("value"));
             Assert.Equal(MaximumReaderWidthLabel, cut.FindByTestId(UiTestIds.Teleprompter.WidthValue).TextContent.Trim());
             Assert.Contains(MaximumReaderWidthScaleStyle, cut.FindByTestId(UiTestIds.Teleprompter.Stage).GetAttribute("style"), StringComparison.Ordinal);
+            Assert.Contains(MaximumReaderContentScaleStyle, cut.FindByTestId(UiTestIds.Teleprompter.Stage).GetAttribute("style"), StringComparison.Ordinal);
         });
     }
 

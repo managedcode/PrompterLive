@@ -9,7 +9,9 @@ namespace PrompterOne.Shared.Components.Settings;
 public partial class SettingsCloudSection : ComponentBase
 {
     private const string ConnectedStatusClass = "set-dest-ok";
+    private const string DisabledStateValue = "false";
     private const string DisconnectedStatusClass = "set-dest-idle";
+    private const string EnabledStateValue = "true";
     private const string OnCssClass = "on";
     private const string SetToggleCssClass = "set-toggle";
 

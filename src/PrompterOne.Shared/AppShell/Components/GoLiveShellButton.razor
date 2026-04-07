@@ -7,6 +7,7 @@
         title="@AccessibleLabel"
         aria-label="@AccessibleLabel"
         data-live-state="@LiveState"
+        data-subdued="@(Subdued ? EnabledStateValue : DisabledStateValue)"
         data-test="@TestId"
         @onclick="HandleClick">
     <span class="go-live-shell-button__signal" aria-hidden="true">
@@ -30,6 +31,8 @@
 
 @code {
     private const string BaseCssClass = "go-live-shell-button";
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
     private const string SubduedCssClass = "go-live-shell-button--subdued";
 
     private string AccessibleLabel => string.IsNullOrWhiteSpace(Status)

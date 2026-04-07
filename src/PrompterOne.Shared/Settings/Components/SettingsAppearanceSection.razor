@@ -28,6 +28,7 @@
                         @foreach (var option in ThemeOptions)
                         {
                             <label class="@(option.Value == ColorScheme ? "set-theme-opt active" : "set-theme-opt")"
+                                   data-active="@(option.Value == ColorScheme ? ActiveStateValue : InactiveStateValue)"
                                    data-test="@UiTestIds.Settings.ThemeOption(option.Value)"
                                    @onclick:stopPropagation="true">
                                 <input type="radio"
@@ -134,6 +135,7 @@
                         @foreach (var density in DensityOptions)
                         {
                             <label class="@(density.Value == UiDensity ? "set-theme-opt active" : "set-theme-opt")"
+                                   data-active="@(density.Value == UiDensity ? ActiveStateValue : InactiveStateValue)"
                                    @onclick:stopPropagation="true">
                                 <input type="radio"
                                        name="density"
@@ -167,6 +169,8 @@
 </section>
 
 @code {
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
     private const string InterfaceCardId = "appearance-interface";
     private const string TeleprompterCardId = "appearance-teleprompter";
     private const string ThemeCardId = "appearance-theme";

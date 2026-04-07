@@ -12,6 +12,7 @@
                  @onclick="() => HandleCardClickAsync(card.Id)"
                  data-test="@card.TestId">
             <div class="@GetCardMenuWrapClass(card.Id)"
+                 data-expanded="@GetCardMenuExpandedState(card.Id)"
                  @onclick:stopPropagation="true">
                 <TooltipAnchor OwnerTestId="@UiTestIds.Library.CardMenu(card.Id)"
                                Placement="TooltipPlacement.LeftCenter"
@@ -167,6 +168,8 @@
 @code {
     private const string CardMenuWrapClass = "dcard-menu-wrap";
     private const string CardMenuWrapOpenClass = CardMenuWrapClass + " open";
+    private const string ExpandedStateClosedValue = "closed";
+    private const string ExpandedStateOpenValue = "open";
     private string? _openCardMenuId;
 
     [Parameter, EditorRequired] public IReadOnlyList<LibraryCardViewModel> Cards { get; set; } = [];
@@ -206,6 +209,11 @@
         string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
             ? CardMenuWrapOpenClass
             : CardMenuWrapClass;
+
+    private string GetCardMenuExpandedState(string cardId) =>
+        string.Equals(_openCardMenuId, cardId, StringComparison.Ordinal)
+            ? ExpandedStateOpenValue
+            : ExpandedStateClosedValue;
 
     private void ToggleCardMenu(string cardId)
     {

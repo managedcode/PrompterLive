@@ -154,10 +154,10 @@
     --rd-stage-inline-clearance: clamp(160px, 14vw, 320px);
     --rd-stage-available-width: min(calc(100vw - var(--rd-stage-inline-clearance)), 1760px);
     --rd-stage-width-scale: 1;
-    --rd-stage-content-scale: .92;
+    --rd-stage-content-scale: .97;
     --rd-stage-shell-width: calc(var(--rd-stage-available-width) * var(--rd-stage-width-scale));
     --rd-stage-content-width: calc(var(--rd-stage-available-width) * var(--rd-stage-content-scale));
-    --rd-text-optical-inset: clamp(28px, calc(var(--rd-stage-content-width) * .06), 64px);
+    --rd-text-optical-inset: clamp(24px, calc(var(--rd-stage-shell-width) * .022), 36px);
     /* Spotlight mask: fade text above reading zone and below */
     -webkit-mask-image: linear-gradient(
         to bottom,
@@ -182,7 +182,7 @@
 /* Cluster container — active cluster pinned to vertical center */
 .rd-cluster-wrap {
     position: relative;
-    padding: 0 4%;
+    padding: 0 clamp(12px, 1.4vw, 24px);
     max-width: min(100%, var(--rd-stage-shell-width));
     margin: 0 auto;
     width: 100%;

@@ -7,7 +7,8 @@
 
 @if (ShowAppHeader)
 {
-    <header class="@BuildAppHeaderCssClass()">
+    <header class="@BuildAppHeaderCssClass()"
+            data-reader-muted="@(IsTeleprompterPlaybackChromeMuted ? EnabledStateValue : DisabledStateValue)">
         <button type="button"
                 class="app-header-left app-header-home"
                 @onclick="HandleHomeClickAsync"
@@ -195,4 +196,9 @@
                   data-test="@UiTestIds.Header.LiveWidgetDetail">@GoLiveWidgetDetail</span>
         </div>
     </button>
+}
+
+@code {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
 }

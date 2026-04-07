@@ -11,7 +11,10 @@
      @onkeydown:preventDefault="true"
      data-test="@UiTestIds.Teleprompter.Page">
     <div class="rd">
-        <div class="@BuildReaderGradientCssClass()" id="rd-gradient" data-test="@UiTestIds.Teleprompter.Gradient"></div>
+        <div class="@BuildReaderGradientCssClass()"
+             id="rd-gradient"
+             data-gradient="@_gradientClass"
+             data-test="@UiTestIds.Teleprompter.Gradient"></div>
         <video class="@BuildCameraCssClass()"
                id="@_cameraLayer.ElementId"
                autoplay
@@ -39,6 +42,7 @@
                     <button class="@BuildReaderMirrorButtonCssClass(_isReaderMirrorHorizontal)"
                             @onclick="ToggleReaderMirrorHorizontalAsync"
                             aria-label="@ReaderMirrorHorizontalTitle"
+                            data-active="@BuildBooleanDataAttribute(_isReaderMirrorHorizontal)"
                             data-test="@UiTestIds.Teleprompter.MirrorHorizontalToggle">
                         @ReaderMirrorHorizontalLabel
                     </button>
@@ -51,6 +55,7 @@
                     <button class="@BuildReaderMirrorButtonCssClass(_isReaderMirrorVertical)"
                             @onclick="ToggleReaderMirrorVerticalAsync"
                             aria-label="@ReaderMirrorVerticalTitle"
+                            data-active="@BuildBooleanDataAttribute(_isReaderMirrorVertical)"
                             data-test="@UiTestIds.Teleprompter.MirrorVerticalToggle">
                         @ReaderMirrorVerticalLabel
                     </button>
@@ -63,6 +68,7 @@
                     <button class="@BuildReaderOrientationButtonCssClass()"
                             @onclick="ToggleReaderOrientationAsync"
                             aria-label="@ReaderOrientationTitle"
+                            data-active="@BuildBooleanDataAttribute(_readerTextOrientation == ReaderTextOrientation.Portrait)"
                             data-test="@UiTestIds.Teleprompter.OrientationToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                             <path d="M7 3H3v4"></path>
@@ -80,6 +86,7 @@
                     <button class="@BuildReaderFullscreenButtonCssClass()"
                             @onclick="ToggleReaderFullscreenAsync"
                             aria-label="@ReaderFullscreenTitle"
+                            data-active="@BuildBooleanDataAttribute(_isReaderFullscreenActive)"
                             data-test="@UiTestIds.Teleprompter.FullscreenToggle">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                             <polyline points="8,3 3,3 3,8"></polyline>
@@ -100,6 +107,7 @@
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Left)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Left))"
                                 aria-label="@ReaderTextAlignLeftTitle"
+                                data-active="@BuildBooleanDataAttribute(_readerTextAlignment == ReaderTextAlignment.Left)"
                                 data-test="@UiTestIds.Teleprompter.AlignmentLeft">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="3" y1="4.5" x2="13" y2="4.5" />
@@ -116,6 +124,7 @@
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Center)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Center))"
                                 aria-label="@ReaderTextAlignCenterTitle"
+                                data-active="@BuildBooleanDataAttribute(_readerTextAlignment == ReaderTextAlignment.Center)"
                                 data-test="@UiTestIds.Teleprompter.AlignmentCenter">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="5" y1="4.5" x2="15" y2="4.5" />
@@ -132,6 +141,7 @@
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Right)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Right))"
                                 aria-label="@ReaderTextAlignRightTitle"
+                                data-active="@BuildBooleanDataAttribute(_readerTextAlignment == ReaderTextAlignment.Right)"
                                 data-test="@UiTestIds.Teleprompter.AlignmentRight">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="7" y1="4.5" x2="17" y2="4.5" />
@@ -148,6 +158,7 @@
                         <button class="@BuildReaderAlignmentButtonCssClass(ReaderTextAlignment.Justify)"
                                 @onclick="@(() => SetReaderTextAlignmentAsync(ReaderTextAlignment.Justify))"
                                 aria-label="@ReaderTextAlignJustifyTitle"
+                                data-active="@BuildBooleanDataAttribute(_readerTextAlignment == ReaderTextAlignment.Justify)"
                                 data-test="@UiTestIds.Teleprompter.AlignmentJustify">
                             <svg class="rd-align-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                                 <line x1="3" y1="4.5" x2="17" y2="4.5" />
@@ -276,6 +287,7 @@
                                         if (chunk is ReaderGroupViewModel group)
                                         {
                                             <span class="@BuildReaderGroupCssClass(entry.index, chunkIndex)"
+                                                  data-emphasis="@BuildBooleanDataAttribute(group.IsEmphasis)"
                                                   data-test="@UiTestIds.Teleprompter.CardGroup(entry.index, chunkIndex)">
                                                 @for (var wordIndex = 0; wordIndex < group.Words.Count; wordIndex++)
                                                 {
@@ -324,7 +336,9 @@
                     }
                 </div>
             </div>
-                <div class="@BuildReaderEdgeInfoCssClass()" data-test="@UiTestIds.Teleprompter.EdgeInfo">
+                <div class="@BuildReaderEdgeInfoCssClass()"
+                     data-active="@BuildBooleanDataAttribute(_isReaderPlaying)"
+                     data-test="@UiTestIds.Teleprompter.EdgeInfo">
                     <span class="rd-edge-section" data-test="@UiTestIds.Teleprompter.EdgeSection">@_edgeSectionLabel</span>
                     <span class="rd-time"
                       id="@UiDomIds.Teleprompter.Time"
@@ -332,7 +346,9 @@
                       @attributes="BuildReaderTimeDataAttributes()">@BuildElapsedLabel()</span>
                 </div>
 
-            <div class="@BuildReaderProgressShellCssClass()" data-test="@UiTestIds.Teleprompter.Progress">
+            <div class="@BuildReaderProgressShellCssClass()"
+                 data-active="@BuildBooleanDataAttribute(_isReaderPlaying)"
+                 data-test="@UiTestIds.Teleprompter.Progress">
                 <div class="rd-progress-meta">
                     <span class="rd-progress-title">@BuildBlockIndicatorLabel()</span>
                     <span class="rd-progress-label" data-test="@UiTestIds.Teleprompter.ProgressLabel">@BuildReaderProgressLabel()</span>
@@ -349,7 +365,9 @@
                 </div>
             </div>
 
-            <div class="@BuildReaderControlsCssClass()" data-test="@UiTestIds.Teleprompter.Controls">
+            <div class="@BuildReaderControlsCssClass()"
+                 data-active="@BuildBooleanDataAttribute(_isReaderPlaying)"
+                 data-test="@UiTestIds.Teleprompter.Controls">
                 <div class="rd-ctrl-group">
                     <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.SpeedDown" Text="@ReaderSpeedDownTooltip">
                         <button class="rd-ctrl-btn"
@@ -388,6 +406,7 @@
                                 id="tp-play-btn"
                                 @onclick="ToggleReaderPlaybackAsync"
                                 aria-label="@ReaderPlayToggleTooltip"
+                                data-active="@BuildBooleanDataAttribute(_isReaderPlaying)"
                                 data-test="@UiTestIds.Teleprompter.PlayToggle">
                             <span data-toggle-icon="play" data-test="@UiTestIds.Teleprompter.PlayIcon" hidden="@_isReaderPlaying">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" /></svg>
@@ -418,6 +437,7 @@
                                 id="@UiDomIds.Teleprompter.CameraButton"
                                 @onclick="ToggleReaderCameraAsync"
                                 aria-label="@ReaderCameraTooltip"
+                                data-active="@BuildBooleanDataAttribute(_isReaderCameraActive)"
                                 data-test="@UiTestIds.Teleprompter.CameraToggle">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
                         </button>

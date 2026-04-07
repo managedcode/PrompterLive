@@ -64,6 +64,7 @@
                             <div class="set-device-actions" @onclick:stopPropagation="true">
                                 <div class="@BuildToggleCssClass(isEnabled)"
                                      @onclick="() => ToggleCameraSelection.InvokeAsync(camera)"
+                                     data-enabled="@(isEnabled ? EnabledStateValue : DisabledStateValue)"
                                      data-test="@UiTestIds.Settings.CameraDeviceAction(camera.DeviceId)">
                                     <div class="set-toggle-thumb"></div>
                                 </div>
@@ -84,6 +85,7 @@
                                         <label>@Text(UiTextKey.SettingsCamerasMirrorHorizontal)</label>
                                         <div class="@BuildToggleCssClass(sceneCamera.Transform.MirrorHorizontal)"
                                              @onclick="() => ToggleSceneMirror.InvokeAsync(sceneCamera.SourceId)"
+                                             data-enabled="@(sceneCamera.Transform.MirrorHorizontal ? EnabledStateValue : DisabledStateValue)"
                                              data-test="@BuildMirrorTestId(isPrimary, sceneCamera.SourceId)">
                                             <div class="set-toggle-thumb"></div>
                                         </div>
@@ -92,6 +94,7 @@
                                         <label>@Text(UiTextKey.SettingsCamerasAutoStartOnRead)</label>
                                         <div class="@BuildToggleCssClass(ReaderCameraEnabled)"
                                              @onclick="ToggleReaderCameraScene"
+                                             data-enabled="@(ReaderCameraEnabled ? EnabledStateValue : DisabledStateValue)"
                                              data-test="@(isPrimary ? UiTestIds.Settings.ReaderCameraToggle : null)">
                                             <div class="set-toggle-thumb"></div>
                                         </div>
@@ -118,6 +121,7 @@
                     <div class="set-field set-field-toggle">
                         <label>@Text(UiTextKey.SettingsCamerasAutoStartAllOnGoLive)</label>
                         <div class="@BuildToggleCssClass(AllSceneCamerasIncludedInOutput)"
+                             data-enabled="@(AllSceneCamerasIncludedInOutput ? EnabledStateValue : DisabledStateValue)"
                              @onclick="ToggleAllSceneOutputs">
                             <div class="set-toggle-thumb"></div>
                         </div>
@@ -136,6 +140,8 @@
 </section>
 
 @code {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
     private const string PrimaryCameraButtonActiveCssClass = "set-btn-golden set-btn-sm set-btn-primary-cam active";
     private const string PrimaryCameraButtonCssClass = "set-btn-outline set-btn-sm set-btn-primary-cam";
     [Parameter] public bool AllSceneCamerasIncludedInOutput { get; set; }

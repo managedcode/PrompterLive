@@ -7,6 +7,9 @@ public static class TpsVisualCueContracts
     public const string CueWeightVariableName = "--tps-cue-weight";
     public const string DeliveryAttributeName = "data-tps-delivery";
     public const string DeliveryModeBuilding = "building";
+    public const string EmotionAttributeName = "data-tps-emotion";
+    public const string HighlightAttributeName = "data-tps-highlight";
+    public const string HighlightAttributeValue = "true";
     public const string SpeedAttributeName = "data-tps-speed";
     public const string SpeedCueFast = "fast";
     public const string SpeedCueSlow = "slow";

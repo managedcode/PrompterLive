@@ -8,7 +8,6 @@
 <section class="set-section set-panel"
          id="set-shortcuts"
          style="@DisplayStyle"
-         data-test="@UiTestIds.Settings.ShortcutsPanel"
          data-test="@UiTestIds.Settings.ShortcutsPanel">
     <h3 class="set-section-title">@Text(UiTextKey.SettingsShortcutsSectionTitle)</h3>
     <p class="set-section-desc">@Text(UiTextKey.SettingsShortcutsSectionDescription)</p>
@@ -27,7 +26,6 @@
                     @foreach (var definition in group.Definitions)
                     {
                         <div class="set-shortcut-row"
-                             data-test="@UiTestIds.Settings.ShortcutsAction(group.Id, definition.Id)"
                              data-test="@UiTestIds.Settings.ShortcutsAction(group.Id, definition.Id)">
                             <div class="set-shortcut-copy">
                                 <span class="set-shortcut-name">@ActionLabel(definition)</span>
