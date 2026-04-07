@@ -1,7 +1,7 @@
 .app-live-widget {
     position: fixed;
-    right: calc(22px + env(safe-area-inset-right));
-    bottom: calc(20px + env(safe-area-inset-bottom));
+    right: 22px;
+    bottom: 20px;
     z-index: 60;
     width: min(234px, calc(100vw - 28px));
     display: flex;
@@ -150,42 +150,27 @@
 
 @media (max-width: 900px) {
     .app-live-widget {
-        right: calc(14px + env(safe-area-inset-right));
-        bottom: calc(14px + env(safe-area-inset-bottom));
+        right: 14px;
+        bottom: 14px;
         width: min(210px, calc(100vw - 20px));
     }
 }
 
 @media (max-width: 560px) {
     .app-live-widget {
-        right: calc(8px + env(safe-area-inset-right));
-        bottom: calc(18px + env(safe-area-inset-bottom));
-        width: min(176px, calc(100vw - 24px));
-        padding: 6px;
-        gap: 6px;
+        right: 10px;
+        bottom: 10px;
+        width: min(188px, calc(100vw - 20px));
+        padding: 8px;
+        gap: 8px;
         border-radius: 16px;
     }
 
     .app-live-widget-preview {
-        min-height: 74px;
+        min-height: 92px;
     }
 
     .app-live-widget-copy {
-        gap: 2px;
-    }
-
-    .app-live-widget-live-pill,
-    .app-live-widget-timer {
-        min-height: 18px;
-        padding: 0 6px;
-        font-size: 8px;
-    }
-
-    .app-live-widget-title {
-        font-size: 12px;
-    }
-
-    .app-live-widget-detail {
-        font-size: 10px;
+        gap: 3px;
     }
 }

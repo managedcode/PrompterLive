@@ -22,7 +22,7 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Library.Page,
             UiTestIds.Library.FolderAll,
             UiTestIds.Library.OpenSettings,
-            UiTestIds.Header.LibrarySearchSurface,
+            UiTestIds.Header.LibrarySearch,
             UiTestIds.Header.GoLive,
             UiTestIds.Header.LibraryOpenScript,
             UiTestIds.Header.LibraryNewScript));
@@ -39,7 +39,7 @@ public sealed class ResponsiveLayoutTests(StandaloneAppFixture fixture) : AppUiT
             UiTestIds.Header.Home,
             UiTestIds.Header.Brand,
             UiTestIds.Header.LibraryBreadcrumbCurrent,
-            UiTestIds.Header.LibrarySearchSurface,
+            UiTestIds.Header.LibrarySearch,
             UiTestIds.Header.GoLive,
             UiTestIds.Header.LibraryOpenScript,
             UiTestIds.Header.LibraryNewScript));

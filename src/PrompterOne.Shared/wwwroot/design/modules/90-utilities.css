@@ -150,3 +150,36 @@
     .tp-scroll { padding: 0 6%; }
     .rsvp-word { font-size: 52px; }
 }
+
+@media (max-width: 768px) and (max-height: 480px) {
+    #screen-library.active {
+        flex-direction: row;
+    }
+
+    .lib-sidebar {
+        width: min(220px, 34vw);
+        border-right: var(--glass-border-light);
+        border-bottom: none;
+        padding: 10px 12px;
+        flex: 0 0 auto;
+    }
+
+    .lib-folders-section {
+        margin-top: 12px;
+        max-height: none;
+    }
+
+    .lib-nav-bottom {
+        margin-top: auto;
+        padding-top: 10px;
+    }
+
+    .lib-main {
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .lib-scroll {
+        padding: 16px 14px 20px;
+    }
+}

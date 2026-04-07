@@ -59,10 +59,7 @@ public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture)
                 }
                 """);
             var lineNumberGap = contentLeftBoundary - lineNumberTextRight;
-            await Assert.That(lineNumberGap >= 0).IsTrue().Because($"Expected Monaco line numbers to stay inside the gutter without overlapping content, but the computed gap was {lineNumberGap:0.##}.");
-            await Assert.That(lineNumberGap <= BrowserTestConstants.Editor.MaximumLineNumberTextGapPx)
-                .IsTrue()
-                .Because($"Expected Monaco line numbers to keep a compact gutter gap, but the computed gap was {lineNumberGap:0.##}.");
+            await Assert.That(lineNumberGap).IsBetween(BrowserTestConstants.Editor.MinimumLineNumberTextGapPx, BrowserTestConstants.Editor.MaximumLineNumberTextGapPx);
         }
         finally
         {
