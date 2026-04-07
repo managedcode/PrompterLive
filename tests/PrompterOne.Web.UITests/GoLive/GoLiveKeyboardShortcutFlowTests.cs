@@ -24,14 +24,18 @@ public sealed class GoLiveKeyboardShortcutFlowTests(StandaloneAppFixture fixture
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Digit2);
             await Expect(page.GetByTestId(UiTestIds.GoLive.ModeStudio))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.State.ActiveAttribute,
+                    BrowserTestConstants.State.ActiveValue);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.BracketLeft);
             await Expect(page.GetByTestId(UiTestIds.GoLive.SourceRail)).ToHaveCountAsync(0);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.F);
             await Expect(page.GetByTestId(UiTestIds.GoLive.FullProgramToggle))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.State.ActiveAttribute,
+                    BrowserTestConstants.State.ActiveValue);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Enter);
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel))

@@ -25,8 +25,12 @@ public sealed class EditorLearnScreenFlowTests(StandaloneAppFixture fixture) : A
             await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
             await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
             await page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1)).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1))).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(2))).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1))).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(2))).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Benefits Block");
 
             await Expect(page.GetByTestId(UiTestIds.Header.EditorLearn)).ToBeVisibleAsync();

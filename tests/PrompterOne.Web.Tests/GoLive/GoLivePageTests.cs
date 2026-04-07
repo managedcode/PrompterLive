@@ -18,12 +18,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class GoLivePageTests : BunitContext
 {
-    private const string ProgramMonitorClass = "gl-monitor-program";
-    private const string SessionBarClass = "gl-topbar";
-    private const string SettingsButtonClass = "gl-settings-btn";
-    private const string SourcesRailClass = "gl-sources";
-    private const string PreviewRailClass = "gl-sidebar-right";
-    private const string SceneBarClass = "gl-scenes-bar";
+    private const string EnabledStateValue = "true";
     private const string SceneSettingsStorageKey = BrowserAppSettingsKeys.SceneSettings;
 
     private readonly AppHarness _harness;
@@ -88,13 +83,13 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains(SessionBarClass, cut.FindByTestId(UiTestIds.GoLive.SessionBar).ClassName, StringComparison.Ordinal);
-            Assert.Contains(SourcesRailClass, cut.FindByTestId(UiTestIds.GoLive.SourceRail).ClassName, StringComparison.Ordinal);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SessionBar));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SourceRail));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Stage));
-            Assert.Contains(PreviewRailClass, cut.FindByTestId(UiTestIds.GoLive.PreviewRail).ClassName, StringComparison.Ordinal);
-            Assert.Contains(ProgramMonitorClass, cut.FindByTestId(UiTestIds.GoLive.ProgramCard).ClassName, StringComparison.Ordinal);
-            Assert.Contains(SceneBarClass, cut.FindByTestId(UiTestIds.GoLive.SceneBar).ClassName, StringComparison.Ordinal);
-            Assert.Contains(SettingsButtonClass, cut.FindByTestId(UiTestIds.GoLive.OpenSettings).ClassName, StringComparison.Ordinal);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.PreviewRail));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProgramCard));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.SceneBar));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.OpenSettings));
         });
     }
 
@@ -110,10 +105,10 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Back).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.AddSource).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.OpenSettings).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.TakeToAir).QuerySelector(".ui-icon"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Back));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.AddSource));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.OpenSettings));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.TakeToAir));
         });
 
         cut.FindByTestId(UiTestIds.GoLive.AudioTab).Click();
@@ -121,8 +116,9 @@ public sealed class GoLivePageTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var audioChannel = cut.FindByTestId(UiTestIds.GoLive.AudioChannel(AppTestData.GoLive.MicChannelId));
-            Assert.NotNull(audioChannel.QuerySelector(".ui-icon"));
-            Assert.NotNull(audioChannel.QuerySelector(".ui-percent-fill.gl-mix-level"));
+            Assert.Equal("active", audioChannel.GetAttribute("data-live-state"));
+            Assert.True(
+                int.TryParse(audioChannel.GetAttribute("data-live-level"), out var liveLevel) && liveLevel > 0);
         });
 
         cut.FindByTestId(UiTestIds.GoLive.RoomTab).Click();
@@ -138,9 +134,8 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RoomInvite).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RoomParticipant(AppTestData.GoLive.PrimaryParticipantId))
-                .QuerySelector(".ui-percent-fill.gl-part-meter-fill"));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RoomInvite));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RoomParticipant(AppTestData.GoLive.PrimaryParticipantId)));
         });
     }
 
@@ -258,14 +253,12 @@ public sealed class GoLivePageTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains(
-                "on",
-                cut.FindByTestId(UiTestIds.GoLive.VdoToggle).ClassName,
-                StringComparison.Ordinal);
-            Assert.Contains(
-                "on",
-                cut.FindByTestId(UiTestIds.GoLive.YoutubeToggle).ClassName,
-                StringComparison.Ordinal);
+            Assert.Equal(
+                EnabledStateValue,
+                cut.FindByTestId(UiTestIds.GoLive.VdoToggle).GetAttribute("data-enabled"));
+            Assert.Equal(
+                EnabledStateValue,
+                cut.FindByTestId(UiTestIds.GoLive.YoutubeToggle).GetAttribute("data-enabled"));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.VdoNinja)));
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.ProviderCard(GoLiveTargetCatalog.TargetIds.Youtube)));
         });

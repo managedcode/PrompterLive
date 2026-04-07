@@ -31,7 +31,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private const int ReaderMaxTextWidthPercent = 100;
     private const int ReaderMinFontSize = 20;
     private const int ReaderMinFocalPointPercent = 15;
-    private const int ReaderMinimumPlaybackSpeedWpm = 100;
+    private const int ReaderMinimumPlaybackSpeedWpm = 60;
     private const int ReaderMinTextWidthPercent = 35;
     private const int ReaderPlaybackSpeedStepWpm = 10;
     private const double ReaderLegacyMaximumScrollSpeedMultiplier = 5d;

@@ -63,8 +63,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             var demoCard = page.GetByTestId(BrowserTestConstants.Elements.DemoCard);
             await Expect(demoCard).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
-            await Expect(demoCard.Locator(BrowserTestConstants.Selectors.CardCoverMeta))
-                .ToContainTextAsync(BrowserTestConstants.Library.ModeLabel);
+            await Expect(demoCard).ToContainTextAsync(BrowserTestConstants.Library.ModeLabel);
             await demoCard.HoverAsync();
             var hoverBoxShadow = await demoCard.EvaluateAsync<string>("element => getComputedStyle(element).boxShadow");
             await Assert.That(hoverBoxShadow).IsNotEqualTo(BrowserTestConstants.Library.HoverBoxShadowNone);
@@ -73,10 +72,14 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(demoCard).ToBeHiddenAsync();
             await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(string.Empty);
             await page.GetByTestId(UiTestIds.Library.SortDate).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Library.SortDate)).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Library.SortDate)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             var tedTalksFolder = page.GetByTestId(BrowserTestConstants.Elements.TedTalksFolder);
             await tedTalksFolder.ClickAsync();
-            await Expect(tedTalksFolder).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(tedTalksFolder).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
                 .ToHaveTextAsync(BrowserTestConstants.Folders.TedTalksName);
 
@@ -197,14 +200,18 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             await tedTalksFolder.ClickAsync();
 
-            await Expect(tedTalksFolder).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(tedTalksFolder).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToBeHiddenAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.TedTalksName);
 
             await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
 
-            await Expect(page.GetByTestId(UiTestIds.Library.FolderAll)).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(page.GetByTestId(UiTestIds.Library.FolderAll)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
         });

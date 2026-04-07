@@ -32,7 +32,9 @@ public sealed class SettingsCrossTabSyncTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
                 BrowserTestConstants.SettingsFlow.LightTheme);
             await Expect(secondaryPage.GetByTestId(UiTestIds.Settings.ThemeOption(BrowserTestConstants.SettingsFlow.LightTheme)))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.State.ActiveAttribute,
+                    BrowserTestConstants.State.ActiveValue);
 
             await UiScenarioArtifacts.CapturePageAsync(
                 secondaryPage,

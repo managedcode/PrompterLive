@@ -36,13 +36,17 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
             await Assert.That(backButtonBackground).IsNotEqualTo(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor);
 
             await mirrorHorizontal.ClickAsync();
-            await Expect(mirrorHorizontal).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(mirrorHorizontal).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(clusterWrap).ToHaveAttributeAsync(
                 BrowserTestConstants.TeleprompterFlow.StyleAttribute,
                 new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.MirrorHorizontalTransform), RegexOptions.Compiled));
 
             await mirrorVertical.ClickAsync();
-            await Expect(mirrorVertical).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(mirrorVertical).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await Expect(clusterWrap).ToHaveAttributeAsync(
                 BrowserTestConstants.TeleprompterFlow.StyleAttribute,
                 new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.MirrorVerticalTransform), RegexOptions.Compiled));

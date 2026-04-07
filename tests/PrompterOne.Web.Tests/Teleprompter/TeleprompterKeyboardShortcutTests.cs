@@ -10,7 +10,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterKeyboardShortcutTests : BunitContext
 {
-    private const string ActiveCssClass = "active";
+    private const string ActiveStateValue = "active";
 
     [Test]
     public void TeleprompterPage_EscapeShortcut_NavigatesBackToEditor()
@@ -44,17 +44,15 @@ public sealed class TeleprompterKeyboardShortcutTests : BunitContext
             var page = cut.FindByTestId(UiTestIds.Teleprompter.Page);
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.HLower });
 
-            Assert.Contains(
-                ActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).ClassName,
-                StringComparison.Ordinal);
+            Assert.Equal(
+                ActiveStateValue,
+                cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).GetAttribute("data-active"));
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.Digit4 });
 
-            Assert.Contains(
-                ActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClassName,
-                StringComparison.Ordinal);
+            Assert.Equal(
+                ActiveStateValue,
+                cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).GetAttribute("data-active"));
         });
     }
 }

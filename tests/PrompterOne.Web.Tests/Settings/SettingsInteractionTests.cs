@@ -18,6 +18,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class SettingsInteractionTests : BunitContext
 {
+    private const string ExpandedStateOpenValue = "open";
     private const string FakeEngineerName = "Anna Petrenko";
     private const string FakeFounderName = "Mykola Kovalenko";
     private const string FakeInfrastructureName = "Dmytro Shevchenko";
@@ -130,7 +131,7 @@ public sealed class SettingsInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var dropboxCard = cut.FindByTestId(UiTestIds.Settings.CloudProviderCard(CloudStorageProviderIds.Dropbox));
-            Assert.Contains("open", dropboxCard.GetAttribute("class") ?? string.Empty, StringComparison.Ordinal);
+            Assert.Equal(ExpandedStateOpenValue, dropboxCard.GetAttribute("data-expanded"));
         });
     }
 
@@ -329,8 +330,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.FindByTestId(UiTestIds.Settings.NavAppearance).Click();
         cut.FindByTestId(UiTestIds.Settings.ThemeOption(AppTestData.Theme.LightColorScheme))
-            .QuerySelector("input")!
-            .Change(true);
+            .Click();
 
         var savedPreferences = _harness.JsRuntime.GetSavedValue<SettingsPagePreferences>(SettingsPagePreferences.StorageKey);
         Assert.Equal(SettingsAppearanceValues.LightColorScheme, savedPreferences.ColorScheme);
@@ -453,11 +453,9 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var appCard = cut.FindByTestId(UiTestIds.Settings.AboutAppCard);
-            var iconSurface = appCard.QuerySelector(".ui-icon-surface--gold");
-
+            var iconSurface = cut.FindByTestId(UiTestIds.Settings.AboutAppIconSurface);
             Assert.NotNull(iconSurface);
-            Assert.DoesNotContain("style=", iconSurface!.OuterHtml, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("style=", iconSurface.OuterHtml, StringComparison.OrdinalIgnoreCase);
         });
     }
 
@@ -471,11 +469,12 @@ public sealed class SettingsInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var providerCard = cut.FindByTestId(UiTestIds.Settings.CloudProviderCard(CloudStorageProviderIds.OneDrive));
-            var actionRow = providerCard.QuerySelector(".set-path-field-actions");
+            var actionRow = cut.FindByTestId(UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.OneDrive));
 
             Assert.NotNull(actionRow);
-            Assert.DoesNotContain("style=", actionRow!.OuterHtml, StringComparison.OrdinalIgnoreCase);
-            Assert.NotNull(providerCard.QuerySelector("[data-test='" + UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.OneDrive) + "']"));
+            Assert.DoesNotContain("style=", actionRow.OuterHtml, StringComparison.OrdinalIgnoreCase);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.OneDrive)));
+            Assert.NotNull(providerCard);
         });
     }
 

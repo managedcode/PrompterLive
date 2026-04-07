@@ -112,14 +112,11 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
         await locator.EvaluateAsync<CssColor>(
             """
             element => {
-                const line = element.querySelector('.view-line');
-                const sample = Array.from(line?.querySelectorAll('span') ?? [])
-                    .find(node => node.textContent?.trim()?.length > 0) ?? line;
-                if (!(sample instanceof HTMLElement)) {
+                if (!(element instanceof HTMLElement)) {
                     return { r: 0, g: 0, b: 0, a: 0 };
                 }
 
-                const value = getComputedStyle(sample).color;
+                const value = getComputedStyle(element).color;
                 const match = value.match(/rgba?\(([^)]+)\)/);
                 if (!match) {
                     return { r: 0, g: 0, b: 0, a: 0 };

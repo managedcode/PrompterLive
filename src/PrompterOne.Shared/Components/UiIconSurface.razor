@@ -1,6 +1,7 @@
 @namespace PrompterOne.Shared.Components
 
-<div class="@CssClass">
+<div class="@CssClass"
+     data-test="@TestId">
     @ChildContent
 </div>
 
@@ -21,5 +22,6 @@
 
     [Parameter] public string AdditionalCssClass { get; set; } = string.Empty;
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string TestId { get; set; } = string.Empty;
     [Parameter] public UiIconSurfaceTone Tone { get; set; } = UiIconSurfaceTone.Slate;
 }

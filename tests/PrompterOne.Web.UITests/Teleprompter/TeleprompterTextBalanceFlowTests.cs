@@ -30,7 +30,7 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                             return null;
                         }
 
-                        const stage = document.getElementById(args.stageId);
+                        const stage = document.querySelector(`[data-test="${args.stageTestId}"]`);
                         if (!(stage instanceof HTMLElement)) {
                             return null;
                         }
@@ -80,6 +80,7 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                         return {
                             lineCount: lineRects.length,
                             textAlign: computedStyle.textAlign,
+                            textWrap: computedStyle.textWrap,
                             paddingInlineStartPx: parseFloat(computedStyle.paddingInlineStart || "0"),
                             clusterWrapPaddingInlinePx: parseFloat(clusterWrapStyle.paddingInlineStart || "0"),
                             maxCenterOffsetPx: Math.max(...centerOffsets),
@@ -90,11 +91,12 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
                     new
                     {
                         clusterWrapTestId = UiTestIds.Teleprompter.ClusterWrap,
-                        stageId = UiDomIds.Teleprompter.Stage
+                        stageTestId = UiTestIds.Teleprompter.Stage
                     });
 
             await Assert.That(balance).IsNotNull();
             await Assert.That(balance.TextAlign).IsEqualTo(BrowserTestConstants.TeleprompterFlow.AlignmentLeftValue);
+            await Assert.That(balance.TextWrap).IsEqualTo(BrowserTestConstants.TeleprompterFlow.TextWrapPrettyValue);
             await Assert.That(balance.LineCount >= BrowserTestConstants.TeleprompterFlow.MinimumBalancedTextLineCount).IsTrue().Because($"Expected at least {BrowserTestConstants.TeleprompterFlow.MinimumBalancedTextLineCount} visible text lines, but found {balance.LineCount}.");
             await Assert.That(balance.PaddingInlineStartPx).IsBetween(BrowserTestConstants.TeleprompterFlow.MinimumOpticalInsetPx, double.MaxValue);
             await Assert.That(balance.PaddingInlineStartPx).IsBetween(0, BrowserTestConstants.TeleprompterFlow.MaximumOpticalInsetPx);
@@ -108,6 +110,8 @@ public sealed class TeleprompterTextBalanceFlowTests(StandaloneAppFixture fixtur
         public int LineCount { get; init; }
 
         public string TextAlign { get; init; } = string.Empty;
+
+        public string TextWrap { get; init; } = string.Empty;
 
         public double PaddingInlineStartPx { get; init; }
 

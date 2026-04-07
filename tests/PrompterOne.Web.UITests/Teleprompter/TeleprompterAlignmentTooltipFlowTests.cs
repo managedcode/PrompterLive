@@ -43,6 +43,8 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
                 page,
                 LeftRailTooltipScenario,
                 LeftRailTooltipStep);
+
+            await AssertTooltipDismissesAsync(page, trigger, tooltip);
         });
 
     [Test]
@@ -73,6 +75,8 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
                 page,
                 RightRailTooltipScenario,
                 RightRailTooltipStep);
+
+            await AssertTooltipDismissesAsync(page, trigger, tooltip);
         });
 
     private static double CalculateIntersectionArea(ElementBounds left, ElementBounds right)
@@ -87,6 +91,23 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
         await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+    }
+
+    private static async Task AssertTooltipDismissesAsync(IPage page, ILocator trigger, ILocator tooltip)
+    {
+        await page.Mouse.MoveAsync(
+            BrowserTestConstants.TooltipAuditFlow.ClearHoverX,
+            BrowserTestConstants.TooltipAuditFlow.ClearHoverY);
+        await Expect(tooltip).ToBeHiddenAsync(
+            new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
+
+        await trigger.HoverAsync();
+        await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.TooltipSettleDelayMs);
+        await Expect(tooltip).ToBeVisibleAsync();
+
+        await trigger.ClickAsync();
+        await Expect(tooltip).ToBeHiddenAsync(
+            new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
     }
 
     private static async Task<double> ReadOpacityAsync(ILocator locator) =>

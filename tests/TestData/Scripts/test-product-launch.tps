@@ -66,7 +66,7 @@ and a [highlight][emphasis]30% increase[/emphasis][/highlight] in engagement. //
 
 [soft]Let me share something personal.[/soft] //
 
-When we started this journey, / our [phonetic:ˈviʒən]vision[/phonetic] was simple: /
+When we started this journey, / our [pronunciation:VI-zhun]vision[/pronunciation] was simple: /
 make technology [emphasis]disappear[/emphasis] / so people can [rhetorical]focus on what matters[/rhetorical]. //
 
 [slow]I want each of you to [emphasis]imagine[/emphasis] a world[/slow] /

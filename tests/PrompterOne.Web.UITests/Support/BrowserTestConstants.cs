@@ -14,18 +14,26 @@ internal static partial class BrowserTestConstants
         public const int DefaultWidth = 1366;
     }
 
-    public static class Css
-    {
-        public const string ActiveClass = "active";
-        public const string OnClass = "on";
-    }
-
     public static class Html
     {
-        public const string ClassAttribute = "class";
         public const string DataTestAttribute = "data-test";
         public const string ValueAttribute = "value";
-        public static readonly char[] ClassSeparator = [' '];
+    }
+
+    public static class State
+    {
+        public const string ActiveAttribute = "data-active";
+        public const string EnabledAttribute = "data-enabled";
+        public const string ExpandedAttribute = "data-expanded";
+        public const string VisibleAttribute = "data-visible";
+        public const string ActiveValue = "active";
+        public const string InactiveValue = "inactive";
+        public const string EnabledValue = "true";
+        public const string DisabledValue = "false";
+        public const string OpenValue = "open";
+        public const string ClosedValue = "closed";
+        public const string VisibleValue = "true";
+        public const string HiddenValue = "false";
     }
 
     public static class Scripts
@@ -135,8 +143,6 @@ internal static partial class BrowserTestConstants
         public const string AdjustedFocalPointPercent = "45";
         public static readonly Regex AdjustedFocalGuideStyle = new("top:\\s*45%", RegexOptions.Compiled);
         public const int AlignmentTimeoutMs = 1000;
-        public const string ActiveCardSelector =
-            $"[{UiDataAttributes.Teleprompter.CardState}='{UiDataAttributes.Teleprompter.ActiveState}']";
         public const string ActiveWordSelector =
             $"[{Html.DataTestAttribute}='{UiTestIds.Teleprompter.ActiveWord}']";
         public const int TransitionProbeIntervalMs = 50;
@@ -196,7 +202,6 @@ internal static partial class BrowserTestConstants
         public const string NewDraftProbeText = "dc";
         public const string SecondProbeCharacter = "c";
         public const string BodyHeading = "## [Intro|140WPM|warm]";
-        public const string BlockLineCssClass = "ed-src-line ed-src-line-block";
         public const string DisplayDuration = "12:34";
         public const string HeaderContinuationText = " B";
         public const string LegacyActiveBlockLabel = "ACTIVE BLOCK";
@@ -881,10 +886,8 @@ internal static partial class BrowserTestConstants
 
     public static class Regexes
     {
-        public static Regex ActiveClass { get; } = new(@"\bactive\b", RegexOptions.Compiled);
         public static Regex LearnProgressLabel { get; } = new(BrowserTestConstants.Learn.ProgressLabelPattern, RegexOptions.Compiled);
         public static Regex SettingsAboutVersion { get; } = new(@"^Version \d+\.\d+\.\d+ · Build \d+$", RegexOptions.Compiled);
-        public static Regex ToggleOnClass { get; } = new(@"\bon\b", RegexOptions.Compiled);
         public static Regex NonZeroWidth { get; } = new(@"width:\s*0%", RegexOptions.Compiled);
         public static Regex ReaderFirstBlockIndicator { get; } = new(@"^1 / \d+$", RegexOptions.Compiled);
         public static Regex ReaderTimeNotZero { get; } = new(@"^0:00 /", RegexOptions.Compiled);

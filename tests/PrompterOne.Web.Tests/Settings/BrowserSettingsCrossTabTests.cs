@@ -12,6 +12,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class BrowserSettingsCrossTabTests : BunitContext
 {
+    private const string ActiveStateValue = "active";
+
     [Test]
     public async Task BrowserSettingsStore_SaveAsync_PublishesSettingsChangedMessage()
     {
@@ -107,7 +109,7 @@ public sealed class BrowserSettingsCrossTabTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var themeOption = cut.FindByTestId(UiTestIds.Settings.ThemeOption(SettingsAppearanceValues.LightColorScheme));
-            Assert.Contains("active", themeOption.ClassName, StringComparison.Ordinal);
+            Assert.Equal(ActiveStateValue, themeOption.GetAttribute("data-active"));
         });
     }
 }

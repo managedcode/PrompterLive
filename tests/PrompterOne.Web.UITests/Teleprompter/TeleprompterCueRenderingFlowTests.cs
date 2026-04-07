@@ -27,9 +27,13 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             var probe = await cardText.EvaluateAsync<TeleprompterCueProbe>(
                 $$"""
                 host => {
-                    const soft = host.querySelector('[{{TpsVisualCueContracts.VolumeAttributeName}}="{{TpsVisualCueContracts.VolumeSoft}}"]');
-                    const loud = host.querySelector('[{{TpsVisualCueContracts.VolumeAttributeName}}="{{TpsVisualCueContracts.VolumeLoud}}"]');
-                    const buildingWords = [...host.querySelectorAll('[{{TpsVisualCueContracts.DeliveryAttributeName}}="{{TpsVisualCueContracts.DeliveryModeBuilding}}"]')];
+                    const nodes = [...host.querySelectorAll('[{{BrowserTestConstants.Html.DataTestAttribute}}]')];
+                    const soft = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeSoft}}');
+                    const loud = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeLoud}}');
+                    const buildingWords = nodes.filter(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.DeliveryAttributeName}}') === '{{TpsVisualCueContracts.DeliveryModeBuilding}}');
 
                     const readScale = element => {
                         if (!(element instanceof HTMLElement)) {

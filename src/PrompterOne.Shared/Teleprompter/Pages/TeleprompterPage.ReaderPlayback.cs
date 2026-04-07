@@ -32,18 +32,6 @@ public partial class TeleprompterPage
         await Task.CompletedTask;
     }
 
-    private async Task ChangeReaderFontSizeAsync(int delta)
-    {
-        var nextFontSize = Math.Clamp(_readerFontSize + delta, ReaderMinFontSize, ReaderMaxFontSize);
-        if (nextFontSize == _readerFontSize)
-        {
-            return;
-        }
-        _readerFontSize = nextFontSize;
-        RequestReaderAlignment(instant: true);
-        await PersistCurrentReaderLayoutAsync();
-    }
-
     private async Task ChangeReaderPlaybackSpeedAsync(int delta)
     {
         var nextSpeedWpm = Math.Clamp(

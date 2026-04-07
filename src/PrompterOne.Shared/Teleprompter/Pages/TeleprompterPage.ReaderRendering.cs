@@ -14,7 +14,7 @@ public partial class TeleprompterPage
     private const string ReaderCardNextCssClass = "rd-card-next";
     private const string ReaderCardPreviousCssClass = "rd-card-prev";
     private const string ReaderAlignmentButtonCssClass = "rd-align-btn";
-    private const double ReaderContentWidthScaleFactor = 0.97d;
+    private const double ReaderContentWidthScaleFactor = 1d;
     private const string ReaderControlButtonCssClass = "rd-ctrl-btn";
     private const string ReaderCountdownCssClass = "rd-countdown";
     private const string ReaderGradientCssClass = "rd-gradient";
@@ -265,7 +265,8 @@ public partial class TeleprompterPage
     {
         var group = (ReaderGroupViewModel)_cards[cardIndex].Chunks[chunkIndex];
         var word = group.Words[wordIndex];
-        var wordOrdinal = GetChunkWordStartIndex(cardIndex, chunkIndex) + wordIndex;
+
+        _ = GetChunkWordStartIndex(cardIndex, chunkIndex) + wordIndex;
         var stateClass = ResolveReaderWordCssClass(cardIndex, chunkIndex, wordIndex);
 
         return BuildClassList(ReaderWordCssClass, word.CssClass, stateClass);

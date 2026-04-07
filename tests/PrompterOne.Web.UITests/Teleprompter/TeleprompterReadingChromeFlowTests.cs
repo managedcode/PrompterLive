@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -9,10 +8,6 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
-    private static readonly Regex ReadingActiveClassRegex = new(
-        $@"\b{BrowserTestConstants.TeleprompterFlow.ReadingActiveCssClass}\b",
-        RegexOptions.Compiled);
-
     [Test]
     public Task TeleprompterScreen_ActivePlayback_MutesChromeIntensity() =>
         RunPageAsync(async page =>
@@ -40,9 +35,15 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
             await page.GetByTestId(UiTestIds.Teleprompter.PlayToggle).ClickAsync();
 
-            await Expect(controls).ToHaveClassAsync(ReadingActiveClassRegex);
-            await Expect(progressShell).ToHaveClassAsync(ReadingActiveClassRegex);
-            await Expect(edgeInfo).ToHaveClassAsync(ReadingActiveClassRegex);
+            await Expect(controls).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(progressShell).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(edgeInfo).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.ReadingChromeSettleDelayMs);
 
             var activeControls = await ReadChromeVisualStateAsync(controls);

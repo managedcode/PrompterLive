@@ -209,15 +209,19 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
 
     private static void AssertMenuActionCluster(IElement action, string expectedLabel, string expectedMeta)
     {
-        var content = action.QuerySelector(".ed-action-content");
-        var leading = action.QuerySelector(".ed-action-leading");
-        var copy = action.QuerySelector(".ed-action-copy");
-        var label = action.QuerySelector(".ed-action-label");
-        var meta = action.QuerySelector(".ed-action-meta");
+        var actionTestId = action.GetAttribute("data-test");
+        Assert.False(string.IsNullOrWhiteSpace(actionTestId));
 
-        Assert.NotNull(content);
-        Assert.NotNull(leading);
-        Assert.NotNull(copy);
+        _ = action.QuerySelector(
+            BunitTestSelectors.BuildTestIdSelector(
+                UiTestIds.Editor.ToolbarActionLeading(actionTestId!)));
+        var label = action.QuerySelector(
+            BunitTestSelectors.BuildTestIdSelector(
+                UiTestIds.Editor.ToolbarActionLabel(actionTestId!)));
+        var meta = action.QuerySelector(
+            BunitTestSelectors.BuildTestIdSelector(
+                UiTestIds.Editor.ToolbarActionMeta(actionTestId!)));
+
         Assert.NotNull(label);
         Assert.NotNull(meta);
         Assert.Equal(expectedLabel, label!.TextContent.Trim());

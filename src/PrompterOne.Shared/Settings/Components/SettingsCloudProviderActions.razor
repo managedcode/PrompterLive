@@ -1,6 +1,7 @@
 @namespace PrompterOne.Shared.Components.Settings
 
-<div class="set-path-field set-path-field-actions">
+<div class="set-path-field set-path-field-actions"
+     data-test="@ActionRowTestId">
     <button type="button"
             class="set-btn-golden"
             data-test="@ConnectTestId"
@@ -36,6 +37,7 @@
 }
 
 @code {
+    [Parameter] public string ActionRowTestId { get; set; } = string.Empty;
     [Parameter] public EventCallback Connect { get; set; }
     [Parameter] public string ConnectLabel { get; set; } = string.Empty;
     [Parameter] public string ConnectTestId { get; set; } = string.Empty;

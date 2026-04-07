@@ -7,6 +7,7 @@
          @onclick="OnToggle">
     <div class="set-dest-header">
         <UiIconSurface Tone="@IconTone"
+                       TestId="@IconTestId"
                        AdditionalCssClass="@IconCssClass">
             @if (Icon is not null)
             {
@@ -77,6 +78,7 @@
     [Parameter] public RenderFragment? Icon { get; set; }
 
     [Parameter] public string IconClass { get; set; } = string.Empty;
+    [Parameter] public string IconTestId { get; set; } = string.Empty;
 
     [Parameter] public UiIconSurfaceTone IconTone { get; set; } = UiIconSurfaceTone.Slate;
 

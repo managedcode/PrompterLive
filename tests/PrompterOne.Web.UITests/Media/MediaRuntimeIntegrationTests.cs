@@ -56,7 +56,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
                 new object[]
                 {
-                    UiDomIds.Settings.CameraPreviewVideo,
+                    UiTestIds.Settings.CameraPreviewVideo,
                     BrowserTestConstants.Media.PrimaryCameraId
                 },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
@@ -77,7 +77,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Media.ElementHasLiveAudioLevelScript,
                 new object[]
                 {
-                    UiDomIds.Settings.MicrophoneLevelMonitor,
+                    UiTestIds.Settings.MicPreviewMeter,
                     BrowserTestConstants.Media.LiveLevelThreshold
                 },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
@@ -108,7 +108,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
 
             var state = await page.EvaluateAsync<SyntheticMediaElementState>(
                 BrowserTestConstants.Media.GetElementStateScript,
-                UiDomIds.Teleprompter.Camera);
+                UiTestIds.Teleprompter.CameraBackground);
 
             await Assert.That(state.HasElement).IsTrue();
             await Assert.That(state.HasStream).IsTrue();
@@ -136,7 +136,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
             await page.EvaluateAsync(BrowserTestConstants.Media.ConcealDeviceIdentityUntilRequestScript);
             await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page)).ToBeVisibleAsync();
-            await Expect(page.Locator($"#{UiDomIds.Teleprompter.Camera}")).ToHaveAttributeAsync("data-camera-device-id", string.Empty);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraBackground)).ToHaveAttributeAsync("data-camera-device-id", string.Empty);
 
             await page.EvaluateAsync(BrowserTestConstants.Media.ClearRequestLogScript);
             await TeleprompterCameraDriver.EnsureEnabledAsync(page);
@@ -147,7 +147,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
 
             var state = await page.EvaluateAsync<SyntheticMediaElementState>(
                 BrowserTestConstants.Media.GetElementStateScript,
-                UiDomIds.Teleprompter.Camera);
+                UiTestIds.Teleprompter.CameraBackground);
 
             await Assert.That(state.HasStream).IsTrue();
             await Assert.That(state.Metadata).IsNotNull();
@@ -244,7 +244,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
                 new object[]
                 {
-                    UiDomIds.GoLive.PreviewVideo,
+                    UiTestIds.GoLive.PreviewVideo,
                     BrowserTestConstants.Media.PrimaryCameraId
                 },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
@@ -255,14 +255,14 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Media.ElementUsesVideoDeviceScript,
                 new object[]
                 {
-                    UiDomIds.GoLive.PreviewVideo,
+                    UiTestIds.GoLive.PreviewVideo,
                     BrowserTestConstants.Media.SecondaryCameraId
                 },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var state = await page.EvaluateAsync<SyntheticMediaElementState>(
                 BrowserTestConstants.Media.GetElementStateScript,
-                UiDomIds.GoLive.PreviewVideo);
+                UiTestIds.GoLive.PreviewVideo);
 
             await Assert.That(state.HasStream).IsTrue();
             await Assert.That(state.VideoTrackCount).IsEqualTo(BrowserTestConstants.Media.ExpectedVideoTrackCount);

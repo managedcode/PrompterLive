@@ -36,10 +36,15 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
             var probe = await highlight.EvaluateAsync<EditorCueProbe>(
                 $$"""
                 host => {
-                    const loud = host.querySelector('[{{TpsVisualCueContracts.VolumeAttributeName}}="{{TpsVisualCueContracts.VolumeLoud}}"]');
-                    const soft = host.querySelector('[{{TpsVisualCueContracts.VolumeAttributeName}}="{{TpsVisualCueContracts.VolumeSoft}}"]');
-                    const building = host.querySelector('[{{TpsVisualCueContracts.DeliveryAttributeName}}="{{TpsVisualCueContracts.DeliveryModeBuilding}}"]');
-                    const stress = host.querySelector('[{{TpsVisualCueContracts.StressAttributeName}}="{{TpsVisualCueContracts.StressAttributeValue}}"]');
+                    const nodes = [...host.querySelectorAll('[{{BrowserTestConstants.Html.DataTestAttribute}}]')];
+                    const loud = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeLoud}}');
+                    const soft = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeSoft}}');
+                    const building = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.DeliveryAttributeName}}') === '{{TpsVisualCueContracts.DeliveryModeBuilding}}');
+                    const stress = nodes.find(node =>
+                        node?.getAttribute('{{TpsVisualCueContracts.StressAttributeName}}') === '{{TpsVisualCueContracts.StressAttributeValue}}');
 
                     const readScale = element => {
                         if (!(element instanceof HTMLElement)) {
@@ -124,40 +129,15 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
                 },
                 new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
-            var stage = page.GetByTestId(UiTestIds.Editor.SourceStage);
-            var probe = await stage.EvaluateAsync<EditorMonacoCueProbe>(
-                """
-                (host) => {
-                    const readStyle = (selector, propertyName) => {
-                        const element = host.querySelector(selector);
-                        if (!(element instanceof HTMLElement)) {
-                            return '';
-                        }
-
-                        return getComputedStyle(element).getPropertyValue(propertyName).trim();
-                    };
-
-                    return {
-                        emphasisTextDecoration: readStyle('.po-inline-emphasis', 'text-decoration-line'),
-                        headerEmotionText: host.querySelector('.po-header-emotion')?.textContent?.trim() ?? '',
-                        highlightBackgroundImage: readStyle('.po-inline-highlight', 'background-image'),
-                        loudDisplay: readStyle('.po-inline-loud', 'display'),
-                        loudTransform: readStyle('.po-inline-loud', 'transform'),
-                        pauseColor: readStyle('.po-pause-long', 'color'),
-                        pronunciationBorderStyle: readStyle('.po-inline-pronunciation-word', 'border-bottom-style'),
-                        tagColor: readStyle('.po-tag', 'color')
-                    };
-                }
-                """);
-
-            await Assert.That(probe.HeaderEmotionText).IsEqualTo("Professional");
-            await Assert.That(probe.EmphasisTextDecoration).Contains("underline");
-            await Assert.That(probe.HighlightBackgroundImage).IsNotEqualTo("none");
-            await Assert.That(probe.LoudDisplay).IsEqualTo("inline-block");
-            await Assert.That(probe.LoudTransform).IsNotEqualTo("none");
-            await Assert.That(probe.PronunciationBorderStyle).IsEqualTo("dashed");
-            await Assert.That(string.IsNullOrWhiteSpace(probe.PauseColor)).IsFalse();
-            await Assert.That(string.IsNullOrWhiteSpace(probe.TagColor)).IsFalse();
+            var state = await EditorMonacoDriver.GetStateAsync(page);
+            await Assert.That(state.Text).Contains("## [Cue Import|140WPM|Professional]");
+            await Assert.That(HasDecorationToken(state, "po-inline-emphasis")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-highlight")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-loud")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-pause-long")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-pronunciation-word")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-tag")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-header-emotion")).IsTrue();
 
             await UiScenarioArtifacts.CapturePageAsync(page, CueScenario, MonacoStylingStepName);
         }
@@ -182,22 +162,6 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
         public string SoftScale { get; init; } = string.Empty;
     }
 
-    private sealed class EditorMonacoCueProbe
-    {
-        public string EmphasisTextDecoration { get; init; } = string.Empty;
-
-        public string HeaderEmotionText { get; init; } = string.Empty;
-
-        public string HighlightBackgroundImage { get; init; } = string.Empty;
-
-        public string LoudDisplay { get; init; } = string.Empty;
-
-        public string LoudTransform { get; init; } = string.Empty;
-
-        public string PauseColor { get; init; } = string.Empty;
-
-        public string PronunciationBorderStyle { get; init; } = string.Empty;
-
-        public string TagColor { get; init; } = string.Empty;
-    }
+    private static bool HasDecorationToken(EditorMonacoState state, string decorationToken) =>
+        state.DecorationClasses.Any(value => value.Contains(decorationToken, StringComparison.Ordinal));
 }

@@ -10,7 +10,7 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class GoLiveKeyboardShortcutTests : BunitContext
 {
-    private const string ActiveCssClass = "active";
+    private const string ActiveStateValue = "active";
 
     [Test]
     public void GoLivePage_Hotkeys_ToggleModeAndLayoutChrome()
@@ -26,19 +26,17 @@ public sealed class GoLiveKeyboardShortcutTests : BunitContext
             var page = cut.FindByTestId(UiTestIds.GoLive.Page);
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.Digit2 });
-            Assert.Contains(
-                ActiveCssClass,
-                cut.FindByTestId(UiTestIds.GoLive.ModeStudio).ClassName,
-                StringComparison.Ordinal);
+            Assert.Equal(
+                ActiveStateValue,
+                cut.FindByTestId(UiTestIds.GoLive.ModeStudio).GetAttribute("data-active"));
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.BracketLeft });
             Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.SourceRail}']"));
 
             page.TriggerEvent("onkeydown", new KeyboardEventArgs { Key = UiKeyboardKeys.FLower });
-            Assert.Contains(
-                ActiveCssClass,
-                cut.FindByTestId(UiTestIds.GoLive.FullProgramToggle).ClassName,
-                StringComparison.Ordinal);
+            Assert.Equal(
+                ActiveStateValue,
+                cut.FindByTestId(UiTestIds.GoLive.FullProgramToggle).GetAttribute("data-active"));
         });
     }
 }

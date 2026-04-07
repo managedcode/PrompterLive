@@ -18,9 +18,10 @@ internal static class TeleprompterCameraDriver
 
         await page.WaitForFunctionAsync(
             BrowserTestConstants.Media.ElementHasNoStreamScript,
-            UiDomIds.Teleprompter.Camera,
+            UiTestIds.Teleprompter.CameraBackground,
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-        await Expect(cameraToggle).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+        await Expect(cameraToggle)
+            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.InactiveValue);
     }
 
     public static async Task EnsureEnabledAsync(IPage page)
@@ -35,27 +36,24 @@ internal static class TeleprompterCameraDriver
 
         await page.WaitForFunctionAsync(
             BrowserTestConstants.Media.ElementHasVideoStreamScript,
-            UiDomIds.Teleprompter.Camera,
+            UiTestIds.Teleprompter.CameraBackground,
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-        await Expect(cameraToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+        await Expect(cameraToggle)
+            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.ActiveValue);
     }
 
     private static async Task<bool> IsEnabledAsync(IPage page, ILocator cameraToggle)
     {
         var hasStream = await page.EvaluateAsync<bool>(
             BrowserTestConstants.Media.ElementHasVideoStreamScript,
-            UiDomIds.Teleprompter.Camera);
+            UiTestIds.Teleprompter.CameraBackground);
 
         if (hasStream)
         {
             return true;
         }
 
-        return await HasClassAsync(cameraToggle, BrowserTestConstants.Css.ActiveClass);
+        var state = await cameraToggle.GetAttributeAsync(BrowserTestConstants.State.ActiveAttribute);
+        return string.Equals(state, BrowserTestConstants.State.ActiveValue, StringComparison.Ordinal);
     }
-
-    private static async Task<bool> HasClassAsync(ILocator locator, string className) =>
-        (await locator.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty)
-        .Split(BrowserTestConstants.Html.ClassSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Contains(className, StringComparer.Ordinal);
 }

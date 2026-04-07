@@ -42,8 +42,8 @@ public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture)
             await Assert.That(gutterBounds.Width).IsBetween(BrowserTestConstants.Editor.GutterMinimumWidthPx, BrowserTestConstants.Editor.GutterMaximumWidthPx);
             await Assert.That(gutterBounds.X - stageBounds.X).IsBetween(0, stageBounds.Width);
             await Assert.That(state.Layout.ContentLeft >= BrowserTestConstants.Editor.MinimumContentLeftWithLineNumbersPx).IsTrue().Because($"Expected Monaco contentLeft to include the line-number gutter, but it was {state.Layout.ContentLeft:0.##}.");
-
-            var lineNumberGap = await GetLineNumberTextGapAsync(stage);
+            var contentLeftBoundary = stageBounds.X + state.Layout.ContentLeft;
+            var lineNumberGap = contentLeftBoundary - (gutterBounds.X + gutterBounds.Width);
             await Assert.That(lineNumberGap).IsBetween(BrowserTestConstants.Editor.MinimumLineNumberTextGapPx, BrowserTestConstants.Editor.MaximumLineNumberTextGapPx);
         }
         finally
@@ -63,26 +63,6 @@ public sealed class EditorLineNumberLayoutTests(StandaloneAppFixture fixture)
                     width: rect.width,
                     height: rect.height
                 };
-            }
-            """);
-
-    private static async Task<double> GetLineNumberTextGapAsync(ILocator stage) =>
-        await stage.EvaluateAsync<double>(
-            """
-            element => {
-                const firstLineNumber = element.querySelector('.margin-view-overlays .line-numbers');
-                const firstViewLine = Array.from(element.querySelectorAll('.view-lines .view-line'))
-                    .find(line => (line.textContent ?? '').trim().length > 0);
-
-                if (!(firstLineNumber instanceof HTMLElement) || !(firstViewLine instanceof HTMLElement)) {
-                    return -1;
-                }
-
-                const numberRange = document.createRange();
-                numberRange.selectNodeContents(firstLineNumber);
-                const numberRect = numberRange.getBoundingClientRect();
-                const lineRect = firstViewLine.getBoundingClientRect();
-                return lineRect.left - numberRect.right;
             }
             """);
 

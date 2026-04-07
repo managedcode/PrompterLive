@@ -10,6 +10,7 @@ public partial class TeleprompterPage
     private const string ReaderRailTooltipCssClass = "rd-rail-tooltip";
     private const string ReaderRailTooltipLeftCssClass = "rd-rail-tooltip--left";
     private const string ReaderRailTooltipRightCssClass = "rd-rail-tooltip--right";
+    private const string ReaderRailTooltipVisibleCssClass = "rd-rail-tooltip--visible";
 
     private string ReaderFocalSliderTitle => Text(UiTextKey.TooltipMoveFocalReadingGuide);
 
@@ -33,10 +34,17 @@ public partial class TeleprompterPage
 
     private string ReaderWidthSliderTitle => Text(UiTextKey.TooltipAdjustReaderTextWidth);
 
-    private static string BuildRailTooltipCssClass(bool placeOnRightSide) =>
-        placeOnRightSide
-            ? $"{ReaderRailTooltipCssClass} {ReaderRailTooltipRightCssClass}"
-            : $"{ReaderRailTooltipCssClass} {ReaderRailTooltipLeftCssClass}";
+    private string BuildRailTooltipCssClass(string key, bool placeOnRightSide)
+    {
+        var placementClass = placeOnRightSide
+            ? ReaderRailTooltipRightCssClass
+            : ReaderRailTooltipLeftCssClass;
+
+        return BuildClassList(
+            ReaderRailTooltipCssClass,
+            placementClass,
+            IsRailTooltipVisible(key) ? ReaderRailTooltipVisibleCssClass : null);
+    }
 
     private static string BuildRailTooltipDomId(string key) => UiDomIds.Teleprompter.RailTooltip(key);
 

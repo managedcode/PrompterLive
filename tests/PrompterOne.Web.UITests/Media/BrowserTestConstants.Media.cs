@@ -54,16 +54,17 @@ internal static partial class BrowserTestConstants
         public static string ClearRequestLogScript => $$"""() => window["{{HarnessGlobal}}"].clearRequestLog()""";
         public static string ConcealDeviceIdentityUntilRequestScript => $$"""() => window["{{HarnessGlobal}}"].concealDeviceIdentityUntilRequest()""";
         public static string GetRequestLogScript => $$"""() => window["{{HarnessGlobal}}"].getRequestLog()""";
-        public static string GetElementStateScript => $$"""elementId => window["{{HarnessGlobal}}"].getElementState(elementId)""";
+        public static string GetElementStateScript =>
+            $$"""testId => { const element = document.querySelector(`[data-test="${testId}"]`); return window["{{HarnessGlobal}}"].getElementState(element?.id ?? ""); }""";
         public static string RestoreDeviceIdentityScript => $$"""() => window["{{HarnessGlobal}}"].restoreDeviceIdentity()""";
         public static string ElementHasVideoStreamScript =>
-            $$"""elementId => { const state = window["{{HarnessGlobal}}"].getElementState(elementId); return Boolean(state?.hasStream && state.videoTrackCount >= 1 && state.metadata?.isSynthetic === true); }""";
+            $$"""testId => { const element = document.querySelector(`[data-test="${testId}"]`); const state = window["{{HarnessGlobal}}"].getElementState(element?.id ?? ""); return Boolean(state?.hasStream && state.videoTrackCount >= 1 && state.metadata?.isSynthetic === true); }""";
         public static string ElementHasNoStreamScript =>
-            $$"""elementId => { const state = window["{{HarnessGlobal}}"].getElementState(elementId); return Boolean(state && !state.hasStream); }""";
+            $$"""testId => { const element = document.querySelector(`[data-test="${testId}"]`); const state = window["{{HarnessGlobal}}"].getElementState(element?.id ?? ""); return Boolean(state && !state.hasStream); }""";
         public const string ElementHasLiveAudioLevelScript =
-            "([elementId, minimumLevel]) => Number(document.getElementById(elementId)?.dataset.liveLevel ?? '0') >= minimumLevel";
+            "([testId, minimumLevel]) => Number(document.querySelector(`[data-test=\"${testId}\"]`)?.dataset.liveLevel ?? '0') >= minimumLevel";
         public static string ElementUsesVideoDeviceScript =>
-            $$"""([elementId, deviceId]) => { const state = window["{{HarnessGlobal}}"].getElementState(elementId); return Boolean(state?.hasStream && state.metadata?.videoDeviceId === deviceId); }""";
+            $$"""([testId, deviceId]) => { const element = document.querySelector(`[data-test="${testId}"]`); const state = window["{{HarnessGlobal}}"].getElementState(element?.id ?? ""); return Boolean(state?.hasStream && state.metadata?.videoDeviceId === deviceId); }""";
         public static string HasAudioOnlyRequestScript =>
             $$"""([audioId]) => window["{{HarnessGlobal}}"].getRequestLog().some(request => request.hasVideo === false && request.hasAudio === true && request.resolvedAudioDeviceId === audioId)""";
         public static string HasAudioVideoRequestScript =>

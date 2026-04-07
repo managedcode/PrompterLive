@@ -1,6 +1,7 @@
 using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Web.Tests;
 

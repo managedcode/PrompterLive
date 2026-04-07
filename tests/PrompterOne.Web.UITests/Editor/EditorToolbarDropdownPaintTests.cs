@@ -86,7 +86,6 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
                     hitInsideMenu: !!hitElement && (hitElement === menu || menu.contains(hitElement)),
                     hitTestId: hitElement?.getAttribute('data-test') ?? '',
                     hitTagName: hitElement?.tagName ?? '',
-                    hitClassName: hitElement?.className ?? '',
                     menuHeight: rect.height,
                     menuWidth: rect.width,
                     probeX,
@@ -106,7 +105,7 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
             BuildStepName(scenario.ScenarioIndex, scenario.TriggerTestId));
 
         await Assert.That(hitTest).IsNotNull();
-        await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-test '{hitTest.HitTestId}' and class '{hitTest.HitClassName}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
+        await Assert.That(hitTest!.HitInsideMenu).IsTrue().Because($"Expected dropdown '{scenario.PanelTestId}' to paint above the editor surface and receive pointer hits, but the probe hit '{hitTest.HitTagName}' with data-test '{hitTest.HitTestId}'. Menu size was {hitTest.MenuWidth:0.##}x{hitTest.MenuHeight:0.##} at probe ({hitTest.ProbeX:0.##}, {hitTest.ProbeY:0.##}).");
     }
 
     private sealed class DropdownHitTestResult
@@ -116,8 +115,6 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
         public string HitTestId { get; init; } = string.Empty;
 
         public string HitTagName { get; init; } = string.Empty;
-
-        public string HitClassName { get; init; } = string.Empty;
 
         public double MenuHeight { get; init; }
 

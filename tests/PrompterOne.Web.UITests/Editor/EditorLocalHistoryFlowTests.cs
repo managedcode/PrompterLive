@@ -57,7 +57,8 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Settings.NavFiles).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.FilesPanel)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Settings.FileAutoSave).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave)).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.DisabledValue);
 
             await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
@@ -80,7 +81,8 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await page.GotoAsync(BrowserTestConstants.Routes.Settings);
             await page.GetByTestId(UiTestIds.Settings.NavFiles).ClickAsync();
             await page.GetByTestId(UiTestIds.Settings.FileAutoSave).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
 
             await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
             await EditorMonacoDriver.WaitUntilReadyAsync(page);

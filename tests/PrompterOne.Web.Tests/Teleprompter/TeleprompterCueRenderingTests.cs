@@ -80,7 +80,7 @@ public sealed class TeleprompterCueRenderingTests : BunitContext
 
     private static AngleSharp.Dom.IElement FindReaderWordByText(IRenderedComponent<TeleprompterPage> cut, int cardIndex, string text) =>
         cut.FindByTestId(UiTestIds.Teleprompter.CardText(cardIndex))
-            .QuerySelectorAll(".rd-w")
+            .QuerySelectorAll(BunitTestSelectors.BuildTestIdPrefixSelector(UiTestIds.Teleprompter.CardWordPrefix(cardIndex)))
             .Single(element => string.Equals(element.TextContent.Trim(), text, StringComparison.Ordinal));
 
     private static double ReadStyleVariable(AngleSharp.Dom.IElement element, string variableName)

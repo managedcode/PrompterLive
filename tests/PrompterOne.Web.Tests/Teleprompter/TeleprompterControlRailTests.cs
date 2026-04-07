@@ -1,3 +1,4 @@
+using System;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,7 +74,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     {
         Assert.Equal(expectedAriaLabel, button.GetAttribute("aria-label"));
         Assert.Equal(string.Empty, button.TextContent.Trim());
-        Assert.NotNull(button.QuerySelector("svg"));
+        Assert.Contains("<svg", button.InnerHtml, StringComparison.OrdinalIgnoreCase);
     }
 
     private static void AssertTooltip(IRenderedComponent<TeleprompterPage> cut, string tooltipKey, string expectedText)

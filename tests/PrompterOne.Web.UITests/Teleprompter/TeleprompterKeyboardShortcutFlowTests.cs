@@ -20,11 +20,11 @@ public sealed class TeleprompterKeyboardShortcutFlowTests(StandaloneAppFixture f
             await page.GetByTestId(UiTestIds.Teleprompter.Page).FocusAsync();
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.H);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+                .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.ActiveValue);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Digit4);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.AlignmentJustify))
-                .ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+                .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.State.ActiveValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync(
                     BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute,

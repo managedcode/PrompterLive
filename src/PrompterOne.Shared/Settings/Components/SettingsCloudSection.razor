@@ -86,6 +86,7 @@
             </div>
             <SettingsCloudProviderActions IsConnected="@_preferences.OneDrive.Connection.IsConnected"
                                           Message="@(_providerMessages.GetValueOrDefault(CloudStorageProviderIds.OneDrive) ?? _preferences.OneDrive.Connection.LastError)"
+                                          ActionRowTestId="@UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.OneDrive)"
                                           MessageTestId="@UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.OneDrive)"
                                           ConnectLabel="@Text(UiTextKey.CommonSaveAndTest)"
                                           ConnectTestId="@UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.OneDrive)"
@@ -141,6 +142,7 @@
             </div>
             <SettingsCloudProviderActions IsConnected="@_preferences.GoogleDrive.Connection.IsConnected"
                                           Message="@(_providerMessages.GetValueOrDefault(CloudStorageProviderIds.GoogleDrive) ?? _preferences.GoogleDrive.Connection.LastError)"
+                                          ActionRowTestId="@UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.GoogleDrive)"
                                           MessageTestId="@UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.GoogleDrive)"
                                           ConnectLabel="@Text(UiTextKey.CommonSaveAndTest)"
                                           ConnectTestId="@UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.GoogleDrive)"
@@ -195,6 +197,7 @@
             </div>
             <SettingsCloudProviderActions IsConnected="@_preferences.Dropbox.Connection.IsConnected"
                                           Message="@(_providerMessages.GetValueOrDefault(CloudStorageProviderIds.Dropbox) ?? _preferences.Dropbox.Connection.LastError)"
+                                          ActionRowTestId="@UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.Dropbox)"
                                           MessageTestId="@UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.Dropbox)"
                                           ConnectLabel="@Text(UiTextKey.CommonSaveAndTest)"
                                           ConnectTestId="@UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.Dropbox)"
@@ -245,6 +248,7 @@
             </div>
             <SettingsCloudProviderActions IsConnected="@_preferences.GoogleCloudStorage.Connection.IsConnected"
                                           Message="@(_providerMessages.GetValueOrDefault(CloudStorageProviderIds.GoogleCloudStorage) ?? _preferences.GoogleCloudStorage.Connection.LastError)"
+                                          ActionRowTestId="@UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.GoogleCloudStorage)"
                                           MessageTestId="@UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.GoogleCloudStorage)"
                                           ConnectLabel="@Text(UiTextKey.CommonSaveAndTest)"
                                           ConnectTestId="@UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.GoogleCloudStorage)"
@@ -317,6 +321,7 @@
             </div>
             <SettingsCloudProviderActions IsConnected="@_preferences.CloudKit.Connection.IsConnected"
                                           Message="@(_providerMessages.GetValueOrDefault(CloudStorageProviderIds.CloudKit) ?? _preferences.CloudKit.Connection.LastError)"
+                                          ActionRowTestId="@UiTestIds.Settings.CloudProviderActions(CloudStorageProviderIds.CloudKit)"
                                           MessageTestId="@UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.CloudKit)"
                                           ConnectLabel="@Text(UiTextKey.CommonSaveAndTest)"
                                           ConnectTestId="@UiTestIds.Settings.CloudProviderConnect(CloudStorageProviderIds.CloudKit)"

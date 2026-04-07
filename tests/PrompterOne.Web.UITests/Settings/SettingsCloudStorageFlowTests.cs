@@ -30,7 +30,9 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
                 UiTestIds.Settings.CloudDefaultProvider,
                 CloudStorageProviderIds.Dropbox);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave))
-                .Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.State.EnabledAttribute,
+                    BrowserTestConstants.State.DisabledValue);
             var accountLabelField = page.GetByTestId(
                 UiTestIds.Settings.CloudProviderField(CloudStorageProviderIds.Dropbox, CloudStorageFieldIds.AccountLabel));
             await Expect(accountLabelField).ToBeVisibleAsync();
@@ -53,7 +55,9 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudProviderSubtitle(CloudStorageProviderIds.Dropbox)))
                 .ToHaveTextAsync(BrowserTestConstants.SettingsFlow.DropboxLabel);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave))
-                .Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.State.EnabledAttribute,
+                    BrowserTestConstants.State.DisabledValue);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudProviderMessage(CloudStorageProviderIds.Dropbox)))
                 .ToHaveTextAsync(BrowserTestConstants.SettingsFlow.DropboxValidationMessage);
 
@@ -123,17 +127,19 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
 
     private static async Task EnsureToggleOffAsync(ILocator locator)
     {
-        if (await HasOnClassAsync(locator))
+        if (await HasEnabledStateAsync(locator))
         {
             await locator.ClickAsync();
-            await Expect(locator).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(locator).ToHaveAttributeAsync(
+                BrowserTestConstants.State.EnabledAttribute,
+                BrowserTestConstants.State.DisabledValue);
         }
     }
 
-    private static async Task<bool> HasOnClassAsync(ILocator locator)
+    private static async Task<bool> HasEnabledStateAsync(ILocator locator)
     {
-        var classes = await locator.GetAttributeAsync("class");
-        return (classes ?? string.Empty).Contains("on", StringComparison.Ordinal);
+        var state = await locator.GetAttributeAsync(BrowserTestConstants.State.EnabledAttribute);
+        return string.Equals(state, BrowserTestConstants.State.EnabledValue, StringComparison.Ordinal);
     }
 
     private static bool HasMinimumChannels(CssColor color, double minimum) =>

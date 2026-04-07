@@ -6,6 +6,7 @@
         {
             <button class="@BuildChipCssClass(chip)"
                     @onclick="() => OnSelectFolder.InvokeAsync(chip.Id)"
+                    data-active="@(chip.IsSelected ? ActiveStateValue : InactiveStateValue)"
                     data-test="@chip.TestId">
                 <span>@chip.Name</span>
                 <span class="folder-count">@chip.TotalCount</span>
@@ -15,6 +16,9 @@
 }
 
 @code {
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
+
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderChipViewModel> Chips { get; set; } = [];
 
     [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }

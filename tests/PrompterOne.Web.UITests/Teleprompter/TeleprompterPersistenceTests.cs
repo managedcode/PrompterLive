@@ -13,6 +13,7 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
+    private const int MinimumReaderSpeedWpm = 60;
     private const int ReaderSpeedStepWpm = 10;
     private const string WordsPerMinuteSuffix = "WPM";
     private const string PersistedFocalPointValue = "37";
@@ -119,6 +120,35 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
 
             var secondCardState = await secondCard.GetAttributeAsync(UiDataAttributes.Teleprompter.CardState);
             await Assert.That(secondCardState).IsEqualTo(UiDataAttributes.Teleprompter.NextState);
+        });
+
+    [Test]
+    public Task Teleprompter_SpeedDown_ClampsAtSixtyWordsPerMinute() =>
+        RunPageAsync(async page =>
+        {
+            await page.GotoAsync(BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
+            var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
+            var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
+            var speedReductionClicks = Math.Max(0, (baselineSpeedWpm - MinimumReaderSpeedWpm) / ReaderSpeedStepWpm);
+
+            for (var clickIndex = 0; clickIndex < speedReductionClicks + 1; clickIndex++)
+            {
+                await page.GetByTestId(UiTestIds.Teleprompter.SpeedDown).ClickAsync();
+            }
+
+            await Expect(speedValue).ToHaveTextAsync(BuildWordsPerMinuteLabel(MinimumReaderSpeedWpm));
+
+            var storedJson = await page.EvaluateAsync<string>(
+                "(storageKey) => localStorage.getItem(storageKey) ?? ''",
+                StoredReaderSettingsKey);
+            var storedSettings = JsonSerializer.Deserialize<ReaderSettings>(storedJson);
+
+            await Assert.That(storedSettings).IsNotNull();
+            await Assert.That(storedSettings.ScrollSpeed).IsEqualTo(MinimumReaderSpeedWpm);
         });
 
     private static Task SetRangeValueAsync(Microsoft.Playwright.ILocator locator, string value) =>

@@ -372,13 +372,13 @@
     right: calc(100% + 14px);
     transform: translate3d(4px, -50%, 0);
 }
-.rd-rail-tip-anchor:is(:hover, :focus-within) > .rd-rail-tooltip {
+.rd-rail-tip-anchor > .rd-rail-tooltip--visible {
     visibility: visible;
     opacity: 1;
     transition-delay: 3.2s, 3.2s, 3.2s;
 }
-.rd-rail-tip-anchor:is(:hover, :focus-within) > .rd-rail-tooltip--right,
-.rd-rail-tip-anchor:is(:hover, :focus-within) > .rd-rail-tooltip--left {
+.rd-rail-tip-anchor > .rd-rail-tooltip--visible.rd-rail-tooltip--right,
+.rd-rail-tip-anchor > .rd-rail-tooltip--visible.rd-rail-tooltip--left {
     transform: translate3d(0, -50%, 0);
 }
 .rd-slider-icon {

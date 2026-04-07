@@ -34,5 +34,5 @@ flowchart TD
 
 - `#blazor-error-ui` keeps the standard Blazor id, but it must render in PrompterOne styling.
 - Standalone WASM has no server reconnect modal, so browser connectivity states are surfaced through the branded Blazor overlay instead of a global shell script.
-- Runtime diagnostics must expose stable `data-testid` hooks for browser coverage.
+- Runtime diagnostics must expose stable `data-test` hooks for browser coverage.
 - Fatal and recoverable diagnostics labels must come from the shared localization catalog.

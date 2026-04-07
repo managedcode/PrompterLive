@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -9,10 +8,6 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
-    private static readonly Regex ReadingActiveClassRegex = new(
-        $@"\b{BrowserTestConstants.TeleprompterFlow.ReadingActiveCssClass}\b",
-        RegexOptions.Compiled);
-
     private readonly record struct CssColor(double R, double G, double B, double A);
     private readonly record struct GradientColors(CssColor Start, CssColor End);
 
@@ -39,8 +34,12 @@ public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture
 
             await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
             await playToggle.ClickAsync();
-            await Expect(progressShell).ToHaveClassAsync(ReadingActiveClassRegex);
-            await Expect(controls).ToHaveClassAsync(ReadingActiveClassRegex);
+            await Expect(progressShell).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(controls).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
             await ClearChromeHoverAsync(page);
             await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.ReadingChromeSettleDelayMs);
 

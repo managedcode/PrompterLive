@@ -113,6 +113,17 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.TooltipAuditFlow.SettingsAccentStep);
         });
 
+    [Test]
+    public Task TeleprompterScreen_PlayTooltip_HidesOnPointerLeaveAndClick() =>
+        RunPageAsync(async page =>
+        {
+            await OpenPageAsync(page, BrowserTestConstants.Routes.TeleprompterDemo, UiTestIds.Teleprompter.Page);
+            await AssertSharedTooltipDismissesAsync(
+                page,
+                UiTestIds.Teleprompter.PlayToggle,
+                BrowserTestConstants.TooltipAuditFlow.PlayPlaybackTooltipText);
+        });
+
     private static async Task AssertSharedTooltipAsync(IPage page, string ownerTestId, string expectedText, string expectedPlacement)
     {
         var trigger = page.GetByTestId(ownerTestId);
@@ -133,6 +144,34 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         await Assert.That(metrics.HasShadow).IsTrue();
         await Assert.That(overlap).IsBetween(0, BrowserTestConstants.TooltipAuditFlow.MaximumOverlapPx);
     }
+
+    private static async Task AssertSharedTooltipDismissesAsync(IPage page, string ownerTestId, string expectedText)
+    {
+        var trigger = page.GetByTestId(ownerTestId);
+        var tooltip = page.GetByTestId(UiTestIds.Tooltip.Surface(ownerTestId));
+
+        await trigger.HoverAsync();
+        await page.WaitForTimeoutAsync(BrowserTestConstants.TooltipAuditFlow.SharedTooltipSettleDelayMs);
+        await Expect(tooltip).ToBeVisibleAsync();
+        await Expect(tooltip).ToHaveTextAsync(expectedText);
+
+        await ClearTooltipHoverAsync(page);
+        await Expect(tooltip).ToBeHiddenAsync(
+            new() { Timeout = BrowserTestConstants.TooltipAuditFlow.SharedTooltipDismissTimeoutMs });
+
+        await trigger.HoverAsync();
+        await page.WaitForTimeoutAsync(BrowserTestConstants.TooltipAuditFlow.SharedTooltipSettleDelayMs);
+        await Expect(tooltip).ToBeVisibleAsync();
+
+        await trigger.ClickAsync();
+        await Expect(tooltip).ToBeHiddenAsync(
+            new() { Timeout = BrowserTestConstants.TooltipAuditFlow.SharedTooltipDismissTimeoutMs });
+    }
+
+    private static Task ClearTooltipHoverAsync(IPage page) =>
+        page.Mouse.MoveAsync(
+            BrowserTestConstants.TooltipAuditFlow.ClearHoverX,
+            BrowserTestConstants.TooltipAuditFlow.ClearHoverY);
 
     private static double CalculateIntersectionArea(ElementBounds left, ElementBounds right)
     {

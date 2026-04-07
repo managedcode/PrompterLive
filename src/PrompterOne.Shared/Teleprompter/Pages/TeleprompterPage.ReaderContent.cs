@@ -336,9 +336,16 @@ public partial class TeleprompterPage
         }
 
         Dictionary<string, object>? attributes = null;
+        var emotionCueValue = ResolveEmotionKey(metadata.InlineEmotionHint, string.Empty);
+        AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.EmotionAttributeName, emotionCueValue);
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.VolumeAttributeName, NormalizeCueValue(metadata.VolumeLevel));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.DeliveryAttributeName, NormalizeCueValue(metadata.DeliveryMode));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.SpeedAttributeName, speedCueValue);
+
+        if (metadata.IsHighlight)
+        {
+            AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.HighlightAttributeName, TpsVisualCueContracts.HighlightAttributeValue);
+        }
 
         if (!string.IsNullOrWhiteSpace(metadata.StressText) || !string.IsNullOrWhiteSpace(metadata.StressGuide))
         {

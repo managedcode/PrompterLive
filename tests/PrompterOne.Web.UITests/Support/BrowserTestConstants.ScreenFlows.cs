@@ -5,12 +5,6 @@ namespace PrompterOne.Web.UITests;
 
 internal static partial class BrowserTestConstants
 {
-    public static class Selectors
-    {
-        public const string CardCoverMeta = ".dcover-meta";
-        public const string ClassAttribute = "class";
-    }
-
     public static class EditorFlow
     {
         public const string OpeningBlock = "Opening Block";
@@ -78,6 +72,8 @@ internal static partial class BrowserTestConstants
 
     public static class TooltipAuditFlow
     {
+        public const int ClearHoverX = 2;
+        public const int ClearHoverY = 2;
         public const string LibraryFolderScenario = "tooltip-surface-library-folder";
         public const string LibraryCardMenuScenario = "tooltip-surface-library-card-menu";
         public const string LibraryFolderStep = "01-folder-create";
@@ -96,6 +92,7 @@ internal static partial class BrowserTestConstants
         public const string PlayPlaybackTooltipText = "Start playback";
         public const string GoldAccentTooltipText = "Gold accent";
         public const int SharedTooltipSettleDelayMs = 560;
+        public const int SharedTooltipDismissTimeoutMs = 1_500;
         public const double MinimumBorderAlpha = 0.28;
         public const double MinimumVisibleOpacity = 0.7;
         public const double MaximumOverlapPx = 0.5;
@@ -198,9 +195,10 @@ internal static partial class BrowserTestConstants
         public const string AlignmentCenterValue = "center";
         public const string AlignmentRightValue = "right";
         public const string AlignmentJustifyValue = "justify";
-        public const double MinimumOpticalInsetPx = 24;
-        public const double MaximumClusterWrapPaddingPx = 24.5;
-        public const double MaximumOpticalInsetPx = 36.5;
+        public const string TextWrapPrettyValue = "pretty";
+        public const double MinimumOpticalInsetPx = 18;
+        public const double MaximumClusterWrapPaddingPx = 16.5;
+        public const double MaximumOpticalInsetPx = 28.5;
         public const double MaximumFullWidthButtonGapPx = 6;
         public const double MaximumDefaultLeftAverageCenterOffsetPx = 170;
         public const double MaximumDefaultLeftLineCenterOffsetPx = 225;
@@ -216,6 +214,7 @@ internal static partial class BrowserTestConstants
         public const string WidthSliderTooltipText = "Adjust the reader text width";
         public const int TooltipEarlyCheckDelayMs = 1000;
         public const int TooltipSettleDelayMs = 3400;
+        public const int TooltipDismissTimeoutMs = 1_500;
         public const double MaximumEarlyTooltipOpacity = 0.05;
         public const double MinimumVisibleTooltipOpacity = 0.9;
         public const double MaximumTooltipControlOverlapPx = 0.5;
@@ -233,7 +232,6 @@ internal static partial class BrowserTestConstants
         public const string ProgressFitStep = "01-track-contained";
         public const string ReadingChromeScenarioName = "teleprompter-reading-chrome";
         public const string ReadingChromeStep = "01-muted-active-playback";
-        public const string ReadingActiveCssClass = "rd-reading-active";
         public const float ReadingChromeSettleDelayMs = 400;
         public const double MinimumShellButtonBackgroundAlphaReduction = 0.015;
         public const string ProgressEmptyStylePattern = @"width:\s*0%";
@@ -268,7 +266,7 @@ internal static partial class BrowserTestConstants
         public const string ProductLaunchTeleprompterPronunciation = "TELE-promp-ter";
         public const string ProductLaunchTeleprompterWpm = "180";
         public const string ProductLaunchUrgentWord = "time";
-        public const string ProductLaunchVisionPronunciation = "ˈviʒən";
+        public const string ProductLaunchVisionPronunciation = "VI-zhun";
         public const string ProductLaunchVisionWord = "vision";
         public const string ProductLaunchSoftWord = "Let";
         public const string SpeedOffsetsFastWord = "flight.";
@@ -284,7 +282,6 @@ internal static partial class BrowserTestConstants
         public const string CameraDeviceIdAttribute = "data-camera-device-id";
         public const string CameraAutostartAttribute = "data-camera-autostart";
         public const string PrimaryCameraRole = "primary";
-        public const string EnabledClass = "on";
         public const string FalseText = "false";
         public const string StyleAttribute = "style";
         public const string TrueText = "true";

@@ -50,23 +50,29 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                             selectChannels(window.getComputedStyle(firstNode ?? document.body)[propertyName]),
                             selectChannels(window.getComputedStyle(secondNode ?? document.body)[propertyName]));
                     const byTestId = testId => document.querySelector(`[data-test="${testId}"]`);
+                    const readIconShape = iconTestId =>
+                        byTestId(iconTestId)?.firstElementChild?.getAttribute(args.iconShapeAttributeName) ?? '';
 
-                    const loudButton = element.querySelector(`[data-test="${args.loudTestId}"]`);
-                    const voiceButton = element.querySelector(`[data-test="${args.floatingVoiceTestId}"]`);
-                    const emotionButton = element.querySelector(`[data-test="${args.floatingEmotionTestId}"]`);
+                    const loudButton = byTestId(args.loudTestId);
+                    const voiceButton = byTestId(args.floatingVoiceTestId);
+                    const emotionButton = byTestId(args.floatingEmotionTestId);
                     const topVoiceButton = byTestId(args.topVoiceTestId);
                     const topEmotionButton = byTestId(args.topEmotionTestId);
                     const topPauseButton = byTestId(args.topPauseTestId);
-                    const floatingPauseButton = element.querySelector(`[data-test="${args.floatingPauseTestId}"]`);
+                    const floatingPauseButton = byTestId(args.floatingPauseTestId);
                     const topSpeedButton = byTestId(args.topSpeedTestId);
-                    const floatingSpeedButton = element.querySelector(`[data-test="${args.floatingSpeedTestId}"]`);
+                    const floatingSpeedButton = byTestId(args.floatingSpeedTestId);
                     const topInsertButton = byTestId(args.topInsertTestId);
-                    const floatingInsertButton = element.querySelector(`[data-test="${args.floatingInsertTestId}"]`);
+                    const floatingInsertButton = byTestId(args.floatingInsertTestId);
+                    const loudShape = readIconShape(args.loudLeadingIconTestId);
+                    const floatingVoiceShape = readIconShape(args.floatingVoiceLeadingIconTestId);
+                    const floatingEmotionShape = readIconShape(args.floatingEmotionLeadingIconTestId);
 
                     return {
-                        floatingDotCount: element.querySelectorAll('.ed-action-dot').length,
-                        loudUsesDot: Boolean(loudButton?.querySelector('.ed-action-dot')),
-                        loudUsesSvg: Boolean(loudButton?.querySelector('svg')),
+                        floatingDotCount: [floatingVoiceShape, floatingEmotionShape]
+                            .filter(shape => shape === args.dotShapeValue).length,
+                        loudUsesDot: loudShape === args.dotShapeValue,
+                        loudUsesSvg: loudShape === args.glyphShapeValue,
                         voiceColorDistance: colorDistance(topVoiceButton, voiceButton),
                         emotionColorDistance: colorDistance(topEmotionButton, emotionButton),
                         topGroupColorDistance: colorDistance(topVoiceButton, topEmotionButton),
@@ -80,11 +86,17 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                 new
                 {
                     loudTestId = UiTestIds.Editor.FloatingVoiceLoud,
+                    loudLeadingIconTestId = UiTestIds.Editor.ToolbarActionLeadingIcon(UiTestIds.Editor.FloatingVoiceLoud),
+                    floatingVoiceLeadingIconTestId = UiTestIds.Editor.ToolbarActionLeadingIcon(UiTestIds.Editor.FloatingVoice),
+                    floatingEmotionLeadingIconTestId = UiTestIds.Editor.ToolbarActionLeadingIcon(UiTestIds.Editor.FloatingEmotion),
                     floatingEmotionTestId = UiTestIds.Editor.FloatingEmotion,
                     floatingInsertTestId = UiTestIds.Editor.FloatingInsert,
                     floatingPauseTestId = UiTestIds.Editor.FloatingPauseTrigger,
                     floatingSpeedTestId = UiTestIds.Editor.FloatingSpeedTrigger,
                     floatingVoiceTestId = UiTestIds.Editor.FloatingVoice,
+                    iconShapeAttributeName = UiDataAttributes.Editor.IconShape,
+                    dotShapeValue = UiDataAttributes.Editor.IconShapeDot,
+                    glyphShapeValue = UiDataAttributes.Editor.IconShapeGlyph,
                     topEmotionTestId = UiTestIds.Editor.EmotionTrigger,
                     topInsertTestId = UiTestIds.Editor.InsertTrigger,
                     topPauseTestId = UiTestIds.Editor.PauseTrigger,
@@ -137,6 +149,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
             var metrics = await voiceMenu.EvaluateAsync<DropdownSurfaceMetrics>(
                 """
                 (element, args) => {
+                    const byTestId = testId => document.querySelector(`[data-test="${testId}"]`);
                     const parseColor = value => (value?.match(/\d+(\.\d+)?/g) ?? []).map(Number);
                     const readAlpha = value => {
                         const channels = parseColor(value);
@@ -147,15 +160,14 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                             ? 0
                             : Math.abs(left[0] - right[0]) + Math.abs(left[1] - right[1]) + Math.abs(left[2] - right[2]);
                     const heights = args.itemTestIds
-                        .map(testId => document.querySelector(`[data-test="${testId}"]`))
+                        .map(byTestId)
                         .filter(Boolean)
                         .map(item => item.getBoundingClientRect().height);
                     const styles = window.getComputedStyle(element);
-                    const clearAction = document.querySelector(`[data-test="${args.clearTestId}"]`);
-                    const clearLabel = Array.from(clearAction?.querySelectorAll('.ed-action-leading, .ed-action-label, .ed-action-meta') ?? [])
-                        .map(node => node.textContent?.replace(/\s+/g, ' ').trim() ?? '')
-                        .filter(Boolean)
-                        .join(' ');
+                    const clearLeading = byTestId(args.clearLeadingTestId)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+                    const clearLabel = byTestId(args.clearLabelTestId)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+                    const clearMeta = byTestId(args.clearMetaTestId)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+                    const clearParts = [clearLeading, clearLabel, clearMeta].filter(Boolean);
 
                     return {
                         menuWidth: element.getBoundingClientRect().width,
@@ -163,7 +175,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                         rowHeightDelta: heights.length === 0 ? 0 : Math.max(...heights) - Math.min(...heights),
                         borderAlpha: readAlpha(styles.borderTopColor),
                         borderContrast: distance(parseColor(styles.borderTopColor), parseColor(styles.backgroundColor)),
-                        clearLabel
+                        clearLabel: clearParts.join(' ')
                     };
                 }
                 """,
@@ -177,7 +189,9 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                         UiTestIds.Editor.ColorStress,
                         UiTestIds.Editor.ColorGuide
                     },
-                    clearTestId = UiTestIds.Editor.ColorClear
+                    clearLeadingTestId = UiTestIds.Editor.ToolbarActionLeading(UiTestIds.Editor.ColorClear),
+                    clearLabelTestId = UiTestIds.Editor.ToolbarActionLabel(UiTestIds.Editor.ColorClear),
+                    clearMetaTestId = UiTestIds.Editor.ToolbarActionMeta(UiTestIds.Editor.ColorClear)
                 });
 
             await Assert.That(metrics.MenuWidth >= BrowserTestConstants.EditorFlow.MinimumDropdownSurfaceWidthPx).IsTrue();
@@ -300,11 +314,10 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
         page.EvaluateAsync<DropdownAlignmentMetrics>(
             """
             (args) => {
-                const item = document.querySelector(`[data-test="${args.itemTestId}"]`);
-                const label = item?.querySelector('.ed-action-label');
-                const meta = item?.querySelector('.ed-action-meta');
+                const label = document.querySelector(`[data-test="${args.labelTestId}"]`);
+                const meta = document.querySelector(`[data-test="${args.metaTestId}"]`);
 
-                if (!item || !label || !meta) {
+                if (!label || !meta) {
                     return {
                         labelMetaGap: Number.POSITIVE_INFINITY
                     };
@@ -318,7 +331,11 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
                 };
             }
             """,
-            new { itemTestId });
+            new
+            {
+                labelTestId = UiTestIds.Editor.ToolbarActionLabel(itemTestId),
+                metaTestId = UiTestIds.Editor.ToolbarActionMeta(itemTestId)
+            });
 
     private readonly record struct FloatingToolbarSemanticMetrics(
         int FloatingDotCount,

@@ -432,7 +432,7 @@ Rules:
 
 - keep markup aligned with `design`
 - do not move business logic here if it belongs in `Core`
-- preserve `data-testid` selectors for browser tests
+- preserve `data-test` selectors for browser tests
 
 ### `src/PrompterOne.Core`
 

@@ -1,4 +1,3 @@
-using AngleSharp.Dom;
 using Bunit;
 using PrompterOne.Shared.Components.Library;
 using PrompterOne.Shared.Contracts;
@@ -10,7 +9,9 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class LibraryFolderInteractionTests : BunitContext
 {
-    private const string OpenClassName = "open";
+    private const string ActiveStateValue = "active";
+    private const string ClosedExpandedStateValue = "closed";
+    private const string OpenExpandedStateValue = "open";
     private readonly AppHarness _harness;
 
     public LibraryFolderInteractionTests()
@@ -108,12 +109,18 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         cut.FindByTestId(UiTestIds.Library.CardMenu(AppTestData.Scripts.DemoId)).Click();
 
         cut.WaitForAssertion(() =>
-            Assert.True(GetCardMenuWrap(cut, AppTestData.Scripts.DemoId).ClassList.Contains(OpenClassName)));
+            Assert.Equal(
+                OpenExpandedStateValue,
+                cut.FindByTestId(UiTestIds.Library.CardMenuWrap(AppTestData.Scripts.DemoId))
+                    .GetAttribute("data-expanded")));
 
         cut.FindByTestId(UiTestIds.Library.Page).Click();
 
         cut.WaitForAssertion(() =>
-            Assert.False(GetCardMenuWrap(cut, AppTestData.Scripts.DemoId).ClassList.Contains(OpenClassName)));
+            Assert.Equal(
+                ClosedExpandedStateValue,
+                cut.FindByTestId(UiTestIds.Library.CardMenuWrap(AppTestData.Scripts.DemoId))
+                    .GetAttribute("data-expanded")));
     }
 
     [Test]
@@ -130,7 +137,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         {
             Assert.Contains(AppTestData.Scripts.TedLeadershipTitle, cut.Markup);
             Assert.DoesNotContain(AppTestData.Scripts.DemoTitle, cut.Markup);
-            Assert.Contains("active", tedTalksFolder.ClassName, StringComparison.Ordinal);
+            Assert.Equal(ActiveStateValue, tedTalksFolder.GetAttribute("data-active"));
             Assert.DoesNotContain(UiTestIds.Library.FolderChips, cut.Markup, StringComparison.Ordinal);
         });
     }
@@ -188,20 +195,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.Contains("Product Launch", cut.Markup);
             Assert.DoesNotContain("Security Incident", cut.Markup);
             Assert.Contains(UiTestIds.Library.Folder(roadshowsFolder.Id), cut.Markup, StringComparison.Ordinal);
-            Assert.Contains("active", cut.FindByTestId(UiTestIds.Library.SortDate).ClassName);
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.SortDate).GetAttribute("data-active"));
         });
-    }
-
-    private static IElement GetCardMenuWrap(IRenderedComponent<LibraryPage> cut, string scriptId)
-    {
-        const string MenuWrapClassName = "dcard-menu-wrap";
-        var current = cut.FindByTestId(UiTestIds.Library.CardMenu(scriptId)).ParentElement;
-
-        while (current is not null && !current.ClassList.Contains(MenuWrapClassName))
-        {
-            current = current.ParentElement;
-        }
-
-        return current ?? throw new InvalidOperationException("Library card menu wrapper was not rendered.");
     }
 }

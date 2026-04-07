@@ -1,6 +1,5 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
-using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
@@ -64,34 +63,12 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
                     Enumerable.Range(1, BrowserTestConstants.Editor.ScrollProbeLineCount)
                         .Select(index => $"Scroll probe line {index}")));
 
-            await page.EvaluateAsync(
-                """
-                args => {
-                    const harness = window[args.harnessGlobalName];
-                    const state = harness?.getState(args.testId);
-                    if (!state) {
-                        throw new Error("Monaco scroll harness state is unavailable.");
-                    }
-
-                    const host = document.querySelector(`[data-test="${args.testId}"]`);
-                    if (!(host instanceof HTMLElement)) {
-                        throw new Error("Monaco scroll host is unavailable.");
-                    }
-
-                    const editorScrollSurface = host.querySelector('.monaco-scrollable-element');
-                    if (!(editorScrollSurface instanceof HTMLElement)) {
-                        throw new Error("Monaco scroll surface is unavailable.");
-                    }
-
-                    editorScrollSurface.scrollTop = editorScrollSurface.scrollHeight;
-                    editorScrollSurface.dispatchEvent(new Event('scroll', { bubbles: true }));
-                }
-                """,
-                new
-                {
-                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                    testId = UiTestIds.Editor.SourceStage
-                });
+            await EditorMonacoDriver.SetCaretAtEndAsync(page);
+            await EditorMonacoDriver.CenterSelectionLineAsync(page);
+            await EditorMonacoDriver.WaitForSelectionScrollAsync(
+                page,
+                BrowserTestConstants.Editor.AiScrollJumpMinimumScrollTopPx,
+                BrowserTestConstants.Timing.DefaultVisibleTimeoutMs);
 
             var stageState = await EditorMonacoDriver.GetStateAsync(page);
             var scrollState = await sourceScrollHost.EvaluateAsync<EditorScrollState>(

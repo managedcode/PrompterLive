@@ -57,16 +57,20 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(speedValue).ToHaveTextAsync($"{baselineSpeedWpm + ReaderSpeedStepWpm} {WordsPerMinuteSuffix}");
 
         var cameraToggle = page.GetByTestId(UiTestIds.Teleprompter.CameraToggle);
-        var cameraWasActive = await HasActiveClassAsync(cameraToggle);
+        var cameraWasActive = await HasActiveStateAsync(cameraToggle);
         await cameraToggle.ClickAsync();
 
         if (cameraWasActive)
         {
-            await Expect(cameraToggle).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(cameraToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.InactiveValue);
         }
         else
         {
-            await Expect(cameraToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+            await Expect(cameraToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
         }
 
         await page.GetByTestId(UiTestIds.Teleprompter.WidthSlider).EvaluateAsync(BrowserTestConstants.TeleprompterFlow.WidthInputScript);
@@ -100,7 +104,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await page.GetByTestId(UiTestIds.Settings.NavFiles).ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.FilesPanel)).ToBeVisibleAsync();
         await page.GetByTestId(UiTestIds.Settings.FileAutoSave).ClickAsync();
-        await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave)).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+        await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave)).ToHaveAttributeAsync(
+            BrowserTestConstants.State.EnabledAttribute,
+            BrowserTestConstants.State.DisabledValue);
         await page.GetByTestId(UiTestIds.Settings.NavRecording).ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.RecordingPanel)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.RecordingAutoRecord)).ToBeVisibleAsync();
@@ -165,7 +171,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         var appearanceBeforeSelection = await GetRequiredBoundingBoxAsync(appearanceNavItem);
 
         await aiNavItem.ClickAsync();
-        await Expect(aiNavItem).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+        await Expect(aiNavItem).ToHaveAttributeAsync(
+            BrowserTestConstants.State.ActiveAttribute,
+            BrowserTestConstants.State.ActiveValue);
         await Expect(page.GetByTestId(UiTestIds.Settings.AiPanel)).ToBeVisibleAsync();
 
         var aiAfterSelection = await GetRequiredBoundingBoxAsync(aiNavItem);
@@ -176,7 +184,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         var openAiProvider = page.GetByTestId(UiTestIds.Settings.AiProvider(BrowserTestConstants.SettingsFlow.OpenAiProviderId));
         await openAiProvider.ClickAsync();
-        await Expect(openAiProvider).ToHaveClassAsync(new Regex(@"\bopen\b"));
+        await Expect(openAiProvider).ToHaveAttributeAsync(
+            BrowserTestConstants.State.ExpandedAttribute,
+            BrowserTestConstants.State.OpenValue);
         await Expect(page.GetByTestId(UiTestIds.Settings.AiProviderSave(BrowserTestConstants.SettingsFlow.OpenAiProviderId))).ToBeVisibleAsync();
 
         await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
@@ -205,25 +215,30 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         var readerCameraToggle = page.GetByTestId(UiTestIds.Settings.ReaderCameraToggle);
         await readerCameraToggle.ScrollIntoViewIfNeededAsync();
         await Expect(readerCameraToggle).ToBeVisibleAsync();
-        var cameraToggleWasOn = await HasOnClassAsync(readerCameraToggle);
+        var cameraToggleWasOn = await HasEnabledStateAsync(readerCameraToggle);
         await readerCameraToggle.ClickAsync();
 
         if (cameraToggleWasOn)
         {
-            await Expect(readerCameraToggle).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(readerCameraToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.EnabledAttribute,
+                BrowserTestConstants.State.DisabledValue);
         }
         else
         {
-            await Expect(readerCameraToggle).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(readerCameraToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.EnabledAttribute,
+                BrowserTestConstants.State.EnabledValue);
         }
 
         return cameraToggleWasOn;
     }
 
-    private static async Task<bool> HasActiveClassAsync(Microsoft.Playwright.ILocator locator) =>
-        (await locator.GetAttributeAsync(BrowserTestConstants.Html.ClassAttribute) ?? string.Empty)
-        .Split(BrowserTestConstants.Html.ClassSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Contains(BrowserTestConstants.Css.ActiveClass, StringComparer.Ordinal);
+    private static async Task<bool> HasActiveStateAsync(Microsoft.Playwright.ILocator locator)
+    {
+        var state = await locator.GetAttributeAsync(BrowserTestConstants.State.ActiveAttribute);
+        return string.Equals(state, BrowserTestConstants.State.ActiveValue, StringComparison.Ordinal);
+    }
 
     private static async Task AssertTeleprompterChromeVisibilityAsync(Microsoft.Playwright.IPage page)
     {
@@ -294,21 +309,25 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
     private static Task SeedStoredTeleprompterSceneAsync(Microsoft.Playwright.IPage page, string cameraDeviceId) =>
         page.EvaluateAsync(
-            BrowserTestConstants.ScreenFlows.SeedStoredSceneScript,
+            BrowserTestConstants.TeleprompterFlow.SeedStoredSceneScript,
             new { cameraDeviceId });
 
     private static async Task ToggleSettingsButtonAsync(Microsoft.Playwright.ILocator locator)
     {
-        var wasOn = await HasOnClassAsync(locator);
+        var wasOn = await HasEnabledStateAsync(locator);
         await locator.ClickAsync();
 
         if (wasOn)
         {
-            await Expect(locator).Not.ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(locator).ToHaveAttributeAsync(
+                BrowserTestConstants.State.EnabledAttribute,
+                BrowserTestConstants.State.DisabledValue);
         }
         else
         {
-            await Expect(locator).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(locator).ToHaveAttributeAsync(
+                BrowserTestConstants.State.EnabledAttribute,
+                BrowserTestConstants.State.EnabledValue);
         }
     }
 
@@ -324,9 +343,9 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         return parsedWpm;
     }
 
-    private static async Task<bool> HasOnClassAsync(Microsoft.Playwright.ILocator locator)
+    private static async Task<bool> HasEnabledStateAsync(Microsoft.Playwright.ILocator locator)
     {
-        var classes = await locator.GetAttributeAsync("class");
-        return (classes ?? string.Empty).Contains("on", StringComparison.Ordinal);
+        var state = await locator.GetAttributeAsync(BrowserTestConstants.State.EnabledAttribute);
+        return string.Equals(state, BrowserTestConstants.State.EnabledValue, StringComparison.Ordinal);
     }
 }

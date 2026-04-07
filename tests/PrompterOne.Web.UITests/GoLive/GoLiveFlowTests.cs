@@ -52,8 +52,10 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
 
             await page.ReloadAsync(new() { WaitUntil = Microsoft.Playwright.WaitUntilState.NetworkIdle });
 
-            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
             await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingToggle)).ToHaveCountAsync(0);
         }
         finally
@@ -398,7 +400,8 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
 
             await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallVdoNinjaHarnessScript);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle)).ToHaveClassAsync(BrowserTestConstants.Regexes.ToggleOnClass);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.VdoToggle))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
             await page.GetByTestId(UiTestIds.GoLive.StartStream).ClickAsync();
 
             await page.WaitForFunctionAsync(

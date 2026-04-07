@@ -75,20 +75,19 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
             var resumedSlowWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsResumedSlowWord);
             var fastWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsFastWord);
 
-            await Assert.That(slowWord.Classes).Contains("tps-slow");
+            await Assert.That(slowWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueSlow);
             await Assert.That(slowWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm);
             await Assert.That(slowWord.Title).IsEqualTo(string.Empty);
 
             await Assert.That(normalWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsNormalWpm);
-            await Assert.That(normalWord.Classes).DoesNotContain("tps-slow");
-            await Assert.That(normalWord.Classes).DoesNotContain("tps-fast");
+            await Assert.That(normalWord.SpeedCue).IsEqualTo(string.Empty);
             await Assert.That(normalWord.Style).IsEqualTo(string.Empty);
             await Assert.That(normalWord.Title).IsEqualTo(string.Empty);
 
-            await Assert.That(resumedSlowWord.Classes).Contains("tps-slow");
+            await Assert.That(resumedSlowWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueSlow);
             await Assert.That(resumedSlowWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm);
 
-            await Assert.That(fastWord.Classes).Contains("tps-fast");
+            await Assert.That(fastWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueFast);
             await Assert.That(fastWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsFastWpm);
 
             await Assert.That(ParseMilliseconds(slowWord.DurationMs) > ParseMilliseconds(normalWord.DurationMs)).IsTrue();
@@ -118,25 +117,25 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         var rhetoricalWord = await GetWordProbeAsync(page, InspirationCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchRhetoricalWord);
         var teleprompterWord = await GetWordProbeAsync(page, ClosingCardIndex, BrowserTestConstants.TeleprompterFlow.ProductLaunchTeleprompterWord);
 
-        await Assert.That(neutralWord.Classes).DoesNotContain("tps-neutral");
-        await Assert.That(neutralWord.Classes).DoesNotContain("tps-warm");
-        await Assert.That(neutralWord.Classes).DoesNotContain("tps-focused");
+        await Assert.That(neutralWord.EmotionCue).IsEqualTo(string.Empty);
+        await Assert.That(neutralWord.VolumeCue).IsEqualTo(string.Empty);
+        await Assert.That(neutralWord.DeliveryCue).IsEqualTo(string.Empty);
 
-        await Assert.That(professionalWord.Classes).Contains("tps-professional");
-        await Assert.That(professionalWord.Classes).DoesNotContain("tps-warm");
+        await Assert.That(professionalWord.EmotionCue).IsEqualTo("professional");
+        await Assert.That(professionalWord.EmotionCue).IsNotEqualTo("warm");
 
-        await Assert.That(highlightWord.Classes).Contains("tps-highlight");
+        await Assert.That(highlightWord.HighlightCue).IsEqualTo(TpsVisualCueContracts.HighlightAttributeValue);
         await Assert.That(highlightWord.CardState).IsEqualTo(UiDataAttributes.Teleprompter.NextState);
         await Assert.That(highlightWord.BackgroundColor).IsEqualTo(BrowserTestConstants.TeleprompterFlow.TransparentBackgroundColor);
 
-        await Assert.That(slowWord.Classes).Contains("tps-xslow");
-        await Assert.That(fastWord.Classes).Contains("tps-xfast");
-        await Assert.That(softWord.Classes).Contains("tps-soft");
-        await Assert.That(softWord.Classes).DoesNotContain("tps-motivational");
-        await Assert.That(urgentWord.Classes).Contains("tps-urgent");
-        await Assert.That(urgentWord.Classes).DoesNotContain("tps-energetic");
-        await Assert.That(rhetoricalWord.Classes).Contains("tps-rhetorical");
-        await Assert.That(teleprompterWord.Classes).DoesNotContain("tps-energetic");
+        await Assert.That(slowWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueXslow);
+        await Assert.That(fastWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueXfast);
+        await Assert.That(softWord.VolumeCue).IsEqualTo(TpsVisualCueContracts.VolumeSoft);
+        await Assert.That(softWord.EmotionCue).IsNotEqualTo("motivational");
+        await Assert.That(urgentWord.EmotionCue).IsEqualTo("urgent");
+        await Assert.That(urgentWord.EmotionCue).IsNotEqualTo("energetic");
+        await Assert.That(rhetoricalWord.EmotionCue).IsEqualTo("rhetorical");
+        await Assert.That(teleprompterWord.EmotionCue).IsNotEqualTo("energetic");
 
         await Assert.That(visionWord.Pronunciation).IsEqualTo(BrowserTestConstants.TeleprompterFlow.ProductLaunchVisionPronunciation);
         await Assert.That(visionWord.Title).IsEqualTo(string.Empty);
@@ -218,13 +217,18 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                 const computed = window.getComputedStyle(word);
                 const card = word.closest(`[${args.cardStateAttributeName}]`);
                 return {
-                    classes: word.className,
                     cardState: card instanceof HTMLElement ? card.getAttribute(args.cardStateAttributeName) ?? '' : '',
                     style: word.getAttribute('style') ?? '',
                     title: word.getAttribute('title') ?? '',
                     pronunciation: word.getAttribute(args.pronunciationAttributeName) ?? '',
                     effectiveWpm: word.getAttribute(args.effectiveWpmAttributeName) ?? '',
                     durationMs: word.getAttribute(args.durationAttributeName) ?? '',
+                    emotionCue: word.getAttribute(args.emotionAttributeName) ?? '',
+                    volumeCue: word.getAttribute(args.volumeAttributeName) ?? '',
+                    deliveryCue: word.getAttribute(args.deliveryAttributeName) ?? '',
+                    speedCue: word.getAttribute(args.speedAttributeName) ?? '',
+                    highlightCue: word.getAttribute(args.highlightAttributeName) ?? '',
+                    stressCue: word.getAttribute(args.stressAttributeName) ?? '',
                     letterSpacing: computed.letterSpacing ?? '',
                     color: computed.color ?? '',
                     backgroundColor: computed.backgroundColor ?? ''
@@ -236,9 +240,15 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                 cardStateAttributeName = UiDataAttributes.Teleprompter.CardState,
                 durationAttributeName = UiDataAttributes.Teleprompter.DurationMilliseconds,
                 effectiveWpmAttributeName = UiDataAttributes.Teleprompter.EffectiveWordsPerMinute,
+                emotionAttributeName = TpsVisualCueContracts.EmotionAttributeName,
                 expectedWord = wordText,
+                highlightAttributeName = TpsVisualCueContracts.HighlightAttributeName,
                 wordPrefix = UiTestIds.Teleprompter.CardWordPrefix(cardIndex),
-                pronunciationAttributeName = UiDataAttributes.Teleprompter.Pronunciation
+                pronunciationAttributeName = UiDataAttributes.Teleprompter.Pronunciation,
+                speedAttributeName = TpsVisualCueContracts.SpeedAttributeName,
+                stressAttributeName = TpsVisualCueContracts.StressAttributeName,
+                volumeAttributeName = TpsVisualCueContracts.VolumeAttributeName,
+                deliveryAttributeName = TpsVisualCueContracts.DeliveryAttributeName
             });
 
         await Assert.That(probe).IsNotNull();
@@ -260,13 +270,18 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
 
     private sealed class ReaderWordProbe
     {
-        public string Classes { get; set; } = string.Empty;
         public string CardState { get; set; } = string.Empty;
         public string Style { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Pronunciation { get; set; } = string.Empty;
         public string EffectiveWpm { get; set; } = string.Empty;
         public string DurationMs { get; set; } = string.Empty;
+        public string EmotionCue { get; set; } = string.Empty;
+        public string VolumeCue { get; set; } = string.Empty;
+        public string DeliveryCue { get; set; } = string.Empty;
+        public string SpeedCue { get; set; } = string.Empty;
+        public string HighlightCue { get; set; } = string.Empty;
+        public string StressCue { get; set; } = string.Empty;
         public string LetterSpacing { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
         public string BackgroundColor { get; set; } = string.Empty;

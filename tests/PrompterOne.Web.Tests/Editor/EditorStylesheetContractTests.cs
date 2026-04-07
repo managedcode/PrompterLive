@@ -60,6 +60,24 @@ public sealed class EditorStylesheetContractTests
     }
 
     [Test]
+    [Arguments(".ed-main ::deep .po-inline-emphasis", "font-weight")]
+    [Arguments(".ed-main ::deep .po-inline-loud", "display")]
+    [Arguments(".ed-main ::deep .po-inline-loud", "transform")]
+    [Arguments(".ed-main ::deep .po-inline-whisper", "font-style")]
+    [Arguments(".ed-main ::deep .po-inline-whisper", "letter-spacing")]
+    [Arguments(".ed-main ::deep .po-inline-delivery-building", "font-weight")]
+    [Arguments(".ed-main ::deep .po-inline-delivery-building", "transform")]
+    [Arguments(".ed-main ::deep .po-inline-speed-fast", "letter-spacing")]
+    [Arguments(".ed-main ::deep .po-inline-speed-xslow", "letter-spacing")]
+    [Arguments(".ed-main ::deep .po-inline-stress", "transform")]
+    public void MonacoCueRules_AvoidMetricChangingDecorations(string selector, string forbiddenDeclaration)
+    {
+        var rule = GetRuleBlock(selector);
+
+        Assert.DoesNotContain(forbiddenDeclaration, rule, StringComparison.Ordinal);
+    }
+
+    [Test]
     [Arguments(".ed-main ::deep .h-mark", "font-size")]
     [Arguments(".ed-main ::deep .h-sep", "margin")]
     public void HeaderTokenRules_AvoidSyntheticSpacing(string selector, string forbiddenDeclaration)

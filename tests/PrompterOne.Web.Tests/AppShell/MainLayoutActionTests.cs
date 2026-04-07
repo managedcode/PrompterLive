@@ -14,6 +14,8 @@ namespace PrompterOne.Web.Tests;
 [NotInParallel]
 public sealed class MainLayoutActionTests : BunitContext
 {
+    private const string DisabledStateValue = "false";
+    private const string EnabledStateValue = "true";
     private const string EnglishExportLabel = "Export";
     private const string EnglishGoLiveLabel = "Go Live";
     private const string EnglishImportLabel = "Import";
@@ -97,16 +99,24 @@ public sealed class MainLayoutActionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains("app-header--reader-muted", cut.Find("header").ClassName ?? string.Empty, StringComparison.Ordinal);
-            Assert.Contains("go-live-shell-button--subdued", cut.FindByTestId(UiTestIds.Header.GoLive).ClassName ?? string.Empty, StringComparison.Ordinal);
+            Assert.Equal(
+                EnabledStateValue,
+                cut.FindByTestId(UiTestIds.Header.Surface).GetAttribute("data-reader-muted"));
+            Assert.Equal(
+                EnabledStateValue,
+                cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-subdued"));
         });
 
         shell.SetTeleprompterPlaybackActive(false);
 
         cut.WaitForAssertion(() =>
         {
-            Assert.DoesNotContain("app-header--reader-muted", cut.Find("header").ClassName ?? string.Empty, StringComparison.Ordinal);
-            Assert.DoesNotContain("go-live-shell-button--subdued", cut.FindByTestId(UiTestIds.Header.GoLive).ClassName ?? string.Empty, StringComparison.Ordinal);
+            Assert.Equal(
+                DisabledStateValue,
+                cut.FindByTestId(UiTestIds.Header.Surface).GetAttribute("data-reader-muted"));
+            Assert.Equal(
+                DisabledStateValue,
+                cut.FindByTestId(UiTestIds.Header.GoLive).GetAttribute("data-subdued"));
         });
     }
 
@@ -131,7 +141,9 @@ public sealed class MainLayoutActionTests : BunitContext
                 EnglishGoLiveLabel,
                 goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveLabel))?.TextContent.Trim());
             Assert.NotNull(goLive.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.GoLiveDot)));
-            Assert.Contains("btn-create", newScript.ClassName, StringComparison.Ordinal);
+            Assert.Equal(
+                UiTestIds.Header.LibraryNewScript,
+                newScript.GetAttribute("data-test"));
             Assert.Equal(SupportedImportAcceptValue, openScriptInput.GetAttribute("accept"));
             Assert.Contains(EnglishImportLabel, openScript.TextContent, StringComparison.Ordinal);
 
@@ -157,14 +169,10 @@ public sealed class MainLayoutActionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var home = cut.FindByTestId(UiTestIds.Header.Home);
-            var header = cut.Find("header");
-
-            Assert.NotNull(home.QuerySelector(".app-brand-mark"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.GoLive).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryOpenScript).QuerySelector(".ui-icon"));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryNewScript).QuerySelector(".ui-icon"));
-            Assert.True(header.QuerySelectorAll(".ui-icon").Length >= 3);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.HomeBrandMark));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.GoLiveIcon));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptIcon));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryNewScriptIcon));
         });
     }
 
@@ -200,15 +208,16 @@ public sealed class MainLayoutActionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var openScriptSurface = cut.FindByTestId(UiTestIds.Header.LibraryOpenScript);
-            var openScriptButton = openScriptSurface.QuerySelector("button");
+            var openScriptButton = cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptButton);
             var openScriptInput = cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptInput);
 
             Assert.NotNull(openScriptButton);
-            Assert.Equal("dialog", openScriptButton!.GetAttribute("aria-haspopup"));
+            Assert.Equal("dialog", openScriptButton.GetAttribute("aria-haspopup"));
             Assert.Contains(EnglishImportLabel, openScriptButton.TextContent, StringComparison.Ordinal);
             Assert.Equal(UiDomIds.AppShell.LibraryOpenScriptInput, openScriptInput.GetAttribute("id"));
             Assert.Equal(SupportedImportAcceptValue, openScriptInput.GetAttribute("accept"));
             Assert.Equal(EnglishImportLabel, openScriptInput.GetAttribute("aria-label"));
+            Assert.NotNull(openScriptSurface);
         });
     }
 

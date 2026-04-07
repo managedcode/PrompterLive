@@ -9,7 +9,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class TeleprompterChromeStateTests : BunitContext
 {
-    private const string ReadingActiveCssClass = "rd-reading-active";
+    private const string ActiveStateValue = "active";
+    private const string InactiveStateValue = "inactive";
 
     [Test]
     public void TeleprompterPage_PlaybackMarksChromeAsReadingActive()
@@ -22,18 +23,9 @@ public sealed class TeleprompterChromeStateTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.DoesNotContain(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.Controls).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
-            Assert.DoesNotContain(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.Progress).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
-            Assert.DoesNotContain(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.EdgeInfo).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
+            Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Controls).GetAttribute("data-active"));
+            Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Progress).GetAttribute("data-active"));
+            Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.EdgeInfo).GetAttribute("data-active"));
         });
 
         cut.FindByTestId(UiTestIds.Teleprompter.NextWord).Click();
@@ -41,18 +33,9 @@ public sealed class TeleprompterChromeStateTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Contains(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.Controls).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
-            Assert.Contains(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.Progress).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
-            Assert.Contains(
-                ReadingActiveCssClass,
-                cut.FindByTestId(UiTestIds.Teleprompter.EdgeInfo).ClassName ?? string.Empty,
-                StringComparison.Ordinal);
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Controls).GetAttribute("data-active"));
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Progress).GetAttribute("data-active"));
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.EdgeInfo).GetAttribute("data-active"));
         });
     }
 }

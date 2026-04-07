@@ -33,7 +33,7 @@ public sealed class EditorMetadataRailTests : BunitContext
             .Add(component => component.SplitRequested, mode => requestedModes.Add(mode)));
 
         Assert.Contains(SplitSection, cut.Markup, StringComparison.Ordinal);
-        Assert.Equal(SplitHint, cut.Find($".ed-meta-action-note").TextContent.Trim());
+        Assert.Equal(SplitHint, cut.FindByTestId(UiTestIds.Editor.SplitHint).TextContent.Trim());
         Assert.Equal(SplitTopLevelLabel, cut.FindByTestId(UiTestIds.Editor.SplitTopLevel).TextContent.Trim());
         Assert.Equal(EditorSplitFeedbackTestData.SplitSegmentActionLabel, cut.FindByTestId(UiTestIds.Editor.SplitSegment).TextContent.Trim());
 

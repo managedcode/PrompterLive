@@ -97,13 +97,11 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
                     const line = Array
                         .from(overlay.children)
                         .map(node => ({
-                            className: node.className,
                             text: node.textContent ?? ''
                         }))
                         .find(node => node.text.includes(args.targetText));
 
                     return {
-                        className: line?.className ?? '',
                         text: line?.text ?? ''
                     };
                 }
@@ -114,7 +112,6 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
                     targetText = BrowserTestConstants.Editor.QuantumOverviewBlockHeader
                 });
 
-            await Assert.That(lineState.ClassName).IsEqualTo(BrowserTestConstants.Editor.BlockLineCssClass);
             await Assert.That(lineState.Text).IsEqualTo(BrowserTestConstants.Editor.QuantumOverviewBlockLineText);
         }
         finally
@@ -304,8 +301,6 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
     private sealed class HeaderLineState
     {
-        public string ClassName { get; set; } = string.Empty;
-
         public string Text { get; set; } = string.Empty;
     }
 

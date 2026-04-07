@@ -2,6 +2,13 @@ namespace PrompterOne.Shared.Contracts;
 
 public static class UiDataAttributes
 {
+    public static class Editor
+    {
+        public const string IconShape = "data-editor-icon-shape";
+        public const string IconShapeDot = "dot";
+        public const string IconShapeGlyph = "glyph";
+    }
+
     public static class Live
     {
         public const string Level = "data-live-level";

@@ -8,12 +8,14 @@
 @if (ShowAppHeader)
 {
     <header class="@BuildAppHeaderCssClass()"
+            data-test="@UiTestIds.Header.Surface"
             data-reader-muted="@(IsTeleprompterPlaybackChromeMuted ? EnabledStateValue : DisabledStateValue)">
         <button type="button"
                 class="app-header-left app-header-home"
                 @onclick="HandleHomeClickAsync"
                 data-test="@UiTestIds.Header.Home">
-            <div class="logo-icon">
+            <div class="logo-icon"
+                 data-test="@UiTestIds.Header.HomeBrandMark">
                 <AppBrandMark />
             </div>
             <span class="app-logo-text" data-test="@UiTestIds.Header.Brand">PrompterOne</span>
@@ -92,9 +94,12 @@
                      data-test="@UiTestIds.Header.LibraryOpenScript">
                     <button type="button"
                             class="btn-ghost btn-open-script"
+                            data-test="@UiTestIds.Header.LibraryOpenScriptButton"
                             aria-haspopup="dialog"
                             @onclick="HandleOpenScriptTriggerAsync">
-                        <UiIcon Kind="UiIconKind.DocumentImport" Size="16" />
+                        <span data-test="@UiTestIds.Header.LibraryOpenScriptIcon">
+                            <UiIcon Kind="UiIconKind.DocumentImport" Size="16" />
+                        </span>
                         <span class="app-header-action-label">@Text(UiTextKey.HeaderOpenScript)</span>
                     </button>
                     <InputFile @key="_openScriptPickerVersion"
@@ -109,7 +114,9 @@
                         class="btn-create"
                         @onclick="HandleCreateScriptClickAsync"
                         data-test="@UiTestIds.Header.LibraryNewScript">
-                    <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
+                    <span data-test="@UiTestIds.Header.LibraryNewScriptIcon">
+                        <UiIcon Kind="UiIconKind.Plus" Size="16" StrokeWidth="2.5m" />
+                    </span>
                     <span class="app-header-action-label">@Text(UiTextKey.HeaderNewScript)</span>
                 </button>
             }

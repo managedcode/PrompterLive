@@ -38,6 +38,16 @@ const lightThemeMinimapColors = Object.freeze({
     "minimapSlider.background": "#8B735526",
     "minimapSlider.hoverBackground": "#8B73553D"
 });
+const tagSemanticClassNames = Object.freeze({
+    breath: `${cssClassPrefix}-tag-breath`,
+    editPoint: `${cssClassPrefix}-tag-editpoint`,
+    emphasis: `${cssClassPrefix}-tag-emphasis`,
+    highlight: `${cssClassPrefix}-tag-highlight`,
+    pause: `${cssClassPrefix}-tag-pause`,
+    pronunciation: `${cssClassPrefix}-tag-pronunciation`,
+    stress: `${cssClassPrefix}-tag-stress`,
+    wpm: `${cssClassPrefix}-tag-wpm`
+});
 const monacoDefaults = Object.freeze({
     automaticLayout: true,
     contextmenu: false,
@@ -95,10 +105,14 @@ function createDecorationCatalog(options) {
     const speedNames = normalizeCatalogNames(runtimeCatalog.relativeSpeedTags);
     return {
         deliveryClasses: new Map(deliveryNames.map(name => [name, `${cssClassPrefix}-inline-delivery-${name}`])),
+        deliveryTagClasses: createSemanticTagClassMap(deliveryNames, "delivery"),
         emotionClasses: new Map(emotionNames.map(name => [name, `${cssClassPrefix}-inline-emotion-${name}`])),
+        emotionTagClasses: createSemanticTagClassMap(emotionNames, "emotion"),
         headerEmotionTags: new Set(emotionNames),
         speedClasses: new Map(speedNames.map(name => [name, name === "normal" ? null : `${cssClassPrefix}-inline-speed-${name}`])),
-        volumeClasses: new Map(volumeNames.map(name => [name, `${cssClassPrefix}-inline-${name}`]))
+        speedTagClasses: createSemanticTagClassMap(speedNames.filter(name => name !== "normal"), "speed"),
+        volumeClasses: new Map(volumeNames.map(name => [name, `${cssClassPrefix}-inline-${name}`])),
+        volumeTagClasses: createSemanticTagClassMap(volumeNames, "volume")
     };
 }
 
@@ -108,6 +122,69 @@ function normalizeCatalogNames(values) {
             .map(value => String(value ?? emptyValue).trim().toLowerCase())
             .filter(Boolean)
         : [];
+}
+
+function createSemanticTagClassMap(names, category) {
+    return new Map(names.map(name => [name, `${cssClassPrefix}-tag-${category}-${name}`]));
+}
+
+function normalizeTagName(value) {
+    const normalizedValue = String(value ?? emptyValue).trim();
+    const separatorIndex = normalizedValue.indexOf(":");
+    return (separatorIndex >= 0 ? normalizedValue.slice(0, separatorIndex) : normalizedValue)
+        .trim()
+        .toLowerCase();
+}
+
+function createTagClassName(semanticTagClassName) {
+    return semanticTagClassName
+        ? `${cssClassPrefix}-tag ${semanticTagClassName}`
+        : `${cssClassPrefix}-tag`;
+}
+
+function resolveSemanticTagClassName(normalizedName, tpsCatalog) {
+    if (!normalizedName) {
+        return null;
+    }
+
+    if (tpsCatalog.emotionTagClasses.has(normalizedName)) {
+        return tpsCatalog.emotionTagClasses.get(normalizedName);
+    }
+
+    if (tpsCatalog.volumeTagClasses.has(normalizedName)) {
+        return tpsCatalog.volumeTagClasses.get(normalizedName);
+    }
+
+    if (tpsCatalog.deliveryTagClasses.has(normalizedName)) {
+        return tpsCatalog.deliveryTagClasses.get(normalizedName);
+    }
+
+    if (tpsCatalog.speedTagClasses.has(normalizedName)) {
+        return tpsCatalog.speedTagClasses.get(normalizedName);
+    }
+
+    switch (normalizedName) {
+        case "highlight":
+            return tagSemanticClassNames.highlight;
+        case "emphasis":
+        case "strong":
+        case "bold":
+            return tagSemanticClassNames.emphasis;
+        case "stress":
+            return tagSemanticClassNames.stress;
+        case "phonetic":
+        case "pronunciation":
+            return tagSemanticClassNames.pronunciation;
+        case "pause":
+            return tagSemanticClassNames.pause;
+        case "breath":
+            return tagSemanticClassNames.breath;
+        case "edit_point":
+        case "editpoint":
+            return tagSemanticClassNames.editPoint;
+        default:
+            return null;
+    }
 }
 
 export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef, options) {
@@ -990,116 +1067,126 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     const startColumn = tagIndex + 1;
     const endColumn = startColumn + rawTag.length;
     if (inner.startsWith("/")) {
-        const matchedScope = popInlineScope(scopes, inner.slice(1).trim());
+        const normalizedClosingName = normalizeTagName(inner.slice(1));
+        const matchedScope = popInlineScope(scopes, normalizedClosingName);
         if (matchedScope?.kind === scopeKindPronunciation) {
             decoratePronunciationBuffer(monaco, decorations, lineNumber, matchedScope, scopes[scopes.length - 1].state);
         }
 
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(matchedScope?.tagClassName ?? resolveSemanticTagClassName(normalizedClosingName, tpsCatalog)));
         return;
     }
 
     const separatorIndex = inner.indexOf(":");
     const name = (separatorIndex >= 0 ? inner.slice(0, separatorIndex) : inner).trim();
     const argument = separatorIndex >= 0 ? inner.slice(separatorIndex + 1).trim() : null;
-    const normalizedName = name.toLowerCase();
+    const normalizedName = normalizeTagName(name);
     const currentState = scopes[scopes.length - 1].state;
+    const semanticTagClassName = numericWpmRegex.test(name)
+        ? tagSemanticClassNames.wpm
+        : resolveSemanticTagClassName(normalizedName, tpsCatalog);
 
     if (numericWpmRegex.test(name)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-inline-wpm`);
-        scopes.push(createInlineScopeFrame(name, scopeKindWpm, currentState));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindWpm, currentState, null, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "pause") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-pause-timed`);
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
         return;
     }
 
     if (normalizedName === "breath") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-pause-long`);
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
         return;
     }
 
     if (normalizedName === "edit_point" || normalizedName === "editpoint") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
         return;
     }
 
     if (normalizedName === "phonetic" || normalizedName === "pronunciation") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-inline-pronunciation`);
-        scopes.push(createInlineScopeFrame(name, scopeKindPronunciation, currentState, argument));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindPronunciation, currentState, argument, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "highlight") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isHighlighted: true
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "emphasis" || normalizedName === "strong" || normalizedName === "bold") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isEmphasis: true
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "stress") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isStress: true
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (tpsCatalog.speedClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             speedClass: tpsCatalog.speedClasses.get(normalizedName),
             speedValue: tpsCatalog.speedClasses.get(normalizedName) ? normalizedName : null
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (tpsCatalog.volumeClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             volumeClass: tpsCatalog.volumeClasses.get(normalizedName),
             volumeValue: normalizedName
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (tpsCatalog.deliveryClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             deliveryClass: tpsCatalog.deliveryClasses.get(normalizedName),
             deliveryValue: normalizedName
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
     if (tpsCatalog.emotionClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-        scopes.push(createInlineScopeFrame(name, scopeKindStyle, {
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             emotionClass: tpsCatalog.emotionClasses.get(normalizedName)
-        }));
+        }, null, semanticTagClassName));
         return;
     }
 
-    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, `${cssClassPrefix}-tag`);
-    scopes.push(createInlineScopeFrame(name, scopeKindNeutral, currentState));
+    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+    scopes.push(createInlineScopeFrame(normalizedName, scopeKindNeutral, currentState, null, semanticTagClassName));
 }
 
 function decoratePronunciationBuffer(monaco, decorations, lineNumber, scope, parentState) {
@@ -1115,13 +1202,14 @@ function decoratePronunciationBuffer(monaco, decorations, lineNumber, scope, par
     }
 }
 
-function createInlineScopeFrame(name, kind, state, argument) {
+function createInlineScopeFrame(name, kind, state, argument, tagClassName) {
     return {
         argument: argument ?? null,
         buffer: [],
         kind,
         name,
-        state
+        state,
+        tagClassName: tagClassName ?? null
     };
 }
 

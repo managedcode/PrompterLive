@@ -6,6 +6,8 @@ public static class UiTestIds
 {
     public static class Tooltip
     {
+        public static string Anchor(string ownerTestId) => $"{ownerTestId}-tooltip-anchor";
+
         public static string Surface(string ownerTestId) => $"{ownerTestId}-tooltip";
     }
 
@@ -23,10 +25,15 @@ public static class UiTestIds
         public const string GoLiveLabel = "header-go-live-label";
         public const string GoLiveStatus = "header-go-live-status";
         public const string Home = "header-home";
+        public const string HomeBrandMark = "header-home-brand-mark";
+        public const string Surface = "header-surface";
         public const string Onboarding = "header-onboarding";
         public const string LibraryBreadcrumbCurrent = "header-library-breadcrumb-current";
         public const string LibraryNewScript = "header-library-new-script";
+        public const string LibraryNewScriptIcon = "header-library-new-script-icon";
         public const string LibraryOpenScript = "header-library-open-script";
+        public const string LibraryOpenScriptButton = "header-library-open-script-button";
+        public const string LibraryOpenScriptIcon = "header-library-open-script-icon";
         public const string LibraryOpenScriptInput = "header-library-open-script-input";
         public const string LibrarySearch = "library-search";
         public const string LibrarySearchSurface = "library-search-surface";
@@ -110,6 +117,8 @@ public static class UiTestIds
         public static string CardMenu(string scriptId) => $"library-card-menu-{scriptId}";
 
         public static string CardMenuDropdown(string scriptId) => $"library-card-menu-dropdown-{scriptId}";
+
+        public static string CardMenuWrap(string scriptId) => $"library-card-menu-wrap-{scriptId}";
 
         public static string CardRead(string scriptId) => $"library-card-read-{scriptId}";
 
@@ -243,6 +252,7 @@ public static class UiTestIds
         public const string SpeedSlow = "editor-speed-slow";
         public const string SpeedTrigger = "editor-speed-trigger";
         public const string SplitSegment = "editor-split-segment";
+        public const string SplitHint = "editor-split-hint";
         public const string SplitStatus = "editor-split-status";
         public const string SplitTopLevel = "editor-split-top-level";
         public const string SplitResultBadge = "editor-split-result-badge";
@@ -409,6 +419,7 @@ public static class UiTestIds
         public const string AboutVersion = "settings-about-version";
         public const string AppearancePanel = "settings-appearance-panel";
         public const string AiPanel = "settings-ai-panel";
+        public const string AboutAppIconSurface = "settings-about-app-icon-surface";
         public const string LanguagePanel = "settings-language-panel";
         public const string LanguageSelect = "settings-language-select";
         public const string CameraFrameRate = "settings-camera-frame-rate";
@@ -514,6 +525,8 @@ public static class UiTestIds
         public static string CameraPrimaryAction(string deviceId) => $"settings-camera-primary-{deviceId}";
 
         public static string CloudProviderCard(string providerId) => $"settings-cloud-{providerId}-card";
+
+        public static string CloudProviderActions(string providerId) => $"settings-cloud-{providerId}-actions";
 
         public static string CloudProviderConnect(string providerId) => $"settings-cloud-{providerId}-connect";
 

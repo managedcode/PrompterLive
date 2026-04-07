@@ -12,7 +12,6 @@ public sealed class TeleprompterFidelityTests : BunitContext
 {
     private const int BenefitsCardIndex = 5;
     private const int ClosingCardIndex = 7;
-    private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const string ProfessionalWord = "transformative";
     private const string HighlightWord = "solution";
     private const int IntroductionCardIndex = 4;
@@ -22,7 +21,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const double MinimumVisibleSlowLetterSpacingEm = 0.045d;
     private const string MaximumReaderWidthLabel = "100%";
     private const string MaximumReaderWidthValue = "100";
-    private const string MaximumReaderContentScaleStyle = "--rd-stage-content-scale:0.97";
+    private const string MaximumReaderContentScaleStyle = "--rd-stage-content-scale:1";
     private const string MaximumReaderWidthScaleStyle = "--rd-stage-width-scale:1";
     private const string NeutralWord = "Good";
     private const int OpeningCardIndex = 0;
@@ -112,20 +111,20 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
             var rhetoricalWord = FindReaderWordByText(cut, InspirationCardIndex, RhetoricalWord);
 
-            Assert.Contains("tps-xslow", slowWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("xslow", slowWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.Equal("90", slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
-            Assert.Contains("tps-xfast", fastWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("xfast", fastWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(fastWord));
 
-            Assert.Contains("tps-rhetorical", rhetoricalWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("rhetorical", rhetoricalWord.GetAttribute(TpsVisualCueContracts.DeliveryAttributeName));
 
-            Assert.Equal("ˈviʒən", visionWord.GetAttribute(UiDataAttributes.Teleprompter.Pronunciation));
+            Assert.Equal("VI-zhun", visionWord.GetAttribute(UiDataAttributes.Teleprompter.Pronunciation));
             Assert.Null(visionWord.GetAttribute("title"));
 
             Assert.Equal("TELE-promp-ter", teleprompterWord.GetAttribute(UiDataAttributes.Teleprompter.Pronunciation));
@@ -148,24 +147,24 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var normalWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsNormalWord);
             var resumedSlowWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsResumedSlowWord);
             var fastWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsFastWord);
-            var normalWordClassName = normalWord.ClassName ?? string.Empty;
 
-            Assert.Contains("tps-slow", slowWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("slow", slowWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
             Assert.Equal("140", normalWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
-            Assert.False(normalWordClassName.Contains("tps-slow", StringComparison.Ordinal));
-            Assert.False(normalWordClassName.Contains("tps-fast", StringComparison.Ordinal));
+            Assert.DoesNotContain(
+                normalWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName) ?? string.Empty,
+                new[] { "slow", "fast" });
             Assert.Null(normalWord.GetAttribute("style"));
             Assert.Null(normalWord.GetAttribute("title"));
 
-            Assert.Contains("tps-slow", resumedSlowWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("slow", resumedSlowWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Equal(SpeedOffsetsSlowWpm, resumedSlowWord.GetAttribute("data-effective-wpm"));
 
-            Assert.Contains("tps-fast", fastWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal("fast", fastWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Equal(SpeedOffsetsFastWpm, fastWord.GetAttribute("data-effective-wpm"));
             Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
@@ -194,24 +193,26 @@ public sealed class TeleprompterFidelityTests : BunitContext
             var teleprompterWord = FindReaderWordByText(cut, ClosingCardIndex, TeleprompterWord);
             var introductionWord = FindReaderWordByText(cut, IntroductionCardIndex, IntroductionWord);
 
-            Assert.DoesNotContain("tps-neutral", neutralWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-warm", neutralWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-focused", neutralWord.ClassName, StringComparison.Ordinal);
+            AssertDoesNotHaveCueValue(neutralWord, "neutral");
+            AssertDoesNotHaveCueValue(neutralWord, "warm");
+            AssertDoesNotHaveCueValue(neutralWord, "focused");
 
-            Assert.Contains("tps-professional", professionalWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-warm", professionalWord.ClassName, StringComparison.Ordinal);
+            AssertHasCueValue(professionalWord, "professional");
+            AssertDoesNotHaveCueValue(professionalWord, "warm");
 
-            Assert.Contains("tps-highlight", highlightWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-warm", highlightWord.ClassName, StringComparison.Ordinal);
+            Assert.Equal(
+                TpsVisualCueContracts.HighlightAttributeValue,
+                highlightWord.GetAttribute(TpsVisualCueContracts.HighlightAttributeName));
+            AssertDoesNotHaveCueValue(highlightWord, "warm");
 
-            Assert.Contains("tps-soft", softWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-motivational", softWord.ClassName, StringComparison.Ordinal);
+            AssertHasCueValue(softWord, "soft");
+            AssertDoesNotHaveCueValue(softWord, "motivational");
 
-            Assert.Contains("tps-urgent", urgentWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-energetic", urgentWord.ClassName, StringComparison.Ordinal);
+            AssertHasCueValue(urgentWord, "urgent");
+            AssertDoesNotHaveCueValue(urgentWord, "energetic");
 
-            Assert.DoesNotContain("tps-focused", introductionWord.ClassName, StringComparison.Ordinal);
-            Assert.DoesNotContain("tps-energetic", teleprompterWord.ClassName, StringComparison.Ordinal);
+            AssertDoesNotHaveCueValue(introductionWord, "focused");
+            AssertDoesNotHaveCueValue(teleprompterWord, "energetic");
         });
     }
 
@@ -231,7 +232,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
                 .ToArray();
 
             Assert.Contains(SecurityIncidentEmphasisPhrase, emphasisGroup.TextContent, StringComparison.Ordinal);
-            Assert.Contains(ContinuousEmphasisCssClass, emphasisGroup.ClassName, StringComparison.Ordinal);
+            Assert.Equal("true", emphasisGroup.GetAttribute("data-emphasis"));
             Assert.Contains("exposed,", responseWords);
             Assert.DoesNotContain(SecurityIncidentStandaloneComma, responseWords);
         });
@@ -248,13 +249,13 @@ public sealed class TeleprompterFidelityTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var gradient = cut.FindByTestId(UiTestIds.Teleprompter.Gradient);
-            var className = gradient.ClassName ?? string.Empty;
+            var gradientCue = gradient.GetAttribute("data-gradient") ?? string.Empty;
 
-            Assert.DoesNotContain("focused", className, StringComparison.Ordinal);
+            Assert.DoesNotContain("focused", gradientCue, StringComparison.Ordinal);
             Assert.True(
-                className.Contains("calm", StringComparison.Ordinal) ||
-                className.Contains("professional", StringComparison.Ordinal),
-                $"Expected the architecture route to stay on a dark reader palette, but got '{className}'.");
+                gradientCue.Contains("calm", StringComparison.Ordinal) ||
+                gradientCue.Contains("professional", StringComparison.Ordinal),
+                $"Expected the architecture route to stay on a dark reader palette, but got '{gradientCue}'.");
         });
     }
 
@@ -277,4 +278,24 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
         return double.Parse(value ?? "0", CultureInfo.InvariantCulture);
     }
+
+    private static void AssertDoesNotHaveCueValue(AngleSharp.Dom.IElement word, string cueValue)
+    {
+        var hasCueValue = BuildCueValues(word).Contains(cueValue, StringComparer.Ordinal);
+
+        Assert.False(hasCueValue);
+    }
+
+    private static void AssertHasCueValue(AngleSharp.Dom.IElement word, string cueValue)
+    {
+        Assert.Contains(cueValue, BuildCueValues(word));
+    }
+
+    private static IReadOnlyList<string> BuildCueValues(AngleSharp.Dom.IElement word) =>
+    [
+        word.GetAttribute(TpsVisualCueContracts.EmotionAttributeName) ?? string.Empty,
+        word.GetAttribute(TpsVisualCueContracts.DeliveryAttributeName) ?? string.Empty,
+        word.GetAttribute(TpsVisualCueContracts.SpeedAttributeName) ?? string.Empty,
+        word.GetAttribute(TpsVisualCueContracts.VolumeAttributeName) ?? string.Empty
+    ];
 }

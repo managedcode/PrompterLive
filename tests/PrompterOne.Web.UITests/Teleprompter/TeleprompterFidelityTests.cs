@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -8,7 +7,6 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
 {
-    private const string ContinuousEmphasisCssClass = "rd-g-emphasis";
     private const int ImmediateAlignmentFollowUpDelayMilliseconds = 180;
     private const double LegacyMaximumReaderWidthPixels = 1240d;
     private const string MaximumReaderWidthLabel = "100%";
@@ -193,7 +191,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(MaximumReaderWidthValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthValue)).ToHaveTextAsync(MaximumReaderWidthLabel);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CardGroup(SecurityIncidentResponseCardIndex, 0)))
-                .ToHaveClassAsync(new Regex($@"\b{ContinuousEmphasisCssClass}\b"));
+                .ToHaveAttributeAsync(
+                    "data-emphasis",
+                    BrowserTestConstants.State.EnabledValue);
 
             var clusterWrapWidth = await page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap)
                 .EvaluateAsync<double>("element => element.getBoundingClientRect().width");
@@ -214,7 +214,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
     {
         var cameraLayer = page.GetByTestId(UiTestIds.Teleprompter.CameraBackground);
         await TeleprompterCameraDriver.EnsureEnabledAsync(page);
-        await Expect(cameraLayer).ToHaveClassAsync(BrowserTestConstants.Regexes.ActiveClass);
+        await Expect(cameraLayer).ToHaveAttributeAsync(
+            BrowserTestConstants.State.ActiveAttribute,
+            BrowserTestConstants.State.ActiveValue);
     }
 
     private static async Task AssertGuideAlignmentAsync(

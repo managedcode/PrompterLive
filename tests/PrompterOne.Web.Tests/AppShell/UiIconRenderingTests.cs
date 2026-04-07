@@ -1,3 +1,4 @@
+using System;
 using Bunit;
 using PrompterOne.Shared.Components;
 
@@ -12,16 +13,12 @@ public sealed class UiIconRenderingTests : BunitContext
             .Add(icon => icon.Kind, UiIconKind.HelpCircle)
             .Add(icon => icon.Size, 16));
 
-        var svg = cut.Find("svg");
+        var markup = cut.Markup;
 
-        Assert.Equal("round", svg.GetAttribute("stroke-linecap"));
-        Assert.Equal("round", svg.GetAttribute("stroke-linejoin"));
-        Assert.NotNull(svg.QuerySelector("path[d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3']"));
-
-        var dot = svg.QuerySelector("circle[cx='12'][cy='17'][r='1']");
-        Assert.NotNull(dot);
-        Assert.Equal("currentColor", dot!.GetAttribute("fill"));
-        Assert.Equal("none", dot.GetAttribute("stroke"));
-        Assert.Null(svg.QuerySelector("line[x1='12'][y1='17'][x2='12.01'][y2='17']"));
+        Assert.Contains("stroke-linecap=\"round\"", markup, StringComparison.Ordinal);
+        Assert.Contains("stroke-linejoin=\"round\"", markup, StringComparison.Ordinal);
+        Assert.Contains("path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\"", markup, StringComparison.Ordinal);
+        Assert.Contains("circle cx=\"12\" cy=\"17\" r=\"1\" fill=\"currentColor\" stroke=\"none\"", markup, StringComparison.Ordinal);
+        Assert.DoesNotContain("line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"", markup, StringComparison.Ordinal);
     }
 }
