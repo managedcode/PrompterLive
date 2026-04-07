@@ -203,24 +203,21 @@ internal static class EditorMonacoDriver
         await SetSelectionAsync(page, start, start + targetText.Length);
     }
 
-    internal static async Task WaitForSelectionLineVisibleAsync(IPage page, int timeoutMs)
+    internal static async Task WaitForSelectionScrollAsync(IPage page, int minimumScrollTop, int timeoutMs)
     {
         await page.WaitForFunctionAsync(
             """
             (args) => {
                 const harness = window[args.harnessGlobalName];
                 const state = harness?.getState(args.testId);
-                const visibleRange = state?.visibleRange;
-                const selectionLine = state?.selection?.line;
-                return Boolean(visibleRange) &&
-                    typeof selectionLine === "number" &&
-                    selectionLine >= visibleRange.startLineNumber &&
-                    selectionLine <= visibleRange.endLineNumber;
+                const scrollTop = state?.scrollTop;
+                return typeof scrollTop === "number" && scrollTop >= args.minimumScrollTop;
             }
             """,
             new
             {
                 harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                minimumScrollTop,
                 testId = UiTestIds.Editor.SourceStage
             },
             new() { Timeout = timeoutMs });

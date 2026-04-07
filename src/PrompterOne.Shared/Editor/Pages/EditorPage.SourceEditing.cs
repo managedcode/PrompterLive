@@ -66,9 +66,16 @@ public partial class EditorPage
     {
         var sourceText = text ?? string.Empty;
         var importedFrontMatter = TryImportFrontMatterFromSource(sourceText, out var bodyText);
-        _splitFeedback = null;
-        Diagnostics.ClearRecoverable(SplitDraftOperation);
-        _sourceText = importedFrontMatter ? bodyText : sourceText;
+        var nextSourceText = importedFrontMatter ? bodyText : sourceText;
+        var sourceChanged = !string.Equals(_sourceText, nextSourceText, StringComparison.Ordinal);
+
+        if (sourceChanged)
+        {
+            _splitFeedback = null;
+            Diagnostics.ClearRecoverable(SplitDraftOperation);
+        }
+
+        _sourceText = nextSourceText;
         _history.TryRecord(_sourceText, _selection.Range);
         _skipNextRenderFromTyping = !importedFrontMatter;
         QueueDraftAnalysis();
