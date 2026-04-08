@@ -92,10 +92,11 @@ public partial class EditorSourcePanel : IAsyncDisposable
         var isLocalSelectionEcho = _hasPendingLocalSelection && Selection.Range == _lastLocalSelectionRange;
         var selectionChanged = Selection.Range != _lastRenderedSelection.Range;
         var selectionNeedsRender = Selection.HasSelection || _lastRenderedSelection.HasSelection;
+        var requiresSurfaceSyncForText = textChanged && !isLocalTextEcho;
 
         _skipNextRender = _surfaceInteropReady && isLocalTextEcho && !selectionNeedsRender;
         _syncOverlayAfterRender |= textChanged;
-        _syncSurfaceAfterRender |= textChanged || (selectionChanged && selectionNeedsRender && !isLocalSelectionEcho);
+        _syncSurfaceAfterRender |= requiresSurfaceSyncForText || (selectionChanged && selectionNeedsRender && !isLocalSelectionEcho);
 
         if (!isLocalTextEcho)
         {

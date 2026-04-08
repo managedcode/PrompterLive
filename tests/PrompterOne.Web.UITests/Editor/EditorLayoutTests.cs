@@ -232,8 +232,8 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
             await Assert.That(expandedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailExpandedChevronDirection);
 
             await metadataToggle.ClickAsync();
-            await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.MetadataRailToggleSettleDelayMs);
             await Expect(metadataToggle).ToHaveAttributeAsync("aria-expanded", "false");
+            await WaitForMetadataRailCollapsedAsync(page);
 
             var collapsedMetrics = await ReadLayoutMetricsAsync(page);
             await UiScenarioArtifacts.CapturePageAsync(
@@ -256,6 +256,30 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
             await page.Context.CloseAsync();
         }
     }
+
+    private static Task WaitForMetadataRailCollapsedAsync(IPage page) =>
+        page.WaitForFunctionAsync(
+            """
+            (args) => {
+                const rail = document.querySelector(`[data-test="${args.railTestId}"]`);
+                const toggle = document.querySelector(`[data-test="${args.toggleTestId}"]`);
+                if (!(rail instanceof HTMLElement) || !(toggle instanceof HTMLElement)) {
+                    return false;
+                }
+
+                const railWidth = rail.getBoundingClientRect().width;
+                return rail.getAttribute('data-collapsed') === 'true' &&
+                    toggle.getAttribute('aria-expanded') === 'false' &&
+                    railWidth <= args.maximumCollapsedWidth;
+            }
+            """,
+            new
+            {
+                maximumCollapsedWidth = BrowserTestConstants.Editor.MaximumCollapsedMetadataRailWidthPx,
+                railTestId = UiTestIds.Editor.MetadataRail,
+                toggleTestId = UiTestIds.Editor.MetadataRailToggle
+            },
+            new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
     private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(ILocator locator) =>
         await locator.EvaluateAsync<LayoutBounds>(
