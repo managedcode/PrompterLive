@@ -347,15 +347,16 @@ export function getSelectionState(host) {
     return state ? createSelectionState(state) : createEmptySelectionState();
 }
 
-export function setSelection(host, start, end, revealSelection = true, focusEditor = true) {
+export async function setSelection(host, start, end, revealSelection = true, focusEditor = true) {
     const state = hostStates.get(host);
     if (!state) {
         return createEmptySelectionState();
     }
 
     applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, undefined, undefined, focusEditor !== false);
-    notifySelectionChanged(state, false);
-    return createSelectionState(state);
+    await waitForSelectionState(state, start ?? 0, end ?? 0);
+    await notifySelectionChangedAsync(state, false);
+    return await waitForSelectionState(state, start ?? 0, end ?? 0);
 }
 
 export function setFindMatches(host, matches, activeMatchIndex = -1) {
@@ -519,11 +520,12 @@ function ensureHarness(options) {
                 }
                 : null;
         },
-        setSelection: (testId, start, end, revealSelection = true) => {
+        setSelection: async (testId, start, end, revealSelection = true) => {
             const state = getRequiredHarnessState(testId);
             applySelection(state, start ?? 0, end ?? 0, revealSelection !== false);
-            notifySelectionChanged(state, false);
-            return createSelectionState(state);
+            await waitForSelectionState(state, start ?? 0, end ?? 0);
+            await notifySelectionChangedAsync(state, false);
+            return await waitForSelectionState(state, start ?? 0, end ?? 0);
         },
         centerSelectionLine: testId => {
             const state = getRequiredHarnessState(testId);
@@ -746,10 +748,14 @@ function onEditorContentChanged(state) {
 }
 
 function notifySelectionChanged(state, dismissMenus) {
+    void notifySelectionChangedAsync(state, dismissMenus);
+}
+
+async function notifySelectionChangedAsync(state, dismissMenus) {
     syncProxyFromEditor(state);
     if (!state.suppressSelectionNotification) {
         const selectionState = createSelectionState(state);
-        void state.dotNetRef.invokeMethodAsync(
+        await state.dotNetRef.invokeMethodAsync(
             state.options.selectionChangedCallbackName,
             selectionState.start,
             selectionState.end,
@@ -759,6 +765,42 @@ function notifySelectionChanged(state, dismissMenus) {
             selectionState.toolbarLeft,
             dismissMenus);
     }
+}
+
+function waitForAnimationFrames(frameCount = 1) {
+    return new Promise(resolve => {
+        const pump = remaining => {
+            if (remaining <= 0) {
+                resolve();
+                return;
+            }
+
+            requestAnimationFrame(() => pump(remaining - 1));
+        };
+
+        pump(frameCount);
+    });
+}
+
+function selectionMatchesOffsets(state, start, end) {
+    const selection = createSelectionState(state);
+    const orderedStart = Math.min(start, end);
+    const orderedEnd = Math.max(start, end);
+    return Math.min(selection.start, selection.end) === orderedStart &&
+        Math.max(selection.start, selection.end) === orderedEnd;
+}
+
+async function waitForSelectionState(state, start, end) {
+    const attempts = 12;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+        if (selectionMatchesOffsets(state, start, end)) {
+            return createSelectionState(state);
+        }
+
+        await waitForAnimationFrames(2);
+    }
+
+    return createSelectionState(state);
 }
 
 function notifyHistoryRequested(state, command) {

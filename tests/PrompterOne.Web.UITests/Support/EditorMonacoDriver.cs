@@ -171,39 +171,22 @@ internal static class EditorMonacoDriver
 
     internal static async Task SetSelectionAsync(IPage page, int start, int end, bool revealSelection = true)
     {
-        _ = await InvokeHarnessAsync<EditorMonacoSelection>(page, "setSelection", new
+        var selection = await InvokeHarnessAsync<EditorMonacoSelection>(page, "setSelection", new
         {
             start,
             end,
             revealSelection
         });
 
+        await Assert.That(selection).IsNotNull();
+
         var orderedStart = Math.Min(start, end);
         var orderedEnd = Math.Max(start, end);
+        var normalizedStart = Math.Min(selection!.Start, selection.End);
+        var normalizedEnd = Math.Max(selection.Start, selection.End);
 
-        await page.WaitForFunctionAsync(
-            """
-            (args) => {
-                const harness = window[args.harnessGlobalName];
-                const state = harness?.getState(args.testId);
-                const selection = state?.selection;
-                if (!selection) {
-                    return false;
-                }
-
-                const normalizedStart = Math.min(selection.start, selection.end);
-                const normalizedEnd = Math.max(selection.start, selection.end);
-                return normalizedStart === args.orderedStart && normalizedEnd === args.orderedEnd;
-            }
-            """,
-            new
-            {
-                harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                orderedEnd,
-                orderedStart,
-                testId = UiTestIds.Editor.SourceStage
-            },
-            new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+        await Assert.That(normalizedStart).IsEqualTo(orderedStart);
+        await Assert.That(normalizedEnd).IsEqualTo(orderedEnd);
     }
 
     internal static async Task SetSelectionByTextAsync(IPage page, string targetText)
