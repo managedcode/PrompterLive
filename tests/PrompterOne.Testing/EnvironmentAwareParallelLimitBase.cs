@@ -7,7 +7,7 @@ namespace PrompterOne.Testing;
 /// </summary>
 public abstract class EnvironmentAwareParallelLimitBase : IParallelLimit
 {
-    protected virtual int CiLimit { get; } = 6;
+    protected virtual int CiLimit { get; } = 4;
     protected virtual int LocalLimit { get; } = 10;
 
     public int Limit => ResolveLimit();
