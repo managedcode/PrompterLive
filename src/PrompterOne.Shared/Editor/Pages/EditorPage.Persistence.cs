@@ -4,12 +4,15 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class EditorPage
 {
-    private async Task PersistDraftAsync(string text, string? documentNameOverride = null)
+    private async Task PersistDraftAsync(
+        string text,
+        string? documentNameOverride = null,
+        CancellationToken cancellationToken = default)
     {
         CancelDraftAnalysis();
         CancelAutosave();
         var revision = PrepareDraftPersistence(text, documentNameOverride);
-        await PersistPreparedDraftAsync(revision, CancellationToken.None);
+        await PersistPreparedDraftAsync(revision, cancellationToken);
     }
 
     private long PrepareDraftPersistence(string text, string? documentNameOverride = null)
@@ -20,12 +23,15 @@ public partial class EditorPage
         return checked(++_draftRevision);
     }
 
-    private void PersistDraftInBackground(string text, string? documentNameOverride = null)
+    private void PersistDraftInBackground(
+        string text,
+        string? documentNameOverride = null,
+        CancellationToken cancellationToken = default)
     {
         CancelDraftAnalysis();
         CancelAutosave();
         var revision = PrepareDraftPersistence(text, documentNameOverride);
-        _ = InvokeAsync(() => PersistPreparedDraftAsync(revision, CancellationToken.None));
+        _ = InvokeAsync(() => PersistPreparedDraftAsync(revision, cancellationToken));
     }
 
     private Task PersistPreparedDraftAsync(long revision, CancellationToken cancellationToken) =>
@@ -65,6 +71,8 @@ public partial class EditorPage
             await CaptureLocalRevisionAsync(savedDocument, cancellationToken);
             if (assignScriptId)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (revision != _draftRevision)
                 {
                     StageDraftIdentity(savedDocument.Id, savedDocument.DocumentName);
@@ -133,7 +141,7 @@ public partial class EditorPage
             await InvokeAsync(() =>
             {
                 _skipNextRenderFromTyping = false;
-                return PersistDraftAsync(_sourceText);
+                return PersistDraftAsync(_sourceText, cancellationToken: cancellationToken);
             });
         }
         catch (OperationCanceledException)
