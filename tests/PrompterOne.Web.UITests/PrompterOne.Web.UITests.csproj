@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
-    <OutputType>Exe</OutputType>
     <TUnitImplicitUsings>false</TUnitImplicitUsings>
     <TUnitAssertionsImplicitUsings>false</TUnitAssertionsImplicitUsings>
   </PropertyGroup>
@@ -21,6 +20,13 @@
     <ProjectReference Include="../../src/PrompterOne.Web/PrompterOne.Web.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="../../src/PrompterOne.Shared/PrompterOne.Shared.csproj" />
     <ProjectReference Include="../PrompterOne.Testing/PrompterOne.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PrompterOne.Web.UITests.Editor" />
+    <InternalsVisibleTo Include="PrompterOne.Web.UITests.Reader" />
+    <InternalsVisibleTo Include="PrompterOne.Web.UITests.Shell" />
+    <InternalsVisibleTo Include="PrompterOne.Web.UITests.Studio" />
   </ItemGroup>
 
 </Project>

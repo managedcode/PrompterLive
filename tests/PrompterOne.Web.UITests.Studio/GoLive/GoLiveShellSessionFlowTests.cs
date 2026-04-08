@@ -409,7 +409,5 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
     }
 
     private static string GetRecordingFileHarnessScriptPath() =>
-        Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory,
-            "../../../../../tests/PrompterOne.Web.UITests/Media/recording-file-harness.js"));
+        UiTestAssetPaths.GetRecordingFileHarnessScriptPath();
 }

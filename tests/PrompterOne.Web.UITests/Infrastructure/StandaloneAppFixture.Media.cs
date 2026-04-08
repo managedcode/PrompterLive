@@ -7,11 +7,6 @@ public sealed partial class StandaloneAppFixture
     private static async Task ConfigureMediaHarnessAsync(IBrowserContext context)
     {
         await context.AddInitScriptAsync(BrowserTestConstants.Media.RuntimeContractInitializationScript);
-        await context.AddInitScriptAsync(scriptPath: GetMediaHarnessScriptPath());
+        await context.AddInitScriptAsync(scriptPath: UiTestAssetPaths.GetSyntheticMediaHarnessScriptPath());
     }
-
-    private static string GetMediaHarnessScriptPath() =>
-        Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory,
-            "../../../../../tests/PrompterOne.Web.UITests/Media/synthetic-media-harness.js"));
 }

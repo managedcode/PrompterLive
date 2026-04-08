@@ -91,9 +91,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
     }
 
     private static string GetEditorFileSaveHarnessScriptPath() =>
-        Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory,
-            "../../../../../tests/PrompterOne.Web.UITests/Editor/editor-file-save-harness.js"));
+        UiTestAssetPaths.GetEditorFileSaveHarnessScriptPath();
 
     private static async Task<JsonElement> WaitForSavedFileAsync(Microsoft.Playwright.IPage page, string mode)
     {

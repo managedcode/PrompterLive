@@ -70,7 +70,9 @@ flowchart LR
 - `src/PrompterOne.Shared` keeps routed UI in feature slices: `AppShell`, `Diagnostics`, `Editor`, `Library`, `Learn`, `Teleprompter`, `GoLive`, `Settings`, and `Media`.
 - `src/PrompterOne.Core` keeps host-neutral behavior in matching domain slices: `Tps`, `Editor`, `Workspace`, `Library`, `Rsvp`, `Media`, `Streaming`, and `Localization`.
 - `src/PrompterOne.TpsSdk` keeps the vendored `ManagedCode.Tps` parser/compiler/runtime that `PrompterOne.Core` adapts into app-owned contracts.
-- `tests/PrompterOne.Core.Tests`, `tests/PrompterOne.Web.Tests`, and `tests/PrompterOne.Web.UITests` mirror those feature slices.
+- `tests/PrompterOne.Core.Tests` and `tests/PrompterOne.Web.Tests` mirror the core and component slices.
+- `tests/PrompterOne.Web.UITests` owns the shared Playwright/browser-host harness, browser test assets, and cross-suite helpers for browser acceptance.
+- `tests/PrompterOne.Web.UITests.Shell`, `tests/PrompterOne.Web.UITests.Studio`, `tests/PrompterOne.Web.UITests.Editor`, and `tests/PrompterOne.Web.UITests.Reader` own the runnable browser acceptance suites by routed concern.
 - `tests/PrompterOne.Testing` owns reusable test assertions and runner configuration shared across multiple test projects.
 
 ## Design And Structure Principles
@@ -112,6 +114,8 @@ flowchart LR
 | `Workspace` | Active script/session state model | Gives editor, learn, read, and go-live one shared script context | `src/PrompterOne.Core/Workspace` | loaded script state, previews, estimated duration, active session metadata | feature-specific rendering details |
 | `Media` | Browser media and scene domain | Models cameras, microphones, transforms, and audio bus state | `src/PrompterOne.Core/Media`, `src/PrompterOne.Shared/Media` | media device models, scene state, browser media interop | routed screen layout ownership |
 | `Streaming` | Program capture, transport, and target routing domain | Defines how one composed program feed is described, which source/output modules can attach to it, and which external targets are genuinely reachable without a PrompterOne backend | `src/PrompterOne.Core/Streaming` | program-capture profiles, source/output module contracts, transport connection profiles, downstream target descriptors, routing normalization, standalone transport constraints | Razor UI or page layout concerns |
+| `Browser UITest Base` | Shared browser acceptance harness | Keeps one authoritative Playwright host, synthetic media harness, browser constants, asset resolution, and helper drivers for browser suites | `tests/PrompterOne.Web.UITests` | self-hosted SPA fixture, synthetic media harness, screenshot/artifact capture, shared browser seed data, reusable browser helpers | routed feature test cases, production logic ownership |
+| `Browser UITest Suites` | Category-based browser acceptance projects | Isolates browser verification by routed concern while allowing CI fan-out across independent test DLLs | `tests/PrompterOne.Web.UITests.Shell`, `tests/PrompterOne.Web.UITests.Studio`, `tests/PrompterOne.Web.UITests.Editor`, `tests/PrompterOne.Web.UITests.Reader` | routed browser scenarios for shell, studio, editor, and reader flows | duplicating the browser harness, production logic ownership |
 | `tests` | Verification layers | Protects behavior with browser, component, and core assertions | `tests/*` | acceptance flows, component contracts, domain verification | production logic ownership |
 
 ## Build Governance
@@ -119,8 +123,8 @@ flowchart LR
 - `Directory.Packages.props` is the canonical source for NuGet package versions.
 - `Directory.Build.props` is the canonical source for shared target framework, analyzer policy, and assembly/app version settings.
 - `global.json` pins the expected .NET SDK for local and CI builds.
-- `.github/workflows/pr-validation.yml` is the canonical pull-request validation flow for repo build and test gates; it runs the browser-realistic Playwright suite in a dedicated `dotnet test` step after the non-browser test projects finish.
-- `.github/workflows/deploy-github-pages.yml` is the canonical release pipeline for the standalone WASM app: build and test, resolve the release version from `Directory.Build.props`, publish the release artifact, publish the GitHub Release, and deploy GitHub Pages on the custom-domain root. Its validation job isolates `PrompterOne.Web.UITests` from the supporting test projects so the self-hosted browser harness owns the test assets during its run.
+- `.github/workflows/pr-validation.yml` is the canonical pull-request validation flow for repo build and test gates; it runs the browser-realistic Playwright suites as dedicated macOS matrix entries after the non-browser test projects finish.
+- `.github/workflows/deploy-github-pages.yml` is the canonical release pipeline for the standalone WASM app: build and test, resolve the release version from `Directory.Build.props`, publish the release artifact, publish the GitHub Release, and deploy GitHub Pages on the custom-domain root. Its validation stage isolates the `PrompterOne.Web.UITests.*` suite family from the supporting test projects so the self-hosted browser harness owns the test assets during each browser-suite run.
 - Vendored browser SDK release pins live in `vendored-streaming-sdks.json`, and the exact release sync or watch flow is documented in `docs/Features/VendoredBrowserRuntimeReleases.md`.
 
 ## Runtime Boundaries
@@ -373,7 +377,8 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    UITests["PrompterOne.Web.UITests"]
+    UiSuites["PrompterOne.Web.UITests.*<br/>Shell + Studio + Editor + Reader"]
+    UiBase["PrompterOne.Web.UITests<br/>shared harness"]
     Fixture["StandaloneAppFixture"]
     InitScript["synthetic-media-harness.js<br/>BrowserContext.addInitScript"]
     Browser["Chromium context<br/>dynamic loopback origin + granted permissions"]
@@ -382,7 +387,8 @@ flowchart LR
     Reader["Teleprompter runtime"]
     GoLive["Go Live preview/runtime"]
 
-    UITests --> Fixture
+    UiSuites --> UiBase
+    UiBase --> Fixture
     Fixture --> InitScript
     Fixture --> Browser
     InitScript --> MediaApis
@@ -541,20 +547,33 @@ flowchart LR
     TestSupport["tests/PrompterOne.Testing"]
     CoreTests["tests/PrompterOne.Core.Tests"]
     AppTests["tests/PrompterOne.Web.Tests"]
-    UiTests["tests/PrompterOne.Web.UITests"]
+    UiBase["tests/PrompterOne.Web.UITests<br/>shared harness"]
+    UiShell["tests/PrompterOne.Web.UITests.Shell"]
+    UiStudio["tests/PrompterOne.Web.UITests.Studio"]
+    UiEditor["tests/PrompterOne.Web.UITests.Editor"]
+    UiReader["tests/PrompterOne.Web.UITests.Reader"]
 
     CoreTests --> TestSupport
     AppTests --> TestSupport
+    UiBase --> TestSupport
     CoreTests --> Core["src/PrompterOne.Core"]
     AppTests --> Shared["src/PrompterOne.Shared"]
-    UiTests --> App["src/PrompterOne.Web"]
+    UiShell --> UiBase
+    UiStudio --> UiBase
+    UiEditor --> UiBase
+    UiReader --> UiBase
+    UiBase --> App["src/PrompterOne.Web"]
 ```
 
 ## Test Strategy
 
 - `PrompterOne.Core.Tests`: domain correctness and regression tests grouped by core slice plus `Support/`
 - `PrompterOne.Web.Tests`: bUnit coverage grouped by routed feature slice plus `Support/`
-- `PrompterOne.Web.UITests`: Playwright browser flows grouped by browser feature slice plus `Infrastructure/`, `Scenarios/`, `Media/`, and `Support/`
+- `PrompterOne.Web.UITests`: shared Playwright/browser-host harness, synthetic media assets, browser constants, seed data, and helper drivers used by all browser suites
+- `PrompterOne.Web.UITests.Shell`: Playwright browser flows for app shell, diagnostics, library, localization, settings, and browser-host infrastructure
+- `PrompterOne.Web.UITests.Studio`: Playwright browser flows for GoLive, media, and end-to-end studio workflows
+- `PrompterOne.Web.UITests.Editor`: Playwright browser flows for editor authoring, Monaco, toolbar, layout, and performance
+- `PrompterOne.Web.UITests.Reader`: Playwright browser flows for Learn, Reader, Teleprompter, and responsive reading surfaces
 - `PrompterOne.Testing`: shared test-only infrastructure such as assertion adapters and environment-aware runner limits
 
 ## Constraints

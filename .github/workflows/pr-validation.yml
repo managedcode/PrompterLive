@@ -18,7 +18,6 @@ env:
   CORE_TEST_PROJECT: tests/PrompterOne.Core.Tests/PrompterOne.Core.Tests.csproj
   PLAYWRIGHT_CLI: tests/PrompterOne.Web.UITests/bin/Debug/net10.0/.playwright/package/cli.js
   SOLUTION_FILE: PrompterOne.slnx
-  UI_TEST_PROJECT: tests/PrompterOne.Web.UITests/PrompterOne.Web.UITests.csproj
 
 jobs:
   build_supporting_suites:
@@ -66,8 +65,8 @@ jobs:
           dotnet test --project "$CORE_TEST_PROJECT"
           dotnet test --project "$APP_TEST_PROJECT"
 
-  build_browser_suite:
-    name: Restore + Build Browser Suite
+  build_browser_suites:
+    name: Restore + Build Browser Suites
     runs-on: macos-latest
 
     steps:
@@ -85,10 +84,26 @@ jobs:
       - name: Build solution
         run: dotnet build "$SOLUTION_FILE" -warnaserror
 
-  test_browser_suite:
-    name: Run Browser Suite
-    needs: build_browser_suite
+  test_browser_suites:
+    name: Run Browser Suite (${{ matrix.suite.name }})
+    needs: build_browser_suites
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - name: Shell
+            artifact: shell
+            project: tests/PrompterOne.Web.UITests.Shell/PrompterOne.Web.UITests.Shell.csproj
+          - name: Studio
+            artifact: studio
+            project: tests/PrompterOne.Web.UITests.Studio/PrompterOne.Web.UITests.Studio.csproj
+          - name: Editor
+            artifact: editor
+            project: tests/PrompterOne.Web.UITests.Editor/PrompterOne.Web.UITests.Editor.csproj
+          - name: Reader
+            artifact: reader
+            project: tests/PrompterOne.Web.UITests.Reader/PrompterOne.Web.UITests.Reader.csproj
 
     steps:
       - name: Checkout
@@ -116,12 +131,12 @@ jobs:
         run: node "$PLAYWRIGHT_CLI" install chromium
 
       - name: Test browser suite
-        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity normal
+        run: dotnet test --project "${{ matrix.suite.project }}" --verbosity normal
 
       - name: Upload Playwright artifacts
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-artifacts-pr-validation
+          name: playwright-artifacts-pr-validation-${{ matrix.suite.artifact }}
           path: output/playwright/
           if-no-files-found: ignore
