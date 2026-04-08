@@ -44,7 +44,6 @@ jobs:
     name: Run Supporting Suites
     needs: build_supporting_suites
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -84,6 +83,10 @@ jobs:
     needs: build_browser_suite
     runs-on: macos-latest
 
+    env:
+      BROWSER_TEST_LOG_DIR: output/test-results/browser-suite
+      BROWSER_TEST_LOG_PATH: output/test-results/browser-suite/browser-suite.log
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -103,7 +106,31 @@ jobs:
         run: node "$PLAYWRIGHT_CLI" install chromium
 
       - name: Test browser suite
-        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity normal
+        id: browser_tests
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p "$BROWSER_TEST_LOG_DIR"
+          dotnet test --project "$UI_TEST_PROJECT" --verbosity normal 2>&1 | tee "$BROWSER_TEST_LOG_PATH"
+
+      - name: Summarize browser suite
+        if: always()
+        shell: bash
+        env:
+          BROWSER_TEST_OUTCOME: ${{ steps.browser_tests.outcome }}
+        run: |
+          bash ./scripts/ci/write-browser-suite-summary.sh \
+            "$BROWSER_TEST_LOG_PATH" \
+            "$BROWSER_TEST_OUTCOME" \
+            "Run Browser Suite" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload browser test logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-test-logs-pr-validation
+          path: ${{ env.BROWSER_TEST_LOG_DIR }}
+          if-no-files-found: ignore
 
       - name: Upload Playwright artifacts
         if: always()

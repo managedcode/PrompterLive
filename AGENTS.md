@@ -102,6 +102,8 @@ Rule format:
 - Editor footer status metrics must keep a stable one-row layout while cursor or count values change; line, column, word, and duration updates must not make neighboring status chips jump or reflow.
 - Editor footer status chrome should read like a quiet IDE status strip: one compact row, low emphasis, and no oversized chip or outlined-block treatment for static metrics.
 - Editor top-toolbar search must remain visible in narrow layouts; when width runs out, the other toolbar groups should become explicitly horizontally scrollable/reachable before search is allowed to disappear.
+- Do not push branches or `main` without an explicit user command for that push; local commits are allowed, but network publish actions require clear approval in the current conversation.
+- When a CI test job fails, times out, or is cancelled, the workflow summary must still state which tests failed or that the run ended before per-test failure data was available; do not leave browser-suite failures represented only by generic job annotations.
 - Public web hosting is split by role: the standalone PrompterOne app in this repo must publish on `app.prompter.one`, while the marketing landing site for `prompter.one` lives in the separate `PrompterOne-LandingPage` repository.
 - For deploy-only, domain, CI, or static-site hosting tasks, do not spend time on unrelated app/browser test suites unless the user explicitly asks or the runtime behavior itself changes; prefer workflow, build, and publish-config validation only.
 - Repo-wide .NET SDK and test-runner selection belong in the root `global.json`; do not split `global.json` test-runner opt-ins per project or subfolder once the user asks for a global test-platform policy.

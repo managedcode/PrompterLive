@@ -276,13 +276,7 @@ strategy:
         name: web
 ```
 
-### Timeout Configuration
 
-```yaml
-jobs:
-  analyze:
-    timeout-minutes: 60
-```
 
 ## Security Permissions
 
