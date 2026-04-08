@@ -117,6 +117,18 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
 
             await EditorMonacoDriver.FocusAsync(page);
             await EditorMonacoDriver.SetCaretAtEndAsync(page);
+            await page.EvaluateAsync(
+                """
+                () => {
+                    const probe = window.__editorHugeDraftProbe;
+                    if (!probe) {
+                        throw new Error("Huge draft performance probe was not initialized before reset.");
+                    }
+
+                    probe.longTasks.length = 0;
+                    probe.samples.length = 0;
+                }
+                """);
             await page.Keyboard.TypeAsync(EditorLargeDraftPerformanceTestData.FollowupTypingText, new() { Delay = 0 });
             await page.WaitForTimeoutAsync(EditorLargeDraftPerformanceTestData.ObservationDelayMs);
 

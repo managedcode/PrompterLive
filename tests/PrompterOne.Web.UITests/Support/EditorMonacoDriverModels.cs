@@ -40,6 +40,8 @@ internal sealed class EditorMonacoSelection
 {
     public int Column { get; set; }
 
+    public string Direction { get; set; } = string.Empty;
+
     public int End { get; set; }
 
     public int Line { get; set; }

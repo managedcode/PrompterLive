@@ -8,6 +8,12 @@ namespace PrompterOne.Web.UITests;
 
 internal static class EditorMonacoDriver
 {
+    private static class SelectionDirections
+    {
+        public const string Backward = "backward";
+        public const string Forward = "forward";
+    }
+
     internal sealed record DroppedFileDescriptor(string FileName, string Text);
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -157,7 +163,7 @@ internal static class EditorMonacoDriver
         var state = await GetStateAsync(page);
         var targetStart = FindTextStart(state.Text, targetText);
         var targetEnd = Math.Min(state.Text.Length, targetStart + characterCount);
-        await SetSelectionAsync(page, targetStart, targetEnd);
+        await SetSelectionAsync(page, targetStart, targetEnd, expectedDirection: SelectionDirections.Forward);
     }
 
     internal static async Task SetBackwardSelectionFromTextEndAsync(IPage page, string targetText, int characterCount)
@@ -166,16 +172,17 @@ internal static class EditorMonacoDriver
         var targetStart = FindTextStart(state.Text, targetText);
         var targetEnd = targetStart + targetText.Length;
         var selectionStart = Math.Max(0, targetEnd - characterCount);
-        await SetSelectionAsync(page, targetEnd, selectionStart);
+        await SetSelectionAsync(page, targetEnd, selectionStart, expectedDirection: SelectionDirections.Backward);
     }
 
-    internal static async Task SetSelectionAsync(IPage page, int start, int end, bool revealSelection = true)
+    internal static async Task SetSelectionAsync(IPage page, int start, int end, bool revealSelection = true, string? expectedDirection = null)
     {
         var selection = await InvokeHarnessAsync<EditorMonacoSelection>(page, "setSelection", new
         {
             start,
             end,
-            revealSelection
+            revealSelection,
+            selectionDirection = expectedDirection
         });
 
         await Assert.That(selection).IsNotNull();
@@ -187,6 +194,10 @@ internal static class EditorMonacoDriver
 
         await Assert.That(normalizedStart).IsEqualTo(orderedStart);
         await Assert.That(normalizedEnd).IsEqualTo(orderedEnd);
+        if (!string.IsNullOrEmpty(expectedDirection))
+        {
+            await Assert.That(selection.Direction).IsEqualTo(expectedDirection);
+        }
     }
 
     internal static async Task SetSelectionByTextAsync(IPage page, string targetText)

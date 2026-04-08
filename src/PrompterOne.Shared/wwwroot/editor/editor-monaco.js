@@ -330,16 +330,16 @@ export function getSelectionState(host) {
     return state ? createSelectionState(state) : createEmptySelectionState();
 }
 
-export async function setSelection(host, start, end, revealSelection = true, focusEditor = true) {
+export async function setSelection(host, start, end, revealSelection = true, focusEditor = true, selectionDirection = undefined) {
     const state = hostStates.get(host);
     if (!state) {
         return createEmptySelectionState();
     }
 
-    applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, undefined, undefined, focusEditor !== false);
-    await waitForSelectionState(state, start ?? 0, end ?? 0);
+    applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, selectionDirection, undefined, focusEditor !== false);
+    await waitForSelectionState(state, start ?? 0, end ?? 0, selectionDirection);
     await notifySelectionChangedAsync(state, false);
-    return await waitForSelectionState(state, start ?? 0, end ?? 0);
+    return await waitForSelectionState(state, start ?? 0, end ?? 0, selectionDirection);
 }
 
 export function setFindMatches(host, matches, activeMatchIndex = -1) {
@@ -501,12 +501,12 @@ function ensureHarness(options) {
                 }
                 : null;
         },
-        setSelection: async (testId, start, end, revealSelection = true) => {
+        setSelection: async (testId, start, end, revealSelection = true, selectionDirection = undefined) => {
             const state = getRequiredHarnessState(testId);
-            applySelection(state, start ?? 0, end ?? 0, revealSelection !== false);
-            await waitForSelectionState(state, start ?? 0, end ?? 0);
+            applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, selectionDirection);
+            await waitForSelectionState(state, start ?? 0, end ?? 0, selectionDirection);
             await notifySelectionChangedAsync(state, false);
-            return await waitForSelectionState(state, start ?? 0, end ?? 0);
+            return await waitForSelectionState(state, start ?? 0, end ?? 0, selectionDirection);
         },
         centerSelectionLine: testId => {
             const state = getRequiredHarnessState(testId);
@@ -785,18 +785,20 @@ async function waitForTextState(state, expectedText) {
     return createHarnessState(state, state.options);
 }
 
-function selectionMatchesOffsets(state, start, end) {
+function selectionMatchesOffsets(state, start, end, expectedDirection) {
     const selection = createSelectionState(state);
     const orderedStart = Math.min(start, end);
     const orderedEnd = Math.max(start, end);
+    const directionMatches = !expectedDirection || selection.direction === expectedDirection;
     return Math.min(selection.start, selection.end) === orderedStart &&
-        Math.max(selection.start, selection.end) === orderedEnd;
+        Math.max(selection.start, selection.end) === orderedEnd &&
+        directionMatches;
 }
 
-async function waitForSelectionState(state, start, end) {
-    const attempts = 12;
+async function waitForSelectionState(state, start, end, expectedDirection) {
+    const attempts = 24;
     for (let attempt = 0; attempt < attempts; attempt++) {
-        if (selectionMatchesOffsets(state, start, end)) {
+        if (selectionMatchesOffsets(state, start, end, expectedDirection)) {
             return createSelectionState(state);
         }
 
