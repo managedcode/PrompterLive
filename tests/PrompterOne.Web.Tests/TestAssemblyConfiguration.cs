@@ -9,5 +9,4 @@ namespace PrompterOne.Web.Tests;
 /// </summary>
 public sealed class MaxParallelTestsForPipeline : EnvironmentAwareParallelLimitBase
 {
-    protected override int LocalLimit { get; } = 15;
 }
