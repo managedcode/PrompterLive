@@ -308,8 +308,6 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
 
             var savedRecording = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.GetSavedRecordingStateScript);
             var savedAnalysis = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.AnalyzeSavedRecordingScript);
-            Console.WriteLine($"SAVED_RECORDING={savedRecording.GetRawText()}");
-            Console.WriteLine($"SAVED_ANALYSIS={savedAnalysis.GetRawText()}");
 
             await Assert.That(savedRecording.GetProperty("pickerCallCount").GetInt32() >= 1).IsTrue();
             await Assert.That(savedRecording.GetProperty("sizeBytes").GetInt64() > 0).IsTrue();
@@ -348,24 +346,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
             await Expect(micChannel)
                 .ToHaveAttributeAsync(BrowserTestConstants.GoLive.LiveStateAttributeName, BrowserTestConstants.GoLive.ActiveStateValue);
 
-            var audioGeneratorCapabilities = await page.EvaluateAsync<string>(
-                "() => `${typeof window.MediaStreamTrackGenerator}|${typeof window.AudioData}`");
-            Console.WriteLine($"AUDIO_CAPS={audioGeneratorCapabilities}");
-            var harnessAudioState = await page.EvaluateAsync<string>(
-                "() => JSON.stringify(window.__prompterOneMediaHarness?.getAudioDebugState?.() ?? null)");
-            Console.WriteLine($"AUDIO_HARNESS_BEFORE={harnessAudioState}");
             await page.GetByTestId(UiTestIds.GoLive.StartRecording).ClickAsync();
-            for (var attempt = 0; attempt < 2; attempt++)
-            {
-                await page.WaitForTimeoutAsync(1000);
-                var harnessState = await page.EvaluateAsync<string>(
-                    "() => JSON.stringify(window.__prompterOneMediaHarness?.getAudioDebugState?.() ?? null)");
-                var debugRuntimeState = await page.EvaluateAsync<JsonElement>(
-                    BrowserTestConstants.GoLive.GetRuntimeStateScript,
-                    BrowserTestConstants.GoLive.RuntimeSessionId);
-                Console.WriteLine($"AUDIO_HARNESS[{attempt}]={harnessState}");
-                Console.WriteLine($"AUDIO_DEBUG[{attempt}]={debugRuntimeState.GetRawText()}");
-            }
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.RecordingRuntimeAudioLevelsReadyScript,
                 new object[] { BrowserTestConstants.GoLive.RuntimeSessionId, BrowserTestConstants.GoLive.MinimumActiveLevelPercent },

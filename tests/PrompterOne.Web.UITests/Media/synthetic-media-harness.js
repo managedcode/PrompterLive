@@ -515,14 +515,6 @@
         restoreDeviceLabels() {
             deviceLabelOverrides.clear();
         },
-        getAudioDebugState() {
-            return {
-                lastAudioError,
-                lastAudioLevelPercent,
-                lastAudioMode,
-                sharedAudioContextState: emptyDeviceLabel
-            };
-        },
         clearRequestLog() {
             requestLog.length = 0;
         },

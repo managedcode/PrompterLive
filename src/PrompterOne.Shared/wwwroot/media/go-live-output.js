@@ -286,33 +286,11 @@
 
     function buildRuntimeState(session) {
         const programState = getComposer().getProgramState(session);
-        const programAudioTrack = session.mediaStream?.getAudioTracks?.()?.[0] ?? null;
-        const programVideoTrack = session.mediaStream?.getVideoTracks?.()?.[0] ?? null;
-        const audioBindings = [...(session.audioBindings?.entries?.() ?? [])].map(([deviceId, binding]) => ({
-            deviceId,
-            inputLevelPercent: binding?.inputLevelPercent ?? 0,
-            outputConnected: binding?.outputConnected ?? false,
-            trackEnabled: binding?.track?.mediaStreamTrack?.enabled ?? false,
-            trackMuted: binding?.track?.mediaStreamTrack?.muted ?? false,
-            trackReadyState: binding?.track?.mediaStreamTrack?.readyState ?? ""
-        }));
         return {
             audioDeviceId: session.audioDeviceId,
             audio: {
                 programLevelPercent: session.programLevelPercent,
                 recordingLevelPercent: session.recordingActive ? session.programLevelPercent : 0
-            },
-            debugMedia: {
-                audioTrackCount: session.mediaStream?.getAudioTracks?.()?.length ?? 0,
-                audioTrackEnabled: programAudioTrack?.enabled ?? false,
-                audioTrackMuted: programAudioTrack?.muted ?? false,
-                audioTrackReadyState: programAudioTrack?.readyState ?? "",
-                audioBindings,
-                audioContextState: session.audioContext?.state ?? "",
-                destinationAudioTrackCount: session.audioDestination?.stream?.getAudioTracks?.()?.length ?? 0,
-                programTrackCount: session.mediaStream?.getTracks?.()?.length ?? 0,
-                videoTrackCount: session.mediaStream?.getVideoTracks?.()?.length ?? 0,
-                videoTrackReadyState: programVideoTrack?.readyState ?? ""
             },
             hasMediaStream: Boolean(session.mediaStream),
             liveKit: {
