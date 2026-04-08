@@ -120,7 +120,7 @@ jobs:
         run: node "$PLAYWRIGHT_CLI" install chromium
 
       - name: Test browser suite
-        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity minimal
+        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity normal
 
       - name: Upload Playwright artifacts
         if: always()
