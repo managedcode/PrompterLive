@@ -279,23 +279,6 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
     state.hostDragOverHandler = hostDragOverHandler;
     state.hostDropHandler = hostDropHandler;
 
-    const proxySelectionHandler = () => {
-        if (state.suppressProxySelection) {
-            return;
-        }
-
-        applySelection(
-            state,
-            proxy.selectionStart ?? 0,
-            proxy.selectionEnd ?? 0,
-            false,
-            proxy.selectionDirection ?? "none");
-    };
-
-    proxy.addEventListener("select", proxySelectionHandler);
-    proxy.addEventListener("keyup", proxySelectionHandler);
-    state.proxySelectionHandler = proxySelectionHandler;
-
     hostStates.set(host, state);
     host.setAttribute(options.editorEngineAttributeName, options.editorEngineAttributeValue);
     host.setAttribute(options.editorReadyAttributeName, "true");
@@ -382,8 +365,6 @@ export function disposeEditor(host) {
 
     state.host.removeEventListener("dragover", state.hostDragOverHandler);
     state.host.removeEventListener("drop", state.hostDropHandler);
-    state.proxy.removeEventListener("select", state.proxySelectionHandler);
-    state.proxy.removeEventListener("keyup", state.proxySelectionHandler);
     state.decorationCollection.clear();
     state.findDecorationCollection.clear();
     for (const subscription of state.subscriptions) {

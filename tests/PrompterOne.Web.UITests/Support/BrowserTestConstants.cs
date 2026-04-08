@@ -285,7 +285,6 @@ internal static partial class BrowserTestConstants
         public const double MinimapStageEdgeTolerancePx = 18;
         public const double MinimumContentLeftWithLineNumbersPx = 36;
         public const double MaximumLayoutViewportRightGapPx = 2;
-        public const double MinimumMainPanelGrowthOnCollapsePx = 96;
         public const double MaximumCollapsedMetadataRailWidthPx = 72;
         public const double MetadataRailDockGapPx = 10;
         public const double MetadataRailDockTolerancePx = 2;

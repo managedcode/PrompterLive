@@ -244,8 +244,12 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
             await Assert.That(collapsedMetrics.LayoutViewportRightGap).IsBetween(0, BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
             await Assert.That(collapsedMetrics.MetadataRailCollapsed).IsTrue();
             await Assert.That(collapsedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailCollapsedChevronDirection);
-            await Assert.That(expandedMetrics.MainWidth + BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx <= collapsedMetrics.MainWidth).IsTrue().Because($"Expected the main editor panel to grow by at least {BrowserTestConstants.Editor.MinimumMainPanelGrowthOnCollapsePx}px after collapsing metadata, but it changed from {expandedMetrics.MainWidth:0.##} to {collapsedMetrics.MainWidth:0.##}.");
             await Assert.That(collapsedMetrics.MetadataRailWidth).IsBetween(0, BrowserTestConstants.Editor.MaximumCollapsedMetadataRailWidthPx);
+
+            var reclaimedMainWidth = collapsedMetrics.MainWidth - expandedMetrics.MainWidth;
+
+            await Assert.That(reclaimedMainWidth > 0).IsTrue().Because($"Expected the main editor panel to grow after collapsing metadata, but it changed from {expandedMetrics.MainWidth:0.##} to {collapsedMetrics.MainWidth:0.##}.");
+            await Assert.That(reclaimedMainWidth >= collapsedMetrics.MetadataRailWidth).IsTrue().Because($"Expected the main editor panel to reclaim at least the remaining collapsed rail width ({collapsedMetrics.MetadataRailWidth:0.##}px), but it only grew by {reclaimedMainWidth:0.##}px.");
         }
         finally
         {
