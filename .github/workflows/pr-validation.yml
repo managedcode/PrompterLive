@@ -58,8 +58,8 @@ jobs:
 
       - name: Test supporting suites
         run: |
-          dotnet test --project "$CORE_TEST_PROJECT" --verbosity minimal
-          dotnet test --project "$APP_TEST_PROJECT" --verbosity minimal
+          dotnet test --project "$CORE_TEST_PROJECT" --verbosity normal
+          dotnet test --project "$APP_TEST_PROJECT" --verbosity normal
 
   build_browser_suite:
     name: Restore + Build Browser Suite
@@ -106,7 +106,7 @@ jobs:
         run: node "$PLAYWRIGHT_CLI" install chromium
 
       - name: Test browser suite
-        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity minimal
+        run: dotnet test --project "$UI_TEST_PROJECT" --verbosity normal
 
       - name: Upload Playwright artifacts
         if: always()
