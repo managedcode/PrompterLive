@@ -859,7 +859,7 @@
     <value>Terminer la visite</value>
   </data>
   <data name="OnboardingStepLibrary" xml:space="preserve">
-    <value>Bibliothèque</value>
+    <value>PrompterOne</value>
   </data>
   <data name="OnboardingStepTps" xml:space="preserve">
     <value>TPS</value>

@@ -77,6 +77,7 @@ Rule format:
 - remove obsolete rules when a better one replaces them
 
 - Use `PrompterOne` as the canonical product, solution, namespace, and folder name across code, docs, tests, and build paths; do not reintroduce legacy product-name variants after the rename.
+- Localized UI copy must keep the product brand as `PrompterOne` in every language; do not translate, transliterate, or inflect the app name into locale-specific variants such as `СуфлерOne`.
 - Repo-owned docs, README, ADRs, and AGENTS files must not contain local usernames, home-directory paths, or personal machine-specific references; use repo-relative paths or neutral wording instead.
 - Public-facing screenshots and any screenshot-generating or screenshot-asserting tests must use English-visible content so README, docs, and release assets stay globally readable and consistent.
 - Public-facing screenshots that include camera or preview feeds must not ship mirrored or reversed readable text; choose or configure the capture so visible text reads correctly in the final asset.
@@ -441,7 +442,7 @@ Repo-specific design rules:
 - Never introduce a non-SOLID design unless the exception is explicitly documented under `exception_policy`.
 - Never force-push to `main`.
 - Never approve or merge on behalf of a human maintainer.
-- When the task explicitly needs delivery, the agent may commit, push to `main` or a feature branch, open a PR, and merge it after the required tests and validation commands pass.
+- The agent may commit locally after the required tests and validation commands pass, but it must not push, merge, or otherwise publish repo changes until the user gives an explicit command to do so.
 
 ### Boundaries
 
@@ -488,6 +489,7 @@ Ask first:
 - any continued xUnit ownership of the repo test stack; when the user asks for TUnit, remove xUnit packages and attributes instead of leaving a mixed long-term setup behind
 - any use of `--no-build` in repo commands, docs, or CI; test runs must rebuild against the current source and current WASM assets every time
 - mixed-language root README or public entry docs; keep them English-only unless the user explicitly asks otherwise
+- any push or publish action without the user's explicit command; local commits are fine, but network delivery must stay user-controlled
 - any reintroduction of a repo-local `design/` prototype folder as a parallel source of truth; the shipped Blazor UI must be the only product reference
 - fake `display_*` or other presentation-only script metrics that override real TPS-derived words, segments, speed, or duration in user-facing UI
 - made-up About/team content or stale attribution; About must point to real Managed Code ownership and official links

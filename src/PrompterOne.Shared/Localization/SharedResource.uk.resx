@@ -874,7 +874,7 @@
     <value>Завершити тур</value>
   </data>
   <data name="OnboardingStepLibrary" xml:space="preserve">
-    <value>Бібліотека</value>
+    <value>PrompterOne</value>
   </data>
   <data name="OnboardingStepTps" xml:space="preserve">
     <value>TPS</value>
