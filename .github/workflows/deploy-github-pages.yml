@@ -66,8 +66,8 @@ jobs:
 
       - name: Test supporting suites
         run: |
-          dotnet test --project "$CORE_TEST_PROJECT" --verbosity minimal
-          dotnet test --project "$APP_TEST_PROJECT" --verbosity minimal
+          dotnet test --project "$CORE_TEST_PROJECT" --verbosity normal
+          dotnet test --project "$APP_TEST_PROJECT" --verbosity normal
 
   build_browser_suite:
     name: Restore + Build Browser Suite
