@@ -258,6 +258,9 @@ internal static partial class BrowserTestConstants
         public const double MenuDismissClickVerticalFactor = 0.5;
         public const int MenuDismissRightInsetPx = 96;
         public const int LocalHistoryAutosaveObservationDelayMs = 1900;
+        public const int LocalHistoryCurrentRevisionIndex = 0;
+        public const int LocalHistoryPreviousRevisionIndex = 1;
+        public const int LocalHistoryOriginalRevisionIndex = 2;
         public const string LocalHistoryFirstLine = "First browser-local revision for restore.";
         public const string LocalHistorySecondLine = "Second browser-local revision for restore.";
         public const string LocalHistoryUnsavedLine = "Autosave disabled should keep this line local.";

@@ -31,6 +31,11 @@ internal static class EditorMonacoDriver
     {
         var browserErrors = BrowserErrorCollector.Attach(page);
 
+        await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(new()
+        {
+            Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+        });
+
         await Expect(SourceStage(page)).ToBeVisibleAsync(new()
         {
             Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs

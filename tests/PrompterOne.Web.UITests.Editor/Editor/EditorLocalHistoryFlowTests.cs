@@ -26,10 +26,12 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             var secondRevisionText = string.Concat(firstRevisionText, "\n", BrowserTestConstants.Editor.LocalHistorySecondLine);
 
             await EditorMonacoDriver.SetTextAsync(page, firstRevisionText);
-            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(0))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(BrowserTestConstants.Editor.LocalHistoryPreviousRevisionIndex)))
+                .ToBeVisibleAsync();
 
             await EditorMonacoDriver.SetTextAsync(page, secondRevisionText);
-            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(1))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(BrowserTestConstants.Editor.LocalHistoryOriginalRevisionIndex)))
+                .ToBeVisibleAsync();
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
                 BrowserTestConstants.EditorFlow.LocalHistoryScenario,
@@ -40,7 +42,8 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(sourceInput).ToHaveValueAsync(secondRevisionText);
 
-            await page.GetByTestId(UiTestIds.Editor.LocalHistoryRestore(1)).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.LocalHistoryRestore(BrowserTestConstants.Editor.LocalHistoryPreviousRevisionIndex))
+                .ClickAsync();
             await Expect(sourceInput).ToHaveValueAsync(firstRevisionText);
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -59,6 +62,14 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.LocalHistoryAutosaveScenario);
 
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
+                page,
+                BrowserTestConstants.Scripts.DemoId,
+                setSeedTitle: false);
+            var draftUrl = page.Url;
+            var sourceInput = EditorMonacoDriver.SourceInput(page);
+            var originalText = await sourceInput.InputValueAsync();
+
             await page.GotoAsync(BrowserTestConstants.Routes.Settings);
             await page.GetByTestId(UiTestIds.Settings.NavFiles).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.FilesPanel)).ToBeVisibleAsync();
@@ -66,16 +77,11 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.DisabledValue);
 
-            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
-                page,
-                BrowserTestConstants.Scripts.DemoId,
-                setSeedTitle: false,
-                waitForPersistedRoute: false);
+            await page.GotoAsync(draftUrl);
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
 
-            var sourceInput = EditorMonacoDriver.SourceInput(page);
-            var originalText = await sourceInput.InputValueAsync();
             var unsavedText = string.Concat(originalText, "\n", BrowserTestConstants.Editor.LocalHistoryUnsavedLine);
 
             await EditorMonacoDriver.SetTextAsync(page, unsavedText);
@@ -95,10 +101,8 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
 
-            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
-                page,
-                BrowserTestConstants.Scripts.DemoId,
-                setSeedTitle: false);
+            await page.GotoAsync(draftUrl);
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
 
@@ -108,7 +112,8 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.Editor.LocalHistoryResavedLine);
 
             await EditorMonacoDriver.SetTextAsync(page, resavedText);
-            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(0))).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(BrowserTestConstants.Editor.LocalHistoryPreviousRevisionIndex)))
+                .ToBeVisibleAsync();
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
                 BrowserTestConstants.EditorFlow.LocalHistoryAutosaveScenario,

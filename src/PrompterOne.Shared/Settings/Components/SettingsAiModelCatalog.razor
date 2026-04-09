@@ -1,0 +1,146 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Contracts
+@using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Settings.Models
+@using PrompterOne.Shared.Settings.Components
+@inject IStringLocalizer<SharedResource> Localizer
+
+<div class="set-device-fields">
+    <div class="set-path-field set-path-field-actions">
+        <p class="set-card-copy">@Text(UiTextKey.CommonModels)</p>
+        <button class="set-btn-outline set-btn-sm"
+                type="button"
+                data-test="@UiTestIds.Settings.AiProviderModelAdd(ProviderId)"
+                @onclick="AddModelAsync"
+                @onclick:stopPropagation="true">
+            @Text(UiTextKey.CommonAddModel)
+        </button>
+    </div>
+
+    @for (var index = 0; index < Models.Count; index++)
+    {
+        var currentIndex = index;
+        var model = Models[currentIndex];
+
+        <div class="set-device-fields"
+             data-test="@UiTestIds.Settings.AiProviderModel(ProviderId, currentIndex)">
+            <div class="set-field">
+                <label>@ModelNameLabel</label>
+                <input type="text"
+                       class="set-input"
+                       placeholder="@ModelNamePlaceholder"
+                       data-test="@UiTestIds.Settings.AiProviderModelField(ProviderId, currentIndex, SettingsAiModelFieldIds.Name)"
+                       @bind="model.Name"
+                       @onclick:stopPropagation="true" />
+            </div>
+
+            @if (ShowModelPath)
+            {
+                <div class="set-field">
+                    <label>@EffectiveModelPathLabel</label>
+                    <input type="text"
+                           class="set-input"
+                           placeholder="@ModelPathPlaceholder"
+                           data-test="@UiTestIds.Settings.AiProviderModelField(ProviderId, currentIndex, SettingsAiModelFieldIds.Path)"
+                           @bind="model.ModelPath"
+                           @onclick:stopPropagation="true" />
+                </div>
+            }
+
+            <div class="set-field">
+                <label>@Text(UiTextKey.CommonModelType)</label>
+                <SettingsSelect Value="@model.Type"
+                                TestId="@UiTestIds.Settings.AiProviderModelField(ProviderId, currentIndex, SettingsAiModelFieldIds.Type)"
+                                Options="@BuildModelTypeOptions()"
+                                OnChange="args => OnModelTypeChangedAsync(currentIndex, args)" />
+            </div>
+
+            <div class="set-field">
+                <label>@Text(UiTextKey.CommonContextSize)</label>
+                <input type="number"
+                       min="1"
+                       step="1"
+                       class="set-input"
+                       data-test="@UiTestIds.Settings.AiProviderModelField(ProviderId, currentIndex, SettingsAiModelFieldIds.ContextSize)"
+                       @bind="model.ContextSize"
+                       @onclick:stopPropagation="true" />
+            </div>
+
+            <div class="set-field">
+                <label>@Text(UiTextKey.CommonRemoveModel)</label>
+                <button class="set-btn-outline set-btn-sm"
+                        type="button"
+                        data-test="@UiTestIds.Settings.AiProviderModelRemove(ProviderId, currentIndex)"
+                        @onclick="() => RemoveModelAsync(currentIndex)"
+                        @onclick:stopPropagation="true">
+                    @Text(UiTextKey.CommonRemoveModel)
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Func<AiProviderModelSettings> CreateModel { get; set; } = static () => new();
+    [Parameter] public string ModelNameLabel { get; set; } = string.Empty;
+    [Parameter] public string ModelNamePlaceholder { get; set; } = string.Empty;
+    [Parameter] public string ModelPathLabel { get; set; } = string.Empty;
+    [Parameter] public string ModelPathPlaceholder { get; set; } = string.Empty;
+    [Parameter] public IList<AiProviderModelSettings> Models { get; set; } = [];
+    [Parameter] public EventCallback OnChanged { get; set; }
+    [Parameter] public string ProviderId { get; set; } = string.Empty;
+    [Parameter] public bool ShowModelPath { get; set; }
+
+    private string EffectiveModelPathLabel =>
+        string.IsNullOrWhiteSpace(ModelPathLabel)
+            ? Text(UiTextKey.CommonModelPath)
+            : ModelPathLabel;
+
+    private async Task AddModelAsync()
+    {
+        Models.Add(CreateModel());
+        await NotifyChangedAsync();
+    }
+
+    private IReadOnlyList<SettingsSelectOption> BuildModelTypeOptions() =>
+    [
+        new(AiProviderModelTypes.Text, Text(UiTextKey.CommonText)),
+        new(AiProviderModelTypes.Embeddings, Text(UiTextKey.CommonEmbeddings)),
+        new(AiProviderModelTypes.AudioToText, Text(UiTextKey.CommonAudioToText)),
+        new(AiProviderModelTypes.TextToAudio, Text(UiTextKey.CommonTextToAudio))
+    ];
+
+    private async Task NotifyChangedAsync()
+    {
+        if (OnChanged.HasDelegate)
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+
+    private async Task OnModelTypeChangedAsync(int index, ChangeEventArgs args)
+    {
+        if (index < 0 || index >= Models.Count)
+        {
+            return;
+        }
+
+        Models[index].Type = args.Value?.ToString() ?? string.Empty;
+        await NotifyChangedAsync();
+    }
+
+    private async Task RemoveModelAsync(int index)
+    {
+        if (index < 0 || index >= Models.Count)
+        {
+            return;
+        }
+
+        Models.RemoveAt(index);
+        await NotifyChangedAsync();
+    }
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+}

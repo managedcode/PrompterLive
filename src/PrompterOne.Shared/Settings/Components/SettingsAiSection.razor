@@ -47,15 +47,6 @@
                                @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>@Text(UiTextKey.CommonModel)</label>
-                        <input type="text"
-                               class="set-input"
-                               placeholder="claude-haiku-4-5"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.ClaudeApi, ModelFieldId)"
-                               @bind="_settings.ClaudeApi.Model"
-                               @onclick:stopPropagation="true" />
-                    </div>
-                    <div class="set-field">
                         <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
                         <input type="text"
                                class="set-input"
@@ -65,6 +56,13 @@
                                @onclick:stopPropagation="true" />
                     </div>
                 </div>
+
+                <SettingsAiModelCatalog ProviderId="@SettingsAiProviderIds.ClaudeApi"
+                                        Models="@_settings.ClaudeApi.Models"
+                                        ModelNameLabel="@Text(UiTextKey.CommonModel)"
+                                        ModelNamePlaceholder="claude-sonnet-4-6"
+                                        CreateModel="@CreateEmptyRemoteModel"
+                                        OnChanged="HandleModelCatalogChangedAsync" />
             </ChildContent>
         </SettingsAiProviderCard>
 
@@ -106,15 +104,6 @@
                                @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>@Text(UiTextKey.CommonModel)</label>
-                        <input type="text"
-                               class="set-input"
-                               placeholder="gpt-4o-mini"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, ModelFieldId)"
-                               @bind="_settings.OpenAi.Model"
-                               @onclick:stopPropagation="true" />
-                    </div>
-                    <div class="set-field">
                         <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
                         <input type="text"
                                class="set-input"
@@ -124,6 +113,13 @@
                                @onclick:stopPropagation="true" />
                     </div>
                 </div>
+
+                <SettingsAiModelCatalog ProviderId="@SettingsAiProviderIds.OpenAi"
+                                        Models="@_settings.OpenAi.Models"
+                                        ModelNameLabel="@Text(UiTextKey.CommonModel)"
+                                        ModelNamePlaceholder="gpt-4o-mini"
+                                        CreateModel="@CreateEmptyRemoteModel"
+                                        OnChanged="HandleModelCatalogChangedAsync" />
             </ChildContent>
         </SettingsAiProviderCard>
 
@@ -165,15 +161,6 @@
                                @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
-                        <label>@Text(UiTextKey.CommonDeployment)</label>
-                        <input type="text"
-                               class="set-input"
-                               placeholder="gpt-4o-mini"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, DeploymentFieldId)"
-                               @bind="_settings.AzureOpenAi.Deployment"
-                               @onclick:stopPropagation="true" />
-                    </div>
-                    <div class="set-field">
                         <label>@Text(UiTextKey.CommonApiVersion)</label>
                         <input type="text"
                                class="set-input"
@@ -192,6 +179,13 @@
                                @onclick:stopPropagation="true" />
                     </div>
                 </div>
+
+                <SettingsAiModelCatalog ProviderId="@SettingsAiProviderIds.AzureOpenAi"
+                                        Models="@_settings.AzureOpenAi.Models"
+                                        ModelNameLabel="@Text(UiTextKey.CommonDeployment)"
+                                        ModelNamePlaceholder="gpt-4o-mini"
+                                        CreateModel="@CreateEmptyRemoteModel"
+                                        OnChanged="HandleModelCatalogChangedAsync" />
             </ChildContent>
         </SettingsAiProviderCard>
 
@@ -225,16 +219,14 @@
                                @bind="_settings.Ollama.Endpoint"
                                @onclick:stopPropagation="true" />
                     </div>
-                    <div class="set-field">
-                        <label>@Text(UiTextKey.CommonModel)</label>
-                        <input type="text"
-                               class="set-input"
-                               placeholder="llama3.2"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.Ollama, ModelFieldId)"
-                               @bind="_settings.Ollama.Model"
-                               @onclick:stopPropagation="true" />
-                    </div>
                 </div>
+
+                <SettingsAiModelCatalog ProviderId="@SettingsAiProviderIds.Ollama"
+                                        Models="@_settings.Ollama.Models"
+                                        ModelNameLabel="@Text(UiTextKey.CommonModel)"
+                                        ModelNamePlaceholder="llama3.2:3b"
+                                        CreateModel="@CreateEmptyRemoteModel"
+                                        OnChanged="HandleModelCatalogChangedAsync" />
             </ChildContent>
         </SettingsAiProviderCard>
 
@@ -260,25 +252,6 @@
             <ChildContent>
                 <div class="set-device-fields">
                     <div class="set-field">
-                        <label>@Text(UiTextKey.CommonModelPath)</label>
-                        <input type="text"
-                               class="set-input"
-                               placeholder="/models/llama3.2.gguf"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.LlamaSharp, ModelPathFieldId)"
-                               @bind="_settings.LlamaSharp.ModelPath"
-                               @onclick:stopPropagation="true" />
-                    </div>
-                    <div class="set-field">
-                        <label>@Text(UiTextKey.CommonContextSize)</label>
-                        <input type="number"
-                               min="1"
-                               step="1"
-                               class="set-input"
-                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.LlamaSharp, ContextSizeFieldId)"
-                               @bind="_settings.LlamaSharp.ContextSize"
-                               @onclick:stopPropagation="true" />
-                    </div>
-                    <div class="set-field">
                         <label>@Text(UiTextKey.CommonGpuLayers)</label>
                         <input type="number"
                                min="0"
@@ -289,6 +262,15 @@
                                @onclick:stopPropagation="true" />
                     </div>
                 </div>
+
+                <SettingsAiModelCatalog ProviderId="@SettingsAiProviderIds.LlamaSharp"
+                                        Models="@_settings.LlamaSharp.Models"
+                                        ModelNameLabel="@Text(UiTextKey.CommonModel)"
+                                        ModelNamePlaceholder="llama-3.2-3b-instruct"
+                                        ModelPathPlaceholder="/models/llama-3.2-3b-instruct.gguf"
+                                        CreateModel="@CreateEmptyLocalModel"
+                                        ShowModelPath="true"
+                                        OnChanged="HandleModelCatalogChangedAsync" />
             </ChildContent>
         </SettingsAiProviderCard>
     </div>

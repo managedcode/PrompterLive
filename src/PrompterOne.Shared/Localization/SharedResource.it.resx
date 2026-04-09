@@ -235,7 +235,7 @@
     <value>Provider IA</value>
   </data>
   <data name="SettingsAiSectionDescription" xml:space="preserve">
-    <value>Conserva le bozze dei provider IA localmente in questo browser. I test di connessione runtime non sono ancora implementati, quindi ogni provider resta scollegato finché non arriverà una vera integrazione.</value>
+    <value>Salva i profili dei provider IA localmente in questo browser. PrompterOne conserva questi valori come configurazione locale e non valida le credenziali remote quando salvi.</value>
   </data>
   <data name="SettingsRecordingSectionTitle" xml:space="preserve">
     <value>Registrazione</value>
@@ -737,5 +737,68 @@
   </data>
   <data name="FeedbackDialogMessageRequired" xml:space="preserve">
     <value>Aggiungi una breve descrizione prima di inviare il feedback.</value>
+  </data>
+  <data name="CommonApiVersion" xml:space="preserve">
+    <value>Versione API</value>
+  </data>
+  <data name="CommonClientType" xml:space="preserve">
+    <value>Tipo di client</value>
+  </data>
+  <data name="CommonDeployment" xml:space="preserve">
+    <value>Distribuzione</value>
+  </data>
+  <data name="CommonEndpoint" xml:space="preserve">
+    <value>Endpoint</value>
+  </data>
+  <data name="CommonContextSize" xml:space="preserve">
+    <value>Dimensione contesto</value>
+  </data>
+  <data name="CommonGpuLayers" xml:space="preserve">
+    <value>Livelli GPU</value>
+  </data>
+  <data name="CommonModelPath" xml:space="preserve">
+    <value>Percorso modello</value>
+  </data>
+  <data name="SettingsAiClaudeTitle" xml:space="preserve">
+    <value>Anthropic</value>
+  </data>
+  <data name="SettingsAiOpenAiTitle" xml:space="preserve">
+    <value>OpenAI</value>
+  </data>
+  <data name="SettingsAiAzureOpenAiTitle" xml:space="preserve">
+    <value>Azure OpenAI</value>
+  </data>
+  <data name="SettingsAiLlamaSharpTitle" xml:space="preserve">
+    <value>LLamaSharp</value>
+  </data>
+  <data name="SettingsAiOllamaTitle" xml:space="preserve">
+    <value>Ollama</value>
+  </data>
+  <data name="SettingsAiOllamaUrlLabel" xml:space="preserve">
+    <value>Endpoint Ollama</value>
+  </data>
+  <data name="CommonModels" xml:space="preserve">
+    <value>Modelli</value>
+  </data>
+  <data name="CommonAddModel" xml:space="preserve">
+    <value>Aggiungi modello</value>
+  </data>
+  <data name="CommonRemoveModel" xml:space="preserve">
+    <value>Rimuovi modello</value>
+  </data>
+  <data name="CommonModelType" xml:space="preserve">
+    <value>Tipo di modello</value>
+  </data>
+  <data name="CommonText" xml:space="preserve">
+    <value>Testo</value>
+  </data>
+  <data name="CommonEmbeddings" xml:space="preserve">
+    <value>Embeddings</value>
+  </data>
+  <data name="CommonAudioToText" xml:space="preserve">
+    <value>Audio in testo</value>
+  </data>
+  <data name="CommonTextToAudio" xml:space="preserve">
+    <value>Testo in audio</value>
   </data>
 </root>

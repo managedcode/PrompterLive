@@ -28,6 +28,8 @@ public sealed class SettingsInteractionTests : BunitContext
     private const string DropboxValidationMessage = "Dropbox requires an access token or a refresh token with app key.";
     private const string NotConnectedLabel = "Not connected";
     private const string ClaudeConfiguredModel = "claude-opus-4-6";
+    private const int CustomOpenAiModelContextSize = 64000;
+    private const string CustomOpenAiModelName = "whisper-large-v3";
     private const string OllamaConfiguredAuthority = "ollama.local:11434";
     private const string OllamaConfiguredModel = "llama3.2";
     private const string OpenAiConfiguredModel = "o3-mini";
@@ -242,8 +244,7 @@ public sealed class SettingsInteractionTests : BunitContext
 
         cut.FindByTestId(UiTestIds.Settings.NavAi).Click();
         cut.FindByTestId(UiTestIds.Settings.AiProvider(SettingsAiProviderIds.OpenAi)).Click();
-        cut.FindAll("input")
-            .First(input => string.Equals(input.GetAttribute("placeholder"), "sk-...", StringComparison.Ordinal))
+        cut.FindByTestId(UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, SettingsAiProviderFieldIds.ApiKey))
             .Change("sk-live-openai");
         cut.FindByTestId(UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.OpenAi)).Click();
 
@@ -261,16 +262,40 @@ public sealed class SettingsInteractionTests : BunitContext
         {
             ClaudeApi = new AnthropicAiProviderSettings
             {
-                Model = ClaudeConfiguredModel
+                ApiKey = "sk-ant-configured",
+                Model = string.Empty,
+                Models =
+                [
+                    AiProviderModelSettings.Create(
+                        ClaudeConfiguredModel,
+                        AiProviderModelTypes.Text,
+                        AiProviderModelCatalogDefaults.AnthropicContextSize)
+                ]
             },
             OpenAi = new OpenAiProviderSettings
             {
-                Model = OpenAiConfiguredModel
+                ApiKey = "sk-openai-configured",
+                ClientType = AiProviderClientTypes.Responses,
+                Model = string.Empty,
+                Models =
+                [
+                    AiProviderModelSettings.Create(
+                        OpenAiConfiguredModel,
+                        AiProviderModelTypes.Text,
+                        AiProviderModelCatalogDefaults.CloudTextContextSize)
+                ]
             },
             Ollama = new OllamaAiProviderSettings
             {
                 Endpoint = $"http://{OllamaConfiguredAuthority}",
-                Model = OllamaConfiguredModel
+                Model = string.Empty,
+                Models =
+                [
+                    AiProviderModelSettings.Create(
+                        OllamaConfiguredModel,
+                        AiProviderModelTypes.Text,
+                        AiProviderModelSettings.DefaultContextSize)
+                ]
             }
         };
 
@@ -283,12 +308,52 @@ public sealed class SettingsInteractionTests : BunitContext
                 $"{Text(UiTextKey.SettingsAiClaudeTitle)} · {ClaudeConfiguredModel}",
                 cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.ClaudeApi)).TextContent.Trim());
             Assert.Equal(
-                $"{Text(UiTextKey.SettingsAiOpenAiTitle)} · {OpenAiConfiguredModel}",
+                $"{Text(UiTextKey.SettingsAiOpenAiTitle)} · Responses · {OpenAiConfiguredModel}",
                 cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.OpenAi)).TextContent.Trim());
             Assert.Equal(
                 $"Self-hosted · {OllamaConfiguredAuthority} · {OllamaConfiguredModel}",
                 cut.FindByTestId(UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.Ollama)).TextContent.Trim());
         });
+    }
+
+    [Test]
+    public void AiSection_AddOpenAiModel_PersistsModelCatalogMetadata_WithoutBrowserE2e()
+    {
+        var cut = Render<SettingsPage>();
+        var addedModelIndex = AiProviderModelCatalogDefaults.CreateOpenAi().Count;
+        var modelTypeTestId = UiTestIds.Settings.AiProviderModelField(
+            SettingsAiProviderIds.OpenAi,
+            addedModelIndex,
+            SettingsAiModelFieldIds.Type);
+
+        cut.WaitForAssertion(() => Assert.Contains(UiTestIds.Settings.AiPanel, cut.Markup, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Settings.NavAi).Click();
+        cut.FindByTestId(UiTestIds.Settings.AiProvider(SettingsAiProviderIds.OpenAi)).Click();
+        cut.FindByTestId(UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, SettingsAiProviderFieldIds.ApiKey))
+            .Change("sk-live-openai");
+        cut.FindByTestId(UiTestIds.Settings.AiProviderModelAdd(SettingsAiProviderIds.OpenAi)).Click();
+
+        cut.WaitForAssertion(() =>
+            Assert.NotNull(
+                cut.FindByTestId(
+                    UiTestIds.Settings.AiProviderModelField(
+                        SettingsAiProviderIds.OpenAi,
+                        addedModelIndex,
+                        SettingsAiModelFieldIds.Name))));
+
+        cut.FindByTestId(UiTestIds.Settings.AiProviderModelField(SettingsAiProviderIds.OpenAi, addedModelIndex, SettingsAiModelFieldIds.Name))
+            .Change(CustomOpenAiModelName);
+        cut.SelectSettingsOption(modelTypeTestId, AiProviderModelTypes.AudioToText);
+        cut.FindByTestId(UiTestIds.Settings.AiProviderModelField(SettingsAiProviderIds.OpenAi, addedModelIndex, SettingsAiModelFieldIds.ContextSize))
+            .Change(CustomOpenAiModelContextSize);
+        cut.FindByTestId(UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.OpenAi)).Click();
+
+        var savedSettings = _harness.JsRuntime.GetSavedValue<AiProviderSettings>(AiProviderSettings.StorageKey);
+        var customModel = Assert.Single(savedSettings.OpenAi.Models.Where(model => model.Name == CustomOpenAiModelName));
+
+        Assert.Equal(AiProviderModelTypes.AudioToText, customModel.Type);
+        Assert.Equal(CustomOpenAiModelContextSize, customModel.ContextSize);
     }
 
     [Test]

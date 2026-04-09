@@ -110,6 +110,10 @@ public static partial class UiTestIds
         public static string AccentSwatch(string swatchId) => $"settings-accent-swatch-{swatchId}";
         public static string AiProviderClear(string providerId) => $"settings-ai-provider-{providerId}-clear";
         public static string AiProviderField(string providerId, string fieldId) => $"settings-ai-provider-{providerId}-{fieldId}";
+        public static string AiProviderModel(string providerId, int index) => $"settings-ai-provider-{providerId}-model-{index}";
+        public static string AiProviderModelAdd(string providerId) => $"settings-ai-provider-{providerId}-model-add";
+        public static string AiProviderModelField(string providerId, int index, string fieldId) => $"settings-ai-provider-{providerId}-model-{index}-{fieldId}";
+        public static string AiProviderModelRemove(string providerId, int index) => $"settings-ai-provider-{providerId}-model-{index}-remove";
         public static string AiProviderMessage(string providerId) => $"settings-ai-provider-{providerId}-message";
         public static string AiProviderSave(string providerId) => $"settings-ai-provider-{providerId}-save";
         public static string AiProviderSubtitle(string providerId) => $"settings-ai-provider-{providerId}-subtitle";

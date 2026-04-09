@@ -15,15 +15,11 @@ public partial class SettingsAiSection : ComponentBase
     private const string AzureOpenAiCardId = "ai-azure-openai";
     private const string ClientTypeFieldId = "client-type";
     private const string ClaudeApiCardId = "ai-claude-api";
-    private const string ContextSizeFieldId = "context-size";
-    private const string DeploymentFieldId = "deployment";
     private const string DisconnectedStatusClass = "set-dest-idle";
     private const string EndpointFieldId = "endpoint";
     private const string GpuLayersFieldId = "gpu-layers";
     private const string LlamaSharpCardId = "ai-llamasharp";
     private const string LocalStatusClass = "set-dest-local";
-    private const string ModelFieldId = "model";
-    private const string ModelPathFieldId = "model-path";
     private const string OllamaCardId = "ai-ollama";
     private const string OpenAiCardId = "ai-openai";
     private const string SubtitleSeparator = " · ";
@@ -58,40 +54,34 @@ public partial class SettingsAiSection : ComponentBase
 
     private static string BuildCardCssClass(bool isConfigured) => isConfigured ? ActiveCssClass : string.Empty;
     private static string BuildStatusClass(bool isConfigured) => isConfigured ? LocalStatusClass : DisconnectedStatusClass;
-    private string BuildStatusLabel(bool isConfigured) => isConfigured ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
+
+    private string BuildStatusLabel(bool isConfigured) =>
+        isConfigured ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
 
     private string BuildClaudeSubtitle(AnthropicAiProviderSettings settings) =>
         settings.IsConfigured()
-            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), settings.Model)
-            : JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModel));
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), BuildModelCatalogLabel(settings.Models))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModels));
 
     private string BuildOpenAiSubtitle(OpenAiProviderSettings settings) =>
         settings.IsConfigured()
-            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), BuildClientTypeLabel(settings.ClientType), settings.Model)
-            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), Text(UiTextKey.CommonClientType), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModel));
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), BuildClientTypeLabel(settings.ClientType), BuildModelCatalogLabel(settings.Models))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), Text(UiTextKey.CommonClientType), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModels));
 
     private string BuildAzureOpenAiSubtitle(AzureOpenAiProviderSettings settings) =>
         settings.IsConfigured()
-            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiAzureOpenAiTitle), BuildClientTypeLabel(settings.ClientType), BuildAuthorityLabel(settings.Endpoint), settings.Deployment)
-            : JoinSubtitleParts(
-                Text(UiTextKey.SettingsAiAzureOpenAiTitle),
-                Text(UiTextKey.CommonClientType),
-                Text(UiTextKey.CommonEndpoint),
-                Text(UiTextKey.CommonDeployment),
-                Text(UiTextKey.CommonApiVersion),
-                Text(UiTextKey.CommonApiKey));
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiAzureOpenAiTitle), BuildClientTypeLabel(settings.ClientType), BuildAuthorityLabel(settings.Endpoint), BuildModelCatalogLabel(settings.Models))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiAzureOpenAiTitle), Text(UiTextKey.CommonClientType), Text(UiTextKey.CommonEndpoint), Text(UiTextKey.CommonApiVersion), Text(UiTextKey.CommonModels));
 
     private string BuildOllamaSubtitle(OllamaAiProviderSettings settings) =>
         settings.IsConfigured()
-            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiSelfHosted), BuildAuthorityLabel(settings.Endpoint), settings.Model)
-            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOllamaTitle), Text(UiTextKey.CommonEndpoint), Text(UiTextKey.CommonModel));
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiSelfHosted), BuildAuthorityLabel(settings.Endpoint), BuildModelCatalogLabel(settings.Models))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOllamaTitle), Text(UiTextKey.CommonEndpoint), Text(UiTextKey.CommonModels));
 
     private string BuildLlamaSharpSubtitle(LlamaSharpProviderSettings settings) =>
         settings.IsConfigured()
-            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), BuildModelPathLabel(settings.ModelPath), BuildContextLabel(settings.ContextSize))
-            : JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), Text(UiTextKey.CommonModelPath), Text(UiTextKey.CommonContextSize), Text(UiTextKey.CommonGpuLayers));
-
-    private string GetMessage(string providerId) => _messages.GetValueOrDefault(providerId) ?? string.Empty;
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), BuildLocalModelCatalogLabel(settings.Models))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), Text(UiTextKey.CommonModels), Text(UiTextKey.CommonModelPath), Text(UiTextKey.CommonContextSize));
 
     private static string BuildAuthorityLabel(string endpoint)
     {
@@ -104,34 +94,55 @@ public partial class SettingsAiSection : ComponentBase
         return endpoint;
     }
 
-    private static string BuildModelPathLabel(string modelPath)
-    {
-        if (string.IsNullOrWhiteSpace(modelPath))
-        {
-            return string.Empty;
-        }
-
-        return Path.GetFileName(modelPath.Trim());
-    }
-
-    private string BuildContextLabel(int contextSize) => string.Concat(Text(UiTextKey.CommonContextSize), " ", contextSize);
-
-    private static string JoinSubtitleParts(params string[] parts) =>
-        string.Join(SubtitleSeparator, parts.Where(static part => !string.IsNullOrWhiteSpace(part)).Select(static part => part.Trim()));
-
     private static string BuildClientTypeLabel(string clientType) =>
         ClientTypeOptions.FirstOrDefault(option => string.Equals(option.Value, clientType, StringComparison.Ordinal))?.Label
         ?? ClientTypeOptions[0].Label;
 
-    private Task OnOpenAiClientTypeChanged(ChangeEventArgs args)
+    private static string BuildLocalModelCatalogLabel(IEnumerable<AiProviderModelSettings> models)
     {
-        _settings.OpenAi.ClientType = args.Value?.ToString() ?? string.Empty;
-        return Task.CompletedTask;
+        var localModels = models.Where(static model => model.IsConfiguredWithLocalPath()).ToList();
+        if (localModels.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var firstLabel = Path.GetFileName(localModels[0].ModelPath);
+        return localModels.Count == 1 ? firstLabel : string.Concat(firstLabel, " +", localModels.Count - 1);
     }
+
+    private static string BuildModelCatalogLabel(IEnumerable<AiProviderModelSettings> models)
+    {
+        var namedModels = models.Where(static model => model.IsConfigured()).ToList();
+        if (namedModels.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        return namedModels.Count == 1 ? namedModels[0].Name : string.Concat(namedModels[0].Name, " +", namedModels.Count - 1);
+    }
+
+    private static AiProviderModelSettings CreateEmptyLocalModel() =>
+        AiProviderModelCatalogDefaults.CreateEmptyLocal()[0];
+
+    private static AiProviderModelSettings CreateEmptyRemoteModel() =>
+        AiProviderModelCatalogDefaults.CreateEmptyRemote()[0];
+
+    private string GetMessage(string providerId) => _messages.GetValueOrDefault(providerId) ?? string.Empty;
+
+    private Task HandleModelCatalogChangedAsync() => InvokeAsync(StateHasChanged);
+
+    private static string JoinSubtitleParts(params string[] parts) =>
+        string.Join(SubtitleSeparator, parts.Where(static part => !string.IsNullOrWhiteSpace(part)).Select(static part => part.Trim()));
 
     private Task OnAzureOpenAiClientTypeChanged(ChangeEventArgs args)
     {
         _settings.AzureOpenAi.ClientType = args.Value?.ToString() ?? string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private Task OnOpenAiClientTypeChanged(ChangeEventArgs args)
+    {
+        _settings.OpenAi.ClientType = args.Value?.ToString() ?? string.Empty;
         return Task.CompletedTask;
     }
 

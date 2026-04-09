@@ -1119,6 +1119,30 @@
   <data name="SettingsAiOllamaUrlLabel" xml:space="preserve">
     <value>Ollama Endpoint</value>
   </data>
+  <data name="CommonModels" xml:space="preserve">
+    <value>Models</value>
+  </data>
+  <data name="CommonAddModel" xml:space="preserve">
+    <value>Add Model</value>
+  </data>
+  <data name="CommonRemoveModel" xml:space="preserve">
+    <value>Remove Model</value>
+  </data>
+  <data name="CommonModelType" xml:space="preserve">
+    <value>Model Type</value>
+  </data>
+  <data name="CommonText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="CommonEmbeddings" xml:space="preserve">
+    <value>Embeddings</value>
+  </data>
+  <data name="CommonAudioToText" xml:space="preserve">
+    <value>Audio to Text</value>
+  </data>
+  <data name="CommonTextToAudio" xml:space="preserve">
+    <value>Text to Audio</value>
+  </data>
   <data name="SettingsAiProviderCleared" xml:space="preserve">
     <value>Provider cleared.</value>
   </data>

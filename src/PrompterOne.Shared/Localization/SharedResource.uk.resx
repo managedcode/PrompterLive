@@ -1200,4 +1200,28 @@
   <data name="CommonModelPath" xml:space="preserve">
     <value>Шлях до моделі</value>
   </data>
+  <data name="CommonModels" xml:space="preserve">
+    <value>Моделі</value>
+  </data>
+  <data name="CommonAddModel" xml:space="preserve">
+    <value>Додати модель</value>
+  </data>
+  <data name="CommonRemoveModel" xml:space="preserve">
+    <value>Видалити модель</value>
+  </data>
+  <data name="CommonModelType" xml:space="preserve">
+    <value>Тип моделі</value>
+  </data>
+  <data name="CommonText" xml:space="preserve">
+    <value>Текст</value>
+  </data>
+  <data name="CommonEmbeddings" xml:space="preserve">
+    <value>Ембедінги</value>
+  </data>
+  <data name="CommonAudioToText" xml:space="preserve">
+    <value>Аудіо в текст</value>
+  </data>
+  <data name="CommonTextToAudio" xml:space="preserve">
+    <value>Текст в аудіо</value>
+  </data>
 </root>
