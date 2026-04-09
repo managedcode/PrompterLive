@@ -32,7 +32,7 @@ public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : A
     {
         await page.GotoAsync(
             BrowserTestConstants.Routes.EditorDemo,
-            new() { WaitUntil = WaitUntilState.NetworkIdle });
+            new() { WaitUntil = WaitUntilState.DOMContentLoaded });
 
         var createdInput = page.GetByTestId(UiTestIds.Editor.Created);
         await Expect(createdInput).ToBeVisibleAsync(
@@ -62,7 +62,7 @@ public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : A
     {
         await page.GotoAsync(
             BrowserTestConstants.Routes.Settings,
-            new() { WaitUntil = WaitUntilState.NetworkIdle });
+            new() { WaitUntil = WaitUntilState.DOMContentLoaded });
         await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();

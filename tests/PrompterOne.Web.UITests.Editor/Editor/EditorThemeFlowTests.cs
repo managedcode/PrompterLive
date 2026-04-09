@@ -24,7 +24,7 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
             {
                 await page.GotoAsync(
                     BrowserTestConstants.Routes.Settings,
-                    new() { WaitUntil = WaitUntilState.NetworkIdle });
+                    new() { WaitUntil = WaitUntilState.DOMContentLoaded });
                 await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
                     new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
@@ -37,7 +37,7 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
 
                 await page.GotoAsync(
                     BrowserTestConstants.Routes.EditorDemo,
-                    new() { WaitUntil = WaitUntilState.NetworkIdle });
+                    new() { WaitUntil = WaitUntilState.DOMContentLoaded });
                 await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(
                     new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
                 await EditorMonacoDriver.WaitUntilReadyAsync(page);

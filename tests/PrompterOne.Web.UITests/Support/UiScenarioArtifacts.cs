@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using Microsoft.Playwright;
 
@@ -8,13 +9,28 @@ internal static class UiScenarioArtifacts
     private const string InvalidPathCharactersPattern = @"[^\w\-]+";
     private const string DefaultStepName = "step";
     private static readonly char[] TrimCharacters = ['-', '_', ' '];
+    private static readonly ConcurrentDictionary<string, byte> ResetDirectories = [];
 
     public static void ResetScenario(string scenarioName)
     {
         var directory = GetScenarioDirectory(scenarioName);
-        if (Directory.Exists(directory))
+        if (!ResetDirectories.TryAdd(directory, 0))
         {
-            Directory.Delete(directory, recursive: true);
+            return;
+        }
+
+        try
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+        }
+        catch (DirectoryNotFoundException)
+        {
+        }
+        catch (IOException) when (!Directory.Exists(directory))
+        {
         }
     }
 

@@ -27,7 +27,7 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
             await SwitchThemeAsync(page);
             await page.GotoAsync(
                 BrowserTestConstants.Routes.EditorDemo,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
+                new() { WaitUntil = WaitUntilState.DOMContentLoaded });
             await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync(
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.Locator("html")).ToHaveAttributeAsync(
@@ -70,7 +70,7 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
     {
         await page.GotoAsync(
             BrowserTestConstants.Routes.Settings,
-            new() { WaitUntil = WaitUntilState.NetworkIdle });
+            new() { WaitUntil = WaitUntilState.DOMContentLoaded });
         await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
         await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();

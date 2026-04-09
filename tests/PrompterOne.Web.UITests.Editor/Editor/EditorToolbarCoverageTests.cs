@@ -222,7 +222,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
             {
                 await page.GotoAsync(
                     BrowserTestConstants.Routes.EditorDemo,
-                    new() { WaitUntil = WaitUntilState.NetworkIdle });
+                    new() { WaitUntil = WaitUntilState.DOMContentLoaded });
                 await Expect(page.GetByTestId(UiTestIds.Editor.Page))
                     .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
                 await EditorMonacoDriver.WaitUntilReadyAsync(page);

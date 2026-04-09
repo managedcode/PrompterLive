@@ -82,7 +82,11 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
                 }
                 """);
 
-            await Assert.That(stageState.ScrollTop > 0).IsTrue();
+            await Assert.That(stageState.VisibleRange).IsNotNull();
+            await Assert.That(
+                stageState.VisibleRange!.StartLineNumber > 1 &&
+                stageState.Selection.Line >= stageState.VisibleRange.StartLineNumber &&
+                stageState.Selection.Line <= stageState.VisibleRange.EndLineNumber).IsTrue().Because($"Expected Monaco to own the vertical scroll surface after centering the selection line, but the visible range did not move off the first line or did not contain the caret line. ScrollTop={stageState.ScrollTop}; SelectionLine={stageState.Selection.Line}; VisibleStart={stageState.VisibleRange.StartLineNumber}; VisibleEnd={stageState.VisibleRange.EndLineNumber}; LineCount={stageState.LineCount}.");
             await Assert.That(scrollState.HostScrollTop).IsEqualTo(BrowserTestConstants.Editor.MaxSourceScrollHostTopPx);
             await Assert.That(
                 string.Equals(scrollState.HostOverflow, BrowserTestConstants.Editor.HiddenOverflowValue, StringComparison.Ordinal) ||
