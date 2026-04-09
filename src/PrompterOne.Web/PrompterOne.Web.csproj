@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Localization" />
     <PackageReference Include="Microsoft.Extensions.Logging.Configuration" />
+    <PackageReference Include="PDFtoImage" PrivateAssets="all" />
     <PackageReference Include="Sentry.AspNetCore.Blazor.WebAssembly" />
   </ItemGroup>
 

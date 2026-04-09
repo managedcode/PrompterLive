@@ -22,6 +22,7 @@ It owns TPS parsing, compilation, export, RSVP helpers, preview and workspace st
 - No Blazor dependencies.
 - No JavaScript interop.
 - No browser or server runtime assumptions.
+- Do not add browser-only, WebAssembly-only, or host-specific NuGet overrides here; keep those package pins in the runnable host project.
 - Keep abstractions, models, preview helpers, and services colocated inside their owning feature slices.
 - Keep types serializable and reusable from the WebAssembly app.
 

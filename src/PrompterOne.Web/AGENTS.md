@@ -31,6 +31,7 @@
 ## Local Risks Or Protected Areas
 
 - Any dependency that assumes ASP.NET server hosting is a red flag.
+- Browser-only or native WebAssembly package overrides belong here instead of `PrompterOne.Core` when the fix is host-specific.
 - Keep static asset references aligned with `PrompterOne.Shared`.
 - Keep the launch-settings origin stable. Do not teach the repo to run on random ports because browser media permissions are bound to origin.
 - If the launch-settings port is already occupied, stop the stale dev-server process. Do not move the standalone app host to a new port as a workaround.
