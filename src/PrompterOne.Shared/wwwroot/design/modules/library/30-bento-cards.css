@@ -173,8 +173,11 @@
     position: relative;
     z-index: 1;
     padding: 0;
+    overflow: hidden;
     margin-bottom: 6px;
+    text-overflow: ellipsis;
     text-shadow: 0 2px 12px rgba(0,0,0,.7), 0 0 30px rgba(0,0,0,.4);
+    white-space: nowrap;
 }
 
 .dcover-meta {
@@ -328,5 +331,56 @@ body.theme-light .dcard-act-go:hover {
     .dcards-grid {
         grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
         gap: 14px;
+    }
+}
+
+@media (max-width: 640px) {
+    .dcards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .dcard-cover {
+        height: 140px;
+        padding: 14px 16px;
+    }
+
+    .dcard-cover .dcard-title {
+        font-size: 16px;
+    }
+
+    .dcard-data {
+        padding: 12px 16px;
+    }
+
+    .dcard-actions {
+        padding: 6px 12px 12px;
+        gap: 6px;
+    }
+
+    .dcard-act {
+        padding: 8px;
+        font-size: 11px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    .dcard-cover {
+        height: 110px;
+        padding: 12px;
+    }
+
+    .dcard-cover .dcard-title {
+        font-size: 15px;
+    }
+
+    .dcard-data {
+        padding: 10px 12px;
+    }
+
+    .ddata-row {
+        font-size: 11px;
+        gap: 6px 10px;
     }
 }

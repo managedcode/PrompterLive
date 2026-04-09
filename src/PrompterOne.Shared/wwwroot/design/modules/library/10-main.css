@@ -257,3 +257,29 @@ body.theme-light .folder-chip.active {
         padding: 0 8px;
     }
 }
+
+/* ---- Mobile: full-width content ---- */
+@media (max-width: 640px) {
+    .lib-main {
+        min-height: 0;
+    }
+
+    .lib-scroll {
+        padding: 12px;
+    }
+
+    .lib-header {
+        margin-bottom: 14px;
+    }
+
+    .lib-sort-bar {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 380px) {
+    .lib-scroll {
+        padding: 10px 8px;
+    }
+}

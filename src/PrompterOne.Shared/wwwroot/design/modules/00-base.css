@@ -85,3 +85,9 @@ button {
     border: none;
     outline: none;
 }
+
+@media (max-width: 640px) {
+    :root {
+        --sidebar-width: 100%;
+    }
+}

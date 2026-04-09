@@ -6,6 +6,8 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .app-onboarding__scrim {
@@ -213,10 +215,14 @@
 @media (max-width: 860px) {
     .app-onboarding {
         padding: 16px;
+        align-items: flex-start;
     }
 
     .app-onboarding__panel {
         padding: 22px;
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .app-onboarding__hero {
@@ -234,6 +240,34 @@
 }
 
 @media (max-width: 640px) {
+    .app-onboarding {
+        padding: 12px;
+    }
+
+    .app-onboarding__panel {
+        padding: 18px;
+        gap: 16px;
+        max-height: calc(100dvh - 24px);
+    }
+
+    .app-onboarding__hero {
+        gap: 12px;
+    }
+
+    .app-onboarding__icon-shell {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .app-onboarding__title {
+        font-size: clamp(22px, 5vw, 28px);
+    }
+
+    .app-onboarding__body {
+        font-size: 14px;
+    }
+
     .app-onboarding__steps {
         gap: 8px;
     }
@@ -241,6 +275,14 @@
     .app-onboarding__step {
         flex: 1 1 calc(50% - 8px);
         justify-content: center;
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 13px;
+    }
+
+    .app-onboarding__fact {
+        min-height: auto;
+        padding: 12px;
     }
 
     .app-onboarding__actions {
@@ -250,6 +292,62 @@
     .app-onboarding__secondary,
     .app-onboarding__primary {
         width: 100%;
+    }
+}
+
+@media (max-width: 380px) {
+    .app-onboarding {
+        padding: 8px;
+    }
+
+    .app-onboarding__panel {
+        padding: 14px;
+        gap: 12px;
+        border-radius: 18px;
+        max-height: calc(100dvh - 16px);
+    }
+
+    .app-onboarding__hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app-onboarding__icon-shell {
+        display: none;
+    }
+
+    .app-onboarding__dismiss {
+        grid-column: auto;
+        font-size: 13px;
+        min-height: 32px;
+        padding: 0 12px;
+    }
+
+    .app-onboarding__title {
+        font-size: 22px;
+    }
+
+    .app-onboarding__step {
+        flex: 1 1 calc(50% - 6px);
+        font-size: 12px;
+        min-height: 32px;
+        padding: 0 8px;
+        gap: 5px;
+    }
+
+    .app-onboarding__progress {
+        font-size: 11px;
+    }
+
+    .app-onboarding__fact {
+        padding: 10px;
+        font-size: 13px;
+        border-radius: 14px;
+    }
+
+    .app-onboarding__secondary,
+    .app-onboarding__primary {
+        min-height: 38px;
+        font-size: 14px;
     }
 }
 

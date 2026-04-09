@@ -495,6 +495,7 @@ Ask first:
 
 ### Dislikes
 
+- settings features that the user asks to surface as a menu option being hidden inside `About` or another existing section; when the request says "in the menu", add a dedicated settings navigation item
 - fallback code paths, compatibility shims, or alternate behavior branches added "just in case"; implement the direct fix and only add a fallback when the user explicitly asks for one
 - any "safety-net" or "just in case" workaround added to mask incorrect behavior; fix the root cause cleanly instead of layering retries, forced refocus, defensive rerenders, or compensating logic
 - backend creep in the standalone runtime
@@ -514,6 +515,7 @@ Ask first:
 - any use of `--no-build` in repo commands, docs, or CI; test runs must rebuild against the current source and current WASM assets every time
 - mixed-language root README or public entry docs; keep them English-only unless the user explicitly asks otherwise
 - any push or publish action without the user's explicit command; local commits are fine, but network delivery must stay user-controlled
+- remediation work that spills into unrelated code outside the current change ownership; when validation exposes a failure outside the touched files or owned behavior, report it separately and do not "fix the suite" by editing someone else's area
 - any reintroduction of a repo-local `design/` prototype folder as a parallel source of truth; the shipped Blazor UI must be the only product reference
 - fake `display_*` or other presentation-only script metrics that override real TPS-derived words, segments, speed, or duration in user-facing UI
 - made-up About/team content or stale attribution; About must point to real Managed Code ownership and official links
