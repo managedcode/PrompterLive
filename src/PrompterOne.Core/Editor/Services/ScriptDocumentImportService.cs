@@ -27,16 +27,19 @@ public sealed class ScriptDocumentImportService(ScriptImportDescriptorService de
             throw new ArgumentException(UnsupportedFileNameMessage, nameof(fileName));
         }
 
-        var text = ScriptDocumentFileTypes.CanReadAsText(normalizedFileName)
+        var isTextImport = ScriptDocumentFileTypes.CanReadAsText(normalizedFileName);
+        var text = isTextImport
             ? await ReadTextAsync(stream, cancellationToken)
             : await ConvertToMarkdownAsync(stream, normalizedFileName, mimeType, cancellationToken);
         var importedDocumentName = ScriptDocumentFileTypes.BuildImportedDocumentName(normalizedFileName);
         var descriptor = _descriptorService.Build(importedDocumentName, text);
 
-        return descriptor with
-        {
-            Title = ScriptDocumentFileTypes.ResolvePickerTitle(normalizedFileName)
-        };
+        return isTextImport
+            ? descriptor
+            : descriptor with
+            {
+                Title = ScriptDocumentFileTypes.ResolvePickerTitle(normalizedFileName)
+            };
     }
 
     private static async Task<string> ConvertToMarkdownAsync(

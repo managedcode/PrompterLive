@@ -14,16 +14,16 @@ public sealed class ScriptDocumentImportServiceTests
     private const string ImportedHeading = "Converted heading should stay in the editor body";
     private const string ImportedParagraph = "MarkItDown should convert this DOCX paragraph into Markdown for the editor.";
     private const string FrontMatterMarkdownFileName = "Quarterly Town Hall.md";
-    private const string FrontMatterMarkdownTitle = "Quarterly Town Hall";
+    private const string FrontMatterMarkdownTitle = "Front matter title should win";
     private const string FrontMatterMarkdownText =
         """
         ---
-        title: "Front matter title should not win"
+        title: "Front matter title should win"
         ---
 
         ## [Opening|140WPM|Professional]
         ### [First block|140WPM|Warm]
-        Imported markdown should keep the file stem as the editor title.
+        Imported markdown should preserve the explicit front matter title in the editor.
         """;
     private const string NativeScriptFileName = "camera-check.tps";
     private const string NativeScriptText =
@@ -94,7 +94,7 @@ public sealed class ScriptDocumentImportServiceTests
     }
 
     [Test]
-    public async Task ImportAsync_MarkdownImport_UsesFileStemTitle_EvenWhenFrontMatterDefinesAnotherTitle()
+    public async Task ImportAsync_MarkdownImport_PreservesFrontMatterTitle_WhenProvided()
     {
         var service = new ScriptDocumentImportService(new ScriptImportDescriptorService());
         await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(FrontMatterMarkdownText));
