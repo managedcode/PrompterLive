@@ -3,6 +3,11 @@
     color: #CBD5E1;
 }
 
+.ui-icon-surface--cobalt {
+    background: rgba(37, 99, 235, .14);
+    color: #93C5FD;
+}
+
 .ui-icon-surface--gold {
     background: rgba(196, 160, 96, .10);
     color: var(--gold);

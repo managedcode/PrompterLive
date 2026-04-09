@@ -244,7 +244,25 @@
     <value>Провайдер ШІ</value>
   </data>
   <data name="SettingsAiSectionDescription" xml:space="preserve">
-    <value>Зберігайте чернетки провайдерів ШІ локально в цьому браузері. Перевірка з’єднання під час виконання ще не реалізована, тому кожен провайдер залишається від’єднаним, доки не з’явиться справжня інтеграція.</value>
+    <value>Зберігайте профілі ШІ-провайдерів локально в цьому браузері. PrompterOne використовує ці значення як локальну конфігурацію і не перевіряє віддалені облікові дані під час збереження.</value>
+  </data>
+  <data name="SettingsAiClaudeTitle" xml:space="preserve">
+    <value>Anthropic</value>
+  </data>
+  <data name="SettingsAiOpenAiTitle" xml:space="preserve">
+    <value>OpenAI</value>
+  </data>
+  <data name="SettingsAiAzureOpenAiTitle" xml:space="preserve">
+    <value>Azure OpenAI</value>
+  </data>
+  <data name="SettingsAiLlamaSharpTitle" xml:space="preserve">
+    <value>LLamaSharp</value>
+  </data>
+  <data name="SettingsAiOllamaTitle" xml:space="preserve">
+    <value>Ollama</value>
+  </data>
+  <data name="SettingsAiOllamaUrlLabel" xml:space="preserve">
+    <value>Адреса Ollama</value>
   </data>
   <data name="SettingsRecordingSectionTitle" xml:space="preserve">
     <value>Запис</value>
@@ -1160,5 +1178,26 @@
   </data>
   <data name="FeedbackDialogMessageRequired" xml:space="preserve">
     <value>Додайте короткий опис перед надсиланням відгуку.</value>
+  </data>
+  <data name="CommonApiVersion" xml:space="preserve">
+    <value>Версія API</value>
+  </data>
+  <data name="CommonClientType" xml:space="preserve">
+    <value>Тип клієнта</value>
+  </data>
+  <data name="CommonDeployment" xml:space="preserve">
+    <value>Розгортання</value>
+  </data>
+  <data name="CommonEndpoint" xml:space="preserve">
+    <value>Endpoint</value>
+  </data>
+  <data name="CommonContextSize" xml:space="preserve">
+    <value>Розмір контексту</value>
+  </data>
+  <data name="CommonGpuLayers" xml:space="preserve">
+    <value>GPU-шари</value>
+  </data>
+  <data name="CommonModelPath" xml:space="preserve">
+    <value>Шлях до моделі</value>
   </data>
 </root>

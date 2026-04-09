@@ -15,9 +15,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeDisabledAsync();
@@ -37,9 +35,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
         try
         {
             await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();

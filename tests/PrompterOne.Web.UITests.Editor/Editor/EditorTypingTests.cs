@@ -18,8 +18,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
             await Expect(page.GetByTestId(UiTestIds.Editor.ActiveSegmentName)).ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.Editor.ActiveBlockName)).ToHaveCountAsync(0);
 
@@ -51,8 +50,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
 
             await EditorMonacoDriver.ClickAsync(page, new Position
             {
@@ -79,8 +77,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
             await EditorMonacoDriver.SetCaretAtTextEndAsync(page, BrowserTestConstants.Editor.QuantumOverviewBlockHeader);
 
             await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.HeaderContinuationText, new() { Delay = 0 });
@@ -127,8 +124,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.ClearAndTypeAsync(page, BrowserTestConstants.Editor.TypedScript);
 
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(BrowserTestConstants.Editor.TypedScript);
@@ -150,8 +146,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Editor);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.OpenBlankDraftAsync(page);
 
             await EditorMonacoDriver.ClickAsync(page);
             await page.Keyboard.TypeAsync(BrowserTestConstants.Editor.FirstProbeCharacter);
@@ -184,8 +179,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
             await EditorMonacoDriver.ClickAsync(page);
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.SelectAll);
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.Backspace);

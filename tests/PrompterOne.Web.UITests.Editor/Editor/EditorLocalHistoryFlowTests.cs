@@ -13,8 +13,10 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.LocalHistoryScenario);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
+                page,
+                BrowserTestConstants.Scripts.DemoId,
+                setSeedTitle: false);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
 
@@ -64,8 +66,11 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.DisabledValue);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
+                page,
+                BrowserTestConstants.Scripts.DemoId,
+                setSeedTitle: false,
+                waitForPersistedRoute: false);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
 
@@ -90,8 +95,10 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
+                page,
+                BrowserTestConstants.Scripts.DemoId,
+                setSeedTitle: false);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
 

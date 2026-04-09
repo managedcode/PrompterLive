@@ -1,4 +1,5 @@
 using System.Text.Json;
+using PrompterOne.Core.Services.Editor;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Settings.Models;
 
@@ -7,6 +8,7 @@ namespace PrompterOne.Web.UITests;
 internal static class BrowserTestLibrarySeedData
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly TpsFrontMatterDocumentService FrontMatterService = new();
 
     public static string CreateInitializationScript()
     {
@@ -52,6 +54,17 @@ internal static class BrowserTestLibrarySeedData
             })();
             """;
     }
+
+    public static string GetSeededScriptText(string scriptId) =>
+        GetSeededScriptDocument(scriptId).Text
+        ?? throw new InvalidOperationException($"The seeded script '{scriptId}' does not have text.");
+
+    public static string GetSeededScriptTitle(string scriptId) =>
+        GetSeededScriptDocument(scriptId).Title
+        ?? throw new InvalidOperationException($"The seeded script '{scriptId}' does not have a title.");
+
+    public static string GetSeededScriptVisibleText(string scriptId) =>
+        FrontMatterService.Parse(GetSeededScriptText(scriptId)).Body;
 
     private static IReadOnlyList<BrowserStoredLibraryFolderDto> CreateFolders() =>
     [
@@ -141,6 +154,11 @@ internal static class BrowserTestLibrarySeedData
             FolderId = folderId
         };
     }
+
+    private static BrowserStoredScriptDocumentDto GetSeededScriptDocument(string scriptId) =>
+        CreateDocuments().FirstOrDefault(
+            document => string.Equals(document.Id, scriptId, StringComparison.Ordinal))
+        ?? throw new InvalidOperationException($"Unable to resolve the seeded script '{scriptId}'.");
 
     private static BrowserStoredScriptDocumentDto CreateDocument(
         string id,

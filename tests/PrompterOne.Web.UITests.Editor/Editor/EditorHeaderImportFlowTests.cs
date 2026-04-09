@@ -23,8 +23,7 @@ public sealed class EditorHeaderImportFlowTests(StandaloneAppFixture fixture) : 
 
             try
             {
-                await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await EditorIsolatedDraftDriver.OpenBlankDraftAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.EditorImportScriptInput)
                     .SetInputFilesAsync(importPath);

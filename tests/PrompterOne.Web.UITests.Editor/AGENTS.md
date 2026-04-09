@@ -30,3 +30,4 @@
 - Editor typing and authoring regressions must be exercised through the live browser surface, not only helper abstractions.
 - Keep editor-only helpers or assets inside this suite unless they are truly shared across multiple browser suites.
 - Do not weaken editor performance or authoring assertions to hide slowness.
+- Mutating editor scenarios must create or import their own isolated script and edit that script only; do not reuse a shared seeded script as the writable document across multiple tests.

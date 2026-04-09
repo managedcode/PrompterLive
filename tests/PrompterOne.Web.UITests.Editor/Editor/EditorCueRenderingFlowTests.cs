@@ -20,10 +20,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.OpenBlankDraftAsync(page);
             await EditorMonacoDriver.SetTextAsync(
                 page,
                 """
@@ -89,10 +86,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.OpenBlankDraftAsync(page);
             await EditorMonacoDriver.SetTextAsync(
                 page,
                 """

@@ -22,6 +22,7 @@ public enum UiIconKind
     CodeArrows,
     DocumentLines,
     DocumentImport,
+    Database,
     Eye,
     Expand,
     ExportArrow,

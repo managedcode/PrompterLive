@@ -53,8 +53,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
     public Task EditorScreen_DropOnEmptyDraft_ReplacesTextAndSupportsUndoRedo() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Editor);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.OpenBlankDraftAsync(page);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(string.Empty);
 
             await EditorMonacoDriver.DropFilesAsync(
@@ -77,8 +76,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
     public Task EditorScreen_DropOnExistingDraft_AppendsVisibleBodyAndSupportsUndoRedo() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
             var sourceInput = EditorMonacoDriver.SourceInput(page);
             var initialText = await sourceInput.InputValueAsync();
             var expectedText = BuildExpectedAppendedText(initialText, AppendVisibleBody);
@@ -105,8 +103,7 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
     public Task EditorScreen_DropRejectsUnsupportedExtensions_AndKeepsDraftUnchanged() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             var sourceInput = EditorMonacoDriver.SourceInput(page);
             var initialText = await sourceInput.InputValueAsync();
 

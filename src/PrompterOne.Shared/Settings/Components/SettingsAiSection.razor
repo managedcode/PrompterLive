@@ -1,8 +1,9 @@
 @namespace PrompterOne.Shared.Components.Settings
 @using Microsoft.Extensions.Localization
 @using PrompterOne.Shared.Components
-@using PrompterOne.Shared.Pages
+@using PrompterOne.Shared.Contracts
 @using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Pages
 @using PrompterOne.Shared.Settings.Components
 @using PrompterOne.Shared.Settings.Models
 @inject IStringLocalizer<SharedResource> Localizer
@@ -17,16 +18,16 @@
     <div class="set-device-list">
         <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiClaudeTitle)"
                                 Subtitle="@BuildClaudeSubtitle(_settings.ClaudeApi)"
-                                StatusLabel="@BuildStatusLabel(_settings.ClaudeApi)"
-                                StatusClass="@BuildStatusClass(_settings.ClaudeApi)"
+                                StatusLabel="@BuildStatusLabel(_settings.ClaudeApi.IsConfigured())"
+                                StatusClass="@BuildStatusClass(_settings.ClaudeApi.IsConfigured())"
                                 IconTone="UiIconSurfaceTone.Gold"
-                                AdditionalCssClass="@BuildCardCssClass(_settings.ClaudeApi)"
+                                AdditionalCssClass="@BuildCardCssClass(_settings.ClaudeApi.IsConfigured())"
                                 IsOpen="@IsCardOpen(ClaudeApiCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(ClaudeApiCardId))"
                                 SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.ClaudeApi)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.ClaudeApi)"
-                                Save="SaveClaudeAsync"
-                                Clear="ClearClaudeAsync"
+                                Save="@(() => SaveProviderAsync(SettingsAiProviderIds.ClaudeApi))"
+                                Clear="@(() => ClearProviderAsync(SettingsAiProviderIds.ClaudeApi, () => _settings.ClaudeApi = new AnthropicAiProviderSettings()))"
                                 SaveTestId="@UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.ClaudeApi)"
                                 ClearTestId="@UiTestIds.Settings.AiProviderClear(SettingsAiProviderIds.ClaudeApi)"
                                 Message="@GetMessage(SettingsAiProviderIds.ClaudeApi)"
@@ -38,17 +39,30 @@
                 <div class="set-device-fields">
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonApiKey)</label>
-                        <input type="password" class="set-input" placeholder="sk-ant-..." @bind="_settings.ClaudeApi.ApiKey" @onclick:stopPropagation="true" />
+                        <input type="password"
+                               class="set-input"
+                               placeholder="sk-ant-..."
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.ClaudeApi, ApiKeyFieldId)"
+                               @bind="_settings.ClaudeApi.ApiKey"
+                               @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonModel)</label>
-                        <SettingsSelect Value="@_settings.ClaudeApi.Model"
-                                       Options="@ClaudeModelOptions"
-                                       OnChange="OnClaudeModelChanged" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="claude-haiku-4-5"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.ClaudeApi, ModelFieldId)"
+                               @bind="_settings.ClaudeApi.Model"
+                               @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
-                        <input type="text" class="set-input" placeholder="https://api.anthropic.com" @bind="_settings.ClaudeApi.BaseUrl" @onclick:stopPropagation="true" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="https://api.anthropic.com"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.ClaudeApi, UrlFieldId)"
+                               @bind="_settings.ClaudeApi.BaseUrl"
+                               @onclick:stopPropagation="true" />
                     </div>
                 </div>
             </ChildContent>
@@ -56,16 +70,16 @@
 
         <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiOpenAiTitle)"
                                 Subtitle="@BuildOpenAiSubtitle(_settings.OpenAi)"
-                                StatusLabel="@BuildStatusLabel(_settings.OpenAi)"
-                                StatusClass="@BuildStatusClass(_settings.OpenAi)"
+                                StatusLabel="@BuildStatusLabel(_settings.OpenAi.IsConfigured())"
+                                StatusClass="@BuildStatusClass(_settings.OpenAi.IsConfigured())"
                                 IconTone="UiIconSurfaceTone.Emerald"
-                                AdditionalCssClass="@BuildCardCssClass(_settings.OpenAi)"
+                                AdditionalCssClass="@BuildCardCssClass(_settings.OpenAi.IsConfigured())"
                                 IsOpen="@IsCardOpen(OpenAiCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(OpenAiCardId))"
                                 SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.OpenAi)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.OpenAi)"
-                                Save="SaveOpenAiAsync"
-                                Clear="ClearOpenAiAsync"
+                                Save="@(() => SaveProviderAsync(SettingsAiProviderIds.OpenAi))"
+                                Clear="@(() => ClearProviderAsync(SettingsAiProviderIds.OpenAi, () => _settings.OpenAi = new OpenAiProviderSettings()))"
                                 SaveTestId="@UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.OpenAi)"
                                 ClearTestId="@UiTestIds.Settings.AiProviderClear(SettingsAiProviderIds.OpenAi)"
                                 Message="@GetMessage(SettingsAiProviderIds.OpenAi)"
@@ -76,18 +90,106 @@
             <ChildContent>
                 <div class="set-device-fields">
                     <div class="set-field">
+                        <label>@Text(UiTextKey.CommonClientType)</label>
+                        <SettingsSelect Value="@_settings.OpenAi.ClientType"
+                                        TestId="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, ClientTypeFieldId)"
+                                        Options="@ClientTypeOptions"
+                                        OnChange="OnOpenAiClientTypeChanged" />
+                    </div>
+                    <div class="set-field">
                         <label>@Text(UiTextKey.CommonApiKey)</label>
-                        <input type="password" class="set-input" placeholder="sk-..." @bind="_settings.OpenAi.ApiKey" @onclick:stopPropagation="true" />
+                        <input type="password"
+                               class="set-input"
+                               placeholder="sk-..."
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, ApiKeyFieldId)"
+                               @bind="_settings.OpenAi.ApiKey"
+                               @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonModel)</label>
-                        <SettingsSelect Value="@_settings.OpenAi.Model"
-                                       Options="@OpenAiModelOptions"
-                                       OnChange="OnOpenAiModelChanged" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="gpt-4o-mini"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, ModelFieldId)"
+                               @bind="_settings.OpenAi.Model"
+                               @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonBaseUrlOptional)</label>
-                        <input type="text" class="set-input" placeholder="https://api.openai.com/v1" @bind="_settings.OpenAi.BaseUrl" @onclick:stopPropagation="true" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="https://api.openai.com/v1"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.OpenAi, UrlFieldId)"
+                               @bind="_settings.OpenAi.BaseUrl"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                </div>
+            </ChildContent>
+        </SettingsAiProviderCard>
+
+        <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiAzureOpenAiTitle)"
+                                Subtitle="@BuildAzureOpenAiSubtitle(_settings.AzureOpenAi)"
+                                StatusLabel="@BuildStatusLabel(_settings.AzureOpenAi.IsConfigured())"
+                                StatusClass="@BuildStatusClass(_settings.AzureOpenAi.IsConfigured())"
+                                IconTone="UiIconSurfaceTone.Cobalt"
+                                AdditionalCssClass="@BuildCardCssClass(_settings.AzureOpenAi.IsConfigured())"
+                                IsOpen="@IsCardOpen(AzureOpenAiCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(AzureOpenAiCardId))"
+                                SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.AzureOpenAi)"
+                                TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.AzureOpenAi)"
+                                Save="@(() => SaveProviderAsync(SettingsAiProviderIds.AzureOpenAi))"
+                                Clear="@(() => ClearProviderAsync(SettingsAiProviderIds.AzureOpenAi, () => _settings.AzureOpenAi = new AzureOpenAiProviderSettings()))"
+                                SaveTestId="@UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.AzureOpenAi)"
+                                ClearTestId="@UiTestIds.Settings.AiProviderClear(SettingsAiProviderIds.AzureOpenAi)"
+                                Message="@GetMessage(SettingsAiProviderIds.AzureOpenAi)"
+                                MessageTestId="@UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.AzureOpenAi)">
+            <Icon>
+                <UiIcon Kind="UiIconKind.Cloud" Size="17" />
+            </Icon>
+            <ChildContent>
+                <div class="set-device-fields">
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonClientType)</label>
+                        <SettingsSelect Value="@_settings.AzureOpenAi.ClientType"
+                                        TestId="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, ClientTypeFieldId)"
+                                        Options="@ClientTypeOptions"
+                                        OnChange="OnAzureOpenAiClientTypeChanged" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonEndpoint)</label>
+                        <input type="text"
+                               class="set-input"
+                               placeholder="https://your-resource.openai.azure.com"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, EndpointFieldId)"
+                               @bind="_settings.AzureOpenAi.Endpoint"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonDeployment)</label>
+                        <input type="text"
+                               class="set-input"
+                               placeholder="gpt-4o-mini"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, DeploymentFieldId)"
+                               @bind="_settings.AzureOpenAi.Deployment"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonApiVersion)</label>
+                        <input type="text"
+                               class="set-input"
+                               placeholder="2025-04-01-preview"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, ApiVersionFieldId)"
+                               @bind="_settings.AzureOpenAi.ApiVersion"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonApiKey)</label>
+                        <input type="password"
+                               class="set-input"
+                               placeholder="azure-openai-key"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.AzureOpenAi, ApiKeyFieldId)"
+                               @bind="_settings.AzureOpenAi.ApiKey"
+                               @onclick:stopPropagation="true" />
                     </div>
                 </div>
             </ChildContent>
@@ -95,16 +197,16 @@
 
         <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiOllamaTitle)"
                                 Subtitle="@BuildOllamaSubtitle(_settings.Ollama)"
-                                StatusLabel="@BuildStatusLabel(_settings.Ollama)"
-                                StatusClass="@BuildStatusClass(_settings.Ollama)"
+                                StatusLabel="@BuildStatusLabel(_settings.Ollama.IsConfigured())"
+                                StatusClass="@BuildStatusClass(_settings.Ollama.IsConfigured())"
                                 IconTone="UiIconSurfaceTone.Indigo"
-                                AdditionalCssClass="@BuildCardCssClass(_settings.Ollama)"
+                                AdditionalCssClass="@BuildCardCssClass(_settings.Ollama.IsConfigured())"
                                 IsOpen="@IsCardOpen(OllamaCardId)"
                                 OnToggle="@(() => ToggleCard.InvokeAsync(OllamaCardId))"
                                 SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.Ollama)"
                                 TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.Ollama)"
-                                Save="SaveOllamaAsync"
-                                Clear="ClearOllamaAsync"
+                                Save="@(() => SaveProviderAsync(SettingsAiProviderIds.Ollama))"
+                                Clear="@(() => ClearProviderAsync(SettingsAiProviderIds.Ollama, () => _settings.Ollama = new OllamaAiProviderSettings()))"
                                 SaveTestId="@UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.Ollama)"
                                 ClearTestId="@UiTestIds.Settings.AiProviderClear(SettingsAiProviderIds.Ollama)"
                                 Message="@GetMessage(SettingsAiProviderIds.Ollama)"
@@ -116,11 +218,75 @@
                 <div class="set-device-fields">
                     <div class="set-field">
                         <label>@Text(UiTextKey.SettingsAiOllamaUrlLabel)</label>
-                        <input type="text" class="set-input" placeholder="http://localhost:11434" @bind="_settings.Ollama.Endpoint" @onclick:stopPropagation="true" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="http://localhost:11434"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.Ollama, UrlFieldId)"
+                               @bind="_settings.Ollama.Endpoint"
+                               @onclick:stopPropagation="true" />
                     </div>
                     <div class="set-field">
                         <label>@Text(UiTextKey.CommonModel)</label>
-                        <input type="text" class="set-input" placeholder="llama3, mistral, gemma..." @bind="_settings.Ollama.Model" @onclick:stopPropagation="true" />
+                        <input type="text"
+                               class="set-input"
+                               placeholder="llama3.2"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.Ollama, ModelFieldId)"
+                               @bind="_settings.Ollama.Model"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                </div>
+            </ChildContent>
+        </SettingsAiProviderCard>
+
+        <SettingsAiProviderCard Title="@Text(UiTextKey.SettingsAiLlamaSharpTitle)"
+                                Subtitle="@BuildLlamaSharpSubtitle(_settings.LlamaSharp)"
+                                StatusLabel="@BuildStatusLabel(_settings.LlamaSharp.IsConfigured())"
+                                StatusClass="@BuildStatusClass(_settings.LlamaSharp.IsConfigured())"
+                                IconTone="UiIconSurfaceTone.Slate"
+                                AdditionalCssClass="@BuildCardCssClass(_settings.LlamaSharp.IsConfigured())"
+                                IsOpen="@IsCardOpen(LlamaSharpCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(LlamaSharpCardId))"
+                                SubtitleTestId="@UiTestIds.Settings.AiProviderSubtitle(SettingsAiProviderIds.LlamaSharp)"
+                                TestId="@UiTestIds.Settings.AiProvider(SettingsAiProviderIds.LlamaSharp)"
+                                Save="@(() => SaveProviderAsync(SettingsAiProviderIds.LlamaSharp))"
+                                Clear="@(() => ClearProviderAsync(SettingsAiProviderIds.LlamaSharp, () => _settings.LlamaSharp = new LlamaSharpProviderSettings()))"
+                                SaveTestId="@UiTestIds.Settings.AiProviderSave(SettingsAiProviderIds.LlamaSharp)"
+                                ClearTestId="@UiTestIds.Settings.AiProviderClear(SettingsAiProviderIds.LlamaSharp)"
+                                Message="@GetMessage(SettingsAiProviderIds.LlamaSharp)"
+                                MessageTestId="@UiTestIds.Settings.AiProviderMessage(SettingsAiProviderIds.LlamaSharp)">
+            <Icon>
+                <UiIcon Kind="UiIconKind.Database" Size="17" />
+            </Icon>
+            <ChildContent>
+                <div class="set-device-fields">
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonModelPath)</label>
+                        <input type="text"
+                               class="set-input"
+                               placeholder="/models/llama3.2.gguf"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.LlamaSharp, ModelPathFieldId)"
+                               @bind="_settings.LlamaSharp.ModelPath"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonContextSize)</label>
+                        <input type="number"
+                               min="1"
+                               step="1"
+                               class="set-input"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.LlamaSharp, ContextSizeFieldId)"
+                               @bind="_settings.LlamaSharp.ContextSize"
+                               @onclick:stopPropagation="true" />
+                    </div>
+                    <div class="set-field">
+                        <label>@Text(UiTextKey.CommonGpuLayers)</label>
+                        <input type="number"
+                               min="0"
+                               step="1"
+                               class="set-input"
+                               data-test="@UiTestIds.Settings.AiProviderField(SettingsAiProviderIds.LlamaSharp, GpuLayersFieldId)"
+                               @bind="_settings.LlamaSharp.GpuLayers"
+                               @onclick:stopPropagation="true" />
                     </div>
                 </div>
             </ChildContent>

@@ -10,27 +10,30 @@ namespace PrompterOne.Shared.Components.Settings;
 public partial class SettingsAiSection : ComponentBase
 {
     private const string ActiveCssClass = "active";
+    private const string ApiKeyFieldId = "api-key";
+    private const string ApiVersionFieldId = "api-version";
+    private const string AzureOpenAiCardId = "ai-azure-openai";
+    private const string ClientTypeFieldId = "client-type";
     private const string ClaudeApiCardId = "ai-claude-api";
+    private const string ContextSizeFieldId = "context-size";
+    private const string DeploymentFieldId = "deployment";
     private const string DisconnectedStatusClass = "set-dest-idle";
-    private const string LocalhostAuthority = "localhost:11434";
+    private const string EndpointFieldId = "endpoint";
+    private const string GpuLayersFieldId = "gpu-layers";
+    private const string LlamaSharpCardId = "ai-llamasharp";
     private const string LocalStatusClass = "set-dest-local";
+    private const string ModelFieldId = "model";
+    private const string ModelPathFieldId = "model-path";
     private const string OllamaCardId = "ai-ollama";
     private const string OpenAiCardId = "ai-openai";
     private const string SubtitleSeparator = " · ";
+    private const string UrlFieldId = "url";
 
-    private static readonly IReadOnlyList<SettingsSelectOption> ClaudeModelOptions =
+    private static readonly IReadOnlyList<SettingsSelectOption> ClientTypeOptions =
     [
-        new("claude-sonnet-4-6", "claude-sonnet-4-6"),
-        new("claude-opus-4-6", "claude-opus-4-6"),
-        new("claude-haiku-4-5", "claude-haiku-4-5"),
-    ];
-
-    private static readonly IReadOnlyList<SettingsSelectOption> OpenAiModelOptions =
-    [
-        new("gpt-4o", "gpt-4o"),
-        new("gpt-4o-mini", "gpt-4o-mini"),
-        new("o1", "o1"),
-        new("o3-mini", "o3-mini"),
+        new(AiProviderClientTypes.ChatCompletions, "Chat Completion"),
+        new(AiProviderClientTypes.Responses, "Responses"),
+        new(AiProviderClientTypes.Assistants, "Assistants"),
     ];
 
     private readonly Dictionary<string, string> _messages = new(StringComparer.Ordinal);
@@ -39,9 +42,7 @@ public partial class SettingsAiSection : ComponentBase
     [Inject] private AiProviderSettingsStore SettingsStore { get; set; } = null!;
 
     [Parameter] public string DisplayStyle { get; set; } = string.Empty;
-
     [Parameter] public Func<string, bool> IsCardOpen { get; set; } = static _ => false;
-
     [Parameter] public EventCallback<string> ToggleCard { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -55,71 +56,44 @@ public partial class SettingsAiSection : ComponentBase
         await InvokeAsync(StateHasChanged);
     }
 
-    private static string BuildCardCssClass(AnthropicAiProviderSettings settings) =>
-        settings.IsConfigured() ? ActiveCssClass : string.Empty;
-
-    private static string BuildCardCssClass(OpenAiProviderSettings settings) =>
-        settings.IsConfigured() ? ActiveCssClass : string.Empty;
-
-    private static string BuildCardCssClass(OllamaAiProviderSettings settings) =>
-        settings.IsConfigured() ? ActiveCssClass : string.Empty;
-
-    private static string BuildStatusClass(AnthropicAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusClass : DisconnectedStatusClass;
-
-    private static string BuildStatusClass(OpenAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusClass : DisconnectedStatusClass;
-
-    private static string BuildStatusClass(OllamaAiProviderSettings settings) =>
-        settings.IsConfigured() ? LocalStatusClass : DisconnectedStatusClass;
-
-    private string BuildStatusLabel(AnthropicAiProviderSettings settings) =>
-        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
-
-    private string BuildStatusLabel(OpenAiProviderSettings settings) =>
-        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
-
-    private string BuildStatusLabel(OllamaAiProviderSettings settings) =>
-        settings.IsConfigured() ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
+    private static string BuildCardCssClass(bool isConfigured) => isConfigured ? ActiveCssClass : string.Empty;
+    private static string BuildStatusClass(bool isConfigured) => isConfigured ? LocalStatusClass : DisconnectedStatusClass;
+    private string BuildStatusLabel(bool isConfigured) => isConfigured ? Text(UiTextKey.CommonSavedLocally) : Text(UiTextKey.CommonNotConfigured);
 
     private string BuildClaudeSubtitle(AnthropicAiProviderSettings settings) =>
-        BuildCatalogSubtitle(Text(UiTextKey.SettingsAiClaudeTitle), settings.Model, ClaudeModelOptions);
+        settings.IsConfigured()
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), settings.Model)
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiClaudeTitle), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModel));
 
     private string BuildOpenAiSubtitle(OpenAiProviderSettings settings) =>
-        BuildCatalogSubtitle(Text(UiTextKey.SettingsAiOpenAiTitle), settings.Model, OpenAiModelOptions);
+        settings.IsConfigured()
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), BuildClientTypeLabel(settings.ClientType), settings.Model)
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOpenAiTitle), Text(UiTextKey.CommonClientType), Text(UiTextKey.CommonApiKey), Text(UiTextKey.CommonModel));
 
-    private string BuildOllamaSubtitle(OllamaAiProviderSettings settings)
-    {
-        var endpointLabel = BuildOllamaEndpointLabel(settings.Endpoint);
-        var modelLabel = string.IsNullOrWhiteSpace(settings.Model)
-            ? Text(UiTextKey.CommonSavedLocally).ToLowerInvariant()
-            : settings.Model.Trim();
+    private string BuildAzureOpenAiSubtitle(AzureOpenAiProviderSettings settings) =>
+        settings.IsConfigured()
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiAzureOpenAiTitle), BuildClientTypeLabel(settings.ClientType), BuildAuthorityLabel(settings.Endpoint), settings.Deployment)
+            : JoinSubtitleParts(
+                Text(UiTextKey.SettingsAiAzureOpenAiTitle),
+                Text(UiTextKey.CommonClientType),
+                Text(UiTextKey.CommonEndpoint),
+                Text(UiTextKey.CommonDeployment),
+                Text(UiTextKey.CommonApiVersion),
+                Text(UiTextKey.CommonApiKey));
 
-        return string.Join(
-            SubtitleSeparator,
-            new[]
-            {
-                Text(UiTextKey.SettingsAiSelfHosted),
-                endpointLabel,
-                modelLabel
-            });
-    }
+    private string BuildOllamaSubtitle(OllamaAiProviderSettings settings) =>
+        settings.IsConfigured()
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiSelfHosted), BuildAuthorityLabel(settings.Endpoint), settings.Model)
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiOllamaTitle), Text(UiTextKey.CommonEndpoint), Text(UiTextKey.CommonModel));
 
-    private string GetMessage(string providerId) =>
-        _messages.GetValueOrDefault(providerId) ?? string.Empty;
+    private string BuildLlamaSharpSubtitle(LlamaSharpProviderSettings settings) =>
+        settings.IsConfigured()
+            ? JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), BuildModelPathLabel(settings.ModelPath), BuildContextLabel(settings.ContextSize))
+            : JoinSubtitleParts(Text(UiTextKey.SettingsAiLlamaSharpTitle), Text(UiTextKey.CommonModelPath), Text(UiTextKey.CommonContextSize), Text(UiTextKey.CommonGpuLayers));
 
-    private static string BuildCatalogSubtitle(
-        string providerLabel,
-        string configuredModel,
-        IReadOnlyList<SettingsSelectOption> options)
-    {
-        var modelLabel = string.IsNullOrWhiteSpace(configuredModel)
-            ? string.Join(SubtitleSeparator, options.Select(static option => option.Label))
-            : configuredModel.Trim();
-        return string.Concat(providerLabel, SubtitleSeparator, modelLabel);
-    }
+    private string GetMessage(string providerId) => _messages.GetValueOrDefault(providerId) ?? string.Empty;
 
-    private static string BuildOllamaEndpointLabel(string endpoint)
+    private static string BuildAuthorityLabel(string endpoint)
     {
         if (Uri.TryCreate(endpoint, UriKind.Absolute, out var endpointUri) &&
             !string.IsNullOrWhiteSpace(endpointUri.Authority))
@@ -127,57 +101,50 @@ public partial class SettingsAiSection : ComponentBase
             return endpointUri.Authority;
         }
 
-        return LocalhostAuthority;
+        return endpoint;
     }
 
-    private Task OnClaudeModelChanged(ChangeEventArgs args)
+    private static string BuildModelPathLabel(string modelPath)
     {
-        _settings.ClaudeApi.Model = args.Value?.ToString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(modelPath))
+        {
+            return string.Empty;
+        }
+
+        return Path.GetFileName(modelPath.Trim());
+    }
+
+    private string BuildContextLabel(int contextSize) => string.Concat(Text(UiTextKey.CommonContextSize), " ", contextSize);
+
+    private static string JoinSubtitleParts(params string[] parts) =>
+        string.Join(SubtitleSeparator, parts.Where(static part => !string.IsNullOrWhiteSpace(part)).Select(static part => part.Trim()));
+
+    private static string BuildClientTypeLabel(string clientType) =>
+        ClientTypeOptions.FirstOrDefault(option => string.Equals(option.Value, clientType, StringComparison.Ordinal))?.Label
+        ?? ClientTypeOptions[0].Label;
+
+    private Task OnOpenAiClientTypeChanged(ChangeEventArgs args)
+    {
+        _settings.OpenAi.ClientType = args.Value?.ToString() ?? string.Empty;
         return Task.CompletedTask;
     }
 
-    private Task OnOpenAiModelChanged(ChangeEventArgs args)
+    private Task OnAzureOpenAiClientTypeChanged(ChangeEventArgs args)
     {
-        _settings.OpenAi.Model = args.Value?.ToString() ?? string.Empty;
+        _settings.AzureOpenAi.ClientType = args.Value?.ToString() ?? string.Empty;
         return Task.CompletedTask;
     }
 
-    private async Task SaveClaudeAsync()
+    private async Task SaveProviderAsync(string providerId)
     {
         await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.ClaudeApi] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
+        _messages[providerId] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
     }
 
-    private async Task SaveOpenAiAsync()
+    private async Task ClearProviderAsync(string providerId, Action reset)
     {
-        await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.OpenAi] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
-    }
-
-    private async Task SaveOllamaAsync()
-    {
-        await SettingsStore.SaveAsync(_settings);
-        _messages[SettingsAiProviderIds.Ollama] = Text(UiTextKey.SettingsAiSavedLocallyDetail);
-    }
-
-    private async Task ClearClaudeAsync()
-    {
-        _settings.ClaudeApi = new AnthropicAiProviderSettings();
-        _messages[SettingsAiProviderIds.ClaudeApi] = Text(UiTextKey.SettingsAiProviderCleared);
-        await SettingsStore.SaveAsync(_settings);
-    }
-
-    private async Task ClearOpenAiAsync()
-    {
-        _settings.OpenAi = new OpenAiProviderSettings();
-        _messages[SettingsAiProviderIds.OpenAi] = Text(UiTextKey.SettingsAiProviderCleared);
-        await SettingsStore.SaveAsync(_settings);
-    }
-
-    private async Task ClearOllamaAsync()
-    {
-        _settings.Ollama = new OllamaAiProviderSettings();
-        _messages[SettingsAiProviderIds.Ollama] = Text(UiTextKey.SettingsAiProviderCleared);
+        reset();
+        _messages[providerId] = Text(UiTextKey.SettingsAiProviderCleared);
         await SettingsStore.SaveAsync(_settings);
     }
 }

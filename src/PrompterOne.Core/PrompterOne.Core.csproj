@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="LLamaSharp" />
     <PackageReference Include="ManagedCode.MarkItDown" />
     <PackageReference Include="ManagedCode.MimeTypes" />
     <PackageReference Include="Microsoft.Agents.AI" />

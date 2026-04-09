@@ -16,10 +16,7 @@ public sealed class EditorMetadataTitleFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(MetadataTitleScenario);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
 
             var titleInput = page.GetByTestId(UiTestIds.Editor.Title);
             var authorInput = page.GetByTestId(UiTestIds.Editor.Author);

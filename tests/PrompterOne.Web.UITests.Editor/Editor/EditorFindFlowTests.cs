@@ -13,8 +13,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
     public Task EditorScreen_FindBarSelectsMatches_AndShowsNoResultState() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.FindBar)).ToBeVisibleAsync();
 
@@ -48,8 +47,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.FindSurfaceScenario);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
 
             var findBar = page.GetByTestId(UiTestIds.Editor.FindBar);
             var inputShell = page.GetByTestId(UiTestIds.Editor.FindInputShell);
@@ -87,8 +85,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.FindFocusScenario);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
 
             var input = page.GetByTestId(UiTestIds.Editor.FindInput);
 
