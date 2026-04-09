@@ -225,7 +225,10 @@ jobs:
         run: |
           mkdir -p "$PAGES_ARTIFACT_ROOT"
           cp -R "$PUBLISH_ROOT/wwwroot/." "$PAGES_ARTIFACT_ROOT/"
-          sed -i "s#<base href=\"/\" />#<base href=\"${PAGES_BASE_PATH}\" />#g" "$PAGES_ARTIFACT_ROOT/index.html"
+          pages_index_path="$PAGES_ARTIFACT_ROOT/index.html"
+          pages_index_temp_path="$PAGES_ARTIFACT_ROOT/index.html.tmp"
+          sed "s#<base href=\"/\" />#<base href=\"${PAGES_BASE_PATH}\" />#g" "$pages_index_path" > "$pages_index_temp_path"
+          mv "$pages_index_temp_path" "$pages_index_path"
           cp "$PAGES_ARTIFACT_ROOT/index.html" "$PAGES_ARTIFACT_ROOT/404.html"
           printf '%s\n' "$PAGES_CNAME" > "$PAGES_ARTIFACT_ROOT/CNAME"
           touch "$PAGES_ARTIFACT_ROOT/.nojekyll"
