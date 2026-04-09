@@ -12,7 +12,7 @@ public abstract class EnvironmentAwareParallelLimitBase : IParallelLimit
 
     public int Limit => ResolveLimit();
 
-    protected int ResolveLimit() =>
+    private int ResolveLimit() =>
         TestEnvironment.IsCiEnvironment
             ? CiLimit
             : LocalLimit;

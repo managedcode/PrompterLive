@@ -3,7 +3,6 @@ using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
 
-[NotInParallel(UiTestParallelization.EditorAuthoringConstraintKey)]
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)

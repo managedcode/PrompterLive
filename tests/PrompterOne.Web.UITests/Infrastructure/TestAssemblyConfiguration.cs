@@ -9,4 +9,5 @@ public sealed class MaxParallelTestsForPipeline : EnvironmentAwareParallelLimitB
 internal static class UiTestParallelization
 {
     public const string EditorAuthoringConstraintKey = nameof(EditorAuthoringConstraintKey);
+    public const string EditorPerformanceConstraintKey = nameof(EditorPerformanceConstraintKey);
 }
