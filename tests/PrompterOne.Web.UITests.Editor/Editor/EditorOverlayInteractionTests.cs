@@ -11,7 +11,7 @@ public sealed class EditorOverlayInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_HidesFloatingBarWhileToolbarDropdownIsOpen()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

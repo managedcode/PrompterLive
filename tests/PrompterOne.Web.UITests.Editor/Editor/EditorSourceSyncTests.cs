@@ -11,7 +11,7 @@ public sealed class EditorSourceSyncTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_DirectSourceHeaderEditsRefreshStructureTree()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

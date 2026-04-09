@@ -12,7 +12,7 @@ public sealed class EditorMinimapLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_MonacoMinimapStaysVisibleInsideEditorStage()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

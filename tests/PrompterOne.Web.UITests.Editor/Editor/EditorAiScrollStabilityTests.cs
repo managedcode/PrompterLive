@@ -14,7 +14,7 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_AiAction_DoesNotJumpScrollPositionForVisibleSelection()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

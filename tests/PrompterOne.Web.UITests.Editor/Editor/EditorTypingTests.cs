@@ -14,7 +14,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_RapidTypingUpdatesStructureAndPersistsAfterReload()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -47,7 +47,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_KeepsStyledOverlayVisibleAndPreservesClickCaretPlacement()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -75,7 +75,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_QuantumHeaderEditingKeepsBlockLineStyled()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -123,7 +123,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_SequentialTypingIntoSourceInputCompletesWithoutTimeout()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -146,7 +146,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_NewDraftDoesNotReplaceRouteWhileTypingIsStillSettling()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -180,7 +180,7 @@ public sealed class EditorTypingTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_QuantumTypingKeepsStyledOverlayVisibleResponsive()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

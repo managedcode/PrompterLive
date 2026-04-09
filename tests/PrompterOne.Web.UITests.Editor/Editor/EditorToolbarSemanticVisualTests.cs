@@ -17,7 +17,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarSemanticScenario);
 
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -126,7 +126,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarSurfaceScenario);
 
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -210,7 +210,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_EmotionDropdown_UsesCompactMenuRows()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -266,7 +266,7 @@ public sealed class EditorToolbarSemanticVisualTests(StandaloneAppFixture fixtur
     {
         UiScenarioArtifacts.ResetScenario(BrowserTestConstants.EditorFlow.ToolbarDropdownAlignmentScenario);
 
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

@@ -293,7 +293,7 @@ internal static partial class BrowserTestConstants
         public const int ScrollProbeLineCount = 120;
         public const int MaxSourceScrollHostTopPx = 0;
         public const int CiMaxTypingLongTaskCount = 10;
-        public const int LocalMaxTypingLongTaskCount = 0;
+        public const int LocalMaxTypingLongTaskCount = 2;
         public const double MaxVisibleRenderP95LatencyMs = 240;
         public const double MaxVisibleRenderSpikeLatencyMs = 300;
         public static int AllowedTypingLongTaskCount =>

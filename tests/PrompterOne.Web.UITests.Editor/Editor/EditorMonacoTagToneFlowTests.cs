@@ -19,7 +19,7 @@ public sealed class EditorMonacoTagToneFlowTests(StandaloneAppFixture fixture)
     {
         UiScenarioArtifacts.ResetScenario(ScenarioName);
 
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {

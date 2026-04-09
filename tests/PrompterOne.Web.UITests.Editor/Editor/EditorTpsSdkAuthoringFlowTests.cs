@@ -135,7 +135,7 @@ public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 
     private async Task<Microsoft.Playwright.IPage> OpenEditorAsync()
     {
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
         await page.GotoAsync(BrowserTestConstants.Routes.EditorDemo);
         await Expect(page.GetByTestId(UiTestIds.Editor.Page))
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });

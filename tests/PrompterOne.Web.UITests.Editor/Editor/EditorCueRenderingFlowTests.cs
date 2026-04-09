@@ -16,7 +16,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
     {
         UiScenarioArtifacts.ResetScenario(CueScenario);
 
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -85,7 +85,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
     {
         UiScenarioArtifacts.ResetScenario(CueScenario);
 
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {

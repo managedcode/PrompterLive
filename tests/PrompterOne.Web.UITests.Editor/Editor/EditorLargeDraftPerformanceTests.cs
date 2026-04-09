@@ -15,7 +15,7 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_LargeDraftPasteKeepsFollowupTypingResponsive()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -120,7 +120,7 @@ public sealed class EditorLargeDraftPerformanceTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_LargeDraftSegmentNavigationMovesCaretAndTargetEpisodeIntoView()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

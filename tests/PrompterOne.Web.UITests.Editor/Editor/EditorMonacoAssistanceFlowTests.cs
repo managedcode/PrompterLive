@@ -51,7 +51,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
     [Test]
     public async Task EditorScreen_TokenizesSupportedTpsSyntaxWithMonacoLanguage()
     {
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -95,7 +95,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
     [MethodDataSource(nameof(CompletionLabels))]
     public async Task EditorScreen_ProvidesMonacoTpsCompletionLabel(string expectedLabel)
     {
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -119,7 +119,7 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
     [Test]
     public async Task EditorScreen_ProvidesMonacoHoverHelpForTpsAuthoring()
     {
-        var page = await fixture.NewPageAsync();
+        var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {

@@ -15,7 +15,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_ShowsFloatingBarAndAppliesFormattingToSelectedSourceText()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -40,7 +40,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_UndoAndRedoWorkFromToolbarAndKeyboard()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -79,7 +79,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FloatingToolbarShowsAiAndPersistsSelectionFormatting()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -110,7 +110,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FloatingEmotionMenuAppliesSelectedEmotion()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -136,7 +136,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     public async Task EditorScreen_FloatingMenusExposeExpandedTpsSurface()
     {
         const string scenarioName = "editor-floating-tps-surface";
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
         UiScenarioArtifacts.ResetScenario(scenarioName);
 
         try
@@ -163,7 +163,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FloatingVoiceMenuAppliesWhisperCue()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -188,7 +188,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FloatingEmotionMenuAppliesDeliveryModeCue()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -213,7 +213,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FloatingPauseSpeedAndInsertMenusApplyExtendedTpsCues()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -251,7 +251,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_DoesNotRenderLegacyStructureInspectorPanel()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -270,7 +270,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_HidesFrontMatterFromVisibleEditorBody()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -292,7 +292,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_MetadataDurationPersistsAfterReload()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -327,7 +327,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_ClickableMenusAndAiButtonsApplyCommands()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -374,7 +374,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_TopToolbarShowsVisibleStructureButtons()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -400,7 +400,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_FullToolbarSurfaceSupportsExtendedCommands()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -450,7 +450,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_ToolbarDropdownsCloseCentrallyAcrossCommandsAndOutsideClicks()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

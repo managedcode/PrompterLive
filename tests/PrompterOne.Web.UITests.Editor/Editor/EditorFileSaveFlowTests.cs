@@ -31,7 +31,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_SaveFile_UsesFilePickerAndWritesCanonicalTpsDocument()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -63,7 +63,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_SaveFile_FallsBackToDownloadWhenSavePickerIsUnavailable()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

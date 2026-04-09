@@ -17,7 +17,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_FloatingToolbarKeepsFullHeightWhenSelectionIsActive()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -41,7 +41,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_FloatingToolbarStaysAboveMultiLineSelection()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -92,7 +92,7 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
     [Test]
     public async Task EditorScreen_FloatingToolbarStaysPinnedAfterFloatingFormatAction()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

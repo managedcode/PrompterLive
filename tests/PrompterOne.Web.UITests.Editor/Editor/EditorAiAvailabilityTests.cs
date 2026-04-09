@@ -11,7 +11,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_AiButtonsAreDisabled_WhenNoProviderIsConfigured()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -32,7 +32,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_AiButtonsAreEnabled_WhenAProviderIsConfigured()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

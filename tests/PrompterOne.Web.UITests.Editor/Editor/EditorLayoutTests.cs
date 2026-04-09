@@ -12,7 +12,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_MetadataRailStaysDockedToRightOfMainPanel()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -44,7 +44,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_SourceEditorUsesSingleVerticalScrollSurface()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -102,7 +102,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_CreatedDateFieldShowsVisibleCalendarIcon()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -132,7 +132,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_ToolbarKeepsFarActionsReachableOnPhoneLandscape()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
@@ -207,7 +207,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
     [Test]
     public async Task EditorScreen_UsesAvailableWidthAndMetadataRailCanCollapse()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

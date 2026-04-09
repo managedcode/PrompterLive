@@ -28,7 +28,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
     [MethodDataSource(nameof(MenuScenarios))]
     public async Task EditorToolbar_MenuTrigger_ExposesExpectedBehavior(EditorMenuScenario scenario)
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
         var browserErrors = BrowserErrorCollector.Attach(page);
 
         try
@@ -53,7 +53,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
     [MethodDataSource(nameof(FloatingMenuScenarios))]
     public async Task EditorToolbar_FloatingMenuTrigger_ExposesExpectedBehavior(EditorMenuScenario scenario)
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
         var browserErrors = BrowserErrorCollector.Attach(page);
 
         try
@@ -81,7 +81,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
     [MethodDataSource(nameof(AiScenarios))]
     public async Task EditorToolbar_AiAction_MutatesSource(EditorAiScenario scenario)
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
         var browserErrors = BrowserErrorCollector.Attach(page);
 
         try
@@ -120,7 +120,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
     [MethodDataSource(nameof(ToolbarCommandScenarios))]
     public async Task EditorToolbar_CommandButton_MutatesSource(EditorCommandScenario scenario)
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
         var browserErrors = BrowserErrorCollector.Attach(page);
 
         try
@@ -153,7 +153,7 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
     [MethodDataSource(nameof(FloatingCommandScenarios))]
     public async Task EditorToolbar_FloatingCommandButton_MutatesSource(EditorCommandScenario scenario)
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {

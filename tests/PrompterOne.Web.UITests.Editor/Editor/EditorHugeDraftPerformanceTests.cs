@@ -14,7 +14,7 @@ public sealed class EditorHugeDraftPerformanceTests(StandaloneAppFixture fixture
     [Test]
     public async Task EditorScreen_HugeDraftLoadedFromSeedKeepsFollowupTypingResponsive()
     {
-        var page = await _fixture.NewPageAsync();
+        var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
