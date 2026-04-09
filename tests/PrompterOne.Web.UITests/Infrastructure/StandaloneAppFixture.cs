@@ -81,7 +81,9 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
             try
             {
                 await WarmUpContextWithSacrificialPageAsync(context);
-                return await CreatePrimedPageAsync(context);
+                var page = await CreatePrimedPageAsync(context);
+                await WarmUpContextPageIfNeededAsync(page, BaseAddress);
+                return page;
             }
             catch (PlaywrightException exception) when (attempt < ContextBootstrapAttemptCount && IsBrowserClosedException(exception))
             {
