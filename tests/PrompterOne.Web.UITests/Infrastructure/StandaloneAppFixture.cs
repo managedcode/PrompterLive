@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.Playwright;
+using PrompterOne.Testing;
 
 namespace PrompterOne.Web.UITests;
 
@@ -79,11 +80,8 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
 
             try
             {
-                var page = await context.NewPageAsync();
-                PreparePage(page);
-                await PrimeIsolatedBrowserStorageAsync(page);
-                await WarmUpContextPageIfNeededAsync(page, BaseAddress);
-                return page;
+                await WarmUpContextWithSacrificialPageAsync(context);
+                return await CreatePrimedPageAsync(context);
             }
             catch (PlaywrightException exception) when (attempt < ContextBootstrapAttemptCount && IsBrowserClosedException(exception))
             {
@@ -104,20 +102,13 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
 
             try
             {
-                var page = await context.NewPageAsync();
-                PreparePage(page);
-
                 if (isNewSharedContext)
                 {
-                    await PrimeIsolatedBrowserStorageAsync(page);
-                    await WarmUpContextPageIfNeededAsync(page, BaseAddress, warmAllRuntimeRoutes: true);
-                }
-                else
-                {
-                    await page.GotoAsync($"{BaseAddress}{UiTestHostConstants.BlankPagePath}");
+                    await WarmUpContextWithSacrificialPageAsync(context, warmAllRuntimeRoutes: true);
+                    return await CreatePrimedPageAsync(context);
                 }
 
-                return page;
+                return await CreateBlankPageAsync(context);
             }
             catch (PlaywrightException exception) when (attempt < ContextBootstrapAttemptCount && IsBrowserClosedException(exception))
             {
@@ -241,8 +232,60 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
     private static bool IsContextWarmupFailure(InvalidOperationException exception) =>
         exception.Message.StartsWith("Browser context warmup failed.", StringComparison.Ordinal);
 
+    private async Task<IPage> CreatePrimedPageAsync(IBrowserContext context)
+    {
+        var page = await context.NewPageAsync();
+        PreparePage(page);
+        await PrimeIsolatedBrowserStorageAsync(page);
+        return page;
+    }
+
+    private async Task<IPage> CreateBlankPageAsync(IBrowserContext context)
+    {
+        var page = await context.NewPageAsync();
+        PreparePage(page);
+        await page.GotoAsync($"{BaseAddress}{UiTestHostConstants.BlankPagePath}");
+        return page;
+    }
+
+    private async Task WarmUpContextWithSacrificialPageAsync(IBrowserContext context, bool warmAllRuntimeRoutes = false)
+    {
+        if (!TestEnvironment.IsCiEnvironment)
+        {
+            return;
+        }
+
+        var warmupPage = await context.NewPageAsync();
+
+        try
+        {
+            // Warm a disposable page so the returned test page stays clean and isolated.
+            PreparePage(warmupPage);
+            await PrimeIsolatedBrowserStorageAsync(warmupPage);
+            await WarmUpContextPageIfNeededAsync(warmupPage, BaseAddress, warmAllRuntimeRoutes);
+        }
+        finally
+        {
+            await ClosePageAsync(warmupPage);
+        }
+    }
+
     private Task PrimeIsolatedBrowserStorageAsync(IPage page) =>
         PrimeIsolatedBrowserStorageAsync(page, BaseAddress);
+
+    private static async Task ClosePageAsync(IPage page)
+    {
+        try
+        {
+            if (!page.IsClosed)
+            {
+                await page.CloseAsync();
+            }
+        }
+        catch
+        {
+        }
+    }
 
     private static void PreparePage(IPage page)
     {
