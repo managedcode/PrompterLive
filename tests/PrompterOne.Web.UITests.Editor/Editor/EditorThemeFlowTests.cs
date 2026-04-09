@@ -49,22 +49,20 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
                 var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
                 var emotionMenu = page.GetByTestId(UiTestIds.Editor.MenuEmotion);
                 var motivationalEmotion = page.GetByTestId(UiTestIds.Editor.EmotionMotivational);
-                var tooltip = page.GetByTestId(UiTestIds.Editor.ToolbarTooltip)
-                    .Filter(new() { HasTextString = BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText });
+                var tooltip = EditorTooltipDriver.GetToolbarTooltip(page, BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText);
 
                 await emotionTrigger.ClickAsync();
                 await Expect(emotionMenu).ToBeVisibleAsync();
                 await Expect(motivationalEmotion).ToBeVisibleAsync();
 
                 await motivationalEmotion.HoverAsync();
-                await page.WaitForTimeoutAsync(BrowserTestConstants.EditorFlow.TooltipSettleDelayMs);
-                await Expect(tooltip).ToBeVisibleAsync();
+                await EditorTooltipDriver.WaitUntilFullyVisibleAsync(page, tooltip, BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText);
 
                 var menuBackground = await ReadCssColorAsync(emotionMenu, BackgroundColorProperty);
                 var menuItemColor = await ReadCssColorAsync(motivationalEmotion, ColorProperty);
                 var tooltipBackground = await ReadCssColorAsync(tooltip, BackgroundColorProperty);
                 var tooltipColor = await ReadCssColorAsync(tooltip, ColorProperty);
-                var tooltipOpacity = await ReadOpacityAsync(tooltip);
+                var tooltipOpacity = await EditorTooltipDriver.ReadOpacityAsync(tooltip);
 
                 await Assert.That(await motivationalEmotion.GetAttributeAsync("title")).IsNull();
                 await Assert.That(await motivationalEmotion.GetAttributeAsync("aria-label")).IsEqualTo(BrowserTestConstants.EditorFlow.MotivationalEmotionTooltipText);
@@ -116,9 +114,4 @@ public sealed class EditorThemeFlowTests(StandaloneAppFixture fixture) : AppUiTe
             """,
             propertyName);
 
-    private static async Task<double> ReadOpacityAsync(ILocator locator) =>
-        await locator.EvaluateAsync<double>(
-            """
-            element => Number.parseFloat(getComputedStyle(element).opacity)
-            """);
 }

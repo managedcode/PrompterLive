@@ -872,6 +872,7 @@ internal static partial class BrowserTestConstants
         public const int DefaultVisibleTimeoutMs = 10_000;
         public const int DiagnosticPollDelayMs = 50;
         public const int ExtendedVisibleTimeoutMs = 15_000;
+        public const int RuntimeWarmupVisibleTimeoutMs = 45_000;
         public const int NewDraftPersistGraceDelayMs = 700;
         public const int NewDraftPersistSettleDelayMs = 2_200;
         public const int FloatingToolbarSettleDelayMs = 500;

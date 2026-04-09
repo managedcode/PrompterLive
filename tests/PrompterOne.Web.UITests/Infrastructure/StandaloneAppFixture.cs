@@ -139,13 +139,7 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
     {
         var runtime = await EnsureRuntimeHandleAsync();
         var context = await CreateBrowserContextAsync(runtime.Browser);
-        await context.AddInitScriptAsync(BrowserTestLibrarySeedData.CreateInitializationScript());
-        await context.AddInitScriptAsync(UiTestHostConstants.RuntimeTelemetryHarnessInitializationScript);
-        await context.GrantPermissionsAsync(UiTestHostConstants.GrantedPermissions, new BrowserContextGrantPermissionsOptions
-        {
-            Origin = runtime.BaseAddress
-        });
-        await ConfigureMediaHarnessAsync(context);
+        await InitializeContextAsync(context, BaseAddress);
         EnsureContextTracked(context);
         return context;
     }
@@ -210,28 +204,12 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
     {
         try
         {
-            return await browser.NewContextAsync(new BrowserNewContextOptions
-            {
-                BaseURL = BaseAddress,
-                ViewportSize = new()
-                {
-                    Width = BrowserTestConstants.Viewport.DefaultWidth,
-                    Height = BrowserTestConstants.Viewport.DefaultHeight
-                }
-            });
+            return await CreateBrowserContextAsync(browser, BaseAddress);
         }
         catch (PlaywrightException exception) when (IsBrowserClosedException(exception))
         {
             _runtimeHandle = await SharedRuntime.AcquireAsync();
-            return await _runtimeHandle.Browser.NewContextAsync(new BrowserNewContextOptions
-            {
-                BaseURL = _runtimeHandle.BaseAddress,
-                ViewportSize = new()
-                {
-                    Width = BrowserTestConstants.Viewport.DefaultWidth,
-                    Height = BrowserTestConstants.Viewport.DefaultHeight
-                }
-            });
+            return await CreateBrowserContextAsync(_runtimeHandle.Browser, _runtimeHandle.BaseAddress);
         }
     }
 
@@ -239,14 +217,8 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
         exception.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal)
         || exception.Message.Contains("Process exited", StringComparison.Ordinal);
 
-    private async Task PrimeIsolatedBrowserStorageAsync(IPage page)
-    {
-        await page.GotoAsync($"{BaseAddress}{UiTestHostConstants.BlankPagePath}");
-        await page.EvaluateAsync(
-            UiTestHostConstants.ResetBrowserStorageScript,
-            UiTestHostConstants.BrowserStorageDatabaseName);
-        await page.EvaluateAsync(BrowserTestLibrarySeedData.CreateInitializationScript());
-    }
+    private Task PrimeIsolatedBrowserStorageAsync(IPage page) =>
+        PrimeIsolatedBrowserStorageAsync(page, BaseAddress);
 
     private static void PreparePage(IPage page)
     {
@@ -311,6 +283,7 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
             _playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             _playwright.Selectors.SetTestIdAttribute(BrowserTestConstants.Html.DataTestAttribute);
             _browser = await CreateBrowserAsync(_playwright);
+            await WarmUpRuntimeAsync(_browser, _server.BaseAddress);
         }
 
         private static StaticSpaServer CreateServer()

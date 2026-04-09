@@ -95,9 +95,7 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
 
     private static async Task AssertTooltipDismissesAsync(IPage page, ILocator trigger, ILocator tooltip)
     {
-        await page.Mouse.MoveAsync(
-            BrowserTestConstants.TooltipAuditFlow.ClearHoverX,
-            BrowserTestConstants.TooltipAuditFlow.ClearHoverY);
+        await page.GetByTestId(UiTestIds.Teleprompter.Stage).HoverAsync();
         await Expect(tooltip).ToBeHiddenAsync(
             new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
 
