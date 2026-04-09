@@ -28,8 +28,4 @@
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <Compile Include="$(MSBuildThisFileDirectory)tests/Shared/TestProgressHooks.cs" Link="TestProgressHooks.cs" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(IsTestProject)' == 'true' and '$(TestingPlatformCommandLineArguments)' == ''">
-    <TestingPlatformCommandLineArguments>--output detailed --no-ansi</TestingPlatformCommandLineArguments>
-  </PropertyGroup>
 </Project>
