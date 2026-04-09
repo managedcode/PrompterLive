@@ -6,7 +6,6 @@ using static Microsoft.Playwright.Assertions;
 namespace PrompterOne.Web.UITests;
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-[NotInParallel(nameof(EditorTypingTests))]
 public sealed class EditorTypingTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;

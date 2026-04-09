@@ -6,7 +6,6 @@ namespace PrompterOne.Web.UITests;
 [System.Obsolete]
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-[NotInParallel(nameof(EditorTpsSdkAuthoringFlowTests))]
 public sealed class EditorTpsSdkAuthoringFlowTests(StandaloneAppFixture fixture)
 {
     private const string MinimalDocument = "# TPS Authoring";

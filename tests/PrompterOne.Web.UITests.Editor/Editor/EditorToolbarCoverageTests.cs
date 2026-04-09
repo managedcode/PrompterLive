@@ -8,7 +8,6 @@ namespace PrompterOne.Web.UITests;
 [System.Obsolete]
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-[NotInParallel(nameof(EditorToolbarCoverageTests))]
 public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;

@@ -6,7 +6,6 @@ namespace PrompterOne.Web.UITests;
 [System.Obsolete]
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-[NotInParallel(nameof(EditorSelectionRenderRegressionTests))]
 public sealed class EditorSelectionRenderRegressionTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
     [Test]

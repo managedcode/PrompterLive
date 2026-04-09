@@ -5,7 +5,6 @@ namespace PrompterOne.Web.UITests;
 [System.Obsolete]
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-[NotInParallel(nameof(EditorMonacoAssistanceRegressionTests))]
 public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture fixture)
 {
     private const int TitleLineNumber = 1;
