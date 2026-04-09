@@ -15,6 +15,7 @@ public sealed class EditorAiAvailabilityTests(StandaloneAppFixture fixture)
 
         try
         {
+            await AiProviderTestSeeder.SeedUnconfiguredAsync(page);
             await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 

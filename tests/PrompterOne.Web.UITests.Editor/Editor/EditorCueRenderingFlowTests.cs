@@ -1,6 +1,5 @@
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services.Editor;
-using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
 

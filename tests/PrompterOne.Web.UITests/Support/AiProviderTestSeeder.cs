@@ -29,4 +29,18 @@ internal static class AiProviderTestSeeder
                 json
             });
     }
+
+    internal static Task SeedUnconfiguredAsync(IPage page)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+
+        var json = JsonSerializer.Serialize(AiProviderSettings.CreateDefault().Normalize());
+        return page.EvaluateAsync(
+            BrowserTestConstants.Localization.SetLocalStorageScript,
+            new object[]
+            {
+                string.Concat(BrowserStorageKeys.SettingsPrefix, AiProviderSettings.StorageKey),
+                json
+            });
+    }
 }
