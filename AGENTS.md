@@ -487,6 +487,7 @@ Ask first:
 ### Likes
 
 - exact fidelity with the shipped Blazor UI and current runtime behavior, not a separate prototype tree
+- localization as a default part of every UI task; menu labels, section copy, buttons, and other user-facing text should be localized in the same change, not deferred
 - thin WASM host boundaries
 - browser-realistic UI verification
 - domain logic that stays reusable and serializable

@@ -18,8 +18,8 @@
                         type="button"
                         @onclick="() => OnNavigate.InvokeAsync(new EditorNavigationTarget(segment.Index, null, segment.StartIndex, segment.EndIndex))">
                     <div class="ed-tree-dot"></div>
-                    <span>@segment.Name</span>
-                    <small>@segment.EmotionLabel</small>
+                    <span class="ed-tree-seg__name" title="@segment.Name">@segment.Name</span>
+                    <small title="@segment.EmotionLabel">@segment.EmotionLabel</small>
                 </button>
                 <div class="ed-tree-children">
                     @foreach (var block in segment.Blocks)
@@ -31,7 +31,7 @@
                                 data-test="@UiTestIds.Editor.BlockNavigation(segment.Index, block.Index)"
                                 type="button"
                                 @onclick="() => OnNavigate.InvokeAsync(new EditorNavigationTarget(segment.Index, block.Index, block.StartIndex, block.EndIndex))">
-                            <span>@block.Name</span>
+                            <span class="ed-tree-block__name" title="@block.Name">@block.Name</span>
                             <code>@block.TargetWpmLabel</code>
                         </button>
                     }

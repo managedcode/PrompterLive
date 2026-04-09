@@ -35,17 +35,6 @@ public sealed class ScriptImportDescriptorService
     }
 
     private static string ResolveFallbackTitle(string fileName)
-    {
-        var suffix = ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(fileName);
-        if (suffix is null)
-        {
-            return ScriptWorkspaceState.UntitledScriptTitle;
-        }
-
-        var stem = fileName[..^suffix.Length].Trim();
-        return string.IsNullOrWhiteSpace(stem)
-            ? ScriptWorkspaceState.UntitledScriptTitle
-            : stem;
-    }
+        => ScriptDocumentFileTypes.ResolveSaveTitle(fileName);
 
 }

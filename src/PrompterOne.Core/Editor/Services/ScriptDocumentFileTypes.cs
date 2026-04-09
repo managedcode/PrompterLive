@@ -73,6 +73,12 @@ public static class ScriptDocumentFileTypes
         return suffix is ".tps" or ".tps.md" or ".md.tps";
     }
 
+    public static string ResolvePickerTitle(string? fileName) =>
+        ResolveTitle(fileName, ResolvePickerSupportedSuffix(fileName));
+
+    public static string ResolveSaveTitle(string? fileName) =>
+        ResolveTitle(fileName, ResolveSaveSupportedSuffix(fileName));
+
     public static string BuildImportedDocumentName(string? fileName)
     {
         var normalizedFileName = NormalizeFileName(fileName);
@@ -108,6 +114,20 @@ public static class ScriptDocumentFileTypes
 
     private static string BuildUntitledImportedDocumentName() =>
         string.Concat(Path.GetFileNameWithoutExtension(ScriptWorkspaceState.UntitledScriptDocumentName), CanonicalImportedExtension);
+
+    private static string ResolveTitle(string? fileName, string? suffix)
+    {
+        var normalizedFileName = NormalizeFileName(fileName);
+        if (string.IsNullOrWhiteSpace(normalizedFileName) || string.IsNullOrWhiteSpace(suffix))
+        {
+            return ScriptWorkspaceState.UntitledScriptTitle;
+        }
+
+        var stem = normalizedFileName[..^suffix.Length].Trim();
+        return string.IsNullOrWhiteSpace(stem)
+            ? ScriptWorkspaceState.UntitledScriptTitle
+            : stem;
+    }
 
     private static string? ResolveMatchingSuffix(string? fileName, IReadOnlyList<string> suffixes)
     {

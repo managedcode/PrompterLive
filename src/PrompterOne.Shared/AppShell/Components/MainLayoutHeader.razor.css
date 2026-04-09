@@ -4,6 +4,14 @@
     flex: 0 0 auto;
 }
 
+.app-header-title {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .app-header-import-progress {
     position: absolute;
     top: calc(100% + 8px);

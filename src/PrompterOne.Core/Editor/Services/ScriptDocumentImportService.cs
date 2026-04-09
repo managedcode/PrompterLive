@@ -31,8 +31,12 @@ public sealed class ScriptDocumentImportService(ScriptImportDescriptorService de
             ? await ReadTextAsync(stream, cancellationToken)
             : await ConvertToMarkdownAsync(stream, normalizedFileName, mimeType, cancellationToken);
         var importedDocumentName = ScriptDocumentFileTypes.BuildImportedDocumentName(normalizedFileName);
+        var descriptor = _descriptorService.Build(importedDocumentName, text);
 
-        return _descriptorService.Build(importedDocumentName, text);
+        return descriptor with
+        {
+            Title = ScriptDocumentFileTypes.ResolvePickerTitle(normalizedFileName)
+        };
     }
 
     private static async Task<string> ConvertToMarkdownAsync(
