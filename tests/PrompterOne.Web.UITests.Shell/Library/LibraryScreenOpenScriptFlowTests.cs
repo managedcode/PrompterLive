@@ -62,7 +62,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(importPath);
 
-                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await EditorIsolatedDraftDriver.WaitForImportedDraftAsync(page, BodyOnlyTitle, BodyOnlyDocument);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(BodyOnlyTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BodyOnlyDocument);
             }
@@ -112,7 +112,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(firstImportPath);
 
-                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await EditorIsolatedDraftDriver.WaitForImportedDraftAsync(page, FirstImportTitle, FirstImportDocument);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(FirstImportTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(FirstImportDocument);
 
@@ -121,7 +121,7 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(secondImportPath);
 
-                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await EditorIsolatedDraftDriver.WaitForImportedDraftAsync(page, SecondImportTitle, SecondImportBody);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(SecondImportTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(SecondImportBody);
                 await Assert.That(new Uri(page.Url).Query).Contains($"{AppRoutes.ScriptIdQueryKey}=");

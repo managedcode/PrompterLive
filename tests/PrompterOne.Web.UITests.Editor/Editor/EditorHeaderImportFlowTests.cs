@@ -28,6 +28,7 @@ public sealed class EditorHeaderImportFlowTests(StandaloneAppFixture fixture) : 
                 await page.GetByTestId(UiTestIds.Header.EditorImportScriptInput)
                     .SetInputFilesAsync(importPath);
 
+                await EditorIsolatedDraftDriver.WaitForImportedDraftAsync(page, ImportedTitle, ImportedHeading, ImportedParagraph);
                 var headerTitle = page.GetByTestId(UiTestIds.Header.Title);
                 await Expect(headerTitle).ToHaveTextAsync(ImportedTitle);
                 await Expect(headerTitle).ToHaveAttributeAsync("title", ImportedTitle);

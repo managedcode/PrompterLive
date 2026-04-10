@@ -84,11 +84,12 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.LeadershipCard)).ToContainTextAsync(BrowserTestConstants.Scripts.LeadershipTitle);
             var leadershipMenuDropdown = page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.LeadershipId));
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)));
-            await Expect(leadershipMenuDropdown).ToBeVisibleAsync();
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardDuplicate(BrowserTestConstants.Scripts.LeadershipId)));
+            var leadershipMenuTrigger = page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId));
+            var leadershipDuplicateAction = leadershipMenuDropdown.GetByTestId(
+                UiTestIds.Library.CardDuplicate(BrowserTestConstants.Scripts.LeadershipId));
+            await Expect(leadershipMenuDropdown).ToBeHiddenAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(leadershipMenuTrigger, leadershipMenuDropdown);
+            await UiInteractionDriver.ClickAndContinueAsync(leadershipDuplicateAction);
 
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.OpenSettings));
             await ShellRouteDriver.WaitForSettingsReadyAsync(page);
@@ -136,7 +137,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(importPath);
 
-                await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                await EditorIsolatedDraftDriver.WaitForImportedDraftAsync(page, ImportedTitle, ImportedBodyOnly);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(ImportedTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(ImportedBodyOnly);
                 await Expect(page.GetByTestId(UiTestIds.Editor.Profile)).ToHaveValueAsync(ImportedProfile);

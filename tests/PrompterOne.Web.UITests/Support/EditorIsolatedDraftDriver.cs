@@ -63,6 +63,38 @@ internal static class EditorIsolatedDraftDriver
         return CreateDraftAsync(page, visibleText, title, waitForPersistedRoute);
     }
 
+    internal static async Task WaitForImportedDraftAsync(
+        IPage page,
+        string expectedTitle,
+        params string[] expectedSourceFragments)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(expectedTitle);
+        ArgumentNullException.ThrowIfNull(expectedSourceFragments);
+
+        await EditorMonacoDriver.WaitUntilReadyAsync(page);
+        await page.WaitForFunctionAsync(
+            """
+            args => {
+                const titleElement = document.querySelector(`[data-test="${args.headerTitleTestId}"]`);
+                const sourceElement = document.querySelector(`[data-test="${args.sourceInputTestId}"]`);
+                const titleText = titleElement?.textContent?.trim() ?? "";
+                const titleAttribute = titleElement?.getAttribute("title") ?? "";
+                const sourceValue = sourceElement?.value ?? "";
+                return titleText === args.expectedTitle
+                    && titleAttribute === args.expectedTitle
+                    && args.expectedSourceFragments.every(fragment => sourceValue.includes(fragment));
+            }
+            """,
+            new
+            {
+                headerTitleTestId = UiTestIds.Header.Title,
+                sourceInputTestId = UiTestIds.Editor.SourceInput,
+                expectedTitle,
+                expectedSourceFragments
+            },
+            new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
+    }
+
     private static async Task SetTitleAsync(IPage page, string title)
     {
         var titleInput = page.GetByTestId(UiTestIds.Editor.Title);

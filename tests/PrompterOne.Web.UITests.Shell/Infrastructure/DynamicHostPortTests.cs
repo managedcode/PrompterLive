@@ -1,4 +1,3 @@
-using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Services;
 using static Microsoft.Playwright.Assertions;
@@ -42,15 +41,12 @@ public sealed class DynamicHostPortTests(StandaloneAppFixture fixture)
     [Test]
     public async Task NewPageAsync_RepeatedBootstrap_DoesNotTripShellDiagnostics()
     {
-        var pages = new List<IPage>(RepeatedBootstrapPageCount);
-
-        try
+        for (var pageIndex = 0; pageIndex < RepeatedBootstrapPageCount; pageIndex++)
         {
-            for (var pageIndex = 0; pageIndex < RepeatedBootstrapPageCount; pageIndex++)
-            {
-                var page = await _fixture.NewPageAsync(additionalContext: true);
-                pages.Add(page);
+            var page = await _fixture.NewPageAsync(additionalContext: true);
 
+            try
+            {
                 await BrowserRouteDriver.OpenPageAsync(
                     page,
                     BrowserTestConstants.Routes.Library,
@@ -58,10 +54,7 @@ public sealed class DynamicHostPortTests(StandaloneAppFixture fixture)
                     nameof(NewPageAsync_RepeatedBootstrap_DoesNotTripShellDiagnostics));
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Bootstrap)).ToBeHiddenAsync();
             }
-        }
-        finally
-        {
-            foreach (var page in pages)
+            finally
             {
                 await page.Context.CloseAsync();
             }

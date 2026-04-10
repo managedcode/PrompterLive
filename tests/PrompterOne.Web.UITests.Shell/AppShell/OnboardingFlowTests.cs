@@ -171,8 +171,14 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await page.WaitForURLAsync(expectedRoutePattern);
         }
 
+        await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface))
+            .ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Onboarding.Title))
             .ToHaveTextAsync(expectedTitle);
+        await Expect(page.GetByTestId(UiTestIds.Onboarding.Next))
+            .ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Onboarding.Next))
+            .ToBeEnabledAsync();
         await UiScenarioArtifacts.CapturePageAsync(
             page,
             BrowserTestConstants.AppShellFlow.OnboardingScenario,

@@ -223,6 +223,17 @@ Tracked failing tests from the current baseline:
   - introduce a shared `NoWaitAfter` click helper for SPA route/state-changing controls and use it in the failing Shell, Studio, and Editor flows
   - retry page screenshot capture in the shared artifact helper
   - stop awaiting camera detach inside `GoLivePage` location-changing so route leaves are not blocked by cleanup
+- [x] `StandaloneAppFixture` shared-context creation still exposed accidental cross-test coupling
+  Symptom:
+  - the browser harness still defaulted `NewPageAsync()` to the shared-storage path, so any missing `additionalContext: true` quietly joined a shared browser context and became order-dependent under CI parallelism
+  - shared-context bootstrap failures could also leave a poisoned shared context cached for later reuse
+  Root cause:
+  - isolation was opt-in instead of the default browser-harness contract
+  - shared-context creation was not explicit enough, and retry eviction only handled a narrow closed-browser exception path
+  Fix path:
+  - switch `StandaloneAppFixture.NewPageAsync()` to isolated-by-default
+  - add explicit `NewSharedPageAsync(...)` / explicit-key `NewSharedPagesAsync(...)` APIs for the few real shared-tab scenarios
+  - evict and dispose shared contexts on any blank-page bootstrap failure before retrying
 
 ## Ordered Plan
 

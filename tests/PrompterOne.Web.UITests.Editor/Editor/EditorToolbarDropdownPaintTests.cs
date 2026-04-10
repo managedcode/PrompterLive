@@ -1,4 +1,3 @@
-using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -28,12 +27,10 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
         {
             UiScenarioArtifacts.ResetScenario(ScenarioName);
 
-            await page.GotoAsync(
+            await EditorRouteDriver.OpenReadyAsync(
+                page,
                 BrowserTestConstants.Routes.EditorDemo,
-                new() { WaitUntil = WaitUntilState.DOMContentLoaded });
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                $"{scenario.TriggerTestId}-editor-dropdown-paint");
 
             await AssertDropdownPaintAsync(page, scenario);
         });
@@ -45,12 +42,10 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
         {
             UiScenarioArtifacts.ResetScenario(ScenarioName);
 
-            await page.GotoAsync(
+            await EditorRouteDriver.OpenReadyAsync(
+                page,
                 BrowserTestConstants.Routes.EditorDemo,
-                new() { WaitUntil = WaitUntilState.DOMContentLoaded });
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+                $"{scenario.TriggerTestId}-editor-floating-dropdown-paint");
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.TransformativeMoment);
             await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });

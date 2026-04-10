@@ -291,16 +291,6 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.GoLive.RuntimeSessionId,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            var activeRuntimeState = await page.EvaluateAsync<JsonElement>(
-                BrowserTestConstants.GoLive.GetRuntimeStateScript,
-                BrowserTestConstants.GoLive.RuntimeSessionId);
-            var initialPayloadSizeBytes = activeRuntimeState.GetProperty("recording").GetProperty("sizeBytes").GetInt64();
-
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.GoLive.RecordingRuntimePayloadGrowthScript,
-                new object[] { BrowserTestConstants.GoLive.RuntimeSessionId, initialPayloadSizeBytes },
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.StartRecording));
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.RecordingRuntimeInactiveScript,

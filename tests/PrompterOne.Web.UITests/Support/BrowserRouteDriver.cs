@@ -27,30 +27,35 @@ internal static class BrowserRouteDriver
             return;
         }
 
+        var forceNavigation = !IsCurrentRoute(page, route);
+
         for (var attempt = 1; attempt <= RouteBootstrapAttemptCount; attempt++)
         {
-            Exception? lastFailure;
             try
             {
                 // Route readiness is validated by explicit URL and page-level sentinels below.
                 // NetworkIdle is too strict for pages that keep long-lived browser activity alive on CI.
-                if (!IsCurrentRoute(page, route))
+                if (forceNavigation || !IsCurrentRoute(page, route))
                 {
                     await page.GotoAsync(route, new() { WaitUntil = RouteNavigationReadyState });
                 }
 
+                forceNavigation = false;
                 await WaitForRouteAsync(page, route);
                 if (await IsPageVisibleAsync(page, pageTestId, routeVisibleTimeoutMs))
                 {
                     return;
                 }
-
-                lastFailure = new TimeoutException(
-                    $"Route '{route}' reached the expected URL but '{pageTestId}' did not become visible within {routeVisibleTimeoutMs}ms.");
             }
-            catch (TimeoutException exception)
+            catch (TimeoutException)
             {
-                lastFailure = exception;
+                if (attempt >= RouteBootstrapAttemptCount)
+                {
+                    throw;
+                }
+
+                forceNavigation = true;
+                continue;
             }
             catch (PlaywrightException exception) when (IsRetryableRouteOpenFailure(exception))
             {
@@ -62,18 +67,13 @@ internal static class BrowserRouteDriver
                         return;
                     }
                 }
-            }
 
-            if (attempt < RouteBootstrapAttemptCount)
-            {
-                if (!IsCurrentRoute(page, UiTestHostConstants.BlankPagePath))
+                if (attempt >= RouteBootstrapAttemptCount)
                 {
-                    await page.GotoAsync(UiTestHostConstants.BlankPagePath, new()
-                    {
-                        WaitUntil = RouteNavigationReadyState
-                    });
+                    throw;
                 }
 
+                forceNavigation = true;
                 continue;
             }
         }

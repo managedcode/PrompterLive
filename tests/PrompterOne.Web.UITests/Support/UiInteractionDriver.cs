@@ -15,19 +15,13 @@ internal static class UiInteractionDriver
         {
             try
             {
-                await locator.WaitForAsync(new()
-                {
-                    State = WaitForSelectorState.Visible,
-                    Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
-                });
-                await Expect(locator).ToBeEnabledAsync(new()
-                {
-                    Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
-                });
-                await locator.ScrollIntoViewIfNeededAsync();
+                await WaitUntilInteractableAsync(locator);
                 if (noWaitAfter)
                 {
-                    await locator.EvaluateAsync("element => element.click()");
+                    await locator.ClickAsync(new()
+                    {
+                        Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+                    });
                 }
                 else
                 {
@@ -53,6 +47,64 @@ internal static class UiInteractionDriver
         }
 
         throw lastFailure ?? new InvalidOperationException("The UI interaction driver exhausted its click retries without capturing a failure.");
+    }
+
+    internal static async Task ClickAndWaitForVisibleAsync(
+        ILocator trigger,
+        ILocator visibleLocator)
+    {
+        Exception? lastFailure = null;
+
+        for (var attempt = 1; attempt <= BrowserTestConstants.Timing.InteractionRetryCount; attempt++)
+        {
+            try
+            {
+                if (await visibleLocator.IsVisibleAsync())
+                {
+                    return;
+                }
+
+                await WaitUntilInteractableAsync(trigger);
+                await trigger.ClickAsync(new()
+                {
+                    Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+                });
+                await visibleLocator.WaitForAsync(new()
+                {
+                    State = WaitForSelectorState.Visible,
+                    Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs
+                });
+                return;
+            }
+            catch (TimeoutException exception) when (attempt < BrowserTestConstants.Timing.InteractionRetryCount)
+            {
+                lastFailure = exception;
+            }
+            catch (PlaywrightException exception) when (
+                attempt < BrowserTestConstants.Timing.InteractionRetryCount &&
+                IsRetryableInteractionFailure(exception))
+            {
+                lastFailure = exception;
+            }
+
+            await Task.Delay(BrowserTestConstants.Timing.InteractionRetryDelayMs);
+        }
+
+        throw lastFailure ?? new InvalidOperationException("The UI interaction driver exhausted its menu-open retries without capturing a failure.");
+    }
+
+    private static async Task WaitUntilInteractableAsync(ILocator locator)
+    {
+        await locator.WaitForAsync(new()
+        {
+            State = WaitForSelectorState.Visible,
+            Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+        });
+        await Expect(locator).ToBeEnabledAsync(new()
+        {
+            Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+        });
+        await locator.ScrollIntoViewIfNeededAsync();
     }
 
     private static bool IsRetryableInteractionFailure(PlaywrightException exception) =>
