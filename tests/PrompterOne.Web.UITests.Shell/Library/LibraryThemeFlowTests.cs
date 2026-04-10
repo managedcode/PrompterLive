@@ -15,11 +15,7 @@ public sealed class LibraryThemeFlowTests(StandaloneAppFixture fixture) : AppUiT
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.LibraryFlow.LightThemeScenario);
 
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.Settings,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenSettingsAsync(page);
 
             await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();
@@ -28,11 +24,7 @@ public sealed class LibraryThemeFlowTests(StandaloneAppFixture fixture) : AppUiT
                 BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
                 BrowserTestConstants.SettingsFlow.LightTheme);
 
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.Library,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await Expect(page.Locator("html")).ToHaveAttributeAsync(
                 BrowserTestConstants.SettingsFlow.HtmlThemeAttribute,
                 BrowserTestConstants.SettingsFlow.LightTheme);

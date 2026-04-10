@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PrompterOne.Shared.Contracts;
-using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
 
@@ -80,8 +79,7 @@ public sealed class RuntimeTelemetryFlowTests(StandaloneAppFixture fixture)
 
             await page.AddInitScriptAsync(UiTestHostConstants.RuntimeTelemetryAllowVendorLoadsScript);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await WaitForTelemetryCollectionsAsync(
                 page,
                 BrowserTestConstants.Telemetry.MinimumInitializationCount,

@@ -24,7 +24,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.TooltipAuditFlow.LibraryFolderScenario);
 
-            await OpenPageAsync(page, BrowserTestConstants.Routes.Library, UiTestIds.Library.Page);
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await AssertSharedTooltipAsync(
                 page,
                 UiTestIds.Library.FolderCreateStart,
@@ -43,7 +43,7 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.TooltipAuditFlow.LibraryCardMenuScenario);
 
-            await OpenPageAsync(page, BrowserTestConstants.Routes.Library, UiTestIds.Library.Page);
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await AssertSharedTooltipAsync(
                 page,
                 UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId),
@@ -62,7 +62,11 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.TooltipAuditFlow.LearnScenario);
 
-            await OpenPageAsync(page, BrowserTestConstants.Routes.LearnDemo, UiTestIds.Learn.Page);
+            await BrowserRouteDriver.OpenPageAsync(
+                page,
+                BrowserTestConstants.Routes.LearnDemo,
+                UiTestIds.Learn.Page,
+                $"{nameof(LearnScreen_PlayTooltip_UsesReadableSharedSurface)}-{UiTestIds.Learn.Page}");
             await AssertSharedTooltipAsync(
                 page,
                 UiTestIds.Learn.PlayToggle,
@@ -81,7 +85,11 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.TooltipAuditFlow.TeleprompterScenario);
 
-            await OpenPageAsync(page, BrowserTestConstants.Routes.TeleprompterDemo, UiTestIds.Teleprompter.Page);
+            await BrowserRouteDriver.OpenPageAsync(
+                page,
+                BrowserTestConstants.Routes.TeleprompterDemo,
+                UiTestIds.Teleprompter.Page,
+                $"{nameof(TeleprompterScreen_PlayTooltip_UsesReadableSharedSurface)}-{UiTestIds.Teleprompter.Page}");
             await AssertSharedTooltipAsync(
                 page,
                 UiTestIds.Teleprompter.PlayToggle,
@@ -117,7 +125,11 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
     public Task TeleprompterScreen_PlayTooltip_HidesOnPointerLeaveAndClick() =>
         RunPageAsync(async page =>
         {
-            await OpenPageAsync(page, BrowserTestConstants.Routes.TeleprompterDemo, UiTestIds.Teleprompter.Page);
+            await BrowserRouteDriver.OpenPageAsync(
+                page,
+                BrowserTestConstants.Routes.TeleprompterDemo,
+                UiTestIds.Teleprompter.Page,
+                $"{nameof(TeleprompterScreen_PlayTooltip_HidesOnPointerLeaveAndClick)}-{UiTestIds.Teleprompter.Page}");
             await AssertSharedTooltipDismissesAsync(
                 page,
                 UiTestIds.Teleprompter.PlayToggle,
@@ -182,16 +194,9 @@ public sealed class TooltipSurfaceAuditFlowTests(StandaloneAppFixture fixture)
 
     private static async Task OpenAppearancePanelAsync(IPage page)
     {
-        await OpenPageAsync(page, BrowserTestConstants.Routes.Settings, UiTestIds.Settings.Page);
+        await ShellRouteDriver.OpenSettingsAsync(page);
         await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync(
-            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-    }
-
-    private static async Task OpenPageAsync(IPage page, string route, string pageTestId)
-    {
-        await page.GotoAsync(route);
-        await Expect(page.GetByTestId(pageTestId)).ToBeVisibleAsync(
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
     }
 

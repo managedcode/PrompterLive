@@ -19,15 +19,13 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.GetByTestId(UiTestIds.Header.GoLive).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
             await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenSettingsAsync(page);
 
             await page.GetByTestId(UiTestIds.Header.GoLive).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
@@ -47,9 +45,10 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await EditorRouteDriver.OpenReadyAsync(
+                page,
+                BrowserTestConstants.Routes.EditorQuantum,
+                nameof(ScreenNavigation_UsesSpaRoutingWithoutReloadingBrowserContext));
 
             await page.EvaluateAsync("value => window.__prompterSpaNonce = value", nonce);
 
@@ -58,8 +57,10 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
             await Assert.That(await page.EvaluateAsync<string>("() => window.__prompterSpaNonce")).IsEqualTo(nonce);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.EditorQuantum);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await EditorRouteDriver.OpenReadyAsync(
+                page,
+                BrowserTestConstants.Routes.EditorQuantum,
+                $"{nameof(ScreenNavigation_UsesSpaRoutingWithoutReloadingBrowserContext)}-return");
             await page.EvaluateAsync("value => window.__prompterSpaNonce = value", nonce);
 
             await page.GetByTestId(UiTestIds.Header.EditorRead).ClickAsync();
@@ -85,15 +86,13 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveAttributeAsync(BrowserTestConstants.GoLive.LiveStateAttributeName, GoLiveIndicatorStates.Idle);
 
             var libraryChrome = await ReadGoLiveChromeAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenSettingsAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveAttributeAsync(BrowserTestConstants.GoLive.LiveStateAttributeName, GoLiveIndicatorStates.Idle);
 

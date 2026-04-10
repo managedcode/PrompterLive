@@ -1,6 +1,5 @@
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
-using PrompterOne.Testing;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
@@ -49,37 +48,6 @@ public sealed partial class StandaloneAppFixture
         await page.EvaluateAsync(BrowserTestLibrarySeedData.CreateInitializationScript());
     }
 
-    private static async Task WarmUpContextPageIfNeededAsync(
-        IPage page,
-        string baseAddress,
-        bool warmAllRuntimeRoutes = false)
-    {
-        if (!TestEnvironment.IsCiEnvironment)
-        {
-            return;
-        }
-
-        var browserErrors = BrowserErrorCollector.Attach(page);
-        var warmupRoutes = warmAllRuntimeRoutes
-            ? RuntimeWarmupRoutes
-            : [RuntimeWarmupRoutes[0]];
-
-        try
-        {
-            foreach (var (route, pageTestId) in warmupRoutes)
-            {
-                await WarmUpRouteAsync(page, route, pageTestId);
-            }
-
-            await PrimeIsolatedBrowserStorageAsync(page, baseAddress);
-            await browserErrors.AssertNoCriticalUiErrorsAsync();
-        }
-        catch (Exception exception)
-        {
-            throw BuildContextWarmupFailure(exception, browserErrors.Describe());
-        }
-    }
-
     private static async Task WarmUpRuntimeAsync(IBrowser browser, string baseAddress)
     {
         var context = await CreateBrowserContextAsync(browser, baseAddress);
@@ -121,14 +89,6 @@ public sealed partial class StandaloneAppFixture
     private static InvalidOperationException BuildWarmupFailure(Exception exception, string browserDiagnostics) =>
         new(
             "Shared UI test runtime warmup failed." + Environment.NewLine +
-            "Captured browser errors:" + Environment.NewLine +
-            browserDiagnostics + Environment.NewLine +
-            exception,
-            exception);
-
-    private static InvalidOperationException BuildContextWarmupFailure(Exception exception, string browserDiagnostics) =>
-        new(
-            "Browser context warmup failed." + Environment.NewLine +
             "Captured browser errors:" + Environment.NewLine +
             browserDiagnostics + Environment.NewLine +
             exception,

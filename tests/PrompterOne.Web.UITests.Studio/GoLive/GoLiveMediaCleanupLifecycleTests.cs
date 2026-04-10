@@ -217,9 +217,7 @@ public sealed class GoLiveMediaCleanupLifecycleTests(StandaloneAppFixture fixtur
                 BrowserTestConstants.Media.PrimaryCameraId);
             await Assert.That(activePrimaryCameraTrackCount).IsEqualTo(BrowserTestConstants.Media.ExpectedVideoTrackCount);
 
-            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateBackToLibraryAsync(page);
             await AssertNoActiveVideoTracksAsync(page);
         }
         finally

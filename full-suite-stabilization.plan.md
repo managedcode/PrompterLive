@@ -88,13 +88,13 @@ Tracked failing tests from the current baseline:
   - the studio suite is hitting the same cold-start bootstrap pressure as `Shell`, but the failures fan out through GoLive/media helpers because those helpers seed state only after the first shell route becomes interactive
   Fix path:
   - reuse the shared-runtime warmup so the first library/settings/go-live routes are already booted before studio scenarios start seeding or asserting
-- [ ] `Release Pipeline` run `24203100281` still reports cold fresh-context bootstrap failures after the shared-runtime warmup
+- [x] `Release Pipeline` run `24203100281` still reports cold fresh-context bootstrap failures after the shared-runtime warmup
   Symptom:
   - `Shell` and `Studio` still fail on the first visible page assertion for a newly created browser context, and editor-only scenarios can still hit context/page closure while opening the first routed page inside a fresh context
   Root cause:
-  - the one-time shared-runtime warmup removed process-level cold start, but each brand-new Playwright browser context on CI still pays its own first-route browser bootstrap cost before the test scenario begins
+  - the earlier hypothesis was incomplete; the added CI-only sacrificial per-context warmup made CI bootstrap behavior diverge from local runs and added extra routed app startup work before every returned test page
   Fix path:
-  - add a CI-only per-context warmup in the browser harness, then reset browser storage again so each returned page is both warmed and isolated
+  - remove the CI-only per-context routed warmup, keep only the one-time shared-runtime warmup, and make every returned test page follow the same bootstrap path locally and on CI
 - [ ] `StandaloneAppFixture` build break: `WarmUpContextPageIfNeededAsync` missing in `StandaloneAppFixture.cs`
   Symptom:
   - compiler reports `CS0103` for `WarmUpContextPageIfNeededAsync` from `tests/PrompterOne.Web.UITests/Infrastructure/StandaloneAppFixture.cs`
@@ -114,6 +114,18 @@ Tracked failing tests from the current baseline:
   Fix path:
   - preserve and inspect CI screenshot artifacts for each failing run, then harden the fresh-context bootstrap so local and CI both receive the same blank primed page
   - remove mutable library/settings seeding from `AddInitScript`, keep explicit isolated reset+seed only, and make blocked IndexedDB reset fail fast instead of silently succeeding
+- [ ] `Release Pipeline` run `24218745809` fails in `Shell` (`27` tests) and `Studio` (`5` tests) after the direct `main` push on commit `4bea2cd`
+  Symptom:
+  - `Shell` now fails broadly on the very first routed page visibility checks for `library-page` and `settings-page`, with screenshots showing the shell UI eventually rendered after the assertion already timed out
+  - `Studio` fails on initial `library-page` visibility in go-live setup plus a smaller cluster of route-return clicks that stay on `/go-live?id=...`
+  Root cause:
+  - the CI-only sacrificial per-context warmup still makes every new context pay extra routed bootstrap work that local runs never execute
+  - `Shell` still opens many routes with raw `GotoAsync(...)` plus one-shot `ToBeVisibleAsync(...)` checks instead of the shared retrying route driver, so slower CI bootstrap falls straight into suite-wide flakes
+  - `Studio` route-open and go-live-return flows still rely on root-page readiness alone instead of a stronger page-ready contract before clicking or waiting for downstream session state
+  Fix path:
+  - remove the per-context routed warmup so local and CI use the same isolated-page bootstrap path
+  - introduce shared shell route-open helpers and migrate raw shell route opens onto `BrowserRouteDriver`
+  - strengthen go-live route readiness in the studio helpers before interaction-heavy assertions
 - [x] `Release Pipeline` run `24199073318` reports a `Reader` bootstrap cluster (`163` failing tests)
   Symptom:
   - learn, teleprompter, responsive, and route-visibility tests all fail at the initial `learn-page`, `teleprompter-page`, `settings-page`, `go-live-page`, `editor-page`, or `library-page` visibility gate
@@ -156,6 +168,13 @@ Tracked failing tests from the current baseline:
   - the test mixed a fixed wall-clock sleep with a CSS-delay contract, so slower solution-level execution could consume enough time between `HoverAsync` and the assertion for the tooltip fade-in to have already started
   Fix path:
   - assert the low-opacity state immediately after hover, then rely on the existing tooltip driver to wait for the real visible state instead of stacking extra fixed settle sleeps
+- [x] `Reader` route bootstrap/readiness hardening after the `24218745809` CI failures
+  Symptom:
+  - remote reader failures clustered around first-route `learn-page` visibility timeouts while the same commit stayed green locally
+  Root cause:
+  - the shared reader route helper treated the routed page root as "ready" too early, so slower CI could advance into shortcut/playback assertions before the interactive learn or teleprompter controls were actually present
+  Fix path:
+  - strengthen `ReaderRouteDriver` to wait for production-owned interactive sentinels (`learn` progress/play controls, teleprompter stage/play toggle, settings title) instead of stopping at the top-level page shell
 
 ## Ordered Plan
 
@@ -189,6 +208,10 @@ Tracked failing tests from the current baseline:
   - local build passes
   - local full test pass count is green across all projects
   - formatting completes cleanly
+  Result:
+  - `dotnet format ./PrompterOne.slnx` passed
+  - `dotnet build ./PrompterOne.slnx -warnaserror` passed
+  - `dotnet test @./tests/dotnet-test-progress.rsp --solution ./PrompterOne.slnx --max-parallel-test-modules 1` passed with `1162/1162` green in `7m 42.943s`
 
 - [ ] Step 5. Publish directly to `main`.
   Actions:

@@ -17,7 +17,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
         try
         {
             await page.AddInitScriptAsync(BrowserTestConstants.Localization.BuildNavigatorLanguagesInitScript("de-DE", "en-US"));
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Library.SortLabel))
                 .ToHaveTextAsync(BrowserTestConstants.Localization.GermanSortByLabel);
@@ -35,7 +35,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await ShellRouteDriver.OpenSettingsAsync(page);
             await page.GetByTestId(UiTestIds.Settings.NavLanguage).ClickAsync();
             await page.GetByTestId(UiTestIds.Settings.LanguageSelect).ClickAsync();
             await page.GetByTestId(UiTestIds.Settings.SelectOption(UiTestIds.Settings.LanguageSelect, BrowserTestConstants.Localization.FrenchCultureName)).ClickAsync();
@@ -44,7 +44,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.LanguageSelect))
                 .ToContainTextAsync(BrowserTestConstants.Localization.FrenchLanguageLabel);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Library.SortLabel))
                 .ToHaveTextAsync(BrowserTestConstants.Localization.FrenchSortByLabel);
@@ -69,7 +69,7 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
         try
         {
             await page.AddInitScriptAsync(BrowserTestConstants.Localization.BuildNavigatorLanguagesInitScript("ru-RU", "uk-UA"));
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Library.SortLabel))
                 .ToHaveTextAsync(BrowserTestConstants.Localization.EnglishSortByLabel);

@@ -14,9 +14,7 @@ public sealed class SettingsHotkeyInventoryFlowTests(StandaloneAppFixture fixtur
     public Task SettingsPage_ShortcutsGroup_ExpandsAndShowsItsFirstAction(AppHotkeyGroup group) =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenSettingsAsync(page);
 
             await page.GetByTestId(UiTestIds.Settings.NavShortcuts).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.ShortcutsPanel)).ToBeVisibleAsync();
@@ -33,9 +31,7 @@ public sealed class SettingsHotkeyInventoryFlowTests(StandaloneAppFixture fixtur
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.SettingsFlow.ShortcutsScenario);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenSettingsAsync(page);
 
             await page.GetByTestId(UiTestIds.Settings.NavShortcuts).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.ShortcutsPanel)).ToBeVisibleAsync();

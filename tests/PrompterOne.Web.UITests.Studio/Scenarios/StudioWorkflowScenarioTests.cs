@@ -246,9 +246,7 @@ public sealed class StudioWorkflowScenarioTests(StandaloneAppFixture fixture)
 
     private static async Task OpenGoLiveFromSettingsAsync(IPage page)
     {
-        await page.GetByTestId(UiTestIds.Settings.CameraRoutingCta).ClickAsync();
-        await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
-        await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+        await StudioRouteDriver.NavigateToGoLiveFromSettingsAsync(page);
         await UiScenarioArtifacts.CapturePageAsync(page, BrowserTestConstants.LiveWorkflow.Name, BrowserTestConstants.LiveWorkflow.GoLiveInitialStep);
     }
 

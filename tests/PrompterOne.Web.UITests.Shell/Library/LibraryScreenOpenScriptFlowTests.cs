@@ -57,16 +57,12 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
 
             try
             {
-                await BrowserRouteDriver.OpenPageAsync(
-                    page,
-                    BrowserTestConstants.Routes.Library,
-                    UiTestIds.Library.Page,
-                    nameof(LibraryScreen_OpenScriptImportsBodyOnlyTextFile_UsingFileNameAsTitle));
+                await ShellRouteDriver.OpenLibraryAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(importPath);
 
-                await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+                await EditorMonacoDriver.WaitUntilReadyAsync(page);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(BodyOnlyTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(BodyOnlyDocument);
             }
@@ -84,16 +80,12 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
 
             try
             {
-                await BrowserRouteDriver.OpenPageAsync(
-                    page,
-                    BrowserTestConstants.Routes.Library,
-                    UiTestIds.Library.Page,
-                    nameof(LibraryScreen_OpenScriptRejectsUnsupportedFileExtension_AndKeepsUserOnLibrary));
+                await ShellRouteDriver.OpenLibraryAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(importPath);
 
-                await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+                await ShellRouteDriver.WaitForLibraryReadyAsync(page);
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToBeVisibleAsync();
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToContainTextAsync(SharedUiText.Text(UiTextKey.ImportScriptMessage));
                 await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToContainTextAsync(SharedUiText.Text(UiTextKey.ImportScriptUnsupportedDetail));
@@ -115,29 +107,21 @@ public sealed class LibraryScreenOpenScriptFlowTests(StandaloneAppFixture fixtur
 
             try
             {
-                await BrowserRouteDriver.OpenPageAsync(
-                    page,
-                    BrowserTestConstants.Routes.Library,
-                    UiTestIds.Library.Page,
-                    nameof(LibraryScreen_OpenScriptCanImportASecondFile_AfterPickerResets));
+                await ShellRouteDriver.OpenLibraryAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(firstImportPath);
 
-                await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+                await EditorMonacoDriver.WaitUntilReadyAsync(page);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(FirstImportTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(FirstImportDocument);
 
-                await BrowserRouteDriver.OpenPageAsync(
-                    page,
-                    BrowserTestConstants.Routes.Library,
-                    UiTestIds.Library.Page,
-                    nameof(LibraryScreen_OpenScriptCanImportASecondFile_AfterPickerResets));
+                await ShellRouteDriver.OpenLibraryAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(secondImportPath);
 
-                await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+                await EditorMonacoDriver.WaitUntilReadyAsync(page);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(SecondImportTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(SecondImportBody);
                 await Assert.That(new Uri(page.Url).Query).Contains($"{AppRoutes.ScriptIdQueryKey}=");

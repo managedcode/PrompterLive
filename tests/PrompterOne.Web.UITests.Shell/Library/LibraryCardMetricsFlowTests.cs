@@ -17,8 +17,7 @@ public sealed class LibraryCardMetricsFlowTests(StandaloneAppFixture fixture) : 
         {
             var expectedMetrics = await BuildExpectedMetricsAsync();
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             var quantumCard = page.GetByTestId(BrowserTestConstants.Elements.QuantumCard);
             var wpm = page.GetByTestId(UiTestIds.Library.CardWpm(BrowserTestConstants.Scripts.QuantumId));

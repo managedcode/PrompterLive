@@ -33,8 +33,7 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
                 })();
                 """);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.EvaluateAsync(
                 $$"""
@@ -71,9 +70,7 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.Context.SetOfflineAsync(true);
             await page.EvaluateAsync(BrowserTestConstants.Diagnostics.DispatchOfflineEventScript);

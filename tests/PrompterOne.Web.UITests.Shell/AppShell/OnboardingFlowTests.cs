@@ -17,7 +17,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
         {
             await SeedPendingOnboardingAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeVisibleAsync();
             await AssertOnboardingStepAsync(
@@ -73,7 +73,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
         {
             await SeedPendingOnboardingAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Surface)).ToBeVisibleAsync();
 
@@ -91,7 +91,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
         {
             await SeedCompletedOnboardingAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Settings);
+            await ShellRouteDriver.OpenSettingsAsync(page);
             await page.GetByTestId(UiTestIds.Settings.NavAbout).ClickAsync();
 
             await page.GetByTestId(UiTestIds.Settings.AboutOnboardingRestart).ClickAsync();
@@ -113,7 +113,7 @@ public sealed class OnboardingFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await SeedPendingOnboardingAsync(page);
             await page.AddInitScriptAsync(BrowserTestConstants.Localization.BuildNavigatorLanguagesInitScript("uk-UA", "en-US"));
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Onboarding.Title))
                 .ToHaveTextAsync(BrowserTestConstants.AppShellFlow.OnboardingUkrainianWelcomeTitle);

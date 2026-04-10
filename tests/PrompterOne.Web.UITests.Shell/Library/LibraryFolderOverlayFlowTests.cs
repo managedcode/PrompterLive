@@ -15,8 +15,7 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.GetByTestId(UiTestIds.Library.FolderCreateStart).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
@@ -48,7 +47,7 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
             await page.ReloadAsync();
-
+            await ShellRouteDriver.WaitForLibraryReadyAsync(page);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
         }

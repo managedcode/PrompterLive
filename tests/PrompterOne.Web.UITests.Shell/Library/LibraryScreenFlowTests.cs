@@ -41,8 +41,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_NavigatesIntoEditorAndSettings() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
                 .ToHaveTextAsync(BrowserTestConstants.Folders.AllScriptsName);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
@@ -88,38 +87,35 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await page.GetByTestId(UiTestIds.Library.CardDuplicate(BrowserTestConstants.Scripts.LeadershipId)).ClickAsync();
 
             await page.GetByTestId(UiTestIds.Library.OpenSettings).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.WaitForSettingsReadyAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await page.GetByTestId(UiTestIds.Header.LibraryNewScript).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.Editor);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await page.GetByTestId(UiTestIds.Library.CreateScript).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.Editor);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
         });
 
     [Test]
     public Task LibraryScreen_NewScriptActionsOpenEmptyEditorDraft() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.GetByTestId(UiTestIds.Header.LibraryNewScript).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.Editor);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
 
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.GetByTestId(UiTestIds.Library.CreateScript).ClickAsync();
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.Editor);
-            await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);
         });
 
@@ -131,13 +127,12 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
             try
             {
-                await page.GotoAsync(BrowserTestConstants.Routes.Library);
-                await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+                await ShellRouteDriver.OpenLibraryAsync(page);
 
                 await page.GetByTestId(UiTestIds.Header.LibraryOpenScriptInput)
                     .SetInputFilesAsync(importPath);
 
-                await Expect(page.GetByTestId(UiTestIds.Editor.Page)).ToBeVisibleAsync();
+                await EditorMonacoDriver.WaitUntilReadyAsync(page);
                 await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(ImportedTitle);
                 await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(ImportedBodyOnly);
                 await Expect(page.GetByTestId(UiTestIds.Editor.Profile)).ToHaveValueAsync(ImportedProfile);
@@ -156,8 +151,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_KeepsOnlyOneCardMenuOpen_AndOutsideClickDismissesDropdown() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             var demoDropdown = page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId));
             var leadershipDropdown = page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.LeadershipId));
@@ -191,7 +185,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_SidebarFoldersFilterCards() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Library.FolderChips)).ToHaveCountAsync(0);
             var tedTalksFolder = page.GetByTestId(BrowserTestConstants.Elements.TedTalksFolder);
             var presentationsFolder = page.GetByTestId(BrowserTestConstants.Elements.PresentationsFolder);
@@ -220,8 +214,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
 
@@ -240,8 +233,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_CreatesFolderAndMovesScript() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await ShellRouteDriver.OpenLibraryAsync(page);
             await page.GetByTestId(UiTestIds.Library.FolderCreateTile).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderCard)).ToBeVisibleAsync();
@@ -270,7 +262,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
             await page.ReloadAsync();
-
+            await ShellRouteDriver.WaitForLibraryReadyAsync(page);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
@@ -284,7 +276,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await page.SetViewportSizeAsync(
                 BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth,
                 BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight);
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             var demoCardMenu = page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId));
             var demoCardMenuOpacity = await demoCardMenu.EvaluateAsync<double>(
@@ -292,7 +284,6 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 element => Number.parseFloat(getComputedStyle(element).opacity)
                 """);
 
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToBeHiddenAsync();
             await Assert.That(demoCardMenuOpacity >= BrowserTestConstants.LibraryFlow.MinimumTouchMenuOpacity).IsTrue();
 

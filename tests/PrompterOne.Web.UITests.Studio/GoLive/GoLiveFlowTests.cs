@@ -85,9 +85,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await sourceButton.ClickAsync();
             await Expect(sourceButton).ToContainTextAsync(RemoveActionLabel);
 
-            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateBackToLibraryAsync(page);
         }
         finally
         {
@@ -106,13 +104,9 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await StudioRouteDriver.OpenSettingsAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
 
-            await page.GetByTestId(UiTestIds.Header.GoLive).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateToGoLiveFromHeaderAsync(page);
 
-            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateBackToSettingsAsync(page);
         }
         finally
         {
@@ -242,11 +236,7 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
 
         try
         {
-            await BrowserRouteDriver.OpenPageAsync(
-                page,
-                BrowserTestConstants.Routes.Library,
-                UiTestIds.Library.Page,
-                nameof(GoLivePage_WithEmptyScene_AutoSeedsDefaultDevicesAndShowsStudioShell));
+            await StudioRouteDriver.OpenLibraryAsync(page);
             await page.EvaluateAsync(
                 BrowserTestConstants.GoLive.SeedEmptySceneScript,
                 BrowserTestConstants.GoLive.SceneStorageKey);
@@ -717,13 +707,9 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await StudioRouteDriver.OpenSettingsAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
 
-            await page.GetByTestId(UiTestIds.Settings.CameraRoutingCta).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateToGoLiveFromSettingsAsync(page);
 
-            await page.GetByTestId(UiTestIds.GoLive.OpenSettings).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Settings);
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateToSettingsFromGoLiveAsync(page);
         }
         finally
         {

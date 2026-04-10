@@ -10,7 +10,7 @@ public sealed class LibrarySearchFlowTests(StandaloneAppFixture fixture) : AppUi
     public Task LibraryScreen_SearchMatchesFileNamesAndScriptContent() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(BrowserTestConstants.Routes.Library);
+            await ShellRouteDriver.OpenLibraryAsync(page);
 
             var searchInput = page.GetByTestId(UiTestIds.Header.LibrarySearch);
             var quantumCard = page.GetByTestId(BrowserTestConstants.Elements.QuantumCard);

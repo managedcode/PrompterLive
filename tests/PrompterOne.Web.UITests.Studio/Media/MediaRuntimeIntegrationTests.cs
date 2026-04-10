@@ -309,9 +309,7 @@ public sealed class MediaRuntimeIntegrationTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.CameraDeviceAction(BrowserTestConstants.Media.SecondaryCameraId))).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Settings.CameraDeviceAction(BrowserTestConstants.Media.SecondaryCameraId)).ClickAsync();
 
-            await page.GetByTestId(UiTestIds.Settings.CameraRoutingCta).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.GoLive);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateToGoLiveFromSettingsAsync(page);
 
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.Media.ElementUsesVideoDeviceScript,

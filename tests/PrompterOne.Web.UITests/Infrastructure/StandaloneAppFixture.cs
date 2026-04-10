@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.Playwright;
-using PrompterOne.Testing;
 
 namespace PrompterOne.Web.UITests;
 
@@ -80,15 +79,10 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
 
             try
             {
-                await WarmUpContextWithSacrificialPageAsync(context);
                 var page = await CreatePrimedPageAsync(context);
                 return page;
             }
             catch (PlaywrightException exception) when (attempt < ContextBootstrapAttemptCount && IsBrowserClosedException(exception))
-            {
-                await DisposeContextAsync(context);
-            }
-            catch (InvalidOperationException exception) when (attempt < ContextBootstrapAttemptCount && IsContextWarmupFailure(exception))
             {
                 await DisposeContextAsync(context);
             }
@@ -105,17 +99,12 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
             {
                 if (isNewSharedContext)
                 {
-                    await WarmUpContextWithSacrificialPageAsync(context);
                     return await CreatePrimedPageAsync(context);
                 }
 
                 return await CreateBlankPageAsync(context);
             }
             catch (PlaywrightException exception) when (attempt < ContextBootstrapAttemptCount && IsBrowserClosedException(exception))
-            {
-                RemoveSharedContext(context);
-            }
-            catch (InvalidOperationException exception) when (attempt < ContextBootstrapAttemptCount && IsContextWarmupFailure(exception))
             {
                 RemoveSharedContext(context);
             }
@@ -230,9 +219,6 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
         exception.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal)
         || exception.Message.Contains("Process exited", StringComparison.Ordinal);
 
-    private static bool IsContextWarmupFailure(InvalidOperationException exception) =>
-        exception.Message.StartsWith("Browser context warmup failed.", StringComparison.Ordinal);
-
     private async Task<IPage> CreatePrimedPageAsync(IBrowserContext context)
     {
         var page = await context.NewPageAsync();
@@ -249,44 +235,8 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
         return page;
     }
 
-    private async Task WarmUpContextWithSacrificialPageAsync(IBrowserContext context, bool warmAllRuntimeRoutes = false)
-    {
-        if (!TestEnvironment.IsCiEnvironment)
-        {
-            return;
-        }
-
-        var warmupPage = await context.NewPageAsync();
-
-        try
-        {
-            // Warm a disposable page so the returned test page stays clean and isolated.
-            PreparePage(warmupPage);
-            await PrimeIsolatedBrowserStorageAsync(warmupPage);
-            await WarmUpContextPageIfNeededAsync(warmupPage, BaseAddress, warmAllRuntimeRoutes);
-        }
-        finally
-        {
-            await ClosePageAsync(warmupPage);
-        }
-    }
-
     private Task PrimeIsolatedBrowserStorageAsync(IPage page) =>
         PrimeIsolatedBrowserStorageAsync(page, BaseAddress);
-
-    private static async Task ClosePageAsync(IPage page)
-    {
-        try
-        {
-            if (!page.IsClosed)
-            {
-                await page.CloseAsync();
-            }
-        }
-        catch
-        {
-        }
-    }
 
     private static void PreparePage(IPage page)
     {

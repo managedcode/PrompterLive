@@ -16,11 +16,7 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
         {
             UiScenarioArtifacts.ResetScenario(BrowserTestConstants.SettingsFlow.CloudStorageScenario);
 
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.Settings,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenSettingsAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Settings.CloudPanel)).ToBeVisibleAsync(
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await EnsureToggleOffAsync(page.GetByTestId(UiTestIds.Settings.CloudAutoSyncOnSave));
@@ -71,11 +67,7 @@ public sealed class SettingsCloudStorageFlowTests(StandaloneAppFixture fixture) 
     public Task SettingsCloudStorage_LightTheme_UsesReadableLightSurfaces() =>
         RunPageAsync(async page =>
         {
-            await page.GotoAsync(
-                BrowserTestConstants.Routes.Settings,
-                new() { WaitUntil = WaitUntilState.NetworkIdle });
-            await Expect(page.GetByTestId(UiTestIds.Settings.Page)).ToBeVisibleAsync(
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await ShellRouteDriver.OpenSettingsAsync(page);
 
             await page.GetByTestId(UiTestIds.Settings.NavAppearance).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Settings.AppearancePanel)).ToBeVisibleAsync();

@@ -36,9 +36,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
 
-            await page.GetByTestId(UiTestIds.GoLive.Back).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Library);
-            await Expect(page.GetByTestId(UiTestIds.Library.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.NavigateBackToLibraryAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidget)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidgetDetail)).ToContainTextAsync(BrowserTestConstants.Media.PrimaryMicrophoneLabel);
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidgetDetail))
@@ -61,8 +59,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
             await CaptureScreenshotAsync(page, BrowserTestConstants.GoLive.WidgetReturnScreenshotPath);
             await page.GetByTestId(UiTestIds.Header.LiveWidget).ClickAsync();
 
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.GoLiveDemo);
-            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.WaitForGoLiveReadyAsync(page, BrowserTestConstants.Routes.GoLiveDemo);
             await Expect(page.GetByTestId(UiTestIds.GoLive.ActiveSourceLabel)).ToContainTextAsync(BrowserTestConstants.GoLive.SideCameraLabel);
         }
         finally
@@ -89,8 +86,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive)).ToHaveCountAsync(0);
-            await page.GetByTestId(UiTestIds.GoLive.OpenSettings).ClickAsync();
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.Settings);
+            await StudioRouteDriver.NavigateToSettingsFromGoLiveAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Header.GoLive))
                 .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
         }
@@ -129,8 +125,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
 
             await secondaryPage.GetByTestId(UiTestIds.Header.LiveWidget).ClickAsync();
 
-            await BrowserRouteDriver.WaitForRouteAsync(secondaryPage, BrowserTestConstants.Routes.GoLive);
-            await Expect(secondaryPage.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+            await StudioRouteDriver.WaitForGoLiveReadyAsync(secondaryPage, BrowserTestConstants.Routes.GoLive);
             await Assert.That(new Uri(secondaryPage.Url).PathAndQuery).IsEqualTo(BrowserTestConstants.Routes.GoLive);
         }
         finally
