@@ -10,7 +10,7 @@ using PrompterOne.Shared.Services.Diagnostics;
 
 namespace PrompterOne.Shared.Layout;
 
-public partial class MainLayout : LayoutComponentBase, IDisposable
+public partial class MainLayout : LayoutComponentBase, IDisposable, IAsyncDisposable
 {
     private const string AppHeaderCssClass = "app-header";
     private const string AppHeaderLibraryCssClass = "app-header-library";
@@ -22,6 +22,8 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     private static readonly TimeSpan GoLiveWidgetRefreshInterval = TimeSpan.FromSeconds(1);
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
+    [Inject] private AiSpotlightService AiSpotlight { get; set; } = null!;
+    [Inject] private AiSpotlightHotkeyInterop AiSpotlightHotkeys { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private BrowserConnectivityService Connectivity { get; set; } = null!;
     [Inject] private BrowserThemeService ThemeService { get; set; } = null!;
@@ -194,6 +196,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         GoLiveSession.StateChanged += HandleGoLiveSessionChanged;
         Shell.TrackNavigation(Navigation.Uri);
         SyncShellStateWithCurrentRoute(Navigation.Uri);
+        PublishRouteAiContext();
         UpdateGoLiveWidgetRefreshLoop();
     }
 
@@ -211,6 +214,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         await ThemeService.InitializeAsync();
         await Bootstrapper.EnsureReadyAsync();
         await InitializeOnboardingAsync();
+        await AiSpotlightHotkeys.InitializeAsync();
         await RuntimeTelemetry.InitializeAsync();
         await TrackCurrentPageViewAsync();
     }
@@ -228,6 +232,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         Logger.LogInformation(RouteChangedLogTemplate, e.Location);
         Shell.TrackNavigation(e.Location);
         SyncShellStateWithCurrentRoute(e.Location);
+        PublishRouteAiContext();
         SyncOnboardingStepWithCurrentRoute(e.Location);
         _ = HandleOnboardingLocationChangedAsync(e.Location);
         _ = InvokeAsync(TrackCurrentPageViewAsync);
@@ -371,6 +376,16 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         return Task.CompletedTask;
     }
 
+    private Task HandleOpenAiSpotlightAsync()
+    {
+        PublishRouteAiContext();
+        AiSpotlight.Open();
+        return Task.CompletedTask;
+    }
+
+    private void PublishRouteAiContext() =>
+        AiSpotlight.SetRouteContext(ShellState.Screen, Navigation.Uri, HeaderTitle);
+
     private void UpdateGoLiveWidgetRefreshLoop()
     {
         if (GoLiveSessionState.HasActiveSession)
@@ -423,6 +438,12 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
 
     private static string BuildClassList(params string?[] classNames) =>
         string.Join(' ', classNames.Where(className => !string.IsNullOrWhiteSpace(className)));
+
+    public async ValueTask DisposeAsync()
+    {
+        await AiSpotlightHotkeys.DisposeAsync();
+        Dispose();
+    }
 
     public void Dispose()
     {

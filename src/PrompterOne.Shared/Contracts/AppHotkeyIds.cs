@@ -4,6 +4,7 @@ public static class AppHotkeyIds
 {
     public static class Groups
     {
+        public const string Global = "global";
         public const string Editor = "editor";
         public const string Learn = "learn";
         public const string Teleprompter = "teleprompter";
@@ -12,6 +13,7 @@ public static class AppHotkeyIds
 
     public static class Definitions
     {
+        public const string GlobalOpenAssistant = "global-open-assistant";
         public const string EditorUndo = "editor-undo";
         public const string EditorRedo = "editor-redo";
         public const string EditorSelectAll = "editor-select-all";

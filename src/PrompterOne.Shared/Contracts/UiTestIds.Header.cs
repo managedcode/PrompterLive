@@ -5,6 +5,8 @@ public static partial class UiTestIds
     public static class Header
     {
         public const string Back = "header-back";
+        public const string AiSpotlight = "header-ai-spotlight";
+        public const string AiSpotlightIcon = "header-ai-spotlight-icon";
         public const string Brand = "header-brand";
         public const string Center = "header-center";
         public const string EditorImportScript = "header-editor-import-script";

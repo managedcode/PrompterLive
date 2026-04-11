@@ -124,6 +124,7 @@ public partial class EditorPage
         RefreshStructureAuthoringState();
         UpdateStatus();
         Shell.ShowEditor(_screenTitle, state.ScriptId);
+        PublishEditorAiContext();
     }
 
     private bool ConsumePreserveSplitFeedbackOnNextLoad()

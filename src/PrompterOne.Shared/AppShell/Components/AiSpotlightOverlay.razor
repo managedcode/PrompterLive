@@ -1,0 +1,203 @@
+@namespace PrompterOne.Shared.AppShell.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Core.AI.Models
+@using PrompterOne.Shared.Components
+@using PrompterOne.Shared.Contracts
+@using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Services
+@implements IDisposable
+@inject AiSpotlightService Spotlight
+@inject IStringLocalizer<SharedResource> Localizer
+
+@if (State.IsOpen)
+{
+    <div class="ai-spotlight-backdrop"
+         data-test="@UiTestIds.AiSpotlight.Overlay"
+         @onclick="Close">
+        <section class="ai-spotlight"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-label="@Text(UiTextKey.HeaderAiSpotlight)"
+                 data-mode="@State.Mode.ToString().ToLowerInvariant()"
+                 data-test="@UiTestIds.AiSpotlight.Surface"
+                 @onclick:stopPropagation="true">
+            <header class="ai-spotlight-head">
+                <span class="ai-spotlight-mark" data-test="@UiTestIds.AiSpotlight.Mark">
+                    <UiIcon Kind="UiIconKind.OpenAiBurst" Size="20" />
+                </span>
+                <div class="ai-spotlight-title">
+                    <strong>@Text(UiTextKey.HeaderAiSpotlight)</strong>
+                    <span>@ContextLabel</span>
+                </div>
+                <button type="button"
+                        class="ai-spotlight-close"
+                        aria-label="@Text(UiTextKey.AiSpotlightClose)"
+                        @onclick="Close"
+                        data-test="@UiTestIds.AiSpotlight.Close">
+                    @Text(UiTextKey.AiSpotlightEscapeHint)
+                </button>
+            </header>
+
+            @if (State.Mode == AiSpotlightMode.Idle)
+            {
+                <div class="ai-spotlight-composer" data-test="@UiTestIds.AiSpotlight.IdleState">
+                    <input type="text"
+                           value="@State.Prompt"
+                           placeholder="@Text(UiTextKey.AiSpotlightPlaceholder)"
+                           aria-label="@Text(UiTextKey.AiSpotlightPlaceholder)"
+                           data-ai-spotlight-input="true"
+                           data-test="@UiTestIds.AiSpotlight.PromptInput"
+                           @oninput="HandlePromptInput"
+                           @onkeydown="HandlePromptKeyDown" />
+                    <button type="button"
+                            class="ai-spotlight-mic"
+                            aria-label="@Text(UiTextKey.AiSpotlightMicrophone)"
+                            data-test="@UiTestIds.AiSpotlight.Microphone">
+                        <UiIcon Kind="UiIconKind.Microphone" Size="16" />
+                    </button>
+                    <button type="button"
+                            class="ai-spotlight-submit"
+                            @onclick="SubmitAsync"
+                            data-test="@UiTestIds.AiSpotlight.Submit">
+                        @Text(UiTextKey.AiSpotlightSubmit)
+                    </button>
+                </div>
+                <p class="ai-spotlight-hint">@Text(UiTextKey.AiSpotlightIdleHint)</p>
+            }
+            else if (State.Mode == AiSpotlightMode.Plan)
+            {
+                <div class="ai-spotlight-plan" data-test="@UiTestIds.AiSpotlight.PlanState">
+                    <div>
+                        <h3>@Text(UiTextKey.AiSpotlightPlanTitle)</h3>
+                        @foreach (var item in State.Plan)
+                        {
+                            <div class="ai-spotlight-step" data-test="@UiTestIds.AiSpotlight.PlanItem">
+                                <span></span>
+                                <div>
+                                    <strong>@item.Label</strong>
+                                    <p>@item.Detail</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <aside class="ai-spotlight-context" data-test="@UiTestIds.AiSpotlight.Context">
+                        <span>@Text(UiTextKey.AiSpotlightContextTitle)</span>
+                        <strong>@ContextLabel</strong>
+                        <p>@GraphLabel</p>
+                    </aside>
+                </div>
+                <button type="button"
+                        class="ai-spotlight-run"
+                        @onclick="RunPlanAsync"
+                        data-test="@UiTestIds.AiSpotlight.RunPlan">
+                    @Text(UiTextKey.AiSpotlightRunPlan)
+                </button>
+            }
+            else
+            {
+                <div class="ai-spotlight-running" data-test="@UiTestIds.AiSpotlight.RunningState">
+                    <h3>@(State.Mode == AiSpotlightMode.Approval ? Text(UiTextKey.AiSpotlightApprovalTitle) : Text(UiTextKey.AiSpotlightRunningTitle))</h3>
+                    @if (!string.IsNullOrWhiteSpace(State.ErrorMessage))
+                    {
+                        <p class="ai-spotlight-error" data-test="@UiTestIds.AiSpotlight.Error">@State.ErrorMessage</p>
+                    }
+                    @foreach (var entry in State.Log)
+                    {
+                        <div class="ai-spotlight-log" data-complete="@entry.IsComplete.ToString().ToLowerInvariant()" data-test="@UiTestIds.AiSpotlight.LogItem">
+                            <span></span>
+                            <div>
+                                <strong>@entry.Label</strong>
+                                <p>@entry.Detail</p>
+                            </div>
+                        </div>
+                    }
+                    @if (State.Mode == AiSpotlightMode.Approval && State.ApprovalRequest is { } approval)
+                    {
+                        <div class="ai-spotlight-approval" data-test="@UiTestIds.AiSpotlight.ApprovalState">
+                            <div class="ai-spotlight-diff" data-test="@UiTestIds.AiSpotlight.ApprovalBefore">
+                                <span>@Text(UiTextKey.AiSpotlightApprovalBefore)</span>
+                                <pre>@approval.CurrentText</pre>
+                            </div>
+                            <div class="ai-spotlight-diff proposed" data-test="@UiTestIds.AiSpotlight.ApprovalAfter">
+                                <span>@Text(UiTextKey.AiSpotlightApprovalAfter)</span>
+                                <pre>@approval.ProposedText</pre>
+                            </div>
+                            <div class="ai-spotlight-approval-actions">
+                                <button type="button"
+                                        class="ai-spotlight-secondary"
+                                        @onclick="RejectApproval"
+                                        data-test="@UiTestIds.AiSpotlight.ApprovalReject">
+                                    @Text(UiTextKey.AiSpotlightApprovalReject)
+                                </button>
+                                <button type="button"
+                                        class="ai-spotlight-run"
+                                        @onclick="ApproveAsync"
+                                        data-test="@UiTestIds.AiSpotlight.ApprovalApprove">
+                                    @Text(UiTextKey.AiSpotlightApprovalApprove)
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    private AiSpotlightState State => Spotlight.State;
+
+    private string ContextLabel => ResolveContextLabel();
+
+    private string GraphLabel => State.Context.Graph is { } graph && !graph.IsEmpty
+        ? $"{graph.NodeCount} nodes - {graph.EdgeCount} links"
+        : Text(UiTextKey.AiSpotlightGraphMissing);
+
+    protected override void OnInitialized()
+    {
+        Spotlight.StateChanged += HandleSpotlightStateChanged;
+    }
+
+    private void HandlePromptInput(ChangeEventArgs args) =>
+        Spotlight.UpdatePrompt(args.Value?.ToString() ?? string.Empty);
+
+    private async Task HandlePromptKeyDown(KeyboardEventArgs args)
+    {
+        if (string.Equals(args.Key, UiKeyboardKeys.Enter, StringComparison.Ordinal))
+        {
+            await SubmitAsync();
+        }
+    }
+
+    private Task SubmitAsync() => Spotlight.SubmitAsync();
+
+    private Task RunPlanAsync() => Spotlight.RunPlanAsync();
+
+    private Task ApproveAsync() => Spotlight.ApproveAsync();
+
+    private void RejectApproval() => Spotlight.RejectApproval();
+
+    private void Close() => Spotlight.Close();
+
+    private void HandleSpotlightStateChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+
+    private string ResolveContextLabel()
+    {
+        if (!string.IsNullOrWhiteSpace(State.Context.Editor?.DocumentTitle))
+        {
+            return $"{Text(UiTextKey.AiSpotlightContextEditor)} - {State.Context.Editor.DocumentTitle}";
+        }
+
+        return !string.IsNullOrWhiteSpace(State.Context.Screen)
+            ? $"{Text(UiTextKey.AiSpotlightContextRoute)} - {State.Context.Screen}"
+            : Text(UiTextKey.AiSpotlightContextRoute);
+    }
+
+    public void Dispose()
+    {
+        Spotlight.StateChanged -= HandleSpotlightStateChanged;
+    }
+}

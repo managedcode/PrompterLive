@@ -94,7 +94,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
     }
 
     [Test]
-    public void TeleprompterPage_PersistsReaderLayoutAndCameraPreferenceChanges()
+    public async Task TeleprompterPage_PersistsReaderLayoutAndCameraPreferenceChanges()
     {
         var harness = TestHarnessFactory.Create(this);
         var initialShowCameraScene = harness.Session.State.ReaderSettings.ShowCameraScene;
@@ -106,15 +106,15 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         var baselineSpeedWpm = ParseWordsPerMinuteValue(cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
         var expectedUpdatedSpeedWpm = baselineSpeedWpm + ReaderSpeedStepWpm;
 
-        cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).Input(UpdatedFontSize);
-        cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).Input(UpdatedTextWidthPercent);
-        cut.FindByTestId(UiTestIds.Teleprompter.FocalSlider).Input(UpdatedFocalPointPercent);
-        cut.FindByTestId(UiTestIds.Teleprompter.SpeedUp).Click();
-        cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).Click();
-        cut.FindByTestId(UiTestIds.Teleprompter.MirrorVerticalToggle).Click();
-        cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).Click();
-        cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).Click();
-        cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle).Click();
+        await cut.FindByTestId(UiTestIds.Teleprompter.FontSlider).InputAsync(UpdatedFontSize);
+        await cut.FindByTestId(UiTestIds.Teleprompter.WidthSlider).InputAsync(UpdatedTextWidthPercent);
+        await cut.FindByTestId(UiTestIds.Teleprompter.FocalSlider).InputAsync(UpdatedFocalPointPercent);
+        await cut.FindByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.MirrorHorizontalToggle).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.MirrorVerticalToggle).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {

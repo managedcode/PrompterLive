@@ -142,6 +142,7 @@ Rule format:
 - Assistant context must be route-aware. On editor routes, the assistant context must include the current script content, cursor location, selected lines or ranges, and document metadata so rewrite actions can target the intended selection or paragraph instead of replacing the whole script.
 - AI document-editing tools must operate through explicit range-based contracts such as line or character insert, replace, and delete operations; whole-file regeneration is forbidden for partial rewrite requests.
 - Script knowledge-graph support must treat each script as a source document plus a companion `markdown-ld-kb` graph artifact that can reference lines, TPS sections, entities, characters, themes, intent, emphasis, and relationships for assistant reasoning and editor visualization.
+- Script graph readiness markers such as `data-graph-ready` must be set only after the graph artifact has been processed and the graph renderer has completed the actual graph render/layout path; do not mark the graph ready when only the container or first paint exists.
 - The editor must expose the script knowledge graph as a first-class view that can sit beside or cover the Monaco source surface using an editor-tab pattern, so users can inspect the whole story graph and its references while authoring.
 
 ## Rules to Follow (Mandatory)
@@ -407,7 +408,7 @@ Repo-specific design rules:
 - Dropdown menus across the routed UI must left-align their item content as one readable cluster; right-pinned meta columns or centered item compositions inside dropdown rows are forbidden.
 - Pasted or imported TPS documents MUST render their editor-side authoring styles immediately on first load in the editor; showing the imported script as near-plain text until later interaction is a regression.
 - For standalone cloud-storage integrations, persist provider keys, tokens, and connection metadata in browser `localStorage`; do not introduce server-side secret storage for runtime auth in this app shape.
-- Third-party runtime JavaScript SDKs MUST be sourced only from explicitly pinned GitHub Release tags and assets, copied into the repo, bundled locally with their runtime dependencies, and never loaded from CDNs, package registries, `latest` endpoints, or ad-hoc remote downloads at app runtime.
+- Third-party runtime JavaScript SDKs and vendored browser scripts MUST be sourced only from explicitly pinned GitHub Release tags and assets, copied into the repo, bundled locally with their runtime dependencies, and never loaded from CDNs, package registries, `latest` endpoints, or ad-hoc remote downloads at app runtime.
 - Repo-owned manifests, scripts, workflows, and project files that track third-party runtime JavaScript SDKs MUST point to concrete GitHub release versions and asset URLs, never floating references.
 - Any vendored runtime JavaScript SDK that tracks an upstream GitHub repo MUST have an automated watcher job that checks new GitHub releases and opens a repo issue describing the required update when a newer release appears.
 - Runtime analytics and session-replay scripts must be owned through a product adapter/service layer, not ad-hoc inline screen code, and development or debug runs must not send telemetry to Google Analytics or Microsoft Clarity.

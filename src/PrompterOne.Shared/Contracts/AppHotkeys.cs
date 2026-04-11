@@ -4,6 +4,7 @@ namespace PrompterOne.Shared.Contracts;
 
 public enum AppHotkeySurface
 {
+    Global,
     Editor,
     Learn,
     Teleprompter,
@@ -12,6 +13,7 @@ public enum AppHotkeySurface
 
 public enum AppHotkeyAction
 {
+    GlobalOpenAssistant,
     EditorUndo,
     EditorRedo,
     EditorSelectAll,
@@ -79,6 +81,7 @@ public static class AppHotkeys
         public const string BracketRight = "]";
         public const string Camera = "C";
         public const string CommandA = "Ctrl/Cmd+A";
+        public const string CommandK = "Ctrl/Cmd+K";
         public const string CommandShiftZ = "Ctrl/Cmd+Shift+Z";
         public const string CommandZ = "Ctrl/Cmd+Z";
         public const string Digit1 = "1";
@@ -105,6 +108,12 @@ public static class AppHotkeys
 
     public static IReadOnlyList<AppHotkeyGroup> Groups { get; } =
     [
+        new(
+            AppHotkeySurface.Global,
+            AppHotkeyIds.Groups.Global,
+            [
+                new(AppHotkeyIds.Definitions.GlobalOpenAssistant, AppHotkeyAction.GlobalOpenAssistant, [new(ShortcutDisplayText.CommandK, UiKeyboardKeys.KLower, Ctrl: true)])
+            ]),
         new(
             AppHotkeySurface.Editor,
             AppHotkeyIds.Groups.Editor,

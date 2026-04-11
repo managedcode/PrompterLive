@@ -83,13 +83,22 @@ internal static class UiScenarioArtifacts
                 await locator.ScreenshotAsync(new LocatorScreenshotOptions
                 {
                     Path = path,
-                    Animations = ScreenshotAnimations.Disabled
+                    Animations = ScreenshotAnimations.Disabled,
+                    Timeout = BrowserTestConstants.ScenarioArtifacts.CaptureVisibleTimeoutMs
                 });
+                return;
+            }
+            catch (TimeoutException) when (attempt >= BrowserTestConstants.ScenarioArtifacts.CaptureRetryCount)
+            {
                 return;
             }
             catch (PlaywrightException exception) when (
                 attempt < BrowserTestConstants.ScenarioArtifacts.CaptureRetryCount &&
                 IsTransientLocatorCaptureFailure(exception))
+            {
+                await Task.Delay(BrowserTestConstants.ScenarioArtifacts.CaptureRetryDelayMs);
+            }
+            catch (TimeoutException) when (attempt < BrowserTestConstants.ScenarioArtifacts.CaptureRetryCount)
             {
                 await Task.Delay(BrowserTestConstants.ScenarioArtifacts.CaptureRetryDelayMs);
             }

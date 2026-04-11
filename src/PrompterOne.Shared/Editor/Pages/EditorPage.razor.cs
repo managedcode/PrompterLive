@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Core.AI.Models;
+using PrompterOne.Core.AI.Services;
 using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services;
@@ -41,6 +43,7 @@ public partial class EditorPage
     private long _draftRevision;
     private bool _isEditorReady;
     private bool _loadState = true;
+    private bool _isGraphLoading;
     private int? _activeBlockIndex;
     private int _activeSegmentIndex;
     private string _author = DefaultAuthor;
@@ -52,6 +55,8 @@ public partial class EditorPage
     private IReadOnlyList<EditorLocalRevisionViewModel> _localHistory = [];
     private DateTimeOffset? _lastLocalSaveAt;
     private EditorMetadataRailTab _metadataRailSelectedTab = EditorMetadataRailTab.Metadata;
+    private EditorWorkspaceTab _workspaceTab = EditorWorkspaceTab.Source;
+    private IDisposable? _aiSpotlightEditRegistration;
     private string _profile = DefaultProfileActor;
     private bool _preserveHistoryOnNextLoad;
     private bool _preserveSplitFeedbackOnNextLoad;
@@ -63,12 +68,14 @@ public partial class EditorPage
     private EditorSplitFeedbackViewModel? _splitFeedback;
     private bool _splitOperationInProgress;
     private EditorSourcePanel? _sourcePanel;
+    private ScriptKnowledgeGraphArtifact? _scriptGraphArtifact;
     private string _sourceText = string.Empty;
     private EditorDraftMetrics _draftMetrics = EditorDraftMetrics.Empty;
     private EditorStatusViewModel _status = new(1, 1, "Actor", 140, 0, 0, 0, "0:00", DefaultVersion);
     private string _version = DefaultVersion;
 
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
+    [Inject] private AiSpotlightService AiSpotlight { get; set; } = null!;
     [Inject] private BrowserFileStorageStore BrowserFileStorageStore { get; set; } = null!;
     [Inject] private AppShellFilePickerInterop FilePickerInterop { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
@@ -78,7 +85,8 @@ public partial class EditorPage
     [Inject] private EditorDocumentSaveCoordinator EditorDocumentSaveCoordinator { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private EditorOutlineBuilder OutlineBuilder { get; set; } = null!;
-    [Inject] private EditorLocalAssistant LocalAssistant { get; set; } = null!;
+    [Inject] private ScriptKnowledgeGraphService ScriptKnowledgeGraphService { get; set; } = null!;
+    [Inject] private ScriptDocumentEditService ScriptDocumentEditService { get; set; } = null!;
     [Inject] private ScriptImportDescriptorService ScriptImportDescriptorService { get; set; } = null!;
     [Inject] private TpsDocumentSplitService DocumentSplitService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
@@ -106,5 +114,11 @@ public partial class EditorPage
     {
         _metadataRailSelectedTab = tab;
         return Task.CompletedTask;
+    }
+
+    private enum EditorWorkspaceTab
+    {
+        Source,
+        Graph
     }
 }

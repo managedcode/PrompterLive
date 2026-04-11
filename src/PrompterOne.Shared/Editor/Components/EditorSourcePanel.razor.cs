@@ -63,8 +63,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     [Parameter] public EventCallback<EditorCommandRequest> OnCommandRequested { get; set; }
 
-    [Parameter] public EventCallback<EditorAiAssistAction> OnAiActionRequested { get; set; }
-
     [Parameter] public EventCallback<EditorDroppedFilesRequest> OnFilesDropped { get; set; }
 
     [Parameter] public EventCallback<EditorHistoryCommand> OnHistoryRequested { get; set; }
@@ -117,11 +115,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (await TryLoadInitialAiAvailabilityAfterRenderAsync(firstRender))
-        {
-            return;
-        }
-
         var surfaceBecameReady = await EnsureSurfaceInteropReadyAsync();
         if (surfaceBecameReady)
         {
@@ -192,6 +185,20 @@ public partial class EditorSourcePanel : IAsyncDisposable
         _syncSurfaceAfterRender = false;
         _skipNextRender = false;
         StateHasChanged();
+    }
+
+    public async Task SyncExternalTextAsync(string text, EditorSelectionRange selection)
+    {
+        if (!_surfaceInteropReady)
+        {
+            return;
+        }
+
+        _ = await RunInteropAsync(
+            () => MonacoInterop.SyncEditorStateAsync(_editorHostRef, text, Selection with { Range = selection }),
+            SurfaceSyncFailureMessage);
+        _syncSurfaceAfterRender = false;
+        _syncOverlayAfterRender = false;
     }
 
     protected Task RequestInsertAsync(string token, int? caretOffset = null) =>
@@ -432,8 +439,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        BrowserSettingsChangeNotifier.Changed -= HandleBrowserSettingsChangedAsync;
-
         if (_surfaceInteropReady)
         {
             try

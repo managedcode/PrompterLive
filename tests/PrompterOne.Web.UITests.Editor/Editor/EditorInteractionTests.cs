@@ -24,7 +24,9 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.FloatEmphasis),
+                noWaitAfter: true);
 
             var value = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
             await Assert.That(value).Contains(BrowserTestConstants.Editor.EmphasisFragment);
@@ -50,16 +52,24 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             var initialValue = await sourceInput.InputValueAsync();
 
             await EditorMonacoDriver.SetCaretAtEndAsync(page);
-            await page.GetByTestId(UiTestIds.Editor.PauseTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuPause)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds).ClickAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.PauseTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuPause),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds),
+                noWaitAfter: true);
 
             await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
-            await page.GetByTestId(UiTestIds.Editor.Undo).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Undo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(initialValue);
 
-            await page.GetByTestId(UiTestIds.Editor.Redo).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Redo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(BrowserTestConstants.Regexes.EndsWithPause);
 
             await EditorMonacoDriver.ClickAsync(page);
@@ -76,21 +86,21 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
     }
 
     [Test]
-    public async Task EditorScreen_FloatingToolbarShowsAiAndPersistsSelectionFormatting()
+    public async Task EditorScreen_FloatingToolbarPersistsSelectionFormatting()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
-            await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
             await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.FloatingBar)).ToBeVisibleAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.FloatingAi)).ToBeVisibleAsync();
 
-            await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.FloatEmphasis),
+                noWaitAfter: true);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(
                 new Regex(Regex.Escape(BrowserTestConstants.Editor.EmphasisFragment)));
 
@@ -330,39 +340,42 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
             await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.Welcome);
 
-            await page.GetByTestId(UiTestIds.Editor.FormatTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuFormat)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.FormatHighlight).ClickAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.FormatTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuFormat),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.FormatHighlight),
+                noWaitAfter: true);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(
                 new Regex(Regex.Escape(BrowserTestConstants.Editor.HighlightFragment)));
 
-            await page.GetByTestId(UiTestIds.Editor.PauseTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuPause)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds).ClickAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.PauseTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuPause),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.PauseTwoSeconds),
+                noWaitAfter: true);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.PauseFragment)));
 
             await EditorMonacoDriver.SetCaretAtEndAsync(page);
 
-            await page.GetByTestId(UiTestIds.Editor.InsertTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuInsert)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.InsertBlockMenu).ClickAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.InsertTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuInsert),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.InsertBlockMenu),
+                noWaitAfter: true);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(
                 new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureBlockToken)));
 
-            await EditorMonacoDriver.SetSelectionByTextAsync(page, BrowserTestConstants.Editor.TransformativeMoment);
-
-            var valueBeforeAi = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
-            await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
-
-            var valueAfterAi = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-            await Assert.That(valueAfterAi).IsNotEqualTo(valueBeforeAi);
-            await Assert.That(valueAfterAi).Contains(BrowserTestConstants.Editor.SimplifiedMoment);
+            await Expect(page.GetByTestId(UiTestIds.Header.AiSpotlight)).ToBeVisibleAsync();
         }
         finally
         {
@@ -384,10 +397,14 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Editor.InsertBlock)).ToBeVisibleAsync();
 
             await EditorMonacoDriver.SetCaretAtEndAsync(page);
-            await page.GetByTestId(UiTestIds.Editor.InsertSegment).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.InsertSegment),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureSegmentToken)));
 
-            await page.GetByTestId(UiTestIds.Editor.InsertBlock).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.InsertBlock),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(new Regex(Regex.Escape(BrowserTestConstants.Editor.StructureBlockToken)));
         }
         finally

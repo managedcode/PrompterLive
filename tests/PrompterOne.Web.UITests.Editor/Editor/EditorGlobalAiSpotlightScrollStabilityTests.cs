@@ -1,25 +1,22 @@
 using System.Globalization;
 using System.Text;
-using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
-using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
 
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
-public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
+public sealed class EditorGlobalAiSpotlightScrollStabilityTests(StandaloneAppFixture fixture)
 {
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Test]
-    public async Task EditorScreen_AiAction_DoesNotJumpScrollPositionForVisibleSelection()
+    public async Task EditorScreen_GlobalAiSpotlight_DoesNotJumpScrollPositionForVisibleSelection()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
 
         try
         {
-            await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
             var sourceText = BuildAiScrollJumpText();
             await EditorIsolatedDraftDriver.CreateDraftAsync(page, sourceText);
             await EditorMonacoDriver.ClickAsync(page);
@@ -38,14 +35,12 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
             var before = await EditorMonacoDriver.GetStateAsync(page);
             await Assert.That(before.ScrollTop >= BrowserTestConstants.Editor.AiScrollJumpMinimumScrollTopPx).IsTrue().Because($"Expected the selection reveal to scroll Monaco before the AI action, but ScrollTop stayed at {before.ScrollTop}.");
 
-            await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
-            await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
-            await WaitForAiMutationAndStableScrollAsync(page, before.ScrollTop);
+            await Expect(page.GetByTestId(UiTestIds.Header.AiSpotlight)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Header.AiSpotlight).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.AiSpotlight.Overlay)).ToBeVisibleAsync();
 
             var after = await EditorMonacoDriver.GetStateAsync(page);
-            var value = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
 
-            await Assert.That(value).Contains(BrowserTestConstants.Editor.SimplifiedMoment);
             await Assert.That(Math.Abs(after.ScrollTop - before.ScrollTop)).IsBetween(0, BrowserTestConstants.Editor.AiScrollJumpMaximumAllowedDeltaPx);
         }
         finally
@@ -98,38 +93,6 @@ public sealed class EditorAiScrollStabilityTests(StandaloneAppFixture fixture)
             targetStart,
             targetStart + BrowserTestConstants.Editor.TransformativeMoment.Length);
     }
-
-    private static Task WaitForAiMutationAndStableScrollAsync(IPage page, double baselineScrollTop) =>
-        page.WaitForFunctionAsync(
-            """
-            (args) => {
-                const sourceInput = document.querySelector(`[data-test="${args.sourceInputTestId}"]`);
-                const harness = window[args.harnessGlobalName];
-                const state = harness?.getState(args.stageTestId);
-                const hasValue =
-                    sourceInput instanceof HTMLInputElement ||
-                    sourceInput instanceof HTMLTextAreaElement;
-                if (!hasValue || !state) {
-                    return false;
-                }
-
-                const sourceValue = sourceInput.value ?? "";
-                const scrollTop = typeof state.scrollTop === "number" ? state.scrollTop : 0;
-
-                return sourceValue.includes(args.expectedText) &&
-                    Math.abs(scrollTop - args.baselineScrollTop) <= args.maxAllowedDelta;
-            }
-            """,
-            new
-            {
-                baselineScrollTop,
-                expectedText = BrowserTestConstants.Editor.SimplifiedMoment,
-                harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                maxAllowedDelta = BrowserTestConstants.Editor.AiScrollJumpMaximumAllowedDeltaPx,
-                sourceInputTestId = UiTestIds.Editor.SourceInput,
-                stageTestId = UiTestIds.Editor.SourceStage
-            },
-            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
     private readonly record struct AiScrollJumpRange(int Start, int End);
 }

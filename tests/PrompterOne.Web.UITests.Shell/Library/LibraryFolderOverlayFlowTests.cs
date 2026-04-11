@@ -17,12 +17,14 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
         {
             await ShellRouteDriver.OpenLibraryAsync(page);
 
-            await page.GetByTestId(UiTestIds.Library.FolderCreateStart).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.FolderCreateStart),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
 
             var nameInput = page.GetByTestId(UiTestIds.Library.NewFolderName);
             await Assert.That(await nameInput.InputValueAsync()).IsEqualTo(string.Empty);
-            await nameInput.ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(nameInput, noWaitAfter: true);
             await nameInput.FillAsync(BrowserTestConstants.Folders.RoadshowsName);
             await Expect(nameInput).ToHaveValueAsync(BrowserTestConstants.Folders.RoadshowsName);
 
@@ -39,8 +41,25 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
             await Assert.That(overlayStyles[1]).DoesNotContain("linear-gradient");
             await Assert.That(overlayStyles[2]).Contains("blur");
 
-            await page.GetByTestId(UiTestIds.Library.NewFolderParent).SelectOptionAsync(BrowserTestConstants.Folders.PresentationsId);
-            await page.GetByTestId(UiTestIds.Library.NewFolderSubmit).ClickAsync();
+            var parentSelect = page.GetByTestId(UiTestIds.Library.NewFolderParent);
+            var selectedParentId = await parentSelect.EvaluateAsync<string>(
+                """
+                (element, value) => {
+                    if (!(element instanceof HTMLSelectElement)) {
+                        throw new Error("Expected the new folder parent field to be a select element.");
+                    }
+
+                    element.value = value;
+                    element.dispatchEvent(new Event("input", { bubbles: true }));
+                    element.dispatchEvent(new Event("change", { bubbles: true }));
+                    return element.value;
+                }
+                """,
+                BrowserTestConstants.Folders.PresentationsId);
+            await Assert.That(selectedParentId).IsEqualTo(BrowserTestConstants.Folders.PresentationsId);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.NewFolderSubmit),
+                noWaitAfter: true);
 
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder)).ToBeVisibleAsync();

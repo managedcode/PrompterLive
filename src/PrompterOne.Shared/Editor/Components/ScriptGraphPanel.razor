@@ -1,0 +1,99 @@
+@namespace PrompterOne.Shared.Components.Editor
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Core.AI.Models
+@using PrompterOne.Shared.Contracts
+@using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Services.Editor
+@inject ScriptGraphViewerInterop GraphViewer
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section class="script-graph-panel" data-test="@UiTestIds.Editor.GraphPanel">
+    @if (IsLoading)
+    {
+        <div class="script-graph-empty" data-test="@UiTestIds.Editor.GraphEmpty">@Text(UiTextKey.EditorGraphBuilding)</div>
+    }
+    else if (Artifact is null || Artifact.IsEmpty)
+    {
+        <div class="script-graph-empty" data-test="@UiTestIds.Editor.GraphEmpty">@Text(UiTextKey.EditorGraphEmpty)</div>
+    }
+    else
+    {
+        <header class="script-graph-summary" data-test="@UiTestIds.Editor.GraphSummary">
+            <strong>@Format(UiTextKey.EditorGraphNodesFormat, Artifact.Nodes.Count)</strong>
+            <span>@Format(UiTextKey.EditorGraphLinksFormat, Artifact.Edges.Count)</span>
+            <span>@Format(UiTextKey.EditorGraphSourceRangesFormat, Artifact.SourceRanges.Count)</span>
+        </header>
+        <div class="script-graph-canvas"
+             @ref="_graphElement"
+             data-test="@UiTestIds.Editor.GraphCanvas"></div>
+        <div class="script-graph-node-list">
+            @foreach (var item in EnumerateSourceMappedNodes().Take(MaxListedNodes))
+            {
+                <button type="button"
+                        data-test="@UiTestIds.Editor.GraphNode"
+                        @onclick="() => RequestSourceRangeAsync(item.Range)">
+                    <span>@item.Node.Label</span>
+                    <small>@FormatSourceRange(item.Range)</small>
+                </button>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private const int MaxListedNodes = 16;
+
+    private ElementReference _graphElement;
+    private string? _renderedRevision;
+
+    [Parameter] public ScriptKnowledgeGraphArtifact? Artifact { get; set; }
+
+    [Parameter] public bool IsLoading { get; set; }
+
+    [Parameter] public EventCallback<ScriptKnowledgeGraphSourceRange> SourceRangeRequested { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Artifact is null || Artifact.IsEmpty)
+        {
+            return;
+        }
+
+        var revision = Artifact.Revision.Value;
+        if (string.Equals(_renderedRevision, revision, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await GraphViewer.RenderAsync(_graphElement, Artifact);
+        _renderedRevision = revision;
+    }
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+
+    private string Format(UiTextKey key, params object[] args) =>
+        string.Format(System.Globalization.CultureInfo.CurrentCulture, Text(key), args);
+
+    private IEnumerable<(ScriptKnowledgeGraphNode Node, ScriptKnowledgeGraphSourceRange Range)> EnumerateSourceMappedNodes()
+    {
+        if (Artifact is null)
+        {
+            yield break;
+        }
+
+        var rangeByNodeId = Artifact.SourceRanges.ToDictionary(static range => range.NodeId, StringComparer.Ordinal);
+        foreach (var node in Artifact.Nodes)
+        {
+            if (rangeByNodeId.TryGetValue(node.Id, out var range))
+            {
+                yield return (node, range);
+            }
+        }
+    }
+
+    private Task RequestSourceRangeAsync(ScriptKnowledgeGraphSourceRange range) =>
+        SourceRangeRequested.InvokeAsync(range);
+
+    private static string FormatSourceRange(ScriptKnowledgeGraphSourceRange range) =>
+        $"L{range.Start.Line}:{range.Start.Column}";
+}

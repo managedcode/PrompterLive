@@ -44,7 +44,9 @@ public sealed class InvalidScriptRouteFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Header.Title))
                 .ToHaveTextAsync(BrowserTestConstants.Scripts.UntitledTitle);
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Header.Back));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Header.Back),
+                noWaitAfter: true);
             await BrowserRouteDriver.WaitForRouteAsync(page, AppRoutes.Editor);
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceInput)).ToHaveValueAsync(string.Empty);

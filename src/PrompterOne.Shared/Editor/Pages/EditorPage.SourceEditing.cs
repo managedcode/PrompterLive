@@ -1,3 +1,4 @@
+using PrompterOne.Core.AI.Models;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Services.Editor;
@@ -58,6 +59,7 @@ public partial class EditorPage
         _selection = selection;
         _history.UpdateSelection(selection.Range);
         RefreshSelectionState();
+        PublishEditorAiContext();
         StateHasChanged();
         return Task.CompletedTask;
     }
@@ -76,6 +78,7 @@ public partial class EditorPage
 
         _sourceText = nextSourceText;
         _history.TryRecord(_sourceText, _selection.Range);
+        InvalidateScriptGraph();
         _skipNextRenderFromTyping = !importedFrontMatter;
         QueueDraftAnalysis();
         QueueAutosave();
@@ -114,15 +117,36 @@ public partial class EditorPage
         _history.TryRecord(text, selection);
         if (string.IsNullOrWhiteSpace(ScriptId) || !_fileStorageSettings.FileAutoSaveEnabled)
         {
+            _scriptGraphArtifact = null;
             StageMutationForAutosave(text, documentNameOverride);
         }
         else
         {
+            _scriptGraphArtifact = null;
             PersistDraftInBackground(text, documentNameOverride);
         }
 
         await InvokeAsync(StateHasChanged);
+        if (_sourcePanel is not null)
+        {
+            await _sourcePanel.SyncExternalTextAsync(_sourceText, selection);
+        }
+
         await FocusSourceRangeAsync(selection.Start, selection.End, revealSelection: false);
+        PublishEditorAiContext();
+    }
+
+    private async Task<ScriptDocumentEditResult> ApplyAiEditPlanAsync(ScriptDocumentEditPlan plan)
+    {
+        var result = ScriptDocumentEditService.Apply(_sourceText, plan);
+        var selection = result.AppliedEdits.Count == 0
+            ? _selection.Range
+            : new EditorSelectionRange(
+                result.AppliedEdits[^1].UpdatedRange.Start,
+                result.AppliedEdits[^1].UpdatedRange.End);
+
+        await ApplyMutationAsync(result.Text, selection);
+        return result;
     }
 
     private void StageMutationForAutosave(string text, string? documentNameOverride = null)

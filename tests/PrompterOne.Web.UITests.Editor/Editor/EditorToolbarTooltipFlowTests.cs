@@ -25,9 +25,12 @@ public sealed class EditorToolbarTooltipFlowTests(StandaloneAppFixture fixture) 
             var emotionTrigger = page.GetByTestId(UiTestIds.Editor.EmotionTrigger);
             var tooltip = EditorTooltipDriver.GetToolbarTooltip(page, BrowserTestConstants.EditorFlow.EmotionTooltipText);
 
-            await emotionTrigger.HoverAsync();
+            await Expect(tooltip).ToBeHiddenAsync();
+            await UiInteractionDriver.HoverAndContinueAsync(page, emotionTrigger);
 
-            await Assert.That(await EditorTooltipDriver.ReadOpacityAsync(tooltip)).IsBetween(0, BrowserTestConstants.EditorFlow.MaximumEarlyTooltipOpacity);
+            var opacityDelayMs = await EditorTooltipDriver.ReadOpacityTransitionDelayMillisecondsAsync(tooltip);
+            await Assert.That(opacityDelayMs)
+                .IsBetween(BrowserTestConstants.EditorFlow.TooltipEarlyCheckDelayMs, double.MaxValue);
 
             await EditorTooltipDriver.WaitUntilFullyVisibleAsync(page, tooltip, BrowserTestConstants.EditorFlow.EmotionTooltipText);
 

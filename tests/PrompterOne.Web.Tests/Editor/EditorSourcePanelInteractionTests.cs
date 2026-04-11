@@ -8,20 +8,15 @@ using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
-using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
 
 public sealed class EditorSourcePanelInteractionTests : BunitContext
 {
-    private const string ConfiguredAiApiKey = "sk-test-openai";
-    private const string ConfiguredAiModel = "gpt-4o";
-    private readonly AppHarness _harness;
-
     public EditorSourcePanelInteractionTests()
     {
-        _harness = TestHarnessFactory.Create(this);
+        _ = TestHarnessFactory.Create(this);
     }
 
     [Test]
@@ -165,39 +160,6 @@ public sealed class EditorSourcePanelInteractionTests : BunitContext
         AssertMenuActionCluster(cut.FindByTestId(UiTestIds.Editor.FloatingVoiceEnergy), "Energy", "[energy:8]");
         cut.FindByTestId(UiTestIds.Editor.FloatingInsert).Click();
         AssertMenuActionCluster(cut.FindByTestId(UiTestIds.Editor.FloatingInsertSegmentArchetypeMenu), "Segment", "Archetype aware");
-    }
-
-    [Test]
-    public void EditorSourcePanel_AiButtonsAreDisabled_WhenNoProviderIsConfigured()
-    {
-        var cut = Render<EditorSourcePanelHost>();
-
-        cut.WaitForAssertion(() =>
-        {
-            Assert.True(cut.FindByTestId(UiTestIds.Editor.Ai).HasAttribute("disabled"));
-            Assert.True(cut.FindByTestId(UiTestIds.Editor.FloatingAi).HasAttribute("disabled"));
-        });
-    }
-
-    [Test]
-    public void EditorSourcePanel_AiButtonsAreEnabled_WhenAProviderIsConfigured()
-    {
-        _harness.JsRuntime.SavedValues[AiProviderSettings.StorageKey] = new AiProviderSettings
-        {
-            OpenAi = new OpenAiProviderSettings
-            {
-                ApiKey = ConfiguredAiApiKey,
-                Model = ConfiguredAiModel
-            }
-        };
-
-        var cut = Render<EditorSourcePanelHost>();
-
-        cut.WaitForAssertion(() =>
-        {
-            Assert.False(cut.FindByTestId(UiTestIds.Editor.Ai).HasAttribute("disabled"));
-            Assert.False(cut.FindByTestId(UiTestIds.Editor.FloatingAi).HasAttribute("disabled"));
-        });
     }
 
     private static void AssertTooltipContract(IElement element, string expectedTooltip)

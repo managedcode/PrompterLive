@@ -27,7 +27,9 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
             await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallVdoNinjaHarnessScript);
             await page.EvaluateAsync(BuildVdoNinjaPublishFailurePatchScript());
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.StartStream));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.StartStream),
+                noWaitAfter: true);
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.VdoNinjaHarnessReadyScript,
                 null,
@@ -63,7 +65,9 @@ public sealed class GoLiveOutputFailureRollbackTests(StandaloneAppFixture fixtur
             await page.EvaluateAsync(BrowserTestConstants.GoLive.InstallLiveKitHarnessScript);
             await page.EvaluateAsync(BuildLiveKitConnectFailurePatchScript());
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.StartStream));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.StartStream),
+                noWaitAfter: true);
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.LiveKitRollbackHarnessReadyScript,
                 null,

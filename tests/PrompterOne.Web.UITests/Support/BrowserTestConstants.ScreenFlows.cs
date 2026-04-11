@@ -251,6 +251,7 @@ internal static partial class BrowserTestConstants
         public const int TooltipSettleDelayMs = 3400;
         public const int TooltipRevealTimingSlackMs = 700;
         public const int TooltipDismissTimeoutMs = 1_500;
+        public const int ClearTooltipHoverMoveSteps = 8;
         public const double MaximumEarlyTooltipOpacity = 0.05;
         public const double MinimumVisibleTooltipOpacity = 0.9;
         public const double MaximumTooltipControlOverlapPx = 0.5;

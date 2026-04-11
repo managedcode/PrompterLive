@@ -10,7 +10,6 @@ public sealed class EditorLearnScreenFlowTests(StandaloneAppFixture fixture) : A
     public Task EditorAndLearnScreens_ExposeExpectedInteractiveControls() =>
         RunPageAsync(async page =>
         {
-            await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
             await EditorRouteDriver.OpenReadyAsync(
                 page,
                 BrowserTestConstants.Routes.EditorDemo,
@@ -23,8 +22,10 @@ public sealed class EditorLearnScreenFlowTests(StandaloneAppFixture fixture) : A
             await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.MenuColor)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Editor.Bold).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.Ai)).ToBeEnabledAsync();
-            await page.GetByTestId(UiTestIds.Editor.Ai).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.AiSpotlight)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.Header.AiSpotlight).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.AiSpotlight.Overlay)).ToBeVisibleAsync();
+            await page.GetByTestId(UiTestIds.AiSpotlight.Close).ClickAsync();
             await page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1)).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1))).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,

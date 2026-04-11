@@ -16,15 +16,15 @@ public sealed class ScriptAgentFactory(
     IEnumerable<ScriptAgent> agents,
     IAgentRuntimeSettingsSource settingsSource,
     EmbeddedAgentSkillsProvider embeddedAgentSkillsProvider,
+    ScriptAgentToolProvider scriptAgentToolProvider,
     IServiceProvider serviceProvider) : IScriptAgentFactory
 {
-    private static readonly IList<AITool> NoTools = [];
-
     private readonly IReadOnlyDictionary<string, ScriptAgent> _agentsById = agents.ToDictionary(
         static agent => agent.Id,
         StringComparer.OrdinalIgnoreCase);
     private readonly EmbeddedAgentSkillsProvider _embeddedAgentSkillsProvider = embeddedAgentSkillsProvider;
     private readonly IAgentRuntimeSettingsSource _settingsSource = settingsSource;
+    private readonly ScriptAgentToolProvider _scriptAgentToolProvider = scriptAgentToolProvider;
     private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public async Task<AIAgent> CreateRequiredAsync(
@@ -73,7 +73,7 @@ public sealed class ScriptAgentFactory(
                 agent.GetSystemPrompt(),
                 agent.Name,
                 agent.Description,
-                NoTools,
+                _scriptAgentToolProvider.CreateTools(context),
                 NullLoggerFactory.Instance,
                 _serviceProvider)
         };

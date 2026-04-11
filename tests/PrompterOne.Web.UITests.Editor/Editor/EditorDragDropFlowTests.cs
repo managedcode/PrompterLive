@@ -68,10 +68,14 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
             await Expect(sourceInput).ToHaveValueAsync(ReplaceVisibleBody);
             await Expect(page.GetByTestId(UiTestIds.Header.Title)).ToHaveTextAsync(ReplaceTitle);
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Editor.Undo));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Undo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(string.Empty);
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Editor.Redo));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Redo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(ReplaceVisibleBody);
         });
 
@@ -93,10 +97,14 @@ public sealed class EditorDragDropFlowTests(StandaloneAppFixture fixture) : AppU
             await Assert.That(appendedText).DoesNotContain("title:");
             await Assert.That(appendedText).DoesNotContain("---");
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Editor.Undo));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Undo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(initialText);
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Editor.Redo));
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Redo),
+                noWaitAfter: true);
             await Expect(sourceInput).ToHaveValueAsync(expectedText);
         });
 

@@ -26,6 +26,8 @@
                       LearnLabel="@Text(UiTextKey.HeaderLearn)"
                       LibraryAllScriptsLabel="@Text(UiTextKey.LibraryAllScripts)"
                       LibraryBreadcrumbCurrentLabel="@LibraryBreadcrumbCurrentLabel"
+                      AiSpotlightLabel="@Text(UiTextKey.HeaderAiSpotlight)"
+                      AiSpotlightShortcutLabel="@Text(UiTextKey.HeaderAiSpotlightShortcut)"
                       GoLiveLabel="@Text(UiTextKey.HeaderGoLive)"
                       GoLiveState="@GoLiveIndicatorState"
                       GoLiveStatus="@GoLiveIndicatorStatus"
@@ -36,6 +38,7 @@
                       OnImport="HandleImportScriptAsync"
                       OnImportTrigger="HandleImportScriptTriggerAsync"
                       OnLibrarySearchInput="HandleLibrarySearchInputAsync"
+                      OnOpenAiSpotlight="HandleOpenAiSpotlightAsync"
                       OnOpenGoLive="HandleOpenGoLiveClickAsync"
                       OnOpenLearnClick="HandleOpenLearnClickAsync"
                       OnOpenOnboarding="HandleOpenOnboardingAsync"
@@ -61,6 +64,7 @@
 
 <PrompterOne.Shared.Components.Diagnostics.DiagnosticsBanner />
 <PrompterOne.Shared.Components.Diagnostics.ConnectivityOverlay />
+<AiSpotlightOverlay />
 
 @Body
 

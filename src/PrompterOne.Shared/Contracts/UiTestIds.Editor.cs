@@ -13,7 +13,6 @@ public static partial class UiTestIds
         public const string ActiveSegmentSpeaker = "editor-active-segment-speaker";
         public const string ActiveSegmentTiming = "editor-active-segment-timing";
         public const string ActiveSegmentWpm = "editor-active-segment-wpm";
-        public const string Ai = "editor-ai";
         public const string Author = "editor-author";
         public const string BaseWpm = "editor-base-wpm";
         public const string Bold = "editor-bold";
@@ -43,7 +42,6 @@ public static partial class UiTestIds
         public const string FindNext = "editor-find-next";
         public const string FindPrevious = "editor-find-previous";
         public const string FindResult = "editor-find-result";
-        public const string FloatingAi = "editor-floating-ai";
         public const string FloatingBar = "editor-floating-bar";
         public const string FloatingDeliverySarcasm = "editor-float-delivery-sarcasm";
         public const string FloatingEmotion = "editor-float-emotion";
@@ -78,6 +76,12 @@ public static partial class UiTestIds
         public const string FloatStress = "editor-float-stress";
         public const string FormatHighlight = "editor-format-highlight";
         public const string FormatTrigger = "editor-format-trigger";
+        public const string GraphCanvas = "editor-graph-canvas";
+        public const string GraphEmpty = "editor-graph-empty";
+        public const string GraphNode = "editor-graph-node";
+        public const string GraphPanel = "editor-graph-panel";
+        public const string GraphSummary = "editor-graph-summary";
+        public const string GraphTab = "editor-graph-tab";
         public const string InsertBlock = "editor-insert-block";
         public const string InsertBlockArchetypeMenu = "editor-insert-block-archetype-menu";
         public const string InsertBlockMenu = "editor-insert-block-menu";
@@ -118,6 +122,7 @@ public static partial class UiTestIds
         public const string ToolbarScrollNext = "editor-toolbar-scroll-next";
         public const string ToolbarScrollPrevious = "editor-toolbar-scroll-previous";
         public const string ToolbarTools = "editor-toolbar-tools";
+        public const string WorkspaceTabs = "editor-workspace-tabs";
         public const string SpeedFast = "editor-speed-fast";
         public const string SpeedCustomWpm = "editor-speed-custom-wpm";
         public const string SpeedSlow = "editor-speed-slow";
@@ -130,6 +135,7 @@ public static partial class UiTestIds
         public const string StatusSegments = "editor-status-segments";
         public const string StatusVersion = "editor-status-version";
         public const string StatusWords = "editor-status-words";
+        public const string SourceTab = "editor-source-tab";
         public const string SplitSegment = "editor-split-segment";
         public const string SplitHint = "editor-split-hint";
         public const string SplitSpeaker = "editor-split-speaker";

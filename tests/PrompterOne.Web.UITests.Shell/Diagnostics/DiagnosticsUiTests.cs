@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -46,10 +47,14 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
                     toggleGlobal = BrowserTestConstants.Diagnostics.FolderCreateFailureToggleGlobal
                 });
 
-            await page.GetByTestId(UiTestIds.Library.FolderCreateStart).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.FolderCreateStart),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Library.NewFolderName).FillAsync("Diagnostics Failure Folder");
-            await page.GetByTestId(UiTestIds.Library.NewFolderSubmit).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.NewFolderSubmit),
+                noWaitAfter: true);
 
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Banner))
@@ -73,6 +78,7 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
             await ShellRouteDriver.OpenLibraryAsync(page);
 
             await page.Context.SetOfflineAsync(true);
+            await WaitForNavigatorOnlineStateAsync(page, expectedOnline: false);
             await page.EvaluateAsync(BrowserTestConstants.Diagnostics.DispatchOfflineEventScript);
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
@@ -80,14 +86,13 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
                 .ToContainTextAsync(
                     BrowserTestConstants.Diagnostics.ConnectivityOfflineTitle,
                     new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await page.GetByTestId(UiTestIds.Diagnostics.ConnectivityDismiss).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Diagnostics.ConnectivityDismiss),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
                 .ToBeHiddenAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             await page.Context.SetOfflineAsync(false);
-            await page.EvaluateAsync(BrowserTestConstants.Diagnostics.DispatchOnlineEventScript);
-            await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Diagnostics.Connectivity))
                 .ToContainTextAsync(
                     BrowserTestConstants.Diagnostics.ConnectivityOnlineTitle,
@@ -100,4 +105,10 @@ public sealed class DiagnosticsUiTests(StandaloneAppFixture fixture)
             await page.Context.CloseAsync();
         }
     }
+
+    private static Task WaitForNavigatorOnlineStateAsync(IPage page, bool expectedOnline) =>
+        page.WaitForFunctionAsync(
+            BrowserTestConstants.Diagnostics.NavigatorOnlineMatchesScript,
+            expectedOnline,
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 }

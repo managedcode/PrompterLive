@@ -9,7 +9,6 @@ public enum EditorToolbarActionType
 {
     Command,
     History,
-    Ai,
     ToggleMenu
 }
 
@@ -23,7 +22,6 @@ public sealed record EditorToolbarActionDescriptor(
     string? MenuId = null,
     EditorCommandRequest? Command = null,
     EditorHistoryCommand? HistoryCommand = null,
-    EditorAiAssistAction? AiAction = null,
     bool PreventMouseDown = false);
 
 public sealed record EditorToolbarDropdownGroupDescriptor(
@@ -174,23 +172,7 @@ public static class EditorToolbarCatalog
             ],
             [
                 ..EditorTpsMenuCatalog.BuildToolbarInsertGroups()
-            ]),
-        new(
-            "ai",
-            "AI",
-            null,
-            null,
-            null,
-            [
-                Ai(
-                    "ai-simplify",
-                    EditorActionContents.IconLabel(EditorActionIconKind.Spark, "AI"),
-                    "AI Assistant — rewrite, expand, simplify, or auto-format your script with AI",
-                    UiTestIds.Editor.Ai,
-                    EditorAiAssistAction.Simplify,
-                    "tb-btn tb-ai tb-tip")
-            ],
-            [])
+            ])
     ];
 
     public static IReadOnlyList<IReadOnlyList<EditorToolbarActionDescriptor>> FloatingActionGroups =>
@@ -212,15 +194,6 @@ public static class EditorToolbarCatalog
                     group.Actions.Select(action => LocalizeAction(localizer, action)).ToArray(),
                     group.HasSeparatorBefore)).ToArray()))
             .ToArray();
-
-    private static EditorToolbarActionDescriptor Ai(
-        string key,
-        EditorActionContentDescriptor content,
-        string tooltip,
-        string testId,
-        EditorAiAssistAction aiAction,
-        string cssClass) =>
-        new(key, EditorToolbarActionType.Ai, cssClass, content, tooltip, testId, AiAction: aiAction, PreventMouseDown: true);
 
     private static EditorToolbarActionDescriptor History(string key, EditorActionContentDescriptor content, string tooltip, string testId, EditorHistoryCommand command) =>
         new(key, EditorToolbarActionType.History, "tb-btn tb-tip", content, tooltip, testId, HistoryCommand: command, PreventMouseDown: true);
@@ -309,7 +282,6 @@ public static class EditorToolbarCatalog
             "pause" => Text(localizer, UiTextKey.EditorToolbarSectionPause),
             "speed" => Text(localizer, UiTextKey.EditorToolbarSectionSpeed),
             "insert" => Text(localizer, UiTextKey.EditorToolbarSectionInsert),
-            "ai" => Text(localizer, UiTextKey.EditorToolbarSectionAi),
             _ => key
         };
 
@@ -328,7 +300,6 @@ public static class EditorToolbarCatalog
             UiTestIds.Editor.PauseTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipPauseCues),
             UiTestIds.Editor.SpeedTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipSpeedCues),
             UiTestIds.Editor.InsertTrigger => Text(localizer, UiTextKey.EditorToolbarTooltipMoreInsertOptions),
-            UiTestIds.Editor.Ai => Text(localizer, UiTextKey.EditorToolbarTooltipAiAssist),
             "editor-reset-color" => Text(localizer, UiTextKey.EditorToolbarTooltipRemoveInlineTags),
             UiTestIds.Editor.InsertSegmentArchetypeMenu => Text(localizer, UiTextKey.EditorToolbarTooltipInsertSegmentArchetype),
             UiTestIds.Editor.InsertBlockArchetypeMenu => Text(localizer, UiTextKey.EditorToolbarTooltipInsertBlockArchetype),

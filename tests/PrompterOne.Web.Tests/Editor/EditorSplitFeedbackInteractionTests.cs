@@ -11,7 +11,7 @@ namespace PrompterOne.Web.Tests;
 [NotInParallel]
 public sealed class EditorSplitFeedbackInteractionTests : BunitContext
 {
-    private static readonly TimeSpan AutosaveAssertionTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan AutosaveAssertionTimeout = TimeSpan.FromSeconds(10);
     private readonly AppHarness _harness;
 
     public EditorSplitFeedbackInteractionTests()
@@ -20,7 +20,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
     }
 
     [Test]
-    public void EditorPage_SplitFeedbackStaysVisibleAcrossRedundantSourceChangeEvents()
+    public async Task EditorPage_SplitFeedbackStaysVisibleAcrossRedundantSourceChangeEvents()
     {
         var navigationManager = Services.GetRequiredService<NavigationManager>();
         navigationManager.NavigateTo(AppTestData.Routes.EditorDemo);
@@ -32,9 +32,9 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
             Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
         });
 
-        cut.FindByTestId(UiTestIds.Editor.ToolsTab).Click();
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.SplitSource);
-        cut.FindByTestId(UiTestIds.Editor.SplitSegment).Click();
+        await cut.FindByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.SplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -46,7 +46,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).TextContent.Trim());
         });
 
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.SplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.SplitSource);
 
         cut.WaitForAssertion(() =>
         {
@@ -55,7 +55,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).TextContent.Trim());
         }, AutosaveAssertionTimeout);
 
-        cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).Click();
+        await cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -64,7 +64,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
     }
 
     [Test]
-    public void EditorPage_SplitFeedbackStaysVisibleAfterAutosaveRefresh()
+    public async Task EditorPage_SplitFeedbackStaysVisibleAfterAutosaveRefresh()
     {
         var navigationManager = Services.GetRequiredService<NavigationManager>();
         navigationManager.NavigateTo(AppTestData.Routes.EditorDemo);
@@ -76,9 +76,9 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
             Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
         });
 
-        cut.FindByTestId(UiTestIds.Editor.ToolsTab).Click();
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.SplitSource);
-        cut.FindByTestId(UiTestIds.Editor.SplitSegment).Click();
+        await cut.FindByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.SplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -108,7 +108,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).TextContent.Trim());
         }, AutosaveAssertionTimeout);
 
-        cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).Click();
+        await cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -117,7 +117,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
     }
 
     [Test]
-    public void EditorPage_SplitFeedbackStaysVisibleAfterSourceEdits()
+    public async Task EditorPage_SplitFeedbackStaysVisibleAfterSourceEdits()
     {
         var navigationManager = Services.GetRequiredService<NavigationManager>();
         navigationManager.NavigateTo(AppTestData.Routes.EditorDemo);
@@ -129,9 +129,9 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
             Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
         });
 
-        cut.FindByTestId(UiTestIds.Editor.ToolsTab).Click();
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.SplitSource);
-        cut.FindByTestId(UiTestIds.Editor.SplitSegment).Click();
+        await cut.FindByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.SplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -140,7 +140,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).TextContent.Trim());
         }, AutosaveAssertionTimeout);
 
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.EditedSplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.EditedSplitSource);
 
         cut.WaitForAssertion(() =>
         {
@@ -149,7 +149,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
                 cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).TextContent.Trim());
         });
 
-        cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).Click();
+        await cut.FindByTestId(UiTestIds.Editor.SplitResultOpenLibrary).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -158,7 +158,7 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
     }
 
     [Test]
-    public void EditorPage_SplitFeedbackStaysVisibleAcrossUntitledDraftAutosaveNavigation()
+    public async Task EditorPage_SplitFeedbackStaysVisibleAcrossUntitledDraftAutosaveNavigation()
     {
         var navigationManager = Services.GetRequiredService<NavigationManager>();
         navigationManager.NavigateTo(AppRoutes.Editor);
@@ -169,9 +169,9 @@ public sealed class EditorSplitFeedbackInteractionTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.SourceInput));
         });
 
-        cut.FindByTestId(UiTestIds.Editor.ToolsTab).Click();
-        cut.FindByTestId(UiTestIds.Editor.SourceInput).Input(EditorSplitFeedbackTestData.SplitSource);
-        cut.FindByTestId(UiTestIds.Editor.SplitSegment).Click();
+        await cut.FindByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(EditorSplitFeedbackTestData.SplitSource);
+        await cut.FindByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {

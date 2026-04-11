@@ -4,15 +4,6 @@ namespace PrompterOne.Shared.Components.Editor;
 
 internal static class EditorFloatingToolbarActionFactory
 {
-    public static EditorToolbarActionDescriptor Ai(
-        string key,
-        EditorActionContentDescriptor content,
-        string tooltip,
-        string testId,
-        EditorAiAssistAction aiAction,
-        string cssClass = "efb-btn efb-ai") =>
-        new(key, EditorToolbarActionType.Ai, cssClass, content, tooltip, testId, AiAction: aiAction, PreventMouseDown: true);
-
     public static EditorToolbarActionDescriptor ClearColor(string key, string tooltip, string testId) =>
         new(
             key,

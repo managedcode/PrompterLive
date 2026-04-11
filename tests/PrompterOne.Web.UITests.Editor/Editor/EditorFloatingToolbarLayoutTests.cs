@@ -107,7 +107,9 @@ public sealed class EditorFloatingToolbarLayoutTests(StandaloneAppFixture fixtur
 
             var before = await GetRequiredAnchorAsync(floatingBar);
 
-            await page.GetByTestId(UiTestIds.Editor.FloatEmphasis).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.FloatEmphasis),
+                noWaitAfter: true);
             await Expect(floatingBar).ToBeVisibleAsync();
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
 

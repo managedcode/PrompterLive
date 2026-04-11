@@ -144,9 +144,9 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
             var toolbar = page.GetByTestId(UiTestIds.Editor.Toolbar);
             var toolbarTools = page.GetByTestId(UiTestIds.Editor.ToolbarTools);
             var findBar = page.GetByTestId(UiTestIds.Editor.FindBar);
-            var aiButton = page.GetByTestId(UiTestIds.Editor.Ai);
             var scrollNext = page.GetByTestId(UiTestIds.Editor.ToolbarScrollNext);
             var scrollPrevious = page.GetByTestId(UiTestIds.Editor.ToolbarScrollPrevious);
+            var globalAiButton = page.GetByTestId(UiTestIds.Header.AiSpotlight);
 
             await Expect(toolbar)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
@@ -154,7 +154,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
             await Expect(findBar)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            await Expect(aiButton)
+            await Expect(globalAiButton)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
             await Expect(scrollNext)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });

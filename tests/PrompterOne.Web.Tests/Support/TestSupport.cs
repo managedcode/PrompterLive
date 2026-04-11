@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Core.AI.Services;
 using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Documents;
 using PrompterOne.Core.Models.Library;
@@ -56,7 +57,6 @@ internal static class TestHarnessFactory
         var droppedScriptMergeService = new EditorDroppedScriptMergeService();
         var textEditor = new TpsTextEditor();
         var structureEditor = new TpsStructureEditor();
-        var localAssistant = new EditorLocalAssistant();
         var previewService = new ScriptPreviewService(documentReader, compiler);
         var session = new ScriptSessionService(
             repository,
@@ -114,11 +114,14 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton(droppedScriptMergeService);
         context.Services.AddSingleton(textEditor);
         context.Services.AddSingleton(structureEditor);
-        context.Services.AddSingleton(localAssistant);
+        context.Services.AddSingleton<ScriptDocumentEditService>();
+        context.Services.AddSingleton<ScriptKnowledgeGraphService>();
+        context.Services.AddSingleton<ScriptAgentToolProvider>();
         context.Services.AddSingleton<IScriptPreviewService>(previewService);
         context.Services.AddSingleton<EditorOutlineBuilder>();
         context.Services.AddSingleton<EditorInterop>();
         context.Services.AddSingleton<EditorMonacoInterop>();
+        context.Services.AddSingleton<ScriptGraphViewerInterop>();
         context.Services.AddSingleton<EditorToolbarInterop>();
         context.Services.AddSingleton<AppShellFilePickerInterop>();
         context.Services.AddSingleton<EditorDocumentSaveCoordinator>();
@@ -157,6 +160,8 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<GoLiveRemoteSourceInterop>();
         context.Services.AddSingleton<GoLiveRemoteSourceRuntimeService>();
         context.Services.AddSingleton(bootstrapper);
+        context.Services.AddSingleton<AiSpotlightHotkeyInterop>();
+        context.Services.AddSingleton<AiSpotlightService>();
         context.Services.AddSingleton<GoLiveSessionService>();
         context.Services.AddSingleton(runtimeTelemetryOptions ?? RuntimeTelemetryOptions.Disabled);
         context.Services.AddSingleton<ISentryRuntimeClient>(sentryClient);

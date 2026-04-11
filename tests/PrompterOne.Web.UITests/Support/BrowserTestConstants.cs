@@ -274,6 +274,8 @@ internal static partial class BrowserTestConstants
         public const int AiScrollJumpTargetLineIndex = 90;
         public const int AiScrollJumpSettleDelayMs = 500;
         public const double AiScrollJumpMaximumAllowedDeltaPx = 64;
+        public const string GraphReadyAttributeName = "data-graph-ready";
+        public const string GraphReadyAttributeValue = "true";
         public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
         public const int ClickNearStartOffsetX = 140;
@@ -823,6 +825,7 @@ internal static partial class BrowserTestConstants
         public const string ConnectivityOnlineTitle = "Connection restored";
         public const string DispatchOfflineEventScript = "() => window.dispatchEvent(new Event('offline'))";
         public const string DispatchOnlineEventScript = "() => window.dispatchEvent(new Event('online'))";
+        public const string NavigatorOnlineMatchesScript = "expectedOnline => navigator.onLine === expectedOnline";
         public const string FolderCreateFailureToggleGlobal = "__prompterFailFolderCreate";
         public const string ForcedFailureDetail = "Forced diagnostics failure from browser test.";
         public const string CreateFolderFailure = "Unable to create this folder.";
@@ -926,6 +929,7 @@ internal static partial class BrowserTestConstants
         public const string R = "r";
         public const string Space = "Space";
         public const string SelectAll = "ControlOrMeta+A";
+        public const string OpenAssistant = "ControlOrMeta+K";
         public const string Backspace = "Backspace";
         public const string Undo = "ControlOrMeta+Z";
         public const string Redo = "ControlOrMeta+Shift+Z";
@@ -984,7 +988,7 @@ internal static partial class BrowserTestConstants
         public const string RuntimeAllowVendorLoadsProperty = AppRuntimeTelemetry.Harness.RuntimeAllowVendorLoadsProperty;
         public const string RuntimeGlobal = AppRuntimeTelemetry.Harness.RuntimeGlobalName;
         public const string RuntimeHarnessEnabledProperty = AppRuntimeTelemetry.Harness.RuntimeHarnessEnabledProperty;
-        public const int TelemetryWaitTimeoutMs = 5_000;
+        public const int TelemetryWaitTimeoutMs = Timing.ExtendedVisibleTimeoutMs;
         public const string VendorLoadsCollection = AppRuntimeTelemetry.Harness.VendorLoadsCollection;
     }
 

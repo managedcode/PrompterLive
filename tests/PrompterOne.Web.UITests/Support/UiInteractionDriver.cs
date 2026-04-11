@@ -47,7 +47,8 @@ internal static class UiInteractionDriver
 
     internal static async Task ClickAndWaitForVisibleAsync(
         ILocator trigger,
-        ILocator visibleLocator)
+        ILocator visibleLocator,
+        bool noWaitAfter = false)
     {
         Exception? lastFailure = null;
 
@@ -61,10 +62,19 @@ internal static class UiInteractionDriver
                 }
 
                 await WaitUntilInteractableAsync(trigger);
-                await trigger.ClickAsync(new()
+
+                if (noWaitAfter)
                 {
-                    Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
-                });
+                    await trigger.EvaluateAsync("element => element.click()");
+                }
+                else
+                {
+                    await trigger.ClickAsync(new()
+                    {
+                        Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+                    });
+                }
+
                 await visibleLocator.WaitForAsync(new()
                 {
                     State = WaitForSelectorState.Visible,
@@ -87,6 +97,41 @@ internal static class UiInteractionDriver
         }
 
         throw lastFailure ?? new InvalidOperationException("The UI interaction driver exhausted its menu-open retries without capturing a failure.");
+    }
+
+    internal static async Task HoverAndContinueAsync(IPage page, ILocator locator)
+    {
+        Exception? lastFailure = null;
+
+        for (var attempt = 1; attempt <= BrowserTestConstants.Timing.InteractionRetryCount; attempt++)
+        {
+            try
+            {
+                await WaitUntilInteractableAsync(locator);
+                var bounds = await locator.BoundingBoxAsync();
+                if (bounds is null)
+                {
+                    throw new PlaywrightException("The target locator has no bounding box for hover.");
+                }
+
+                await page.Mouse.MoveAsync(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+                return;
+            }
+            catch (TimeoutException exception) when (attempt < BrowserTestConstants.Timing.InteractionRetryCount)
+            {
+                lastFailure = exception;
+            }
+            catch (PlaywrightException exception) when (
+                attempt < BrowserTestConstants.Timing.InteractionRetryCount &&
+                IsRetryableInteractionFailure(exception))
+            {
+                lastFailure = exception;
+            }
+
+            await Task.Delay(BrowserTestConstants.Timing.InteractionRetryDelayMs);
+        }
+
+        throw lastFailure ?? new InvalidOperationException("The UI interaction driver exhausted its hover retries without capturing a failure.");
     }
 
     private static async Task WaitUntilInteractableAsync(ILocator locator)

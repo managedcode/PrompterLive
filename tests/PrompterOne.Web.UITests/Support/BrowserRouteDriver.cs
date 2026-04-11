@@ -9,7 +9,7 @@ internal static class BrowserRouteDriver
     private const int RouteBootstrapAttemptCount = 2;
     private const string RouteFailurePrefix = "route-open";
     private const string RouteReloadFailurePrefix = "route-reload";
-    private const WaitUntilState RouteNavigationReadyState = WaitUntilState.Load;
+    private const WaitUntilState RouteNavigationReadyState = WaitUntilState.Commit;
 
     internal static async Task OpenPageAsync(
         IPage page,

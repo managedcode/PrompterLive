@@ -32,7 +32,9 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
                 });
             await Assert.That(splitActionLivesInToolsPanel).IsTrue();
 
-            await page.GetByTestId(UiTestIds.Editor.SplitSegment).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.SplitSegment),
+                noWaitAfter: true);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitStatus)).ToBeVisibleAsync(new()
             {
@@ -73,7 +75,9 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitSpeaker)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitSpeakerActionLabel);
 
-            await page.GetByTestId(UiTestIds.Editor.SplitSpeaker).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.SplitSpeaker),
+                noWaitAfter: true);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitStatus)).ToBeVisibleAsync(new()
             {

@@ -78,6 +78,18 @@
                            OnClick="OnOpenGoLive"
                            TestId="@UiTestIds.Header.GoLive" />
 
+        <button type="button"
+                class="btn-ghost app-header-ai"
+                @onclick="HandleOpenAiSpotlightAsync"
+                title="@AiSpotlightShortcutLabel"
+                aria-label="@AiSpotlightLabel"
+                data-test="@UiTestIds.Header.AiSpotlight">
+            <span data-test="@UiTestIds.Header.AiSpotlightIcon">
+                <UiIcon Kind="UiIconKind.OpenAiBurst" Size="16" />
+            </span>
+            <span class="app-header-action-label">@AiSpotlightLabel</span>
+        </button>
+
         @if (ShowLibraryActions)
         {
             <button type="button"
@@ -219,6 +231,8 @@
     [Parameter] public string? HeaderSubtitleDomId { get; set; }
     [Parameter, EditorRequired] public string HeaderSubtitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string HeaderTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string AiSpotlightLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string AiSpotlightShortcutLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ImportActionButtonTestId { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ImportActionIconTestId { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ImportActionInputId { get; set; } = string.Empty;
@@ -247,6 +261,7 @@
     [Parameter] public EventCallback OnCreateScriptClick { get; set; }
     [Parameter] public EventCallback OnHomeClick { get; set; }
     [Parameter] public EventCallback OnImportTrigger { get; set; }
+    [Parameter] public EventCallback OnOpenAiSpotlight { get; set; }
     [Parameter] public EventCallback OnOpenGoLive { get; set; }
     [Parameter] public EventCallback OnOpenLearnClick { get; set; }
     [Parameter] public EventCallback OnOpenOnboarding { get; set; }
@@ -266,6 +281,8 @@
     private Task HandleImportTriggerAsync() => OnImportTrigger.InvokeAsync();
 
     private Task HandleLibrarySearchInputAsync(ChangeEventArgs args) => OnLibrarySearchInput.InvokeAsync(args);
+
+    private Task HandleOpenAiSpotlightAsync() => OnOpenAiSpotlight.InvokeAsync();
 
     private Task HandleOpenLearnClickAsync() => OnOpenLearnClick.InvokeAsync();
 

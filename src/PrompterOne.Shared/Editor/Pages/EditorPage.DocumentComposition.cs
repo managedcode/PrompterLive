@@ -1,17 +1,10 @@
 using System.Globalization;
-using PrompterOne.Core.Models.Editor;
 using PrompterOne.Core.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
 public partial class EditorPage
 {
-    private async Task OnAiActionRequestedAsync(EditorAiAssistAction action)
-    {
-        var mutation = LocalAssistant.Apply(_sourceText, _selection.Range, action);
-        await ApplyMutationAsync(mutation.Text, mutation.Selection);
-    }
-
     private string BuildPersistedDocument(string bodyText) =>
         _frontMatterService.Build(BuildMetadata(), bodyText);
 

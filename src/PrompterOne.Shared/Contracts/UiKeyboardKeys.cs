@@ -20,6 +20,7 @@ public static class UiKeyboardKeys
     public const string Escape = "Escape";
     public const string FLower = "f";
     public const string HLower = "h";
+    public const string KLower = "k";
     public const string LLower = "l";
     public const string OLower = "o";
     public const string PageDown = "PageDown";

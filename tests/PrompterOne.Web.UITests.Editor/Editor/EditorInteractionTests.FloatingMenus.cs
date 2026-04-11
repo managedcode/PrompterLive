@@ -12,7 +12,6 @@ public sealed partial class EditorInteractionTests
 
         await trigger.ScrollIntoViewIfNeededAsync();
         await Expect(trigger).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
-        await trigger.ClickAsync();
-        await Expect(panel).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+        await UiInteractionDriver.ClickAndWaitForVisibleAsync(trigger, panel, noWaitAfter: true);
     }
 }

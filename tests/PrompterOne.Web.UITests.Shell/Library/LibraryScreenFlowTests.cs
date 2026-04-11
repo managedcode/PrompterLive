@@ -63,7 +63,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             var demoCard = page.GetByTestId(BrowserTestConstants.Elements.DemoCard);
             await Expect(demoCard).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(demoCard).ToContainTextAsync(BrowserTestConstants.Library.ModeLabel);
-            await demoCard.HoverAsync();
+            await UiInteractionDriver.HoverAndContinueAsync(page, demoCard);
             await page.WaitForFunctionAsync(
                 """
                 (args) => {
@@ -179,16 +179,22 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(demoDropdown).ToBeHiddenAsync();
             await Expect(leadershipDropdown).ToBeHiddenAsync();
 
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)));
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)),
+                demoDropdown,
+                noWaitAfter: true);
             await Expect(demoDropdown).ToBeVisibleAsync();
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.SortLabel));
             await Expect(demoDropdown).ToBeHiddenAsync();
 
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)));
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)));
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)),
+                demoDropdown,
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.LeadershipId)),
+                leadershipDropdown,
+                noWaitAfter: true);
             await Expect(leadershipDropdown).ToBeVisibleAsync();
             await Expect(demoDropdown).ToBeHiddenAsync();
 
@@ -257,18 +263,27 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         RunPageAsync(async page =>
         {
             await ShellRouteDriver.OpenLibraryAsync(page);
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.FolderCreateTile));
-            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
+            var newFolderOverlay = page.GetByTestId(UiTestIds.Library.NewFolderOverlay);
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.FolderCreateTile),
+                newFolderOverlay,
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Library.NewFolderCard)).ToBeVisibleAsync();
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.NewFolderCancel));
-            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.NewFolderCancel),
+                noWaitAfter: true);
+            await Expect(newFolderOverlay).ToBeHiddenAsync();
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.FolderCreateStart));
-            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeVisibleAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.FolderCreateStart),
+                newFolderOverlay,
+                noWaitAfter: true);
             await page.GetByTestId(UiTestIds.Library.NewFolderName).FillAsync(BrowserTestConstants.Folders.RoadshowsName);
             await page.GetByTestId(UiTestIds.Library.NewFolderParent).SelectOptionAsync(new[] { BrowserTestConstants.Folders.PresentationsId });
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.NewFolderSubmit));
-            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync(new()
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.NewFolderSubmit),
+                noWaitAfter: true);
+            await Expect(newFolderOverlay).ToBeHiddenAsync(new()
             {
                 Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
             });
@@ -276,11 +291,16 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowsName);
 
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.FolderAll));
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)),
+                page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)),
+                noWaitAfter: true);
             await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardMenu(BrowserTestConstants.Scripts.DemoId)));
+                page.GetByTestId(UiTestIds.Library.Move(BrowserTestConstants.Scripts.DemoId, BrowserTestConstants.Folders.RoadshowsId)),
+                noWaitAfter: true);
             await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.Move(BrowserTestConstants.Scripts.DemoId, BrowserTestConstants.Folders.RoadshowsId)));
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder));
+                page.GetByTestId(BrowserTestConstants.Elements.RoadshowsFolder),
+                noWaitAfter: true);
 
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
@@ -315,8 +335,9 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent)).ToBeHiddenAsync();
             await Assert.That(demoCardMenuOpacity >= BrowserTestConstants.LibraryFlow.MinimumTouchMenuOpacity).IsTrue();
 
-            await UiInteractionDriver.ClickAndContinueAsync(demoCardMenu);
-            await Expect(page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)))
-                .ToBeVisibleAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                demoCardMenu,
+                page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)),
+                noWaitAfter: true);
         });
 }

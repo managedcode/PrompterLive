@@ -19,57 +19,84 @@
                                     ActiveBlockIndex="@_activeBlockIndex"
                                     OnNavigate="OnNavigateAsync" />
 
-            <EditorSourcePanel @ref="_sourcePanel"
-                               Text="@_sourceText"
-                               Selection="@_selection"
-                               Status="@_status"
-                               CanUndo="@_history.CanUndo"
-                               CanRedo="@_history.CanRedo"
-                               CanApplyWrapCommands="@CanApplyWrapCommands"
-                               CanRenderFloatingToolbar="@CanRenderFloatingToolbar"
-                               ErrorMessage="@_errorMessage"
-                               OnFilesDropped="OnFilesDroppedAsync"
-                               OnTextChanged="OnSourceChangedAsync"
-                               OnSelectionChanged="OnSelectionChangedAsync"
-                               OnHistoryRequested="OnHistoryRequestedAsync"
-                               OnCommandRequested="OnCommandRequestedAsync"
-                               OnAiActionRequested="OnAiActionRequestedAsync" />
+            <div class="editor-workspace">
+                <div class="editor-workspace-tabs" data-test="@UiTestIds.Editor.WorkspaceTabs">
+                    <button type="button"
+                            class="@GetWorkspaceTabCss(EditorWorkspaceTab.Source)"
+                            @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Source)"
+                            data-test="@UiTestIds.Editor.SourceTab">
+                        @Text(UiTextKey.EditorWorkspaceSourceTab)
+                    </button>
+                    <button type="button"
+                            class="@GetWorkspaceTabCss(EditorWorkspaceTab.Graph)"
+                            @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Graph)"
+                            data-test="@UiTestIds.Editor.GraphTab">
+                        @Text(UiTextKey.EditorWorkspaceGraphTab)
+                    </button>
+                </div>
 
-            <EditorMetadataRail Profile="@_profile"
-                                Title="@_screenTitle"
-                                BaseWpm="@_baseWpm"
-                                Duration="@_displayDuration"
-                                XslowOffset="@_xslowOffset"
-                                SlowOffset="@_slowOffset"
-                                FastOffset="@_fastOffset"
-                                XfastOffset="@_xfastOffset"
-                                Author="@_author"
-                                CreatedDate="@_createdDate"
-                                Version="@_version"
-                                Status="@_status"
-                                AutoSaveEnabled="@_fileStorageSettings.FileAutoSaveEnabled"
-                                LastLocalSaveAt="@_lastLocalSaveAt"
-                                LocalHistory="@_localHistory"
-                                SplitFeedback="@_splitFeedback"
-                                ProfileChanged="OnProfileChangedAsync"
-                                TitleChanged="OnTitleChangedAsync"
-                                BaseWpmChanged="OnBaseWpmChangedAsync"
-                                DurationChanged="OnDurationChangedAsync"
-                                XslowOffsetChanged="OnXslowOffsetChangedAsync"
-                                SlowOffsetChanged="OnSlowOffsetChangedAsync"
-                                FastOffsetChanged="OnFastOffsetChangedAsync"
-                                XfastOffsetChanged="OnXfastOffsetChangedAsync"
-                                AuthorChanged="OnAuthorChangedAsync"
-                                CreatedDateChanged="OnCreatedDateChangedAsync"
-                                VersionChanged="OnVersionChangedAsync"
-                                LocalHistoryRestoreRequested="OnLocalHistoryRestoreRequestedAsync"
-                                OpenLibraryRequested="OnOpenLibraryRequested"
-                                SplitRequested="OnSplitRequestedAsync"
-                                SelectedTab="@_metadataRailSelectedTab"
-                                SelectedTabChanged="OnMetadataRailTabChanged"
-                                IsCollapsed="@_isMetadataRailCollapsed"
-                                ToggleLabel="@GetMetadataRailToggleLabel()"
-                                ToggleRequested="OnMetadataRailToggleAsync" />
+                <div class="editor-workspace-body">
+                    @if (_workspaceTab == EditorWorkspaceTab.Source)
+                    {
+                        <EditorSourcePanel @ref="_sourcePanel"
+                                           Text="@_sourceText"
+                                           Selection="@_selection"
+                                           Status="@_status"
+                                           CanUndo="@_history.CanUndo"
+                                           CanRedo="@_history.CanRedo"
+                                           CanApplyWrapCommands="@CanApplyWrapCommands"
+                                           CanRenderFloatingToolbar="@CanRenderFloatingToolbar"
+                                           ErrorMessage="@_errorMessage"
+                                           OnFilesDropped="OnFilesDroppedAsync"
+                                           OnTextChanged="OnSourceChangedAsync"
+                                           OnSelectionChanged="OnSelectionChangedAsync"
+                                           OnHistoryRequested="OnHistoryRequestedAsync"
+                                           OnCommandRequested="OnCommandRequestedAsync" />
+                    }
+                    else
+                    {
+                        <ScriptGraphPanel Artifact="@_scriptGraphArtifact"
+                                          IsLoading="@_isGraphLoading"
+                                          SourceRangeRequested="OnGraphSourceRangeRequestedAsync" />
+                    }
+
+                    <EditorMetadataRail Profile="@_profile"
+                                        Title="@_screenTitle"
+                                        BaseWpm="@_baseWpm"
+                                        Duration="@_displayDuration"
+                                        XslowOffset="@_xslowOffset"
+                                        SlowOffset="@_slowOffset"
+                                        FastOffset="@_fastOffset"
+                                        XfastOffset="@_xfastOffset"
+                                        Author="@_author"
+                                        CreatedDate="@_createdDate"
+                                        Version="@_version"
+                                        Status="@_status"
+                                        AutoSaveEnabled="@_fileStorageSettings.FileAutoSaveEnabled"
+                                        LastLocalSaveAt="@_lastLocalSaveAt"
+                                        LocalHistory="@_localHistory"
+                                        SplitFeedback="@_splitFeedback"
+                                        ProfileChanged="OnProfileChangedAsync"
+                                        TitleChanged="OnTitleChangedAsync"
+                                        BaseWpmChanged="OnBaseWpmChangedAsync"
+                                        DurationChanged="OnDurationChangedAsync"
+                                        XslowOffsetChanged="OnXslowOffsetChangedAsync"
+                                        SlowOffsetChanged="OnSlowOffsetChangedAsync"
+                                        FastOffsetChanged="OnFastOffsetChangedAsync"
+                                        XfastOffsetChanged="OnXfastOffsetChangedAsync"
+                                        AuthorChanged="OnAuthorChangedAsync"
+                                        CreatedDateChanged="OnCreatedDateChangedAsync"
+                                        VersionChanged="OnVersionChangedAsync"
+                                        LocalHistoryRestoreRequested="OnLocalHistoryRestoreRequestedAsync"
+                                        OpenLibraryRequested="OnOpenLibraryRequested"
+                                        SplitRequested="OnSplitRequestedAsync"
+                                        SelectedTab="@_metadataRailSelectedTab"
+                                        SelectedTabChanged="OnMetadataRailTabChanged"
+                                        IsCollapsed="@_isMetadataRailCollapsed"
+                                        ToggleLabel="@GetMetadataRailToggleLabel()"
+                                        ToggleRequested="OnMetadataRailToggleAsync" />
+                </div>
+            </div>
         </div>
     }
 </div>

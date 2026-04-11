@@ -99,6 +99,18 @@
     cursor: pointer;
 }
 
+.app-header-ai {
+    border-color: var(--gold-20);
+    color: var(--gold-light);
+}
+
+.app-header-ai:hover,
+.app-header-ai:focus-visible {
+    border-color: var(--gold-35);
+    background: var(--gold-10);
+    color: var(--text-1);
+}
+
 .btn-open-script[disabled] {
     cursor: progress;
     opacity: .78;

@@ -99,15 +99,15 @@ flowchart LR
 | Component / Slice | What It Is | Why It Exists | Where It Lives | Owns | Must Not Own |
 | --- | --- | --- | --- | --- | --- |
 | `PrompterOne.Web` | Browser host and startup shell | Boots the standalone WASM app on the stable local origin | `src/PrompterOne.Web` | startup, host config, app shell entrypoint, production-only telemetry and error-monitoring provider ids | domain logic, feature behavior, server runtime code |
-| `AppShell` | Shared routed layout and navigation shell | Keeps one navigation, header, widget, and screen-frame contract across the app | `src/PrompterOne.Shared/AppShell` | layout chrome, route-aware header state, persistent shell widgets, runtime page/event telemetry ownership | feature-specific editing, streaming, or document logic |
+| `AppShell` | Shared routed layout and navigation shell | Keeps one navigation, header, widget, spotlight, and screen-frame contract across the app | `src/PrompterOne.Shared/AppShell` | layout chrome, route-aware header state, global AI spotlight entry point and hotkey, persistent shell widgets, runtime page/event telemetry ownership | feature-specific editing, streaming, or document logic |
 | `Library` | Script and folder browsing surface | Lets users discover, search, and organize scripts | `src/PrompterOne.Shared/Library`, `src/PrompterOne.Core/Library` | cards, folder tree UI, repository-backed browse flows | TPS authoring rules, reader rendering, streaming orchestration |
-| `Editor` | TPS authoring surface | Creates and reshapes scripts with structure-aware tooling | `src/PrompterOne.Shared/Editor`, `src/PrompterOne.Core/Editor`, `src/PrompterOne.Core/Tps` | source editing UI, toolbar actions, front matter, TPS transforms | shell navigation policy, teleprompter playback, live runtime wiring |
+| `Editor` | TPS authoring surface | Creates and reshapes scripts with structure-aware tooling | `src/PrompterOne.Shared/Editor`, `src/PrompterOne.Core/Editor`, `src/PrompterOne.Core/Tps` | source editing UI, toolbar actions, front matter, TPS transforms, central Source/Graph workspace tabs, editor-context publication for the global assistant | shell navigation policy, global assistant chrome, teleprompter playback, live runtime wiring |
 | `PrompterOne.TpsSdk` | Vendored TPS parser/compiler/runtime | Keeps `PrompterOne` aligned with the upstream TPS contract without parallel local spec copies | `src/PrompterOne.TpsSdk` | TPS parser internals, runtime models, diagnostics, compile-time phrase/block/segment contracts | Blazor UI state, app-specific repositories, parallel repo-local parser implementations |
 | `Learn` | RSVP rehearsal mode | Trains delivery with timing and context | `src/PrompterOne.Shared/Learn`, `src/PrompterOne.Core/Rsvp` | ORP playback, rehearsal pacing, next-phrase context | document storage, scene routing, destination configuration |
 | `Teleprompter` | Read-mode playback surface | Presents the script for live reading with camera-backed composition | `src/PrompterOne.Shared/Teleprompter` | reading layout, background camera composition, runtime reading flow | script persistence rules, destination setup screens |
 | `GoLive` | Operational browser studio surface | Operates the composed program feed and exposes honest live/runtime state | `src/PrompterOne.Shared/GoLive`, `src/PrompterOne.Core/Streaming` | studio layout, left-rail source control, selected vs on-air source state, browser-owned program capture, local recording control, concurrent transport publish state, right-rail telemetry and downstream health summaries | provider credential editing, source inventory, per-device sync definitions, PrompterOne-managed server media processing, unrelated editor or library concerns |
 | `Settings` | Device, scene, and transport setup surface | Configures the inputs, sync, capture profile, transport connections, and downstream targets that `Go Live` operates | `src/PrompterOne.Shared/Settings`, `src/PrompterOne.Core/Media`, `src/PrompterOne.Core/Streaming` | device selection UI, source inventory, scene transforms, microphone gain/delay/sync, program-capture profiles, recording defaults, transport connection profiles, downstream target profiles, scene persistence flows | live output orchestration policy, document editing |
-| `AI` | Local multi-agent text orchestration | Loads embedded skills, builds predefined agents through one factory, and exposes workflow execution for future UI actions | `src/PrompterOne.Core/AI`, `src/PrompterOne.Shared/Settings/Services` | per-agent classes with colocated system prompts, one agent factory, embedded markdown skills, provider-agnostic runtime settings contract, predefined sequential and group-chat workflows, settings-to-agent runtime bridge | routed UI, browser interop, server-hosted orchestration |
+| `AI` | Local multi-agent text orchestration | Loads embedded skills, builds predefined agents through one factory, and exposes workflow execution for future UI actions | `src/PrompterOne.Core/AI`, `src/PrompterOne.Shared/Settings/Services` | per-agent classes with colocated system prompts, one agent factory, embedded markdown skills, route-aware context providers, predefined range-edit and graph-summary tools, `markdown-ld-kb` script graph adapter, provider-agnostic runtime settings contract, predefined sequential and group-chat workflows, settings-to-agent runtime bridge | routed UI, browser interop, server-hosted orchestration, global spotlight chrome |
 | `Storage` | Browser persistence and cloud transfer orchestration | Keeps scripts and settings local-first while exposing provider-backed import/export | `src/PrompterOne.Shared/Storage`, `src/PrompterOne.Shared/Library/Services/Storage` | browser `IStorage` and VFS registration, authoritative browser repositories for scripts/folders, provider credential persistence, scripts/settings snapshot transfer | routed page layout, teleprompter rendering, video-stream upload workflows |
 | `Cross-Tab Messaging` | Same-origin browser runtime coordination | Lets separate WASM tabs coordinate browser-owned state without a backend | `src/PrompterOne.Shared/AppShell/Services`, `src/PrompterOne.Shared/Settings/Services`, `src/PrompterOne.Shared/wwwroot/app` | `BroadcastChannel` bridge, typed envelopes, settings fan-out, same-origin tab sync | server state, cross-origin transport, collaborative editor conflict resolution |
 | `Diagnostics` | Error and operation feedback layer | Makes recoverable and fatal issues visible in the shell | `src/PrompterOne.Shared/Diagnostics` | banners, error boundary reporting, operation status wiring | owning business logic of the failing feature |
@@ -293,27 +293,38 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    SourcePanel["EditorSourcePanel<br/>body-only source textarea + highlight overlay"]
+    WorkspaceTabs["Editor workspace tabs<br/>Source + Graph"]
+    SourcePanel["EditorSourcePanel<br/>Monaco source editor + authoring toolbar"]
+    GraphPanel["ScriptGraphPanel<br/>AntV G6 graph view"]
     ToolbarCatalog["EditorToolbarCatalog<br/>descriptor-driven toolbar + floating bar"]
     StructureSidebar["EditorStructureSidebar<br/>tree navigation only"]
     MetadataRail["EditorMetadataRail<br/>front matter + speed offsets"]
-    LocalAi["EditorLocalAssistant<br/>direct toolbar and floating-button rewrite helpers"]
+    SpotlightContext["AiSpotlightService<br/>route-aware editor context"]
     Page["EditorPage"]
+    GraphService["ScriptKnowledgeGraphService<br/>markdown-ld-kb adapter + source ranges"]
     FrontMatter["TpsFrontMatterDocumentService"]
     TextEditor["TpsTextEditor<br/>wrap / insert / clear-color"]
     StructureEditor["TpsStructureEditor"]
     Session["IScriptSessionService"]
 
+    WorkspaceTabs --> SourcePanel
+    WorkspaceTabs --> GraphPanel
     ToolbarCatalog --> SourcePanel
     SourcePanel --> Page
+    GraphPanel --> Page
     StructureSidebar --> Page
     MetadataRail --> Page
-    Page --> LocalAi
+    Page --> SpotlightContext
+    Page --> GraphService
     Page --> FrontMatter
     Page --> TextEditor
     Page --> StructureEditor
     Page --> Session
 ```
+
+- The global assistant is launched from `AppShell`; editor code only publishes the active document, cursor, selected range, selected lines, metadata, and graph summary into `AiSpotlightService`.
+- The graph view is a central editor workspace tab. It renders an app-owned script graph artifact with local AntV G6 assets and must mark graph readiness only after the graph artifact has been processed and the renderer finishes the real graph render path.
+- Range-based assistant document tools live in `PrompterOne.Core/AI`; editor UI must not reintroduce editor-only AI dropdowns or floating AI rewrite buttons.
 
 ## Diagnostics Contracts
 

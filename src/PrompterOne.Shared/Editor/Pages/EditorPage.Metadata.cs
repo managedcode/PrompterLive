@@ -43,6 +43,7 @@ public partial class EditorPage
     {
         _screenTitle = NormalizeTitle(value);
         Shell.ShowEditor(_screenTitle, SessionService.State.ScriptId);
+        PublishEditorAiContext();
         await PersistMetadataAsync();
     }
 

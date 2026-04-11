@@ -19,12 +19,6 @@ public sealed record EditorMenuScenario(
     string TriggerTestId,
     string PanelTestId);
 
-public sealed record EditorAiScenario(
-    string TestId,
-    bool RequiresSelection,
-    string SourceText,
-    string ExpectedFragment);
-
 internal static class EditorToolbarCoverageScenarios
 {
     public static IReadOnlyList<EditorCommandScenario> ToolbarCommandScenarios { get; } = BuildToolbarCommandScenarios();
@@ -34,35 +28,6 @@ internal static class EditorToolbarCoverageScenarios
     public static IReadOnlyList<EditorMenuScenario> MenuScenarios { get; } = BuildMenuScenarios();
 
     public static IReadOnlyList<EditorMenuScenario> FloatingMenuScenarios { get; } = BuildFloatingMenuScenarios();
-
-    public static IReadOnlyList<EditorAiScenario> AiScenarios { get; } = BuildAiScenarios();
-
-    private static IReadOnlyList<EditorAiScenario> BuildAiScenarios()
-    {
-        var scenarios = new List<EditorAiScenario>();
-
-        scenarios.AddRange(
-            EditorToolbarCatalog.Sections
-                .SelectMany(section => section.MainActions)
-                .Where(action => action.ActionType == EditorToolbarActionType.Ai && !string.IsNullOrWhiteSpace(action.TestId))
-                .Select(action => new EditorAiScenario(
-                    action.TestId!,
-                    RequiresSelection: true,
-                    BrowserTestSource.SimplifySource,
-                    BrowserTestSource.SimplifiedToken)));
-
-        scenarios.AddRange(
-            EditorToolbarCatalog.FloatingActionGroups
-                .SelectMany(group => group)
-                .Where(action => action.ActionType == EditorToolbarActionType.Ai && !string.IsNullOrWhiteSpace(action.TestId))
-                .Select(action => new EditorAiScenario(
-                    action.TestId!,
-                    RequiresSelection: true,
-                    BrowserTestSource.SimplifySource,
-                    BrowserTestSource.SimplifiedToken)));
-
-        return scenarios;
-    }
 
     private static IReadOnlyList<EditorCommandScenario> BuildFloatingCommandScenarios() =>
         BuildFloatingDirectCommandScenarios()
@@ -150,14 +115,4 @@ internal static class EditorToolbarCoverageScenarios
         command.Kind == EditorCommandKind.ClearColor
             ? EditorScenarioSelectionMode.ClearColorSelection
             : EditorScenarioSelectionMode.WrapSelection;
-
-    private static class BrowserTestSource
-    {
-        public const string SimplifiedToken = "clear moment";
-        public const string SimplifySource = """
-            ## [Intro|140WPM|warm]
-            ### [Opening Block|140WPM]
-            transformative moment
-            """;
-    }
 }

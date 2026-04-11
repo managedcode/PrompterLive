@@ -40,4 +40,26 @@ internal static class EditorTooltipDriver
             """
             element => Number.parseFloat(getComputedStyle(element).opacity)
             """);
+
+    internal static async Task<double> ReadOpacityTransitionDelayMillisecondsAsync(ILocator locator) =>
+        await locator.EvaluateAsync<double>(
+            """
+            element => {
+                const styles = getComputedStyle(element);
+                const properties = styles.transitionProperty.split(',').map(property => property.trim());
+                const delays = styles.transitionDelay.split(',').map(delay => delay.trim());
+                const opacityIndex = properties.findIndex(property => property === 'opacity');
+                const selectedDelay = delays[Math.max(0, opacityIndex)] ?? delays[0] ?? '0s';
+
+                if (selectedDelay.endsWith('ms')) {
+                    return Number.parseFloat(selectedDelay);
+                }
+
+                if (selectedDelay.endsWith('s')) {
+                    return Number.parseFloat(selectedDelay) * 1000;
+                }
+
+                return Number.parseFloat(selectedDelay) || 0;
+            }
+            """);
 }

@@ -1,6 +1,8 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterOne.Core.AI.Models;
+using PrompterOne.Core.AI.Services;
 using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Editor;
@@ -17,6 +19,7 @@ public sealed class MainLayoutActionTests : BunitContext
     private const string DisabledStateValue = "false";
     private const string EnabledStateValue = "true";
     private const string EnglishExportLabel = "Export";
+    private const string EnglishAiSpotlightLabel = "AI Assistant";
     private const string EnglishGoLiveLabel = "Go Live";
     private const string EnglishImportLabel = "Import";
     private const string IntroSubtitle = "Intro";
@@ -84,6 +87,136 @@ public sealed class MainLayoutActionTests : BunitContext
     }
 
     [Test]
+    [Arguments(AppRoutes.Library)]
+    [Arguments(AppRoutes.Editor)]
+    [Arguments(AppRoutes.Settings)]
+    public void MainLayout_RendersGlobalAiSpotlightAction_OnSharedHeaderScreens(string route)
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(route);
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.WaitForAssertion(() =>
+        {
+            var spotlight = cut.FindByTestId(UiTestIds.Header.AiSpotlight);
+
+            Assert.NotNull(spotlight.QuerySelector(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.AiSpotlightIcon)));
+            Assert.Equal(EnglishAiSpotlightLabel, spotlight.GetAttribute("aria-label"));
+        });
+    }
+
+    [Test]
+    public void MainLayout_GlobalAiSpotlightAction_OpensOverlay()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.QuantumId));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.FindByTestId(UiTestIds.Header.AiSpotlight).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.AiSpotlight.Overlay));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.AiSpotlight.Surface));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.AiSpotlight.PromptInput));
+        });
+    }
+
+    [Test]
+    public void MainLayout_GlobalAiSpotlightApproval_AppliesOnlySelectedRange()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        var spotlight = Services.GetRequiredService<AiSpotlightService>();
+        var editService = Services.GetRequiredService<ScriptDocumentEditService>();
+        var sourceText = "Keep before. Rewrite me. Keep after.";
+        var selectedText = "Rewrite me.";
+        var selectedStart = sourceText.IndexOf(selectedText, StringComparison.Ordinal);
+        var selectedRange = new ScriptDocumentRange(selectedStart, selectedStart + selectedText.Length);
+        using var editRegistration = spotlight.RegisterDocumentEditTarget(plan =>
+        {
+            var result = editService.Apply(sourceText, plan);
+            sourceText = result.Text;
+            return Task.FromResult(result);
+        });
+
+        spotlight.SetContext(new ScriptArticleContext(
+            Title: "Draft",
+            Content: sourceText,
+            Source: "PrompterOne Editor",
+            Route: AppRoutes.Editor,
+            Screen: AppShellScreen.Editor.ToString(),
+            Editor: new ScriptEditorContext(
+                DocumentId: "draft",
+                DocumentTitle: "Draft",
+                Content: sourceText,
+                Revision: ScriptDocumentRevision.Create(sourceText),
+                Cursor: ScriptDocumentPosition.FromOffset(sourceText, selectedStart),
+                SelectedRange: selectedRange,
+                SelectedText: selectedText,
+                SelectedLineNumbers: [1])));
+
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.QuantumId));
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.FindByTestId(UiTestIds.Header.AiSpotlight).Click();
+        cut.FindByTestId(UiTestIds.AiSpotlight.PromptInput).Input("rewrite this selected paragraph");
+        cut.FindByTestId(UiTestIds.AiSpotlight.Submit).Click();
+        cut.FindByTestId(UiTestIds.AiSpotlight.RunPlan).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(selectedText, cut.FindByTestId(UiTestIds.AiSpotlight.ApprovalBefore).TextContent, StringComparison.Ordinal);
+            Assert.Contains("[warm]Rewrite me.[/warm]", cut.FindByTestId(UiTestIds.AiSpotlight.ApprovalAfter).TextContent, StringComparison.Ordinal);
+        });
+
+        cut.FindByTestId(UiTestIds.AiSpotlight.ApprovalApprove).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("Keep before. [warm]Rewrite me.[/warm] Keep after.", sourceText);
+            Assert.DoesNotContain("[warm]Keep before", sourceText, StringComparison.Ordinal);
+        });
+    }
+
+    [Test]
+    public void MainLayout_GlobalAiSpotlightRouteContext_ClearsStaleEditorContextOutsideEditor()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var spotlight = Services.GetRequiredService<AiSpotlightService>();
+        var sourceText = "Selected";
+
+        spotlight.SetContext(new ScriptArticleContext(
+            Title: "Draft",
+            Content: sourceText,
+            Source: "PrompterOne Editor",
+            Route: AppRoutes.Editor,
+            Screen: AppShellScreen.Editor.ToString(),
+            Editor: new ScriptEditorContext(
+                DocumentId: "draft",
+                DocumentTitle: "Draft",
+                Content: sourceText,
+                Revision: ScriptDocumentRevision.Create(sourceText),
+                SelectedRange: new ScriptDocumentRange(0, sourceText.Length),
+                SelectedText: sourceText,
+                SelectedLineNumbers: [1]),
+            Graph: new ScriptKnowledgeGraphContext(ScriptDocumentRevision.Create(sourceText), 1, 0, ["Draft"])));
+
+        spotlight.SetRouteContext(AppShellScreen.Settings, AppRoutes.Settings, "Settings");
+
+        Assert.Null(spotlight.State.Context.Editor);
+        Assert.Null(spotlight.State.Context.Graph);
+        Assert.Equal(AppShellScreen.Settings.ToString(), spotlight.State.Context.Screen);
+    }
+
+    [Test]
     public void MainLayout_TeleprompterPlayback_MutesSharedHeaderChrome()
     {
         _ = TestHarnessFactory.Create(this);
@@ -133,6 +266,7 @@ public sealed class MainLayoutActionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var goLive = cut.FindByTestId(UiTestIds.Header.GoLive);
+            var aiSpotlight = cut.FindByTestId(UiTestIds.Header.AiSpotlight);
             var openScript = cut.FindByTestId(UiTestIds.Header.LibraryOpenScript);
             var openScriptInput = cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptInput);
             var newScript = cut.FindByTestId(UiTestIds.Header.LibraryNewScript);
@@ -148,11 +282,14 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Contains(EnglishImportLabel, openScript.TextContent, StringComparison.Ordinal);
 
             var goLiveIndex = cut.Markup.IndexOf(UiTestIds.Header.GoLive, StringComparison.Ordinal);
+            var aiSpotlightIndex = cut.Markup.IndexOf(UiTestIds.Header.AiSpotlight, StringComparison.Ordinal);
             var openScriptIndex = cut.Markup.IndexOf(UiTestIds.Header.LibraryOpenScript, StringComparison.Ordinal);
             var newScriptIndex = cut.Markup.IndexOf(UiTestIds.Header.LibraryNewScript, StringComparison.Ordinal);
-            Assert.True(goLiveIndex >= 0 && openScriptIndex >= 0 && newScriptIndex >= 0);
-            Assert.True(goLiveIndex < openScriptIndex);
+            Assert.True(goLiveIndex >= 0 && aiSpotlightIndex >= 0 && openScriptIndex >= 0 && newScriptIndex >= 0);
+            Assert.True(goLiveIndex < aiSpotlightIndex);
+            Assert.True(aiSpotlightIndex < openScriptIndex);
             Assert.True(openScriptIndex < newScriptIndex);
+            Assert.NotNull(aiSpotlight);
             Assert.NotNull(openScript);
         });
     }
@@ -171,6 +308,7 @@ public sealed class MainLayoutActionTests : BunitContext
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.HomeBrandMark));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.GoLiveIcon));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.AiSpotlightIcon));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryOpenScriptIcon));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.LibraryNewScriptIcon));
         });

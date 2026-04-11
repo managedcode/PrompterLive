@@ -1209,4 +1209,100 @@
   <data name="CommonTextToAudio" xml:space="preserve">
     <value>Texte vers audio</value>
   </data>
+  <data name="HeaderAiSpotlight" xml:space="preserve">
+    <value>Assistant IA</value>
+  </data>
+  <data name="HeaderAiSpotlightShortcut" xml:space="preserve">
+    <value>Ctrl/Cmd+K</value>
+  </data>
+  <data name="AiSpotlightPlaceholder" xml:space="preserve">
+    <value>Demandez sur cet écran, le texte sélectionné ou le graphe du script</value>
+  </data>
+  <data name="AiSpotlightIdleHint" xml:space="preserve">
+    <value>Les lignes sélectionnées permettent des réécritures précises. PrompterOne demandera avant de modifier le texte.</value>
+  </data>
+  <data name="AiSpotlightClose" xml:space="preserve">
+    <value>Fermer l'assistant</value>
+  </data>
+  <data name="AiSpotlightEscapeHint" xml:space="preserve">
+    <value>Esc</value>
+  </data>
+  <data name="AiSpotlightMicrophone" xml:space="preserve">
+    <value>Saisie vocale</value>
+  </data>
+  <data name="AiSpotlightSubmit" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="AiSpotlightRunPlan" xml:space="preserve">
+    <value>Lancer</value>
+  </data>
+  <data name="AiSpotlightPlanTitle" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="AiSpotlightRunningTitle" xml:space="preserve">
+    <value>En cours</value>
+  </data>
+  <data name="AiSpotlightApprovalTitle" xml:space="preserve">
+    <value>Validation requise</value>
+  </data>
+  <data name="AiSpotlightApprovalApprove" xml:space="preserve">
+    <value>Approuver la modification</value>
+  </data>
+  <data name="AiSpotlightApprovalReject" xml:space="preserve">
+    <value>Refuser</value>
+  </data>
+  <data name="AiSpotlightApprovalBefore" xml:space="preserve">
+    <value>Texte actuel</value>
+  </data>
+  <data name="AiSpotlightApprovalAfter" xml:space="preserve">
+    <value>Texte proposé</value>
+  </data>
+  <data name="AiSpotlightApprovalApplied" xml:space="preserve">
+    <value>Modification appliquée</value>
+  </data>
+  <data name="AiSpotlightContextTitle" xml:space="preserve">
+    <value>Contexte</value>
+  </data>
+  <data name="AiSpotlightContextEditor" xml:space="preserve">
+    <value>Éditeur</value>
+  </data>
+  <data name="AiSpotlightContextRoute" xml:space="preserve">
+    <value>Route</value>
+  </data>
+  <data name="AiSpotlightGraphMissing" xml:space="preserve">
+    <value>Graphe du script pas encore généré</value>
+  </data>
+  <data name="SettingsHotkeysGroupGlobalTitle" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="SettingsHotkeysGroupGlobalSubtitle" xml:space="preserve">
+    <value>Commandes de l'assistant disponibles partout dans PrompterOne.</value>
+  </data>
+  <data name="SettingsHotkeyGlobalOpenAssistantLabel" xml:space="preserve">
+    <value>Ouvrir l'assistant</value>
+  </data>
+  <data name="SettingsHotkeyGlobalOpenAssistantDescription" xml:space="preserve">
+    <value>Ouvrir ou fermer le spotlight IA.</value>
+  </data>
+  <data name="EditorGraphBuilding" xml:space="preserve">
+    <value>Génération du graphe...</value>
+  </data>
+  <data name="EditorGraphEmpty" xml:space="preserve">
+    <value>Aucun graphe pour ce script.</value>
+  </data>
+  <data name="EditorGraphNodesFormat" xml:space="preserve">
+    <value>{0} nœuds</value>
+  </data>
+  <data name="EditorGraphLinksFormat" xml:space="preserve">
+    <value>{0} liens</value>
+  </data>
+  <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
+    <value>{0} plages source</value>
+  </data>
+  <data name="EditorWorkspaceSourceTab" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="EditorWorkspaceGraphTab" xml:space="preserve">
+    <value>Graphe</value>
+  </data>
 </root>

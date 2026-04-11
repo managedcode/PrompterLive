@@ -1,0 +1,51 @@
+.editor-workspace {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.editor-workspace-tabs {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+    padding: 0 0 8px;
+}
+
+.editor-workspace-tab {
+    min-height: 32px;
+    padding: 0 12px;
+    color: rgba(248, 241, 226, .70);
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .04);
+    font: inherit;
+    cursor: pointer;
+}
+
+.editor-workspace-tab:hover,
+.editor-workspace-tab:focus-visible,
+.editor-workspace-tab.active {
+    color: rgba(255, 252, 246, .96);
+    border-color: rgba(255, 196, 106, .38);
+    background: rgba(255, 196, 106, .10);
+}
+
+.editor-workspace-body {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    gap: 10px;
+}
+
+.editor-workspace-body > * {
+    min-width: 0;
+}
+
+@media (max-width: 1400px) {
+    .editor-workspace-body {
+        gap: 8px;
+    }
+}

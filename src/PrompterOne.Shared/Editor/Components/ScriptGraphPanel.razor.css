@@ -1,0 +1,85 @@
+.script-graph-panel {
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    color: rgba(248, 241, 226, .92);
+    border: var(--glass-border);
+    border-radius: var(--radius-xl);
+    background: var(--glass-bg-light);
+    box-shadow: var(--glass-shadow), var(--glass-inset);
+}
+
+.script-graph-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.script-graph-summary strong {
+    color: rgba(255, 196, 106, .96);
+    font-size: .86rem;
+}
+
+.script-graph-summary span {
+    color: rgba(248, 241, 226, .64);
+    font-size: .76rem;
+}
+
+.script-graph-canvas {
+    min-height: 360px;
+    height: 100%;
+}
+
+.script-graph-node-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.script-graph-node-list button {
+    display: grid;
+    max-width: 220px;
+    overflow: hidden;
+    gap: 2px;
+    padding: 5px 8px;
+    text-align: left;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, .10);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .05);
+}
+
+.script-graph-node-list button:hover,
+.script-graph-node-list button:focus-visible {
+    border-color: rgba(255, 196, 106, .42);
+    background: rgba(255, 196, 106, .08);
+}
+
+.script-graph-node-list span,
+.script-graph-node-list small {
+    max-width: 180px;
+    overflow: hidden;
+    color: rgba(255, 252, 246, .76);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.script-graph-node-list small {
+    color: rgba(255, 196, 106, .68);
+    font-size: .66rem;
+}
+
+.script-graph-empty {
+    display: grid;
+    min-height: 360px;
+    place-items: center;
+    padding: 24px;
+    color: rgba(248, 241, 226, .72);
+}

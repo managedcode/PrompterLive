@@ -54,6 +54,7 @@
 
     private static UiIconSurfaceTone BuildIconTone(AppHotkeySurface surface) => surface switch
     {
+        AppHotkeySurface.Global => UiIconSurfaceTone.Gold,
         AppHotkeySurface.Editor => UiIconSurfaceTone.Indigo,
         AppHotkeySurface.Learn => UiIconSurfaceTone.Emerald,
         AppHotkeySurface.Teleprompter => UiIconSurfaceTone.Amber,
@@ -63,6 +64,7 @@
 
     private string ActionDescription(AppHotkeyDefinition definition) => definition.Id switch
     {
+        AppHotkeyIds.Definitions.GlobalOpenAssistant => Text(UiTextKey.SettingsHotkeyGlobalOpenAssistantDescription),
         AppHotkeyIds.Definitions.EditorUndo => Text(UiTextKey.SettingsHotkeyEditorUndoDescription),
         AppHotkeyIds.Definitions.EditorRedo => Text(UiTextKey.SettingsHotkeyEditorRedoDescription),
         AppHotkeyIds.Definitions.EditorSelectAll => Text(UiTextKey.SettingsHotkeyEditorSelectAllDescription),
@@ -101,6 +103,7 @@
 
     private string ActionLabel(AppHotkeyDefinition definition) => definition.Id switch
     {
+        AppHotkeyIds.Definitions.GlobalOpenAssistant => Text(UiTextKey.SettingsHotkeyGlobalOpenAssistantLabel),
         AppHotkeyIds.Definitions.EditorUndo => Text(UiTextKey.SettingsHotkeyEditorUndoLabel),
         AppHotkeyIds.Definitions.EditorRedo => Text(UiTextKey.SettingsHotkeyEditorRedoLabel),
         AppHotkeyIds.Definitions.EditorSelectAll => Text(UiTextKey.SettingsHotkeyEditorSelectAllLabel),
@@ -139,6 +142,7 @@
 
     private string GroupSubtitle(AppHotkeyGroup group) => group.Id switch
     {
+        AppHotkeyIds.Groups.Global => Text(UiTextKey.SettingsHotkeysGroupGlobalSubtitle),
         AppHotkeyIds.Groups.Editor => Text(UiTextKey.SettingsHotkeysGroupEditorSubtitle),
         AppHotkeyIds.Groups.Learn => Text(UiTextKey.SettingsHotkeysGroupLearnSubtitle),
         AppHotkeyIds.Groups.Teleprompter => Text(UiTextKey.SettingsHotkeysGroupTeleprompterSubtitle),
@@ -148,6 +152,7 @@
 
     private string GroupTitle(AppHotkeyGroup group) => group.Id switch
     {
+        AppHotkeyIds.Groups.Global => Text(UiTextKey.SettingsHotkeysGroupGlobalTitle),
         AppHotkeyIds.Groups.Editor => Text(UiTextKey.SettingsHotkeysGroupEditorTitle),
         AppHotkeyIds.Groups.Learn => Text(UiTextKey.SettingsHotkeysGroupLearnTitle),
         AppHotkeyIds.Groups.Teleprompter => Text(UiTextKey.SettingsHotkeysGroupTeleprompterTitle),

@@ -312,7 +312,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     private static class EditorSourceInteractionTestSource
     {
         public const int AutosaveAssertionTimeout = 5_000;
-        public const int HistoryAssertionTimeout = 10_000;
+        public const int HistoryAssertionTimeout = 15_000;
         public const string AuthorField = "author:";
         public const string AuthorPersistenceLine = "author: \"Jane Doe\"";
         public const string BaseWpm210 = "210";

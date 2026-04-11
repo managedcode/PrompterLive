@@ -43,10 +43,10 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.GoLive.ProgramCard)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.GoLive.SourcesCard)).ToBeVisibleAsync();
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.VdoToggle));
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.VdoToggle));
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle));
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle));
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.VdoToggle), noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.VdoToggle), noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle), noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.GoLive.YoutubeToggle), noWaitAfter: true);
 
             await page.WaitForFunctionAsync(
                 BrowserTestConstants.GoLive.PersistedToggleTargetsScript,

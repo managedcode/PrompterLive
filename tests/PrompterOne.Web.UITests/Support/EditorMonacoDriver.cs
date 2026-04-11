@@ -68,13 +68,19 @@ internal static class EditorMonacoDriver
 
     internal static async Task ClickAsync(IPage page, Position? position = null)
     {
-        if (position is null)
+        var stage = SourceStage(page);
+        await stage.WaitForAsync(new()
         {
-            await SourceStage(page).ClickAsync();
-            return;
-        }
+            State = WaitForSelectorState.Visible,
+            Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs
+        });
+        await stage.ScrollIntoViewIfNeededAsync();
+        var stageBounds = await stage.BoundingBoxAsync();
+        await Assert.That(stageBounds).IsNotNull();
 
-        await SourceStage(page).ClickAsync(new() { Position = position });
+        var clickX = stageBounds!.X + (position?.X ?? stageBounds.Width / 2);
+        var clickY = stageBounds.Y + (position?.Y ?? stageBounds.Height / 2);
+        await page.Mouse.ClickAsync((float)clickX, (float)clickY);
     }
 
     internal static async Task ClickUncoveredStageAreaAsync(IPage page)
@@ -295,14 +301,15 @@ internal static class EditorMonacoDriver
         await page.WaitForFunctionAsync(
             """
             (args) => {
-                const overlay = document.querySelector(`[data-test="${args.overlayTestId}"]`);
-                return Number.parseInt(overlay?.dataset?.renderedLength ?? '-1', 10) === args.expectedLength;
+                const harness = window[args.harnessGlobalName];
+                return harness?.getState(args.testId)?.text === args.expectedText;
             }
             """,
             new
             {
-                expectedLength = text.Length,
-                overlayTestId = UiTestIds.Editor.SourceHighlight
+                expectedText = text,
+                harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                testId = UiTestIds.Editor.SourceStage
             },
             new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
     }

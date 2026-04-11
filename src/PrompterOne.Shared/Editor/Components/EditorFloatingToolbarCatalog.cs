@@ -37,8 +37,7 @@ internal static class EditorFloatingToolbarCatalog
             EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingSpeed, EditorActionContents.Trigger(EditorActionIconKind.Lightning), "Speed cues", UiTestIds.Editor.FloatingSpeedTrigger, "efb-btn efb-btn--speed")
         ],
         [
-            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingInsert, EditorActionContents.Trigger(EditorActionIconKind.EditPoint), "Insert TPS helpers", UiTestIds.Editor.FloatingInsert, "efb-btn efb-btn--insert"),
-            EditorFloatingToolbarActionFactory.Ai("float-ai", EditorActionContents.IconLabel(EditorActionIconKind.Spark, "AI"), "AI — rewrite, expand, simplify", UiTestIds.Editor.FloatingAi, EditorAiAssistAction.Simplify)
+            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingInsert, EditorActionContents.Trigger(EditorActionIconKind.EditPoint), "Insert TPS helpers", UiTestIds.Editor.FloatingInsert, "efb-btn efb-btn--insert")
         ]
     ];
 
@@ -117,7 +116,6 @@ internal static class EditorFloatingToolbarCatalog
             UiTestIds.Editor.FloatingSpeedCustomWpm => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingSpeedCustomWpm),
             UiTestIds.Editor.FloatingInsert => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingInsertTrigger),
             UiTestIds.Editor.FloatingInsertPronunciation => Text(localizer, UiTextKey.EditorToolbarTooltipFloatingInsertPronunciation),
-            UiTestIds.Editor.FloatingAi => Text(localizer, UiTextKey.EditorToolbarTooltipAiAssist),
             _ => action.Tooltip
         };
 

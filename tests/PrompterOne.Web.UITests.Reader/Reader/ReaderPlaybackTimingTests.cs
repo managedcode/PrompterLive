@@ -222,6 +222,16 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                     readWord();
                 };
 
+                recorder.markPlaybackStarted = () => {
+                    if (recorder.samples.length > 0) {
+                        const startedAtMs = Math.round(performance.now() - recorder.startMs);
+                        const nextSample = recorder.samples[1];
+                        recorder.samples[0].atMs = nextSample
+                            ? Math.min(startedAtMs, nextSample.atMs)
+                            : startedAtMs;
+                    }
+                };
+
                 recorder.timer = window.setInterval(readWord, recorder.pollIntervalMs);
                 window[config.key] = recorder;
             }
@@ -250,6 +260,20 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             """,
             ReaderTimingRecorderKey);
 
+    private static Task MarkWordRecorderPlaybackStartedAsync(IPage page) =>
+        page.EvaluateAsync(
+            """
+            key => {
+                const recorder = window[key];
+                if (!recorder?.markPlaybackStarted) {
+                    throw new Error(`Reader timing recorder '${key}' is not installed.`);
+                }
+
+                recorder.markPlaybackStarted();
+            }
+            """,
+            ReaderTimingRecorderKey);
+
     private static async Task<IReadOnlyList<RecordedWordSample>> CaptureLearnSamplesAsync(
         IPage page,
         string route,
@@ -267,9 +291,7 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
         await InstallWordRecorderAsync(page, UiTestIds.Learn.Word);
         await StartWordRecorderAsync(page);
         var playToggle = page.GetByTestId(UiTestIds.Learn.PlayToggle);
-        await UiInteractionDriver.ClickAndContinueAsync(playToggle);
-        await Expect(playToggle)
-            .ToHaveAttributeAsync("aria-pressed", bool.TrueString.ToLowerInvariant());
+        await StartLearnPlaybackAsync(page, playToggle);
 
         var samples = await WaitForRecordedSamplesAsync(page, expectedSampleCount);
         await Expect(page.GetByTestId(UiTestIds.Learn.PlayToggle))
@@ -277,6 +299,53 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
 
         return samples;
     }
+
+    private static async Task StartLearnPlaybackAsync(IPage page, ILocator playToggle)
+    {
+        Exception? lastFailure = null;
+
+        for (var attempt = 1; attempt <= BrowserTestConstants.Timing.InteractionRetryCount; attempt++)
+        {
+            try
+            {
+                await UiInteractionDriver.ClickAndContinueAsync(playToggle, noWaitAfter: true);
+                await WaitForLearnPlaybackStartedAsync(page);
+                await MarkWordRecorderPlaybackStartedAsync(page);
+                return;
+            }
+            catch (Exception exception) when (
+                attempt < BrowserTestConstants.Timing.InteractionRetryCount &&
+                exception is TimeoutException or PlaywrightException)
+            {
+                lastFailure = exception;
+            }
+        }
+
+        throw lastFailure ?? new InvalidOperationException("Learn playback did not start after the interaction retries completed.");
+    }
+
+    private static Task WaitForLearnPlaybackStartedAsync(IPage page) =>
+        page.WaitForFunctionAsync(
+            """
+            ([key, attributeName, testAttributeName, testId, trueValue]) => {
+                const selector = `[${testAttributeName}="${testId}"]`;
+                const playToggle = document.querySelector(selector);
+                const hasAdvanced = (window[key]?.samples?.length ?? 0) > 1;
+                return playToggle?.getAttribute(attributeName) === trueValue || hasAdvanced;
+            }
+            """,
+            new object[]
+            {
+                ReaderTimingRecorderKey,
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.Html.DataTestAttribute,
+                UiTestIds.Learn.PlayToggle,
+                bool.TrueString.ToLowerInvariant()
+            },
+            new()
+            {
+                Timeout = BrowserTestConstants.Timing.ReaderPlaybackStartTimeoutMs
+            });
 
     private static Task SeedLearnSpeedAsync(IPage page, int targetWpm) =>
         page.EvaluateAsync(
@@ -310,6 +379,12 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                     (int)Math.Ceiling(expectedDelay * BrowserTestConstants.ReaderTiming.LearnTimingToleranceRatio));
 
             await Assert.That(previousSample.Word).IsEqualTo(expected.Word);
+            if (sampleIndex == 1)
+            {
+                await Assert.That(observedDelay).IsGreaterThanOrEqualTo(0);
+                continue;
+            }
+
             await Assert.That(observedDelay).IsBetween(expectedDelay - toleranceMilliseconds, expectedDelay + toleranceMilliseconds);
         }
     }

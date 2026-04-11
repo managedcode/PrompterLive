@@ -12,13 +12,6 @@ public partial class EditorSourcePanel
     private EditorFloatingMenuDescriptor? OpenFloatingMenu =>
         FloatingMenus.FirstOrDefault(menu => string.Equals(menu.MenuId, _openFloatingMenuId, StringComparison.Ordinal));
 
-    private Task ExecuteAiActionAsync(EditorAiAssistAction action)
-    {
-        PreserveFloatingBarAnchor();
-        CloseToolbarPanels();
-        return OnAiActionRequested.InvokeAsync(action);
-    }
-
     private async Task ExecuteToolbarActionAsync(EditorToolbarActionDescriptor action)
     {
         if (GetActionDisabled(action))
@@ -45,15 +38,6 @@ public partial class EditorSourcePanel
                 if (action.HistoryCommand is { } historyCommand)
                 {
                     await RequestHistoryAsync(historyCommand);
-                }
-
-                break;
-            case EditorToolbarActionType.Ai:
-                PreserveFloatingBarAnchor();
-                CloseToolbarPanels();
-                if (action.AiAction is { } aiAction)
-                {
-                    await ExecuteAiActionAsync(aiAction);
                 }
 
                 break;
@@ -126,7 +110,6 @@ public partial class EditorSourcePanel
     private bool GetActionDisabled(EditorToolbarActionDescriptor action) =>
         action.ActionType switch
         {
-            EditorToolbarActionType.Ai => !_hasConfiguredAiProvider,
             _ when action.Command?.Kind == EditorCommandKind.Wrap && !CanApplyWrapCommands => true,
             _ => action.HistoryCommand switch
             {

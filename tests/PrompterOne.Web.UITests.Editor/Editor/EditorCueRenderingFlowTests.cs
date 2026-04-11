@@ -27,7 +27,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
                 ### [Delivery Block|140WPM|neutral]
                 [loud][building]Rise together[/building][/loud] and [soft]listen[stress]ing[/stress][/soft].
                 """);
-            await page.WaitForFunctionAsync(
+            var probeHandle = await page.WaitForFunctionAsync(
                 """
                 (args) => {
                     const host = document.querySelector(`[data-test="${args.overlayTestId}"]`);
@@ -49,12 +49,20 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
                             ? getComputedStyle(element).getPropertyValue(args.cueScaleVariableName).trim()
                             : '';
 
-                    return Boolean(loud) &&
-                        Boolean(soft) &&
-                        Boolean(building) &&
-                        Boolean(stress) &&
-                        readScale(loud).length > 0 &&
-                        readScale(soft).length > 0;
+                    const loudScale = readScale(loud);
+                    const softScale = readScale(soft);
+                    if (!loud || !soft || !building || !stress || !loudScale || !softScale) {
+                        return false;
+                    }
+
+                    return {
+                        loudVolume: loud.getAttribute(args.volumeAttributeName) ?? '',
+                        softVolume: soft.getAttribute(args.volumeAttributeName) ?? '',
+                        buildingDelivery: building.getAttribute(args.deliveryAttributeName) ?? '',
+                        stressValue: stress.getAttribute(args.stressAttributeName) ?? '',
+                        loudScale,
+                        softScale
+                    };
                 }
                 """,
                 new
@@ -70,39 +78,7 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
                     volumeAttributeName = TpsVisualCueContracts.VolumeAttributeName
                 },
                 new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
-
-            var highlight = page.GetByTestId(UiTestIds.Editor.SourceHighlight);
-            var probe = await highlight.EvaluateAsync<EditorCueProbe>(
-                $$"""
-                host => {
-                    const nodes = [...host.querySelectorAll('*')];
-                    const loud = nodes.find(node =>
-                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeLoud}}');
-                    const soft = nodes.find(node =>
-                        node?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') === '{{TpsVisualCueContracts.VolumeSoft}}');
-                    const building = nodes.find(node =>
-                        node?.getAttribute('{{TpsVisualCueContracts.DeliveryAttributeName}}') === '{{TpsVisualCueContracts.DeliveryModeBuilding}}');
-                    const stress = nodes.find(node =>
-                        node?.getAttribute('{{TpsVisualCueContracts.StressAttributeName}}') === '{{TpsVisualCueContracts.StressAttributeValue}}');
-
-                    const readScale = element => {
-                        if (!(element instanceof HTMLElement)) {
-                            return '';
-                        }
-
-                        return getComputedStyle(element).getPropertyValue('{{TpsVisualCueContracts.CueScaleVariableName}}').trim();
-                    };
-
-                    return {
-                        loudVolume: loud?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') ?? '',
-                        softVolume: soft?.getAttribute('{{TpsVisualCueContracts.VolumeAttributeName}}') ?? '',
-                        buildingDelivery: building?.getAttribute('{{TpsVisualCueContracts.DeliveryAttributeName}}') ?? '',
-                        stressValue: stress?.getAttribute('{{TpsVisualCueContracts.StressAttributeName}}') ?? '',
-                        loudScale: readScale(loud),
-                        softScale: readScale(soft)
-                    };
-                }
-                """);
+            var probe = await probeHandle.JsonValueAsync<EditorCueProbe>();
 
             await Assert.That(probe.LoudVolume).IsEqualTo(TpsVisualCueContracts.VolumeLoud);
             await Assert.That(probe.SoftVolume).IsEqualTo(TpsVisualCueContracts.VolumeSoft);

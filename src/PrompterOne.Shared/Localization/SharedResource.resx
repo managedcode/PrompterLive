@@ -903,9 +903,6 @@
   <data name="EditorToolbarSectionInsert" xml:space="preserve">
     <value>Insert</value>
   </data>
-  <data name="EditorToolbarSectionAi" xml:space="preserve">
-    <value>AI</value>
-  </data>
   <data name="EditorToolbarGroupFormatting" xml:space="preserve">
     <value>Formatting</value>
   </data>
@@ -974,9 +971,6 @@
   </data>
   <data name="EditorToolbarTooltipRemoveInlineTags" xml:space="preserve">
     <value>Remove inline tags</value>
-  </data>
-  <data name="EditorToolbarTooltipAiAssist" xml:space="preserve">
-    <value>AI assist</value>
   </data>
   <data name="EditorToolbarTooltipWrapFormat" xml:space="preserve">
     <value>Wrap selection with this format</value>
@@ -2393,5 +2387,101 @@
   </data>
   <data name="FeedbackDialogMessageRequired" xml:space="preserve">
     <value>Add a short description before sending feedback.</value>
+  </data>
+  <data name="HeaderAiSpotlight" xml:space="preserve">
+    <value>AI Assistant</value>
+  </data>
+  <data name="HeaderAiSpotlightShortcut" xml:space="preserve">
+    <value>Ctrl/Cmd+K</value>
+  </data>
+  <data name="AiSpotlightPlaceholder" xml:space="preserve">
+    <value>Ask about this screen, selected text, or script graph</value>
+  </data>
+  <data name="AiSpotlightIdleHint" xml:space="preserve">
+    <value>Use selected editor lines for precise rewrites. PrompterOne will ask before changing text.</value>
+  </data>
+  <data name="AiSpotlightClose" xml:space="preserve">
+    <value>Close assistant</value>
+  </data>
+  <data name="AiSpotlightEscapeHint" xml:space="preserve">
+    <value>Esc</value>
+  </data>
+  <data name="AiSpotlightMicrophone" xml:space="preserve">
+    <value>Voice input</value>
+  </data>
+  <data name="AiSpotlightSubmit" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="AiSpotlightRunPlan" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="AiSpotlightPlanTitle" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="AiSpotlightRunningTitle" xml:space="preserve">
+    <value>Working</value>
+  </data>
+  <data name="AiSpotlightApprovalTitle" xml:space="preserve">
+    <value>Needs approval</value>
+  </data>
+  <data name="AiSpotlightApprovalApprove" xml:space="preserve">
+    <value>Approve change</value>
+  </data>
+  <data name="AiSpotlightApprovalReject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="AiSpotlightApprovalBefore" xml:space="preserve">
+    <value>Current text</value>
+  </data>
+  <data name="AiSpotlightApprovalAfter" xml:space="preserve">
+    <value>Proposed text</value>
+  </data>
+  <data name="AiSpotlightApprovalApplied" xml:space="preserve">
+    <value>Change applied</value>
+  </data>
+  <data name="AiSpotlightContextTitle" xml:space="preserve">
+    <value>Context</value>
+  </data>
+  <data name="AiSpotlightContextEditor" xml:space="preserve">
+    <value>Editor</value>
+  </data>
+  <data name="AiSpotlightContextRoute" xml:space="preserve">
+    <value>Route</value>
+  </data>
+  <data name="AiSpotlightGraphMissing" xml:space="preserve">
+    <value>Script graph not built yet</value>
+  </data>
+  <data name="SettingsHotkeysGroupGlobalTitle" xml:space="preserve">
+    <value>Global</value>
+  </data>
+  <data name="SettingsHotkeysGroupGlobalSubtitle" xml:space="preserve">
+    <value>Assistant controls available across PrompterOne.</value>
+  </data>
+  <data name="SettingsHotkeyGlobalOpenAssistantLabel" xml:space="preserve">
+    <value>Open assistant</value>
+  </data>
+  <data name="SettingsHotkeyGlobalOpenAssistantDescription" xml:space="preserve">
+    <value>Open or close the AI spotlight.</value>
+  </data>
+  <data name="EditorGraphBuilding" xml:space="preserve">
+    <value>Building graph...</value>
+  </data>
+  <data name="EditorGraphEmpty" xml:space="preserve">
+    <value>No graph for this script yet.</value>
+  </data>
+  <data name="EditorGraphNodesFormat" xml:space="preserve">
+    <value>{0} nodes</value>
+  </data>
+  <data name="EditorGraphLinksFormat" xml:space="preserve">
+    <value>{0} links</value>
+  </data>
+  <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
+    <value>{0} source ranges</value>
+  </data>
+  <data name="EditorWorkspaceSourceTab" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="EditorWorkspaceGraphTab" xml:space="preserve">
+    <value>Graph</value>
   </data>
 </root>

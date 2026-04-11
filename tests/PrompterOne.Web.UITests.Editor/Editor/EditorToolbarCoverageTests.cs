@@ -16,8 +16,6 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
 
     public static IEnumerable<EditorMenuScenario> FloatingMenuScenarios => EditorToolbarCoverageScenarios.FloatingMenuScenarios;
 
-    public static IEnumerable<EditorAiScenario> AiScenarios => EditorToolbarCoverageScenarios.AiScenarios;
-
     public static IEnumerable<EditorCommandScenario> ToolbarCommandScenarios => EditorToolbarCoverageScenarios.ToolbarCommandScenarios;
 
     public static IEnumerable<EditorCommandScenario> FloatingCommandScenarios => EditorToolbarCoverageScenarios.FloatingCommandScenarios;
@@ -55,36 +53,6 @@ public sealed class EditorToolbarCoverageTests(StandaloneAppFixture fixture)
                     .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
             },
             $"Floating toolbar menu coverage failed for scenario '{scenario.TriggerTestId}'.");
-    }
-
-    [Test]
-    [MethodDataSource(nameof(AiScenarios))]
-    public async Task EditorToolbar_AiAction_MutatesSource(EditorAiScenario scenario)
-    {
-        await UiPageScenarioDriver.RunWithIsolatedPageRetryAsync(
-            _fixture,
-            async page =>
-            {
-                await AiProviderTestSeeder.SeedConfiguredOpenAiAsync(page);
-                await OpenEditorAsync(page);
-
-                if (scenario.RequiresSelection)
-                {
-                    await SetSourceTextAndSelectPhraseAsync(page, scenario.SourceText, BrowserTestConstants.Editor.TransformativeMoment);
-                    await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.FloatingToolbarSettleDelayMs);
-                }
-
-                var beforeValue = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-                var actionButton = page.GetByTestId(scenario.TestId);
-                await Expect(actionButton)
-                    .ToBeEnabledAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-                await actionButton.ClickAsync();
-                var afterValue = await EditorMonacoDriver.SourceInput(page).InputValueAsync();
-
-                await Assert.That(afterValue).IsNotEqualTo(beforeValue);
-                await Assert.That(afterValue).Contains(scenario.ExpectedFragment);
-            },
-            $"AI toolbar coverage failed for scenario '{scenario.TestId}'.");
     }
 
     [Test]

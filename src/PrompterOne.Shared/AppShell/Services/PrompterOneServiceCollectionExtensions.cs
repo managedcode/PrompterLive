@@ -54,7 +54,8 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<EditorDroppedScriptMergeService>();
         services.AddScoped<TpsTextEditor>();
         services.AddScoped<TpsStructureEditor>();
-        services.AddScoped<EditorLocalAssistant>();
+        services.AddScoped<ScriptDocumentEditService>();
+        services.AddScoped<ScriptKnowledgeGraphService>();
         services.AddSingleton<ScriptAgent, WriterScriptAgent>();
         services.AddSingleton<ScriptAgent, ReviewerScriptAgent>();
         services.AddSingleton<ScriptWorkflow, WriterReviewSequentialWorkflow>();
@@ -66,6 +67,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<EditorOutlineBuilder>();
         services.AddScoped<EditorInterop>();
         services.AddScoped<EditorMonacoInterop>();
+        services.AddScoped<ScriptGraphViewerInterop>();
         services.AddScoped<EditorToolbarInterop>();
         services.AddScoped<AppShellFilePickerInterop>();
         services.AddScoped<EditorDocumentSaveCoordinator>();
@@ -84,6 +86,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<AiProviderSettingsStore>();
         services.AddScoped<IAgentRuntimeSettingsSource, AiProviderAgentRuntimeSettingsSource>();
         services.AddSingleton<EmbeddedAgentSkillsProvider>();
+        services.AddScoped<ScriptAgentToolProvider>();
         services.AddScoped<IScriptAgentFactory, ScriptAgentFactory>();
         services.AddScoped<ScriptAgentRuntime>();
         services.AddScoped<BrowserCloudStorageStore>();
@@ -101,6 +104,8 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<MicrophoneLevelInterop>();
         services.AddScoped<TeleprompterReaderInterop>();
         services.AddScoped<AppBootstrapper>();
+        services.AddScoped<AiSpotlightHotkeyInterop>();
+        services.AddScoped<AiSpotlightService>();
         services.AddScoped<AppShellService>();
         services.AddSingleton(runtimeTelemetryOptions ?? RuntimeTelemetryOptions.Disabled);
         services.AddSingleton<ISentryRuntimeClient, SentryRuntimeClient>();

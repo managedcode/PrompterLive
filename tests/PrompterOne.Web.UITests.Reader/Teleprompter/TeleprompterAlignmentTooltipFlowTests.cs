@@ -101,7 +101,7 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
 
     private static async Task AssertTooltipDismissesAsync(IPage page, ILocator trigger, ILocator tooltip)
     {
-        await page.GetByTestId(UiTestIds.Teleprompter.Stage).HoverAsync();
+        await MovePointerToStageCenterAsync(page);
         await Expect(tooltip).ToBeHiddenAsync(
             new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
 
@@ -112,6 +112,20 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
         await UiInteractionDriver.ClickAndContinueAsync(trigger);
         await Expect(tooltip).ToBeHiddenAsync(
             new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
+    }
+
+    private static async Task MovePointerToStageCenterAsync(IPage page)
+    {
+        var stageBounds = await page.GetByTestId(UiTestIds.Teleprompter.Stage).BoundingBoxAsync();
+        if (stageBounds is null)
+        {
+            throw new InvalidOperationException("The teleprompter stage had no bounds for clearing tooltip hover.");
+        }
+
+        await page.Mouse.MoveAsync(
+            stageBounds.X + stageBounds.Width / 2,
+            stageBounds.Y + stageBounds.Height / 2,
+            new() { Steps = BrowserTestConstants.TeleprompterFlow.ClearTooltipHoverMoveSteps });
     }
 
     private static Task StartTooltipRevealDelayProbeAsync(IPage page, string triggerTestId, string tooltipTestId) =>
