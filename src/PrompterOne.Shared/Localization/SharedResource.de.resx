@@ -1329,6 +1329,18 @@
   <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
     <value>{0} Quellbereiche</value>
   </data>
+  <data name="EditorGraphZoomIn" xml:space="preserve">
+    <value>Vergrößern</value>
+  </data>
+  <data name="EditorGraphZoomOut" xml:space="preserve">
+    <value>Verkleinern</value>
+  </data>
+  <data name="EditorGraphFit" xml:space="preserve">
+    <value>Alles anzeigen</value>
+  </data>
+  <data name="EditorGraphLayout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Quelle</value>
   </data>

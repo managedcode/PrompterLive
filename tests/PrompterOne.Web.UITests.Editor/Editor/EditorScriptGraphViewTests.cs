@@ -9,7 +9,7 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
     private readonly StandaloneAppFixture _fixture = fixture;
 
     [Test]
-    public async Task EditorScreen_GraphTabRendersScriptKnowledgeGraph()
+    public async Task EditorScreen_GraphTabRendersScriptKnowledgeGraphControls()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
 
@@ -23,38 +23,38 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphSummary))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            await Expect(page.GetByTestId(UiTestIds.Editor.GraphNode).First)
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphControls))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphZoomIn))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphZoomOut))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphFit))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphLayoutMode))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphCanvas))
                 .ToHaveAttributeAsync(
                     BrowserTestConstants.Editor.GraphReadyAttributeName,
                     BrowserTestConstants.Editor.GraphReadyAttributeValue,
                     new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphCanvas))
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.Editor.GraphTooltipsAttributeName,
+                    BrowserTestConstants.Editor.GraphTooltipsAttributeValue,
+                    new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Assert.That(await page.GetByTestId(UiTestIds.Editor.GraphNodeList).CountAsync()).IsEqualTo(0);
 
-            await page.GetByTestId(UiTestIds.Editor.GraphNode).First.ClickAsync();
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
-            var selectedState = await EditorMonacoDriver.GetStateAsync(page);
-            await Assert.That(selectedState.Selection.End).IsGreaterThan(selectedState.Selection.Start);
+            await page.GetByTestId(UiTestIds.Editor.GraphZoomIn).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.GraphZoomOut).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.GraphFit).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.GraphLayoutMode).ClickAsync();
 
-            await page.GetByTestId(UiTestIds.Header.AiSpotlight).ClickAsync();
-            await page.GetByTestId(UiTestIds.AiSpotlight.PromptInput).FillAsync("rewrite selected graph range");
-            await page.GetByTestId(UiTestIds.AiSpotlight.Submit).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.AiSpotlight.ApprovalState))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            await page.GetByTestId(UiTestIds.AiSpotlight.ApprovalApprove).ClickAsync();
-            await page.WaitForFunctionAsync(
-                """
-                (args) => {
-                    const state = window[args.harnessGlobalName]?.getState(args.testId);
-                    return state?.text?.includes("[warm]");
-                }
-                """,
-                new
-                {
-                    harnessGlobalName = PrompterOne.Shared.Services.Editor.EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                    testId = UiTestIds.Editor.SourceStage
-                },
-                new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphCanvas))
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.Editor.GraphLayoutAttributeName,
+                    BrowserTestConstants.Editor.GraphLayoutCompactValue,
+                    new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
         }
         finally
         {

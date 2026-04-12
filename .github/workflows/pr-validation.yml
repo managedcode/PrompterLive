@@ -65,8 +65,18 @@ jobs:
 
       - name: Test supporting suites
         run: |
-          dotnet test --project "$CORE_TEST_PROJECT"
-          dotnet test --project "$APP_TEST_PROJECT"
+          dotnet test @./tests/dotnet-test-progress.rsp --project "$CORE_TEST_PROJECT" --coverage --coverage-output-format cobertura
+          dotnet test @./tests/dotnet-test-progress.rsp --project "$APP_TEST_PROJECT" --coverage --coverage-output-format cobertura
+
+      - name: Upload supporting suite test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-pr-validation-supporting
+          path: |
+            tests/PrompterOne.Core.Tests/bin/**/TestResults/**
+            tests/PrompterOne.Web.Tests/bin/**/TestResults/**
+          if-no-files-found: ignore
 
   build_browser_suites:
     name: Restore + Build Browser Suites
@@ -140,7 +150,15 @@ jobs:
         run: node "$PLAYWRIGHT_CLI" install chromium
 
       - name: Test browser suite
-        run: dotnet test --project "${{ matrix.suite.project }}" --verbosity normal
+        run: dotnet test @./tests/dotnet-test-progress.rsp --project "${{ matrix.suite.project }}" --coverage --coverage-output-format cobertura
+
+      - name: Upload browser suite test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-pr-validation-${{ matrix.suite.artifact }}
+          path: tests/PrompterOne.Web.UITests.${{ matrix.suite.name }}/bin/**/TestResults/**
+          if-no-files-found: ignore
 
       - name: Upload Playwright artifacts
         if: always()

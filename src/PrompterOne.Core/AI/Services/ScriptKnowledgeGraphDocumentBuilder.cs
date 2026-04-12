@@ -21,7 +21,13 @@ internal static class ScriptKnowledgeGraphDocumentBuilder
             documentNodeId,
             string.IsNullOrWhiteSpace(request.Title) ? "Script document" : request.Title.Trim(),
             "Document",
-            "script");
+            "script",
+            content.Length == 0 ? "Empty script document" : "Script document root",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["source"] = "script",
+                ["documentId"] = request.DocumentId ?? string.Empty
+            });
 
         AddLineNodes(documentNodeId, containsEdgeLabel, content, nodes, edges, ranges);
     }
@@ -42,7 +48,13 @@ internal static class ScriptKnowledgeGraphDocumentBuilder
             }
 
             var nodeId = CreateLineNodeId(line.Number);
-            nodes[nodeId] = new ScriptKnowledgeGraphNode(nodeId, CreateLineLabel(line), "Line", "script");
+            nodes[nodeId] = new ScriptKnowledgeGraphNode(
+                nodeId,
+                CreateLineLabel(line),
+                "Line",
+                "script",
+                line.Text.Trim(),
+                CreateLineAttributes(line));
             ranges[nodeId] = ScriptKnowledgeGraphSourceRanges.CreateSourceRange(nodeId, content, line.Start, line.End);
             ScriptKnowledgeGraphEdges.Add(edges, documentNodeId, nodeId, containsEdgeLabel);
 
@@ -70,11 +82,19 @@ internal static class ScriptKnowledgeGraphDocumentBuilder
         }
 
         var label = trimmed.TrimStart('#', ' ', '[').TrimEnd(']');
+        var headingLevel = trimmed.TakeWhile(static character => character == '#').Count();
         node = new ScriptKnowledgeGraphNode(
             SectionNodePrefix + line.Number.ToString(CultureInfo.InvariantCulture),
             string.IsNullOrWhiteSpace(label) ? $"Section line {line.Number}" : label,
             "Section",
-            "script");
+            "script",
+            trimmed,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["source"] = "script",
+                ["line"] = line.Number.ToString(CultureInfo.InvariantCulture),
+                ["headingLevel"] = headingLevel.ToString(CultureInfo.InvariantCulture)
+            });
         return true;
     }
 
@@ -86,4 +106,11 @@ internal static class ScriptKnowledgeGraphDocumentBuilder
 
     private static string CreateLineNodeId(int lineNumber) =>
         LineNodePrefix + lineNumber.ToString(CultureInfo.InvariantCulture);
+
+    private static IReadOnlyDictionary<string, string> CreateLineAttributes(ScriptKnowledgeGraphLine line) =>
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["source"] = "script",
+            ["line"] = line.Number.ToString(CultureInfo.InvariantCulture)
+        };
 }

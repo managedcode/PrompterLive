@@ -23,7 +23,9 @@ public sealed record ScriptKnowledgeGraphNode(
     string Id,
     string Label,
     string Kind,
-    string? Group = null);
+    string? Group = null,
+    string? Detail = null,
+    IReadOnlyDictionary<string, string>? Attributes = null);
 
 public sealed record ScriptKnowledgeGraphEdge(
     string Id,

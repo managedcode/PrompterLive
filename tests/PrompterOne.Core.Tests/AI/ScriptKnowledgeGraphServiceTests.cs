@@ -76,4 +76,48 @@ public sealed class ScriptKnowledgeGraphServiceTests
         Assert.Equal(2, introRange.Start.Line);
         Assert.Equal(4, questionRange.Start.Line);
     }
+
+    [Test]
+    public async Task BuildAsync_ProjectsTpsAttributesAndCueValuesIntoGraphNodes()
+    {
+        const string source = """
+        # Product Launch
+        ## [Intro|Speaker:Alex|Archetype:Coach|warm|0:00-0:30]
+        ### [Proof|Speaker:Jordan|180WPM|focused]
+        [highlight]Ship[/highlight] this [pause:500ms]
+        """;
+
+        var request = new ScriptKnowledgeGraphBuildRequest(
+            "launch",
+            "Product Launch",
+            source,
+            ScriptDocumentRevision.Create(source));
+
+        var result = await _service.BuildAsync(request);
+        var segment = result.Nodes.Single(static node => node.Kind == "TpsSegment" && node.Label == "Intro");
+        var block = result.Nodes.Single(static node => node.Kind == "TpsBlock" && node.Label == "Proof");
+
+        Assert.Equal("segment", segment.Attributes!["scope"]);
+        Assert.Equal("Alex", segment.Attributes["speaker"]);
+        Assert.Equal("coach", segment.Attributes["archetype"]);
+        Assert.Equal("warm", segment.Attributes["emotion"]);
+        Assert.Equal("0:00-0:30", segment.Attributes["timing"]);
+        Assert.Equal("2", segment.Attributes["line"]);
+        Assert.Contains("## [Intro", segment.Detail ?? string.Empty, StringComparison.Ordinal);
+        Assert.Equal("block", block.Attributes!["scope"]);
+        Assert.Equal("180", block.Attributes["wpm"]);
+        Assert.Equal("Jordan", block.Attributes["speaker"]);
+        Assert.Equal("focused", block.Attributes["emotion"]);
+        Assert.Equal("3", block.Attributes["line"]);
+        Assert.Contains(result.Nodes, static node =>
+            node.Kind == "Pace" &&
+            node.Attributes is not null &&
+            node.Attributes.TryGetValue("valueType", out var valueType) &&
+            string.Equals(valueType, "wpm", StringComparison.Ordinal) &&
+            node.Attributes.TryGetValue("value", out var value) &&
+            string.Equals(value, "180", StringComparison.Ordinal));
+        Assert.Contains(result.Nodes, static node => node.Kind == "Timing" && node.Label == "0:00-0:30");
+        Assert.Contains(result.Nodes, static node => node.Kind == "Cue" && node.Label == "highlight");
+        Assert.Contains(result.Nodes, static node => node.Kind == "Cue" && node.Label == "pause:500ms");
+    }
 }

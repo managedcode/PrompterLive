@@ -2508,6 +2508,18 @@
   <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
     <value>{0} source ranges</value>
   </data>
+  <data name="EditorGraphZoomIn" xml:space="preserve">
+    <value>Zoom in</value>
+  </data>
+  <data name="EditorGraphZoomOut" xml:space="preserve">
+    <value>Zoom out</value>
+  </data>
+  <data name="EditorGraphFit" xml:space="preserve">
+    <value>Show all</value>
+  </data>
+  <data name="EditorGraphLayout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Source</value>
   </data>

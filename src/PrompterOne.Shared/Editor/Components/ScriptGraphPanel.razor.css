@@ -1,7 +1,7 @@
 .script-graph-panel {
     display: grid;
     flex: 1 1 auto;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
     min-height: 0;
     height: 100%;
     overflow: hidden;
@@ -15,9 +15,18 @@
 .script-graph-summary {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     padding: 10px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.script-graph-metrics {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
 }
 
 .script-graph-summary strong {
@@ -30,50 +39,80 @@
     font-size: .76rem;
 }
 
+.script-graph-controls {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+}
+
+.script-graph-controls button {
+    min-width: 34px;
+    min-height: 30px;
+    padding: 5px 9px;
+    cursor: pointer;
+    color: rgba(255, 252, 246, .78);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .06);
+}
+
+.script-graph-controls button:hover,
+.script-graph-controls button:focus-visible {
+    color: rgba(255, 252, 246, .96);
+    border-color: rgba(255, 196, 106, .42);
+    background: rgba(255, 196, 106, .10);
+    outline: none;
+}
+
 .script-graph-canvas {
+    position: relative;
     min-height: 360px;
     height: 100%;
-}
-
-.script-graph-node-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 10px 14px 14px;
-    border-top: 1px solid rgba(255, 255, 255, .08);
-}
-
-.script-graph-node-list button {
-    display: grid;
-    max-width: 220px;
     overflow: hidden;
-    gap: 2px;
-    padding: 5px 8px;
-    text-align: left;
-    cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, .10);
+}
+
+.script-graph-canvas ::deep .script-graph-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    max-width: min(320px, calc(100% - 24px));
+    padding: 10px 12px;
+    pointer-events: none;
+    color: rgba(255, 252, 246, .94);
+    border: 1px solid rgba(255, 196, 106, .26);
     border-radius: 8px;
-    background: rgba(255, 255, 255, .05);
+    background: rgba(12, 14, 18, .92);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .42);
 }
 
-.script-graph-node-list button:hover,
-.script-graph-node-list button:focus-visible {
-    border-color: rgba(255, 196, 106, .42);
-    background: rgba(255, 196, 106, .08);
+.script-graph-canvas ::deep .script-graph-tooltip[hidden] {
+    display: none;
 }
 
-.script-graph-node-list span,
-.script-graph-node-list small {
-    max-width: 180px;
-    overflow: hidden;
-    color: rgba(255, 252, 246, .76);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.script-graph-canvas ::deep .script-graph-tooltip strong,
+.script-graph-canvas ::deep .script-graph-tooltip span,
+.script-graph-canvas ::deep .script-graph-tooltip small {
+    display: block;
 }
 
-.script-graph-node-list small {
-    color: rgba(255, 196, 106, .68);
-    font-size: .66rem;
+.script-graph-canvas ::deep .script-graph-tooltip strong {
+    font-size: .86rem;
+    line-height: 1.2;
+}
+
+.script-graph-canvas ::deep .script-graph-tooltip span,
+.script-graph-canvas ::deep .script-graph-tooltip small {
+    color: rgba(248, 241, 226, .70);
+    font-size: .72rem;
+}
+
+.script-graph-canvas ::deep .script-graph-tooltip p {
+    margin: 6px 0;
+    color: rgba(248, 241, 226, .82);
+    font-size: .78rem;
+    line-height: 1.35;
 }
 
 .script-graph-empty {
@@ -82,4 +121,15 @@
     place-items: center;
     padding: 24px;
     color: rgba(248, 241, 226, .72);
+}
+
+@media (max-width: 680px) {
+    .script-graph-summary {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .script-graph-controls {
+        overflow-x: auto;
+    }
 }

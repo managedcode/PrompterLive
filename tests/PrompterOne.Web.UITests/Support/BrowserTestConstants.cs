@@ -276,6 +276,10 @@ internal static partial class BrowserTestConstants
         public const double AiScrollJumpMaximumAllowedDeltaPx = 64;
         public const string GraphReadyAttributeName = "data-graph-ready";
         public const string GraphReadyAttributeValue = "true";
+        public const string GraphTooltipsAttributeName = "data-graph-tooltips";
+        public const string GraphTooltipsAttributeValue = "true";
+        public const string GraphLayoutAttributeName = "data-graph-layout";
+        public const string GraphLayoutCompactValue = "compact";
         public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
         public const int ClickNearStartOffsetX = 140;

@@ -19,30 +19,49 @@
     else
     {
         <header class="script-graph-summary" data-test="@UiTestIds.Editor.GraphSummary">
-            <strong>@Format(UiTextKey.EditorGraphNodesFormat, Artifact.Nodes.Count)</strong>
-            <span>@Format(UiTextKey.EditorGraphLinksFormat, Artifact.Edges.Count)</span>
-            <span>@Format(UiTextKey.EditorGraphSourceRangesFormat, Artifact.SourceRanges.Count)</span>
+            <div class="script-graph-metrics">
+                <strong>@Format(UiTextKey.EditorGraphNodesFormat, Artifact.Nodes.Count)</strong>
+                <span>@Format(UiTextKey.EditorGraphLinksFormat, Artifact.Edges.Count)</span>
+                <span>@Format(UiTextKey.EditorGraphSourceRangesFormat, Artifact.SourceRanges.Count)</span>
+            </div>
+            <div class="script-graph-controls" data-test="@UiTestIds.Editor.GraphControls">
+                <button type="button"
+                        data-graph-control="zoom-in"
+                        data-test="@UiTestIds.Editor.GraphZoomIn"
+                        title="@Text(UiTextKey.EditorGraphZoomIn)"
+                        aria-label="@Text(UiTextKey.EditorGraphZoomIn)">
+                    +
+                </button>
+                <button type="button"
+                        data-graph-control="zoom-out"
+                        data-test="@UiTestIds.Editor.GraphZoomOut"
+                        title="@Text(UiTextKey.EditorGraphZoomOut)"
+                        aria-label="@Text(UiTextKey.EditorGraphZoomOut)">
+                    -
+                </button>
+                <button type="button"
+                        data-graph-control="fit"
+                        data-test="@UiTestIds.Editor.GraphFit"
+                        title="@Text(UiTextKey.EditorGraphFit)"
+                        aria-label="@Text(UiTextKey.EditorGraphFit)">
+                    @Text(UiTextKey.EditorGraphFit)
+                </button>
+                <button type="button"
+                        data-graph-control="layout"
+                        data-test="@UiTestIds.Editor.GraphLayoutMode"
+                        title="@Text(UiTextKey.EditorGraphLayout)"
+                        aria-label="@Text(UiTextKey.EditorGraphLayout)">
+                    @Text(UiTextKey.EditorGraphLayout)
+                </button>
+            </div>
         </header>
         <div class="script-graph-canvas"
              @ref="_graphElement"
              data-test="@UiTestIds.Editor.GraphCanvas"></div>
-        <div class="script-graph-node-list">
-            @foreach (var item in EnumerateSourceMappedNodes().Take(MaxListedNodes))
-            {
-                <button type="button"
-                        data-test="@UiTestIds.Editor.GraphNode"
-                        @onclick="() => RequestSourceRangeAsync(item.Range)">
-                    <span>@item.Node.Label</span>
-                    <small>@FormatSourceRange(item.Range)</small>
-                </button>
-            }
-        </div>
     }
 </section>
 
 @code {
-    private const int MaxListedNodes = 16;
-
     private ElementReference _graphElement;
     private string? _renderedRevision;
 
@@ -73,27 +92,4 @@
 
     private string Format(UiTextKey key, params object[] args) =>
         string.Format(System.Globalization.CultureInfo.CurrentCulture, Text(key), args);
-
-    private IEnumerable<(ScriptKnowledgeGraphNode Node, ScriptKnowledgeGraphSourceRange Range)> EnumerateSourceMappedNodes()
-    {
-        if (Artifact is null)
-        {
-            yield break;
-        }
-
-        var rangeByNodeId = Artifact.SourceRanges.ToDictionary(static range => range.NodeId, StringComparer.Ordinal);
-        foreach (var node in Artifact.Nodes)
-        {
-            if (rangeByNodeId.TryGetValue(node.Id, out var range))
-            {
-                yield return (node, range);
-            }
-        }
-    }
-
-    private Task RequestSourceRangeAsync(ScriptKnowledgeGraphSourceRange range) =>
-        SourceRangeRequested.InvokeAsync(range);
-
-    private static string FormatSourceRange(ScriptKnowledgeGraphSourceRange range) =>
-        $"L{range.Start.Line}:{range.Start.Column}";
 }

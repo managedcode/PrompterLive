@@ -921,6 +921,18 @@
   <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
     <value>{0} intervalli sorgente</value>
   </data>
+  <data name="EditorGraphZoomIn" xml:space="preserve">
+    <value>Ingrandisci</value>
+  </data>
+  <data name="EditorGraphZoomOut" xml:space="preserve">
+    <value>Riduci</value>
+  </data>
+  <data name="EditorGraphFit" xml:space="preserve">
+    <value>Mostra tutto</value>
+  </data>
+  <data name="EditorGraphLayout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Sorgente</value>
   </data>

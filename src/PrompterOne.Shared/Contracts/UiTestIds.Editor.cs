@@ -77,11 +77,17 @@ public static partial class UiTestIds
         public const string FormatHighlight = "editor-format-highlight";
         public const string FormatTrigger = "editor-format-trigger";
         public const string GraphCanvas = "editor-graph-canvas";
+        public const string GraphControls = "editor-graph-controls";
         public const string GraphEmpty = "editor-graph-empty";
+        public const string GraphFit = "editor-graph-fit";
+        public const string GraphLayoutMode = "editor-graph-layout-mode";
         public const string GraphNode = "editor-graph-node";
+        public const string GraphNodeList = "editor-graph-node-list";
         public const string GraphPanel = "editor-graph-panel";
         public const string GraphSummary = "editor-graph-summary";
         public const string GraphTab = "editor-graph-tab";
+        public const string GraphZoomIn = "editor-graph-zoom-in";
+        public const string GraphZoomOut = "editor-graph-zoom-out";
         public const string InsertBlock = "editor-insert-block";
         public const string InsertBlockArchetypeMenu = "editor-insert-block-archetype-menu";
         public const string InsertBlockMenu = "editor-insert-block-menu";

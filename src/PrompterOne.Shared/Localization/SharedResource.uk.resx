@@ -1344,6 +1344,18 @@
   <data name="EditorGraphSourceRangesFormat" xml:space="preserve">
     <value>{0} діапазонів джерела</value>
   </data>
+  <data name="EditorGraphZoomIn" xml:space="preserve">
+    <value>Наблизити</value>
+  </data>
+  <data name="EditorGraphZoomOut" xml:space="preserve">
+    <value>Віддалити</value>
+  </data>
+  <data name="EditorGraphFit" xml:space="preserve">
+    <value>Показати все</value>
+  </data>
+  <data name="EditorGraphLayout" xml:space="preserve">
+    <value>Розкладка</value>
+  </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Джерело</value>
   </data>
