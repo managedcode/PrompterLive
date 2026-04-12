@@ -63,6 +63,69 @@ public sealed class MainLayoutActionTests : BunitContext
     }
 
     [Test]
+    public void MainLayout_HeaderBack_UsesTrackedRouteHistory_BeforeFallbackRoute()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.Library);
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        var editorRoute = AppRoutes.EditorWithId(AppTestData.Scripts.DemoId);
+        navigation.NavigateTo(editorRoute);
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.Back)));
+
+        navigation.NavigateTo(AppRoutes.Settings);
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.Back)));
+
+        cut.FindByTestId(UiTestIds.Header.Back).Click();
+        cut.WaitForAssertion(() => Assert.EndsWith(editorRoute, navigation.Uri, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Header.Back).Click();
+        cut.WaitForAssertion(() => Assert.Equal(AppRoutes.Library, new Uri(navigation.Uri).AbsolutePath));
+    }
+
+    [Test]
+    public void MainLayout_HeaderBack_DoesNotLoopAfterExternalBackNavigation()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.Library);
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        var editorRoute = AppRoutes.EditorWithId(AppTestData.Scripts.DemoId);
+        navigation.NavigateTo(editorRoute);
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.Back)));
+
+        navigation.NavigateTo(AppRoutes.Settings);
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.Header.Back)));
+
+        navigation.NavigateTo(editorRoute);
+        cut.WaitForAssertion(() => Assert.EndsWith(editorRoute, navigation.Uri, StringComparison.Ordinal));
+
+        cut.FindByTestId(UiTestIds.Header.Back).Click();
+        cut.WaitForAssertion(() => Assert.Equal(AppRoutes.Library, new Uri(navigation.Uri).AbsolutePath));
+    }
+
+    [Test]
+    public void MainLayout_HeaderHome_NavigatesToLibrary_FromEditorScreen()
+    {
+        _ = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.QuantumId));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.FindByTestId(UiTestIds.Header.Home).Click();
+
+        Assert.Equal(AppRoutes.Library, new Uri(navigation.Uri).AbsolutePath);
+    }
+
+    [Test]
     [Arguments(AppRoutes.Library)]
     [Arguments(AppRoutes.Settings)]
     public void MainLayout_RendersGoLiveAction_OnEveryNonGoLiveScreen(string route)

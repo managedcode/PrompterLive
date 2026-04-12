@@ -67,11 +67,19 @@
     align-items: center;
     gap: 12px;
     justify-content: flex-end;
+    justify-self: stretch;
     min-width: 0;
-    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     flex: 0 1 auto;
-    flex-shrink: 0;
     padding: 0 20px;
+    scrollbar-width: none;
+}
+.app-header-right::-webkit-scrollbar {
+    display: none;
 }
 .app-header-action-label {
     min-width: 0;

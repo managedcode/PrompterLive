@@ -42,9 +42,14 @@ public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : A
             BrowserTestConstants.EditorFlow.DatePickerScenario,
             screenshotStep);
 
-        return await createdInput.EvaluateAsync<DatePickerMetrics>(
+        return await page.EvaluateAsync<DatePickerMetrics>(
             """
-            element => {
+            testId => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!(element instanceof HTMLInputElement)) {
+                    throw new Error(`Expected date input for data-test '${testId}'.`);
+                }
+
                 const inputStyle = getComputedStyle(element);
                 const rect = element.getBoundingClientRect();
                 return {
@@ -53,7 +58,8 @@ public sealed class EditorDatePickerThemeTests(StandaloneAppFixture fixture) : A
                     inputWidth: rect.width
                 };
             }
-            """);
+            """,
+            UiTestIds.Editor.Created);
     }
 
     private static async Task SwitchThemeAsync(IPage page, string theme)

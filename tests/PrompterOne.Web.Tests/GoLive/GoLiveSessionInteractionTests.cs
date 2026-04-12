@@ -159,7 +159,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Test]
-    public void GoLivePage_SwitchProgramSource_WhileVdoNinjaActive_RefreshesOutputSessionDevices()
+    public async Task GoLivePage_SwitchProgramSource_WhileVdoNinjaActive_RefreshesOutputSessionDevices()
     {
         SeedSceneState(CreateTwoCameraScene());
         SeedStudioSettings(StudioSettings.Default with
@@ -190,12 +190,12 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
 
         var invocationCountBeforeSwitch = _harness.JsRuntime.Invocations.Count;
 
-        cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click());
         cut.WaitForAssertion(() =>
             Assert.Equal(
                 AppTestData.Camera.SecondSourceId,
                 Services.GetRequiredService<GoLiveSessionService>().State.SelectedSourceId));
-        cut.FindByTestId(UiTestIds.GoLive.TakeToAir).Click();
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.TakeToAir).Click());
 
         cut.WaitForAssertion(() =>
             Assert.Contains(

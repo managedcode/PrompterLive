@@ -25,7 +25,7 @@ internal static class ResponsiveLayoutAssertions
 
         foreach (var controlTestId in controlTestIds)
         {
-            await AssertVisibleWithinViewportAsync(page.GetByTestId(controlTestId), controlTestId, routeName, viewport);
+            await AssertVisibleWithinViewportAsync(page, page.GetByTestId(controlTestId), controlTestId, routeName, viewport);
         }
 
         await UiScenarioArtifacts.CapturePageAsync(
@@ -53,6 +53,7 @@ internal static class ResponsiveLayoutAssertions
         };
 
     internal static async Task AssertVisibleWithinViewportAsync(
+        IPage page,
         ILocator locator,
         string controlTestId,
         string routeName,
@@ -61,10 +62,7 @@ internal static class ResponsiveLayoutAssertions
         await Expect(locator)
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
-        var box = await locator.BoundingBoxAsync();
-        await Assert.That(box).IsNotNull();
-
-        var bounds = box!;
+        var bounds = await UiInteractionDriver.GetBoundingClientRectAsync(page, controlTestId);
         var tolerance = BrowserTestConstants.ResponsiveLayout.ViewportEdgeTolerancePx;
 
         await Assert.That(bounds.X >= -tolerance && bounds.X <= viewport.Width)

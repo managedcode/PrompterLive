@@ -17,7 +17,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
 
             await Expect(page.GetByTestId(UiTestIds.Editor.FindBar)).ToBeVisibleAsync();
 
-            await SetFindInputValueAsync(page.GetByTestId(UiTestIds.Editor.FindInput), BrowserTestConstants.Editor.FindQuery);
+            await SetFindInputValueAsync(page, BrowserTestConstants.Editor.FindQuery);
             await Expect(page.GetByTestId(UiTestIds.Editor.FindResult))
                 .ToHaveTextAsync(BrowserTestConstants.Editor.FindSingleMatchSummary);
             await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
@@ -34,7 +34,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             // TODO: TUnit migration - xUnit Assert.Equal had additional argument(s) (ignoreCase: true) that could not be converted.
             await Assert.That(selectedText).IsEqualTo(BrowserTestConstants.Editor.FindQuery);
 
-            await SetFindInputValueAsync(page.GetByTestId(UiTestIds.Editor.FindInput), BrowserTestConstants.Editor.FindMissingQuery);
+            await SetFindInputValueAsync(page, BrowserTestConstants.Editor.FindMissingQuery);
             await Expect(page.GetByTestId(UiTestIds.Editor.FindResult))
                 .ToHaveTextAsync(BrowserTestConstants.Editor.FindNoMatches);
             await Expect(page.GetByTestId(UiTestIds.Editor.FindNext)).ToBeDisabledAsync();
@@ -56,7 +56,7 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             await Expect(findBar).ToBeVisibleAsync();
             await Expect(inputShell).ToBeVisibleAsync();
 
-            await SetFindInputValueAsync(page.GetByTestId(UiTestIds.Editor.FindInput), BrowserTestConstants.Editor.FindQuery);
+            await SetFindInputValueAsync(page, BrowserTestConstants.Editor.FindQuery);
             await Expect(page.GetByTestId(UiTestIds.Editor.FindResult))
                 .ToHaveTextAsync(BrowserTestConstants.Editor.FindSingleMatchSummary);
             await Expect(previousButton).ToBeVisibleAsync();
@@ -93,13 +93,13 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
 
             await Expect(input).ToBeVisibleAsync();
 
-            await input.FocusAsync();
-            await AppendFindInputTextAsync(input, "i");
-            await Expect(input).ToHaveValueAsync("i");
+            await UiInteractionDriver.FocusAndContinueAsync(page, UiTestIds.Editor.FindInput);
+            await AppendFindInputTextAsync(page, "i");
+            await ExpectFindInputValueAsync(page, "i");
             await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
 
-            await AppendFindInputTextAsync(input, "n");
-            await Expect(input).ToHaveValueAsync("in");
+            await AppendFindInputTextAsync(page, "n");
+            await ExpectFindInputValueAsync(page, "in");
             await ExpectActiveElementDataTestAsync(page, UiTestIds.Editor.FindInput);
 
             await UiScenarioArtifacts.CapturePageAsync(
@@ -136,28 +136,14 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
             """,
             propertyName);
 
-    private static async Task SetFindInputValueAsync(Microsoft.Playwright.ILocator input, string value)
+    private static async Task SetFindInputValueAsync(Microsoft.Playwright.IPage page, string value)
     {
-        await Expect(input).ToBeVisibleAsync();
-        await input.EvaluateAsync(
-            """
-            (element, value) => {
-                if (!(element instanceof HTMLInputElement)) {
-                    throw new Error("Expected the editor find target to be an input element.");
-                }
-
-                element.focus();
-                element.value = value;
-                element.dispatchEvent(new InputEvent("input", {
-                    bubbles: true,
-                    data: value,
-                    inputType: "insertText"
-                }));
-                element.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-            """,
-            value);
-        await Expect(input).ToHaveValueAsync(value);
+        await UiInteractionDriver.FillAndContinueAsync(
+            page,
+            UiTestIds.Editor.FindInput,
+            value,
+            BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs);
+        await ExpectFindInputValueAsync(page, value);
     }
 
     private static async Task ExpectActiveElementDataTestAsync(Microsoft.Playwright.IPage page, string expectedTestId)
@@ -184,12 +170,33 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
         }
     }
 
-    private static async Task AppendFindInputTextAsync(Microsoft.Playwright.ILocator input, string value)
+    private static async Task ExpectFindInputValueAsync(Microsoft.Playwright.IPage page, string value)
     {
-        await Expect(input).ToBeVisibleAsync();
-        await input.EvaluateAsync(
+        await page.WaitForFunctionAsync(
             """
-            (element, value) => {
+            ({ testId, value }) => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                return element instanceof HTMLInputElement && element.value === value;
+            }
+            """,
+            new
+            {
+                testId = UiTestIds.Editor.FindInput,
+                value
+            },
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+    }
+
+    private static async Task AppendFindInputTextAsync(Microsoft.Playwright.IPage page, string value)
+    {
+        await UiInteractionDriver.FocusAndContinueAsync(
+            page,
+            UiTestIds.Editor.FindInput,
+            BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs);
+        await page.EvaluateAsync(
+            """
+            ({ testId, value }) => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
                 if (!(element instanceof HTMLInputElement)) {
                     throw new Error("Expected the editor find target to be an input element.");
                 }
@@ -205,6 +212,10 @@ public sealed class EditorFindFlowTests(StandaloneAppFixture fixture) : AppUiTes
                 }));
             }
             """,
-            value);
+            new
+            {
+                testId = UiTestIds.Editor.FindInput,
+                value
+            });
     }
 }

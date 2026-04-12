@@ -111,10 +111,10 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         sourceEditor.Input(updatedSource);
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
-        }, TimeSpan.FromMilliseconds(EditorSourceInteractionTestSource.AutosaveAssertionTimeout));
+        WaitForSourceValue(
+            cut,
+            updatedSource,
+            EditorSourceInteractionTestSource.AutosaveAssertionTimeout);
 
         cut.WaitForAssertion(() =>
         {
@@ -138,7 +138,7 @@ public sealed class EditorSourceInteractionTests : BunitContext
     }
 
     [Test]
-    public void EditorPage_TypingStaysLocalFirstUntilAutosaveDebounce()
+    public void EditorPage_TypingUpdatesDraftAnalysisAfterDebounce()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -160,22 +160,27 @@ public sealed class EditorSourceInteractionTests : BunitContext
 
         sourceEditor.Input(updatedSource);
 
-        Assert.DoesNotContain(
-            EditorSourceInteractionTestSource.LocalFirstTypingLine,
-            _harness.Session.State.Text,
-            StringComparison.Ordinal);
-        Assert.Equal(initialSessionWordCount, _harness.Session.State.WordCount);
+        WaitForSourceValue(
+            cut,
+            updatedSource,
+            EditorSourceInteractionTestSource.AutosaveAssertionTimeout);
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
             Assert.Contains(EditorSourceInteractionTestSource.LocalFirstTypingLine, cut.Markup, StringComparison.Ordinal);
         }, TimeSpan.FromMilliseconds(EditorSourceInteractionTestSource.AutosaveAssertionTimeout));
 
         cut.WaitForState(
-            () => _harness.Session.State.WordCount > initialSessionWordCount,
+            () => _harness.Session.State.WordCount > initialSessionWordCount
+                && _harness.Session.State.Text.Contains(
+                    EditorSourceInteractionTestSource.LocalFirstTypingLine,
+                    StringComparison.Ordinal),
             TimeSpan.FromMilliseconds(EditorSourceInteractionTestSource.AutosaveAssertionTimeout));
 
+        Assert.Contains(
+            EditorSourceInteractionTestSource.LocalFirstTypingLine,
+            _harness.Session.State.Text,
+            StringComparison.Ordinal);
         Assert.True(_harness.Session.State.WordCount > initialSessionWordCount);
     }
 
@@ -273,10 +278,10 @@ public sealed class EditorSourceInteractionTests : BunitContext
             Key = EditorSourceInteractionTestSource.UndoKey
         });
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Equal(initialSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
-        }, TimeSpan.FromMilliseconds(EditorSourceInteractionTestSource.HistoryAssertionTimeout));
+        WaitForSourceValue(
+            cut,
+            initialSource,
+            EditorSourceInteractionTestSource.HistoryAssertionTimeout);
 
         currentSourceEditor = cut.FindByTestId(UiTestIds.Editor.SourceInput);
 
@@ -286,10 +291,10 @@ public sealed class EditorSourceInteractionTests : BunitContext
             Key = EditorSourceInteractionTestSource.RedoKey
         });
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Equal(updatedSource, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
-        }, TimeSpan.FromMilliseconds(EditorSourceInteractionTestSource.HistoryAssertionTimeout));
+        WaitForSourceValue(
+            cut,
+            updatedSource,
+            EditorSourceInteractionTestSource.HistoryAssertionTimeout);
     }
 
     [Test]
@@ -370,5 +375,21 @@ public sealed class EditorSourceInteractionTests : BunitContext
         public const string UndoKey = "z";
         public const string VersionPersistenceLine = "version: \"2.0\"";
         public const string LocalFirstTypingLine = "steady local typing proof";
+    }
+
+    private static void WaitForSourceValue(
+        IRenderedComponent<EditorPage> cut,
+        string expected,
+        int timeoutMs)
+    {
+        if (cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") == expected)
+        {
+            return;
+        }
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(expected, cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value"));
+        }, TimeSpan.FromMilliseconds(timeoutMs));
     }
 }

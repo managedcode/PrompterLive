@@ -134,6 +134,80 @@ internal static class UiInteractionDriver
         throw lastFailure ?? new InvalidOperationException("The UI interaction driver exhausted its hover retries without capturing a failure.");
     }
 
+    internal static async Task FillAndContinueAsync(
+        IPage page,
+        string testId,
+        string value,
+        int? timeoutMs = null)
+    {
+        await WaitUntilEditableAsync(page, testId, timeoutMs ?? BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs);
+        await page.EvaluateAsync(
+            """
+            ({ testId, value }) => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
+                    throw new Error(`Expected editable input for data-test '${testId}'.`);
+                }
+
+                element.focus();
+                const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element), 'value')?.set;
+                if (setter) {
+                    setter.call(element, value);
+                } else {
+                    element.value = value;
+                }
+
+                element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value }));
+                element.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            """,
+            new
+            {
+                testId,
+                value
+            });
+    }
+
+    internal static async Task FocusAndContinueAsync(
+        IPage page,
+        string testId,
+        int? timeoutMs = null)
+    {
+        await WaitUntilEditableAsync(page, testId, timeoutMs ?? BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs);
+        await page.EvaluateAsync(
+            """
+            testId => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
+                    throw new Error(`Expected editable input for data-test '${testId}'.`);
+                }
+
+                element.focus();
+            }
+            """,
+            testId);
+    }
+
+    internal static Task<ElementBounds> GetBoundingClientRectAsync(IPage page, string testId) =>
+        page.EvaluateAsync<ElementBounds>(
+            """
+            testId => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!(element instanceof Element)) {
+                    throw new Error(`Expected element for data-test '${testId}'.`);
+                }
+
+                const rect = element.getBoundingClientRect();
+                return {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height
+                };
+            }
+            """,
+            testId);
+
     private static async Task WaitUntilInteractableAsync(ILocator locator)
     {
         await locator.WaitForAsync(new()
@@ -148,7 +222,35 @@ internal static class UiInteractionDriver
         await locator.ScrollIntoViewIfNeededAsync();
     }
 
+    private static Task WaitUntilEditableAsync(IPage page, string testId, int timeoutMs) =>
+        page.WaitForFunctionAsync(
+            """
+            testId => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
+                    return false;
+                }
+
+                const style = window.getComputedStyle(element);
+                const rect = element.getBoundingClientRect();
+                return !element.disabled
+                    && !element.readOnly
+                    && style.display !== 'none'
+                    && style.visibility !== 'hidden'
+                    && rect.width > 0
+                    && rect.height > 0;
+            }
+            """,
+            testId,
+            new() { Timeout = timeoutMs });
+
     private static bool IsRetryableInteractionFailure(PlaywrightException exception) =>
         !exception.Message.Contains("Target page, context or browser has been closed", StringComparison.Ordinal)
         && !exception.Message.Contains("Process exited", StringComparison.Ordinal);
+
+    internal readonly record struct ElementBounds(
+        double X,
+        double Y,
+        double Width,
+        double Height);
 }

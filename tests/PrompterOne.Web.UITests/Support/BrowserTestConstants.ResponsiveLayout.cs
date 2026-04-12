@@ -68,5 +68,13 @@ internal static partial class BrowserTestConstants
             Viewports
                 .Where(static viewport => viewport.Name is IpadMiniPortraitName or IpadAirPortraitName or IpadProPortraitName)
                 .ToArray();
+
+        public static IReadOnlyList<ResponsiveViewport> HeaderChromeViewports { get; } =
+        [
+            new("iphone-medium-portrait", IphoneMediumWidth, IphoneMediumHeight),
+            new("iphone-medium-landscape", IphoneMediumHeight, IphoneMediumWidth),
+            new("ipad-mini-portrait", IpadMiniWidth, IpadMiniHeight),
+            new("ipad-mini-landscape", IpadMiniHeight, IpadMiniWidth)
+        ];
     }
 }

@@ -37,7 +37,11 @@ internal static class BrowserRouteDriver
                 // NetworkIdle is too strict for pages that keep long-lived browser activity alive on CI.
                 if (forceNavigation || !IsCurrentRoute(page, route))
                 {
-                    await page.GotoAsync(route, new() { WaitUntil = RouteNavigationReadyState });
+                    await page.GotoAsync(route, new()
+                    {
+                        WaitUntil = RouteNavigationReadyState,
+                        Timeout = routeVisibleTimeoutMs
+                    });
                 }
 
                 forceNavigation = false;
@@ -93,7 +97,11 @@ internal static class BrowserRouteDriver
         {
             try
             {
-                await page.ReloadAsync(new() { WaitUntil = RouteNavigationReadyState });
+                await page.ReloadAsync(new()
+                {
+                    WaitUntil = RouteNavigationReadyState,
+                    Timeout = BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs
+                });
                 await WaitForRouteAsync(page, route);
                 if (await IsPageVisibleAsync(page, pageTestId, BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs))
                 {

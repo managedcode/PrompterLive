@@ -17,16 +17,28 @@ public sealed class EditorLearnScreenFlowTests(StandaloneAppFixture fixture) : A
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync(BrowserTestConstants.Editor.BodyHeading);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Opening Block");
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceHighlight)).ToContainTextAsync("Purpose Block");
-            await page.GetByTestId(UiTestIds.Editor.FormatTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuFormat)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.ColorTrigger).ClickAsync();
-            await Expect(page.GetByTestId(UiTestIds.Editor.MenuColor)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Editor.Bold).ClickAsync();
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.FormatTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuFormat),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+                page.GetByTestId(UiTestIds.Editor.ColorTrigger),
+                page.GetByTestId(UiTestIds.Editor.MenuColor),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.Bold),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Header.AiSpotlight)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.Header.AiSpotlight).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Header.AiSpotlight),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.AiSpotlight.Overlay)).ToBeVisibleAsync();
-            await page.GetByTestId(UiTestIds.AiSpotlight.Close).ClickAsync();
-            await page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1)).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.AiSpotlight.Close),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1)),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Editor.BlockNavigation(2, 1))).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
                 BrowserTestConstants.State.ActiveValue);

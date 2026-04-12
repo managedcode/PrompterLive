@@ -243,8 +243,18 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
     {
         var page = await context.NewPageAsync();
         PreparePage(page);
-        await PrimeIsolatedBrowserStorageAsync(page);
-        return page;
+
+        try
+        {
+            await PrimeIsolatedBrowserStorageAsync(page);
+            return page;
+        }
+        catch
+        {
+            await TryCaptureFixtureFailurePageAsync(page, "fixture-primed-page-bootstrap");
+            await SafeClosePageAsync(page);
+            throw;
+        }
     }
 
     private async Task<IPage> CreateBlankPageAsync(IBrowserContext context)
@@ -259,7 +269,7 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
 
             try
             {
-                await page.GotoAsync($"{BaseAddress}{UiTestHostConstants.BlankPagePath}", new() { WaitUntil = WaitUntilState.Load });
+                await NavigateToBlankPageAsync(page, BaseAddress);
                 return page;
             }
             catch (TimeoutException exception) when (attempt < BlankPageBootstrapAttemptCount)
@@ -298,6 +308,22 @@ public sealed partial class StandaloneAppFixture : IAsyncInitializer, IAsyncDisp
         try
         {
             await page.CloseAsync();
+        }
+        catch
+        {
+        }
+    }
+
+    private static async Task TryCaptureFixtureFailurePageAsync(IPage page, string failureLabel)
+    {
+        if (page.IsClosed)
+        {
+            return;
+        }
+
+        try
+        {
+            await UiScenarioArtifacts.CaptureFailurePageAsync(page, failureLabel);
         }
         catch
         {

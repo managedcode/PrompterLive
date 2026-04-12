@@ -46,11 +46,13 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Header.LiveWidgetDetail))
                 .Not.ToContainTextAsync(BrowserTestConstants.Scripts.IntroSubtitle);
             await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page,
                 page.GetByTestId(UiTestIds.Header.LiveWidget),
                 UiTestIds.Header.LiveWidget,
                 BrowserTestConstants.AppShellFlow.LiveWidgetScenario,
                 compactViewport);
             await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page,
                 page.GetByTestId(UiTestIds.Header.LiveWidgetPreview),
                 UiTestIds.Header.LiveWidgetPreview,
                 BrowserTestConstants.AppShellFlow.LiveWidgetScenario,
@@ -325,6 +327,7 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
                 BrowserTestConstants.GoLive.RecordingRuntimeMetadataReadyScript,
                 BrowserTestConstants.GoLive.RuntimeSessionId,
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForRecordingPayloadGrowthAsync(page);
 
             await UiInteractionDriver.ClickAndContinueAsync(
                 page.GetByTestId(UiTestIds.GoLive.StartRecording),
@@ -461,6 +464,19 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
             BrowserTestConstants.Media.ElementHasVisibleVideoScript,
             new object[] { UiTestIds.GoLive.ProgramVideo, BrowserTestConstants.Media.MinimumVisiblePixelCount },
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+    }
+
+    private static async Task WaitForRecordingPayloadGrowthAsync(IPage page)
+    {
+        var runtimeState = await page.EvaluateAsync<JsonElement>(
+            BrowserTestConstants.GoLive.GetRuntimeStateScript,
+            BrowserTestConstants.GoLive.RuntimeSessionId);
+        var initialSizeBytes = runtimeState.GetProperty("recording").GetProperty("sizeBytes").GetInt64();
+
+        await page.WaitForFunctionAsync(
+            BrowserTestConstants.GoLive.RecordingRuntimePayloadGrowthScript,
+            new object[] { BrowserTestConstants.GoLive.RuntimeSessionId, initialSizeBytes },
+            new() { Timeout = BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs });
     }
 
     private static string GetRecordingFileHarnessScriptPath() =>

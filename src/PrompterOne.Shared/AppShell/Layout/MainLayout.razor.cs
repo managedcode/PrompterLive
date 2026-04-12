@@ -321,7 +321,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable, IAsyncDispos
 
     private Task HandleBackClickAsync()
     {
-        Navigation.NavigateTo(Shell.GetBackRoute());
+        Navigation.NavigateTo(Shell.GetBackNavigationRoute(), replace: true);
         return Task.CompletedTask;
     }
 

@@ -5,6 +5,7 @@ namespace PrompterOne.Web.UITests;
 
 public sealed partial class StandaloneAppFixture
 {
+    private const WaitUntilState BlankPageNavigationReadyState = WaitUntilState.Commit;
     private static readonly (string Route, string PageTestId)[] RuntimeWarmupRoutes =
     [
         (BrowserTestConstants.Routes.Library, UiTestIds.Library.Page),
@@ -40,12 +41,19 @@ public sealed partial class StandaloneAppFixture
 
     private static async Task PrimeIsolatedBrowserStorageAsync(IPage page, string baseAddress)
     {
-        await page.GotoAsync($"{baseAddress}{UiTestHostConstants.BlankPagePath}");
+        await NavigateToBlankPageAsync(page, baseAddress);
         await page.EvaluateAsync(
             UiTestHostConstants.ResetBrowserStorageScript,
             UiTestHostConstants.BrowserStorageDatabaseName);
         await page.EvaluateAsync(BrowserTestLibrarySeedData.CreateInitializationScript());
     }
+
+    private static Task NavigateToBlankPageAsync(IPage page, string baseAddress) =>
+        page.GotoAsync($"{baseAddress}{UiTestHostConstants.BlankPagePath}", new()
+        {
+            WaitUntil = BlankPageNavigationReadyState,
+            Timeout = BrowserTestConstants.Timing.DefaultNavigationTimeoutMs
+        });
 
     private static async Task WarmUpRuntimeAsync(IBrowser browser, string baseAddress)
     {

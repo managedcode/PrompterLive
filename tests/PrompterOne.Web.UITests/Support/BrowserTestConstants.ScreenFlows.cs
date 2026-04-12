@@ -185,6 +185,8 @@ internal static partial class BrowserTestConstants
         public const string SettingsLaunchStep = "01-go-live-open-settings";
         public const string SettingsBackStep = "02-header-back-from-settings";
         public const string SettingsTitle = "Settings";
+        public const string HeaderChromeScenario = "app-shell-header-chrome";
+        public const string HeaderChromeReachableStep = "01-actions-reachable";
         public const string LiveWidgetScenario = "app-shell-live-widget";
         public const string LiveWidgetViewportName = "iphone-medium-portrait";
         public const int LiveWidgetTimerPollAttempts = 5;

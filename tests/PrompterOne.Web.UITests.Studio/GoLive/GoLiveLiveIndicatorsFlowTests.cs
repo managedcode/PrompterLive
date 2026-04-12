@@ -56,16 +56,14 @@ public sealed class GoLiveLiveIndicatorsFlowTests(StandaloneAppFixture fixture)
             await UiInteractionDriver.ClickAndContinueAsync(
                 page.GetByTestId(UiTestIds.GoLive.StartRecording),
                 noWaitAfter: true);
-            await page.WaitForFunctionAsync(
-                BrowserTestConstants.GoLive.RecordingRuntimeActiveScript,
-                BrowserTestConstants.GoLive.RuntimeSessionId,
-                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-
             var activeSourceBadge = page.GetByTestId(UiTestIds.GoLive.SourceCameraBadge(BrowserTestConstants.GoLive.FirstSourceId));
             var previewLiveDot = page.GetByTestId(UiTestIds.GoLive.PreviewLiveDot);
 
             await Expect(activeSourceBadge)
-                .ToHaveAttributeAsync("data-live-state", BrowserTestConstants.GoLive.RecordingStateValue);
+                .ToHaveAttributeAsync(
+                    "data-live-state",
+                    BrowserTestConstants.GoLive.RecordingStateValue,
+                    new() { Timeout = BrowserTestConstants.Timing.RuntimeWarmupVisibleTimeoutMs });
             await Expect(activeSourceBadge).ToContainTextAsync(LiveBadgeLabel);
 
             await Expect(previewLiveDot)

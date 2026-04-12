@@ -816,6 +816,7 @@ async function applyTextForHarnessAsync(state, nextText, options) {
 
     state.suppressTextNotification = true;
     replaceModelTextPreservingViewport(state, nextText);
+    syncProxyFromEditor(state);
     state.suppressTextNotification = false;
 
     await notifyTextChangedAsync(state);

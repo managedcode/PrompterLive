@@ -78,10 +78,16 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 });
             var hoverBoxShadow = await demoCard.EvaluateAsync<string>("element => getComputedStyle(element).boxShadow");
             await Assert.That(hoverBoxShadow).IsNotEqualTo(BrowserTestConstants.Library.HoverBoxShadowNone);
-            await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(BrowserTestConstants.Library.SearchQuery);
+            await UiInteractionDriver.FillAndContinueAsync(
+                page,
+                UiTestIds.Header.LibrarySearch,
+                BrowserTestConstants.Library.SearchQuery);
             await Expect(page.GetByTestId(BrowserTestConstants.Elements.QuantumCard)).ToContainTextAsync(BrowserTestConstants.Scripts.QuantumTitle);
             await Expect(demoCard).ToBeHiddenAsync();
-            await page.GetByTestId(UiTestIds.Header.LibrarySearch).FillAsync(string.Empty);
+            await UiInteractionDriver.FillAndContinueAsync(
+                page,
+                UiTestIds.Header.LibrarySearch,
+                string.Empty);
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.SortDate));
             await Expect(page.GetByTestId(UiTestIds.Library.SortDate)).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,

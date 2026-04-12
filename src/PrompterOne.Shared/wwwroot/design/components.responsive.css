@@ -19,7 +19,7 @@
 
 @media (max-width: 900px) {
     .app-header {
-        grid-template-columns: 156px minmax(0, 1fr) auto;
+        grid-template-columns: 156px minmax(40px, 1fr) fit-content(calc(100vw - 196px));
     }
 
     .app-header-left {
@@ -35,15 +35,18 @@
     }
 
     .app-header-right {
-        flex: 1 1 auto;
         gap: 8px;
         padding: 0 12px;
+    }
+
+    .app-header-action-label {
+        display: none;
     }
 }
 
 @media (max-width: 720px) {
     .app-header {
-        grid-template-columns: 56px minmax(0, 1fr) auto;
+        grid-template-columns: 56px minmax(40px, 1fr) fit-content(calc(100vw - 104px));
     }
 
     .app-header-left {
@@ -63,11 +66,8 @@
 
     .app-header-right {
         gap: 6px;
+        justify-content: flex-start;
         padding: 0 8px;
-    }
-
-    .app-header-action-label {
-        display: none;
     }
 
     .btn-gold,
@@ -103,7 +103,6 @@
 
 @media (max-width: 560px) {
     .app-header-center {
-        flex: 0 1 auto;
         padding: 0 4px 0 2px;
     }
 

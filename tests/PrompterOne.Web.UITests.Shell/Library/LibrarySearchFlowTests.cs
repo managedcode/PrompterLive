@@ -12,19 +12,27 @@ public sealed class LibrarySearchFlowTests(StandaloneAppFixture fixture) : AppUi
         {
             await ShellRouteDriver.OpenLibraryAsync(page);
 
-            var searchInput = page.GetByTestId(UiTestIds.Header.LibrarySearch);
             var quantumCard = page.GetByTestId(BrowserTestConstants.Elements.QuantumCard);
             var demoCard = page.GetByTestId(BrowserTestConstants.Elements.DemoCard);
 
-            await searchInput.FillAsync(BrowserTestConstants.Library.FileNameSearchQuery);
+            await UiInteractionDriver.FillAndContinueAsync(
+                page,
+                UiTestIds.Header.LibrarySearch,
+                BrowserTestConstants.Library.FileNameSearchQuery);
             await Expect(quantumCard).ToBeVisibleAsync();
             await Expect(demoCard).ToBeHiddenAsync();
 
-            await searchInput.FillAsync(BrowserTestConstants.Library.ContentSearchQuery);
+            await UiInteractionDriver.FillAndContinueAsync(
+                page,
+                UiTestIds.Header.LibrarySearch,
+                BrowserTestConstants.Library.ContentSearchQuery);
             await Expect(quantumCard).ToBeVisibleAsync();
             await Expect(demoCard).ToBeHiddenAsync();
 
-            await searchInput.FillAsync(string.Empty);
+            await UiInteractionDriver.FillAndContinueAsync(
+                page,
+                UiTestIds.Header.LibrarySearch,
+                string.Empty);
             await Expect(demoCard).ToBeVisibleAsync();
         });
 }

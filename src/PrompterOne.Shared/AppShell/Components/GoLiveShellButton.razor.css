@@ -164,6 +164,10 @@
         padding: 0 10px;
         gap: 8px;
     }
+
+    .go-live-shell-button__copy {
+        display: none;
+    }
 }
 
 @media (max-width: 560px) {
@@ -174,7 +178,4 @@
         justify-content: center;
     }
 
-    .go-live-shell-button__copy {
-        display: none;
-    }
 }

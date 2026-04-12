@@ -23,6 +23,7 @@ public sealed class TeleprompterChromeStateTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
+            Assert.NotEmpty(cut.FindByTestId(UiTestIds.Teleprompter.CardText(0)).TextContent.Trim());
             Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Controls).GetAttribute("data-active"));
             Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.Progress).GetAttribute("data-active"));
             Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Teleprompter.EdgeInfo).GetAttribute("data-active"));

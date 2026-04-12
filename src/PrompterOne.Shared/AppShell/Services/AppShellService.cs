@@ -5,10 +5,15 @@ namespace PrompterOne.Shared.Services;
 public sealed class AppShellService
 {
     private const string EmptyRoute = "";
+    private const int MaxBackRouteHistory = 32;
     private const string QuerySeparator = "?";
+
+    private readonly List<string> _backRouteHistory = [];
 
     private string _currentRoute = AppRoutes.Library;
     private string _goLiveBackRoute = AppRoutes.Library;
+    private bool _hasTrackedRoute;
+    private string _pendingBackRoute = EmptyRoute;
     private string _settingsBackRoute = AppRoutes.Library;
 
     public event Action? StateChanged;
@@ -108,6 +113,23 @@ public sealed class AppShellService
         _ => AppRoutes.Library
     };
 
+    public string GetBackNavigationRoute()
+    {
+        var historyRoute = PopBackRoute();
+        if (!string.IsNullOrWhiteSpace(historyRoute))
+        {
+            _pendingBackRoute = historyRoute;
+            return historyRoute;
+        }
+
+        var fallbackRoute = GetBackRoute();
+        _pendingBackRoute = string.Equals(fallbackRoute, _currentRoute, StringComparison.Ordinal)
+            ? EmptyRoute
+            : fallbackRoute;
+
+        return fallbackRoute;
+    }
+
     public string GetGoLiveBackRoute() => IsValidGoLiveBackTarget(_goLiveBackRoute)
         ? _goLiveBackRoute
         : AppRoutes.Library;
@@ -124,6 +146,21 @@ public sealed class AppShellService
             return;
         }
 
+        var followsHeaderBack = string.Equals(_pendingBackRoute, nextRoute, StringComparison.Ordinal);
+        var followsTrackedHistoryBack = TryRemoveMatchingBackRoute(nextRoute);
+        if (!_hasTrackedRoute)
+        {
+            _hasTrackedRoute = true;
+        }
+        else if (followsHeaderBack || followsTrackedHistoryBack)
+        {
+            _pendingBackRoute = EmptyRoute;
+        }
+        else
+        {
+            PushBackRoute(_currentRoute);
+        }
+
         if (IsSettingsRoute(nextRoute) && IsValidSettingsBackTarget(_currentRoute))
         {
             _settingsBackRoute = _currentRoute;
@@ -135,6 +172,53 @@ public sealed class AppShellService
         }
 
         _currentRoute = nextRoute;
+    }
+
+    private string PopBackRoute()
+    {
+        while (_backRouteHistory.Count > 0)
+        {
+            var route = _backRouteHistory[^1];
+            _backRouteHistory.RemoveAt(_backRouteHistory.Count - 1);
+            if (IsUsefulBackRoute(route))
+            {
+                return route;
+            }
+        }
+
+        return EmptyRoute;
+    }
+
+    private bool TryRemoveMatchingBackRoute(string route)
+    {
+        if (_backRouteHistory.Count == 0
+            || !string.Equals(_backRouteHistory[^1], route, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        _backRouteHistory.RemoveAt(_backRouteHistory.Count - 1);
+        return true;
+    }
+
+    private void PushBackRoute(string route)
+    {
+        if (!IsUsefulBackRoute(route))
+        {
+            return;
+        }
+
+        if (_backRouteHistory.Count > 0
+            && string.Equals(_backRouteHistory[^1], route, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _backRouteHistory.Add(route);
+        if (_backRouteHistory.Count > MaxBackRouteHistory)
+        {
+            _backRouteHistory.RemoveAt(0);
+        }
     }
 
     private void SetScriptScopedState(
@@ -202,6 +286,11 @@ public sealed class AppShellService
 
     private static bool IsValidSettingsBackTarget(string route) =>
         !string.IsNullOrWhiteSpace(route) && !IsSettingsRoute(route);
+
+    private bool IsUsefulBackRoute(string route) =>
+        !string.IsNullOrWhiteSpace(route)
+        && !string.Equals(route, _currentRoute, StringComparison.Ordinal)
+        && IsTrackedRoute(GetRouteBase(route));
 
     private static string GetRouteBase(string route)
     {
