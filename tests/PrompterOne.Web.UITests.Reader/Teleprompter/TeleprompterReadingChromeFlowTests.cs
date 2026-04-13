@@ -44,7 +44,7 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
             await Expect(edgeInfo).ToHaveAttributeAsync(
                 BrowserTestConstants.State.ActiveAttribute,
                 BrowserTestConstants.Teleprompter.ActiveStateValue);
-            await page.WaitForTimeoutAsync(BrowserTestConstants.TeleprompterFlow.ReadingChromeSettleDelayMs);
+            await WaitForEdgeInfoMutedAsync(page, initialEdgeInfo);
 
             var activeControls = await ReadChromeVisualStateAsync(controls);
             var activeProgress = await ReadChromeVisualStateAsync(progressShell);
@@ -65,6 +65,27 @@ public sealed class TeleprompterReadingChromeFlowTests(StandaloneAppFixture fixt
                 BrowserTestConstants.TeleprompterFlow.ReadingChromeScenarioName,
                 BrowserTestConstants.TeleprompterFlow.ReadingChromeStep);
         });
+
+    private static Task WaitForEdgeInfoMutedAsync(IPage page, ChromeVisualState initialEdgeInfo) =>
+        page.WaitForFunctionAsync(
+            """
+            ([testId, initialOpacity, minimumReduction]) => {
+                const element = document.querySelector(`[data-test="${testId}"]`);
+                if (!element) {
+                    return false;
+                }
+
+                const opacity = Number.parseFloat(window.getComputedStyle(element).opacity || "1");
+                return Number.isFinite(opacity) && initialOpacity - opacity >= minimumReduction;
+            }
+            """,
+            new object[]
+            {
+                UiTestIds.Teleprompter.EdgeInfo,
+                initialEdgeInfo.Opacity,
+                BrowserTestConstants.TeleprompterFlow.MinimumEdgeInfoOpacityReduction
+            },
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
     private static async Task<ChromeVisualState> ReadChromeVisualStateAsync(ILocator locator) =>
         await locator.EvaluateAsync<ChromeVisualState>(

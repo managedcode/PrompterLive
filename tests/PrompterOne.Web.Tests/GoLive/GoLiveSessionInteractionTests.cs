@@ -32,7 +32,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Test]
-    public void GoLivePage_StartStream_UsesSelectedCameraAsActiveProgramSource()
+    public async Task GoLivePage_StartStream_UsesSelectedCameraAsActiveProgramSource()
     {
         SeedSceneState(CreateTwoCameraScene());
         SeedStudioSettings(StudioSettings.Default with
@@ -50,8 +50,8 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         var cut = Render<GoLivePage>();
 
         cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
-        cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click();
-        cut.FindByTestId(UiTestIds.GoLive.StartStream).Click();
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.SourceCameraSelect(AppTestData.Camera.SecondSourceId)).Click());
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.StartStream).Click());
 
         cut.WaitForAssertion(() =>
         {

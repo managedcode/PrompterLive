@@ -71,9 +71,12 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Assert.That(storedSettings.ScrollSpeed).IsEqualTo(expectedSpeedWpm);
             await Assert.That(storedSettings.TextAlignment).IsEqualTo(ReaderTextAlignment.Justify);
 
-            await page.ReloadAsync();
-            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
-                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.TeleprompterDemo,
+                UiTestIds.Teleprompter.Page,
+                $"{nameof(Teleprompter_PersistsWidthAndFocalSettingsAcrossReload)}-reload");
+            await PlaybackRouteDriver.WaitForTeleprompterReadyAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.FontSlider)).ToHaveValueAsync(PersistedFontValue);
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider)).ToHaveValueAsync(PersistedTextWidthValue);
