@@ -34,13 +34,6 @@ internal sealed class BrowserErrorCollector
 
     private void OnConsoleMessage(object? sender, IConsoleMessage message)
     {
-        if (!string.Equals(message.Type, BrowserTestConstants.RapidInput.ConsoleErrorType, StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals(message.Type, BrowserTestConstants.RapidInput.ConsoleWarningType, StringComparison.OrdinalIgnoreCase) &&
-            !message.Text.Contains(BrowserTestConstants.RapidInput.CriticalConsolePrefix, StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
         _consoleErrors.Add($"{message.Type}: {message.Text}");
     }
 

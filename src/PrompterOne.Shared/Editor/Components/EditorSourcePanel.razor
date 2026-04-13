@@ -102,12 +102,16 @@
                  @ref="_editorHostRef"
                  data-test="@UiTestIds.Editor.SourceStage"
                  data-editor-ready="false"></div>
-            <div class="ed-source-highlight"
-                 @ref="_semanticSnapshotRef"
-                 data-test="@UiTestIds.Editor.SourceHighlight">
+            <div class="ed-source-highlight">
+                <div class="ed-source-highlight-surface"
+                     @ref="_semanticSnapshotRef"
+                     data-test="@UiTestIds.Editor.SourceHighlight"
+                     aria-hidden="true"></div>
                 @if (!_surfaceInteropReady)
                 {
-                    @TpsSourceHighlighter.Render(Text)
+                    <div class="ed-source-highlight-fallback" aria-hidden="true">
+                        @TpsSourceHighlighter.Render(Text)
+                    </div>
                 }
             </div>
             <textarea class="ed-source-input"

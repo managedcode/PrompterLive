@@ -10,7 +10,7 @@ public sealed class ScriptGraphViewerInterop(IJSRuntime jsRuntime) : IAsyncDispo
 
     private IJSObjectReference? _module;
 
-    public async Task RenderAsync(ElementReference element, ScriptKnowledgeGraphArtifact artifact)
+    public async Task RenderAsync(ElementReference element, ScriptKnowledgeGraphArtifact artifact, object config)
     {
         _module ??= await jsRuntime.InvokeAsync<IJSObjectReference?>("import", ModulePath);
         if (_module is null)
@@ -18,7 +18,15 @@ public sealed class ScriptGraphViewerInterop(IJSRuntime jsRuntime) : IAsyncDispo
             return;
         }
 
-        await _module.InvokeVoidAsync("render", element, artifact);
+        await _module.InvokeVoidAsync("render", element, artifact, config);
+    }
+
+    public async Task<ElementRect?> MeasureAsync(ElementReference element)
+    {
+        _module ??= await jsRuntime.InvokeAsync<IJSObjectReference?>("import", ModulePath);
+        return _module is null
+            ? null
+            : await _module.InvokeAsync<ElementRect?>("measureElement", element);
     }
 
     public async ValueTask DisposeAsync()
@@ -28,4 +36,6 @@ public sealed class ScriptGraphViewerInterop(IJSRuntime jsRuntime) : IAsyncDispo
             await _module.DisposeAsync();
         }
     }
+
+    public sealed record ElementRect(double Left, double Top, double Width, double Height);
 }

@@ -30,6 +30,9 @@ public partial class EditorPage
     private const int LargeDraftDebounceThreshold = 16_000;
     private const int UntitledDraftAutosaveDelayMilliseconds = 1_500;
     private const int UntitledDraftAutosaveCharacterThreshold = 2;
+    private const double GraphSourcePaneDefaultPercent = 34;
+    private const double GraphSourcePaneMinimumPercent = 22;
+    private const double GraphSourcePaneMaximumPercent = 64;
     private const string DefaultAuthor = "PrompterOne";
     private const string DefaultProfileActor = "Actor";
     private const string DefaultProfileRsvp = "RSVP";
@@ -44,6 +47,15 @@ public partial class EditorPage
     private bool _isEditorReady;
     private bool _loadState = true;
     private bool _isGraphLoading;
+    private string _graphLayoutMode = ScriptGraphLayoutModes.Knowledge;
+    private string _graphNodeStyleMode = ScriptGraphNodeStyleModes.Compact;
+    private ScriptKnowledgeGraphSemanticMode _graphSemanticMode = ScriptKnowledgeGraphSemanticMode.ModelOnly;
+    private bool _graphOnlyMode;
+    private bool _isGraphSplitDragging;
+    private bool _isGraphSplitVertical;
+    private double _graphSourcePanePercent = GraphSourcePaneDefaultPercent;
+    private ElementReference _graphSplitRef;
+    private ScriptGraphViewerInterop.ElementRect? _graphSplitBounds;
     private int? _activeBlockIndex;
     private int _activeSegmentIndex;
     private string _author = DefaultAuthor;
@@ -81,6 +93,7 @@ public partial class EditorPage
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private UiDiagnosticsService Diagnostics { get; set; } = null!;
     [Inject] private EditorDroppedScriptMergeService DroppedScriptMergeService { get; set; } = null!;
+    [Inject] private ScriptGraphViewerInterop GraphViewerInterop { get; set; } = null!;
     [Inject] private EditorLocalRevisionStore EditorLocalRevisionStore { get; set; } = null!;
     [Inject] private EditorDocumentSaveCoordinator EditorDocumentSaveCoordinator { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
@@ -113,6 +126,18 @@ public partial class EditorPage
     private Task OnMetadataRailTabChanged(EditorMetadataRailTab tab)
     {
         _metadataRailSelectedTab = tab;
+        return Task.CompletedTask;
+    }
+
+    private Task OnGraphLayoutModeChanged(string layoutMode)
+    {
+        _graphLayoutMode = ScriptGraphLayoutModes.Normalize(layoutMode);
+        return Task.CompletedTask;
+    }
+
+    private Task OnGraphNodeStyleModeChanged(string nodeStyleMode)
+    {
+        _graphNodeStyleMode = ScriptGraphNodeStyleModes.Normalize(nodeStyleMode);
         return Task.CompletedTask;
     }
 

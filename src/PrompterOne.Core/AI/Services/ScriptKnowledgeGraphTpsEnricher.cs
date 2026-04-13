@@ -8,17 +8,13 @@ internal static class ScriptKnowledgeGraphTpsEnricher
 {
     private const string TpsSegmentNodePrefix = "prompterone:tps:segment:";
     private const string TpsBlockNodePrefix = "prompterone:tps:block:";
-    private const string TpsSpeakerNodePrefix = "prompterone:tps:speaker:";
-    private const string TpsEmotionNodePrefix = "prompterone:tps:emotion:";
-    private const string TpsArchetypeNodePrefix = "prompterone:tps:archetype:";
-    private const string TpsCueNodePrefix = "prompterone:tps:cue:";
-    private const string TpsTimingNodePrefix = "prompterone:tps:timing:";
-    private const string TpsWpmNodePrefix = "prompterone:tps:wpm:";
+    private const string TpsSpeakerNodePrefix = "prompterone:character:";
 
     public static void AddTpsGraph(
         string documentNodeId,
         string containsEdgeLabel,
         string content,
+        ICollection<ScriptKnowledgeGraphSemanticScope> scopes,
         IDictionary<string, ScriptKnowledgeGraphNode> nodes,
         IDictionary<string, ScriptKnowledgeGraphEdge> edges,
         IDictionary<string, ScriptKnowledgeGraphSourceRange> ranges)
@@ -38,7 +34,7 @@ internal static class ScriptKnowledgeGraphTpsEnricher
                     segment.Name,
                     "TpsSegment",
                     "tps",
-                    header?.Text.Trim() ?? segment.Content.Trim(),
+                    CreateReadableDetail(segment.Content, segment.Name),
                     CreateScopeAttributes(
                         "segment",
                         compiledSegment?.TargetWpm ?? segment.TargetWpm,
@@ -51,13 +47,10 @@ internal static class ScriptKnowledgeGraphTpsEnricher
             AddTpsHeaderRange(content, segmentNodeId, ranges, header);
             AddTpsMetadataNodes(
                 segmentNodeId,
-                compiledSegment?.TargetWpm ?? segment.TargetWpm,
                 compiledSegment?.Speaker ?? segment.Speaker,
-                compiledSegment?.Emotion ?? segment.Emotion,
-                compiledSegment?.Archetype ?? segment.Archetype,
-                compiledSegment?.Timing ?? segment.Timing,
                 nodes,
                 edges);
+            scopes.Add(new ScriptKnowledgeGraphSemanticScope(segmentNodeId, segment.Name, segment.Content));
 
             var compiledBlocks = compiledSegment?.Blocks.ToDictionary(static block => block.Id, StringComparer.Ordinal)
                 ?? new Dictionary<string, ManagedCode.Tps.Models.CompiledBlock>(StringComparer.Ordinal);
@@ -74,7 +67,7 @@ internal static class ScriptKnowledgeGraphTpsEnricher
                         block.Name,
                         "TpsBlock",
                         "tps",
-                        header?.Text.Trim() ?? block.Content.Trim(),
+                        CreateReadableDetail(block.Content, block.Name),
                         CreateScopeAttributes(
                             "block",
                             compiledBlock?.TargetWpm ?? block.TargetWpm ?? compiledSegment?.TargetWpm ?? segment.TargetWpm,
@@ -87,33 +80,21 @@ internal static class ScriptKnowledgeGraphTpsEnricher
                 AddTpsHeaderRange(content, blockNodeId, ranges, header);
                 AddTpsMetadataNodes(
                     blockNodeId,
-                    compiledBlock?.TargetWpm ?? block.TargetWpm ?? compiledSegment?.TargetWpm ?? segment.TargetWpm,
                     compiledBlock?.Speaker ?? block.Speaker ?? compiledSegment?.Speaker ?? segment.Speaker,
-                    compiledBlock?.Emotion ?? block.Emotion ?? compiledSegment?.Emotion ?? segment.Emotion,
-                    compiledBlock?.Archetype ?? block.Archetype ?? compiledSegment?.Archetype ?? segment.Archetype,
-                    null,
                     nodes,
                     edges);
-                AddTpsCueNodes(blockNodeId, compiledBlock?.Words ?? Array.Empty<ManagedCode.Tps.Models.CompiledWord>(), nodes, edges);
+                scopes.Add(new ScriptKnowledgeGraphSemanticScope(blockNodeId, block.Name, block.Content));
             }
         }
     }
 
     private static void AddTpsMetadataNodes(
         string scopeNodeId,
-        int? targetWpm,
         string? speaker,
-        string? emotion,
-        string? archetype,
-        string? timing,
         IDictionary<string, ScriptKnowledgeGraphNode> nodes,
         IDictionary<string, ScriptKnowledgeGraphEdge> edges)
     {
-        AddTpsMetadataNode(nodes, edges, scopeNodeId, targetWpm?.ToString(System.Globalization.CultureInfo.InvariantCulture), TpsWpmNodePrefix, "Pace", "uses wpm", "wpm");
         AddTpsMetadataNode(nodes, edges, scopeNodeId, speaker, TpsSpeakerNodePrefix, "Character", "spoken by", "speaker");
-        AddTpsMetadataNode(nodes, edges, scopeNodeId, emotion, TpsEmotionNodePrefix, "Theme", "uses emotion", "emotion");
-        AddTpsMetadataNode(nodes, edges, scopeNodeId, archetype, TpsArchetypeNodePrefix, "Archetype", "uses archetype", "archetype");
-        AddTpsMetadataNode(nodes, edges, scopeNodeId, timing, TpsTimingNodePrefix, "Timing", "uses timing", "timing");
     }
 
     private static void AddTpsMetadataNode(
@@ -143,82 +124,6 @@ internal static class ScriptKnowledgeGraphTpsEnricher
                 $"{valueType}: {normalizedValue}",
                 CreateValueAttributes(valueType, normalizedValue)));
         ScriptKnowledgeGraphEdges.Add(edges, scopeNodeId, nodeId, edgeLabel);
-    }
-
-    private static void AddTpsCueNodes(
-        string scopeNodeId,
-        IReadOnlyList<ManagedCode.Tps.Models.CompiledWord> words,
-        IDictionary<string, ScriptKnowledgeGraphNode> nodes,
-        IDictionary<string, ScriptKnowledgeGraphEdge> edges)
-    {
-        foreach (var cue in EnumerateCueValues(words).Distinct(StringComparer.Ordinal))
-        {
-            AddTpsMetadataNode(nodes, edges, scopeNodeId, cue, TpsCueNodePrefix, "Cue", "uses cue", "cue");
-        }
-    }
-
-    private static IEnumerable<string> EnumerateCueValues(IReadOnlyList<ManagedCode.Tps.Models.CompiledWord> words)
-    {
-        foreach (var metadata in words.Select(static word => word.Metadata))
-        {
-            if (metadata.IsPause)
-            {
-                yield return metadata.PauseDurationMs is null ? "pause" : $"pause:{metadata.PauseDurationMs.Value}ms";
-            }
-
-            if (metadata.IsBreath)
-            {
-                yield return "breath";
-            }
-
-            if (metadata.IsEditPoint)
-            {
-                yield return string.IsNullOrWhiteSpace(metadata.EditPointPriority) ? "edit_point" : $"edit_point:{metadata.EditPointPriority}";
-            }
-
-            if (metadata.IsHighlight)
-            {
-                yield return "highlight";
-            }
-
-            if (metadata.IsEmphasis)
-            {
-                yield return "emphasis";
-            }
-
-            foreach (var cue in EnumerateNamedCues(metadata))
-            {
-                yield return cue;
-            }
-        }
-    }
-
-    private static IEnumerable<string> EnumerateNamedCues(ManagedCode.Tps.Models.WordMetadata metadata)
-    {
-        if (!string.IsNullOrWhiteSpace(metadata.InlineEmotionHint))
-        {
-            yield return $"emotion:{metadata.InlineEmotionHint}";
-        }
-
-        if (!string.IsNullOrWhiteSpace(metadata.VolumeLevel))
-        {
-            yield return $"volume:{metadata.VolumeLevel}";
-        }
-
-        if (!string.IsNullOrWhiteSpace(metadata.DeliveryMode))
-        {
-            yield return $"delivery:{metadata.DeliveryMode}";
-        }
-
-        if (!string.IsNullOrWhiteSpace(metadata.ArticulationStyle))
-        {
-            yield return $"articulation:{metadata.ArticulationStyle}";
-        }
-
-        if (metadata.SpeedOverride is { } speedOverride)
-        {
-            yield return $"speed:{speedOverride.ToString(System.Globalization.CultureInfo.InvariantCulture)}wpm";
-        }
     }
 
     private static void AddTpsHeaderRange(
@@ -262,6 +167,20 @@ internal static class ScriptKnowledgeGraphTpsEnricher
 
     private static string SanitizeId(string value) =>
         Regex.Replace(value.Trim().ToLowerInvariant(), "[^a-z0-9]+", "-", RegexOptions.CultureInvariant).Trim('-');
+
+    private static string CreateReadableDetail(string content, string fallback)
+    {
+        var text = Regex.Replace(content, @"(?m)^\s*@[\p{L}_][^\r\n]*$", " ", RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"\[([^\]]+)\]\([^)]+\)", "$1", RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"\[[^\]\r\n|]+:[^\]\r\n]*\]|\[/[^\]\r\n]+\]|\[[^\]\r\n|]+\]", string.Empty, RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"\s+", " ", RegexOptions.CultureInvariant).Trim();
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return fallback;
+        }
+
+        return text.Length <= 220 ? text : string.Concat(text.AsSpan(0, 217).Trim(), "...");
+    }
 
     private static IReadOnlyDictionary<string, string> CreateScopeAttributes(
         string scope,

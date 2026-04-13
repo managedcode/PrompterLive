@@ -8,9 +8,10 @@ internal static class ScriptKnowledgeGraphEdges
         IDictionary<string, ScriptKnowledgeGraphEdge> edges,
         string sourceId,
         string targetId,
-        string label)
+        string label,
+        IReadOnlyDictionary<string, string>? attributes = null)
     {
         var id = $"{sourceId}|{label}|{targetId}";
-        edges.TryAdd(id, new ScriptKnowledgeGraphEdge(id, sourceId, targetId, label));
+        edges.TryAdd(id, new ScriptKnowledgeGraphEdge(id, sourceId, targetId, label, attributes));
     }
 }

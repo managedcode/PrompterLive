@@ -1353,8 +1353,140 @@
   <data name="EditorGraphFit" xml:space="preserve">
     <value>Показати все</value>
   </data>
+  <data name="EditorGraphAutoLayout" xml:space="preserve">
+    <value>Автолейаут</value>
+  </data>
+  <data name="EditorGraphAnalyze" xml:space="preserve">
+    <value>Аналізувати</value>
+  </data>
+  <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
+    <value>Запустити tokenizer similarity</value>
+  </data>
+  <data name="EditorGraphSemanticUnavailableTitle" xml:space="preserve">
+    <value>Семантичному графу потрібен AI</value>
+  </data>
+  <data name="EditorGraphSemanticUnavailableDetail" xml:space="preserve">
+    <value>Підключіть AI-провайдера для повного графа або запустіть нижчий за якістю tokenizer similarity.</value>
+  </data>
+  <data name="EditorGraphSemanticFailedTitle" xml:space="preserve">
+    <value>AI-екстракція графа не спрацювала</value>
+  </data>
+  <data name="EditorGraphSemanticFailedDetail" xml:space="preserve">
+    <value>Перевірте AI-налаштування або запустіть tokenizer similarity як локальний fallback.</value>
+  </data>
+  <data name="EditorGraphTokenizerActiveTitle" xml:space="preserve">
+    <value>Граф tokenizer similarity</value>
+  </data>
+  <data name="EditorGraphTokenizerActiveDetail" xml:space="preserve">
+    <value>Цей режим використовує перетин і дистанцію токенів, а не LLM-семантику.</value>
+  </data>
+  <data name="EditorGraphOnlyMode" xml:space="preserve">
+    <value>Тільки граф</value>
+  </data>
+  <data name="EditorGraphSplitMode" xml:space="preserve">
+    <value>Спліт</value>
+  </data>
+  <data name="EditorGraphResizeDivider" xml:space="preserve">
+    <value>Змінити розмір панелей джерела і графа</value>
+  </data>
   <data name="EditorGraphLayout" xml:space="preserve">
     <value>Розкладка</value>
+  </data>
+  <data name="EditorGraphLayoutType" xml:space="preserve">
+    <value>Тип графа</value>
+  </data>
+  <data name="EditorGraphNodeStyle" xml:space="preserve">
+    <value>Стиль нод</value>
+  </data>
+  <data name="EditorGraphNodeStyleCards" xml:space="preserve">
+    <value>Картки</value>
+  </data>
+  <data name="EditorGraphNodeStyleCompact" xml:space="preserve">
+    <value>Компактні підписи</value>
+  </data>
+  <data name="EditorGraphNodeStyleDots" xml:space="preserve">
+    <value>Точки</value>
+  </data>
+  <data name="EditorGraphStoryLayout" xml:space="preserve">
+    <value>Карта історії</value>
+  </data>
+  <data name="EditorGraphCompactLayout" xml:space="preserve">
+    <value>Компактна карта</value>
+  </data>
+  <data name="EditorGraphKnowledgeLayout" xml:space="preserve">
+    <value>Карта знань</value>
+  </data>
+  <data name="EditorGraphStructureLayout" xml:space="preserve">
+    <value>Карта структури</value>
+  </data>
+  <data name="EditorGraphDeliveryLayout" xml:space="preserve">
+    <value>Карта подачі</value>
+  </data>
+  <data name="EditorGraphRelationshipLayout" xml:space="preserve">
+    <value>Карта зв'язків</value>
+  </data>
+  <data name="EditorGraphRadialLayout" xml:space="preserve">
+    <value>Радіальний вигляд</value>
+  </data>
+  <data name="EditorGraphForceLayout" xml:space="preserve">
+    <value>Силовий вигляд</value>
+  </data>
+  <data name="EditorGraphDagreLayout" xml:space="preserve">
+    <value>Dagre-ієрархія</value>
+  </data>
+  <data name="EditorGraphGridLayout" xml:space="preserve">
+    <value>Сітковий вигляд</value>
+  </data>
+  <data name="EditorGraphConcentricLayout" xml:space="preserve">
+    <value>Концентричний вигляд</value>
+  </data>
+  <data name="EditorGraphCircularLayout" xml:space="preserve">
+    <value>Коловий вигляд</value>
+  </data>
+  <data name="EditorGraphMdsLayout" xml:space="preserve">
+    <value>MDS-карта</value>
+  </data>
+  <data name="EditorGraphFruchtermanLayout" xml:space="preserve">
+    <value>Сила Фрухтермана</value>
+  </data>
+  <data name="EditorGraphForceAtlasLayout" xml:space="preserve">
+    <value>Force Atlas 2</value>
+  </data>
+  <data name="EditorGraphD3ForceLayout" xml:space="preserve">
+    <value>D3-сила</value>
+  </data>
+  <data name="EditorGraphAntvDagreLayout" xml:space="preserve">
+    <value>AntV Dagre</value>
+  </data>
+  <data name="EditorGraphIndentedLayout" xml:space="preserve">
+    <value>Ієрархічне дерево</value>
+  </data>
+  <data name="EditorGraphLanePeople" xml:space="preserve">
+    <value>Персонажі</value>
+  </data>
+  <data name="EditorGraphLaneThemes" xml:space="preserve">
+    <value>Теми</value>
+  </data>
+  <data name="EditorGraphLaneDocument" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+  <data name="EditorGraphLaneSections" xml:space="preserve">
+    <value>Секції</value>
+  </data>
+  <data name="EditorGraphLaneBlocks" xml:space="preserve">
+    <value>Блоки</value>
+  </data>
+  <data name="EditorGraphLaneDelivery" xml:space="preserve">
+    <value>Подача</value>
+  </data>
+  <data name="EditorGraphLaneKnowledge" xml:space="preserve">
+    <value>Знання</value>
+  </data>
+  <data name="EditorGraphJumpToSourceHint" xml:space="preserve">
+    <value>Натисни, щоб перейти до джерела</value>
+  </data>
+  <data name="EditorGraphSettingsDescription" xml:space="preserve">
+    <value>Групує скрипт за знаннями, структурою та підказками подачі.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Джерело</value>

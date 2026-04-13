@@ -1,9 +1,12 @@
 @namespace PrompterOne.Shared.Components.Editor
+@using System.Runtime.CompilerServices
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 @using PrompterOne.Core.AI.Models
 @using PrompterOne.Shared.Contracts
 @using PrompterOne.Shared.Localization
 @using PrompterOne.Shared.Services.Editor
+@implements IAsyncDisposable
 @inject ScriptGraphViewerInterop GraphViewer
 @inject IStringLocalizer<SharedResource> Localizer
 
@@ -18,11 +21,12 @@
     }
     else
     {
+        var graphStats = CreateGraphStats(Artifact);
         <header class="script-graph-summary" data-test="@UiTestIds.Editor.GraphSummary">
             <div class="script-graph-metrics">
-                <strong>@Format(UiTextKey.EditorGraphNodesFormat, Artifact.Nodes.Count)</strong>
-                <span>@Format(UiTextKey.EditorGraphLinksFormat, Artifact.Edges.Count)</span>
-                <span>@Format(UiTextKey.EditorGraphSourceRangesFormat, Artifact.SourceRanges.Count)</span>
+                <strong>@Format(UiTextKey.EditorGraphNodesFormat, graphStats.NodeCount)</strong>
+                <span>@Format(UiTextKey.EditorGraphLinksFormat, graphStats.EdgeCount)</span>
+                <span>@Format(UiTextKey.EditorGraphSourceRangesFormat, graphStats.SourceRangeCount)</span>
             </div>
             <div class="script-graph-controls" data-test="@UiTestIds.Editor.GraphControls">
                 <button type="button"
@@ -30,33 +34,105 @@
                         data-test="@UiTestIds.Editor.GraphZoomIn"
                         title="@Text(UiTextKey.EditorGraphZoomIn)"
                         aria-label="@Text(UiTextKey.EditorGraphZoomIn)">
-                    +
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="8.5" cy="8.5" r="5.5" /><line x1="13" y1="13" x2="17" y2="17" />
+                        <line x1="6" y1="8.5" x2="11" y2="8.5" /><line x1="8.5" y1="6" x2="8.5" y2="11" />
+                    </svg>
                 </button>
                 <button type="button"
                         data-graph-control="zoom-out"
                         data-test="@UiTestIds.Editor.GraphZoomOut"
                         title="@Text(UiTextKey.EditorGraphZoomOut)"
                         aria-label="@Text(UiTextKey.EditorGraphZoomOut)">
-                    -
+                    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="8.5" cy="8.5" r="5.5" /><line x1="13" y1="13" x2="17" y2="17" />
+                        <line x1="6" y1="8.5" x2="11" y2="8.5" />
+                    </svg>
                 </button>
                 <button type="button"
                         data-graph-control="fit"
                         data-test="@UiTestIds.Editor.GraphFit"
                         title="@Text(UiTextKey.EditorGraphFit)"
                         aria-label="@Text(UiTextKey.EditorGraphFit)">
-                    @Text(UiTextKey.EditorGraphFit)
+                    <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4" />
+                    </svg>
                 </button>
                 <button type="button"
-                        data-graph-control="layout"
-                        data-test="@UiTestIds.Editor.GraphLayoutMode"
-                        title="@Text(UiTextKey.EditorGraphLayout)"
-                        aria-label="@Text(UiTextKey.EditorGraphLayout)">
-                    @Text(UiTextKey.EditorGraphLayout)
+                        class="script-graph-auto-layout"
+                        data-graph-control="auto-layout"
+                        data-test="@UiTestIds.Editor.GraphAutoLayout"
+                        title="@Text(UiTextKey.EditorGraphAutoLayout)"
+                        aria-label="@Text(UiTextKey.EditorGraphAutoLayout)">
+                    @Text(UiTextKey.EditorGraphAutoLayout)
                 </button>
+                <button type="button"
+                        class="script-graph-analyze"
+                        data-test="@UiTestIds.Editor.GraphAnalyze"
+                        title="@Text(UiTextKey.EditorGraphAnalyze)"
+                        aria-label="@Text(UiTextKey.EditorGraphAnalyze)"
+                        @onclick="() => AnalyzeRequested.InvokeAsync()">
+                    @Text(UiTextKey.EditorGraphAnalyze)
+                </button>
+                <button type="button"
+                        class="script-graph-mode-toggle"
+                        data-test="@UiTestIds.Editor.GraphOnlyToggle"
+                        aria-pressed="@IsGraphOnly.ToString().ToLowerInvariant()"
+                        title="@GraphModeToggleLabel"
+                        aria-label="@GraphModeToggleLabel"
+                        @onclick="ToggleGraphOnlyModeAsync">
+                    @GraphModeToggleLabel
+                </button>
+                <select class="script-graph-layout-select"
+                        value="@LayoutMode"
+                        aria-label="@Text(UiTextKey.EditorGraphLayout)"
+                        data-test="@UiTestIds.Editor.GraphLayoutMode"
+                        @onchange="OnLayoutSelectChangedAsync">
+                    <option value="@ScriptGraphLayoutModes.Story">@Text(UiTextKey.EditorGraphStoryLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Compact">@Text(UiTextKey.EditorGraphCompactLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Knowledge">@Text(UiTextKey.EditorGraphKnowledgeLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Structure">@Text(UiTextKey.EditorGraphStructureLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Delivery">@Text(UiTextKey.EditorGraphDeliveryLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Relationship">@Text(UiTextKey.EditorGraphRelationshipLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Dagre">@Text(UiTextKey.EditorGraphDagreLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Radial">@Text(UiTextKey.EditorGraphRadialLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Grid">@Text(UiTextKey.EditorGraphGridLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Concentric">@Text(UiTextKey.EditorGraphConcentricLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Circular">@Text(UiTextKey.EditorGraphCircularLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Mds">@Text(UiTextKey.EditorGraphMdsLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Fruchterman">@Text(UiTextKey.EditorGraphFruchtermanLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.ForceAtlas2">@Text(UiTextKey.EditorGraphForceAtlasLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.D3Force">@Text(UiTextKey.EditorGraphD3ForceLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.AntvDagre">@Text(UiTextKey.EditorGraphAntvDagreLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Force">@Text(UiTextKey.EditorGraphForceLayout)</option>
+                    <option value="@ScriptGraphLayoutModes.Indented">@Text(UiTextKey.EditorGraphIndentedLayout)</option>
+                </select>
             </div>
         </header>
+        @if (TryReadSemanticStatus(out var statusTitle, out var statusDetail, out var canRunTokenizer))
+        {
+            <div class="script-graph-semantic-status"
+                 data-test="@UiTestIds.Editor.GraphSemanticStatus"
+                 data-status="@Artifact.SemanticStatus.ToString()">
+                <div>
+                    <strong>@statusTitle</strong>
+                    <span>@statusDetail</span>
+                </div>
+                @if (canRunTokenizer)
+                {
+                    <button type="button"
+                            data-test="@UiTestIds.Editor.GraphTokenizerAnalyze"
+                            @onclick="() => TokenizerAnalysisRequested.InvokeAsync()">
+                        @Text(UiTextKey.EditorGraphTokenizerAnalyze)
+                    </button>
+                }
+            </div>
+        }
         <div class="script-graph-canvas"
              @ref="_graphElement"
+             tabindex="0"
+             data-graph-layout="@LayoutMode"
+             data-graph-node-style="@NodeStyleMode"
              data-test="@UiTestIds.Editor.GraphCanvas"></div>
     }
 </section>
@@ -64,12 +140,144 @@
 @code {
     private ElementReference _graphElement;
     private string? _renderedRevision;
+    private string? _renderingRevision;
+    private DotNetObjectReference<ScriptGraphPanel>? _callbackReference;
 
     [Parameter] public ScriptKnowledgeGraphArtifact? Artifact { get; set; }
 
     [Parameter] public bool IsLoading { get; set; }
 
+    [Parameter] public string LayoutMode { get; set; } = ScriptGraphLayoutModes.Knowledge;
+
+    [Parameter] public EventCallback<string> LayoutModeChanged { get; set; }
+
+    [Parameter] public string NodeStyleMode { get; set; } = ScriptGraphNodeStyleModes.Compact;
+
+    [Parameter] public bool IsGraphOnly { get; set; }
+
+    [Parameter] public EventCallback<bool> IsGraphOnlyChanged { get; set; }
+
+    [Parameter] public EventCallback AnalyzeRequested { get; set; }
+
+    [Parameter] public EventCallback TokenizerAnalysisRequested { get; set; }
+
     [Parameter] public EventCallback<ScriptKnowledgeGraphSourceRange> SourceRangeRequested { get; set; }
+
+    private static readonly string[] LaneOrder =
+    [
+        "knowledge",
+        "character",
+        "tag",
+        "main",
+        "structure",
+        "block",
+        "delivery",
+    ];
+
+    private static readonly Dictionary<string, string> LaneByKind = new(StringComparer.Ordinal)
+    {
+        ["Document"] = "main",
+        ["Section"] = "structure",
+        ["Heading"] = "structure",
+        ["TpsSegment"] = "structure",
+        ["TpsBlock"] = "block",
+        ["Character"] = "character",
+        ["Theme"] = "tag",
+        ["Reference"] = "tag",
+        ["Plot"] = "tag",
+        ["Location"] = "tag",
+        ["Object"] = "tag",
+        ["Timeline"] = "tag",
+        ["Entity"] = "tag",
+        ["Term"] = "tag",
+        ["Claim"] = "knowledge",
+        ["SimilarityChunk"] = "knowledge",
+        ["Custom"] = "tag",
+        ["Mention"] = "tag",
+        ["Story"] = "tag",
+    };
+
+    private static readonly Dictionary<string, GraphKindStyle> KindStyles = new(StringComparer.Ordinal)
+    {
+        ["default"] = new("defaultFill", "defaultStroke", "labelLight", 12, 600, 4, new[] { 200, 54 }, new[] { 230, 60 }),
+        ["Document"] = new("documentFill", "documentStroke", "labelDark", 20, 700, 4, new[] { 250, 78 }, new[] { 296, 90 }),
+        ["Section"] = new("sectionFill", "sectionStroke", "labelDark", 15, 600, 4, new[] { 230, 58 }, new[] { 270, 66 }),
+        ["Heading"] = new("sectionFill", "sectionStroke", "labelDark", 15, 600, 4, new[] { 230, 58 }, new[] { 270, 66 }),
+        ["TpsSegment"] = new("sectionFill", "sectionStroke", "labelDark", 15, 600, 4, new[] { 230, 58 }, new[] { 270, 66 }),
+        ["TpsBlock"] = new("blockFill", "blockStroke", "labelDark", 15, 600, 4, new[] { 218, 56 }, new[] { 252, 62 }),
+        ["Character"] = new("characterFill", "characterStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Theme"] = new("themeFill", "themeStroke", "labelDark", 18, 650, 4, new[] { 184, 54 }, new[] { 224, 62 }),
+        ["Reference"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Plot"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Location"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Object"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Timeline"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Entity"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Term"] = new("termFill", "termStroke", "labelDark", 18, 650, 4, new[] { 184, 54 }, new[] { 224, 62 }),
+        ["Claim"] = new("claimFill", "claimStroke", "labelLight", 18, 650, 5, new[] { 260, 66 }, new[] { 330, 82 }),
+        ["SimilarityChunk"] = new("ideaFill", "ideaStroke", "labelLight", 16, 600, 4, new[] { 230, 58 }, new[] { 280, 70 }),
+        ["Custom"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Mention"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Story"] = new("themeFill", "themeStroke", "labelDark", 15, 600, 4, new[] { 166, 48 }, new[] { 188, 52 }),
+        ["Idea"] = new("ideaFill", "ideaStroke", "labelLight", 18, 600, 6, new[] { 292, 74 }, new[] { 390, 96 }),
+    };
+
+    private static readonly Dictionary<string, GraphEdgeStyle> EdgeStyles = new(StringComparer.Ordinal)
+    {
+        ["default"] = new("edgeStroke", 1.25, .54),
+        ["contains"] = new("edgeStructural", 1.15, .40),
+        ["states"] = new("edgeClaim", 1.65, .76),
+        ["claims"] = new("edgeClaim", 1.75, .82),
+        ["about"] = new("edgeSemantic", 1.45, .68),
+        ["connects"] = new("edgeSemantic", 1.35, .62, new[] { 7, 6 }),
+        ["mentions"] = new("edgeMention", 1.2, .56, new[] { 5, 6 }),
+        ["co-occurs"] = new("edgeSemantic", 1.25, .56, new[] { 5, 5 }),
+        ["token similarity"] = new("edgeSemantic", 1.4, .68, new[] { 8, 5 }),
+        ["features"] = new("edgeMention", 1.25, .58, new[] { 4, 5 }),
+        ["references"] = new("edgeReference", 1.5, .70),
+        ["spoken by"] = new("edgeCharacter", 1.55, .72),
+        ["derived from"] = new("edgeStructural", 1.05, .38, new[] { 6, 8 }),
+    };
+
+    private static readonly HashSet<string> NonVisualNodeKinds = new(StringComparer.Ordinal)
+    {
+        "Line",
+        "Pace",
+        "Timing",
+        "Cue",
+        "Archetype",
+        "Literal",
+        "Uri",
+    };
+
+    private static readonly HashSet<string> StoryNodeKinds = new(StringComparer.Ordinal)
+    {
+        "Document",
+        "Section",
+        "Heading",
+        "TpsSegment",
+        "Idea",
+        "Character",
+        "Reference",
+        "Plot",
+        "Location",
+        "Object",
+        "Timeline",
+        "Entity",
+        "Term",
+        "Claim",
+        "SimilarityChunk",
+        "Custom",
+        "Mention",
+        "Story",
+    };
+
+    private static readonly Dictionary<string, HashSet<string>> ModeLaneFilters = new(StringComparer.Ordinal)
+    {
+        [ScriptGraphLayoutModes.Knowledge] = new HashSet<string>(StringComparer.Ordinal) { "knowledge", "character", "tag", "main" },
+        [ScriptGraphLayoutModes.Structure] = new HashSet<string>(StringComparer.Ordinal) { "main", "structure", "block" },
+        [ScriptGraphLayoutModes.Delivery] = new HashSet<string>(StringComparer.Ordinal) { "main", "structure", "delivery" },
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -78,18 +286,309 @@
             return;
         }
 
-        var revision = Artifact.Revision.Value;
-        if (string.Equals(_renderedRevision, revision, StringComparison.Ordinal))
+        var revision = CreateRenderRevision(Artifact);
+        if (string.Equals(_renderedRevision, revision, StringComparison.Ordinal) ||
+            string.Equals(_renderingRevision, revision, StringComparison.Ordinal))
         {
             return;
         }
 
-        await GraphViewer.RenderAsync(_graphElement, Artifact);
-        _renderedRevision = revision;
+        _callbackReference ??= DotNetObjectReference.Create(this);
+        _renderingRevision = revision;
+        try
+        {
+            await GraphViewer.RenderAsync(_graphElement, Artifact, BuildGraphConfig(_callbackReference));
+            _renderedRevision = revision;
+        }
+        finally
+        {
+            if (string.Equals(_renderingRevision, revision, StringComparison.Ordinal))
+            {
+                _renderingRevision = null;
+            }
+        }
     }
+
+    private string CreateRenderRevision(ScriptKnowledgeGraphArtifact artifact) =>
+        $"{RuntimeHelpers.GetHashCode(artifact)}:{artifact.Revision.Value}:{artifact.SemanticStatus}:{LayoutMode}:{NodeStyleMode}:{IsGraphOnly}";
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 
+    private string GraphModeToggleLabel =>
+        IsGraphOnly
+            ? Text(UiTextKey.EditorGraphSplitMode)
+            : Text(UiTextKey.EditorGraphOnlyMode);
+
     private string Format(UiTextKey key, params object[] args) =>
         string.Format(System.Globalization.CultureInfo.CurrentCulture, Text(key), args);
+
+    private bool TryReadSemanticStatus(out string title, out string detail, out bool canRunTokenizer)
+    {
+        title = string.Empty;
+        detail = string.Empty;
+        canRunTokenizer = false;
+        if (Artifact is null)
+        {
+            return false;
+        }
+
+        switch (Artifact.SemanticStatus)
+        {
+            case ScriptKnowledgeGraphSemanticStatus.ModelUnavailable:
+                title = Text(UiTextKey.EditorGraphSemanticUnavailableTitle);
+                detail = Text(UiTextKey.EditorGraphSemanticUnavailableDetail);
+                canRunTokenizer = Artifact.SemanticMode != ScriptKnowledgeGraphSemanticMode.TokenizerSimilarity;
+                return true;
+            case ScriptKnowledgeGraphSemanticStatus.ModelFailed:
+                title = Text(UiTextKey.EditorGraphSemanticFailedTitle);
+                detail = Text(UiTextKey.EditorGraphSemanticFailedDetail);
+                canRunTokenizer = Artifact.SemanticMode != ScriptKnowledgeGraphSemanticMode.TokenizerSimilarity;
+                return true;
+            case ScriptKnowledgeGraphSemanticStatus.TokenizerSimilarity:
+                title = Text(UiTextKey.EditorGraphTokenizerActiveTitle);
+                detail = Text(UiTextKey.EditorGraphTokenizerActiveDetail);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private async Task OnLayoutSelectChangedAsync(ChangeEventArgs args)
+    {
+        var nextMode = ScriptGraphLayoutModes.Normalize(args.Value?.ToString());
+        if (string.Equals(nextMode, LayoutMode, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await LayoutModeChanged.InvokeAsync(nextMode);
+    }
+
+    private Task ToggleGraphOnlyModeAsync() =>
+        IsGraphOnlyChanged.InvokeAsync(!IsGraphOnly);
+
+    [JSInvokable]
+    public async Task OnGraphNodeRequestedAsync(string? nodeId)
+    {
+        var sourceRange = Artifact?.SourceRanges.FirstOrDefault(range =>
+            string.Equals(range.NodeId, nodeId, StringComparison.Ordinal));
+        if (sourceRange is null)
+        {
+            return;
+        }
+
+        await SourceRangeRequested.InvokeAsync(sourceRange);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _callbackReference?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+
+    private GraphStats CreateGraphStats(ScriptKnowledgeGraphArtifact artifact)
+    {
+        var visibleNodeIds = artifact.Nodes
+            .Where(NodeIsVisible)
+            .Select(node => node.Id)
+            .ToHashSet(StringComparer.Ordinal);
+        var parentByNode = artifact.Edges
+            .Where(edge => !string.IsNullOrWhiteSpace(edge.SourceId) && !string.IsNullOrWhiteSpace(edge.TargetId))
+            .GroupBy(edge => edge.TargetId, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First().SourceId, StringComparer.Ordinal);
+        var edgeCount = artifact.Edges
+            .Select(edge => ReadVisibleEdge(edge, visibleNodeIds, parentByNode))
+            .Where(edge => !string.IsNullOrWhiteSpace(edge.Source) &&
+                           !string.IsNullOrWhiteSpace(edge.Target) &&
+                           !string.Equals(edge.Source, edge.Target, StringComparison.Ordinal))
+            .Distinct()
+            .Count();
+        var sourceRangeCount = artifact.SourceRanges.Count(range => visibleNodeIds.Contains(range.NodeId));
+        return new GraphStats(visibleNodeIds.Count, edgeCount, sourceRangeCount);
+    }
+
+    private (string? Source, string? Target, string Label) ReadVisibleEdge(
+        ScriptKnowledgeGraphEdge edge,
+        IReadOnlySet<string> visibleNodeIds,
+        IReadOnlyDictionary<string, string> parentByNode)
+    {
+        if (!string.Equals(LayoutMode, ScriptGraphLayoutModes.Story, StringComparison.Ordinal))
+        {
+            return (
+                visibleNodeIds.Contains(edge.SourceId) ? edge.SourceId : null,
+                visibleNodeIds.Contains(edge.TargetId) ? edge.TargetId : null,
+                edge.Label);
+        }
+
+        return (
+            ResolveVisibleAncestor(edge.SourceId, visibleNodeIds, parentByNode),
+            visibleNodeIds.Contains(edge.TargetId) ? edge.TargetId : null,
+            edge.Label);
+    }
+
+    private static string? ResolveVisibleAncestor(
+        string nodeId,
+        IReadOnlySet<string> visibleNodeIds,
+        IReadOnlyDictionary<string, string> parentByNode)
+    {
+        var current = nodeId;
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        while (!string.IsNullOrWhiteSpace(current) && seen.Add(current))
+        {
+            if (visibleNodeIds.Contains(current))
+            {
+                return current;
+            }
+
+            if (!parentByNode.TryGetValue(current, out current))
+            {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private bool NodeIsVisible(ScriptKnowledgeGraphNode node)
+    {
+        if (string.IsNullOrWhiteSpace(node.Id) || NonVisualNodeKinds.Contains(node.Kind))
+        {
+            return false;
+        }
+
+        if (string.Equals(LayoutMode, ScriptGraphLayoutModes.Story, StringComparison.Ordinal))
+        {
+            return StoryNodeKinds.Contains(node.Kind);
+        }
+
+        return !ModeLaneFilters.TryGetValue(LayoutMode, out var lanes) || lanes.Contains(ReadLane(node.Kind));
+    }
+
+    private static string ReadLane(string kind) =>
+        LaneByKind.TryGetValue(kind, out var lane) ? lane : "knowledge";
+
+    private object BuildGraphConfig(DotNetObjectReference<ScriptGraphPanel> callbackReference) => new
+    {
+        layoutMode = LayoutMode,
+        callbackReference,
+        laneOrder = LaneOrder,
+        laneByKind = LaneByKind,
+        nodeStyleMode = NodeStyleMode,
+        nodeStylePresets = NodeVisualStyles,
+        nonVisualKinds = NonVisualNodeKinds,
+        storyKinds = StoryNodeKinds,
+        modeLaneFilters = ModeLaneFilters.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray(), StringComparer.Ordinal),
+        kindStyles = KindStyles,
+        edgeStyles = EdgeStyles,
+        laneTitles = new Dictionary<string, string>
+        {
+            ["character"] = Text(UiTextKey.EditorGraphLanePeople),
+            ["tag"] = Text(UiTextKey.EditorGraphLaneThemes),
+            ["main"] = Text(UiTextKey.EditorGraphLaneDocument),
+            ["structure"] = Text(UiTextKey.EditorGraphLaneSections),
+            ["block"] = Text(UiTextKey.EditorGraphLaneBlocks),
+            ["delivery"] = Text(UiTextKey.EditorGraphLaneDelivery),
+            ["knowledge"] = Text(UiTextKey.EditorGraphLaneKnowledge),
+        },
+        sourceHint = Text(UiTextKey.EditorGraphJumpToSourceHint),
+        colors = new Dictionary<string, string>
+        {
+            ["documentFill"] = "--gold-07",
+            ["documentStroke"] = "--gold-35",
+            ["sectionFill"] = "--gold-05",
+            ["sectionStroke"] = "--gold-25",
+            ["blockFill"] = "--glass-bg-light",
+            ["blockStroke"] = "--gold-16",
+            ["ideaFill"] = "--glass-bg-light",
+            ["ideaStroke"] = "--gold-30",
+            ["characterFill"] = "--gold-04",
+            ["characterStroke"] = "--tps-blue",
+            ["themeFill"] = "--gold-04",
+            ["themeStroke"] = "--tps-green",
+            ["termFill"] = "--gold-04",
+            ["termStroke"] = "--tps-blue",
+            ["claimFill"] = "--glass-bg-light",
+            ["claimStroke"] = "--tps-green",
+            ["defaultFill"] = "--glass-bg-light",
+            ["defaultStroke"] = "--gold-16",
+            ["activeStroke"] = "--border-active",
+            ["edgeStroke"] = "--border-active",
+            ["edgeStructural"] = "--border-default",
+            ["edgeSemantic"] = "--tps-green",
+            ["edgeMention"] = "--gold-35",
+            ["edgeReference"] = "--tps-blue",
+            ["edgeCharacter"] = "--tps-blue",
+            ["edgeClaim"] = "--tps-green",
+            ["labelLight"] = "--text-1",
+            ["labelDark"] = "--text-1",
+            ["labelDim"] = "--text-3",
+            ["glassBg"] = "--glass-bg-light",
+            ["laneHeaderBorder"] = "--border-default",
+            ["laneHeaderLabel"] = "--text-2",
+            ["haloStroke"] = "--gold-35",
+        }
+    };
+
+    private readonly record struct GraphStats(int NodeCount, int EdgeCount, int SourceRangeCount);
+
+    private sealed record GraphKindStyle(
+        string Fill,
+        string Stroke,
+        string LabelFill,
+        int FontSize,
+        int FontWeight,
+        int MaxLines,
+        int[] CompactSize,
+        int[] Size);
+
+    private sealed record GraphEdgeStyle(
+        string Stroke,
+        double LineWidth,
+        double Opacity,
+        int[]? LineDash = null);
+
+    private static readonly Dictionary<string, string> EmptyKindShapes = new(StringComparer.Ordinal);
+
+    private static readonly Dictionary<string, string> BubbleKindShapes = new(StringComparer.Ordinal)
+    {
+        ["Document"] = "ellipse",
+        ["Section"] = "ellipse",
+        ["Heading"] = "ellipse",
+        ["TpsSegment"] = "ellipse",
+        ["TpsBlock"] = "ellipse",
+        ["Idea"] = "ellipse",
+        ["Claim"] = "ellipse",
+        ["Character"] = "ellipse",
+        ["Theme"] = "ellipse",
+        ["Reference"] = "ellipse",
+        ["Plot"] = "ellipse",
+        ["Location"] = "ellipse",
+        ["Object"] = "ellipse",
+        ["Timeline"] = "ellipse",
+        ["Entity"] = "ellipse",
+        ["Term"] = "ellipse",
+        ["Custom"] = "ellipse",
+        ["Mention"] = "ellipse",
+        ["Story"] = "ellipse",
+    };
+
+    private static readonly Dictionary<string, GraphNodeVisualStyle> NodeVisualStyles = new(StringComparer.Ordinal)
+    {
+        [ScriptGraphNodeStyleModes.Cards] = new(1.0, 1.0, 1.0, 0, 0, 1.0, 8, true, false, "rect", EmptyKindShapes),
+        [ScriptGraphNodeStyleModes.Compact] = new(.82, .88, .96, 0, -1, .90, 999, true, true, "ellipse", BubbleKindShapes),
+        [ScriptGraphNodeStyleModes.Dots] = new(.34, .58, .74, -3, -4, .44, 999, false, true, "circle", EmptyKindShapes),
+    };
+
+    private sealed record GraphNodeVisualStyle(
+        double WidthScale,
+        double HeightScale,
+        double FontScale,
+        int FontSizeDelta,
+        int MaxLineDelta,
+        double LabelWidthScale,
+        int Radius,
+        bool ShowLabels,
+        bool CompactBase,
+        string DefaultShape,
+        Dictionary<string, string> KindShapes);
 }

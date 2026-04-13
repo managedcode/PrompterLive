@@ -280,6 +280,10 @@
     align-items: center;
 }
 
+.ed-layout--graph .ed-sidebar {
+    width: 220px;
+}
+
 @media (max-width: 1400px) {
     .ed-layout {
         padding: 8px;

@@ -1,12 +1,17 @@
 using ManagedCode.MarkdownLd.Kb.Pipeline;
+using PrompterOne.Core.AI.Abstractions;
 using PrompterOne.Core.AI.Models;
 
 namespace PrompterOne.Core.AI.Services;
 
-public sealed class ScriptKnowledgeGraphService
+public sealed class ScriptKnowledgeGraphService(
+    IScriptKnowledgeGraphSemanticExtractor? semanticExtractor = null,
+    ScriptKnowledgeGraphTokenizerSimilarityExtractor? tokenizerSimilarityExtractor = null)
 {
     private const string DocumentNodeId = "prompterone:document";
     private const string ContainsEdgeLabel = "contains";
+    private readonly IScriptKnowledgeGraphSemanticExtractor? _semanticExtractor = semanticExtractor;
+    private readonly ScriptKnowledgeGraphTokenizerSimilarityExtractor _tokenizerSimilarityExtractor = tokenizerSimilarityExtractor ?? new();
 
     public async Task<ScriptKnowledgeGraphArtifact> BuildAsync(
         ScriptKnowledgeGraphBuildRequest request,
@@ -23,12 +28,14 @@ public sealed class ScriptKnowledgeGraphService
         var nodes = new Dictionary<string, ScriptKnowledgeGraphNode>(StringComparer.Ordinal);
         var edges = new Dictionary<string, ScriptKnowledgeGraphEdge>(StringComparer.Ordinal);
         var ranges = new Dictionary<string, ScriptKnowledgeGraphSourceRange>(StringComparer.Ordinal);
+        var semanticScopes = new List<ScriptKnowledgeGraphSemanticScope>();
 
         ScriptKnowledgeGraphDocumentBuilder.AddDocumentGraph(
             DocumentNodeId,
             ContainsEdgeLabel,
             request,
             content,
+            semanticScopes,
             nodes,
             edges,
             ranges);
@@ -36,10 +43,21 @@ public sealed class ScriptKnowledgeGraphService
             DocumentNodeId,
             ContainsEdgeLabel,
             content,
+            semanticScopes,
             nodes,
             edges,
             ranges);
         AddKnowledgeBankGraph(kbResult.Graph.ToSnapshot(), content, nodes, edges, ranges);
+        var semanticStatus = await TryAddModelSemanticGraphAsync(request, content, semanticScopes, nodes, edges, ranges, cancellationToken)
+            .ConfigureAwait(false);
+        if (semanticStatus != ScriptKnowledgeGraphSemanticStatus.Model &&
+            request.SemanticMode == ScriptKnowledgeGraphSemanticMode.TokenizerSimilarity &&
+            _tokenizerSimilarityExtractor.AddTokenizerSimilarity(content, semanticScopes, nodes, edges, ranges))
+        {
+            semanticStatus = ScriptKnowledgeGraphSemanticStatus.TokenizerSimilarity;
+        }
+
+        ScriptKnowledgeGraphRelationshipEnricher.AddRelationships(nodes, edges);
 
         return new ScriptKnowledgeGraphArtifact(
             request.DocumentId,
@@ -49,7 +67,53 @@ public sealed class ScriptKnowledgeGraphService
             edges.Values.ToArray(),
             ranges.Values.ToArray(),
             kbResult.Graph.SerializeJsonLd(),
-            kbResult.Graph.SerializeTurtle());
+            kbResult.Graph.SerializeTurtle(),
+            semanticStatus,
+            request.SemanticMode);
+    }
+
+    private async Task<ScriptKnowledgeGraphSemanticStatus> TryAddModelSemanticGraphAsync(
+        ScriptKnowledgeGraphBuildRequest request,
+        string content,
+        IReadOnlyList<ScriptKnowledgeGraphSemanticScope> semanticScopes,
+        IDictionary<string, ScriptKnowledgeGraphNode> nodes,
+        IDictionary<string, ScriptKnowledgeGraphEdge> edges,
+        IDictionary<string, ScriptKnowledgeGraphSourceRange> ranges,
+        CancellationToken cancellationToken)
+    {
+        if (_semanticExtractor is null)
+        {
+            return ScriptKnowledgeGraphSemanticStatus.ModelUnavailable;
+        }
+
+        try
+        {
+            var extraction = await _semanticExtractor
+                .ExtractAsync(
+                    new ScriptKnowledgeGraphSemanticExtractionRequest(
+                        request.DocumentId,
+                        request.Title,
+                        content,
+                        request.Revision,
+                        semanticScopes),
+                    cancellationToken)
+                .ConfigureAwait(false);
+            if (extraction is null || extraction.IsEmpty)
+            {
+                return ScriptKnowledgeGraphSemanticStatus.ModelUnavailable;
+            }
+
+            ScriptKnowledgeGraphModelSemanticMapper.AddModelExtraction(content, semanticScopes, extraction, nodes, edges, ranges);
+            return ScriptKnowledgeGraphSemanticStatus.Model;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            return ScriptKnowledgeGraphSemanticStatus.ModelFailed;
+        }
     }
 
     private static void AddKnowledgeBankGraph(
@@ -61,16 +125,38 @@ public sealed class ScriptKnowledgeGraphService
     {
         foreach (var node in snapshot.Nodes)
         {
+            if (IsVisualKnowledgeNoise(node))
+            {
+                continue;
+            }
+
             nodes.TryAdd(node.Id, new ScriptKnowledgeGraphNode(node.Id, node.Label, node.Kind.ToString(), "knowledge"));
             ScriptKnowledgeGraphSourceRanges.AddRangeIfFound(content, node.Id, node.Label, ranges);
         }
 
         foreach (var edge in snapshot.Edges)
         {
+            if (!nodes.ContainsKey(edge.SubjectId) || !nodes.ContainsKey(edge.ObjectId))
+            {
+                continue;
+            }
+
             var id = $"{edge.SubjectId}|{edge.PredicateId}|{edge.ObjectId}";
             edges.TryAdd(id, new ScriptKnowledgeGraphEdge(id, edge.SubjectId, edge.ObjectId, edge.PredicateLabel));
         }
     }
+
+    private static bool IsVisualKnowledgeNoise(KnowledgeGraphNode node) =>
+        IsTpsHeaderLabel(node.Label) || IsSchemaUriNode(node);
+
+    private static bool IsTpsHeaderLabel(string label) =>
+        label.StartsWith("[", StringComparison.Ordinal) &&
+        label.EndsWith("]", StringComparison.Ordinal) &&
+        label.Contains('|', StringComparison.Ordinal);
+
+    private static bool IsSchemaUriNode(KnowledgeGraphNode node) =>
+        node.Kind == KnowledgeGraphNodeKind.Uri &&
+        node.Id.StartsWith("https://schema.org/", StringComparison.Ordinal);
 
     private static string CreateSourcePath(string? documentId) =>
         string.IsNullOrWhiteSpace(documentId) ? "script.tps.md" : $"{documentId}.tps.md";

@@ -44,8 +44,106 @@
     min-width: 0;
 }
 
+.editor-graph-split {
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-columns:
+        minmax(220px, var(--editor-graph-source-pane, 34%))
+        12px
+        minmax(0, 1fr);
+    min-width: 0;
+    min-height: 0;
+    gap: 0;
+}
+
+.editor-graph-split > * {
+    min-width: 0;
+    min-height: 0;
+}
+
+.editor-graph-source-pane {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+}
+
+.editor-graph-split-resizer {
+    display: grid;
+    align-self: stretch;
+    place-items: center;
+    width: 12px;
+    min-width: 12px;
+    padding: 0;
+    cursor: col-resize;
+    color: var(--text-3);
+    border: 0;
+    background: transparent;
+}
+
+.editor-graph-split-resizer span {
+    width: 3px;
+    height: min(120px, 42%);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--border-default) 76%, transparent);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .18);
+}
+
+.editor-graph-split-resizer:hover span,
+.editor-graph-split-resizer:focus-visible span,
+.editor-graph-split--resizing .editor-graph-split-resizer span {
+    background: var(--border-active);
+}
+
+.editor-graph-split-resizer:focus-visible {
+    outline: 1px solid var(--border-active);
+    outline-offset: -2px;
+}
+
+.editor-graph-split--resizing {
+    cursor: col-resize;
+    user-select: none;
+}
+
+.editor-graph-split--graph-only {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.editor-graph-split--graph-only .script-graph-panel {
+    min-height: 0;
+}
+
 @media (max-width: 1400px) {
     .editor-workspace-body {
         gap: 8px;
+    }
+
+    .editor-graph-split {
+        grid-template-columns:
+            minmax(200px, var(--editor-graph-source-pane, 38%))
+            12px
+            minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .editor-graph-split {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(220px, var(--editor-graph-source-pane, 38%)) 12px minmax(320px, 1fr);
+    }
+
+    .editor-graph-split--graph-only {
+        grid-template-rows: minmax(0, 1fr);
+    }
+
+    .editor-graph-split-resizer {
+        width: auto;
+        min-width: 0;
+        min-height: 12px;
+        cursor: row-resize;
+    }
+
+    .editor-graph-split-resizer span {
+        width: min(120px, 42%);
+        height: 3px;
     }
 }

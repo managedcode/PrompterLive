@@ -56,6 +56,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<TpsStructureEditor>();
         services.AddScoped<ScriptDocumentEditService>();
         services.AddScoped<ScriptKnowledgeGraphService>();
+        services.AddScoped<ScriptKnowledgeGraphTokenizerSimilarityExtractor>();
         services.AddSingleton<ScriptAgent, WriterScriptAgent>();
         services.AddSingleton<ScriptAgent, ReviewerScriptAgent>();
         services.AddSingleton<ScriptWorkflow, WriterReviewSequentialWorkflow>();
@@ -85,6 +86,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<IBrowserSettingsChangeNotifier>(serviceProvider => serviceProvider.GetRequiredService<BrowserSettingsStore>());
         services.AddScoped<AiProviderSettingsStore>();
         services.AddScoped<IAgentRuntimeSettingsSource, AiProviderAgentRuntimeSettingsSource>();
+        services.AddScoped<IScriptKnowledgeGraphSemanticExtractor, ScriptKnowledgeGraphLlmExtractor>();
         services.AddSingleton<EmbeddedAgentSkillsProvider>();
         services.AddScoped<ScriptAgentToolProvider>();
         services.AddScoped<IScriptAgentFactory, ScriptAgentFactory>();

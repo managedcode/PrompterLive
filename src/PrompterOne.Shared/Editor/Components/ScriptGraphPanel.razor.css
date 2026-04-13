@@ -1,7 +1,7 @@
 .script-graph-panel {
     display: grid;
     flex: 1 1 auto;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     min-height: 0;
     height: 100%;
     overflow: hidden;
@@ -43,25 +43,137 @@
     display: flex;
     flex: 0 0 auto;
     align-items: center;
+    padding: 3px;
     gap: 6px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--glass-bg-light);
 }
 
 .script-graph-controls button {
-    min-width: 34px;
-    min-height: 30px;
+    min-width: 36px;
+    min-height: 32px;
     padding: 5px 9px;
     cursor: pointer;
-    color: rgba(255, 252, 246, .78);
-    border: 1px solid rgba(255, 255, 255, .12);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, .06);
+    color: var(--text-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+}
+
+.script-graph-controls button[data-graph-control^="zoom"] {
+    min-width: 38px;
+    min-height: 34px;
+}
+
+.script-graph-mode-toggle {
+    min-width: 86px;
+    font-size: .76rem;
+    font-weight: 650;
+}
+
+.script-graph-analyze {
+    font-size: .76rem;
+    font-weight: 650;
+}
+
+.script-graph-auto-layout {
+    min-width: 84px;
+    font-size: .76rem;
+    font-weight: 650;
+}
+
+.script-graph-mode-toggle[aria-pressed="true"] {
+    color: var(--text-1);
+    border-color: var(--border-active);
+    background: var(--gold-10);
+}
+
+.script-graph-controls button[data-graph-control^="zoom"]:hover,
+.script-graph-controls button[data-graph-control^="zoom"]:focus-visible {
+    background:
+        radial-gradient(circle at 42% 42%, color-mix(in srgb, var(--gold-light) 16%, transparent) 0 36%, transparent 38%),
+        var(--gold-10);
 }
 
 .script-graph-controls button:hover,
 .script-graph-controls button:focus-visible {
-    color: rgba(255, 252, 246, .96);
-    border-color: rgba(255, 196, 106, .42);
-    background: rgba(255, 196, 106, .10);
+    color: var(--text-1);
+    border-color: var(--border-hover);
+    background: var(--gold-10);
+    outline: none;
+}
+
+.script-graph-controls button svg {
+    display: block;
+}
+
+.script-graph-layout-select {
+    min-height: 30px;
+    min-width: 100px;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: var(--text-2);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    background: var(--glass-bg);
+    font: inherit;
+    font-size: .76rem;
+}
+
+.script-graph-layout-select:hover,
+.script-graph-layout-select:focus-visible {
+    color: var(--text-1);
+    border-color: var(--border-active);
+    background: var(--gold-10);
+    outline: none;
+}
+
+.script-graph-semantic-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--border-default);
+    background: color-mix(in srgb, var(--glass-bg-light) 76%, transparent);
+}
+
+.script-graph-semantic-status div {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.script-graph-semantic-status strong {
+    color: var(--text-1);
+    font-size: .82rem;
+}
+
+.script-graph-semantic-status span {
+    color: var(--text-3);
+    font-size: .74rem;
+    line-height: 1.35;
+}
+
+.script-graph-semantic-status button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: var(--text-1);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-sm);
+    background: var(--gold-10);
+    font: inherit;
+    font-size: .76rem;
+    font-weight: 650;
+}
+
+.script-graph-semantic-status button:hover,
+.script-graph-semantic-status button:focus-visible {
+    background: var(--gold-16);
     outline: none;
 }
 
@@ -72,6 +184,10 @@
     overflow: hidden;
 }
 
+.script-graph-canvas:focus {
+    outline: none;
+}
+
 .script-graph-canvas ::deep .script-graph-tooltip {
     position: absolute;
     top: 0;
@@ -80,10 +196,10 @@
     max-width: min(320px, calc(100% - 24px));
     padding: 10px 12px;
     pointer-events: none;
-    color: rgba(255, 252, 246, .94);
-    border: 1px solid rgba(255, 196, 106, .26);
-    border-radius: 8px;
-    background: rgba(12, 14, 18, .92);
+    color: var(--text-1);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-sm);
+    background: var(--bg-2);
     box-shadow: 0 18px 42px rgba(0, 0, 0, .42);
 }
 
@@ -103,14 +219,22 @@
 }
 
 .script-graph-canvas ::deep .script-graph-tooltip span,
-.script-graph-canvas ::deep .script-graph-tooltip small {
-    color: rgba(248, 241, 226, .70);
+.script-graph-canvas ::deep .script-graph-tooltip small,
+.script-graph-canvas ::deep .script-graph-tooltip em {
+    color: var(--text-3);
     font-size: .72rem;
+}
+
+.script-graph-canvas ::deep .script-graph-tooltip em {
+    display: block;
+    margin-top: 6px;
+    font-style: normal;
+    color: var(--gold-light);
 }
 
 .script-graph-canvas ::deep .script-graph-tooltip p {
     margin: 6px 0;
-    color: rgba(248, 241, 226, .82);
+    color: var(--text-2);
     font-size: .78rem;
     line-height: 1.35;
 }
@@ -121,6 +245,18 @@
     place-items: center;
     padding: 24px;
     color: rgba(248, 241, 226, .72);
+}
+
+.script-graph-canvas[data-graph-grab="true"],
+.script-graph-canvas[data-graph-grab="true"] ::deep canvas {
+    cursor: grab !important;
+}
+
+.script-graph-canvas[data-graph-panning="true"],
+.script-graph-canvas[data-graph-panning="true"] ::deep canvas,
+.script-graph-canvas[data-graph-grab="true"]:active,
+.script-graph-canvas[data-graph-grab="true"]:active ::deep canvas {
+    cursor: grabbing !important;
 }
 
 @media (max-width: 680px) {

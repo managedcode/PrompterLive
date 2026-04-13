@@ -12,6 +12,36 @@
     white-space: nowrap;
 }
 
+button.app-header-title-back {
+    padding: 0;
+    color: inherit;
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+button.app-header-subtitle-back {
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    color: inherit;
+    border: none;
+    background: none;
+    font: inherit;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+button.app-header-subtitle-back:hover,
+button.app-header-subtitle-back:focus-visible {
+    color: var(--text-1);
+    text-decoration: underline;
+    outline: none;
+}
+
 .app-header-import-progress {
     position: absolute;
     top: calc(100% + 8px);

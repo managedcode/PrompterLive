@@ -35,6 +35,20 @@
                         @onclick="() => SelectTabAsync(EditorMetadataRailTab.Tools)">
                     @Text(UiTextKey.CommonTools)
                 </button>
+                @if (ShowGraphTab)
+                {
+                    <button type="button"
+                            id="@UiDomIds.Editor.GraphTab"
+                            class="@GetTabClass(EditorMetadataRailTab.Graph)"
+                            role="tab"
+                            aria-selected="@GetTabSelectedAttribute(EditorMetadataRailTab.Graph)"
+                            aria-controls="@UiDomIds.Editor.GraphPanel"
+                            tabindex="@GetTabIndexValue(EditorMetadataRailTab.Graph)"
+                            data-test="@UiTestIds.Editor.GraphRailTab"
+                            @onclick="() => SelectTabAsync(EditorMetadataRailTab.Graph)">
+                        @Text(UiTextKey.EditorWorkspaceGraphTab)
+                    </button>
+                }
             </div>
         }
 
@@ -83,7 +97,7 @@
                                         XfastOffsetChanged="XfastOffsetChanged"
                                         XslowOffsetChanged="XslowOffsetChanged" />
         }
-        else
+        else if (_selectedTab == EditorMetadataRailTab.Tools)
         {
             <EditorMetadataToolsPanel AutoSaveEnabled="@AutoSaveEnabled"
                                       LastLocalSaveAt="@LastLocalSaveAt"
@@ -92,6 +106,13 @@
                                       LocalHistoryRestoreRequested="LocalHistoryRestoreRequested"
                                       SplitFeedback="@SplitFeedback"
                                       SplitRequested="SplitRequested" />
+        }
+        else
+        {
+            <EditorMetadataGraphPanel LayoutMode="@GraphLayoutMode"
+                                      LayoutModeChanged="GraphLayoutModeChanged"
+                                      NodeStyleMode="@GraphNodeStyleMode"
+                                      NodeStyleModeChanged="GraphNodeStyleModeChanged" />
         }
     </div>
 </div>
@@ -108,6 +129,16 @@
     [Parameter] public int FastOffset { get; set; }
 
     [Parameter] public bool IsCollapsed { get; set; }
+
+    [Parameter] public bool ShowGraphTab { get; set; }
+
+    [Parameter] public string GraphLayoutMode { get; set; } = ScriptGraphLayoutModes.Knowledge;
+
+    [Parameter] public EventCallback<string> GraphLayoutModeChanged { get; set; }
+
+    [Parameter] public string GraphNodeStyleMode { get; set; } = ScriptGraphNodeStyleModes.Compact;
+
+    [Parameter] public EventCallback<string> GraphNodeStyleModeChanged { get; set; }
 
     [Parameter] public EventCallback<string> ProfileChanged { get; set; }
 
@@ -174,6 +205,10 @@
     protected override void OnParametersSet()
     {
         _selectedTab = SelectedTab;
+        if (!ShowGraphTab && _selectedTab == EditorMetadataRailTab.Graph)
+        {
+            _selectedTab = EditorMetadataRailTab.Metadata;
+        }
     }
 
     private string GetCollapsedAttributeValue() => IsCollapsed ? "true" : "false";

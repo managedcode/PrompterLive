@@ -1,0 +1,87 @@
+@namespace PrompterOne.Shared.Components.Editor
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<div id="@UiDomIds.Editor.GraphPanel"
+     class="ed-meta-panel ed-graph-settings"
+     role="tabpanel"
+     aria-labelledby="@UiDomIds.Editor.GraphTab"
+     data-test="@UiTestIds.Editor.GraphRailPanel">
+    <section class="ed-meta-panel-section">
+        <p class="ed-meta-note">@Text(UiTextKey.EditorGraphSettingsDescription)</p>
+        <div class="ed-meta-field">
+            <label for="editor-graph-rail-layout">@Text(UiTextKey.EditorGraphLayoutType)</label>
+            <select id="editor-graph-rail-layout"
+                    class="ed-meta-select"
+                    value="@LayoutMode"
+                    @onchange="OnLayoutModeChangedAsync"
+                    data-test="@UiTestIds.Editor.GraphRailLayoutMode">
+                <option value="@ScriptGraphLayoutModes.Story">@Text(UiTextKey.EditorGraphStoryLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Compact">@Text(UiTextKey.EditorGraphCompactLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Knowledge">@Text(UiTextKey.EditorGraphKnowledgeLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Structure">@Text(UiTextKey.EditorGraphStructureLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Delivery">@Text(UiTextKey.EditorGraphDeliveryLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Relationship">@Text(UiTextKey.EditorGraphRelationshipLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Dagre">@Text(UiTextKey.EditorGraphDagreLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Radial">@Text(UiTextKey.EditorGraphRadialLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Grid">@Text(UiTextKey.EditorGraphGridLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Concentric">@Text(UiTextKey.EditorGraphConcentricLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Circular">@Text(UiTextKey.EditorGraphCircularLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Mds">@Text(UiTextKey.EditorGraphMdsLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Fruchterman">@Text(UiTextKey.EditorGraphFruchtermanLayout)</option>
+                <option value="@ScriptGraphLayoutModes.ForceAtlas2">@Text(UiTextKey.EditorGraphForceAtlasLayout)</option>
+                <option value="@ScriptGraphLayoutModes.D3Force">@Text(UiTextKey.EditorGraphD3ForceLayout)</option>
+                <option value="@ScriptGraphLayoutModes.AntvDagre">@Text(UiTextKey.EditorGraphAntvDagreLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Force">@Text(UiTextKey.EditorGraphForceLayout)</option>
+                <option value="@ScriptGraphLayoutModes.Indented">@Text(UiTextKey.EditorGraphIndentedLayout)</option>
+            </select>
+        </div>
+        <div class="ed-meta-field">
+            <label for="editor-graph-rail-node-style">@Text(UiTextKey.EditorGraphNodeStyle)</label>
+            <select id="editor-graph-rail-node-style"
+                    class="ed-meta-select"
+                    value="@NodeStyleMode"
+                    @onchange="OnNodeStyleModeChangedAsync"
+                    data-test="@UiTestIds.Editor.GraphRailNodeStyleMode">
+                <option value="@ScriptGraphNodeStyleModes.Compact">@Text(UiTextKey.EditorGraphNodeStyleCompact)</option>
+                <option value="@ScriptGraphNodeStyleModes.Cards">@Text(UiTextKey.EditorGraphNodeStyleCards)</option>
+                <option value="@ScriptGraphNodeStyleModes.Dots">@Text(UiTextKey.EditorGraphNodeStyleDots)</option>
+            </select>
+        </div>
+    </section>
+</div>
+
+@code {
+    [Parameter] public string LayoutMode { get; set; } = ScriptGraphLayoutModes.Knowledge;
+
+    [Parameter] public EventCallback<string> LayoutModeChanged { get; set; }
+
+    [Parameter] public string NodeStyleMode { get; set; } = ScriptGraphNodeStyleModes.Compact;
+
+    [Parameter] public EventCallback<string> NodeStyleModeChanged { get; set; }
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
+
+    private async Task OnLayoutModeChangedAsync(ChangeEventArgs args)
+    {
+        var nextMode = ScriptGraphLayoutModes.Normalize(args.Value?.ToString());
+        if (string.Equals(nextMode, LayoutMode, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await LayoutModeChanged.InvokeAsync(nextMode);
+    }
+
+    private async Task OnNodeStyleModeChangedAsync(ChangeEventArgs args)
+    {
+        var nextMode = ScriptGraphNodeStyleModes.Normalize(args.Value?.ToString());
+        if (string.Equals(nextMode, NodeStyleMode, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        await NodeStyleModeChanged.InvokeAsync(nextMode);
+    }
+}

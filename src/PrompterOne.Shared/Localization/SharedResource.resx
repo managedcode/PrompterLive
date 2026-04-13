@@ -2517,8 +2517,140 @@
   <data name="EditorGraphFit" xml:space="preserve">
     <value>Show all</value>
   </data>
+  <data name="EditorGraphAutoLayout" xml:space="preserve">
+    <value>Auto layout</value>
+  </data>
+  <data name="EditorGraphAnalyze" xml:space="preserve">
+    <value>Analyze</value>
+  </data>
+  <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
+    <value>Run tokenizer similarity</value>
+  </data>
+  <data name="EditorGraphSemanticUnavailableTitle" xml:space="preserve">
+    <value>Semantic graph needs AI</value>
+  </data>
+  <data name="EditorGraphSemanticUnavailableDetail" xml:space="preserve">
+    <value>Connect an AI provider for writer-grade graph concepts, or run lower-fidelity tokenizer similarity.</value>
+  </data>
+  <data name="EditorGraphSemanticFailedTitle" xml:space="preserve">
+    <value>AI graph extraction failed</value>
+  </data>
+  <data name="EditorGraphSemanticFailedDetail" xml:space="preserve">
+    <value>Check AI settings or run tokenizer similarity for a local fallback.</value>
+  </data>
+  <data name="EditorGraphTokenizerActiveTitle" xml:space="preserve">
+    <value>Tokenizer similarity graph</value>
+  </data>
+  <data name="EditorGraphTokenizerActiveDetail" xml:space="preserve">
+    <value>This view uses token overlap and distance, not LLM semantics.</value>
+  </data>
+  <data name="EditorGraphOnlyMode" xml:space="preserve">
+    <value>Graph only</value>
+  </data>
+  <data name="EditorGraphSplitMode" xml:space="preserve">
+    <value>Split view</value>
+  </data>
+  <data name="EditorGraphResizeDivider" xml:space="preserve">
+    <value>Resize source and graph panes</value>
+  </data>
   <data name="EditorGraphLayout" xml:space="preserve">
     <value>Layout</value>
+  </data>
+  <data name="EditorGraphLayoutType" xml:space="preserve">
+    <value>Graph type</value>
+  </data>
+  <data name="EditorGraphNodeStyle" xml:space="preserve">
+    <value>Node style</value>
+  </data>
+  <data name="EditorGraphNodeStyleCards" xml:space="preserve">
+    <value>Cards</value>
+  </data>
+  <data name="EditorGraphNodeStyleCompact" xml:space="preserve">
+    <value>Compact labels</value>
+  </data>
+  <data name="EditorGraphNodeStyleDots" xml:space="preserve">
+    <value>Dots</value>
+  </data>
+  <data name="EditorGraphStoryLayout" xml:space="preserve">
+    <value>Story map</value>
+  </data>
+  <data name="EditorGraphCompactLayout" xml:space="preserve">
+    <value>Compact map</value>
+  </data>
+  <data name="EditorGraphKnowledgeLayout" xml:space="preserve">
+    <value>Knowledge map</value>
+  </data>
+  <data name="EditorGraphStructureLayout" xml:space="preserve">
+    <value>Structure map</value>
+  </data>
+  <data name="EditorGraphDeliveryLayout" xml:space="preserve">
+    <value>Delivery map</value>
+  </data>
+  <data name="EditorGraphRelationshipLayout" xml:space="preserve">
+    <value>Relationship map</value>
+  </data>
+  <data name="EditorGraphRadialLayout" xml:space="preserve">
+    <value>Radial view</value>
+  </data>
+  <data name="EditorGraphForceLayout" xml:space="preserve">
+    <value>Force view</value>
+  </data>
+  <data name="EditorGraphDagreLayout" xml:space="preserve">
+    <value>Dagre hierarchy</value>
+  </data>
+  <data name="EditorGraphGridLayout" xml:space="preserve">
+    <value>Grid view</value>
+  </data>
+  <data name="EditorGraphConcentricLayout" xml:space="preserve">
+    <value>Concentric view</value>
+  </data>
+  <data name="EditorGraphCircularLayout" xml:space="preserve">
+    <value>Circular view</value>
+  </data>
+  <data name="EditorGraphMdsLayout" xml:space="preserve">
+    <value>MDS map</value>
+  </data>
+  <data name="EditorGraphFruchtermanLayout" xml:space="preserve">
+    <value>Fruchterman force</value>
+  </data>
+  <data name="EditorGraphForceAtlasLayout" xml:space="preserve">
+    <value>Force Atlas 2</value>
+  </data>
+  <data name="EditorGraphD3ForceLayout" xml:space="preserve">
+    <value>D3 force</value>
+  </data>
+  <data name="EditorGraphAntvDagreLayout" xml:space="preserve">
+    <value>AntV Dagre</value>
+  </data>
+  <data name="EditorGraphIndentedLayout" xml:space="preserve">
+    <value>Indented tree</value>
+  </data>
+  <data name="EditorGraphLanePeople" xml:space="preserve">
+    <value>People</value>
+  </data>
+  <data name="EditorGraphLaneThemes" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+  <data name="EditorGraphLaneDocument" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="EditorGraphLaneSections" xml:space="preserve">
+    <value>Sections</value>
+  </data>
+  <data name="EditorGraphLaneBlocks" xml:space="preserve">
+    <value>Blocks</value>
+  </data>
+  <data name="EditorGraphLaneDelivery" xml:space="preserve">
+    <value>Delivery</value>
+  </data>
+  <data name="EditorGraphLaneKnowledge" xml:space="preserve">
+    <value>Knowledge</value>
+  </data>
+  <data name="EditorGraphJumpToSourceHint" xml:space="preserve">
+    <value>Click to jump to source</value>
+  </data>
+  <data name="EditorGraphSettingsDescription" xml:space="preserve">
+    <value>Group the script by knowledge, structure, and delivery cues.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Source</value>

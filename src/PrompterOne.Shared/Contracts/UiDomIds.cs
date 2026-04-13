@@ -41,6 +41,8 @@ public static class UiDomIds
 
     public static class Editor
     {
+        public const string GraphPanel = "editor-graph-rail-panel";
+        public const string GraphTab = "editor-graph-rail-tab";
         public const string MetadataRailBody = "editor-metadata-rail-body";
         public const string MetadataPanel = "editor-metadata-panel";
         public const string MetadataTab = "editor-metadata-tab";

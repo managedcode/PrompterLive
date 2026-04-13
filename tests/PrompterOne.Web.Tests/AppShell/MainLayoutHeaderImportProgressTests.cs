@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using PrompterOne.Shared.AppShell.Components;
 using PrompterOne.Shared.Contracts;
 
@@ -11,6 +12,7 @@ public sealed class MainLayoutHeaderImportProgressTests : BunitContext
     private const string ProgressLabel = "Preparing script";
     private const string ProgressStepLabel = "2/3";
     private const string ProgressWidth = "66%";
+    private const string SubtitleBackLabel = "This is a text description";
     private const string SupportedImportAcceptValue = ".txt,.md,.docx";
     private const string LongHeaderTitle = "Imported file title from a very long file name that should clamp inside the shared editor header without pushing shell actions away";
 
@@ -51,14 +53,35 @@ public sealed class MainLayoutHeaderImportProgressTests : BunitContext
         Assert.Equal(LongHeaderTitle, title.TextContent.Trim());
     }
 
+    [Test]
+    public void MainLayoutHeader_SubtitleBackText_InvokesBackAction()
+    {
+        var backClicked = false;
+        var cut = RenderHeader(parameters => parameters
+            .Add(component => component.ShowBackButton, true)
+            .Add(component => component.ShowHeaderSubtitle, true)
+            .Add(component => component.OnBackClick, EventCallback.Factory.Create(this, () => backClicked = true)),
+            headerSubtitle: SubtitleBackLabel);
+
+        var subtitle = cut.FindByTestId(UiTestIds.Header.Subtitle);
+
+        Assert.Equal("button", subtitle.TagName.ToLowerInvariant());
+        Assert.Contains("app-header-subtitle-back", subtitle.ClassList);
+
+        subtitle.Click();
+
+        Assert.True(backClicked);
+    }
+
     private IRenderedComponent<MainLayoutHeader> RenderHeader(
         Action<ComponentParameterCollectionBuilder<MainLayoutHeader>>? configure = null,
-        string headerTitle = "Editor")
+        string headerTitle = "Editor",
+        string headerSubtitle = "")
     {
         return Render<MainLayoutHeader>(parameters =>
         {
             parameters.Add(component => component.CssClass, "app-header");
-            parameters.Add(component => component.HeaderSubtitle, string.Empty);
+            parameters.Add(component => component.HeaderSubtitle, headerSubtitle);
             parameters.Add(component => component.HeaderTitle, headerTitle);
             parameters.Add(component => component.ImportActionButtonTestId, UiTestIds.Header.EditorImportScriptButton);
             parameters.Add(component => component.ImportActionIconTestId, UiTestIds.Header.EditorImportScriptIcon);

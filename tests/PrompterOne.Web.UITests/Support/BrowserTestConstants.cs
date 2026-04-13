@@ -16,6 +16,9 @@ internal static partial class BrowserTestConstants
 
     public static class Html
     {
+        public const string AriaPressedAttribute = "aria-pressed";
+        public const string AriaPressedFalseValue = "false";
+        public const string AriaPressedTrueValue = "true";
         public const string DataTestAttribute = "data-test";
         public const string ValueAttribute = "value";
     }
@@ -276,10 +279,47 @@ internal static partial class BrowserTestConstants
         public const double AiScrollJumpMaximumAllowedDeltaPx = 64;
         public const string GraphReadyAttributeName = "data-graph-ready";
         public const string GraphReadyAttributeValue = "true";
+        public const string GraphStateAttributeName = "data-graph-state";
+        public const string GraphErrorAttributeName = "data-graph-error";
+        public const string GraphSemanticStatusAttributeName = "data-status";
+        public const string GraphSemanticStatusModelUnavailableValue = "ModelUnavailable";
+        public const string GraphSemanticStatusTokenizerSimilarityValue = "TokenizerSimilarity";
         public const string GraphTooltipsAttributeName = "data-graph-tooltips";
         public const string GraphTooltipsAttributeValue = "true";
+        public const string GraphNavigationAttributeName = "data-graph-navigation";
+        public const string GraphNavigationAttributeValue = "true";
+        public const string GraphSelectedNodeAttributeName = "data-graph-selected-node";
         public const string GraphLayoutAttributeName = "data-graph-layout";
+        public const string GraphNodeStyleAttributeName = "data-graph-node-style";
+        public const string GraphAutoLayoutRunsAttributeName = "data-graph-auto-layout-runs";
+        public const string GraphGrabAttributeName = "data-graph-grab";
+        public const string GraphGrabAttributeValue = "true";
+        public const string GraphPanningAttributeName = "data-graph-panning";
+        public const string GraphPanningAttributeValue = "true";
+        public const string GraphSplitModeAttributeName = "data-mode";
+        public const string GraphSplitModeSplitValue = "split";
+        public const string GraphSplitModeGraphOnlyValue = "graph-only";
+        public const string GraphSplitResizingAttributeName = "data-resizing";
+        public const string GraphSplitResizingValue = "true";
+        public const int GraphSplitResizeDeltaPx = 90;
+        public const double GraphSplitResizeMinimumDeltaPx = 24;
+        public const string GraphGrabCursorValue = "grab";
         public const string GraphLayoutCompactValue = "compact";
+        public const string GraphLayoutCircularValue = "circular";
+        public const string GraphLayoutGridValue = "grid";
+        public const string GraphLayoutMdsValue = "mds";
+        public const int GraphNodeOverlapExpectedCount = 0;
+        public const string GraphLaneNodePrefix = "prompterone:graph:lane:";
+        public const string GraphNodeTypeEllipseValue = "ellipse";
+        public const string GraphNodeTypeRectValue = "rect";
+        public const string GraphNodeKindSimilarityChunkValue = "SimilarityChunk";
+        public const string GraphEdgeLabelTokenSimilarityValue = "token similarity";
+        public const string GraphNodeStyleCardsValue = "cards";
+        public const string GraphNodeStyleCompactValue = "compact";
+        public const string GraphNodeStyleDotsValue = "dots";
+        public const string GraphAutoLayoutFirstRunValue = "1";
+        public const string GraphAutoLayoutSecondRunValue = "2";
+        public const string GraphLayoutStoryValue = "story";
         public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
         public const int ClickNearStartOffsetX = 140;

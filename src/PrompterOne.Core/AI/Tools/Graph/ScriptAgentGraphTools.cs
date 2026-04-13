@@ -37,7 +37,7 @@ internal sealed class ScriptAgentGraphTools(
             artifact.Nodes.Count,
             artifact.Edges.Count,
             artifact.Nodes
-                .Where(static node => node.Kind is "Section" or "Entity")
+                .Where(static node => node.Kind is "Section" or "TpsSegment" or "TpsBlock" or "Entity" or "Character" or "Theme" or "Idea")
                 .Select(static node => node.Label)
                 .Distinct(StringComparer.Ordinal)
                 .Take(8)

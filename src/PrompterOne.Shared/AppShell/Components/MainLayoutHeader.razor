@@ -44,17 +44,37 @@
                         data-test="@UiTestIds.Header.Back">
                     <UiIcon Kind="UiIconKind.ChevronLeft" Size="18" />
                 </button>
-            }
 
-            <span class="top-bar-title app-header-title"
-                  title="@HeaderTitle"
-                  data-test="@UiTestIds.Header.Title">@HeaderTitle</span>
+                <button type="button"
+                        class="top-bar-title app-header-title app-header-title-back"
+                        title="@HeaderTitle"
+                        @onclick="HandleBackClickAsync"
+                        data-test="@UiTestIds.Header.Title">@HeaderTitle</button>
+            }
+            else
+            {
+                <span class="top-bar-title app-header-title"
+                      title="@HeaderTitle"
+                      data-test="@UiTestIds.Header.Title">@HeaderTitle</span>
+            }
 
             @if (ShowHeaderSubtitle)
             {
-                <span id="@HeaderSubtitleDomId"
-                      class="app-header-subtitle"
-                      data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
+                @if (ShowBackButton)
+                {
+                    <button type="button"
+                            id="@HeaderSubtitleDomId"
+                            class="app-header-subtitle app-header-subtitle-back"
+                            title="@HeaderSubtitle"
+                            @onclick="HandleBackClickAsync"
+                            data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</button>
+                }
+                else
+                {
+                    <span id="@HeaderSubtitleDomId"
+                          class="app-header-subtitle"
+                          data-test="@UiTestIds.Header.Subtitle">@HeaderSubtitle</span>
+                }
             }
         }
     </div>
