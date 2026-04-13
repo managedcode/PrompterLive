@@ -87,7 +87,7 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.DisabledValue);
 
-            await page.GotoAsync(draftUrl);
+            await OpenDraftRouteAsync(page, draftUrl, "editor-local-history-open-autosave-disabled");
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
@@ -116,7 +116,7 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Settings.FileAutoSave))
                 .ToHaveAttributeAsync(BrowserTestConstants.State.EnabledAttribute, BrowserTestConstants.State.EnabledValue);
 
-            await page.GotoAsync(draftUrl);
+            await OpenDraftRouteAsync(page, draftUrl, "editor-local-history-open-autosave-enabled");
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await page.GetByTestId(UiTestIds.Editor.ToolsTab).ClickAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.ToolsPanel)).ToBeVisibleAsync();
@@ -145,4 +145,10 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
 
     private static string CurrentRoute(IPage page) =>
         new Uri(page.Url).PathAndQuery;
+
+    private static async Task OpenDraftRouteAsync(IPage page, string draftUrl, string failureLabel)
+    {
+        var route = new Uri(draftUrl).PathAndQuery;
+        await BrowserRouteDriver.OpenPageAsync(page, route, UiTestIds.Editor.Page, failureLabel);
+    }
 }

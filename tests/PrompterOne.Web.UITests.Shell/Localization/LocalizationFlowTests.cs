@@ -44,6 +44,9 @@ public sealed class LocalizationFlowTests(StandaloneAppFixture fixture)
                     UiTestIds.Settings.LanguageSelect,
                     BrowserTestConstants.Localization.FrenchCultureName)));
             await page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+            await ShellRouteDriver.OpenSettingsAsync(page);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Settings.NavLanguage));
+            await SettingsCardDriver.EnsureExpandedAsync(page, UiTestIds.Settings.LanguagePreferencesCard);
 
             await Expect(page.GetByTestId(UiTestIds.Settings.LanguageSelect))
                 .ToContainTextAsync(BrowserTestConstants.Localization.FrenchLanguageLabel);

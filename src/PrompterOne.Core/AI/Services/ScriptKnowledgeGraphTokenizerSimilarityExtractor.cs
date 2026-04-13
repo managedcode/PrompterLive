@@ -72,7 +72,10 @@ public sealed class ScriptKnowledgeGraphTokenizerSimilarityExtractor
 
             nodes.TryAdd(node.Id, node);
             added[node.Id] = node;
-            ScriptKnowledgeGraphSourceRanges.AddRangeIfFound(content, node.Id, node.Label, ranges);
+            if (!ScriptKnowledgeGraphSourceRanges.AddRangeIfFound(content, node.Id, entity.Label, ranges))
+            {
+                ScriptKnowledgeGraphSourceRanges.AddSequentialTokenRangeIfFound(content, node.Id, entity.Label, ranges);
+            }
         }
 
         return added;
