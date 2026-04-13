@@ -540,7 +540,7 @@
     background: var(--gold-16);
 }
 .rd-controls.rd-reading-active .rd-ctrl-play:hover {
-    background: rgba(196,160,96,.13);
+    background: rgba(196,160,96,.10);
 }
 
 .rd-ctrl-label {

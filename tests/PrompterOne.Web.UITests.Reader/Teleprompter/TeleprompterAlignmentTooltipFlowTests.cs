@@ -114,6 +114,7 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
         await Expect(tooltip).ToBeVisibleAsync();
 
         await UiInteractionDriver.ClickAndContinueAsync(trigger);
+        await MovePointerToStageCenterAsync(page);
         await Expect(tooltip).ToBeHiddenAsync(
             new() { Timeout = BrowserTestConstants.TeleprompterFlow.TooltipDismissTimeoutMs });
     }

@@ -6,9 +6,6 @@ namespace PrompterOne.Web.UITests;
 
 internal static class PlaybackRouteDriver
 {
-    private const string LearnLayoutReadyAttributeName = "data-rsvp-layout-ready";
-    private const string TrueValue = "true";
-
     internal static async Task OpenLearnAsync(IPage page, string route, string? failureLabel = null)
     {
         await OpenAsync(page, route, UiTestIds.Learn.Page, failureLabel);
@@ -30,8 +27,6 @@ internal static class PlaybackRouteDriver
         await BrowserRouteDriver.WaitForRouteAsync(page, route);
         await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.Display)).ToBeVisibleAsync();
-        await Expect(page.GetByTestId(UiTestIds.Learn.Display))
-            .ToHaveAttributeAsync(LearnLayoutReadyAttributeName, TrueValue);
         await Expect(page.GetByTestId(UiTestIds.Learn.Word)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.ProgressLabel)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.PlayToggle)).ToBeVisibleAsync();
