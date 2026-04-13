@@ -106,7 +106,7 @@ Rule format:
 - When a CI test job fails, times out, or is cancelled, the workflow summary must still state which tests failed or that the run ended before per-test failure data was available; do not leave browser-suite failures represented only by generic job annotations.
 - Do not add or raise CI timeout settings as a fix for browser-suite instability or slow runs; fix the underlying failure path cleanly instead of masking it with workflow or step timeouts.
 - For TUnit reporting in GitHub Actions, prefer TUnit's built-in HTML report and the documented `actions/github-script` runtime exposure step over repo-local custom summary scripts or ad-hoc log parsers.
-- GitHub Actions test jobs must use the repo `tests/dotnet-test-progress.rsp` response file and enable TUnit coverage for every runnable test suite so CI measures the same detailed, non-ANSI test output and coverage signal expected locally.
+- GitHub Actions test jobs must use the repo `tests/dotnet-test-progress.rsp` response file and enable TUnit coverage for every runnable test suite so CI measures the same minimal, non-ANSI test output and coverage signal expected locally; do not configure detailed per-test `Standard output` or empty `Error output` blocks as the default log format.
 - Public web hosting is split by role: the standalone PrompterOne app in this repo must publish on `app.prompter.one`, while the marketing landing site for `prompter.one` lives in the separate `PrompterOne-LandingPage` repository.
 - Runtime telemetry providers such as Google Analytics, Clarity, and Sentry must not be described as connected or working unless the real production path is verified with actual outbound delivery or loaded vendor SDKs; local harness snapshots, init flags, or stubbed globals are not sufficient proof.
 - Runtime telemetry readiness must be proven against Release-built app artifacts in CI; do not sign off GA, Clarity, or Sentry from Debug-only local runs when the shipped Release pipeline has not validated that path.
@@ -173,7 +173,7 @@ Rule format:
 For this `.NET` repo:
 
 - all automated test projects run on `TUnit` and native `Microsoft.Testing.Platform`
-- use `@./tests/dotnet-test-progress.rsp` on repo test commands so `dotnet test` emits detailed, non-ANSI per-test progress logs consistently in terminal and CI text logs
+- use `@./tests/dotnet-test-progress.rsp` on repo test commands so `dotnet test` emits minimal, non-ANSI progress logs consistently in terminal and CI text logs without flooding every test with `Standard output` or empty `Error output` sections
 - `format` is direct `dotnet format`, not `--verify-no-changes` and not a wrapper
 - coverage uses TUnit's native `--coverage` support
 - `LangVersion` is not pinned; use the SDK default unless the repo intentionally changes it later

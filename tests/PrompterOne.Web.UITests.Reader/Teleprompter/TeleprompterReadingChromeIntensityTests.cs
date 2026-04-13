@@ -79,7 +79,12 @@ public sealed class TeleprompterReadingChromeIntensityTests(StandaloneAppFixture
         });
 
     private static bool HasMaximumChannels(CssColor color, double maximum) =>
-        color.R <= maximum && color.G <= maximum && color.B <= maximum;
+        EffectiveChannel(color.R, color.A) <= maximum &&
+        EffectiveChannel(color.G, color.A) <= maximum &&
+        EffectiveChannel(color.B, color.A) <= maximum;
+
+    private static double EffectiveChannel(double channel, double alpha) =>
+        channel * alpha;
 
     private static Task ClearChromeHoverAsync(IPage page) =>
         page.Mouse.MoveAsync(

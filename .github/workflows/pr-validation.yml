@@ -78,6 +78,15 @@ jobs:
             tests/PrompterOne.Web.Tests/bin/**/TestResults/**
           if-no-files-found: ignore
 
+      - name: Publish supporting suite coverage report
+        if: always() && hashFiles('tests/PrompterOne.Core.Tests/bin/**/TestResults/*.cobertura.xml', 'tests/PrompterOne.Web.Tests/bin/**/TestResults/*.cobertura.xml') != ''
+        uses: ./.github/actions/publish-coverage-report
+        with:
+          artifact-name: coverage-report-pr-validation-supporting
+          reports: tests/PrompterOne.Core.Tests/bin/**/TestResults/*.cobertura.xml;tests/PrompterOne.Web.Tests/bin/**/TestResults/*.cobertura.xml
+          targetdir: coverage-report/supporting
+          title: PR Validation Supporting Coverage
+
   build_browser_suites:
     name: Build Browser Tests
     runs-on: macos-latest
@@ -159,6 +168,15 @@ jobs:
           name: test-results-pr-validation-${{ matrix.suite.artifact }}
           path: tests/PrompterOne.Web.UITests.${{ matrix.suite.name }}/bin/**/TestResults/**
           if-no-files-found: ignore
+
+      - name: Publish browser suite coverage report
+        if: always() && hashFiles(format('tests/PrompterOne.Web.UITests.{0}/bin/**/TestResults/*.cobertura.xml', matrix.suite.name)) != ''
+        uses: ./.github/actions/publish-coverage-report
+        with:
+          artifact-name: coverage-report-pr-validation-${{ matrix.suite.artifact }}
+          reports: tests/PrompterOne.Web.UITests.${{ matrix.suite.name }}/bin/**/TestResults/*.cobertura.xml
+          targetdir: coverage-report/${{ matrix.suite.artifact }}
+          title: PR Validation ${{ matrix.suite.name }} Coverage
 
       - name: Upload Playwright artifacts
         if: always()

@@ -1,0 +1,47 @@
+name: Publish Coverage Report
+description: Generate and publish a human-readable coverage report from Cobertura files.
+
+inputs:
+  artifact-name:
+    description: Name for the uploaded coverage report artifact.
+    required: true
+  reports:
+    description: Semicolon-separated Cobertura report globs.
+    required: true
+  targetdir:
+    description: Directory where ReportGenerator should write the generated report.
+    required: true
+  title:
+    description: Title shown in the generated report and GitHub Actions summary.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Generate coverage report
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.4
+      with:
+        reports: ${{ inputs.reports }}
+        targetdir: ${{ inputs.targetdir }}
+        reporttypes: HtmlInline;MarkdownSummaryGithub;Cobertura
+        title: ${{ inputs.title }}
+        tag: ${{ github.run_number }}_${{ github.run_id }}
+
+    - name: Upload coverage report artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.targetdir }}
+        if-no-files-found: error
+
+    - name: Publish coverage summary
+      shell: bash
+      run: |
+        summary_path="${{ inputs.targetdir }}/SummaryGithub.md"
+        if [[ ! -f "$summary_path" ]]; then
+          printf '## %s\n\nCoverage summary was not generated.\n' "${{ inputs.title }}" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+        fi
+
+        printf '## %s\n\n' "${{ inputs.title }}" >> "$GITHUB_STEP_SUMMARY"
+        cat "$summary_path" >> "$GITHUB_STEP_SUMMARY"

@@ -288,10 +288,7 @@ public sealed partial class EditorInteractionTests(StandaloneAppFixture fixture)
 
         try
         {
-            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(
-                page,
-                BrowserTestConstants.Scripts.QuantumId,
-                waitForPersistedRoute: false);
+            await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.QuantumId);
             await Expect(page.GetByTestId(UiTestIds.Editor.ActiveSegmentName)).ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.Editor.ActiveBlockName)).ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.Editor.SegmentNavigation(0))).ToContainTextAsync("Introduction");

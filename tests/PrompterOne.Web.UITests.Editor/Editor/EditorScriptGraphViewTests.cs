@@ -180,7 +180,9 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
             await Assert.That(graphKinds.Contains("Literal")).IsFalse();
             await Assert.That(graphKinds.Contains("Uri")).IsFalse();
 
-            await page.GetByTestId(UiTestIds.Editor.GraphTokenizerAnalyze).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Editor.GraphTokenizerAnalyze),
+                noWaitAfter: true);
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphSemanticStatus))
                 .ToHaveAttributeAsync(
                     BrowserTestConstants.Editor.GraphSemanticStatusAttributeName,

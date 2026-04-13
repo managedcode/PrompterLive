@@ -30,13 +30,13 @@ internal static class PlaybackRouteDriver
         await BrowserRouteDriver.WaitForRouteAsync(page, route);
         await Expect(page.GetByTestId(UiTestIds.Learn.Page)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.Display)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Learn.Display))
+            .ToHaveAttributeAsync(LearnLayoutReadyAttributeName, TrueValue);
         await Expect(page.GetByTestId(UiTestIds.Learn.Word)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.ProgressLabel)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.PlayToggle)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.StepForward)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.StepForwardLarge)).ToBeVisibleAsync();
-        await Expect(page.GetByTestId(UiTestIds.Learn.Display))
-            .ToHaveAttributeAsync(LearnLayoutReadyAttributeName, TrueValue);
     }
 
     internal static async Task WaitForTeleprompterReadyAsync(
