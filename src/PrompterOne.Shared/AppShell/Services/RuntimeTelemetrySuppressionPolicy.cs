@@ -1,5 +1,3 @@
-using Sentry;
-
 namespace PrompterOne.Shared.Services;
 
 public static class RuntimeTelemetrySuppressionPolicy

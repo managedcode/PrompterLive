@@ -13,7 +13,6 @@ using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Tests;
-using Sentry;
 
 namespace PrompterOne.Web.Tests;
 

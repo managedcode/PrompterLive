@@ -3,6 +3,7 @@ import { ensureTpsLanguage, getTpsLanguageSupport } from "./editor-monaco-tps-la
 const cssClassPrefix = "po";
 const largeDraftDecorationCharacterThreshold = 16000;
 const largeDraftDecorationViewportLinePadding = 24;
+const largeDraftTextNotificationDelayMs = 750;
 const frontMatterDelimiter = "---";
 const emptyValue = "";
 const findMatchActiveClassName = `${cssClassPrefix}-find-match-active`;
@@ -251,6 +252,7 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
         options,
         proxy,
         semanticSnapshot,
+        pendingTextNotificationTimeoutId: 0,
         suppressProxySelection: false,
         suppressSelectionNotification: false,
         suppressTextNotification: false,
@@ -313,6 +315,7 @@ export async function syncEditorState(host, text, selectionStart, selectionEnd) 
 
     const nextText = text ?? emptyValue;
     const preservedScrollPosition = resolvePreservedScrollPosition(state);
+    cancelPendingTextNotification(state);
     state.suppressTextNotification = true;
     state.suppressSelectionNotification = true;
 
@@ -378,6 +381,7 @@ export function disposeEditor(host) {
 
     state.host.removeEventListener("dragover", state.hostDragOverHandler);
     state.host.removeEventListener("drop", state.hostDropHandler);
+    cancelPendingTextNotification(state);
     state.decorationCollection.clear();
     state.findDecorationCollection.clear();
     for (const subscription of state.subscriptions) {
@@ -732,9 +736,7 @@ function onEditorContentChanged(state) {
     dispatchProxyChangedEvent(state);
     renderSemanticSnapshot(state, state.editor.getValue());
     scheduleDecorations(state);
-    if (!state.suppressTextNotification) {
-        void notifyTextChangedAsync(state);
-    }
+    queueTextChangedNotification(state);
 }
 
 function notifySelectionChanged(state, dismissMenus) {
@@ -757,14 +759,46 @@ async function notifySelectionChangedAsync(state, dismissMenus) {
     }
 }
 
-async function notifyTextChangedAsync(state) {
+async function notifyTextChangedAsync(state, text) {
     if (state.suppressTextNotification) {
         return;
     }
 
     await state.dotNetRef.invokeMethodAsync(
         state.options.textChangedCallbackName,
-        state.editor.getValue());
+        text ?? state.editor.getValue());
+}
+
+function cancelPendingTextNotification(state) {
+    if (!state?.pendingTextNotificationTimeoutId) {
+        return;
+    }
+
+    window.clearTimeout(state.pendingTextNotificationTimeoutId);
+    state.pendingTextNotificationTimeoutId = 0;
+}
+
+function queueTextChangedNotification(state) {
+    if (state.suppressTextNotification) {
+        return;
+    }
+
+    const currentText = state.editor.getValue();
+    if (currentText.length < largeDraftDecorationCharacterThreshold) {
+        cancelPendingTextNotification(state);
+        void notifyTextChangedAsync(state, currentText);
+        return;
+    }
+
+    cancelPendingTextNotification(state);
+    state.pendingTextNotificationTimeoutId = window.setTimeout(() => {
+        state.pendingTextNotificationTimeoutId = 0;
+        if (!hostStates.has(state.host) || state.suppressTextNotification) {
+            return;
+        }
+
+        void notifyTextChangedAsync(state, state.editor.getValue());
+    }, largeDraftTextNotificationDelayMs);
 }
 
 function waitForAnimationFrames(frameCount = 1) {
@@ -834,7 +868,7 @@ async function applyTextForHarnessAsync(state, nextText, options) {
     syncProxyFromEditor(state);
     state.suppressTextNotification = false;
 
-    await notifyTextChangedAsync(state);
+    queueTextChangedNotification(state);
     return await waitForTextState(state, nextText);
 }
 
