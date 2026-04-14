@@ -101,7 +101,7 @@
             <div class="ed-source-monaco"
                  @ref="_editorHostRef"
                  data-test="@UiTestIds.Editor.SourceStage"
-                 data-editor-ready="false"></div>
+                 data-editor-ready="@(_surfaceInteropReady ? "true" : "false")"></div>
             <div class="ed-source-highlight">
                 <div class="ed-source-highlight-surface"
                      @ref="_semanticSnapshotRef"
