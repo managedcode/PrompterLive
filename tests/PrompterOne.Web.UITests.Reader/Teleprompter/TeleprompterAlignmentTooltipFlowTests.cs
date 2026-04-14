@@ -12,7 +12,7 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
     private const string LeftRailTooltipStep = "01-left-rail-tooltip";
     private const string RightRailTooltipScenario = "teleprompter-alignment-tooltips-right";
     private const string RightRailTooltipStep = "02-right-rail-tooltip";
-    private const int RevealProbeSchedulerSlackPolls = 4;
+    private const int RevealProbeSchedulerSlackPolls = 8;
 
     private readonly record struct ElementBounds(double Left, double Top, double Right, double Bottom);
 

@@ -30,21 +30,24 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
             var focalGuide = page.GetByTestId(UiTestIds.Teleprompter.FocalGuide);
-            var firstWord = page.GetByTestId(UiTestIds.Teleprompter.CardWord(0, 0, 0));
+            var firstWordSelector = TeleprompterReaderAlignmentAssertions.BuildDataTestSelector(
+                UiTestIds.Teleprompter.CardWord(0, 0, 0));
+            var firstWord = page.Locator(firstWordSelector);
 
             await Expect(firstWord).ToBeVisibleAsync();
-            await AssertGuideAlignmentAsync(page, focalGuide, firstWord);
+            await TeleprompterReaderAlignmentAssertions.AssertWordAlignedToGuideAsync(page, firstWordSelector);
 
             await page.GetByTestId(UiTestIds.Teleprompter.FocalSlider).EvaluateAsync(
                 $$"""
                 element => {
                     element.value = '{{BrowserTestConstants.Teleprompter.AdjustedFocalPointPercent}}';
                     element.dispatchEvent(new Event('input', { bubbles: true }));
+                    element.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 """);
 
             await Expect(focalGuide).ToHaveAttributeAsync("style", BrowserTestConstants.Teleprompter.AdjustedFocalGuideStyle);
-            await AssertGuideAlignmentAsync(page, focalGuide, firstWord);
+            await TeleprompterReaderAlignmentAssertions.AssertWordAlignedToGuideAsync(page, firstWordSelector);
         }
         finally
         {
@@ -217,29 +220,6 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
         await Expect(cameraLayer).ToHaveAttributeAsync(
             BrowserTestConstants.State.ActiveAttribute,
             BrowserTestConstants.Teleprompter.ActiveStateValue);
-    }
-
-    private static async Task AssertGuideAlignmentAsync(
-        Microsoft.Playwright.IPage page,
-        Microsoft.Playwright.ILocator focalGuide,
-        Microsoft.Playwright.ILocator word)
-    {
-        var attemptCount = BrowserTestConstants.Teleprompter.AlignmentTimeoutMs /
-            BrowserTestConstants.Teleprompter.AlignmentPollDelayMs;
-        var lastDelta = double.MaxValue;
-
-        for (var attempt = 0; attempt < attemptCount; attempt++)
-        {
-            lastDelta = await MeasureVerticalCenterDeltaAsync(focalGuide, word);
-            if (Math.Abs(lastDelta) <= BrowserTestConstants.Teleprompter.AlignmentTolerancePx)
-            {
-                return;
-            }
-
-            await page.WaitForTimeoutAsync(BrowserTestConstants.Teleprompter.AlignmentPollDelayMs);
-        }
-
-        await Assert.That(Math.Abs(lastDelta)).IsBetween(0, BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
     }
 
     private static async Task<double> MeasureVerticalCenterDeltaAsync(

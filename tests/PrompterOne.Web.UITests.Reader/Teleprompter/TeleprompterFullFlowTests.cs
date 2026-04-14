@@ -154,52 +154,13 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
 
     private static async Task AssertCurrentActiveWordAlignedAsync(Microsoft.Playwright.IPage page)
     {
-        var activeWord = page.Locator(BrowserTestConstants.Teleprompter.ActiveWordSelector);
+        var activeWordSelector = BrowserTestConstants.Teleprompter.ActiveWordSelector;
+        var activeWord = page.Locator(activeWordSelector);
         await Expect(activeWord).ToBeVisibleAsync(new()
         {
             Timeout = BrowserTestConstants.Timing.ReaderPlaybackAdvanceTimeoutMs
         });
-        await AssertGuideAlignmentAsync(
-            page,
-            page.GetByTestId(UiTestIds.Teleprompter.FocalGuide),
-            activeWord);
-    }
-
-    private static async Task AssertGuideAlignmentAsync(
-        Microsoft.Playwright.IPage page,
-        Microsoft.Playwright.ILocator focalGuide,
-        Microsoft.Playwright.ILocator word)
-    {
-        var attemptCount = BrowserTestConstants.Teleprompter.AlignmentTimeoutMs /
-            BrowserTestConstants.Teleprompter.AlignmentPollDelayMs;
-        var lastDelta = double.MaxValue;
-
-        for (var attempt = 0; attempt < attemptCount; attempt++)
-        {
-            lastDelta = await MeasureVerticalCenterDeltaAsync(focalGuide, word);
-            if (Math.Abs(lastDelta) <= BrowserTestConstants.Teleprompter.AlignmentTolerancePx)
-            {
-                return;
-            }
-
-            await page.WaitForTimeoutAsync(BrowserTestConstants.Teleprompter.AlignmentPollDelayMs);
-        }
-
-        await Assert.That(Math.Abs(lastDelta)).IsBetween(0, BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
-    }
-
-    private static async Task<double> MeasureVerticalCenterDeltaAsync(
-        Microsoft.Playwright.ILocator focalGuide,
-        Microsoft.Playwright.ILocator word)
-    {
-        var focalGuideBox = await focalGuide.BoundingBoxAsync();
-        var wordBox = await word.BoundingBoxAsync();
-
-        await Assert.That(focalGuideBox).IsNotNull();
-        await Assert.That(wordBox).IsNotNull();
-
-        return (focalGuideBox.Y + (focalGuideBox.Height / 2d)) -
-            (wordBox.Y + (wordBox.Height / 2d));
+        await TeleprompterReaderAlignmentAssertions.AssertWordAlignedToGuideAsync(page, activeWordSelector);
     }
 
     private static async Task<ReaderWordProbe> GetWordProbeAsync(Microsoft.Playwright.IPage page, int cardIndex, string wordText)
