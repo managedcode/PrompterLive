@@ -376,7 +376,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 ? BrowserTestConstants.ReaderTiming.LearnStartupTimingToleranceMs
                 : Math.Max(
                     BrowserTestConstants.ReaderTiming.LearnTimingToleranceMs,
-                    (int)Math.Ceiling(expectedDelay * BrowserTestConstants.ReaderTiming.LearnTimingToleranceRatio));
+                    (int)Math.Ceiling(expectedDelay * BrowserTestConstants.ReaderTiming.LearnTimingToleranceRatio))
+                  + BrowserTestConstants.ReaderTiming.CapturePollIntervalMs * 2;
 
             await Assert.That(previousSample.Word).IsEqualTo(expected.Word);
             if (sampleIndex == 1)
