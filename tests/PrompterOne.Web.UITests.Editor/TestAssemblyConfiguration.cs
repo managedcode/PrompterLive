@@ -6,4 +6,5 @@ namespace PrompterOne.Web.UITests.Editor;
 
 public sealed class MaxParallelTestsForPipeline : EnvironmentAwareParallelLimitBase
 {
+    protected override int CiLimit => 6;
 }

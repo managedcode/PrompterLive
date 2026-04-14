@@ -125,7 +125,7 @@ Today we read **bold** with steady confidence.
 Today we read *italic* with steady confidence.
 
 ### [Pronunciation Guide Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pronunciation:prəˌnʌnsiˈeɪʃən]pronunciation[/pronunciation] with steady confidence.
+Today we read [pronunciation:/prəˌnʌnsiˈeɪʃən/]pronunciation[/pronunciation] with steady confidence.
 
 ### [Phonetic Guide Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
 Today we read [phonetic:/fəˈnɛtɪk/]phonetic[/phonetic] with steady confidence.

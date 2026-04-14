@@ -14,6 +14,7 @@ internal static class UiTestHostConstants
     public const int MaximumTcpPort = 65535;
     public const int MinimumDynamicPort = 1;
     public const string ProductionEnvironmentName = "Production";
+    public const string CrossTabScopeGlobal = "__PrompterOneCrossTabScope";
     public static string RuntimeTelemetryHarnessInitializationScript =>
         $$"""
         window["{{BrowserTestConstants.Telemetry.RuntimeGlobal}}"] = window["{{BrowserTestConstants.Telemetry.RuntimeGlobal}}"] || {};
@@ -24,6 +25,10 @@ internal static class UiTestHostConstants
             "{{BrowserTestConstants.Telemetry.PageViewsCollection}}": [],
             "{{BrowserTestConstants.Telemetry.VendorLoadsCollection}}": []
         };
+        """;
+    public static string BuildCrossTabScopeInitializationScript(string scope) =>
+        $$"""
+        window["{{CrossTabScopeGlobal}}"] = "{{scope}}";
         """;
     public static string RuntimeTelemetryAllowVendorLoadsScript =>
         $$"""

@@ -15,6 +15,7 @@
 - Keep editor browser specs grouped by authoring or editor-surface concern.
 - Verify real editor interactions in a real browser, including Monaco typing, selection, menus, tooltips, and screenshot artifacts.
 - Use dedicated `data-test` selectors and named constants only.
+- This suite intentionally caps CI parallelism at 6 workers. Monaco boot and layout are browser-resource-bound under macOS Actions load, and 6 keeps the suite parallel while avoiding broad simultaneous editor runtime starvation.
 
 ## Project-Local Commands
 

@@ -56,7 +56,7 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         new(36, "37-editorial-emphasis", "[emphasis]", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisTag, ExpectEmphasis: true, TargetWord: "emphasis"),
         new(37, "38-markdown-bold", "Markdown bold", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisMarkdownStrong, ExpectEmphasis: true, TargetWord: "bold"),
         new(38, "39-markdown-italic", "Markdown italic", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisMarkdownItalic, ExpectEmphasis: true, TargetWord: "italic"),
-        new(39, "40-guide-pronunciation", "[pronunciation:prəˌnʌnsiˈeɪʃən]", UiDataAttributes.Teleprompter.Pronunciation, "prəˌnʌnsiˈeɪʃən", TargetWord: "pronunciation"),
+        new(39, "40-guide-pronunciation", "[pronunciation:/prəˌnʌnsiˈeɪʃən/]", UiDataAttributes.Teleprompter.Pronunciation, "/prəˌnʌnsiˈeɪʃən/", TargetWord: "pronunciation"),
         new(40, "41-guide-phonetic", "[phonetic:/fəˈnɛtɪk/]", UiDataAttributes.Teleprompter.Pronunciation, "/fəˈnɛtɪk/", TargetWord: "phonetic"),
         new(41, "42-guide-stress", "[stress:rising]", TpsVisualCueContracts.StressAttributeName, TpsVisualCueContracts.StressAttributeValue, TargetWord: "stress"),
         new(42, "43-edit-point", "[edit_point]", TargetWord: "edit"),

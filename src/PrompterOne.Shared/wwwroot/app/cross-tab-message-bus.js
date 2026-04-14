@@ -6,11 +6,14 @@
     const publishMethodName = "publish";
     const receiveMethodName = "ReceiveAsync";
     const registry = new Map();
+    const testScopeGlobalName = "__PrompterOneCrossTabScope";
 
     function resolveEntry(channelName) {
         if (typeof BroadcastChannel === "undefined") {
             return null;
         }
+
+        channelName = resolveScopedChannelName(channelName);
 
         let entry = registry.get(channelName);
         if (entry) {
@@ -44,8 +47,18 @@
         return entry;
     }
 
+    function resolveScopedChannelName(channelName) {
+        const scope = window[testScopeGlobalName];
+        if (typeof scope !== "string" || !scope.trim()) {
+            return channelName;
+        }
+
+        return `${channelName}.${scope.trim()}`;
+    }
+
     window[namespace] = {
         [disposeMethodName]: function (channelName, dotNetHelper) {
+            channelName = resolveScopedChannelName(channelName);
             const entry = registry.get(channelName);
             if (!entry) {
                 return;

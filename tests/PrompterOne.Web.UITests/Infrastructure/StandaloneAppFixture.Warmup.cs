@@ -18,6 +18,8 @@ public sealed partial class StandaloneAppFixture
 
     private static async Task InitializeContextAsync(IBrowserContext context, string baseAddress)
     {
+        await context.AddInitScriptAsync(
+            UiTestHostConstants.BuildCrossTabScopeInitializationScript(Guid.NewGuid().ToString("N")));
         await context.AddInitScriptAsync(UiTestHostConstants.RuntimeTelemetryHarnessInitializationScript);
         await context.GrantPermissionsAsync(UiTestHostConstants.GrantedPermissions, new BrowserContextGrantPermissionsOptions
         {

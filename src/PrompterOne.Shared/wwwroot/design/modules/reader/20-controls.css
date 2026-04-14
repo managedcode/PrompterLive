@@ -533,17 +533,17 @@
     border-radius: 50%;
     background: var(--gold-12);
 }
-.rd-controls.rd-reading-active .rd-ctrl-play,
-.rd-controls[data-active="true"] .rd-ctrl-play,
-.rd-ctrl-play[data-active="true"] {
+.rd-controls.rd-reading-active .rd-ctrl-btn.rd-ctrl-play,
+.rd-controls[data-active="true"] .rd-ctrl-btn.rd-ctrl-play,
+.rd-ctrl-btn.rd-ctrl-play[data-active="true"] {
     background: rgba(196,160,96,.06);
 }
 .rd-ctrl-play:hover {
     background: var(--gold-16);
 }
-.rd-controls.rd-reading-active .rd-ctrl-play:hover,
-.rd-controls[data-active="true"] .rd-ctrl-play:hover,
-.rd-ctrl-play[data-active="true"]:hover {
+.rd-controls.rd-reading-active .rd-ctrl-btn.rd-ctrl-play:hover,
+.rd-controls[data-active="true"] .rd-ctrl-btn.rd-ctrl-play:hover,
+.rd-ctrl-btn.rd-ctrl-play[data-active="true"]:hover {
     background: rgba(196,160,96,.08);
 }
 
