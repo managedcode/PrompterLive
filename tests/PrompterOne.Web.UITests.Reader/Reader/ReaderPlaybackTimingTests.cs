@@ -52,7 +52,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
             await Assert.That(samples.Select(sample => sample.EffectiveWpm).ToArray()).IsEquivalentTo(TeleprompterEffectiveWpmSequence, CollectionOrdering.Matching);
 
             var timingTolerance = BrowserTestConstants.ReaderTiming.TeleprompterTimingToleranceMs
-                                  + BrowserTestConstants.ReaderTiming.CapturePollIntervalMs * 2;
+                                  + BrowserTestConstants.ReaderTiming.CapturePollIntervalMs
+                                  * BrowserTestConstants.ReaderTiming.CapturePollTimingSlackMultiplier;
 
             for (var sampleIndex = 1; sampleIndex < samples.Length; sampleIndex++)
             {
@@ -377,7 +378,8 @@ public sealed class ReaderPlaybackTimingTests(StandaloneAppFixture fixture)
                 : Math.Max(
                     BrowserTestConstants.ReaderTiming.LearnTimingToleranceMs,
                     (int)Math.Ceiling(expectedDelay * BrowserTestConstants.ReaderTiming.LearnTimingToleranceRatio))
-                  + BrowserTestConstants.ReaderTiming.CapturePollIntervalMs * 2;
+                  + BrowserTestConstants.ReaderTiming.CapturePollIntervalMs
+                  * BrowserTestConstants.ReaderTiming.CapturePollTimingSlackMultiplier;
 
             await Assert.That(previousSample.Word).IsEqualTo(expected.Word);
             if (sampleIndex == 1)

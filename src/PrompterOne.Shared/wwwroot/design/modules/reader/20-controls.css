@@ -533,14 +533,16 @@
     border-radius: 50%;
     background: var(--gold-12);
 }
-.rd-controls.rd-reading-active .rd-ctrl-play {
-    background: rgba(196,160,96,.09);
+.rd-controls.rd-reading-active .rd-ctrl-play,
+.rd-controls[data-active="true"] .rd-ctrl-play {
+    background: rgba(196,160,96,.08);
 }
 .rd-ctrl-play:hover {
     background: var(--gold-16);
 }
-.rd-controls.rd-reading-active .rd-ctrl-play:hover {
-    background: rgba(196,160,96,.10);
+.rd-controls.rd-reading-active .rd-ctrl-play:hover,
+.rd-controls[data-active="true"] .rd-ctrl-play:hover {
+    background: rgba(196,160,96,.09);
 }
 
 .rd-ctrl-label {

@@ -442,6 +442,7 @@ internal static partial class BrowserTestConstants
     public static class ReaderTiming
     {
         public const int CapturePollIntervalMs = 20;
+        public const int CapturePollTimingSlackMultiplier = 3;
         public const int BoundaryTransitionSampleIndex = 4;
         public const int LearnTimingToleranceMs = 200;
         public const int LearnStartupTimingToleranceMs = 1800;

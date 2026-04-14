@@ -12,6 +12,7 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
     private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
     private readonly record struct FocusWordSlackMeasurement(double SlackPx);
+    private readonly record struct OrpDeltaMeasurement(double DeltaPx);
     private readonly record struct VisibleContextWordGapMeasurement(double LeftWordGapPx, double RightWordGapPx);
 
     [Test]
@@ -25,16 +26,12 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Learn.WordOrp)).ToBeVisibleAsync();
-            await WaitForLearnLayoutReadyAsync(page);
-
-            var initialDelta = await MeasureOrpDeltaAsync(page);
+            var initialDelta = (await WaitForLearnLayoutReadyAsync(page)).DeltaPx;
             await Assert.That(initialDelta).IsBetween(0, 6);
 
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Learn.PlayToggle));
             await page.WaitForTimeoutAsync(BrowserTestConstants.Timing.LearnPlaybackDelayMs);
-            await WaitForLearnLayoutReadyAsync(page);
-
-            var playbackDelta = await MeasureOrpDeltaAsync(page);
+            var playbackDelta = (await WaitForLearnLayoutReadyAsync(page)).DeltaPx;
             await Assert.That(playbackDelta).IsBetween(0, 6);
         }
         finally
@@ -345,29 +342,6 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         }
     }
 
-    private static Task<double> MeasureOrpDeltaAsync(Microsoft.Playwright.IPage page) =>
-        page.EvaluateAsync<double>(
-            """
-            ids => {
-                const line = document.querySelector(`[data-test="${ids.line}"]`);
-                const orp = document.querySelector(`[data-test="${ids.orp}"]`);
-                if (!line || !orp) {
-                    return 999;
-                }
-
-                const lineRect = line.getBoundingClientRect();
-                const orpRect = orp.getBoundingClientRect();
-                const lineCenter = lineRect.left + (lineRect.width / 2);
-                const orpCenter = orpRect.left + (orpRect.width / 2);
-                return Math.abs(lineCenter - orpCenter);
-            }
-            """,
-            new
-            {
-                line = UiTestIds.Learn.OrpLine,
-                orp = UiTestIds.Learn.WordOrp
-            });
-
     private static Task<int> CountContextWordsAsync(Microsoft.Playwright.IPage page, string contextTestId) =>
         page.EvaluateAsync<int>(
             """
@@ -411,8 +385,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
         Assert.Fail("Unexpected execution path.");
     }
 
-    private static Task WaitForLearnLayoutReadyAsync(Microsoft.Playwright.IPage page) =>
-        page.WaitForFunctionAsync(
+    private static async Task<OrpDeltaMeasurement> WaitForLearnLayoutReadyAsync(Microsoft.Playwright.IPage page)
+    {
+        var handle = await page.WaitForFunctionAsync(
             """
             args => {
                 const display = document.querySelector(`[data-test="${args.displayTestId}"]`);
@@ -425,7 +400,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 const lineRect = line.getBoundingClientRect();
                 const orpRect = orp.getBoundingClientRect();
                 const delta = Math.abs((lineRect.left + (lineRect.width / 2)) - (orpRect.left + (orpRect.width / 2)));
-                return delta <= args.maxOrpDeltaPx;
+                return delta <= args.maxOrpDeltaPx
+                    ? { DeltaPx: delta }
+                    : false;
             }
             """,
             new
@@ -437,6 +414,9 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 maxOrpDeltaPx = MaxLayoutReadyOrpDeltaPx,
                 orpTestId = UiTestIds.Learn.WordOrp
             });
+
+        return await handle.JsonValueAsync<OrpDeltaMeasurement>();
+    }
 
     private static async Task ExpectFocusWordAsync(Microsoft.Playwright.IPage page, string expectedWord)
     {
