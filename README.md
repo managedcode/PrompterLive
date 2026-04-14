@@ -88,20 +88,57 @@ In the teleprompter, the clean reading line keeps those cues visible through sub
 
 ![TPS cue styling in the teleprompter](docs/screenshots/readme/tps-teleprompter-cues.png)
 
-| TPS cue | Reader meaning | Visible reader treatment |
-| --- | --- | --- |
-| `#`, `##`, `###` | Script, segment, and block structure | Groups reader cards, segmented progress, and jump targets without showing raw headers in the reading line |
-| `/`, `//`, `[pause:500ms]`, `[pause:1s]`, `[breath]` | Short and explicit rests | Adds phrase-aware timing gaps; breath and pause cues shape the cadence without becoming noisy text |
-| `[xslow]`, `[slow]`, `[normal]`, `[fast]`, `[xfast]`, `[180WPM]` | Relative or explicit pace | Changes effective word timing; slow cues can add airy spacing, while fast cues keep readable normal spacing instead of squeezing words together |
-| `[loud]`, `[soft]`, `[whisper]` | Volume and vocal intensity | Adjusts subtle color, weight, and opacity so the delivery cue is visible but the line remains readable |
-| `[warm]`, `[urgent]`, `[excited]`, `[happy]`, `[sad]`, `[calm]`, `[energetic]`, `[professional]`, `[focused]`, `[concerned]`, `[motivational]`, `[neutral]` | Emotional tone | Tints the word and reader background mood while preserving the base reading contrast |
-| `[aside]`, `[rhetorical]`, `[building]`, `[sarcasm]` | Delivery shape | Adds delivery-specific tone color and emphasis so the speaker sees how to bend the phrase |
-| `[legato]`, `[staccato]` | Smooth versus clipped articulation | Uses music-like wavy or dotted underline texture below the affected words |
-| `[energy:8]`, `[melody:3]` | Intensity and melodic movement | Adds controlled glow or line color rhythm without shifting word layout |
-| `[highlight]`, `[emphasis]`, Markdown bold/italic | Editorial emphasis | Preserves highlight and emphasis as continuous phrase styling, not broken word-by-word fragments |
-| `[pronunciation:guide]`, `[phonetic:IPA]`, `[stress:rising]` | Pronunciation, phonetic, and stress help | Keeps the reading word clean while retaining metadata, tooltip/detail, and stress underline cues for rehearsal and review |
-| `[edit_point]`, `[edit_point:medium]`, `[edit_point:high]` | Editing and production cut points | Stays out of the spoken reader line; appears only as an editor or operator marker |
-| `Speaker:*`, `Archetype:*` | Talent and delivery persona metadata | Affects validation, graph context, and optional chrome without becoming raw reader text |
+The screenshot matrix below is generated from `test-tps-cue-matrix.tps`. Each row uses one plain reader card, one normal sentence, and one central cue word so the visual treatment is isolated.
+
+| TPS cue | Reader meaning | Visible reader treatment | Reader screenshot |
+| --- | --- | --- | --- |
+| Structure baseline | Plain block text with no inline cue | Shows the clean reading sentence and segmented card shape without raw TPS headers | <img src="docs/screenshots/readme/tps-cues/01-structure-baseline.png" alt="Structure baseline reader screenshot" width="360"> |
+| `/` | Short pause before the next word | Adds one compact rest marker before the central word while keeping the spoken word clean | <img src="docs/screenshots/readme/tps-cues/02-pause-slash.png" alt="Slash pause reader screenshot" width="360"> |
+| `//` | Stronger short pause before the next word | Adds one visible rest marker before the central word without exposing the slash text | <img src="docs/screenshots/readme/tps-cues/03-pause-double-slash.png" alt="Double slash pause reader screenshot" width="360"> |
+| `[pause:500ms]` | Explicit half-second rest | Renders a pause cue before the central word and preserves phrase spacing | <img src="docs/screenshots/readme/tps-cues/04-pause-500ms.png" alt="500 millisecond pause reader screenshot" width="360"> |
+| `[pause:1s]` | Explicit one-second rest | Renders a pause cue before the central word and keeps the next word readable | <img src="docs/screenshots/readme/tps-cues/05-pause-1s.png" alt="One second pause reader screenshot" width="360"> |
+| `[breath]` | Breath cue | Renders a breath rest before the central word without turning the cue into spoken text | <img src="docs/screenshots/readme/tps-cues/06-breath.png" alt="Breath cue reader screenshot" width="360"> |
+| `[xslow]` | Extra-slow pace | Carries a slow timing contract and airy treatment on the central word | <img src="docs/screenshots/readme/tps-cues/07-speed-xslow.png" alt="Xslow cue reader screenshot" width="360"> |
+| `[slow]` | Slow pace | Carries a slow timing contract without overlapping surrounding words | <img src="docs/screenshots/readme/tps-cues/08-speed-slow.png" alt="Slow cue reader screenshot" width="360"> |
+| `[normal]` | Reset to normal pace | Returns the central word to the base pace treatment | <img src="docs/screenshots/readme/tps-cues/09-speed-normal.png" alt="Normal pace cue reader screenshot" width="360"> |
+| `[fast]` | Fast pace | Speeds timing while preserving normal readable word spacing | <img src="docs/screenshots/readme/tps-cues/10-speed-fast.png" alt="Fast cue reader screenshot" width="360"> |
+| `[xfast]` | Extra-fast pace | Speeds timing further without visually squeezing the central word into neighbors | <img src="docs/screenshots/readme/tps-cues/11-speed-xfast.png" alt="Xfast cue reader screenshot" width="360"> |
+| `[180WPM]` | Explicit WPM pace | Maps the central word to a fast timing contract | <img src="docs/screenshots/readme/tps-cues/12-speed-180wpm.png" alt="180 WPM cue reader screenshot" width="360"> |
+| `[loud]` | Strong vocal intensity | Adds stronger weight and tone to the central word | <img src="docs/screenshots/readme/tps-cues/13-volume-loud.png" alt="Loud cue reader screenshot" width="360"> |
+| `[soft]` | Softer delivery | Lowers intensity while keeping the central word legible | <img src="docs/screenshots/readme/tps-cues/14-volume-soft.png" alt="Soft cue reader screenshot" width="360"> |
+| `[whisper]` | Whispered delivery | Uses subdued opacity and tone for the central word | <img src="docs/screenshots/readme/tps-cues/15-volume-whisper.png" alt="Whisper cue reader screenshot" width="360"> |
+| `[warm]` | Warm emotional tone | Tints the central word with a warmer emotional treatment | <img src="docs/screenshots/readme/tps-cues/16-emotion-warm.png" alt="Warm emotion cue reader screenshot" width="360"> |
+| `[urgent]` | Urgent emotional tone | Gives the central word a more urgent emphasis color | <img src="docs/screenshots/readme/tps-cues/17-emotion-urgent.png" alt="Urgent emotion cue reader screenshot" width="360"> |
+| `[excited]` | Excited emotional tone | Adds a brighter emotional treatment to the central word | <img src="docs/screenshots/readme/tps-cues/18-emotion-excited.png" alt="Excited emotion cue reader screenshot" width="360"> |
+| `[happy]` | Happy emotional tone | Tints the central word for upbeat delivery | <img src="docs/screenshots/readme/tps-cues/19-emotion-happy.png" alt="Happy emotion cue reader screenshot" width="360"> |
+| `[sad]` | Sad emotional tone | Tints the central word with a lower-intensity mood | <img src="docs/screenshots/readme/tps-cues/20-emotion-sad.png" alt="Sad emotion cue reader screenshot" width="360"> |
+| `[calm]` | Calm emotional tone | Keeps the central word muted and steady | <img src="docs/screenshots/readme/tps-cues/21-emotion-calm.png" alt="Calm emotion cue reader screenshot" width="360"> |
+| `[energetic]` | Energetic emotional tone | Gives the central word a stronger active treatment | <img src="docs/screenshots/readme/tps-cues/22-emotion-energetic.png" alt="Energetic emotion cue reader screenshot" width="360"> |
+| `[professional]` | Professional emotional tone | Keeps the central word controlled and formal | <img src="docs/screenshots/readme/tps-cues/23-emotion-professional.png" alt="Professional emotion cue reader screenshot" width="360"> |
+| `[focused]` | Focused emotional tone | Highlights the central word as concentrated delivery | <img src="docs/screenshots/readme/tps-cues/24-emotion-focused.png" alt="Focused emotion cue reader screenshot" width="360"> |
+| `[concerned]` | Concerned emotional tone | Uses a concerned tint on the central word | <img src="docs/screenshots/readme/tps-cues/25-emotion-concerned.png" alt="Concerned emotion cue reader screenshot" width="360"> |
+| `[motivational]` | Motivational emotional tone | Gives the central word an encouraging emphasis | <img src="docs/screenshots/readme/tps-cues/26-emotion-motivational.png" alt="Motivational emotion cue reader screenshot" width="360"> |
+| `[neutral]` | Neutral tone reset | Returns the central word to neutral delivery even inside a warmer block context | <img src="docs/screenshots/readme/tps-cues/27-emotion-neutral.png" alt="Neutral emotion cue reader screenshot" width="360"> |
+| `[aside]` | Aside delivery shape | Gives the central word a delivery-specific aside cue | <img src="docs/screenshots/readme/tps-cues/28-delivery-aside.png" alt="Aside delivery cue reader screenshot" width="360"> |
+| `[rhetorical]` | Rhetorical delivery shape | Marks the central word with a rhetorical treatment | <img src="docs/screenshots/readme/tps-cues/29-delivery-rhetorical.png" alt="Rhetorical delivery cue reader screenshot" width="360"> |
+| `[building]` | Building delivery shape | Adds a build cue so delivery can rise through the phrase | <img src="docs/screenshots/readme/tps-cues/30-delivery-building.png" alt="Building delivery cue reader screenshot" width="360"> |
+| `[sarcasm]` | Sarcastic delivery shape | Marks the central word with a sarcastic delivery cue | <img src="docs/screenshots/readme/tps-cues/31-delivery-sarcasm.png" alt="Sarcasm delivery cue reader screenshot" width="360"> |
+| `[legato]` | Smooth articulation | Adds a music-like connected underline texture below the central word | <img src="docs/screenshots/readme/tps-cues/32-articulation-legato.png" alt="Legato articulation cue reader screenshot" width="360"> |
+| `[staccato]` | Clipped articulation | Adds a dotted, clipped underline texture below the central word | <img src="docs/screenshots/readme/tps-cues/33-articulation-staccato.png" alt="Staccato articulation cue reader screenshot" width="360"> |
+| `[energy:8]` | High intensity contour | Adds stronger energy weight and rhythm to the central word | <img src="docs/screenshots/readme/tps-cues/34-contour-energy.png" alt="Energy contour cue reader screenshot" width="360"> |
+| `[melody:3]` | Melodic movement | Adds a subtle melodic contour to the central word | <img src="docs/screenshots/readme/tps-cues/35-contour-melody.png" alt="Melody contour cue reader screenshot" width="360"> |
+| `[highlight]` | Editorial highlight | Preserves highlight as a visible phrase cue on the central word | <img src="docs/screenshots/readme/tps-cues/36-editorial-highlight.png" alt="Highlight cue reader screenshot" width="360"> |
+| `[emphasis]` | Editorial emphasis | Preserves emphasis as continuous reader styling | <img src="docs/screenshots/readme/tps-cues/37-editorial-emphasis.png" alt="Emphasis cue reader screenshot" width="360"> |
+| Markdown bold | Strong editorial emphasis | Shows bold emphasis on the central word without raw markdown markers | <img src="docs/screenshots/readme/tps-cues/38-markdown-bold.png" alt="Markdown bold reader screenshot" width="360"> |
+| Markdown italic | Light editorial emphasis | Shows italic emphasis on the central word without raw markdown markers | <img src="docs/screenshots/readme/tps-cues/39-markdown-italic.png" alt="Markdown italic reader screenshot" width="360"> |
+| `[pronunciation:guide]` | Pronunciation note | Keeps the central reader word clean while preserving pronunciation metadata | <img src="docs/screenshots/readme/tps-cues/40-guide-pronunciation.png" alt="Pronunciation guide reader screenshot" width="360"> |
+| `[phonetic:IPA]` | Phonetic note | Keeps the central reader word clean while preserving phonetic metadata | <img src="docs/screenshots/readme/tps-cues/41-guide-phonetic.png" alt="Phonetic guide reader screenshot" width="360"> |
+| `[stress:rising]` | Stress guide | Adds stress treatment to the central word for rehearsal | <img src="docs/screenshots/readme/tps-cues/42-guide-stress.png" alt="Stress guide reader screenshot" width="360"> |
+| `[edit_point]` | Production cut point | Stays out of the spoken word while leaving operator/editor context | <img src="docs/screenshots/readme/tps-cues/43-edit-point.png" alt="Edit point reader screenshot" width="360"> |
+| `[edit_point:medium]` | Medium production cut point | Stays out of the spoken line and records a stronger editor marker | <img src="docs/screenshots/readme/tps-cues/44-edit-point-medium.png" alt="Medium edit point reader screenshot" width="360"> |
+| `[edit_point:high]` | High production cut point | Stays out of the spoken line and records the strongest editor marker | <img src="docs/screenshots/readme/tps-cues/45-edit-point-high.png" alt="High edit point reader screenshot" width="360"> |
+| `Speaker:Narrator` | Speaker metadata | Keeps persona metadata in validation, graph, and optional chrome without raw reader text | <img src="docs/screenshots/readme/tps-cues/46-metadata-speaker.png" alt="Speaker metadata reader screenshot" width="360"> |
+| `Archetype:Coach` | Archetype metadata | Keeps delivery persona metadata in validation, graph, and optional chrome without raw reader text | <img src="docs/screenshots/readme/tps-cues/47-metadata-archetype.png" alt="Archetype metadata reader screenshot" width="360"> |
 
 The full implemented rendering contract, animation constraints, and verification evidence are recorded in [TPS Cue Rendering Specification](TPS_CUE_RENDERING_PLAN.md).
 

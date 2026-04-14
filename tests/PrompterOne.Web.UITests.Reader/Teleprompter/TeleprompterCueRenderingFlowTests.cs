@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
 
@@ -8,9 +9,61 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixture)
 {
     private const string CueScenario = "teleprompter-tps-cue-rendering";
+    private const string CueMatrixScenario = "teleprompter-tps-cue-matrix";
     private const int InspirationCardIndex = 6;
+    private const int ActiveWordProbeTimeoutMs = 1_000;
     private const string StepName = "01-teleprompter-cue-rendering";
     private const string CueTextStepName = "02-teleprompter-cue-text";
+    private static readonly CueMatrixCapture[] CueMatrixCaptures =
+    [
+        new(0, "01-structure-baseline", "Structure baseline"),
+        new(1, "02-pause-slash", "Pause slash", ExpectedPauseCount: 1),
+        new(2, "03-pause-double-slash", "Pause double slash", ExpectedPauseCount: 1),
+        new(3, "04-pause-500ms", "Pause 500ms", ExpectedPauseCount: 1),
+        new(4, "05-pause-1s", "Pause 1s", ExpectedPauseCount: 1),
+        new(5, "06-breath", "Breath", ExpectedBreathCount: 1),
+        new(6, "07-speed-xslow", "[xslow]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueXslow),
+        new(7, "08-speed-slow", "[slow]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueSlow),
+        new(8, "09-speed-normal", "[normal]", TpsVisualCueContracts.SpeedAttributeName, ExpectedNoAttribute: true),
+        new(9, "10-speed-fast", "[fast]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueFast),
+        new(10, "11-speed-xfast", "[xfast]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueXfast),
+        new(11, "12-speed-180wpm", "[180WPM]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueFast),
+        new(12, "13-volume-loud", "[loud]", TpsVisualCueContracts.VolumeAttributeName, TpsVisualCueContracts.VolumeLoud),
+        new(13, "14-volume-soft", "[soft]", TpsVisualCueContracts.VolumeAttributeName, TpsVisualCueContracts.VolumeSoft),
+        new(14, "15-volume-whisper", "[whisper]", TpsVisualCueContracts.VolumeAttributeName, TpsVisualCueContracts.VolumeWhisper),
+        new(15, "16-emotion-warm", "[warm]", TpsVisualCueContracts.EmotionAttributeName, "warm"),
+        new(16, "17-emotion-urgent", "[urgent]", TpsVisualCueContracts.EmotionAttributeName, "urgent"),
+        new(17, "18-emotion-excited", "[excited]", TpsVisualCueContracts.EmotionAttributeName, "excited"),
+        new(18, "19-emotion-happy", "[happy]", TpsVisualCueContracts.EmotionAttributeName, "happy"),
+        new(19, "20-emotion-sad", "[sad]", TpsVisualCueContracts.EmotionAttributeName, "sad"),
+        new(20, "21-emotion-calm", "[calm]", TpsVisualCueContracts.EmotionAttributeName, "calm"),
+        new(21, "22-emotion-energetic", "[energetic]", TpsVisualCueContracts.EmotionAttributeName, "energetic"),
+        new(22, "23-emotion-professional", "[professional]", TpsVisualCueContracts.EmotionAttributeName, "professional"),
+        new(23, "24-emotion-focused", "[focused]", TpsVisualCueContracts.EmotionAttributeName, "focused"),
+        new(24, "25-emotion-concerned", "[concerned]", TpsVisualCueContracts.EmotionAttributeName, "concerned"),
+        new(25, "26-emotion-motivational", "[motivational]", TpsVisualCueContracts.EmotionAttributeName, "motivational"),
+        new(26, "27-emotion-neutral", "[neutral]", TpsVisualCueContracts.EmotionAttributeName, "neutral"),
+        new(27, "28-delivery-aside", "[aside]", TpsVisualCueContracts.DeliveryAttributeName, "aside"),
+        new(28, "29-delivery-rhetorical", "[rhetorical]", TpsVisualCueContracts.DeliveryAttributeName, "rhetorical"),
+        new(29, "30-delivery-building", "[building]", TpsVisualCueContracts.DeliveryAttributeName, TpsVisualCueContracts.DeliveryModeBuilding),
+        new(30, "31-delivery-sarcasm", "[sarcasm]", TpsVisualCueContracts.DeliveryAttributeName, "sarcasm"),
+        new(31, "32-articulation-legato", "[legato]", TpsVisualCueContracts.ArticulationAttributeName, TpsVisualCueContracts.ArticulationLegato),
+        new(32, "33-articulation-staccato", "[staccato]", TpsVisualCueContracts.ArticulationAttributeName, TpsVisualCueContracts.ArticulationStaccato),
+        new(33, "34-contour-energy", "[energy:8]", TpsVisualCueContracts.EnergyAttributeName, "8"),
+        new(34, "35-contour-melody", "[melody:3]", TpsVisualCueContracts.MelodyAttributeName, "3"),
+        new(35, "36-editorial-highlight", "[highlight]", TpsVisualCueContracts.HighlightAttributeName, TpsVisualCueContracts.HighlightAttributeValue),
+        new(36, "37-editorial-emphasis", "[emphasis]", ExpectEmphasis: true),
+        new(37, "38-markdown-bold", "Markdown bold", ExpectEmphasis: true),
+        new(38, "39-markdown-italic", "Markdown italic", ExpectEmphasis: true),
+        new(39, "40-guide-pronunciation", "[pronunciation:guide]", UiDataAttributes.Teleprompter.Pronunciation, "guide"),
+        new(40, "41-guide-phonetic", "[phonetic:IPA]", UiDataAttributes.Teleprompter.Pronunciation, "IPA"),
+        new(41, "42-guide-stress", "[stress:rising]", TpsVisualCueContracts.StressAttributeName, TpsVisualCueContracts.StressAttributeValue),
+        new(42, "43-edit-point", "[edit_point]"),
+        new(43, "44-edit-point-medium", "[edit_point:medium]"),
+        new(44, "45-edit-point-high", "[edit_point:high]"),
+        new(45, "46-metadata-speaker", "Speaker metadata"),
+        new(46, "47-metadata-archetype", "Archetype metadata")
+    ];
 
     [Test]
     public async Task TeleprompterDemo_RendersTypographyDrivenCueVariablesForVolumeAndDeliveryTexture()
@@ -129,6 +182,191 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         }
     }
 
+    [Test]
+    public async Task TeleprompterCueMatrix_CapturesReadmeExamplesForEveryCueFamily()
+    {
+        UiScenarioArtifacts.ResetScenario(CueMatrixScenario);
+
+        var page = await fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await page.SetViewportSizeAsync(BrowserTestConstants.Learn.DemoViewportWidth, BrowserTestConstants.Learn.DemoViewportHeight);
+            await ReaderRouteDriver.OpenTeleprompterAsync(page, BrowserTestConstants.Routes.TeleprompterTpsCueMatrix);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await AssertCueMatrixCardCountAsync(page);
+
+            var activeCardIndex = 0;
+            var readerStage = page.GetByTestId(UiTestIds.Teleprompter.Stage);
+            foreach (var capture in CueMatrixCaptures)
+            {
+                activeCardIndex = await ActivateCueMatrixCardAsync(page, activeCardIndex, capture.CardIndex);
+                var cardText = page.GetByTestId(UiTestIds.Teleprompter.CardText(capture.CardIndex));
+                var cardCluster = page.GetByTestId(UiTestIds.Teleprompter.CardCluster(capture.CardIndex));
+                await Expect(cardCluster).ToBeVisibleAsync(new()
+                {
+                    Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
+                });
+                await ActivateCueMatrixTargetWordAsync(page, capture);
+                await AssertCueMatrixCardContractAsync(cardCluster, capture);
+                await AssertReaderWordsDoNotOverlapAsync(cardText, capture.CardIndex);
+                await UiScenarioArtifacts.CaptureLocatorAsync(readerStage, CueMatrixScenario, capture.StepName);
+            }
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    private static async Task<int> ActivateCueMatrixCardAsync(
+        Microsoft.Playwright.IPage page,
+        int activeCardIndex,
+        int cardIndex)
+    {
+        while (activeCardIndex < cardIndex)
+        {
+            await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
+            activeCardIndex++;
+        }
+
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.Card(cardIndex))).ToHaveAttributeAsync(
+            UiDataAttributes.Teleprompter.CardState,
+            UiDataAttributes.Teleprompter.ActiveState,
+            new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+        return activeCardIndex;
+    }
+
+    private static async Task ActivateCueMatrixTargetWordAsync(
+        Microsoft.Playwright.IPage page,
+        CueMatrixCapture capture)
+    {
+        var activeWord = page.GetByTestId(UiTestIds.Teleprompter.ActiveWord);
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            var text = await TryReadActiveReaderWordAsync(activeWord);
+            if (string.Equals(
+                    NormalizeReaderWord(text),
+                    "signal",
+                    StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+        }
+
+        throw new InvalidOperationException(
+            $"Unable to activate central TPS cue word for '{capture.CueLabel}'.");
+    }
+
+    private static async Task<string?> TryReadActiveReaderWordAsync(ILocator activeWord)
+    {
+        try
+        {
+            return await activeWord.TextContentAsync(new()
+            {
+                Timeout = ActiveWordProbeTimeoutMs
+            });
+        }
+        catch (TimeoutException)
+        {
+            return null;
+        }
+        catch (PlaywrightException)
+        {
+            return null;
+        }
+    }
+
+    private static async Task AssertCueMatrixCardCountAsync(Microsoft.Playwright.IPage page)
+    {
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.Card(CueMatrixCaptures.Length - 1)))
+            .ToBeAttachedAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+    }
+
+    private static async Task AssertCueMatrixCardContractAsync(
+        Microsoft.Playwright.ILocator cardCluster,
+        CueMatrixCapture capture)
+    {
+        var probe = await cardCluster.EvaluateAsync<CueMatrixCardProbe>(
+            """
+            (host, args) => {
+                const normalize = value => (value ?? '')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[.,;:!?]+$/g, '');
+                const words = [...host.querySelectorAll('.rd-w')];
+                const target = words.find(candidate => normalize(candidate.textContent) === args.targetWord);
+                return {
+                    rawTagsVisible: /\[[^\]]+\]/.test(host.textContent ?? ''),
+                    targetText: target?.textContent?.trim() ?? '',
+                    attributeValue: args.attributeName ? target?.getAttribute(args.attributeName) ?? '' : '',
+                    pauseCueCount: host.querySelectorAll('.rd-pause').length,
+                    breathCueCount: host.querySelectorAll('[data-tps-breath="true"]').length,
+                    emphasisGroupCount: host.querySelectorAll('[data-emphasis="true"]').length
+                };
+            }
+            """,
+            new
+            {
+                attributeName = capture.AttributeName,
+                targetWord = "signal"
+            });
+
+        await Assert.That(probe.RawTagsVisible)
+            .IsFalse()
+            .Because($"Expected raw TPS tags to be hidden in cue example '{capture.CueLabel}'.");
+        await Assert.That(probe.TargetText)
+            .IsEqualTo("signal")
+            .Because($"Expected cue example '{capture.CueLabel}' to keep the central reader word visible.");
+
+        if (!string.IsNullOrWhiteSpace(capture.AttributeName))
+        {
+            if (capture.ExpectedNoAttribute)
+            {
+                await Assert.That(probe.AttributeValue)
+                    .IsEqualTo(string.Empty)
+                    .Because($"Expected cue example '{capture.CueLabel}' to reset without a visible data attribute.");
+            }
+            else
+            {
+                await Assert.That(probe.AttributeValue)
+                    .IsEqualTo(capture.AttributeValue ?? string.Empty)
+                    .Because($"Expected cue example '{capture.CueLabel}' to expose its reader visual contract.");
+            }
+        }
+
+        if (capture.ExpectedPauseCount > 0)
+        {
+            await Assert.That(probe.PauseCueCount)
+                .IsEqualTo(capture.ExpectedPauseCount)
+                .Because($"Expected cue example '{capture.CueLabel}' to render one pause marker.");
+        }
+
+        if (capture.ExpectedBreathCount > 0)
+        {
+            await Assert.That(probe.BreathCueCount)
+                .IsEqualTo(capture.ExpectedBreathCount)
+                .Because($"Expected cue example '{capture.CueLabel}' to render one breath marker.");
+        }
+
+        if (capture.ExpectEmphasis)
+        {
+            await Assert.That(probe.EmphasisGroupCount)
+                .IsGreaterThanOrEqualTo(1)
+                .Because($"Expected cue example '{capture.CueLabel}' to render an emphasis group.");
+        }
+    }
+
+    private static string NormalizeReaderWord(string? value) =>
+        (value ?? string.Empty)
+            .Trim()
+            .TrimEnd('.', ',', ';', ':', '!', '?')
+            .ToLowerInvariant();
+
     private static async Task AssertReaderWordsDoNotOverlapAsync(Microsoft.Playwright.ILocator cardText, int cardIndex)
     {
         var probe = await cardText.EvaluateAsync<ReaderSpacingProbe>(
@@ -229,5 +467,31 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         public double MinimumGap { get; init; }
 
         public string Overlap { get; init; } = string.Empty;
+    }
+
+    private readonly record struct CueMatrixCapture(
+        int CardIndex,
+        string StepName,
+        string CueLabel,
+        string? AttributeName = null,
+        string? AttributeValue = null,
+        int ExpectedPauseCount = 0,
+        int ExpectedBreathCount = 0,
+        bool ExpectEmphasis = false,
+        bool ExpectedNoAttribute = false);
+
+    private sealed class CueMatrixCardProbe
+    {
+        public bool RawTagsVisible { get; init; }
+
+        public string TargetText { get; init; } = string.Empty;
+
+        public string AttributeValue { get; init; } = string.Empty;
+
+        public int PauseCueCount { get; init; }
+
+        public int BreathCueCount { get; init; }
+
+        public int EmphasisGroupCount { get; init; }
     }
 }

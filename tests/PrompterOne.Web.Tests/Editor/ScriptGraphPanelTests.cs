@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.JSInterop;
 using PrompterOne.Core.AI.Models;
 using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
@@ -10,10 +11,12 @@ public sealed class ScriptGraphPanelTests : BunitContext
 {
     private const string NodeId = "prompterone:idea:test";
     private const string Source = "Graph thinking connects the script.";
+    private const string GraphModulePath = "./_content/PrompterOne.Shared/app/script-graph-viewer.js";
+    private readonly AppHarness _harness;
 
     public ScriptGraphPanelTests()
     {
-        TestHarnessFactory.Create(this);
+        _harness = TestHarnessFactory.Create(this);
     }
 
     [Test]
@@ -131,6 +134,34 @@ public sealed class ScriptGraphPanelTests : BunitContext
         Assert.Equal(
             ScriptGraphNodeStyleModes.Dots,
             cut.Find($"[data-test='{UiTestIds.Editor.GraphCanvas}']").GetAttribute("data-graph-node-style"));
+    }
+
+    [Test]
+    public void ScriptGraphPanel_DynamicImportFailureShowsFallbackInsteadOfThrowing()
+    {
+        _harness.JsRuntime.ImportFailures[GraphModulePath] = new JSException(
+            "Failed to fetch dynamically imported module: script-graph-viewer.js");
+        var artifact = new ScriptKnowledgeGraphArtifact(
+            "test",
+            "Graph Test",
+            ScriptDocumentRevision.Create(Source),
+            [new ScriptKnowledgeGraphNode(NodeId, Source, "Idea", "story")],
+            [],
+            [],
+            "{}",
+            string.Empty);
+
+        var cut = Render<ScriptGraphPanel>(parameters => parameters
+            .Add(component => component.Artifact, artifact));
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(
+                "RendererFailed",
+                cut.Find($"[data-test='{UiTestIds.Editor.GraphSemanticStatus}']")
+                    .GetAttribute("data-status"));
+        });
+        _harness.JsRuntime.ImportFailures.Remove(GraphModulePath);
     }
 
     [Test]

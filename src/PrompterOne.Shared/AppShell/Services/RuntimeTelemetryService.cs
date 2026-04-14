@@ -181,6 +181,11 @@ public sealed class RuntimeTelemetryService(
             return SentryId.Empty;
         }
 
+        if (RuntimeTelemetrySuppressionPolicy.ShouldSuppressOutboundSentry(exception))
+        {
+            return SentryId.Empty;
+        }
+
         return _sentryClient.CaptureException(
             exception,
             scope =>

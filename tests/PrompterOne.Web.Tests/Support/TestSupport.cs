@@ -263,6 +263,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     public Dictionary<string, string> SavedJsonValues { get; } = new(StringComparer.Ordinal);
     public List<string> Invocations { get; } = [];
     public List<JsInvocationRecord> InvocationRecords { get; } = [];
+    public Dictionary<string, Exception> ImportFailures { get; } = new(StringComparer.Ordinal);
     private Dictionary<string, GoLiveOutputRuntimeSnapshot> GoLiveSessions { get; } = new(StringComparer.Ordinal);
     private Dictionary<string, GoLiveRemoteSourceRuntimeSnapshot> GoLiveRemoteSessions { get; } = new(StringComparer.Ordinal);
 
@@ -374,6 +375,11 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     private object? ImportModule(object?[]? args)
     {
         var modulePath = args?.FirstOrDefault()?.ToString() ?? string.Empty;
+        if (ImportFailures.TryGetValue(modulePath, out var exception))
+        {
+            throw exception;
+        }
+
         return string.Equals(modulePath, RuntimeTelemetryModulePath, StringComparison.Ordinal)
             ? new TestJsModule(this)
             : null;

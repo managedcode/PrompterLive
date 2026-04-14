@@ -1,6 +1,5 @@
 using System.ClientModel;
 using Anthropic;
-using Azure.AI.OpenAI;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using OpenAI;
@@ -31,15 +30,7 @@ internal static class ScriptChatClientFactory
     }
 
     private static IChatClient CreateAzureOpenAiChatClient(AgentRuntimeSettings runtimeSettings)
-    {
-        var client = new AzureOpenAIClient(
-            new Uri(CreateAzureOpenAiEndpoint(runtimeSettings.Endpoint)),
-            new ApiKeyCredential(runtimeSettings.ApiKey));
-
-        return client
-            .GetChatClient(runtimeSettings.Model)
-            .AsIChatClient();
-    }
+        => CreateOpenAiChatClient(runtimeSettings, CreateAzureOpenAiV1Endpoint(runtimeSettings.Endpoint));
 
     private static IChatClient CreateOpenAiChatClient(AgentRuntimeSettings runtimeSettings, string endpoint)
     {
@@ -52,12 +43,17 @@ internal static class ScriptChatClientFactory
             .AsIChatClient();
     }
 
-    private static string CreateAzureOpenAiEndpoint(string endpoint)
+    private static string CreateAzureOpenAiV1Endpoint(string endpoint)
     {
         var normalized = endpoint.TrimEnd('/');
+        if (normalized.Length == 0)
+        {
+            return string.Empty;
+        }
+
         return normalized.EndsWith("/openai/v1", StringComparison.OrdinalIgnoreCase)
-            ? normalized[..^"/openai/v1".Length]
-            : normalized;
+            ? $"{normalized}/"
+            : $"{normalized}/openai/v1/";
     }
 
     private static OpenAIClientOptions CreateOpenAiOptions(string endpoint)

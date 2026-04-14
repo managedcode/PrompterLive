@@ -117,6 +117,12 @@ internal static class BrowserTestLibrarySeedData
             new DateTimeOffset(2026, 3, 27, 11, 15, 0, TimeSpan.Zero),
             "test-internal"),
         CreateDocument(
+            BrowserTestConstants.Scripts.TpsCueMatrixId,
+            BrowserTestConstants.Scripts.TpsCueMatrixTitle,
+            "test-tps-cue-matrix.tps",
+            new DateTimeOffset(2026, 4, 14, 8, 0, 0, TimeSpan.Zero),
+            "test-internal"),
+        CreateDocument(
             BrowserTestConstants.Scripts.ReaderTimingId,
             BrowserTestConstants.Scripts.ReaderTimingTitle,
             "test-reader-timing.tps",

@@ -35,6 +35,10 @@ internal static class RuntimeSentryBootstrapper
             options.Environment = builder.HostEnvironment.Environment;
             options.Release = release;
             options.SendDefaultPii = true;
+            options.SetBeforeSend(sentryEvent =>
+                RuntimeTelemetrySuppressionPolicy.ShouldSuppressOutboundSentry(sentryEvent)
+                    ? null
+                    : sentryEvent);
 #if DEBUG
             options.Debug = true;
 #endif

@@ -109,7 +109,18 @@
                 </select>
             </div>
         </header>
-        @if (TryReadSemanticStatus(out var statusTitle, out var statusDetail, out var canRunTokenizer))
+        @if (_renderFailed)
+        {
+            <div class="script-graph-semantic-status"
+                 data-test="@UiTestIds.Editor.GraphSemanticStatus"
+                 data-status="@RendererFailedStatus">
+                <div>
+                    <strong>@Text(UiTextKey.EditorGraphSemanticFailedTitle)</strong>
+                    <span>@Text(UiTextKey.EditorGraphSemanticFailedDetail)</span>
+                </div>
+            </div>
+        }
+        else if (TryReadSemanticStatus(out var statusTitle, out var statusDetail, out var canRunTokenizer))
         {
             <div class="script-graph-semantic-status"
                  data-test="@UiTestIds.Editor.GraphSemanticStatus"
@@ -142,6 +153,9 @@
     private string? _renderedRevision;
     private string? _renderingRevision;
     private DotNetObjectReference<ScriptGraphPanel>? _callbackReference;
+    private bool _renderFailed;
+
+    private const string RendererFailedStatus = "RendererFailed";
 
     [Parameter] public ScriptKnowledgeGraphArtifact? Artifact { get; set; }
 
@@ -283,6 +297,7 @@
     {
         if (Artifact is null || Artifact.IsEmpty)
         {
+            _renderFailed = false;
             return;
         }
 
@@ -298,7 +313,14 @@
         try
         {
             await GraphViewer.RenderAsync(_graphElement, Artifact, BuildGraphConfig(_callbackReference));
+            _renderFailed = false;
             _renderedRevision = revision;
+        }
+        catch (JSException)
+        {
+            _renderFailed = true;
+            _renderedRevision = revision;
+            await InvokeAsync(StateHasChanged);
         }
         finally
         {

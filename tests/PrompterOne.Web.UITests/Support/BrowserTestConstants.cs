@@ -50,6 +50,7 @@ internal static partial class BrowserTestConstants
         public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
+        public const string TpsCueMatrixId = "test-tps-cue-matrix-script";
         public const string MissingId = "test-missing-script-id";
         public const string HugeDraftTitle = "Huge Editor Performance Probe";
         public const string LargeDraftTitle = "Large Editor Performance Probe";
@@ -61,6 +62,7 @@ internal static partial class BrowserTestConstants
         public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
         public const string SpeedOffsetsTitle = "TPS Speed Offsets";
+        public const string TpsCueMatrixTitle = "TPS Cue Matrix";
         public const string UntitledTitle = "Untitled Script";
     }
 
@@ -1012,6 +1014,7 @@ internal static partial class BrowserTestConstants
         public static string TeleprompterQuantum => AppRoutes.TeleprompterWithId(Scripts.QuantumId);
         public static string TeleprompterReaderTiming => AppRoutes.TeleprompterWithId(Scripts.ReaderTimingId);
         public static string TeleprompterSpeedOffsets => AppRoutes.TeleprompterWithId(Scripts.SpeedOffsetsId);
+        public static string TeleprompterTpsCueMatrix => AppRoutes.TeleprompterWithId(Scripts.TpsCueMatrixId);
 
         public static string Pattern(string route) => string.Concat("**", route);
     }

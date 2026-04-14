@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using PrompterOne.Core.Localization;
 using PrompterOne.Shared.Components.Diagnostics;
 using PrompterOne.Shared.Contracts;
@@ -12,6 +13,7 @@ using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Tests;
+using Sentry;
 
 namespace PrompterOne.Web.Tests;
 
@@ -146,6 +148,30 @@ public sealed class DiagnosticsTests : BunitContext
     }
 
     [Test]
+    public async Task UiDiagnosticsService_DoesNotSendBrowserInjectedForcedFailuresToSentry()
+    {
+        using var cultureScope = new CultureScope(AppCultureCatalog.EnglishCultureName);
+        var harness = TestHarnessFactory.Create(
+            this,
+            runtimeTelemetryOptions: CreateTelemetryOptions());
+        var diagnostics = Services.GetRequiredService<UiDiagnosticsService>();
+
+        var completed = await diagnostics.RunAsync(
+            "Library create folder",
+            "Unable to create this folder.",
+            () => Task.FromException(new JSException("Forced diagnostics failure from browser test.")));
+
+        Assert.False(completed);
+        Assert.Empty(harness.SentryClient.Exceptions);
+
+        var payload = WaitForTelemetryEventPayload(harness.JsRuntime, ExceptionEventName);
+
+        Assert.Equal("Library create folder", payload.GetProperty(ExceptionOperationParameter).GetString());
+        Assert.Equal("Forced diagnostics failure from browser test.", payload.GetProperty(ExceptionMessageParameter).GetString());
+        Assert.Equal(nameof(JSException), payload.GetProperty(ExceptionTypeParameter).GetString());
+    }
+
+    [Test]
     public void LoggingErrorBoundary_TracksFatalExceptions_ThroughRuntimeTelemetry()
     {
         using var cultureScope = new CultureScope(AppCultureCatalog.EnglishCultureName);
@@ -167,6 +193,15 @@ public sealed class DiagnosticsTests : BunitContext
             Assert.Equal("Forced boundary failure.", payload.GetProperty(ExceptionMessageParameter).GetString());
             Assert.Equal(nameof(InvalidOperationException), payload.GetProperty(ExceptionTypeParameter).GetString());
         });
+    }
+
+    [Test]
+    public void RuntimeTelemetrySuppressionPolicy_SuppressesBrowserInjectedSentryLoggerEvents()
+    {
+        var sentryEvent = new SentryEvent(
+            new JSException("Forced LiveKit connect failure from browser test."));
+
+        Assert.True(RuntimeTelemetrySuppressionPolicy.ShouldSuppressOutboundSentry(sentryEvent));
     }
 
     private string Text(UiTextKey key) =>
