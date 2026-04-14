@@ -1,5 +1,6 @@
 using System.ClientModel;
 using Anthropic;
+using Azure.AI.OpenAI;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using OpenAI;
@@ -13,7 +14,7 @@ internal static class ScriptChatClientFactory
         runtimeSettings.ProviderId switch
         {
             AgentProviderIds.Anthropic => CreateAnthropicChatClient(runtimeSettings),
-            AgentProviderIds.AzureOpenAi => CreateOpenAiChatClient(runtimeSettings, CreateAzureOpenAiEndpoint(runtimeSettings.Endpoint)),
+            AgentProviderIds.AzureOpenAi => CreateAzureOpenAiChatClient(runtimeSettings),
             AgentProviderIds.Ollama => new OllamaApiClient(new Uri(runtimeSettings.Endpoint), runtimeSettings.Model),
             _ => CreateOpenAiChatClient(runtimeSettings, runtimeSettings.Endpoint)
         };
@@ -27,6 +28,17 @@ internal static class ScriptChatClientFactory
         };
 
         return client.AsIChatClient(runtimeSettings.Model, defaultMaxOutputTokens: null);
+    }
+
+    private static IChatClient CreateAzureOpenAiChatClient(AgentRuntimeSettings runtimeSettings)
+    {
+        var client = new AzureOpenAIClient(
+            new Uri(CreateAzureOpenAiEndpoint(runtimeSettings.Endpoint)),
+            new ApiKeyCredential(runtimeSettings.ApiKey));
+
+        return client
+            .GetChatClient(runtimeSettings.Model)
+            .AsIChatClient();
     }
 
     private static IChatClient CreateOpenAiChatClient(AgentRuntimeSettings runtimeSettings, string endpoint)
@@ -44,8 +56,8 @@ internal static class ScriptChatClientFactory
     {
         var normalized = endpoint.TrimEnd('/');
         return normalized.EndsWith("/openai/v1", StringComparison.OrdinalIgnoreCase)
-            ? normalized
-            : $"{normalized}/openai/v1/";
+            ? normalized[..^"/openai/v1".Length]
+            : normalized;
     }
 
     private static OpenAIClientOptions CreateOpenAiOptions(string endpoint)

@@ -23,7 +23,7 @@ public sealed class TeleprompterCueRenderingTests : BunitContext
     private const string WhisperWord = "secret";
 
     [Test]
-    public async Task TeleprompterPage_EmitsCueAttributesAndScaleVariablesForReaderDeliverySemantics()
+    public async Task TeleprompterPage_EmitsCueAttributesAndLayoutStableVariablesForReaderDeliverySemantics()
     {
         var harness = TestHarnessFactory.Create(this, seedLibraryData: false);
         await harness.Repository.SaveAsync(
@@ -75,26 +75,29 @@ public sealed class TeleprompterCueRenderingTests : BunitContext
             Assert.Equal("4", melody.GetAttribute(TpsVisualCueContracts.MelodyAttributeName));
             Assert.Equal(TpsVisualCueContracts.BreathAttributeValue, breath.GetAttribute(TpsVisualCueContracts.BreathAttributeName));
 
-            var whisperScale = ReadStyleVariable(whisper, TpsVisualCueContracts.CueScaleVariableName);
-            var softScale = ReadStyleVariable(soft, TpsVisualCueContracts.CueScaleVariableName);
-            var loudScale = ReadStyleVariable(loud, TpsVisualCueContracts.CueScaleVariableName);
-            var stressScale = ReadStyleVariable(stress, TpsVisualCueContracts.CueScaleVariableName);
-            var energyScale = ReadStyleVariable(energy, TpsVisualCueContracts.CueScaleVariableName);
-            var melodyScale = ReadStyleVariable(melody, TpsVisualCueContracts.CueScaleVariableName);
+            var whisperOpacity = ReadStyleVariable(whisper, TpsVisualCueContracts.CueOpacityVariableName);
+            var softOpacity = ReadStyleVariable(soft, TpsVisualCueContracts.CueOpacityVariableName);
+            var loudWeight = ReadStyleVariable(loud, TpsVisualCueContracts.CueWeightVariableName);
+            var stressWeight = ReadStyleVariable(stress, TpsVisualCueContracts.CueWeightVariableName);
+            var energyWeight = ReadStyleVariable(energy, TpsVisualCueContracts.CueWeightVariableName);
+            var melodyWeight = ReadStyleVariable(melody, TpsVisualCueContracts.CueWeightVariableName);
             var energyLevel = ReadStyleVariable(energy, TpsVisualCueContracts.EnergyVariableName);
             var melodyLevel = ReadStyleVariable(melody, TpsVisualCueContracts.MelodyVariableName);
-            var buildingFirstScale = ReadStyleVariable(buildingFirst, TpsVisualCueContracts.CueScaleVariableName);
-            var buildingLastScale = ReadStyleVariable(buildingLast, TpsVisualCueContracts.CueScaleVariableName);
+            var buildingFirstProgress = ReadStyleVariable(buildingFirst, TpsVisualCueContracts.CueBuildProgressVariableName);
+            var buildingLastProgress = ReadStyleVariable(buildingLast, TpsVisualCueContracts.CueBuildProgressVariableName);
+            var buildingFirstWeight = ReadStyleVariable(buildingFirst, TpsVisualCueContracts.CueWeightVariableName);
+            var buildingLastWeight = ReadStyleVariable(buildingLast, TpsVisualCueContracts.CueWeightVariableName);
 
-            Assert.True(whisperScale < softScale, $"Expected whisper scale < soft scale, got {whisperScale} and {softScale}.");
-            Assert.True(softScale < 1d, $"Expected soft scale below 1, got {softScale}.");
-            Assert.True(loudScale > 1d, $"Expected loud scale above 1, got {loudScale}.");
-            Assert.True(stressScale > 1d, $"Expected stress scale above 1, got {stressScale}.");
-            Assert.True(energyScale > 1d, $"Expected energy scale above 1, got {energyScale}.");
-            Assert.True(melodyScale > 1d, $"Expected melody scale above 1, got {melodyScale}.");
-            Assert.Equal(0.8d, energyLevel);
-            Assert.Equal(0.4d, melodyLevel);
-            Assert.True(buildingLastScale > buildingFirstScale, $"Expected building ramp to increase, got {buildingFirstScale} then {buildingLastScale}.");
+            Assert.True(whisperOpacity < softOpacity, $"Expected whisper opacity < soft opacity, got {whisperOpacity} and {softOpacity}.");
+            Assert.True(softOpacity < 1d, $"Expected soft opacity below 1, got {softOpacity}.");
+            Assert.True(loudWeight >= 800d, $"Expected loud weight to be strong, got {loudWeight}.");
+            Assert.True(stressWeight >= 820d, $"Expected stress weight to be strong, got {stressWeight}.");
+            Assert.True(energyWeight > 700d, $"Expected energy weight to rise, got {energyWeight}.");
+            Assert.True(melodyWeight > 640d, $"Expected melody weight to rise, got {melodyWeight}.");
+            Assert.Equal(0.778d, energyLevel);
+            Assert.Equal(0.333d, melodyLevel);
+            Assert.True(buildingLastProgress > buildingFirstProgress, $"Expected building progress to increase, got {buildingFirstProgress} then {buildingLastProgress}.");
+            Assert.True(buildingLastWeight > buildingFirstWeight, $"Expected building weight to increase, got {buildingFirstWeight} then {buildingLastWeight}.");
         });
     }
 

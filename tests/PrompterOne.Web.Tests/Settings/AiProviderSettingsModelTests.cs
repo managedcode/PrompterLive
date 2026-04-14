@@ -1,4 +1,7 @@
+using System.Globalization;
+using Microsoft.Extensions.Configuration;
 using PrompterOne.Shared.Settings.Models;
+using PrompterOne.Shared.Settings.Services;
 
 namespace PrompterOne.Web.Tests;
 
@@ -118,5 +121,38 @@ public sealed class AiProviderSettingsModelTests
         Assert.Equal(CustomModelName, model.Name);
         Assert.Equal(AiProviderModelTypes.TextToAudio, model.Type);
         Assert.Equal(CustomContextSize, model.ContextSize);
+    }
+
+    [Test]
+    public void AppSettingsFactory_MapsAzureOpenAiEndpointAndModelsIntoProviderSettings()
+    {
+        const string DefaultEndpointName = "eastus-primary";
+        const string AzureDeploymentId = "gpt-4o";
+        const int AzureContextWindowTokens = 128000;
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["AiProvider:Type"] = "AzureOpenAI",
+                ["AiProvider:DefaultEndpoint"] = DefaultEndpointName,
+                ["AiProvider:Endpoints:eastus-primary:Endpoint"] = AzureEndpoint,
+                ["AiProvider:Endpoints:eastus-primary:ApiKey"] = AzureApiKey,
+                ["AiProvider:Models:chat.gpt-4o:DeploymentId"] = AzureDeploymentId,
+                ["AiProvider:Models:chat.gpt-4o:Type"] = "Chat",
+                ["AiProvider:Models:chat.gpt-4o:Connection"] = DefaultEndpointName,
+                ["AiProvider:Models:chat.gpt-4o:ContextWindowTokens"] = AzureContextWindowTokens.ToString(CultureInfo.InvariantCulture)
+            })
+            .Build();
+
+        var settings = AiProviderAppSettingsFactory.Create(configuration);
+
+        Assert.NotNull(settings);
+        Assert.True(settings.AzureOpenAi.IsConfigured());
+        Assert.Equal(AzureApiKey, settings.AzureOpenAi.ApiKey);
+        Assert.Equal(AzureEndpoint, settings.AzureOpenAi.Endpoint);
+        Assert.Equal(AzureDeploymentId, settings.AzureOpenAi.Deployment);
+        Assert.Equal(AzureDeploymentId, settings.AzureOpenAi.Models.Single().Name);
+        Assert.Equal(AzureContextWindowTokens, settings.AzureOpenAi.Models.Single().ContextSize);
+        Assert.Equal(AiProviderModelTypes.Text, settings.AzureOpenAi.Models.Single().Type);
     }
 }

@@ -1,6 +1,6 @@
+using System.Globalization;
 using ManagedCode.MarkdownLd.Kb.Pipeline;
 using PrompterOne.Core.AI.Models;
-using System.Globalization;
 
 namespace PrompterOne.Core.AI.Services;
 

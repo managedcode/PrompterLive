@@ -17,7 +17,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const int IntroductionCardIndex = 4;
     private const string IntroductionWord = "comes";
     private const int InspirationCardIndex = 6;
-    private const double MinimumVisibleFastLetterSpacingEm = -0.024d;
+    private const double MaximumVisibleFastLetterSpacingEm = 0d;
     private const double MinimumVisibleSlowLetterSpacingEm = 0.045d;
     private const string MaximumReaderWidthLabel = "100%";
     private const string MaximumReaderWidthValue = "100";
@@ -118,8 +118,8 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
 
             Assert.Equal("xfast", fastWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
-            Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
-            Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
+            Assert.Contains("--tps-word-letter-spacing:0", fastWord.GetAttribute("style"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(fastWord) <= MaximumVisibleFastLetterSpacingEm);
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(fastWord));
 
             Assert.Equal("rhetorical", rhetoricalWord.GetAttribute(TpsVisualCueContracts.DeliveryAttributeName));
@@ -166,8 +166,8 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
             Assert.Equal("fast", fastWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Equal(SpeedOffsetsFastWpm, fastWord.GetAttribute("data-effective-wpm"));
-            Assert.Contains("--tps-word-letter-spacing:-", fastWord.GetAttribute("style"), StringComparison.Ordinal);
-            Assert.True(GetLetterSpacingEm(fastWord) <= MinimumVisibleFastLetterSpacingEm);
+            Assert.Contains("--tps-word-letter-spacing:0", fastWord.GetAttribute("style"), StringComparison.Ordinal);
+            Assert.True(GetLetterSpacingEm(fastWord) <= MaximumVisibleFastLetterSpacingEm);
 
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(normalWord));
             Assert.True(GetWordDurationMilliseconds(resumedSlowWord) > GetWordDurationMilliseconds(normalWord));

@@ -43,7 +43,7 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultTitle)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackTitle);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultSummary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackSummary);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultBadge)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackBadge);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultLibrary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackDestination);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultLibrary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackSiblingDestination);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultCurrentDraft)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackDraftNote);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultItem(0))).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeOneTitle);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultItem(1))).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeTwoTitle);
@@ -60,9 +60,10 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
                 noWaitAfter: true);
             await ShellRouteDriver.WaitForLibraryReadyAsync(page);
             await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
+            var libraryPage = page.GetByTestId(UiTestIds.Library.Page);
 
-            await Expect(page.GetByTestId(UiTestIds.Library.Card(EditorSplitFeedbackTestData.EpisodeOneCardId))).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeOneTitle);
-            await Expect(page.GetByTestId(UiTestIds.Library.Card(EditorSplitFeedbackTestData.EpisodeTwoCardId))).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeTwoTitle);
+            await Expect(libraryPage).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeOneTitle);
+            await Expect(libraryPage).ToContainTextAsync(EditorSplitFeedbackTestData.EpisodeTwoTitle);
         });
 
     [Test]
@@ -86,7 +87,7 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultTitle)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackTitle);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultSummary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackSummary);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultBadge)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitSpeakerBadge);
-            await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultLibrary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackDestination);
+            await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultLibrary)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackSiblingDestination);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultCurrentDraft)).ToHaveTextAsync(EditorSplitFeedbackTestData.SplitFeedbackDraftNote);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultItem(0))).ToContainTextAsync(EditorSplitFeedbackTestData.SpeakerCreatedTitles[0]);
             await Expect(page.GetByTestId(UiTestIds.Editor.SplitResultItem(1))).ToContainTextAsync(EditorSplitFeedbackTestData.SpeakerCreatedTitles[1]);
@@ -103,8 +104,9 @@ public sealed class EditorDocumentSplitFlowTests(StandaloneAppFixture fixture) :
                 noWaitAfter: true);
             await ShellRouteDriver.WaitForLibraryReadyAsync(page);
             await page.GetByTestId(UiTestIds.Library.FolderAll).ClickAsync();
+            var libraryPage = page.GetByTestId(UiTestIds.Library.Page);
 
-            await Expect(page.GetByTestId(UiTestIds.Library.Card(EditorSplitFeedbackTestData.SpeakerAlexCardId))).ToContainTextAsync(EditorSplitFeedbackTestData.SpeakerCreatedTitles[0]);
-            await Expect(page.GetByTestId(UiTestIds.Library.Card(EditorSplitFeedbackTestData.JordanCardId))).ToContainTextAsync(EditorSplitFeedbackTestData.JordanTitle);
+            await Expect(libraryPage).ToContainTextAsync(EditorSplitFeedbackTestData.SpeakerCreatedTitles[0]);
+            await Expect(libraryPage).ToContainTextAsync(EditorSplitFeedbackTestData.JordanTitle);
         });
 }

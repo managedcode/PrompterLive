@@ -2,6 +2,7 @@ namespace PrompterOne.Shared.Contracts;
 
 public static class TpsVisualCueContracts
 {
+    public const string CueBuildProgressVariableName = "--tps-build-progress";
     public const string CueOpacityVariableName = "--tps-cue-opacity";
     public const string CueScaleVariableName = "--tps-cue-scale";
     public const string CueWeightVariableName = "--tps-cue-weight";

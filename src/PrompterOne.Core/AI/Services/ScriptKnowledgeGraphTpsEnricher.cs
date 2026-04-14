@@ -1,6 +1,6 @@
+using System.Text;
 using ManagedCode.Tps.Models;
 using PrompterOne.Core.AI.Models;
-using System.Text;
 
 namespace PrompterOne.Core.AI.Services;
 

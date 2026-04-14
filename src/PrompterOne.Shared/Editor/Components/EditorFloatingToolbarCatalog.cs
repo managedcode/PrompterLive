@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Localization;
-using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 

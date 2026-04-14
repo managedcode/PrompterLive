@@ -1,15 +1,24 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.AI;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.Logging.Abstractions;
 using PrompterOne.Core.AI.Abstractions;
 using PrompterOne.Core.AI.Models;
 
 namespace PrompterOne.Core.AI.Services;
 
-public sealed class ScriptKnowledgeGraphLlmExtractor(IAgentRuntimeSettingsSource settingsSource) : IScriptKnowledgeGraphSemanticExtractor
+public sealed class ScriptKnowledgeGraphLlmExtractor(
+    IAgentRuntimeSettingsSource settingsSource,
+    IServiceProvider serviceProvider) : IScriptKnowledgeGraphSemanticExtractor
 {
     private const int MaximumScopeCount = 18;
     private const int MaximumScopeCharacters = 1800;
+    private const string ExtractorInstructions = """
+        You are the PrompterOne script knowledge graph extractor.
+        Extract writer-facing graph concepts from compiled TPS display text.
+        Return only valid JSON that matches the requested schema.
+        Do not include markdown fences, comments, TPS syntax tokens, or line-number-only concepts.
+        """;
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -17,6 +26,7 @@ public sealed class ScriptKnowledgeGraphLlmExtractor(IAgentRuntimeSettingsSource
     };
 
     private readonly IAgentRuntimeSettingsSource _settingsSource = settingsSource;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public async Task<ScriptKnowledgeGraphSemanticExtraction?> ExtractAsync(
         ScriptKnowledgeGraphSemanticExtractionRequest request,
@@ -31,11 +41,20 @@ public sealed class ScriptKnowledgeGraphLlmExtractor(IAgentRuntimeSettingsSource
             return null;
         }
 
-        var chatClient = ScriptChatClientFactory.Create(runtimeSettings);
-        var response = await chatClient
-            .GetResponseAsync(CreatePrompt(request), options: null, cancellationToken)
+        var agent = new ChatClientAgent(
+            ScriptChatClientFactory.Create(runtimeSettings),
+            ExtractorInstructions,
+            "PrompterOne Script Graph Extractor",
+            "Extracts writer-facing knowledge graph JSON from compiled TPS script scopes.",
+            [],
+            NullLoggerFactory.Instance,
+            _serviceProvider);
+        var session = await agent.CreateSessionAsync(cancellationToken).ConfigureAwait(false);
+        var response = await agent
+            .RunAsync(CreatePrompt(request), session, new AgentRunOptions(), cancellationToken)
             .ConfigureAwait(false);
-        return ParseResponse(response.Text);
+
+        return ParseResponse(ExtractOutput(response));
     }
 
     private static string CreatePrompt(ScriptKnowledgeGraphSemanticExtractionRequest request)
@@ -71,6 +90,19 @@ public sealed class ScriptKnowledgeGraphLlmExtractor(IAgentRuntimeSettingsSource
         return normalized.Length <= maximumLength
             ? normalized
             : string.Concat(normalized.AsSpan(0, maximumLength - 3).Trim(), "...");
+    }
+
+    private static string ExtractOutput(AgentResponse response)
+    {
+        var messages = response.Messages
+            .Select(static message => message.Text?.Trim())
+            .Where(static text => !string.IsNullOrWhiteSpace(text))
+            .Cast<string>()
+            .ToArray();
+
+        return messages.Length == 0
+            ? string.Empty
+            : string.Join(Environment.NewLine + Environment.NewLine, messages);
     }
 
     private static ScriptKnowledgeGraphSemanticExtraction? ParseResponse(string? responseText)

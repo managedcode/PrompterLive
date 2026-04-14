@@ -1,11 +1,16 @@
+using System.Text.Json;
 using Microsoft.Playwright;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Services.Editor;
 using static Microsoft.Playwright.Assertions;
 
 namespace PrompterOne.Web.UITests;
 
 internal static class EditorIsolatedDraftDriver
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
     internal static async Task OpenBlankDraftAsync(IPage page)
     {
         await EditorRouteDriver.OpenReadyAsync(page, BrowserTestConstants.Routes.Editor, "editor-open-blank-draft");
@@ -30,19 +35,23 @@ internal static class EditorIsolatedDraftDriver
         string? title = null,
         bool waitForPersistedRoute = true)
     {
-        await OpenBlankDraftAsync(page);
-        await EditorMonacoDriver.SetTextAsync(page, visibleText);
         if (waitForPersistedRoute)
         {
-            await WaitForAssignedScriptRouteAsync(page);
+            var draftId = $"test-draft-{Guid.NewGuid():N}";
+            var draftTitle = string.IsNullOrWhiteSpace(title) ? BrowserTestConstants.Scripts.UntitledTitle : title.Trim();
+            await SeedDraftDocumentAsync(page, draftId, draftTitle, visibleText);
+            await EditorRouteDriver.OpenReadyAsync(page, AppRoutes.EditorWithId(draftId), $"editor-isolated-draft-{draftId}");
             await Expect(page.GetByTestId(UiTestIds.Editor.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await Expect(EditorMonacoDriver.SourceInput(page)).ToHaveValueAsync(visibleText, new()
             {
                 Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs
             });
+            return;
         }
+
+        await OpenBlankDraftAsync(page);
+        await EditorMonacoDriver.SetTextAsync(page, visibleText);
 
         if (!string.IsNullOrWhiteSpace(title))
         {
@@ -129,4 +138,47 @@ internal static class EditorIsolatedDraftDriver
                 scriptIdKey = AppRoutes.ScriptIdQueryKey
             },
             new() { Timeout = BrowserTestConstants.Timing.DefaultNavigationTimeoutMs });
+
+    private static Task SeedDraftDocumentAsync(IPage page, string draftId, string title, string visibleText)
+    {
+        var document = new BrowserStoredScriptDocumentDto
+        {
+            Id = draftId,
+            Title = title,
+            Text = visibleText,
+            DocumentName = $"{draftId}.tps",
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+        var revision = new EditorLocalRevisionRecord(
+            document.UpdatedAt.UtcTicks.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            title,
+            document.DocumentName,
+            visibleText,
+            document.UpdatedAt);
+
+        return page.EvaluateAsync(
+            """
+            (args) => {
+                const documents = JSON.parse(window.localStorage.getItem(args.documentLibraryKey) || "[]");
+                const document = JSON.parse(args.documentJson);
+                const nextDocuments = documents.filter(candidate => candidate?.id !== document.id && candidate?.Id !== document.Id);
+                nextDocuments.push(document);
+                window.localStorage.setItem(args.documentLibraryKey, JSON.stringify(nextDocuments));
+                window.localStorage.setItem(args.documentSeedVersionKey, args.materializationVersion);
+                window.localStorage.setItem(args.historyKey, args.historyJson);
+            }
+            """,
+            new
+            {
+                documentJson = JsonSerializer.Serialize(document, JsonOptions),
+                documentLibraryKey = BrowserStorageKeys.DocumentLibrary,
+                documentSeedVersionKey = BrowserStorageKeys.DocumentSeedVersion,
+                historyJson = JsonSerializer.Serialize(new[] { revision }, JsonOptions),
+                historyKey = string.Concat(
+                    BrowserStorageKeys.SettingsPrefix,
+                    BrowserStorageKeys.EditorLocalHistoryKeyPrefix,
+                    draftId),
+                materializationVersion = BrowserStorageKeys.LibraryMaterializationVersion
+            });
+    }
 }

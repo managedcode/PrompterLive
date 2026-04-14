@@ -233,7 +233,7 @@
 
 /* ── TPS Highlight ── */
 .tps-highlight {
-    background: rgba(255,224,102,.12);
+    background: rgba(255,224,102,.18);
     border-radius: 4px;
     padding: 1px 4px;
     margin: 0 -2px;
@@ -272,10 +272,15 @@
 .tps-aside { color: #D8C29B; opacity: var(--tps-cue-opacity, .88); font-style: italic; }
 .tps-rhetorical { color: #CDB3E9; }
 .tps-sarcasm { color: #E2B6C7; opacity: var(--tps-cue-opacity, .92); }
-.tps-building { color: #F0D48D; font-weight: var(--tps-cue-weight, 700); }
+.tps-building {
+    color: #F0D48D;
+    font-weight: var(--tps-cue-weight, 700);
+    text-shadow: 0 0 calc(5px + (12px * var(--tps-build-progress, 0))) rgba(240,212,141, calc(.08 + (.16 * var(--tps-build-progress, 0))));
+}
 
 /* ── TPS Speed Indicators (visual cue for speed tags) ── */
 .tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.085em); }
 .tps-slow { letter-spacing: var(--tps-word-letter-spacing, 0.045em); }
-.tps-fast { letter-spacing: var(--tps-word-letter-spacing, -0.024em); }
-.tps-xfast { letter-spacing: var(--tps-word-letter-spacing, -0.05em); opacity: .82; }
+.tps-fast { letter-spacing: var(--tps-word-letter-spacing, 0); }
+.tps-xfast { letter-spacing: var(--tps-word-letter-spacing, 0); opacity: .82; }
+.tps-normal { letter-spacing: 0; }

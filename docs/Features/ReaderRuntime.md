@@ -12,7 +12,7 @@ The important contracts are:
 - RSVP stops on the last word by default and only wraps when the Learn loop toggle is explicitly enabled.
 - Teleprompter camera stays behind the text as one background layer.
 - Teleprompter word groups stay short enough to avoid run-on lines.
-- Teleprompter preserves TPS word presentation details such as pronunciation guides, inline colors, emotion styling, and speed-derived spacing/timing.
+- Teleprompter preserves TPS word presentation details such as pronunciation guides, inline colors, emotion styling, slow-speed spacing, and speed-derived timing.
 - Teleprompter pre-centers the next card before it slides in, so block transitions do not jump at the focal line.
 - Teleprompter block transitions always move in one upward direction: the outgoing card exits up and the incoming card rises from below.
 - Teleprompter controls stay readable at rest; they must not fade until they become unusable.
@@ -56,7 +56,7 @@ flowchart LR
 - `teleprompter` groups words by pauses, sentence endings, clause endings, and short phrase limits.
 - `teleprompter` forwards TPS pronunciation metadata to word-level `title` / `data-pronunciation` attributes.
 - `teleprompter` derives word-level pacing from the compiled TPS duration and carries effective WPM into the DOM for testable parity.
-- `teleprompter` preserves TPS front-matter speed offsets and `[normal]` resets when rebuilding reader blocks, so relative speed tags keep both their timing math and subtle word-level spacing cues.
+- `teleprompter` preserves TPS front-matter speed offsets and `[normal]` resets when rebuilding reader blocks, so relative speed tags keep their timing math, slow tags may add subtle word-level spacing cues, and fast tags keep normal non-overlapping spacing.
 - `teleprompter` applies TPS inline emotion colors only when a word is explicitly tagged; untagged reader words must stay on the base reader palette instead of inheriting an implicit `neutral` word class.
 - `teleprompter` keeps TPS inline colors visible even when a phrase group is active or the active word is highlighted.
 - `teleprompter` keeps the active focus word calm: the active word may be brighter than its neighbors, but upcoming and read words stay gently dimmed and active-word glow stays restrained enough to avoid a bright moving patch.
@@ -88,5 +88,5 @@ flowchart LR
 - Playwright verifies delayed teleprompter rail tooltips stay hidden during the initial hover delay, appear after the delay, and stay outside the hovered button or slider bounds.
 - Playwright verifies a dedicated reader-timing probe for both `learn` and `teleprompter`, recording emitted words in the browser and checking that sequence order and elapsed delays match the rendered timing contract word by word.
 - Playwright verifies the teleprompter stylesheet is already registered in `document.styleSheets` before the app navigates into the teleprompter route.
-- Playwright verifies custom TPS speed offsets change computed teleprompter `letter-spacing` while `[normal]` words reset back to neutral spacing and timing.
+- Playwright verifies custom TPS speed offsets keep fast teleprompter `letter-spacing` non-negative, allow slow cues to widen spacing, and reset `[normal]` words back to neutral spacing and timing.
 - Playwright verifies teleprompter width and focal settings survive a real browser reload and that backward block jumps reverse direction instead of reusing the forward upward-only path.

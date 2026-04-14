@@ -1,5 +1,4 @@
 using PrompterOne.Core.AI.Models;
-using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Tools;

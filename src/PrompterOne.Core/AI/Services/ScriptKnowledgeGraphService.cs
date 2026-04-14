@@ -1,4 +1,6 @@
 using ManagedCode.MarkdownLd.Kb.Pipeline;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using PrompterOne.Core.AI.Abstractions;
 using PrompterOne.Core.AI.Models;
 
@@ -6,12 +8,14 @@ namespace PrompterOne.Core.AI.Services;
 
 public sealed class ScriptKnowledgeGraphService(
     IScriptKnowledgeGraphSemanticExtractor? semanticExtractor = null,
-    ScriptKnowledgeGraphTokenizerSimilarityExtractor? tokenizerSimilarityExtractor = null)
+    ScriptKnowledgeGraphTokenizerSimilarityExtractor? tokenizerSimilarityExtractor = null,
+    ILogger<ScriptKnowledgeGraphService>? logger = null)
 {
     private const string DocumentNodeId = "prompterone:document";
     private const string ContainsEdgeLabel = "contains";
     private readonly IScriptKnowledgeGraphSemanticExtractor? _semanticExtractor = semanticExtractor;
     private readonly ScriptKnowledgeGraphTokenizerSimilarityExtractor _tokenizerSimilarityExtractor = tokenizerSimilarityExtractor ?? new();
+    private readonly ILogger<ScriptKnowledgeGraphService> _logger = logger ?? NullLogger<ScriptKnowledgeGraphService>.Instance;
 
     public async Task<ScriptKnowledgeGraphArtifact> BuildAsync(
         ScriptKnowledgeGraphBuildRequest request,
@@ -131,8 +135,9 @@ public sealed class ScriptKnowledgeGraphService(
         {
             throw;
         }
-        catch
+        catch (Exception exception)
         {
+            _logger.LogWarning(exception, "Script knowledge graph model extraction failed.");
             return ScriptKnowledgeGraphSemanticStatus.ModelFailed;
         }
     }

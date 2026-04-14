@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Azure.Identity" Version="1.21.0" />
+    <PackageVersion Include="Azure.AI.OpenAI" Version="2.1.0" />
     <PackageVersion Include="bunit" Version="2.7.2" />
     <PackageVersion Include="LLamaSharp" Version="0.26.0" />
     <PackageVersion Include="ManagedCode.MarkdownLd.Kb" Version="0.1.0" />

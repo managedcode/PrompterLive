@@ -84,9 +84,22 @@ In the editor, TPS authoring stays readable while Monaco colors cue tags, underl
 
 ![TPS cue styling in the editor](docs/screenshots/readme/tps-editor-cues.png)
 
-In the teleprompter, the clean reading line keeps those cues visible through subtle contour: speed affects spacing, voice and delivery affect emphasis, breath marks appear as reading rests, legato and staccato use music-like line texture, and energy or melody adds a stronger visual rhythm without exposing raw TPS tags.
+In the teleprompter, the clean reading line keeps those cues visible through subtle contour: pace changes affect timing, slower cues may widen word spacing, faster cues keep normal non-overlapping spacing, voice and delivery affect emphasis, breath marks appear as reading rests, legato and staccato use music-like line texture, and energy or melody adds a stronger visual rhythm without exposing raw TPS tags.
 
 ![TPS cue styling in the teleprompter](docs/screenshots/readme/tps-teleprompter-cues.png)
+
+| TPS cue | Reader meaning | Visible reader treatment |
+| --- | --- | --- |
+| `#`, `##`, `###` | Script, segment, and block structure | Groups reader cards, segmented progress, and jump targets without showing raw headers in the reading line |
+| `/`, `//`, `[pause:500ms]`, `[pause:1s]`, `[breathe]` | Short and explicit rests | Adds phrase-aware timing gaps; breath and pause cues shape the cadence without becoming noisy text |
+| `[xslow]`, `[slow]`, `[normal]`, `[fast]`, `[xfast]`, `[180WPM]` | Relative or explicit pace | Changes effective word timing; slow cues can add airy spacing, while fast cues keep readable normal spacing instead of squeezing words together |
+| `[loud]`, `[soft]`, `[whisper]` | Volume and vocal intensity | Adjusts subtle color, weight, and opacity so the delivery cue is visible but the line remains readable |
+| `[warm]`, `[urgent]`, `[happy]`, `[sad]`, `[calm]`, `[energetic]`, `[professional]`, `[focused]`, `[concerned]`, `[motivational]`, `[neutral]` | Emotional tone | Tints the word and reader background mood while preserving the base reading contrast |
+| `[aside]`, `[rhetorical]`, `[building]`, `[sarcasm]` | Delivery shape | Adds delivery-specific tone color and emphasis so the speaker sees how to bend the phrase |
+| `[legato]`, `[staccato]` | Smooth versus clipped articulation | Uses music-like wavy or dotted underline texture below the affected words |
+| `[energy:8]`, `[melody:3]` | Intensity and melodic movement | Adds controlled glow or line color rhythm without shifting word layout |
+| `[highlight]`, `[emphasis]`, Markdown bold/italic | Editorial emphasis | Preserves highlight and emphasis as continuous phrase styling, not broken word-by-word fragments |
+| `[pronunciation:guide]`, `[phonetic:IPA]`, `[stress:rising]` | Pronunciation, phonetic, and stress help | Keeps the reading word clean while retaining metadata, tooltip/detail, and stress underline cues for rehearsal and review |
 
 ---
 
@@ -110,7 +123,7 @@ Context rails show nearby words without clipping into the focal lane, phrase-awa
 
 ### Teleprompter
 
-The delivery surface. Large readable text, phrase-aware emphasis, adjustable font size, adjustable reader width, and a focal guide you can reposition without leaving the route. TPS formatting carries through here too: speed modifiers affect spacing, inline emphasis stays intact, punctuation is attached correctly, and emphasis groups stay continuous instead of breaking word by word.
+The delivery surface. Large readable text, phrase-aware emphasis, adjustable font size, adjustable reader width, and a focal guide you can reposition without leaving the route. TPS formatting carries through here too: speed modifiers affect timing while preserving readable word gaps, inline emphasis stays intact, punctuation is attached correctly, and emphasis groups stay continuous instead of breaking word by word.
 
 A live camera feed can run behind the reader as a background layer, and the operator controls stay on-screen: horizontal mirror, vertical mirror, reader orientation toggle, browser fullscreen, font controls, width controls, focal positioning, segmented block progress, and transport-style playback controls all live inside the same reader shell. Smooth block-to-block transitions keep the reading flow readable in both forward and backward navigation.
 

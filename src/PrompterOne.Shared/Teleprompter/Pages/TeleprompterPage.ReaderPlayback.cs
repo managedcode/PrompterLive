@@ -8,7 +8,7 @@ public partial class TeleprompterPage
 {
     private const string AttachReaderCameraOperation = "Teleprompter camera attach";
     private const int MinimumReaderLoopDelayMilliseconds = 120;
-    private const int ReaderCardTransitionMilliseconds = 600;
+    private const int ReaderCardTransitionMilliseconds = 760;
 
     private Task DecreaseReaderPlaybackSpeedAsync() => ChangeReaderPlaybackSpeedAsync(-ReaderPlaybackSpeedStepWpm);
 

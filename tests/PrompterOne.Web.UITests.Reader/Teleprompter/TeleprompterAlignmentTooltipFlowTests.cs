@@ -121,11 +121,7 @@ public sealed class TeleprompterAlignmentTooltipFlowTests(StandaloneAppFixture f
 
     private static async Task MovePointerToStageCenterAsync(IPage page)
     {
-        var stageBounds = await page.GetByTestId(UiTestIds.Teleprompter.Stage).BoundingBoxAsync();
-        if (stageBounds is null)
-        {
-            throw new InvalidOperationException("The teleprompter stage had no bounds for clearing tooltip hover.");
-        }
+        var stageBounds = await page.GetByTestId(UiTestIds.Teleprompter.Stage).BoundingBoxAsync() ?? throw new InvalidOperationException("The teleprompter stage had no bounds for clearing tooltip hover.");
 
         await page.Mouse.MoveAsync(
             stageBounds.X + stageBounds.Width / 2,

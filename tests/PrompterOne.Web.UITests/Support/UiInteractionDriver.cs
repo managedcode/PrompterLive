@@ -108,11 +108,7 @@ internal static class UiInteractionDriver
             try
             {
                 await WaitUntilInteractableAsync(locator);
-                var bounds = await locator.BoundingBoxAsync();
-                if (bounds is null)
-                {
-                    throw new PlaywrightException("The target locator has no bounding box for hover.");
-                }
+                var bounds = await locator.BoundingBoxAsync() ?? throw new PlaywrightException("The target locator has no bounding box for hover.");
 
                 await page.Mouse.MoveAsync(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
                 return;

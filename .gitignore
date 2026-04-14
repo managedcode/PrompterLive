@@ -22,6 +22,8 @@ bower_components/
 connect.lock/
 coverage/
 output/playwright/
+src/PrompterOne.Web/wwwroot/appsettings.Development.json
+src/PrompterOne.Web/wwwroot/appsettings.development.json
 libpeerconnection.log/
 npm-debug.log
 testem.log

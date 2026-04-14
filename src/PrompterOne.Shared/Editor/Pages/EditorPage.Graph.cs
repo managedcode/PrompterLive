@@ -1,7 +1,7 @@
+using Microsoft.AspNetCore.Components.Web;
 using PrompterOne.Core.AI.Models;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace PrompterOne.Shared.Pages;
 

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Bunit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -97,6 +98,7 @@ internal static class TestHarnessFactory
         }
 
         context.Services.AddLocalization();
+        context.Services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
         context.Services.AddSingleton(jsRuntime);
         context.Services.AddSingleton<IJSRuntime>(jsRuntime);
         context.Services.AddSingleton<ILoggerFactory>(loggerFactory);

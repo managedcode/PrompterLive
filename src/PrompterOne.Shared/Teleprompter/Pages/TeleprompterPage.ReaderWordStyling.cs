@@ -5,12 +5,10 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class TeleprompterPage
 {
-    private const double BuildingScaleRange = 0.18d;
     private const int BuildingWeightBase = 700;
     private const int BuildingWeightRange = 140;
     private const double FastLetterSpacingDeadZoneRatio = 0.03d;
-    private const double FastLetterSpacingFloorEm = -0.024d;
-    private const double MaximumFastLetterSpacingEm = -0.05d;
+    private const double FastLetterSpacingCompactEm = 0d;
     private const double MaximumSlowClassLetterSpacingEm = 0.085d;
     private const int MaximumTpsContourLevel = 10;
     private const int MinimumReaderReferenceWpm = 60;
@@ -18,13 +16,7 @@ public partial class TeleprompterPage
     private const string ReaderWordLetterSpacingVariable = "--tps-word-letter-spacing";
     private const double SlowLetterSpacingFloorEm = 0.045d;
     private const double SlowLetterSpacingRangeRatio = 0.32d;
-    private const double FastLetterSpacingRangeRatio = 0.45d;
     private const double MaximumSlowLetterSpacingEm = 0.09d;
-    private const double ReaderCueScaleDefault = 1d;
-    private const double ReaderCueScaleLoud = 1.18d;
-    private const double ReaderCueScaleSoft = 0.9d;
-    private const double ReaderCueScaleStress = 1.12d;
-    private const double ReaderCueScaleWhisper = 0.78d;
     private const double ReaderCueOpacityAside = 0.88d;
     private const double ReaderCueOpacityDefault = 1d;
     private const double ReaderCueOpacitySarcasm = 0.92d;
@@ -60,9 +52,9 @@ public partial class TeleprompterPage
             styles.Add(CreateStyleVariable(TpsVisualCueContracts.MelodyVariableName, melodyLevel));
         }
 
-        if (Math.Abs(cueMetrics.Scale - ReaderCueScaleDefault) > 0.001d)
+        if (cueMetrics.BuildProgress is double buildProgress)
         {
-            styles.Add(CreateStyleVariable(TpsVisualCueContracts.CueScaleVariableName, cueMetrics.Scale));
+            styles.Add(CreateStyleVariable(TpsVisualCueContracts.CueBuildProgressVariableName, buildProgress));
         }
 
         if (Math.Abs(cueMetrics.Opacity - ReaderCueOpacityDefault) > 0.001d)
@@ -87,13 +79,14 @@ public partial class TeleprompterPage
             return null;
         }
 
-        var letterSpacingEm = speedRatio < 1d
-            ? Math.Min(
-                MaximumSlowLetterSpacingEm,
-                MaximumSlowLetterSpacingEm * (1d - speedRatio) / SlowLetterSpacingRangeRatio)
-            : -Math.Min(
-                Math.Abs(MaximumFastLetterSpacingEm),
-                Math.Abs(MaximumFastLetterSpacingEm) * (speedRatio - 1d) / FastLetterSpacingRangeRatio);
+        if (speedRatio > 1d)
+        {
+            return FastLetterSpacingCompactEm;
+        }
+
+        var letterSpacingEm = Math.Min(
+            MaximumSlowLetterSpacingEm,
+            MaximumSlowLetterSpacingEm * (1d - speedRatio) / SlowLetterSpacingRangeRatio);
 
         if (speedRatio <= 0.65d)
         {
@@ -103,15 +96,6 @@ public partial class TeleprompterPage
         {
             letterSpacingEm = Math.Max(letterSpacingEm, SlowLetterSpacingFloorEm);
         }
-        else if (speedRatio >= 1.45d)
-        {
-            letterSpacingEm = Math.Min(letterSpacingEm, MaximumFastLetterSpacingEm);
-        }
-        else if (speedRatio > 1.05d)
-        {
-            letterSpacingEm = Math.Min(letterSpacingEm, FastLetterSpacingFloorEm);
-        }
-
         if (Math.Abs(letterSpacingEm) < 0.001d)
         {
             return null;
@@ -163,22 +147,19 @@ public partial class TeleprompterPage
 
     private static ReaderCueMetrics ResolveReaderCueMetrics(WordMetadata metadata, double cueProgress)
     {
-        var scale = ReaderCueScaleDefault;
         var opacity = ReaderCueOpacityDefault;
+        double? buildProgress = null;
         int? weight = null;
 
         switch (NormalizeCueValue(metadata.VolumeLevel))
         {
             case TpsVisualCueContracts.VolumeLoud:
-                scale = Math.Max(scale, ReaderCueScaleLoud);
                 weight = MaxCueWeight(weight, ReaderCueWeightLoud);
                 break;
             case TpsVisualCueContracts.VolumeSoft:
-                scale = Math.Min(scale, ReaderCueScaleSoft);
                 opacity = Math.Min(opacity, ReaderCueOpacitySoft);
                 break;
             case TpsVisualCueContracts.VolumeWhisper:
-                scale = Math.Min(scale, ReaderCueScaleWhisper);
                 opacity = Math.Min(opacity, ReaderCueOpacityWhisper);
                 break;
         }
@@ -186,31 +167,29 @@ public partial class TeleprompterPage
         switch (NormalizeCueValue(metadata.DeliveryMode))
         {
             case TpsVisualCueContracts.DeliveryModeBuilding:
-                scale = Math.Max(scale, 1.02d + (BuildingScaleRange * cueProgress));
+                buildProgress = cueProgress;
                 weight = MaxCueWeight(
                     weight,
                     BuildingWeightBase + (int)Math.Round(BuildingWeightRange * cueProgress, MidpointRounding.AwayFromZero));
                 break;
             case "aside":
-                scale = Math.Min(scale, 0.96d);
                 opacity = Math.Min(opacity, ReaderCueOpacityAside);
                 break;
             case "rhetorical":
-                scale = Math.Max(scale, 1.02d);
+                weight = MaxCueWeight(weight, 700);
                 break;
             case "sarcasm":
                 opacity = Math.Min(opacity, ReaderCueOpacitySarcasm);
+                weight = MaxCueWeight(weight, 700);
                 break;
         }
 
         switch (NormalizeCueValue(metadata.ArticulationStyle))
         {
             case TpsVisualCueContracts.ArticulationLegato:
-                scale = Math.Max(scale, 1.01d);
                 weight = MaxCueWeight(weight, 680);
                 break;
             case TpsVisualCueContracts.ArticulationStaccato:
-                scale = Math.Max(scale, 1.04d);
                 weight = MaxCueWeight(weight, 760);
                 break;
         }
@@ -218,24 +197,21 @@ public partial class TeleprompterPage
         var energyLevel = NormalizeTpsContourLevel(metadata.EnergyLevel);
         if (energyLevel > 0d)
         {
-            scale = Math.Max(scale, 1.01d + (0.07d * energyLevel));
             weight = MaxCueWeight(weight, 620 + (int)Math.Round(190d * energyLevel, MidpointRounding.AwayFromZero));
         }
 
         var melodyLevel = NormalizeTpsContourLevel(metadata.MelodyLevel);
         if (melodyLevel > 0d)
         {
-            scale = Math.Max(scale, 1.01d + (0.025d * melodyLevel));
             weight = MaxCueWeight(weight, 620 + (int)Math.Round(80d * melodyLevel, MidpointRounding.AwayFromZero));
         }
 
         if (!string.IsNullOrWhiteSpace(metadata.StressText) || !string.IsNullOrWhiteSpace(metadata.StressGuide))
         {
-            scale = Math.Max(scale, ReaderCueScaleStress);
             weight = MaxCueWeight(weight, ReaderCueWeightStress);
         }
 
-        return new ReaderCueMetrics(scale, opacity, weight);
+        return new ReaderCueMetrics(opacity, weight, buildProgress);
     }
 
     private static int MaxCueWeight(int? currentWeight, int nextWeight) =>
@@ -248,8 +224,9 @@ public partial class TeleprompterPage
 
     private static double NormalizeTpsContourLevel(int? value) =>
         value is int level
-            ? Math.Clamp(level, MinimumTpsContourLevel, MaximumTpsContourLevel) / (double)MaximumTpsContourLevel
+            ? (Math.Clamp(level, MinimumTpsContourLevel, MaximumTpsContourLevel) - MinimumTpsContourLevel) /
+              (double)(MaximumTpsContourLevel - MinimumTpsContourLevel)
             : 0d;
 
-    private readonly record struct ReaderCueMetrics(double Scale, double Opacity, int? Weight);
+    private readonly record struct ReaderCueMetrics(double Opacity, int? Weight, double? BuildProgress);
 }

@@ -47,13 +47,6 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     const breath = nodes.find(node =>
                         node?.getAttribute('{{TpsVisualCueContracts.BreathAttributeName}}') === '{{TpsVisualCueContracts.BreathAttributeValue}}');
 
-                    const readScale = element => {
-                        if (!(element instanceof HTMLElement)) {
-                            return '';
-                        }
-
-                        return getComputedStyle(element).getPropertyValue('{{TpsVisualCueContracts.CueScaleVariableName}}').trim();
-                    };
                     const readVariable = (element, name) => {
                         if (!(element instanceof HTMLElement)) {
                             return '';
@@ -72,12 +65,14 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                         energyValue: energy?.getAttribute('{{TpsVisualCueContracts.EnergyAttributeName}}') ?? '',
                         melodyValue: melody?.getAttribute('{{TpsVisualCueContracts.MelodyAttributeName}}') ?? '',
                         breathValue: breath?.getAttribute('{{TpsVisualCueContracts.BreathAttributeName}}') ?? '',
-                        softScale: readScale(soft),
-                        loudScale: readScale(loud),
-                        firstBuildingScale: readScale(buildingWords[0]),
-                        lastBuildingScale: readScale(buildingWords.at(-1)),
-                        energyScale: readScale(energy),
-                        melodyScale: readScale(melody),
+                        softOpacity: readVariable(soft, '{{TpsVisualCueContracts.CueOpacityVariableName}}'),
+                        loudWeight: readVariable(loud, '{{TpsVisualCueContracts.CueWeightVariableName}}'),
+                        firstBuildingProgress: readVariable(buildingWords[0], '{{TpsVisualCueContracts.CueBuildProgressVariableName}}'),
+                        lastBuildingProgress: readVariable(buildingWords.at(-1), '{{TpsVisualCueContracts.CueBuildProgressVariableName}}'),
+                        firstBuildingWeight: readVariable(buildingWords[0], '{{TpsVisualCueContracts.CueWeightVariableName}}'),
+                        lastBuildingWeight: readVariable(buildingWords.at(-1), '{{TpsVisualCueContracts.CueWeightVariableName}}'),
+                        energyWeight: readVariable(energy, '{{TpsVisualCueContracts.CueWeightVariableName}}'),
+                        melodyWeight: readVariable(melody, '{{TpsVisualCueContracts.CueWeightVariableName}}'),
                         energyTone: readVariable(energy, '{{TpsVisualCueContracts.EnergyVariableName}}'),
                         melodyTone: readVariable(melody, '{{TpsVisualCueContracts.MelodyVariableName}}')
                     };
@@ -93,14 +88,15 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(probe.EnergyValue).IsEqualTo("8");
             await Assert.That(probe.MelodyValue).IsEqualTo("4");
             await Assert.That(probe.BreathValue).IsEqualTo(TpsVisualCueContracts.BreathAttributeValue);
-            await Assert.That(string.IsNullOrWhiteSpace(probe.SoftScale)).IsFalse();
-            await Assert.That(string.IsNullOrWhiteSpace(probe.LoudScale)).IsFalse();
-            await Assert.That(string.IsNullOrWhiteSpace(probe.FirstBuildingScale)).IsFalse();
-            await Assert.That(string.IsNullOrWhiteSpace(probe.LastBuildingScale)).IsFalse();
-            await Assert.That(double.Parse(probe.EnergyScale, CultureInfo.InvariantCulture)).IsGreaterThan(1d);
-            await Assert.That(double.Parse(probe.MelodyScale, CultureInfo.InvariantCulture)).IsGreaterThan(1d);
-            await Assert.That(double.Parse(probe.EnergyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.8d);
-            await Assert.That(double.Parse(probe.MelodyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.4d);
+            await Assert.That(double.Parse(probe.SoftOpacity, CultureInfo.InvariantCulture)).IsLessThan(1d);
+            await Assert.That(double.Parse(probe.LoudWeight, CultureInfo.InvariantCulture)).IsGreaterThanOrEqualTo(800d);
+            await Assert.That(double.Parse(probe.LastBuildingProgress, CultureInfo.InvariantCulture)).IsGreaterThan(double.Parse(probe.FirstBuildingProgress, CultureInfo.InvariantCulture));
+            await Assert.That(double.Parse(probe.LastBuildingWeight, CultureInfo.InvariantCulture)).IsGreaterThan(double.Parse(probe.FirstBuildingWeight, CultureInfo.InvariantCulture));
+            await Assert.That(double.Parse(probe.EnergyWeight, CultureInfo.InvariantCulture)).IsGreaterThan(700d);
+            await Assert.That(double.Parse(probe.MelodyWeight, CultureInfo.InvariantCulture)).IsGreaterThan(640d);
+            await Assert.That(double.Parse(probe.EnergyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.778d);
+            await Assert.That(double.Parse(probe.MelodyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.333d);
+            await AssertReaderWordsDoNotOverlapAsync(cardText, InspirationCardIndex);
 
             for (var index = 0; index < InspirationCardIndex; index++)
             {
@@ -133,6 +129,60 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         }
     }
 
+    private static async Task AssertReaderWordsDoNotOverlapAsync(Microsoft.Playwright.ILocator cardText, int cardIndex)
+    {
+        var probe = await cardText.EvaluateAsync<ReaderSpacingProbe>(
+            """
+            (host, args) => {
+                const nodes = Array.from(host.querySelectorAll(`[data-test^="${args.wordPrefix}"]`));
+                const words = nodes
+                    .filter(node => node instanceof HTMLElement)
+                    .map(node => {
+                        const box = node.getBoundingClientRect();
+                        return {
+                            text: node.textContent?.trim() ?? '',
+                            left: box.left,
+                            right: box.right,
+                            centerY: box.top + (box.height / 2),
+                            height: box.height
+                        };
+                    })
+                    .filter(word => word.text.length > 0 && word.height > 0);
+
+                let minimumGap = Number.POSITIVE_INFINITY;
+                let overlap = '';
+                for (let index = 0; index < words.length - 1; index++) {
+                    const current = words[index];
+                    const next = words[index + 1];
+                    const sameLine = Math.abs(current.centerY - next.centerY) <= Math.min(current.height, next.height) * 0.45;
+                    if (!sameLine) {
+                        continue;
+                    }
+
+                    const gap = next.left - current.right;
+                    minimumGap = Math.min(minimumGap, gap);
+                    if (gap < -0.5) {
+                        overlap = `${current.text}|${next.text}|${gap.toFixed(2)}`;
+                        break;
+                    }
+                }
+
+                return {
+                    minimumGap: Number.isFinite(minimumGap) ? minimumGap : 0,
+                    overlap
+                };
+            }
+            """,
+            new
+            {
+                wordPrefix = UiTestIds.Teleprompter.CardWordPrefix(cardIndex)
+            });
+
+        await Assert.That(probe.Overlap)
+            .IsEqualTo(string.Empty)
+            .Because($"Expected TPS reader words not to overlap; minimum gap was {probe.MinimumGap}px.");
+    }
+
     private sealed class TeleprompterCueProbe
     {
         public string SoftVolume { get; init; } = string.Empty;
@@ -153,20 +203,31 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         public string BreathValue { get; init; } = string.Empty;
 
-        public string SoftScale { get; init; } = string.Empty;
+        public string SoftOpacity { get; init; } = string.Empty;
 
-        public string LoudScale { get; init; } = string.Empty;
+        public string LoudWeight { get; init; } = string.Empty;
 
-        public string FirstBuildingScale { get; init; } = string.Empty;
+        public string FirstBuildingProgress { get; init; } = string.Empty;
 
-        public string LastBuildingScale { get; init; } = string.Empty;
+        public string LastBuildingProgress { get; init; } = string.Empty;
 
-        public string EnergyScale { get; init; } = string.Empty;
+        public string FirstBuildingWeight { get; init; } = string.Empty;
 
-        public string MelodyScale { get; init; } = string.Empty;
+        public string LastBuildingWeight { get; init; } = string.Empty;
+
+        public string EnergyWeight { get; init; } = string.Empty;
+
+        public string MelodyWeight { get; init; } = string.Empty;
 
         public string EnergyTone { get; init; } = string.Empty;
 
         public string MelodyTone { get; init; } = string.Empty;
+    }
+
+    private sealed class ReaderSpacingProbe
+    {
+        public double MinimumGap { get; init; }
+
+        public string Overlap { get; init; } = string.Empty;
     }
 }
