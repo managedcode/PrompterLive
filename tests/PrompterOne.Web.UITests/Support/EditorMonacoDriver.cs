@@ -47,11 +47,27 @@ internal static class EditorMonacoDriver
                 """
                 (args) => {
                     const host = document.querySelector(`[data-test="${args.testId}"]`);
-                    return host?.getAttribute(args.readyAttributeName) === args.readyValue;
+                    if (!(host instanceof HTMLElement)) {
+                        return false;
+                    }
+
+                    if (host.getAttribute(args.readyAttributeName) === args.readyValue) {
+                        return true;
+                    }
+
+                    const harness = window[args.harnessGlobalName];
+                    const state = harness?.getState?.(args.testId);
+                    return state?.engine === args.editorEngineValue &&
+                        state?.languageId === args.languageId &&
+                        typeof state?.text === "string" &&
+                        state?.lineCount > 0;
                 }
                 """,
                 new
                 {
+                    editorEngineValue = EditorMonacoRuntimeContract.EditorEngineAttributeValue,
+                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                    languageId = EditorMonacoRuntimeContract.TpsLanguageId,
                     readyAttributeName = EditorMonacoRuntimeContract.EditorReadyAttributeName,
                     readyValue = "true",
                     testId = UiTestIds.Editor.SourceStage

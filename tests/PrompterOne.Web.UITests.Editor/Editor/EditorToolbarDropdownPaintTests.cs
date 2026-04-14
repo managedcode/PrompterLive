@@ -58,10 +58,11 @@ public sealed class EditorToolbarDropdownPaintTests(StandaloneAppFixture fixture
 
     private static async Task AssertDropdownPaintAsync(Microsoft.Playwright.IPage page, DropdownPaintScenario scenario)
     {
-        await page.GetByTestId(scenario.TriggerTestId).ClickAsync();
         var panel = page.GetByTestId(scenario.PanelTestId);
-        await Expect(panel)
-            .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.FastVisibleTimeoutMs });
+        await UiInteractionDriver.ClickAndWaitForVisibleAsync(
+            page.GetByTestId(scenario.TriggerTestId),
+            panel,
+            noWaitAfter: true);
 
         var hitTest = await page.EvaluateAsync<DropdownHitTestResult>(
             """

@@ -157,7 +157,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         var activeWord = page.Locator(BrowserTestConstants.Teleprompter.ActiveWordSelector);
         await Expect(activeWord).ToBeVisibleAsync(new()
         {
-            Timeout = BrowserTestConstants.Teleprompter.AlignmentTimeoutMs
+            Timeout = BrowserTestConstants.Timing.ReaderPlaybackAdvanceTimeoutMs
         });
         await AssertGuideAlignmentAsync(
             page,
