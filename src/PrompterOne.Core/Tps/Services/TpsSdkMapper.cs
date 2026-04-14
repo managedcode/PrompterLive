@@ -123,6 +123,7 @@ internal static class TpsSdkMapper
         {
             IsEmphasis = metadata.IsEmphasis,
             EmphasisLevel = metadata.EmphasisLevel,
+            EmphasisStyle = metadata.EmphasisStyle,
             IsPause = metadata.IsPause,
             PauseDuration = metadata.PauseDurationMs,
             IsHighlight = metadata.IsHighlight,

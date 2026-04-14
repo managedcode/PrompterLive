@@ -4,6 +4,7 @@ public class WordMetadata
 {
     public bool IsEmphasis { get; set; }
     public int EmphasisLevel { get; set; }
+    public string? EmphasisStyle { get; set; }
     public bool IsPause { get; set; }
     public int? PauseDuration { get; set; }
     public string? Color { get; set; }

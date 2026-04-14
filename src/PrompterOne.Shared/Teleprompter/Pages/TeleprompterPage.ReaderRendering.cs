@@ -21,8 +21,10 @@ public partial class TeleprompterPage
     private const string ReaderGradientDefaultCssClass = "neutral";
     private const string ReaderGradientNoTransitionCssClass = "rd-gradient-static";
     private const string ReaderGroupActiveCssClass = "rd-g-active";
+    private const string ReaderGroupBuildingCssClass = "rd-g-building";
     private const string ReaderGroupCssClass = "rd-g";
     private const string ReaderGroupEmphasisCssClass = "rd-g-emphasis";
+    private const string ReaderGroupLegatoCssClass = "rd-g-legato";
     private const string ReaderHorizontalGuideCssClass = "rd-guide-h";
     private const string ReaderMirrorButtonCssClass = "rd-mirror-btn";
     private const string ReaderMirrorHorizontalTransform = "scaleX(-1)";
@@ -267,7 +269,9 @@ public partial class TeleprompterPage
         {
             return BuildClassList(
                 ReaderGroupCssClass,
-                group.IsEmphasis ? ReaderGroupEmphasisCssClass : null);
+                group.IsEmphasis ? ReaderGroupEmphasisCssClass : null,
+                ResolveReaderGroupDeliveryCssClass(group),
+                ResolveReaderGroupArticulationCssClass(group));
         }
 
         var groupStartIndex = GetChunkWordStartIndex(cardIndex, chunkIndex);
@@ -278,8 +282,32 @@ public partial class TeleprompterPage
         return BuildClassList(
             ReaderGroupCssClass,
             group.IsEmphasis ? ReaderGroupEmphasisCssClass : null,
+            ResolveReaderGroupDeliveryCssClass(group),
+            ResolveReaderGroupArticulationCssClass(group),
             isActiveGroup ? ReaderGroupActiveCssClass : null);
     }
+
+    private static string? ResolveReaderGroupDeliveryCssClass(ReaderGroupViewModel group) =>
+        group.Words.Count > 1 &&
+        group.Words.All(word => HasReaderWordAttribute(
+            word,
+            TpsVisualCueContracts.DeliveryAttributeName,
+            TpsVisualCueContracts.DeliveryModeBuilding))
+            ? ReaderGroupBuildingCssClass
+            : null;
+
+    private static string? ResolveReaderGroupArticulationCssClass(ReaderGroupViewModel group) =>
+        group.Words.Count > 1 &&
+        group.Words.All(word => HasReaderWordAttribute(
+            word,
+            TpsVisualCueContracts.ArticulationAttributeName,
+            TpsVisualCueContracts.ArticulationLegato))
+            ? ReaderGroupLegatoCssClass
+            : null;
+
+    private static bool HasReaderWordAttribute(ReaderWordViewModel word, string attributeName, string attributeValue) =>
+        word.Attributes?.TryGetValue(attributeName, out var value) == true &&
+        string.Equals(Convert.ToString(value, CultureInfo.InvariantCulture), attributeValue, StringComparison.Ordinal);
 
     private string BuildReaderWordCssClass(int cardIndex, int chunkIndex, int wordIndex)
     {

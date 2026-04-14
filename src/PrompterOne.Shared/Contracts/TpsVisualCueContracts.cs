@@ -13,6 +13,10 @@ public static class TpsVisualCueContracts
     public const string BreathAttributeValue = "true";
     public const string DeliveryAttributeName = "data-tps-delivery";
     public const string DeliveryModeBuilding = "building";
+    public const string EmphasisAttributeName = "data-tps-emphasis";
+    public const string EmphasisMarkdownItalic = "markdown-italic";
+    public const string EmphasisMarkdownStrong = "markdown-strong";
+    public const string EmphasisTag = "emphasis";
     public const string EmotionAttributeName = "data-tps-emotion";
     public const string EnergyAttributeName = "data-tps-energy";
     public const string EnergyVariableName = "--tps-energy";

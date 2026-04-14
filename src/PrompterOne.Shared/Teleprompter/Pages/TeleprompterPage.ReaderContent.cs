@@ -175,6 +175,8 @@ public partial class TeleprompterPage
         var currentGroup = new List<ReaderWordViewModel>();
         var currentCharacterCount = 0;
         bool? currentGroupIsEmphasis = null;
+        bool? currentGroupIsBuilding = null;
+        bool? currentGroupIsLegato = null;
 
         for (var compiledWordIndex = 0; compiledWordIndex < compiledWords.Count; compiledWordIndex++)
         {
@@ -184,6 +186,8 @@ public partial class TeleprompterPage
                 FlushGroup(chunks, currentGroup, currentGroupIsEmphasis ?? false);
                 currentCharacterCount = 0;
                 currentGroupIsEmphasis = null;
+                currentGroupIsBuilding = null;
+                currentGroupIsLegato = null;
                 chunks.Add(new ReaderPauseViewModel(0, ReaderPauseBreathCssClass));
                 continue;
             }
@@ -200,6 +204,8 @@ public partial class TeleprompterPage
                 FlushGroup(chunks, currentGroup, currentGroupIsEmphasis ?? false);
                 currentCharacterCount = 0;
                 currentGroupIsEmphasis = null;
+                currentGroupIsBuilding = null;
+                currentGroupIsLegato = null;
                 chunks.Add(new ReaderPauseViewModel(
                     pauseDuration,
                     pauseDuration >= LongPauseThresholdMilliseconds
@@ -216,16 +222,26 @@ public partial class TeleprompterPage
             }
 
             var isEmphasisWord = IsReaderWordEmphasis(word.Metadata);
+            var isBuildingWord = IsReaderWordBuilding(word.Metadata);
+            var isLegatoWord = IsReaderWordLegato(word.Metadata);
             if (currentGroup.Count > 0 &&
-                currentGroupIsEmphasis.HasValue &&
-                currentGroupIsEmphasis.Value != isEmphasisWord)
+                (currentGroupIsEmphasis.HasValue &&
+                    currentGroupIsEmphasis.Value != isEmphasisWord ||
+                    currentGroupIsBuilding.HasValue &&
+                    currentGroupIsBuilding.Value != isBuildingWord ||
+                    currentGroupIsLegato.HasValue &&
+                    currentGroupIsLegato.Value != isLegatoWord))
             {
-                FlushGroup(chunks, currentGroup, currentGroupIsEmphasis.Value);
+                FlushGroup(chunks, currentGroup, currentGroupIsEmphasis ?? false);
                 currentCharacterCount = 0;
                 currentGroupIsEmphasis = null;
+                currentGroupIsBuilding = null;
+                currentGroupIsLegato = null;
             }
 
             currentGroupIsEmphasis ??= isEmphasisWord;
+            currentGroupIsBuilding ??= isBuildingWord;
+            currentGroupIsLegato ??= isLegatoWord;
             currentCharacterCount += word.CleanText.Length;
             if (currentGroup.Count > 0)
             {
@@ -252,6 +268,8 @@ public partial class TeleprompterPage
                 FlushGroup(chunks, currentGroup, currentGroupIsEmphasis ?? false);
                 currentCharacterCount = 0;
                 currentGroupIsEmphasis = null;
+                currentGroupIsBuilding = null;
+                currentGroupIsLegato = null;
             }
         }
 
@@ -288,6 +306,18 @@ public partial class TeleprompterPage
     private static bool IsReaderWordEmphasis(WordMetadata? metadata) =>
         metadata?.IsEmphasis == true;
 
+    private static bool IsReaderWordLegato(WordMetadata? metadata) =>
+        string.Equals(
+            NormalizeCueValue(metadata?.ArticulationStyle),
+            TpsVisualCueContracts.ArticulationLegato,
+            StringComparison.Ordinal);
+
+    private static bool IsReaderWordBuilding(WordMetadata? metadata) =>
+        string.Equals(
+            NormalizeCueValue(metadata?.DeliveryMode),
+            TpsVisualCueContracts.DeliveryModeBuilding,
+            StringComparison.Ordinal);
+
     private static string BuildReaderWordBaseClass(WordMetadata? metadata, string? speedCueValue)
     {
         if (metadata is null)
@@ -300,6 +330,11 @@ public partial class TeleprompterPage
         if (metadata.IsHighlight)
         {
             classes.Add($"{TpsClassPrefix}-highlight");
+        }
+
+        if (metadata.IsEmphasis)
+        {
+            classes.Add(ResolveEmphasisWordClass(metadata));
         }
 
         var emotionClass = ResolveEmotionWordClass(metadata.InlineEmotionHint, TpsClassPrefix);
@@ -370,6 +405,7 @@ public partial class TeleprompterPage
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.EnergyAttributeName, metadata.EnergyLevel?.ToString(CultureInfo.InvariantCulture));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.MelodyAttributeName, metadata.MelodyLevel?.ToString(CultureInfo.InvariantCulture));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.SpeedAttributeName, speedCueValue);
+        AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.EmphasisAttributeName, ResolveEmphasisValue(metadata));
 
         if (metadata.IsHighlight)
         {
@@ -388,6 +424,30 @@ public partial class TeleprompterPage
         string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim().ToLowerInvariant();
+
+    private static string ResolveEmphasisWordClass(WordMetadata metadata) =>
+        ResolveEmphasisValue(metadata) switch
+        {
+            TpsVisualCueContracts.EmphasisMarkdownItalic => $"{TpsClassPrefix}-italic",
+            TpsVisualCueContracts.EmphasisMarkdownStrong => $"{TpsClassPrefix}-strong",
+            _ => $"{TpsClassPrefix}-emphasis"
+        };
+
+    private static string? ResolveEmphasisValue(WordMetadata? metadata)
+    {
+        if (metadata?.IsEmphasis != true)
+        {
+            return null;
+        }
+
+        return NormalizeCueValue(metadata.EmphasisStyle) switch
+        {
+            TpsVisualCueContracts.EmphasisMarkdownItalic => TpsVisualCueContracts.EmphasisMarkdownItalic,
+            TpsVisualCueContracts.EmphasisMarkdownStrong => TpsVisualCueContracts.EmphasisMarkdownStrong,
+            _ when metadata.EmphasisLevel > 1 => TpsVisualCueContracts.EmphasisMarkdownStrong,
+            _ => TpsVisualCueContracts.EmphasisTag
+        };
+    }
 
     private static void AddReaderWordAttribute(ref Dictionary<string, object>? attributes, string name, string? value)
     {

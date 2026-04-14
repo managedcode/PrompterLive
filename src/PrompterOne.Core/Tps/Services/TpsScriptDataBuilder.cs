@@ -139,6 +139,7 @@ internal static class TpsScriptDataBuilder
             WpmOverride = effectiveWpm,
             SpeedMultiplier = compiledWord.Metadata.SpeedMultiplier,
             EmphasisLevel = compiledWord.Metadata.EmphasisLevel,
+            EmphasisStyle = NormalizeValue(compiledWord.Metadata.EmphasisStyle)?.ToLowerInvariant(),
             IsHighlight = compiledWord.Metadata.IsHighlight,
             IsBreath = compiledWord.Metadata.IsBreath,
             Emotion = NormalizeValue(compiledWord.Metadata.InlineEmotionHint ?? compiledWord.Metadata.EmotionHint)?.ToLowerInvariant(),

@@ -90,6 +90,8 @@ public record ScriptWord
 
     public int EmphasisLevel { get; init; }
 
+    public string? EmphasisStyle { get; init; }
+
     public string? Color { get; init; }
     public bool IsHighlight { get; init; }
     public bool IsBreath { get; init; }

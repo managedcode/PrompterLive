@@ -141,7 +141,7 @@ internal sealed partial class TpsContentCompiler
 
         if (string.Equals(tag.Name, TpsSpec.Tags.Emphasis, StringComparison.Ordinal))
         {
-            return new InlineScope(tag.Name, EmphasisLevel: 1);
+            return new InlineScope(tag.Name, EmphasisLevel: 1, EmphasisStyle: TpsSpec.EmphasisStyles.Emphasis);
         }
 
         if (string.Equals(tag.Name, TpsSpec.Tags.Highlight, StringComparison.Ordinal))
@@ -234,7 +234,12 @@ internal sealed partial class TpsContentCompiler
 
         var markerLength = index + 1 < text.Length && text[index + 1] == '*' ? 2 : 1;
         var marker = new string('*', markerLength);
-        var scopeName = markerLength == 2 ? TpsSpec.Markers.MarkdownStrongScope : TpsSpec.Tags.Emphasis;
+        var scopeName = markerLength == 2
+            ? TpsSpec.Markers.MarkdownStrongScope
+            : TpsSpec.Markers.MarkdownItalicScope;
+        var emphasisStyle = markerLength == 2
+            ? TpsSpec.EmphasisStyles.MarkdownStrong
+            : TpsSpec.EmphasisStyles.MarkdownItalic;
         var existingIndex = scopes.FindLastIndex(scope => string.Equals(scope.Name, scopeName, StringComparison.Ordinal));
         if (existingIndex >= 0)
         {
@@ -248,7 +253,7 @@ internal sealed partial class TpsContentCompiler
             return false;
         }
 
-        scopes.Add(new InlineScope(scopeName, EmphasisLevel: markerLength == 2 ? 2 : 1));
+        scopes.Add(new InlineScope(scopeName, EmphasisLevel: markerLength == 2 ? 2 : 1, EmphasisStyle: emphasisStyle));
         index += markerLength - 1;
         return true;
     }

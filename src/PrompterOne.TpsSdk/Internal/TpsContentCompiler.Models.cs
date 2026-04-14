@@ -27,6 +27,7 @@ internal sealed record PhraseSeed(List<WordSeed> Words, string Text);
 internal sealed record InlineScope(
     string Name,
     int EmphasisLevel = 0,
+    string? EmphasisStyle = null,
     bool Highlight = false,
     string? InlineEmotion = null,
     string? VolumeLevel = null,
@@ -47,6 +48,7 @@ internal sealed record ActiveInlineState(
     string? InlineEmotion,
     string? Speaker,
     int EmphasisLevel,
+    string? EmphasisStyle,
     bool Highlight,
     string? VolumeLevel,
     string? DeliveryMode,
@@ -69,6 +71,8 @@ internal sealed class TokenAccumulator
     private readonly StringBuilder _stressText = new();
 
     public int EmphasisLevel { get; private set; }
+
+    public string? EmphasisStyle { get; private set; }
 
     public bool IsHighlight { get; private set; }
 
@@ -104,6 +108,12 @@ internal sealed class TokenAccumulator
 
     public void Apply(ActiveInlineState state, char character)
     {
+        if (state.EmphasisLevel > EmphasisLevel ||
+            state.EmphasisLevel == EmphasisLevel && !string.IsNullOrWhiteSpace(state.EmphasisStyle))
+        {
+            EmphasisStyle = state.EmphasisStyle ?? EmphasisStyle;
+        }
+
         EmphasisLevel = Math.Max(EmphasisLevel, state.EmphasisLevel);
         IsHighlight |= state.Highlight;
         EmotionHint = state.Emotion;
@@ -149,6 +159,7 @@ internal sealed class TokenAccumulator
         {
             IsEmphasis = EmphasisLevel > 0,
             EmphasisLevel = EmphasisLevel,
+            EmphasisStyle = EmphasisStyle,
             IsHighlight = IsHighlight,
             EmotionHint = EmotionHint,
             InlineEmotionHint = InlineEmotionHint,

@@ -159,7 +159,15 @@ public static partial class TpsSpec
         public const string ClosingTagPrefix = "/";
         public const char ShortPauseMarker = '/';
         public const char TagArgumentSeparator = ':';
+        public const string MarkdownItalicScope = "__markdown-italic__";
         public const string MarkdownStrongScope = "__markdown-strong__";
+    }
+
+    public static class EmphasisStyles
+    {
+        public const string Emphasis = "emphasis";
+        public const string MarkdownItalic = "markdown-italic";
+        public const string MarkdownStrong = "markdown-strong";
     }
 
     public static class NumericComparisons

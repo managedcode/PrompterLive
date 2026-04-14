@@ -53,11 +53,11 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         new(33, "34-contour-energy", "[energy:8]", TpsVisualCueContracts.EnergyAttributeName, "8", TargetWord: "energy"),
         new(34, "35-contour-melody", "[melody:3]", TpsVisualCueContracts.MelodyAttributeName, "3", TargetWord: "melody"),
         new(35, "36-editorial-highlight", "[highlight]", TpsVisualCueContracts.HighlightAttributeName, TpsVisualCueContracts.HighlightAttributeValue, TargetWord: "highlight"),
-        new(36, "37-editorial-emphasis", "[emphasis]", ExpectEmphasis: true, TargetWord: "emphasis"),
-        new(37, "38-markdown-bold", "Markdown bold", ExpectEmphasis: true, TargetWord: "bold"),
-        new(38, "39-markdown-italic", "Markdown italic", ExpectEmphasis: true, TargetWord: "italic"),
-        new(39, "40-guide-pronunciation", "[pronunciation:guide]", UiDataAttributes.Teleprompter.Pronunciation, "GUIDE", TargetWord: "pronunciation"),
-        new(40, "41-guide-phonetic", "[phonetic:IPA]", UiDataAttributes.Teleprompter.Pronunciation, "IPA", TargetWord: "phonetic"),
+        new(36, "37-editorial-emphasis", "[emphasis]", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisTag, ExpectEmphasis: true, TargetWord: "emphasis"),
+        new(37, "38-markdown-bold", "Markdown bold", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisMarkdownStrong, ExpectEmphasis: true, TargetWord: "bold"),
+        new(38, "39-markdown-italic", "Markdown italic", TpsVisualCueContracts.EmphasisAttributeName, TpsVisualCueContracts.EmphasisMarkdownItalic, ExpectEmphasis: true, TargetWord: "italic"),
+        new(39, "40-guide-pronunciation", "[pronunciation:prəˌnʌnsiˈeɪʃən]", UiDataAttributes.Teleprompter.Pronunciation, "prəˌnʌnsiˈeɪʃən", TargetWord: "pronunciation"),
+        new(40, "41-guide-phonetic", "[phonetic:/fəˈnɛtɪk/]", UiDataAttributes.Teleprompter.Pronunciation, "/fəˈnɛtɪk/", TargetWord: "phonetic"),
         new(41, "42-guide-stress", "[stress:rising]", TpsVisualCueContracts.StressAttributeName, TpsVisualCueContracts.StressAttributeValue, TargetWord: "stress"),
         new(42, "43-edit-point", "[edit_point]", TargetWord: "edit"),
         new(43, "44-edit-point-medium", "[edit_point:medium]", TargetWord: "medium"),
@@ -326,6 +326,16 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 const targetStyle = target instanceof HTMLElement
                     ? getComputedStyle(target)
                     : null;
+                const hostStyle = getComputedStyle(host);
+                const targetAfterStyle = target instanceof HTMLElement
+                    ? getComputedStyle(target, '::after')
+                    : null;
+                const targetGroup = target instanceof HTMLElement
+                    ? target.closest('.rd-g')
+                    : null;
+                const targetGroupAfterStyle = targetGroup instanceof HTMLElement
+                    ? getComputedStyle(targetGroup, '::after')
+                    : null;
                 return {
                     rawTagsVisible: /\[[^\]]+\]/.test(host.textContent ?? ''),
                     targetText: target?.textContent?.trim() ?? '',
@@ -337,10 +347,16 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     pronunciationContent,
                     pronunciationFontSize,
                     targetFontStyle: targetStyle?.fontStyle ?? '',
+                    targetFontSize: targetStyle?.fontSize ?? '',
                     targetFontWeight: targetStyle?.fontWeight ?? '',
+                    hostFontSize: hostStyle.fontSize ?? '',
                     targetLetterSpacing: targetStyle?.letterSpacing ?? '',
                     targetTextDecorationStyle: targetStyle?.textDecorationStyle ?? '',
-                    targetTextDecorationThickness: targetStyle?.textDecorationThickness ?? ''
+                    targetTextDecorationThickness: targetStyle?.textDecorationThickness ?? '',
+                    targetAfterContent: targetAfterStyle?.content ?? '',
+                    targetAfterBackgroundImage: targetAfterStyle?.backgroundImage ?? '',
+                    targetGroupAfterContent: targetGroupAfterStyle?.content ?? '',
+                    targetGroupAfterBackgroundImage: targetGroupAfterStyle?.backgroundImage ?? ''
                 };
             }
             """,
@@ -391,7 +407,16 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         if (string.Equals(capture.AttributeName, TpsVisualCueContracts.VolumeAttributeName, StringComparison.Ordinal))
         {
-            if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.VolumeWhisper, StringComparison.Ordinal))
+            if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.VolumeLoud, StringComparison.Ordinal))
+            {
+                await Assert.That(ParseCssPixels(probe.TargetFontSize))
+                    .IsGreaterThan(ParseCssPixels(probe.HostFontSize))
+                    .Because("Expected loud to carry a visibly larger reader word.");
+                await Assert.That(ParseCssNumber(probe.TargetFontWeight))
+                    .IsGreaterThanOrEqualTo(800d)
+                    .Because("Expected loud to carry stronger reader weight.");
+            }
+            else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.VolumeWhisper, StringComparison.Ordinal))
             {
                 await Assert.That(probe.TargetFontStyle)
                     .IsEqualTo("italic")
@@ -408,22 +433,51 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             }
         }
 
+        if (string.Equals(capture.AttributeName, TpsVisualCueContracts.DeliveryAttributeName, StringComparison.Ordinal) &&
+            string.Equals(capture.AttributeValue, TpsVisualCueContracts.DeliveryModeBuilding, StringComparison.Ordinal))
+        {
+            var buildingHairpinImage = capture.ExpectedAttributeMatchCount > 1
+                ? probe.TargetGroupAfterBackgroundImage
+                : probe.TargetAfterBackgroundImage;
+            await Assert.That(HasVisiblePseudoBackground(buildingHairpinImage))
+                .IsTrue()
+                .Because("Expected building delivery to read as a crescendo-style hairpin cue.");
+
+            if (capture.ExpectedAttributeMatchCount > 1)
+            {
+                await Assert.That(IsDisabledPseudoContent(probe.TargetAfterContent))
+                    .IsTrue()
+                    .Because("Expected phrase building to render one group-level crescendo hairpin, not one hairpin per word.");
+            }
+        }
+
         if (string.Equals(capture.AttributeName, TpsVisualCueContracts.ArticulationAttributeName, StringComparison.Ordinal))
         {
             if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationLegato, StringComparison.Ordinal))
             {
-                await Assert.That(probe.TargetTextDecorationStyle)
-                    .IsEqualTo("wavy")
-                    .Because("Expected legato to read as a smooth connected cue.");
+                var legatoSlurImage = capture.ExpectedAttributeMatchCount > 1
+                    ? probe.TargetGroupAfterBackgroundImage
+                    : probe.TargetAfterBackgroundImage;
+
+                await Assert.That(HasVisiblePseudoBackground(legatoSlurImage))
+                    .IsTrue()
+                    .Because("Expected legato to read as a music-like slur cue.");
+                if (capture.ExpectedAttributeMatchCount > 1)
+                {
+                    await Assert.That(IsDisabledPseudoContent(probe.TargetAfterContent))
+                        .IsTrue()
+                        .Because("Expected phrase legato to render one group-level slur, not one slur per word.");
+                }
+
                 await Assert.That(ParseCssPixels(probe.TargetLetterSpacing))
                     .IsLessThan(0d)
                     .Because("Expected legato to visually connect the cue word.");
             }
             else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationStaccato, StringComparison.Ordinal))
             {
-                await Assert.That(probe.TargetTextDecorationStyle)
-                    .IsEqualTo("dotted")
-                    .Because("Expected staccato to read as a clipped dotted cue.");
+                await Assert.That(probe.TargetAfterBackgroundImage.Contains("radial-gradient", StringComparison.Ordinal))
+                    .IsTrue()
+                    .Because("Expected staccato to read as music-like dots.");
                 await Assert.That(ParseCssPixels(probe.TargetLetterSpacing))
                     .IsGreaterThan(0d)
                     .Because("Expected staccato to separate the cue word rhythm.");
@@ -438,6 +492,22 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(ParseCssPixels(probe.TargetTextDecorationThickness))
                 .IsGreaterThanOrEqualTo(2d)
                 .Because("Expected stress to have a stronger visible underline.");
+        }
+
+        if (string.Equals(capture.AttributeName, TpsVisualCueContracts.EmphasisAttributeName, StringComparison.Ordinal))
+        {
+            if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.EmphasisMarkdownItalic, StringComparison.Ordinal))
+            {
+                await Assert.That(probe.TargetFontStyle)
+                    .IsEqualTo("italic")
+                    .Because("Expected markdown italic to read as an obvious italic word shape.");
+            }
+            else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.EmphasisMarkdownStrong, StringComparison.Ordinal))
+            {
+                await Assert.That(ParseCssNumber(probe.TargetFontWeight))
+                    .IsGreaterThanOrEqualTo(800d)
+                    .Because("Expected markdown bold to read as a strong word shape.");
+            }
         }
 
         if (capture.ExpectedPauseCount > 0)
@@ -538,6 +608,14 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         return double.Parse(value, CultureInfo.InvariantCulture);
     }
+
+    private static bool HasVisiblePseudoBackground(string value) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        !string.Equals(value, "none", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsDisabledPseudoContent(string value) =>
+        string.Equals(value, "none", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(value, "normal", StringComparison.OrdinalIgnoreCase);
 
     private static string NormalizeReaderWord(string? value) =>
         (value ?? string.Empty)
@@ -684,13 +762,25 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         public string TargetFontStyle { get; init; } = string.Empty;
 
+        public string TargetFontSize { get; init; } = string.Empty;
+
         public string TargetFontWeight { get; init; } = string.Empty;
+
+        public string HostFontSize { get; init; } = string.Empty;
 
         public string TargetLetterSpacing { get; init; } = string.Empty;
 
         public string TargetTextDecorationStyle { get; init; } = string.Empty;
 
         public string TargetTextDecorationThickness { get; init; } = string.Empty;
+
+        public string TargetAfterContent { get; init; } = string.Empty;
+
+        public string TargetAfterBackgroundImage { get; init; } = string.Empty;
+
+        public string TargetGroupAfterContent { get; init; } = string.Empty;
+
+        public string TargetGroupAfterBackgroundImage { get; init; } = string.Empty;
     }
 
     private sealed class CueMatrixSpeedProbe

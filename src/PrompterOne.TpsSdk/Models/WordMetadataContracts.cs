@@ -10,6 +10,10 @@ public sealed record WordMetadata
     [JsonPropertyName("emphasisLevel")]
     public int EmphasisLevel { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("emphasisStyle")]
+    public string? EmphasisStyle { get; init; }
+
     [JsonPropertyName("isPause")]
     public bool IsPause { get; init; }
 

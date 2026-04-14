@@ -124,6 +124,7 @@ internal sealed partial class TpsContentCompiler
         var hasRelativeSpeed = false;
         var relativeSpeedMultiplier = 1d;
         var emphasisLevel = 0;
+        string? emphasisStyle = null;
         var highlight = false;
         var emotion = inherited.Emotion;
         string? inlineEmotion = null;
@@ -159,6 +160,12 @@ internal sealed partial class TpsContentCompiler
                 relativeSpeedMultiplier *= scopedRelativeSpeed;
             }
 
+            if (scope.EmphasisLevel > emphasisLevel ||
+                scope.EmphasisLevel == emphasisLevel && !string.IsNullOrWhiteSpace(scope.EmphasisStyle))
+            {
+                emphasisStyle = scope.EmphasisStyle ?? emphasisStyle;
+            }
+
             emphasisLevel = Math.Max(emphasisLevel, scope.EmphasisLevel);
             highlight |= scope.Highlight;
             if (scope.InlineEmotion is not null)
@@ -191,6 +198,7 @@ internal sealed partial class TpsContentCompiler
             inlineEmotion,
             inherited.Speaker,
             emphasisLevel,
+            emphasisStyle,
             highlight,
             volumeLevel,
             deliveryMode,
