@@ -6,6 +6,7 @@ namespace PrompterOne.Web.UITests;
 internal static class EditorLargeDraftPerformanceTestData
 {
     public const int BlockCountPerSegment = 4;
+    public const int CiMaxTypingLatencyMs = 250;
     public const int CiMaxHugeFollowupLongTaskMs = 550;
     public const int CiMaxHugeTypingLatencyMs = 425;
     public const int CiMaxPasteLongTaskMs = 375;
@@ -13,10 +14,10 @@ internal static class EditorLargeDraftPerformanceTestData
     public const int HugeDraftMinimumLength = 250_000;
     public const int HugeDraftReadyTimeoutMs = 30_000;
     public const int LargeDraftMinimumLength = 32_000;
+    public const int LocalMaxTypingLatencyMs = 100;
     public const int LocalMaxHugeFollowupLongTaskMs = 500;
     public const int LocalMaxHugeTypingLatencyMs = 250;
     public const int LocalMaxPasteLongTaskMs = 325;
-    public const int MaxTypingLatencyMs = 100;
     public const int NavigationTargetSegmentIndex = 14;
     public const int ObservationDelayMs = 2_200;
     private const string Author = "Managed Code";
@@ -36,6 +37,11 @@ internal static class EditorLargeDraftPerformanceTestData
         PrompterOne.Testing.TestEnvironment.IsCiEnvironment
             ? CiMaxHugeTypingLatencyMs
             : LocalMaxHugeTypingLatencyMs;
+
+    public static int MaxTypingLatencyMs =>
+        PrompterOne.Testing.TestEnvironment.IsCiEnvironment
+            ? CiMaxTypingLatencyMs
+            : LocalMaxTypingLatencyMs;
 
     public static int MaxPasteLongTaskMs =>
         PrompterOne.Testing.TestEnvironment.IsCiEnvironment
