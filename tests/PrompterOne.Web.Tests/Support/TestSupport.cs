@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using PrompterOne.Core.Abstractions;
+using PrompterOne.Core.AI.Abstractions;
+using PrompterOne.Core.AI.Models;
 using PrompterOne.Core.AI.Services;
 using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Documents;
@@ -78,6 +80,7 @@ internal static class TestHarnessFactory
             crossTabMessageBus,
             loggerFactory.CreateLogger<BrowserSettingsStore>());
         var shell = new AppShellService();
+        var scriptAgentRuntime = new FakeScriptAgentRuntime();
         var bootstrapper = new AppBootstrapper(
             session,
             repository,
@@ -119,6 +122,8 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<ScriptDocumentEditService>();
         context.Services.AddSingleton<ScriptKnowledgeGraphService>();
         context.Services.AddSingleton<ScriptAgentToolProvider>();
+        context.Services.AddSingleton(scriptAgentRuntime);
+        context.Services.AddSingleton<IScriptAgentRuntime>(scriptAgentRuntime);
         context.Services.AddSingleton<IScriptPreviewService>(previewService);
         context.Services.AddSingleton<EditorOutlineBuilder>();
         context.Services.AddSingleton<EditorInterop>();
@@ -192,6 +197,7 @@ internal static class TestHarnessFactory
             deviceService,
             crossTabMessageBus,
             sentryClient,
+            scriptAgentRuntime,
             loggerFactory);
     }
 
@@ -213,7 +219,36 @@ internal sealed record AppHarness(
     FakeMediaDeviceService DeviceService,
     CrossTabMessageBus CrossTabMessageBus,
     FakeSentryRuntimeClient SentryClient,
+    FakeScriptAgentRuntime ScriptAgentRuntime,
     ILoggerFactory LoggerFactory);
+
+internal sealed class FakeScriptAgentRuntime : IScriptAgentRuntime
+{
+    public ScriptAgentRunResult? NextResult { get; set; }
+
+    public Exception? NextException { get; set; }
+
+    public int Calls { get; private set; }
+
+    public ScriptAgentRunRequest? LastRequest { get; private set; }
+
+    public Task<ScriptAgentRunResult> RunAsync(
+        ScriptAgentRunRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        Calls++;
+        LastRequest = request;
+
+        if (NextException is not null)
+        {
+            throw NextException;
+        }
+
+        return NextResult is not null
+            ? Task.FromResult(NextResult)
+            : throw new InvalidOperationException("No configured AI provider is available for script agents.");
+    }
+}
 
 internal sealed record JsInvocationRecord(
     string Identifier,

@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Localization;
+using PrompterOne.Core.AI.Abstractions;
 using PrompterOne.Core.AI.Models;
 using PrompterOne.Core.AI.Services;
+using PrompterOne.Core.AI.Workflows;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Tools;
@@ -9,6 +11,7 @@ namespace PrompterOne.Shared.Services;
 
 public sealed class AiSpotlightService(
     ScriptDocumentEditService documentEditService,
+    IScriptAgentRuntime scriptAgentRuntime,
     IStringLocalizer<SharedResource> localizer)
 {
     public event Action? StateChanged;
@@ -88,23 +91,82 @@ public sealed class AiSpotlightService(
                 Log = AiSpotlightExecutionBuilder.BuildApprovalLog(approvalRequest, Text, Format),
                 RequiresApproval = true,
                 ApprovalRequest = approvalRequest,
+                AgentOutput = null,
                 ErrorMessage = null
             });
 
             return Task.CompletedTask;
         }
 
+        return RunAgentAsync(State.Prompt.Trim());
+    }
+
+    private async Task RunAgentAsync(string prompt)
+    {
+        var context = AttachAvailableTools(State.Context);
         SetState(State with
         {
             IsOpen = true,
             Mode = AiSpotlightMode.Running,
-            Log = AiSpotlightExecutionBuilder.BuildRunningLog(State.Context, Text, Format),
+            Context = context,
+            Log = AiSpotlightExecutionBuilder.BuildAgentRunningLog(context, Text, Format),
             RequiresApproval = false,
             ApprovalRequest = null,
+            AgentOutput = null,
             ErrorMessage = null
         });
 
-        return Task.CompletedTask;
+        try
+        {
+            var result = await scriptAgentRuntime.RunAsync(
+                new ScriptAgentRunRequest(
+                    AssistantScriptWorkflow.WorkflowId,
+                    prompt,
+                    ConversationId: CreateConversationId(context),
+                    ArticleContext: context));
+            SetState(State with
+            {
+                Log = AiSpotlightExecutionBuilder.AddLog(
+                    State.Log,
+                    new AiSpotlightLogEntry(Text(UiTextKey.AiSpotlightAgentResponse), result.Output, true)),
+                AgentOutput = result.Output,
+                ErrorMessage = null
+            });
+        }
+        catch (InvalidOperationException exception)
+        {
+            SetState(State with
+            {
+                ErrorMessage = Text(UiTextKey.AiSpotlightAgentUnavailable),
+                Log = AiSpotlightExecutionBuilder.AddLog(
+                    State.Log,
+                    new AiSpotlightLogEntry(
+                        Text(UiTextKey.AiSpotlightAgentUnavailable),
+                        string.IsNullOrWhiteSpace(exception.Message)
+                            ? Text(UiTextKey.AiSpotlightAgentUnavailableDetail)
+                            : exception.Message))
+            });
+        }
+        catch (NotSupportedException exception)
+        {
+            SetState(State with
+            {
+                ErrorMessage = Text(UiTextKey.AiSpotlightAgentFailed),
+                Log = AiSpotlightExecutionBuilder.AddLog(
+                    State.Log,
+                    new AiSpotlightLogEntry(Text(UiTextKey.AiSpotlightAgentFailed), exception.Message))
+            });
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            SetState(State with
+            {
+                ErrorMessage = Text(UiTextKey.AiSpotlightAgentFailed),
+                Log = AiSpotlightExecutionBuilder.AddLog(
+                    State.Log,
+                    new AiSpotlightLogEntry(Text(UiTextKey.AiSpotlightAgentFailed), exception.Message))
+            });
+        }
     }
 
     public async Task ApproveAsync()
@@ -137,6 +199,7 @@ public sealed class AiSpotlightService(
                     new AiSpotlightLogEntry(Text(UiTextKey.AiSpotlightAppliedEdit), Format(UiTextKey.AiSpotlightDocumentRevisionFormat, result.Revision.Value[..8]), true)),
                 RequiresApproval = false,
                 ApprovalRequest = null,
+                AgentOutput = null,
                 ErrorMessage = null
             });
         }
@@ -162,6 +225,7 @@ public sealed class AiSpotlightService(
                 new AiSpotlightLogEntry(Text(UiTextKey.AiSpotlightChangeRejected), Text(UiTextKey.AiSpotlightNoDocumentTextChanged), true)),
             RequiresApproval = false,
             ApprovalRequest = null,
+            AgentOutput = null,
             ErrorMessage = null
         });
     }
@@ -190,4 +254,7 @@ public sealed class AiSpotlightService(
 
     private string Format(UiTextKey key, params object[] arguments) =>
         string.Format(System.Globalization.CultureInfo.CurrentCulture, Text(key), arguments);
+
+    private static string? CreateConversationId(ScriptArticleContext context) =>
+        context.Editor?.DocumentId ?? context.Route ?? context.Screen;
 }

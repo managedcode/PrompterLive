@@ -28,6 +28,7 @@ public sealed record AiSpotlightState(
     IReadOnlyList<AiSpotlightLogEntry> Log,
     bool RequiresApproval,
     AiSpotlightApprovalRequest? ApprovalRequest = null,
+    string? AgentOutput = null,
     string? ErrorMessage = null)
 {
     public static AiSpotlightState Closed { get; } = new(

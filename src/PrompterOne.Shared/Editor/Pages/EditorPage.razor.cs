@@ -49,7 +49,7 @@ public partial class EditorPage
     private bool _isGraphLoading;
     private string _graphLayoutMode = ScriptGraphLayoutModes.Knowledge;
     private string _graphNodeStyleMode = ScriptGraphNodeStyleModes.Compact;
-    private ScriptKnowledgeGraphSemanticMode _graphSemanticMode = ScriptKnowledgeGraphSemanticMode.ModelOnly;
+    private ScriptKnowledgeGraphSemanticMode _graphSemanticMode = ScriptKnowledgeGraphSemanticMode.StructuralOnly;
     private bool _graphOnlyMode;
     private bool _isGraphSplitDragging;
     private bool _isGraphSplitVertical;

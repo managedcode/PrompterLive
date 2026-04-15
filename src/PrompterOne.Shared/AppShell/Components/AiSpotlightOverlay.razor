@@ -95,6 +95,13 @@
                     {
                         <p class="ai-spotlight-error" data-test="@UiTestIds.AiSpotlight.Error">@State.ErrorMessage</p>
                     }
+                    @if (!string.IsNullOrWhiteSpace(State.AgentOutput))
+                    {
+                        <article class="ai-spotlight-answer" data-test="@UiTestIds.AiSpotlight.AgentOutput">
+                            <strong>@Text(UiTextKey.AiSpotlightAgentResponse)</strong>
+                            <p>@State.AgentOutput</p>
+                        </article>
+                    }
                     @foreach (var entry in State.Log)
                     {
                         <div class="ai-spotlight-log" data-complete="@entry.IsComplete.ToString().ToLowerInvariant()" data-test="@UiTestIds.AiSpotlight.LogItem">

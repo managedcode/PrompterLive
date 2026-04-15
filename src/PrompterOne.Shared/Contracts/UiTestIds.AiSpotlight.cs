@@ -11,6 +11,7 @@ public static partial class UiTestIds
         public const string ApprovalBefore = "ai-spotlight-approval-before";
         public const string ApprovalAfter = "ai-spotlight-approval-after";
         public const string ApprovalReject = "ai-spotlight-approval-reject";
+        public const string AgentOutput = "ai-spotlight-agent-output";
         public const string Error = "ai-spotlight-error";
         public const string IdleState = "ai-spotlight-idle";
         public const string LogItem = "ai-spotlight-log-item";

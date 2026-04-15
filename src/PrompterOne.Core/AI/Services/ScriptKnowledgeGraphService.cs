@@ -58,15 +58,17 @@ public sealed class ScriptKnowledgeGraphService(
             edges,
             ranges);
         AddKnowledgeBankGraph(kbResult.Graph.ToSnapshot(), content, nodes, edges, ranges);
-        var semanticStatus = await TryAddModelSemanticGraphAsync(
-                request,
-                compiledDocument.DisplayMarkdown,
-                semanticScopes,
-                nodes,
-                edges,
-                ranges,
-                cancellationToken)
-            .ConfigureAwait(false);
+        var semanticStatus = request.SemanticMode == ScriptKnowledgeGraphSemanticMode.StructuralOnly
+            ? ScriptKnowledgeGraphSemanticStatus.StructuralOnly
+            : await TryAddModelSemanticGraphAsync(
+                    request,
+                    compiledDocument.DisplayMarkdown,
+                    semanticScopes,
+                    nodes,
+                    edges,
+                    ranges,
+                    cancellationToken)
+                .ConfigureAwait(false);
         if (semanticStatus != ScriptKnowledgeGraphSemanticStatus.Model &&
             request.SemanticMode == ScriptKnowledgeGraphSemanticMode.TokenizerSimilarity &&
             await _tokenizerSimilarityExtractor

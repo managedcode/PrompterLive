@@ -529,6 +529,12 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 await Assert.That(HasVisiblePseudoBackground(legatoSlurImage))
                     .IsTrue()
                     .Because("Expected legato to read as a music-like slur cue.");
+                await Assert.That(legatoSlurImage)
+                    .Contains("image/svg+xml")
+                    .Because("Expected legato to use a smooth vector slur instead of a pixelated CSS gradient.");
+                await Assert.That(legatoSlurImage)
+                    .DoesNotContain("radial-gradient")
+                    .Because("Expected legato slurs to avoid jagged radial-gradient rastering.");
                 if (capture.ExpectedAttributeMatchCount > 1)
                 {
                     await Assert.That(IsDisabledPseudoContent(probe.TargetAfterContent))

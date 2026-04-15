@@ -1287,6 +1287,24 @@
   <data name="AiSpotlightRunningTitle" xml:space="preserve">
     <value>Виконується</value>
   </data>
+  <data name="AiSpotlightAgentStarted" xml:space="preserve">
+    <value>Агент запущено</value>
+  </data>
+  <data name="AiSpotlightAgentRunningDetailFormat" xml:space="preserve">
+    <value>Запущено з контекстом маршруту, контекстом редактора і {0} інструментами.</value>
+  </data>
+  <data name="AiSpotlightAgentResponse" xml:space="preserve">
+    <value>Відповідь агента</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailable" xml:space="preserve">
+    <value>AI-провайдер недоступний</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailableDetail" xml:space="preserve">
+    <value>Підключіть AI-провайдер у налаштуваннях і запустіть запит ще раз.</value>
+  </data>
+  <data name="AiSpotlightAgentFailed" xml:space="preserve">
+    <value>Агент не спрацював</value>
+  </data>
   <data name="AiSpotlightApprovalTitle" xml:space="preserve">
     <value>Потрібне підтвердження</value>
   </data>
@@ -1357,7 +1375,7 @@
     <value>Автолейаут</value>
   </data>
   <data name="EditorGraphAnalyze" xml:space="preserve">
-    <value>Аналізувати</value>
+    <value>Побудувати AI-граф</value>
   </data>
   <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
     <value>Запустити tokenizer similarity</value>

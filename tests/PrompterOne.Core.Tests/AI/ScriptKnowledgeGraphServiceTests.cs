@@ -252,6 +252,27 @@ public sealed class ScriptKnowledgeGraphServiceTests
     }
 
     [Test]
+    public async Task BuildAsync_StructuralOnlySkipsSemanticExtractorAndTokenizerFallback()
+    {
+        var extractor = FakeSemanticExtractor.Throwing();
+        var service = new ScriptKnowledgeGraphService(extractor);
+        const string source = """
+        # Product Launch
+        ## [Intro|Speaker:Alex|140WPM|focused]
+        ### [Opening|Speaker:Alex|140WPM|focused]
+        Customer proof reduces launch risk because 80% of buyers need evidence.
+        """;
+
+        var result = await service.BuildAsync(CreateRequest(source, ScriptKnowledgeGraphSemanticMode.StructuralOnly));
+
+        Assert.Equal(0, extractor.Calls);
+        Assert.Equal(ScriptKnowledgeGraphSemanticStatus.StructuralOnly, result.SemanticStatus);
+        Assert.Equal(ScriptKnowledgeGraphSemanticMode.StructuralOnly, result.SemanticMode);
+        Assert.DoesNotContain(result.Nodes, static node => node.Kind == "SimilarityChunk");
+        Assert.DoesNotContain(result.Nodes, static node => node.Attributes?.ContainsKey("claimScore") == true);
+    }
+
+    [Test]
     public async Task BuildAsync_RunsTokenizerSimilarityOnlyWhenExplicitlyRequested()
     {
         var extractor = FakeSemanticExtractor.Throwing();

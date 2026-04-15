@@ -222,8 +222,7 @@
     right: -.1em;
     bottom: -.52em;
     height: .82em;
-    background-image:
-        radial-gradient(ellipse 58% 82% at 50% -10%, transparent 62%, rgba(141,213,226,.7) 63% 68%, transparent 69%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 160' preserveAspectRatio='none'%3E%3Cpath d='M20 22 C250 126 750 126 980 22' fill='none' stroke='%238DD5E2' stroke-opacity='.76' stroke-width='13' stroke-linecap='round'/%3E%3C/svg%3E");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -231,8 +230,7 @@
 }
 
 .rd-g-active.rd-g-legato::after {
-    background-image:
-        radial-gradient(ellipse 58% 82% at 50% -10%, transparent 61%, rgba(164,228,241,.94) 62% 69%, transparent 70%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 160' preserveAspectRatio='none'%3E%3Cpath d='M20 22 C250 126 750 126 980 22' fill='none' stroke='%23A4E4F1' stroke-opacity='.96' stroke-width='15' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .rd-g-emphasis {
@@ -559,8 +557,7 @@ span.rd-pause.rd-pause-long {
     right: -.08em;
     bottom: -.42em;
     height: .66em;
-    background-image:
-        radial-gradient(ellipse 58% 82% at 50% -10%, transparent 62%, rgba(141,213,226,.72) 63% 68%, transparent 69%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 160' preserveAspectRatio='none'%3E%3Cpath d='M20 22 C250 126 750 126 980 22' fill='none' stroke='%238DD5E2' stroke-opacity='.78' stroke-width='13' stroke-linecap='round'/%3E%3C/svg%3E");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -831,8 +828,7 @@ span.rd-pause.rd-pause-long {
 }
 .rd-w.rd-now.tps-legato { color: #A4E4F1; text-decoration-line: none; text-shadow: 0 0 14px rgba(141,213,226,.12); }
 .rd-w.rd-now.tps-legato::after {
-    background-image:
-        radial-gradient(ellipse 58% 82% at 50% -10%, transparent 61%, rgba(164,228,241,.94) 62% 69%, transparent 70%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 160' preserveAspectRatio='none'%3E%3Cpath d='M20 22 C250 126 750 126 980 22' fill='none' stroke='%23A4E4F1' stroke-opacity='.96' stroke-width='15' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 .rd-w.rd-now.tps-staccato { color: #F2C1E1; text-shadow: 0 0 14px rgba(236,181,216,.12); }
 .rd-w.rd-now.tps-staccato::after { background-image: radial-gradient(circle, rgba(242,193,225,.78) 0 1.8px, transparent 2.1px); }

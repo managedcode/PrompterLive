@@ -24,6 +24,7 @@ public sealed record ScriptKnowledgeGraphArtifact(
 
 public enum ScriptKnowledgeGraphSemanticMode
 {
+    StructuralOnly,
     ModelOnly,
     TokenizerSimilarity
 }

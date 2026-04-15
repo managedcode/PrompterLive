@@ -2451,6 +2451,24 @@
   <data name="AiSpotlightRunningTitle" xml:space="preserve">
     <value>Working</value>
   </data>
+  <data name="AiSpotlightAgentStarted" xml:space="preserve">
+    <value>Agent started</value>
+  </data>
+  <data name="AiSpotlightAgentRunningDetailFormat" xml:space="preserve">
+    <value>Running with route context, editor context, and {0} tools.</value>
+  </data>
+  <data name="AiSpotlightAgentResponse" xml:space="preserve">
+    <value>Agent response</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailable" xml:space="preserve">
+    <value>AI provider unavailable</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailableDetail" xml:space="preserve">
+    <value>Connect an AI provider in Settings, then run the request again.</value>
+  </data>
+  <data name="AiSpotlightAgentFailed" xml:space="preserve">
+    <value>Agent failed</value>
+  </data>
   <data name="AiSpotlightApprovalTitle" xml:space="preserve">
     <value>Needs approval</value>
   </data>
@@ -2521,7 +2539,7 @@
     <value>Auto layout</value>
   </data>
   <data name="EditorGraphAnalyze" xml:space="preserve">
-    <value>Analyze</value>
+    <value>Build AI graph</value>
   </data>
   <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
     <value>Run tokenizer similarity</value>

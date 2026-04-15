@@ -217,6 +217,28 @@
     font-size: .8rem;
 }
 
+.ai-spotlight-answer {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-active);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--emo-focused) 9%, transparent);
+}
+
+.ai-spotlight-answer strong {
+    color: var(--text-1);
+    font-size: .8rem;
+}
+
+.ai-spotlight-answer p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: .86rem;
+    line-height: 1.5;
+}
+
 .ai-spotlight-approval {
     display: grid;
     gap: 10px;

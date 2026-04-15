@@ -19,6 +19,18 @@ internal static class AiSpotlightExecutionBuilder
                 : text(UiTextKey.AiSpotlightApprovalRequiredBeforeChangingSelection))
     ];
 
+    public static IReadOnlyList<AiSpotlightLogEntry> BuildAgentRunningLog(
+        ScriptArticleContext context,
+        Func<UiTextKey, string> text,
+        Func<UiTextKey, object[], string> format) =>
+    [
+        new(text(UiTextKey.AiSpotlightContextLoaded), context.Screen ?? text(UiTextKey.AiSpotlightContextRoute), true),
+        new(text(UiTextKey.AiSpotlightGraphChecked), FormatGraphDetail(context.Graph, text, format), true),
+        new(
+            text(UiTextKey.AiSpotlightAgentStarted),
+            format(UiTextKey.AiSpotlightAgentRunningDetailFormat, [(context.AvailableTools ?? []).Count]))
+    ];
+
     public static IReadOnlyList<AiSpotlightLogEntry> BuildApprovalLog(
         AiSpotlightApprovalRequest request,
         Func<UiTextKey, string> text,

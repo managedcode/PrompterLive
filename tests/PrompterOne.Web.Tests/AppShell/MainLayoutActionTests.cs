@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using PrompterOne.Core.AI.Models;
 using PrompterOne.Core.AI.Services;
+using PrompterOne.Core.AI.Workflows;
 using PrompterOne.Core.Localization;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Editor;
@@ -24,6 +25,8 @@ public sealed class MainLayoutActionTests : BunitContext
     private const string EnglishGoLiveLabel = "Go Live";
     private const string EnglishImportLabel = "Import";
     private const string IntroSubtitle = "Intro";
+    private const int ExpectedSingleAgentRunCount = 1;
+    private const int FirstLineNumber = 1;
     private const int MaximumAiSpotlightTopSuggestionCount = 3;
     private const int MaximumAiSpotlightSearchSuggestionCount = 7;
     private const string UkrainianExportLabel = "Експорт";
@@ -240,6 +243,82 @@ public sealed class MainLayoutActionTests : BunitContext
         {
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.AiSpotlight.SuggestionList)));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.AiSpotlight.SuggestionItem)));
+        });
+    }
+
+    [Test]
+    public void MainLayout_GlobalAiSpotlightAction_RunsAssistantAgentWithEditorContextAndTools()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        var spotlight = Services.GetRequiredService<AiSpotlightService>();
+        var sourceText = "Keep intro. Explain this line.";
+        var selectedText = "Explain this line.";
+        var selectedStart = sourceText.IndexOf(selectedText, StringComparison.Ordinal);
+        const string prompt = "explain selected context";
+        const string agentOutput = "This line gives the speaker a concise explainable beat.";
+        harness.ScriptAgentRuntime.NextResult = new ScriptAgentRunResult(
+            AssistantScriptWorkflow.WorkflowId,
+            "Script Assistant",
+            prompt,
+            [new ScriptAgentStepResult("assistant", "Script Assistant", prompt, agentOutput)],
+            agentOutput);
+        spotlight.SetContext(new ScriptArticleContext(
+            Title: "Draft",
+            Content: sourceText,
+            Source: "PrompterOne Editor",
+            Route: AppRoutes.Editor,
+            Screen: AppShellScreen.Editor.ToString(),
+            Editor: new ScriptEditorContext(
+                DocumentId: "draft",
+                DocumentTitle: "Draft",
+                Content: sourceText,
+                Revision: ScriptDocumentRevision.Create(sourceText),
+                Cursor: ScriptDocumentPosition.FromOffset(sourceText, selectedStart),
+                SelectedRange: new ScriptDocumentRange(selectedStart, selectedStart + selectedText.Length),
+                SelectedText: selectedText,
+                SelectedLineNumbers: [FirstLineNumber])));
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.QuantumId));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.FindByTestId(UiTestIds.Header.AiSpotlight).Click();
+        cut.FindByTestId(UiTestIds.AiSpotlight.PromptInput).Input(prompt);
+        cut.FindByTestId(UiTestIds.AiSpotlight.Submit).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(agentOutput, cut.FindByTestId(UiTestIds.AiSpotlight.AgentOutput).TextContent, StringComparison.Ordinal);
+            Assert.Equal(ExpectedSingleAgentRunCount, harness.ScriptAgentRuntime.Calls);
+            Assert.Equal(AssistantScriptWorkflow.WorkflowId, harness.ScriptAgentRuntime.LastRequest!.WorkflowId);
+            Assert.Equal(prompt, harness.ScriptAgentRuntime.LastRequest.Input);
+            Assert.Equal(sourceText, harness.ScriptAgentRuntime.LastRequest.ArticleContext!.Editor!.Content);
+            Assert.Contains(
+                harness.ScriptAgentRuntime.LastRequest.ArticleContext.AvailableTools ?? [],
+                static tool => tool.Name == AiSpotlightToolNames.AskContext);
+        });
+    }
+
+    [Test]
+    public void MainLayout_GlobalAiSpotlightAction_ReportsUnavailableProviderInsteadOfPretendRunning()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        var navigation = Services.GetRequiredService<NavigationManager>();
+        navigation.NavigateTo(AppRoutes.EditorWithId(AppTestData.Scripts.QuantumId));
+
+        var cut = Render<MainLayout>(parameters => parameters
+            .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
+
+        cut.FindByTestId(UiTestIds.Header.AiSpotlight).Click();
+        cut.FindByTestId(UiTestIds.AiSpotlight.PromptInput).Input("explain the current script");
+        cut.FindByTestId(UiTestIds.AiSpotlight.Submit).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("AI provider unavailable", cut.FindByTestId(UiTestIds.AiSpotlight.Error).TextContent, StringComparison.Ordinal);
+            Assert.Equal(ExpectedSingleAgentRunCount, harness.ScriptAgentRuntime.Calls);
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.AiSpotlight.AgentOutput)));
         });
     }
 

@@ -57,8 +57,10 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<ScriptDocumentEditService>();
         services.AddScoped<ScriptKnowledgeGraphService>();
         services.AddScoped<ScriptKnowledgeGraphTokenizerSimilarityExtractor>();
+        services.AddSingleton<ScriptAgent, AssistantScriptAgent>();
         services.AddSingleton<ScriptAgent, WriterScriptAgent>();
         services.AddSingleton<ScriptAgent, ReviewerScriptAgent>();
+        services.AddSingleton<ScriptWorkflow, AssistantScriptWorkflow>();
         services.AddSingleton<ScriptWorkflow, WriterReviewSequentialWorkflow>();
         services.AddSingleton<ScriptWorkflow, WriterReviewGroupChatWorkflow>();
         services.AddScoped<RsvpOrpCalculator>();
@@ -91,6 +93,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<ScriptAgentToolProvider>();
         services.AddScoped<IScriptAgentFactory, ScriptAgentFactory>();
         services.AddScoped<ScriptAgentRuntime>();
+        services.AddScoped<IScriptAgentRuntime>(serviceProvider => serviceProvider.GetRequiredService<ScriptAgentRuntime>());
         services.AddScoped<BrowserCloudStorageStore>();
         services.AddScoped<BrowserFileStorageStore>();
         services.AddScoped<BrowserThemeService>();

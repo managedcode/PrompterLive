@@ -9,7 +9,7 @@ namespace PrompterOne.Core.AI.Services;
 public sealed class ScriptAgentRuntime(
     IEnumerable<ScriptAgent> agents,
     IEnumerable<ScriptWorkflow> workflows,
-    IScriptAgentFactory agentFactory)
+    IScriptAgentFactory agentFactory) : IScriptAgentRuntime
 {
     private readonly IReadOnlyDictionary<string, ScriptAgent> _agentsById = agents.ToDictionary(
         static agent => agent.Id,

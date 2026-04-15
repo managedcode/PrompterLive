@@ -1272,6 +1272,24 @@
   <data name="AiSpotlightRunningTitle" xml:space="preserve">
     <value>Trabajando</value>
   </data>
+  <data name="AiSpotlightAgentStarted" xml:space="preserve">
+    <value>Agente iniciado</value>
+  </data>
+  <data name="AiSpotlightAgentRunningDetailFormat" xml:space="preserve">
+    <value>Ejecutando con contexto de ruta, contexto del editor y {0} herramientas.</value>
+  </data>
+  <data name="AiSpotlightAgentResponse" xml:space="preserve">
+    <value>Respuesta del agente</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailable" xml:space="preserve">
+    <value>Proveedor de IA no disponible</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailableDetail" xml:space="preserve">
+    <value>Conecta un proveedor de IA en Ajustes y vuelve a ejecutar la solicitud.</value>
+  </data>
+  <data name="AiSpotlightAgentFailed" xml:space="preserve">
+    <value>El agente falló</value>
+  </data>
   <data name="AiSpotlightApprovalTitle" xml:space="preserve">
     <value>Necesita aprobación</value>
   </data>
@@ -1342,7 +1360,7 @@
     <value>Diseño automático</value>
   </data>
   <data name="EditorGraphAnalyze" xml:space="preserve">
-    <value>Analizar</value>
+    <value>Crear grafo de IA</value>
   </data>
   <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
     <value>Ejecutar similitud de tokenizer</value>

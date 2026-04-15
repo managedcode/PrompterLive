@@ -54,6 +54,7 @@ No PrompterOne backend. No desktop install. No account wall. Open the app, start
 - **Teleprompter**: read with persisted font and width controls, focal-line positioning, horizontal and vertical mirror toggles, orientation switching, browser fullscreen, segmented progress, and optional camera background.
 - **Onboarding**: walk the first-run flow with a localized tour that explains TPS, RSVP, the editor, Learn, Teleprompter, and Go Live, then reopen that tour later from Settings.
 - **Settings**: manage appearance, browser language, media permissions, camera and microphone setup, sync offsets, recording defaults, AI provider preferences, cloud snapshot targets, transport credentials, and onboarding restart from one routed screen.
+- **AI Spotlight**: when an AI provider is configured, run the global assistant as a real Microsoft Agent Framework agent with route context, editor text, selected ranges, graph summary, and PrompterOne MCP-style tools.
 - **Go Live**: run the browser-owned studio shell and save the composed program feed locally with decodable video and audio while remote transport and destination routing continue to expand.
 
 ## What You Get
@@ -70,7 +71,7 @@ The operating desk for the rest of the app. The library keeps starter scripts an
 
 This is not a plain textarea. The editor understands **TPS** (Teleprompter Script), so you can write in segments, blocks, pacing markers, emphasis, emotion tags, pronunciation guides, pause cues, and speed modifiers directly in the source. Front matter is parsed into the metadata rail and kept out of the visible body instead of lingering inline.
 
-The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, in-document find, import and export actions, browser-local autosave with revision history, syntax-aware highlighting over the live source, and a first-class script graph tab. The graph view can run beside or over the source, lets writers inspect the script's high-level knowledge map, and keeps jump-back-to-source context attached to graph nodes. Recent UI work moved TPS authoring fully onto the Monaco editor surface, tightened dropdown and tooltip behavior, cleaned up gutter spacing, and kept large-draft responsiveness intact on both polished demo scripts and very large seeded drafts.
+The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, in-document find, import and export actions, browser-local autosave with revision history, syntax-aware highlighting over the live source, and a first-class script graph tab. The graph view can run beside or over the source, lets writers inspect the script's high-level knowledge map, and keeps jump-back-to-source context attached to graph nodes. Its **Build AI graph** action uses the configured LLM extractor; tokenizer similarity stays an explicit lower-fidelity fallback instead of silently pretending to be semantic analysis. Recent UI work moved TPS authoring fully onto the Monaco editor surface, tightened dropdown and tooltip behavior, cleaned up gutter spacing, and kept large-draft responsiveness intact on both polished demo scripts and very large seeded drafts.
 
 ![Editor](docs/screenshots/readme/editor.png)
 
@@ -234,7 +235,7 @@ PrompterOne is in **active alpha**: the core authoring, rehearsal, reader, and l
 | **LiveKit transport** | 🟡 | Real transport-aware browser integration and guest-path work, with operational polish still expanding |
 | **Distribution routing** | 🟡 | Targets are capability-gated and blocked when the selected transport cannot service them |
 | **Cloud storage snapshots** | 🟡 | Browser-local provider configuration ships now; broader import/export maturity is still expanding |
-| **AI provider execution** | 🟡 | Provider settings and UI hooks exist, but full runtime execution is still gated behind honest provider integrations |
+| **AI provider execution** | ✅ | AI Spotlight runs a configured Microsoft Agent Framework agent with route/editor context and MCP-style tools; script graph analysis uses the configured LLM extractor before any explicit tokenizer fallback |
 | **Generic RTMP fan-out** | ❌ | Intentionally unsupported without a real upstream transport path |
 | **PrompterOne backend** | ❌ | By design: the browser is the only app runtime |
 
@@ -249,7 +250,7 @@ These are product directions, not release-date promises.
 
 **After that:**
 - Stronger guest and destination-routing workflows on top of the browser studio
-- AI-assisted writing once provider integrations are real enough to document honestly
+- More agent-callable editor, media, and streaming operations on top of the existing AI runtime
 - Deeper operational telemetry and operator ergonomics in Go Live
 
 ## Quick Start

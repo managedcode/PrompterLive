@@ -1272,6 +1272,24 @@
   <data name="AiSpotlightRunningTitle" xml:space="preserve">
     <value>In corso</value>
   </data>
+  <data name="AiSpotlightAgentStarted" xml:space="preserve">
+    <value>Agente avviato</value>
+  </data>
+  <data name="AiSpotlightAgentRunningDetailFormat" xml:space="preserve">
+    <value>In esecuzione con contesto della rotta, contesto editor e {0} strumenti.</value>
+  </data>
+  <data name="AiSpotlightAgentResponse" xml:space="preserve">
+    <value>Risposta agente</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailable" xml:space="preserve">
+    <value>Provider AI non disponibile</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailableDetail" xml:space="preserve">
+    <value>Collega un provider AI in Impostazioni, poi esegui di nuovo la richiesta.</value>
+  </data>
+  <data name="AiSpotlightAgentFailed" xml:space="preserve">
+    <value>Agente non riuscito</value>
+  </data>
   <data name="AiSpotlightApprovalTitle" xml:space="preserve">
     <value>Serve approvazione</value>
   </data>
@@ -1342,7 +1360,7 @@
     <value>Layout automatico</value>
   </data>
   <data name="EditorGraphAnalyze" xml:space="preserve">
-    <value>Analizza</value>
+    <value>Crea grafo AI</value>
   </data>
   <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
     <value>Esegui similarità tokenizer</value>

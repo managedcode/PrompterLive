@@ -1272,6 +1272,24 @@
   <data name="AiSpotlightRunningTitle" xml:space="preserve">
     <value>In Arbeit</value>
   </data>
+  <data name="AiSpotlightAgentStarted" xml:space="preserve">
+    <value>Agent gestartet</value>
+  </data>
+  <data name="AiSpotlightAgentRunningDetailFormat" xml:space="preserve">
+    <value>Läuft mit Routen-Kontext, Editor-Kontext und {0} Tools.</value>
+  </data>
+  <data name="AiSpotlightAgentResponse" xml:space="preserve">
+    <value>Agent-Antwort</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailable" xml:space="preserve">
+    <value>KI-Anbieter nicht verfügbar</value>
+  </data>
+  <data name="AiSpotlightAgentUnavailableDetail" xml:space="preserve">
+    <value>Verbinde einen KI-Anbieter in den Einstellungen und führe die Anfrage erneut aus.</value>
+  </data>
+  <data name="AiSpotlightAgentFailed" xml:space="preserve">
+    <value>Agent fehlgeschlagen</value>
+  </data>
   <data name="AiSpotlightApprovalTitle" xml:space="preserve">
     <value>Freigabe erforderlich</value>
   </data>
@@ -1342,7 +1360,7 @@
     <value>Auto-Layout</value>
   </data>
   <data name="EditorGraphAnalyze" xml:space="preserve">
-    <value>Analysieren</value>
+    <value>KI-Graph erstellen</value>
   </data>
   <data name="EditorGraphTokenizerAnalyze" xml:space="preserve">
     <value>Tokenizer-Ähnlichkeit ausführen</value>
