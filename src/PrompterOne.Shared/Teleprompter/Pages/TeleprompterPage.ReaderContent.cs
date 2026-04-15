@@ -275,9 +275,7 @@ public partial class TeleprompterPage
 
             var effectiveWpm = ResolveEffectiveWpm(word.Metadata, targetWpm);
             var speedCueValue = ResolveReaderSpeedCueValue(targetWpm, effectiveWpm);
-            var pronunciationGuide = string.IsNullOrWhiteSpace(word.Metadata?.PronunciationGuide)
-                ? null
-                : word.Metadata.PronunciationGuide.Trim();
+            var pronunciationGuide = ResolveReaderPronunciationGuide(word.Metadata);
             currentGroup.Add(new ReaderWordViewModel(
                 Text: pronunciationGuide ?? word.CleanText,
                 CssClass: BuildReaderWordBaseClass(word.Metadata, speedCueValue),
@@ -420,6 +418,10 @@ public partial class TeleprompterPage
 
         if (!string.IsNullOrWhiteSpace(metadata.PronunciationGuide))
         {
+            classes.Add("tps-pronunciation");
+        }
+        else if (!string.IsNullOrWhiteSpace(metadata.PhoneticGuide))
+        {
             classes.Add("tps-phonetic");
         }
 
@@ -431,6 +433,18 @@ public partial class TeleprompterPage
         }
 
         return string.Join(' ', classes);
+    }
+
+    private static string? ResolveReaderPronunciationGuide(WordMetadata? metadata)
+    {
+        if (!string.IsNullOrWhiteSpace(metadata?.PronunciationGuide))
+        {
+            return metadata.PronunciationGuide.Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(metadata?.PhoneticGuide)
+            ? null
+            : metadata.PhoneticGuide.Trim();
     }
 
     private static IReadOnlyDictionary<string, object>? BuildReaderWordAttributes(WordMetadata? metadata, string? speedCueValue)

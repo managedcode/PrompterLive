@@ -17,10 +17,10 @@ Today we read / slash with steady confidence.
 Today we read // double with steady confidence.
 
 ### [Pause Half Second Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pause:500ms] pause500 with steady confidence.
+Today we read [pause:500ms] pause with steady confidence.
 
 ### [Pause One Second Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pause:1s] pause1s with steady confidence.
+Today we read [pause:1s] silence with steady confidence.
 
 ### [Breath Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
 Today we read [breath] breath with steady confidence.
@@ -85,7 +85,7 @@ Today we read [concerned]concerned[/concerned] with steady confidence.
 ### [Motivational Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
 Today we read [motivational]motivational[/motivational] with steady confidence.
 
-### [Neutral Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|warm]
+### [Neutral Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
 Today we read [neutral]neutral[/neutral] with steady confidence.
 
 ### [Aside Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]

@@ -149,7 +149,7 @@ internal static class TpsScriptDataBuilder
             EnergyLevel = compiledWord.Metadata.EnergyLevel,
             MelodyLevel = compiledWord.Metadata.MelodyLevel,
             PauseAfter = compiledWord.Metadata.PauseDuration,
-            Pronunciation = compiledWord.Metadata.PronunciationGuide,
+            Pronunciation = compiledWord.Metadata.PronunciationGuide ?? compiledWord.Metadata.PhoneticGuide,
             StressText = compiledWord.Metadata.StressText,
             StressGuide = compiledWord.Metadata.StressGuide,
             Speaker = compiledWord.Metadata.Speaker,

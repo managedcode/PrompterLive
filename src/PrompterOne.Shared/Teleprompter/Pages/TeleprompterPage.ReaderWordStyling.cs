@@ -11,14 +11,14 @@ public partial class TeleprompterPage
     private const double FastLetterSpacingFloorEm = -0.03d;
     private const double FastLetterSpacingRangeRatio = 0.45d;
     private const double MaximumFastLetterSpacingEm = -0.06d;
-    private const double MaximumSlowClassLetterSpacingEm = 0.2d;
+    private const double MaximumSlowClassLetterSpacingEm = 0.085d;
     private const int MaximumTpsContourLevel = 10;
     private const int MinimumReaderReferenceWpm = 60;
     private const int MinimumTpsContourLevel = 1;
     private const string ReaderWordLetterSpacingVariable = "--tps-word-letter-spacing";
-    private const double SlowLetterSpacingFloorEm = 0.12d;
+    private const double SlowLetterSpacingFloorEm = 0.035d;
     private const double SlowLetterSpacingRangeRatio = 0.32d;
-    private const double MaximumSlowLetterSpacingEm = 0.22d;
+    private const double MaximumSlowLetterSpacingEm = 0.09d;
     private const double ReaderCueOpacityAside = 0.88d;
     private const double ReaderCueOpacityDefault = 1d;
     private const double ReaderCueOpacitySarcasm = 0.92d;

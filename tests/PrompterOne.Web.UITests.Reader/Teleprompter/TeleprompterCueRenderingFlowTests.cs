@@ -20,8 +20,8 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         new(0, "01-structure-baseline", "Structure baseline", TargetWord: "baseline"),
         new(1, "02-pause-slash", "Pause slash", ExpectedPauseCount: 1, TargetWord: "slash"),
         new(2, "03-pause-double-slash", "Pause double slash", ExpectedPauseCount: 1, TargetWord: "double"),
-        new(3, "04-pause-500ms", "Pause 500ms", ExpectedPauseCount: 1, TargetWord: "pause500"),
-        new(4, "05-pause-1s", "Pause 1s", ExpectedPauseCount: 1, TargetWord: "pause1s"),
+        new(3, "04-pause-500ms", "Pause 500ms", ExpectedPauseCount: 1, TargetWord: "pause"),
+        new(4, "05-pause-1s", "Pause 1s", ExpectedPauseCount: 1, TargetWord: "silence"),
         new(5, "06-breath", "Breath", ExpectedBreathCount: 1, TargetWord: "breath"),
         new(6, "07-speed-xslow", "[xslow]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueXslow, SpeedProbeKey: "xslow", TargetWord: "xslow"),
         new(7, "08-speed-slow", "[slow]", TpsVisualCueContracts.SpeedAttributeName, TpsVisualCueContracts.SpeedCueSlow, SpeedProbeKey: "slow", TargetWord: "slow"),
@@ -398,11 +398,20 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     targetTextDecorationThickness: targetStyle?.textDecorationThickness ?? '',
                     targetAfterContent: targetAfterStyle?.content ?? '',
                     targetAfterBackgroundImage: targetAfterStyle?.backgroundImage ?? '',
+                    targetAfterBorderBottomColor: targetAfterStyle?.borderBottomColor ?? '',
+                    targetAfterBorderBottomStyle: targetAfterStyle?.borderBottomStyle ?? '',
+                    targetAfterBorderBottomWidth: targetAfterStyle?.borderBottomWidth ?? '',
+                    targetAfterBorderTopColor: targetAfterStyle?.borderTopColor ?? '',
+                    targetAfterBorderTopStyle: targetAfterStyle?.borderTopStyle ?? '',
+                    targetAfterBorderTopWidth: targetAfterStyle?.borderTopWidth ?? '',
                     targetGroupTextDecorationLine: targetGroupStyle?.textDecorationLine ?? '',
                     targetGroupBeforeContent: targetGroupBeforeStyle?.content ?? '',
                     targetGroupBeforeBackgroundImage: targetGroupBeforeStyle?.backgroundImage ?? '',
                     targetGroupAfterContent: targetGroupAfterStyle?.content ?? '',
                     targetGroupAfterBackgroundImage: targetGroupAfterStyle?.backgroundImage ?? '',
+                    targetGroupAfterBorderBottomColor: targetGroupAfterStyle?.borderBottomColor ?? '',
+                    targetGroupAfterBorderBottomStyle: targetGroupAfterStyle?.borderBottomStyle ?? '',
+                    targetGroupAfterBorderBottomWidth: targetGroupAfterStyle?.borderBottomWidth ?? '',
                     targetGroupWidth: groupRect?.width ?? 0,
                     attributeUnionWidth: attributeUnion ? attributeUnion.right - attributeUnion.left : 0
                 };
@@ -496,12 +505,21 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         if (string.Equals(capture.AttributeName, TpsVisualCueContracts.DeliveryAttributeName, StringComparison.Ordinal) &&
             string.Equals(capture.AttributeValue, TpsVisualCueContracts.DeliveryModeBuilding, StringComparison.Ordinal))
         {
-            var buildingHairpinImage = capture.ExpectedAttributeMatchCount > 1
+            var buildingHairpinImage = HasVisiblePseudoBackground(probe.TargetGroupAfterBackgroundImage)
                 ? probe.TargetGroupAfterBackgroundImage
                 : probe.TargetAfterBackgroundImage;
             await Assert.That(HasVisiblePseudoBackground(buildingHairpinImage))
                 .IsTrue()
                 .Because("Expected building delivery to read as a crescendo-style hairpin cue.");
+            await Assert.That(buildingHairpinImage)
+                .Contains("image/svg+xml")
+                .Because("Expected building delivery to use a crisp vector hairpin instead of CSS diagonal gradients.");
+            await Assert.That(buildingHairpinImage)
+                .DoesNotContain("linear-gradient")
+                .Because("Expected building delivery to avoid pixel-stepped diagonal gradient strokes.");
+            await Assert.That(buildingHairpinImage)
+                .DoesNotContain("radial-gradient")
+                .Because("Expected building delivery to avoid raster-like gradient marks.");
 
             if (capture.ExpectedAttributeMatchCount > 1)
             {
@@ -522,19 +540,38 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         {
             if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationLegato, StringComparison.Ordinal))
             {
-                var legatoSlurImage = capture.ExpectedAttributeMatchCount > 1
+                var hasGroupLegatoSlur = string.Equals(probe.TargetGroupAfterBorderBottomStyle, "solid", StringComparison.Ordinal);
+                var legatoSlurImage = hasGroupLegatoSlur
                     ? probe.TargetGroupAfterBackgroundImage
                     : probe.TargetAfterBackgroundImage;
+                var legatoSlurStyle = hasGroupLegatoSlur
+                    ? probe.TargetGroupAfterBorderBottomStyle
+                    : probe.TargetAfterBorderBottomStyle;
+                var legatoSlurWidth = hasGroupLegatoSlur
+                    ? probe.TargetGroupAfterBorderBottomWidth
+                    : probe.TargetAfterBorderBottomWidth;
+                var legatoSlurColor = hasGroupLegatoSlur
+                    ? probe.TargetGroupAfterBorderBottomColor
+                    : probe.TargetAfterBorderBottomColor;
 
-                await Assert.That(HasVisiblePseudoBackground(legatoSlurImage))
+                await Assert.That(IsDisabledPseudoBackground(legatoSlurImage))
                     .IsTrue()
-                    .Because("Expected legato to read as a music-like slur cue.");
-                await Assert.That(legatoSlurImage)
-                    .Contains("image/svg+xml")
-                    .Because("Expected legato to use a smooth vector slur instead of a pixelated CSS gradient.");
+                    .Because("Expected legato to use a vector border arc instead of a stretched background image.");
                 await Assert.That(legatoSlurImage)
                     .DoesNotContain("radial-gradient")
                     .Because("Expected legato slurs to avoid jagged radial-gradient rastering.");
+                await Assert.That(legatoSlurImage)
+                    .DoesNotContain("linear-gradient")
+                    .Because("Expected legato slurs to avoid pixel-stepped gradient strokes.");
+                await Assert.That(legatoSlurStyle)
+                    .IsEqualTo("solid")
+                    .Because("Expected legato to render as a continuous music-like slur stroke.");
+                await Assert.That(ParseCssPixels(legatoSlurWidth))
+                    .IsGreaterThan(0d)
+                    .Because("Expected legato slur stroke width to be visible at README screenshot scale.");
+                await Assert.That(legatoSlurColor)
+                    .IsNotEqualTo("rgba(0, 0, 0, 0)")
+                    .Because("Expected legato slur stroke color to be visible.");
                 if (capture.ExpectedAttributeMatchCount > 1)
                 {
                     await Assert.That(IsDisabledPseudoContent(probe.TargetAfterContent))
@@ -554,9 +591,15 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             }
             else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationStaccato, StringComparison.Ordinal))
             {
-                await Assert.That(probe.TargetAfterBackgroundImage.Contains("radial-gradient", StringComparison.Ordinal))
+                await Assert.That(IsDisabledPseudoBackground(probe.TargetAfterBackgroundImage))
                     .IsTrue()
+                    .Because("Expected staccato dots to avoid radial-gradient rastering.");
+                await Assert.That(probe.TargetAfterBorderBottomStyle)
+                    .IsEqualTo("dotted")
                     .Because("Expected staccato to read as music-like dots.");
+                await Assert.That(ParseCssPixels(probe.TargetAfterBorderBottomWidth))
+                    .IsGreaterThan(0d)
+                    .Because("Expected staccato dots to stay visible at README screenshot scale.");
                 await Assert.That(ParseCssPixels(probe.TargetLetterSpacing))
                     .IsGreaterThan(0d)
                     .Because("Expected staccato to separate the cue word rhythm.");
@@ -571,12 +614,21 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(probe.TargetBeforeContent)
                 .Contains("ˈ")
                 .Because("Expected stress to show a stress mark above the cue word.");
-            await Assert.That(probe.TargetTextDecorationStyle)
-                .IsEqualTo("double")
-                .Because("Expected stress to stay distinct from editorial emphasis and markdown bold.");
-            await Assert.That(ParseCssPixels(probe.TargetTextDecorationThickness))
+            await Assert.That(probe.TargetTextDecorationLine)
+                .DoesNotContain("underline")
+                .Because("Expected stress to use a dedicated vector stress mark instead of generic text-decoration underlines.");
+            await Assert.That(probe.TargetAfterBorderTopStyle)
+                .IsEqualTo("solid")
+                .Because("Expected stress to render the top stroke of its double stress mark.");
+            await Assert.That(probe.TargetAfterBorderBottomStyle)
+                .IsEqualTo("solid")
+                .Because("Expected stress to render the bottom stroke of its double stress mark.");
+            await Assert.That(ParseCssPixels(probe.TargetAfterBorderTopWidth))
                 .IsGreaterThanOrEqualTo(2d)
-                .Because("Expected stress to have a stronger visible underline.");
+                .Because("Expected stress to have a readable top stress stroke.");
+            await Assert.That(ParseCssPixels(probe.TargetAfterBorderBottomWidth))
+                .IsGreaterThanOrEqualTo(2d)
+                .Because("Expected stress to have a readable bottom stress stroke.");
         }
 
         if (!string.IsNullOrWhiteSpace(capture.ExpectedEditPointPriority))
@@ -688,7 +740,8 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
                 const computed = getComputedStyle(target);
                 return {
-                    letterSpacing: computed.letterSpacing ?? ''
+                    letterSpacing: computed.letterSpacing ?? '',
+                    fontSize: computed.fontSize ?? ''
                 };
             }
             """,
@@ -724,6 +777,13 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         await Assert.That(ParseCssPixels(normal.LetterSpacing)).IsGreaterThan(ParseCssPixels(fast.LetterSpacing));
         await Assert.That(ParseCssPixels(fast.LetterSpacing)).IsGreaterThan(ParseCssPixels(xfast.LetterSpacing));
         await Assert.That(ParseCssPixels(customWpm.LetterSpacing)).IsLessThan(ParseCssPixels(normal.LetterSpacing));
+
+        await Assert.That(ParseCssEmRatio(xslow.LetterSpacing, xslow.FontSize))
+            .IsLessThanOrEqualTo(0.11d)
+            .Because("xslow must stay visually restrained in README screenshots.");
+        await Assert.That(ParseCssEmRatio(slow.LetterSpacing, slow.FontSize))
+            .IsLessThanOrEqualTo(0.06d)
+            .Because("slow must broaden the word without becoming a spaced-letter display.");
     }
 
     private static double ParseCssPixels(string value)
@@ -734,6 +794,13 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         }
 
         return double.Parse(value.Replace("px", string.Empty, StringComparison.Ordinal), CultureInfo.InvariantCulture);
+    }
+
+    private static double ParseCssEmRatio(string value, string fontSize)
+    {
+        var fontSizePixels = Math.Max(1d, ParseCssPixels(fontSize));
+
+        return ParseCssPixels(value) / fontSizePixels;
     }
 
     private static double ParseCssNumber(string value)
@@ -941,6 +1008,18 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         public string TargetAfterBackgroundImage { get; init; } = string.Empty;
 
+        public string TargetAfterBorderBottomColor { get; init; } = string.Empty;
+
+        public string TargetAfterBorderBottomStyle { get; init; } = string.Empty;
+
+        public string TargetAfterBorderBottomWidth { get; init; } = string.Empty;
+
+        public string TargetAfterBorderTopColor { get; init; } = string.Empty;
+
+        public string TargetAfterBorderTopStyle { get; init; } = string.Empty;
+
+        public string TargetAfterBorderTopWidth { get; init; } = string.Empty;
+
         public string TargetGroupTextDecorationLine { get; init; } = string.Empty;
 
         public string TargetGroupBeforeContent { get; init; } = string.Empty;
@@ -951,6 +1030,12 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         public string TargetGroupAfterBackgroundImage { get; init; } = string.Empty;
 
+        public string TargetGroupAfterBorderBottomColor { get; init; } = string.Empty;
+
+        public string TargetGroupAfterBorderBottomStyle { get; init; } = string.Empty;
+
+        public string TargetGroupAfterBorderBottomWidth { get; init; } = string.Empty;
+
         public double TargetGroupWidth { get; init; }
 
         public double AttributeUnionWidth { get; init; }
@@ -959,5 +1044,7 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
     private sealed class CueMatrixSpeedProbe
     {
         public string LetterSpacing { get; init; } = string.Empty;
+
+        public string FontSize { get; init; } = string.Empty;
     }
 }

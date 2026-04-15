@@ -263,7 +263,7 @@
 .tps-sad { color: #9DB6FF; }
 .tps-calm { color: #76E4C5; }
 .tps-energetic { color: #FF9F1C; }
-.tps-professional { color: #AFC8FF; }
+.tps-professional { color: #7DB6FF; }
 
 /* ── TPS Delivery And Volume ── */
 .tps-loud { color: #F2C18B; font-weight: var(--tps-cue-weight, 800); }
@@ -279,8 +279,8 @@
 }
 
 /* ── TPS Speed Indicators (visual cue for speed tags) ── */
-.tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.16em); }
-.tps-slow { letter-spacing: var(--tps-word-letter-spacing, 0.09em); }
+.tps-xslow { letter-spacing: var(--tps-word-letter-spacing, 0.07em); }
+.tps-slow { letter-spacing: var(--tps-word-letter-spacing, 0.035em); }
 .tps-fast { letter-spacing: var(--tps-word-letter-spacing, -0.03em); }
 .tps-xfast { letter-spacing: var(--tps-word-letter-spacing, -0.06em); opacity: .9; }
 .tps-normal { letter-spacing: 0; }

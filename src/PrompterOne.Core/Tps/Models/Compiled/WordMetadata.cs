@@ -19,6 +19,7 @@ public class WordMetadata
     public string? ArticulationStyle { get; set; }
     public int? EnergyLevel { get; set; }
     public int? MelodyLevel { get; set; }
+    public string? PhoneticGuide { get; set; }
     public string? PronunciationGuide { get; set; }
     public string? StressText { get; set; }
     public string? StressGuide { get; set; }
