@@ -204,7 +204,7 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
             await Expect(leadershipDropdown).ToBeVisibleAsync();
             await Expect(demoDropdown).ToBeHiddenAsync();
 
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(BrowserTestConstants.Elements.QuantumCard));
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.FolderAll));
             await Expect(leadershipDropdown).ToBeHiddenAsync();
             await Assert.That(new Uri(page.Url).AbsolutePath).IsEqualTo(BrowserTestConstants.Routes.Library);
         });

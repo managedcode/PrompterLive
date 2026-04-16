@@ -26,7 +26,8 @@ internal static class RuntimeLibrarySeedCatalog
         new("starter-security-incident-script", "Security Incident", "starter-security-incident.tps", "starter-news-reports"),
         new("starter-ted-leadership-script", "TED: Leadership", "starter-ted-leadership.tps", "starter-ted-talks"),
         new("starter-green-architecture-script", "Green Architecture", "starter-green-architecture.tps", "starter-investors"),
-        new("starter-quantum-computing-script", "Quantum Computing", "starter-quantum-computing.tps", "starter-internal")
+        new("starter-quantum-computing-script", "Quantum Computing", "starter-quantum-computing.tps", "starter-internal"),
+        new("starter-tps-cue-matrix-script", "TPS Cue Matrix", "starter-tps-cue-matrix.tps", "starter-internal")
     ];
 
     private static readonly DateTimeOffset[] DocumentTimestamps =
@@ -35,7 +36,8 @@ internal static class RuntimeLibrarySeedCatalog
         new(2026, 3, 24, 8, 30, 0, TimeSpan.Zero),
         new(2026, 3, 20, 12, 0, 0, TimeSpan.Zero),
         new(2026, 3, 18, 10, 15, 0, TimeSpan.Zero),
-        new(2026, 3, 15, 16, 45, 0, TimeSpan.Zero)
+        new(2026, 3, 15, 16, 45, 0, TimeSpan.Zero),
+        new(2026, 4, 16, 10, 0, 0, TimeSpan.Zero)
     ];
 
     public static IReadOnlyList<StoredLibraryFolder> CreateFolders() =>

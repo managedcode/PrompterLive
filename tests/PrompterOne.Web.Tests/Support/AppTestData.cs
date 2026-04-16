@@ -17,6 +17,8 @@ internal static class AppTestData
         public const string ReaderTimingId = "test-reader-timing-script";
         public const string SecurityIncidentId = "test-security-incident-script";
         public const string SpeedOffsetsId = "test-tps-speed-offsets-script";
+        public const string RuntimeTpsCueMatrixDocumentName = "starter-tps-cue-matrix.tps";
+        public const string RuntimeTpsCueMatrixId = "starter-tps-cue-matrix-script";
         public const string DemoTitle = "Product Launch";
         public const string TedLeadershipTitle = "TED: Leadership";
         public const string GreenArchitectureTitle = "Green Architecture";
@@ -25,6 +27,7 @@ internal static class AppTestData
         public const string ReaderTimingTitle = "Reader Timing Probe";
         public const string SecurityIncidentTitle = "Security Incident";
         public const string SpeedOffsetsTitle = "TPS Speed Offsets";
+        public const string TpsCueMatrixTitle = "TPS Cue Matrix";
         public const string BroadcastMic = "Broadcast mic";
     }
 
@@ -42,6 +45,7 @@ internal static class AppTestData
         public const string InvestorsName = "Investors";
         public const string InternalId = "test-internal";
         public const string InternalName = "Internal";
+        public const string RuntimeInternalId = "starter-internal";
         public const string RoadshowsId = "roadshows";
         public const string Roadshows = "Roadshows";
     }

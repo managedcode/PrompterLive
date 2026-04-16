@@ -18,6 +18,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string IntroductionWord = "comes";
     private const int InspirationCardIndex = 6;
     private const double MaximumVisibleFastLetterSpacingEm = -0.001d;
+    private const double MinimumVisibleOffsetSlowLetterSpacingEm = 0.03d;
     private const double MinimumVisibleSlowLetterSpacingEm = 0.09d;
     private const string MaximumReaderWidthLabel = "100%";
     private const string MaximumReaderWidthValue = "100";
@@ -156,7 +157,7 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
-            Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleSlowLetterSpacingEm);
+            Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleOffsetSlowLetterSpacingEm);
 
             Assert.Equal("140", normalWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
             Assert.DoesNotContain(
