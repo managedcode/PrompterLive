@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Library/SeedData/starter-product-launch.tps" />
-    <EmbeddedResource Include="Library/SeedData/starter-security-incident.tps" />
-    <EmbeddedResource Include="Library/SeedData/starter-ted-leadership.tps" />
-    <EmbeddedResource Include="Library/SeedData/starter-green-architecture.tps" />
-    <EmbeddedResource Include="Library/SeedData/starter-quantum-computing.tps" />
     <EmbeddedResource Include="Library/SeedData/starter-tps-cue-matrix.tps" />
   </ItemGroup>
 

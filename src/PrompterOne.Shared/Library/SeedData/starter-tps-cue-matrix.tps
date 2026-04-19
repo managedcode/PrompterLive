@@ -8,157 +8,175 @@ base_wpm: 140
 ## [Cue Matrix|Speaker:Host|Archetype:Educator|140WPM|neutral|0:00-8:00]
 
 ### [Structure Baseline|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read baseline with steady confidence.
+The plain baseline shows how reading sounds without any cue applied.
 
 ### [Pause Slash Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read / slash with steady confidence.
+A single / slash pauses the reader briefly before the next word lands.
 
 ### [Pause Double Slash Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read // double with steady confidence.
+Use // double slash marks when the audience needs a longer reset between points.
 
 ### [Pause Half Second Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pause:500ms] pause with steady confidence.
+A [pause:500ms] pause holds silence for half a second before continuing.
 
 ### [Pause One Second Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pause:1s] silence with steady confidence.
+Extend the beat with [pause:1s] silence when the next line needs real weight.
 
 ### [Breath Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [breath] breath with steady confidence.
+A natural [breath] breath between phrases keeps long paragraphs readable at live pace.
 
 ### [Xslow Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [xslow]xslow[/xslow] with steady confidence.
+Stretch your pace with [xslow]xslow[/xslow] when the moment deserves deliberate weight.
 
 ### [Slow Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [slow]slow[/slow] with steady confidence.
+Choose a [slow]slow[/slow] delivery when ideas land better with space around them.
 
 ### [Normal Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [normal]normal[/normal] with steady confidence.
+Return to [normal]normal[/normal] pace whenever the script can read itself without shaping.
 
 ### [Fast Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [fast]fast[/fast] with steady confidence.
+Push a [fast]fast[/fast] tempo when energy has to carry the audience forward.
 
 ### [Xfast Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [xfast]xfast[/xfast] with steady confidence.
+Sprint into [xfast]xfast[/xfast] only for the briefest bursts of excitement or relief.
 
 ### [Custom WPM Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [180WPM]180wpm[/180WPM] with steady confidence.
+Dial an exact [180WPM]180wpm[/180WPM] when you need a specific broadcast cadence.
 
 ### [Loud Volume Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [loud]loud[/loud] with steady confidence.
+Project a [loud]loud[/loud] beat when the line must reach every corner of the room.
 
 ### [Soft Volume Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [soft]soft[/soft] with steady confidence.
+Drop into [soft]soft[/soft] when intimate material deserves a quieter presence.
 
 ### [Whisper Volume Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [whisper]whisper[/whisper] with steady confidence.
+Turn a [whisper]whisper[/whisper] into closeness when the audience must lean in.
 
 ### [Warm Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [warm]warm[/warm] with steady confidence.
+A [warm]warm[/warm] tone welcomes the audience like a familiar voice by a fireplace.
 
 ### [Urgent Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [urgent]urgent[/urgent] with steady confidence.
+Mark the line [urgent]urgent[/urgent] when the listener needs to act without delay.
 
 ### [Excited Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [excited]excited[/excited] with steady confidence.
+Let the phrase sound [excited]excited[/excited] whenever good news deserves genuine sparkle.
 
 ### [Happy Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [happy]happy[/happy] with steady confidence.
+A [happy]happy[/happy] line lifts the room without overdoing the brightness.
 
 ### [Sad Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [sad]sad[/sad] with steady confidence.
+Read the passage [sad]sad[/sad] when loss or disappointment deserves honest weight.
 
 ### [Calm Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [calm]calm[/calm] with steady confidence.
+A steady [calm]calm[/calm] voice reassures listeners during unsettling news reports.
 
 ### [Energetic Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [energetic]energetic[/energetic] with steady confidence.
+Bring an [energetic]energetic[/energetic] charge whenever the script needs visible momentum.
 
 ### [Professional Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [professional]professional[/professional] with steady confidence.
+Keep the phrase [professional]professional[/professional] when briefings need composure and credibility.
 
 ### [Focused Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [focused]focused[/focused] with steady confidence.
+Sound [focused]focused[/focused] when technical material demands precise attention.
 
 ### [Concerned Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [concerned]concerned[/concerned] with steady confidence.
+A [concerned]concerned[/concerned] tone signals that leadership takes the issue seriously.
 
 ### [Motivational Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [motivational]motivational[/motivational] with steady confidence.
+Turn the line [motivational]motivational[/motivational] to rally the room toward action.
 
 ### [Neutral Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [neutral]neutral[/neutral] with steady confidence.
+Stay [neutral]neutral[/neutral] when facts should speak louder than any feeling.
 
 ### [Aside Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [aside]aside[/aside] with steady confidence.
+Drop a short [aside]aside[/aside] as a side remark shared directly with the audience.
 
 ### [Rhetorical Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [rhetorical]rhetorical[/rhetorical] with steady confidence.
+A [rhetorical]rhetorical[/rhetorical] question invites reflection without demanding an answer.
 
 ### [Building Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [building]building[/building] with steady confidence.
+A [building]building[/building] line grows in intensity toward the conclusion it earns.
 
 ### [Sarcasm Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [sarcasm]sarcasm[/sarcasm] with steady confidence.
+Mark [sarcasm]sarcasm[/sarcasm] so your delivery flips the surface meaning of the words.
 
 ### [Legato Articulation Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [legato]legato[/legato] with steady confidence.
+A [legato]legato[/legato] phrase connects the words smoothly like a musical slur.
 
 ### [Staccato Articulation Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [staccato]staccato[/staccato] with steady confidence.
+Each [staccato]staccato[/staccato] syllable lands crisp and separate from its neighbors.
 
 ### [Energy Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [energy:8]energy[/energy] with steady confidence.
+Rising [energy:8]energy[/energy] adds drive and forward momentum to the entire line.
 
 ### [Melody Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [melody:3]melody[/melody] with steady confidence.
+A rising [melody:3]melody[/melody] gives the phrase a lifted, inquisitive shape.
 
 ### [Highlight Editorial Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [highlight]highlight[/highlight] with steady confidence.
+Use [highlight]highlight[/highlight] to mark the key phrase the audience must remember.
 
 ### [Emphasis Editorial Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [emphasis]emphasis[/emphasis] with steady confidence.
+Explicit [emphasis]emphasis[/emphasis] draws the ear to the editorial beat of the script.
 
 ### [Bold Markdown Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read **bold** with steady confidence.
+Markdown **bold** brings typographic weight to the most important word on the line.
 
 ### [Italic Markdown Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read *italic* with steady confidence.
+Markdown *italic* adds a subtle tilt that suits titles and borrowed foreign terms.
 
 ### [Pronunciation Guide Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [pronunciation:/prəˌnʌnsiˈeɪʃən/]pronunciation[/pronunciation] with steady confidence.
+A [pronunciation:/prəˌnʌnsiˈeɪʃən/]pronunciation[/pronunciation] guide teaches tricky words using IPA symbols and accent marks.
 
 ### [Phonetic Guide Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [phonetic:/fəˈnɛtɪk/]phonetic[/phonetic] with steady confidence.
+Inline [phonetic:/fəˈnɛtɪk/]phonetic[/phonetic] notation helps readers say unfamiliar terms the same way every time.
 
 ### [Stress Guide Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [stress:rising]stress[/stress] with steady confidence.
+Mark rising [stress:rising]stress[/stress] so the cue syllable lifts above the surrounding line.
 
 ### [Edit Point Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [edit_point] edit with steady confidence.
+Drop an [edit_point] edit marker here to hint where the editor can cleanly cut.
 
 ### [Edit Point Medium Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [edit_point:medium] medium with steady confidence.
+An [edit_point:medium] medium priority cut deserves attention from the editor on the next pass.
 
 ### [Edit Point High Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [edit_point:high] high with steady confidence.
+A [edit_point:high] high priority cut flags a critical splice the editing team must not miss.
 
 ### [Speaker Metadata Cue|Speaker:Narrator|Archetype:Educator|140WPM|neutral]
-Today we read speaker with steady confidence.
+A different speaker label lets the prompter show who owns each line of the script.
 
 ### [Archetype Metadata Cue|Speaker:Host|Archetype:Coach|140WPM|neutral]
-Today we read archetype with steady confidence.
+Selecting a Coach archetype guides the assistant toward warmer, more instructional rewriting.
 
 ### [Phrase Slow Pace Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [slow]slow cadence[/slow] with confidence.
+Scope a [slow]slow cadence[/slow] across two words to stretch both evenly in the reader.
 
 ### [Phrase Urgent Emotion Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [urgent]urgent cadence[/urgent] with confidence.
+Keep an [urgent]urgent cadence[/urgent] across two words when the phrase must land fast together.
 
 ### [Phrase Loud Volume Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [loud]loud cadence[/loud] with confidence.
+A [loud]loud cadence[/loud] spans two words, giving the whole phrase strong carrying presence.
 
 ### [Phrase Building Delivery Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [building]building cadence[/building] with confidence.
+A [building]building cadence[/building] crescendos across two words toward the emphatic end.
 
 ### [Phrase Legato Articulation Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
-Today we read [legato]legato cadence[/legato] with confidence.
+A [legato]legato cadence[/legato] ties two words together under one connecting slur.
+
+### [Energy Low Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+Set the lowest [energy:1]energy[/energy] when the line should feel quiet, drained, or reflective.
+
+### [Energy Mid Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+A middle [energy:5]energy[/energy] holds the script steady between calm passages and big climaxes.
+
+### [Energy Peak Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+Push to peak [energy:10]energy[/energy] whenever the climax must hit with maximum drive.
+
+### [Melody Low Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+A flat [melody:1]melody[/melody] keeps the phrase nearly monotone for deadpan or solemn moments.
+
+### [Melody Mid Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+A gentle [melody:5]melody[/melody] lifts the phrase with a balanced, conversational rise.
+
+### [Melody Peak Contour Cue|Speaker:Host|Archetype:Educator|140WPM|neutral]
+A soaring [melody:10]melody[/melody] arcs the phrase into its widest, most expressive shape.

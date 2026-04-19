@@ -345,10 +345,19 @@ public partial class TeleprompterPage
     {
         var attributes = new Dictionary<string, object>(StringComparer.Ordinal)
         {
-            [UiDataAttributes.Teleprompter.DurationMilliseconds] = pause.DurationMs
+            [UiDataAttributes.Teleprompter.DurationMilliseconds] = pause.DurationMs,
+            [TpsVisualCueContracts.PauseKindAttributeName] = pause.PauseKind
         };
 
-        if (string.Equals(pause.CssClass, ReaderPauseBreathCssClass, StringComparison.Ordinal))
+        if (pause.DurationMs > 0)
+        {
+            attributes[TpsVisualCueContracts.PauseMillisecondsAttributeName] = pause.DurationMs;
+            var durationSeconds = Math.Max(0.25d, pause.DurationMs / 1000d);
+            attributes["style"] =
+                FormattableString.Invariant($"{TpsVisualCueContracts.PauseDurationVariableName}:{durationSeconds:0.###}s;");
+        }
+
+        if (string.Equals(pause.PauseKind, TpsVisualCueContracts.PauseKindBreath, StringComparison.Ordinal))
         {
             attributes[TpsVisualCueContracts.BreathAttributeName] = TpsVisualCueContracts.BreathAttributeValue;
         }

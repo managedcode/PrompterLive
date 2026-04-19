@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Shared.Localization;
-using PrompterOne.Shared.Settings.Components;
 using PrompterOne.Shared.Settings.Models;
 using PrompterOne.Shared.Settings.Services;
 

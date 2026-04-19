@@ -68,7 +68,13 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         new(48, "49-phrase-emotion-urgent", "[urgent] phrase", TpsVisualCueContracts.EmotionAttributeName, "urgent", TargetWord: "urgent", ExpectedAttributeMatchCount: 2),
         new(49, "50-phrase-volume-loud", "[loud] phrase", TpsVisualCueContracts.VolumeAttributeName, TpsVisualCueContracts.VolumeLoud, TargetWord: "loud", ExpectedAttributeMatchCount: 2),
         new(50, "51-phrase-delivery-building", "[building] phrase", TpsVisualCueContracts.DeliveryAttributeName, TpsVisualCueContracts.DeliveryModeBuilding, TargetWord: "building", ExpectedAttributeMatchCount: 2),
-        new(51, "52-phrase-articulation-legato", "[legato] phrase", TpsVisualCueContracts.ArticulationAttributeName, TpsVisualCueContracts.ArticulationLegato, TargetWord: "legato", ExpectedAttributeMatchCount: 2)
+        new(51, "52-phrase-articulation-legato", "[legato] phrase", TpsVisualCueContracts.ArticulationAttributeName, TpsVisualCueContracts.ArticulationLegato, TargetWord: "legato", ExpectedAttributeMatchCount: 2),
+        new(52, "53-contour-energy-low", "[energy:1]", TpsVisualCueContracts.EnergyAttributeName, "1", TargetWord: "energy"),
+        new(53, "54-contour-energy-mid", "[energy:5]", TpsVisualCueContracts.EnergyAttributeName, "5", TargetWord: "energy"),
+        new(54, "55-contour-energy-peak", "[energy:10]", TpsVisualCueContracts.EnergyAttributeName, "10", TargetWord: "energy"),
+        new(55, "56-contour-melody-low", "[melody:1]", TpsVisualCueContracts.MelodyAttributeName, "1", TargetWord: "melody"),
+        new(56, "57-contour-melody-mid", "[melody:5]", TpsVisualCueContracts.MelodyAttributeName, "5", TargetWord: "melody"),
+        new(57, "58-contour-melody-peak", "[melody:10]", TpsVisualCueContracts.MelodyAttributeName, "10", TargetWord: "melody")
     ];
 
     [Test]

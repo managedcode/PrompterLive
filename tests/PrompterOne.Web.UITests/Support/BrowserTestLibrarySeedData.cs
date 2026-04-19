@@ -119,7 +119,8 @@ internal static class BrowserTestLibrarySeedData
         CreateDocument(
             BrowserTestConstants.Scripts.TpsCueMatrixId,
             BrowserTestConstants.Scripts.TpsCueMatrixTitle,
-            "test-tps-cue-matrix.tps",
+            "starter-tps-cue-matrix.tps",
+            File.ReadAllText(GetSharedSeedPath("starter-tps-cue-matrix.tps")),
             new DateTimeOffset(2026, 4, 14, 8, 0, 0, TimeSpan.Zero),
             "test-internal"),
         CreateDocument(
@@ -193,6 +194,14 @@ internal static class BrowserTestLibrarySeedData
         return Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory,
             "../../../../../tests/TestData/Scripts",
+            fileName));
+    }
+
+    private static string GetSharedSeedPath(string fileName)
+    {
+        return Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "../../../../../src/PrompterOne.Shared/Library/SeedData",
             fileName));
     }
 }

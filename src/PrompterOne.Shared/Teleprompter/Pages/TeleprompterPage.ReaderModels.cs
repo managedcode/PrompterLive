@@ -42,7 +42,7 @@ public partial class TeleprompterPage
 
     private sealed record ReaderEditPointViewModel(string Priority, string CssClass) : ReaderChunkViewModel;
 
-    private sealed record ReaderPauseViewModel(int DurationMs, string CssClass) : ReaderChunkViewModel;
+    private sealed record ReaderPauseViewModel(int DurationMs, string CssClass, string PauseKind) : ReaderChunkViewModel;
 
     private sealed record ReaderWordViewModel(
         string Text,

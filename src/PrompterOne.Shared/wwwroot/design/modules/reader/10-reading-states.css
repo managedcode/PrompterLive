@@ -8,7 +8,13 @@
     cursor: help;
 }
 
-/* ── Card-based layout: cards slide up one by one ── */
+/* ── Card-based layout: cards slide up one by one ──
+   Balanced ease-in-out so the block moves at a consistent rate through the
+   middle of the travel and arrives decisively on the focus line instead of
+   stalling in the last 20 % of the animation. Same duration for transform
+   and opacity keeps the two tracks locked — the card finishes fading at
+   the same instant it lands, so the operator never sees a half-faded block
+   lingering near the guide. */
 .rd-card {
     position: absolute;
     inset: 0;
@@ -16,8 +22,8 @@
     align-items: center;
     justify-content: center;
     transition:
-        transform .76s cubic-bezier(.22,.84,.24,1),
-        opacity .64s ease-out;
+        transform .7s cubic-bezier(.4, 0, .6, 1),
+        opacity .7s cubic-bezier(.4, 0, .6, 1);
     will-change: transform, opacity;
     overflow: visible;
 }
@@ -108,11 +114,13 @@
     font-feature-settings: "kern" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition:
-        transform .42s cubic-bezier(.22,.84,.24,1),
-        color .42s ease,
-        text-shadow .42s ease,
-        opacity .42s ease;
+    /* The cluster-text transform is the word-level scroll inside a block.
+       Color / text-shadow / opacity are NOT transitioned here — they snap
+       instantly when the card class changes so there is no faster "flash"
+       of the previous block's text brightening at the tail of the card
+       transition. Per-word tone fades still happen via .rd-w's own
+       transition block (fast, word-scoped). */
+    transition: transform .3s cubic-bezier(.4, 0, .6, 1);
     will-change: transform;
 }
 
@@ -194,14 +202,16 @@
     position: relative;
 }
 
+/* Group crescendo hairpin — opening `<` shape below the phrase. Thin
+   vector stroke so it reads as music notation, not a decorative blob. */
 .rd-g-building::after {
     content: "";
     position: absolute;
-    left: -.1em;
-    right: -.1em;
-    bottom: -.66em;
-    height: .96em;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 260' preserveAspectRatio='none' shape-rendering='geometricPrecision'%3E%3Cpath d='M24 130 L976 24 M24 130 L976 236' fill='none' stroke='%23F3DA9A' stroke-opacity='.78' stroke-width='19' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    left: -.06em;
+    right: -.06em;
+    bottom: -.56em;
+    height: .72em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M6 30 L394 6 M6 30 L394 54' stroke='%23F3DA9A' stroke-opacity='.78' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -209,26 +219,27 @@
 }
 
 .rd-g-active.rd-g-building::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 260' preserveAspectRatio='none' shape-rendering='geometricPrecision'%3E%3Cpath d='M24 130 L976 24 M24 130 L976 236' fill='none' stroke='%23F6E0A8' stroke-opacity='.96' stroke-width='22' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 60' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M6 30 L394 6 M6 30 L394 54' stroke='%23F6E0A8' stroke-opacity='.96' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
+/* Group-level legato slur — a single smooth SVG arc spanning the whole
+   phrase. Vector stroke so it stays crisp at README screenshot scale. */
 .rd-g-legato::after {
     content: "";
     position: absolute;
-    left: -.12em;
-    right: -.12em;
-    bottom: -.58em;
-    height: .72em;
-    background-image: none;
-    border: .08em solid transparent;
-    border-bottom-color: rgba(141,213,226,.76);
-    border-radius: 50%;
+    left: -.06em;
+    right: -.06em;
+    bottom: -.38em;
+    height: .48em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 32 Q 100 0 196 32' stroke='%238DD5E2' stroke-opacity='.72' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
     pointer-events: none;
 }
 
 .rd-g-active.rd-g-legato::after {
-    border-bottom-color: rgba(164,228,241,.96);
-    border-width: .095em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 32 Q 100 0 196 32' stroke='%23A4E4F1' stroke-opacity='.96' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .rd-g-emphasis {
@@ -239,111 +250,207 @@
     text-decoration-line: none;
 }
 
-/* ── Pause markers — visual breathing points between phrases ──
-   Research: pauses at clause boundaries = breath groups. Short pauses
-   (/) stay inline with a subtle dot; sentence-ending pauses (//) force
-   a line break so the next thought starts on a fresh line — this gives
-   the eye a clear "restart" and matches natural speaking rhythm.  */
-/* Short pause — zero-width inline marker. The natural HTML whitespace
-   between elements provides word separation. The dot is purely decorative
-   and positioned absolutely so it cannot create leading indentation
-   when the pause wraps to the start of a new line. */
+/* ── Pause, breath, silence markers ──
+   Every pause kind shows a readable symbol so the reader sees breathing
+   points at a glance instead of an invisible gap. Markers inherit the
+   word's line-height so baseline stays stable. */
 .rd-pause {
-    display: inline;
-    width: 0;
-    height: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     user-select: none;
-    font-size: 0;
-    line-height: 0;
-}
-.rd-pause::after {
-    content: '';
-    position: absolute;
-    top: -0.3em;
-    left: 0;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: rgba(232,213,176,.08);
-}
-.rd-pause-breath::after {
-    content: 'ˈ';
-    top: -0.78em;
-    left: .08em;
-    width: auto;
-    height: auto;
-    border-radius: 0;
-    background: transparent;
-    color: rgba(238,219,150,.34);
-    font-size: 15px;
+    vertical-align: baseline;
+    color: rgba(238,219,150,.42);
+    font-size: inherit;
     line-height: 1;
-    text-shadow: 0 0 10px rgba(238,219,150,.12);
 }
-/* Medium pause — sentence boundary (//)
-   Forces a line break: next phrase starts on a fresh line.
-   Uses flex-basis:100% trick inside a flex-wrap parent to guarantee
-   the break regardless of remaining space on the current line. */
+
+/* Short pause (/ → ~300ms): caesura-style double dot, inline */
+.rd-pause[data-pause-kind="short"] {
+    width: 0.68em;
+    height: 0.9em;
+    margin-inline: 0.28em;
+}
+.rd-pause[data-pause-kind="short"]::before {
+    content: "··";
+    font-size: 0.95em;
+    letter-spacing: 0.08em;
+    /* letter-spacing adds a trailing gap only after the last glyph, which
+       would offset the "··" pair to the left inside the flex box. Balance
+       it with an equal leading padding so the symbol sits optically centered
+       with identical gaps to the neighbouring words. */
+    padding-inline-start: 0.08em;
+    line-height: 0.8;
+    opacity: 0.6;
+    text-shadow: 0 0 6px rgba(238,219,150,.18);
+    animation: rd-pause-glow var(--tps-pause-duration, 0.45s) ease-in-out;
+}
+
+/* Breath mark: curved SVG breath comma — open arc facing upward */
+.rd-pause-breath {
+    width: 0.9em;
+    height: 0.9em;
+    margin-inline: 0.1em;
+}
+.rd-pause-breath::before {
+    content: "";
+    display: block;
+    width: 0.72em;
+    height: 0.56em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 32' fill='none'%3E%3Cpath d='M5 22 Q 20 3 35 22' stroke='%23EEDB96' stroke-opacity='.62' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    pointer-events: none;
+    animation: rd-pause-breath-inhale 0.9s ease-in-out;
+}
+
+/* Medium pause (// → ~600ms): block divider with fading lines.
+   Block + text-align: center keeps the pair centered at every width. */
 span.rd-pause.rd-pause-med {
     display: block;
     width: 100%;
-    height: 12px;
-    font-size: inherit;
+    margin: 0.18em 0;
+    text-align: center;
+    line-height: 1;
     position: relative;
 }
-.rd-pause-med::after {
-    content: none;
+span.rd-pause.rd-pause-med::before,
+span.rd-pause.rd-pause-med::after {
+    content: "";
+    display: inline-block;
+    width: 2.4em;
+    height: 2px;
+    margin: 0 0.2em;
+    vertical-align: middle;
+    background: rgba(238,219,150,.28);
+    border-radius: 1px;
+    animation: rd-pause-divider var(--tps-pause-duration, 0.6s) ease-out;
 }
-/* Long explicit pauses [pause:2s] — even more prominent break */
+span.rd-pause.rd-pause-med::before {
+    mask-image: linear-gradient(90deg, transparent 0%, black 80%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 80%);
+}
+span.rd-pause.rd-pause-med::after {
+    mask-image: linear-gradient(90deg, black 20%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, black 20%, transparent 100%);
+}
+
+/* Silence (≥1000ms): block-level readable pause pill.
+   The previous whole-rest SVG glyph and tiny "1000MS" caption were
+   unreadable at reader scale — the operator could not tell at a glance
+   that the block was a pause. One centered pill with the pause glyph ⏸,
+   the uppercase word PAUSE, and a readable duration makes the intent
+   unmistakable in a single sweep. */
 span.rd-pause.rd-pause-long {
     display: block;
     width: 100%;
-    height: 20px;
-    font-size: inherit;
-    position: relative;
+    margin: 0.5em 0;
+    padding: 0;
+    text-align: center;
+    line-height: 1;
 }
-.rd-pause-long::after {
+span.rd-pause.rd-pause-long::before {
+    content: "⏸ pause " attr(data-pause-ms) " ms";
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: rgba(238,219,150,.1);
+    border: 1px solid rgba(238,219,150,.34);
+    border-radius: 999px;
+    padding: 0.4em 1.1em;
+    color: rgba(248,236,210,.88);
+    font-size: 0.42em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    animation: rd-pause-silence var(--tps-pause-duration, 1.5s) ease-in-out;
+}
+span.rd-pause.rd-pause-long::after {
     content: none;
 }
-/* Prev/next cluster pauses — subtler */
-.rd-cluster-prev .rd-pause::after,
-.rd-cluster-next .rd-pause::after {
-    background: rgba(232,213,176,.06);
+
+/* Previous / next card pauses — subtler */
+.rd-card-prev .rd-pause,
+.rd-card-next .rd-pause {
+    opacity: 0.22;
 }
 
-/* ── Speed-tagged text ── */
-.rd-xslow {
-    letter-spacing: var(--tps-word-letter-spacing, 0.07em);
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-decoration-color: rgba(232,213,176,.12);
-    text-underline-offset: 5px;
-    text-decoration-thickness: 1px;
+/* ── Pause lifecycle ──
+   Pauses participate in the reader timeline exactly like words: they light
+   up while being served, then dim like read words once the playhead has
+   moved past them. All three states are derived from the neighbouring
+   .rd-w state via :has() so the renderer never has to track pause state
+   explicitly. */
+
+/* Passed pause: the next word already is or was the active focus → this
+   pause has been served. Dim to the read-word level. */
+.rd-pause:has(+ .rd-w.rd-now),
+.rd-pause:has(+ .rd-w.rd-read),
+.rd-pause:has(~ .rd-w.rd-read) {
+    opacity: 0.3;
 }
-.rd-w.tps-slow,
-.rd-w.tps-xslow {
-    font-stretch: 104%;
-    font-variation-settings: "wdth" 104;
-    font-weight: var(--tps-cue-weight, 720);
-    letter-spacing: var(--tps-word-letter-spacing, 0.035em);
-    text-decoration-line: underline;
-    text-decoration-style: dotted;
-    text-decoration-color: rgba(232,213,176,.12);
-    text-underline-offset: 5px;
-    text-decoration-thickness: 1px;
-}
-.rd-w.tps-slow,
-.rd-w.tps-xslow,
-.rd-w.tps-fast,
-.rd-w.tps-xfast {
-    padding-inline-end: .04em;
-}
-.rd-w.tps-xslow {
-    font-stretch: 108%;
-    font-variation-settings: "wdth" 108;
-    letter-spacing: var(--tps-word-letter-spacing, 0.075em);
+.rd-pause:has(+ .rd-w.rd-now)::before,
+.rd-pause:has(+ .rd-w.rd-read)::before,
+.rd-pause:has(~ .rd-w.rd-read)::before,
+.rd-pause:has(+ .rd-w.rd-now)::after,
+.rd-pause:has(+ .rd-w.rd-read)::after,
+.rd-pause:has(~ .rd-w.rd-read)::after {
+    animation: none;
+    box-shadow: none;
 }
 
+/* Active pause: the pause is "on deck" — the previous sibling is the
+   current focus word, meaning the reader is about to serve this pause
+   next. Glow softly so the operator sees where the wait is coming. */
+.rd-w.rd-now + .rd-pause {
+    opacity: 1;
+    animation: rd-pause-active-pulse 1.2s ease-in-out infinite;
+}
+.rd-w.rd-now + .rd-pause::before {
+    animation: rd-pause-active-pulse 1.2s ease-in-out infinite;
+    filter: brightness(1.1);
+}
+@keyframes rd-pause-active-pulse {
+    0%, 100% { opacity: .7; filter: brightness(1); }
+    50%      { opacity: 1;  filter: brightness(1.35); }
+}
+
+@keyframes rd-pause-glow {
+    0%   { opacity: 0.32; }
+    40%  { opacity: 0.9; }
+    100% { opacity: 0.6; }
+}
+@keyframes rd-pause-divider {
+    0%   { opacity: 0.2; }
+    60%  { opacity: 0.9; }
+    100% { opacity: 1; }
+}
+@keyframes rd-pause-breath-inhale {
+    0%   { opacity: 0.28; }
+    45%  { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+@keyframes rd-pause-silence {
+    0%   { opacity: 0.22; }
+    30%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0.78; }
+}
+
+/* ── Speed cues ──
+   Speed is communicated through letter-spacing only. No font-stretch,
+   no font-variation-settings, no padding — every one of those shifts the
+   word's layout metrics between cards or between idle/active states.
+   A single letter-spacing value per speed is static, stable, and reads
+   clearly: tight=fast, wide=slow. No streaks or chips either. */
+.rd-w.tps-xslow { letter-spacing: 0.075em; }
+.rd-w.tps-slow  { letter-spacing: 0.035em; }
+.rd-w.tps-fast  { letter-spacing: -0.025em; }
+.rd-w.tps-xfast { letter-spacing: -0.05em; }
+.rd-w.tps-normal { letter-spacing: 0; }
 
 /* ── WPM badge in emotion header ── */
 .rd-emo-wpm {
@@ -366,8 +473,7 @@ span.rd-pause.rd-pause-long {
    preview upcoming words within the phrase while the speaker reads.
    4-level hierarchy: read (15%) → upcoming (40%) → active group (75%) → current word (100%) */
 .rd-g-active > .rd-w:not(.rd-now):not(.rd-read) {
-    color: rgba(242,230,204,.58);
-    transition: color .1s ease;
+    color: rgba(242,230,204,.74);
 }
 /* Preserve TPS colors inside active group */
 .rd-g-active > .rd-w.tps-warm:not(.rd-now):not(.rd-read) { color: rgba(255,184,99,.74); }
@@ -375,12 +481,12 @@ span.rd-pause.rd-pause-long {
 .rd-g-active > .rd-w.tps-focused:not(.rd-now):not(.rd-read) { color: rgba(124,255,178,.7); }
 .rd-g-active > .rd-w.tps-motivational:not(.rd-now):not(.rd-read) { color: rgba(191,164,255,.76); }
 .rd-g-active > .rd-w.tps-neutral:not(.rd-now):not(.rd-read) { color: rgba(237,242,247,.76); }
-.rd-g-active > .rd-w.tps-urgent:not(.rd-now):not(.rd-read) { color: rgba(255,65,64,.82); font-weight: 800; }
+.rd-g-active > .rd-w.tps-urgent:not(.rd-now):not(.rd-read) { color: rgba(255,65,64,.82); }
 .rd-g-active > .rd-w.tps-happy:not(.rd-now):not(.rd-read) { color: rgba(255,230,109,.74); }
-.rd-g-active > .rd-w.tps-excited:not(.rd-now):not(.rd-read) { color: rgba(255,79,216,.8); font-weight: 760; }
+.rd-g-active > .rd-w.tps-excited:not(.rd-now):not(.rd-read) { color: rgba(255,79,216,.8); }
 .rd-g-active > .rd-w.tps-sad:not(.rd-now):not(.rd-read) { color: rgba(157,182,255,.72); }
 .rd-g-active > .rd-w.tps-calm:not(.rd-now):not(.rd-read) { color: rgba(118,228,197,.72); }
-.rd-g-active > .rd-w.tps-energetic:not(.rd-now):not(.rd-read) { color: rgba(255,102,64,.82); font-weight: 750; }
+.rd-g-active > .rd-w.tps-energetic:not(.rd-now):not(.rd-read) { color: rgba(255,102,64,.82); }
 .rd-g-active > .rd-w.tps-professional:not(.rd-now):not(.rd-read) { color: rgba(125,182,255,.78); }
 .rd-g-active > .rd-w.tps-loud:not(.rd-now):not(.rd-read) { color: rgba(242,193,139,.74); }
 .rd-g-active > .rd-w.tps-soft:not(.rd-now):not(.rd-read) { color: rgba(199,221,245,.68); }
@@ -400,16 +506,20 @@ span.rd-pause.rd-pause-long {
 .rd-g-active.rd-g-emphasis { text-decoration-line: none; }
 .rd-g-active > .rd-w.tps-highlight:not(.rd-now):not(.rd-read) { color: rgba(255,235,184,.78); }
 
-/* Word states — layout-stable visual transitions only. */
+/* Word states — layout-stable visual transitions only.
+   0.32s transition keeps up with reader pace (typical word 350-500ms) so
+   consecutive words don't overlap in fade. `filter` is in the transition
+   list so per-emotion animations don't snap when the word leaves rd-now. */
 .rd-w {
     display: inline;
     position: relative;
     transition:
-        color .26s cubic-bezier(.22,.84,.24,1),
-        background-color .26s cubic-bezier(.22,.84,.24,1),
-        opacity .26s cubic-bezier(.22,.84,.24,1),
-        text-decoration-color .26s cubic-bezier(.22,.84,.24,1),
-        text-shadow .26s cubic-bezier(.22,.84,.24,1);
+        color .32s cubic-bezier(.25,.8,.25,1),
+        background-color .32s cubic-bezier(.25,.8,.25,1),
+        opacity .32s cubic-bezier(.25,.8,.25,1),
+        text-decoration-color .32s cubic-bezier(.25,.8,.25,1),
+        text-shadow .32s cubic-bezier(.25,.8,.25,1),
+        filter .32s cubic-bezier(.25,.8,.25,1);
 }
 
 .rd-w[data-tps-volume],
@@ -428,59 +538,94 @@ span.rd-pause.rd-pause-long {
     opacity: var(--tps-cue-opacity);
     vertical-align: baseline;
 }
+/* ── Volume ──
+   Volume cues encode loudness through font-weight, letter-spacing, opacity,
+   and text-shadow ONLY. They MUST NOT change font-size, line-height, margin,
+   or any transform that could shift the word's baseline or visual height —
+   the active focus word must never hop up or down when it becomes rd-now. */
 .rd-w.tps-loud {
-    font-size: 1.18em;
     font-weight: var(--tps-cue-weight, 860);
     letter-spacing: .018em;
-    line-height: 1;
-    margin-inline: .015em;
-    text-shadow: 0 1px 0 rgba(0,0,0,.2);
+    text-shadow: 0 1px 0 rgba(0,0,0,.2), 0 0 14px rgba(245,200,139,.16);
+}
+.rd-w.rd-now.tps-loud {
+    animation: rd-vol-loud-halo 1s ease-in-out infinite;
 }
 .rd-w.tps-soft {
-    font-size: .92em;
-    font-weight: var(--tps-cue-weight, 360);
-    line-height: 1;
-    opacity: var(--tps-cue-opacity, .72);
-    text-shadow: 0 0 10px rgba(199,221,245,.08);
+    font-weight: var(--tps-cue-weight, 500);
+    opacity: var(--tps-cue-opacity, .82);
+    text-shadow: 0 0 12px rgba(199,221,245,.16);
+}
+.rd-w.rd-now.tps-soft {
+    animation: rd-vol-soft-breathe 1.8s ease-in-out infinite;
 }
 .rd-w.tps-whisper {
-    font-size: .94em;
     font-style: italic;
-    font-weight: var(--tps-cue-weight, 320);
-    letter-spacing: .02em;
-    line-height: 1;
-    opacity: var(--tps-cue-opacity, .76);
+    font-weight: var(--tps-cue-weight, 480);
+    opacity: var(--tps-cue-opacity, .82);
     text-decoration-line: underline;
     text-decoration-style: dotted;
-    text-decoration-color: rgba(207,203,215,.2);
+    text-decoration-color: rgba(207,203,215,.28);
     text-decoration-thickness: 1px;
-    text-underline-offset: .3em;
+    text-underline-offset: .32em;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.92) 0%, #000 20%, #000 80%, rgba(0,0,0,.92) 100%);
+            mask-image: linear-gradient(90deg, rgba(0,0,0,.92) 0%, #000 20%, #000 80%, rgba(0,0,0,.92) 100%);
 }
+.rd-w.rd-now.tps-whisper {
+    animation: rd-vol-whisper-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes rd-vol-loud-halo {
+    /* Loud pulse: the word swells in glow + brightness so it reads like a
+       shout landing. No layout-changing properties — only text-shadow and
+       filter — so the baseline stays pinned while the word feels alive. */
+    0%, 100% {
+        text-shadow: 0 1px 0 rgba(0,0,0,.22), 0 0 14px rgba(245,200,139,.22);
+        filter: brightness(1) saturate(1);
+    }
+    50% {
+        text-shadow: 0 1px 0 rgba(0,0,0,.22), 0 0 30px rgba(245,200,139,.56), 0 0 10px rgba(255,214,146,.3);
+        filter: brightness(1.16) saturate(1.12);
+    }
+}
+@keyframes rd-vol-soft-breathe {
+    0%, 100% { opacity: 0.78; text-shadow: 0 0 10px rgba(199,221,245,.1); }
+    50% { opacity: 1; text-shadow: 0 0 18px rgba(199,221,245,.22); }
+}
+@keyframes rd-vol-whisper-breathe {
+    /* Opacity-only breathe — no letter-spacing change so character
+       positions stay still while the whisper "fades" in and out. */
+    0%, 100% { opacity: 0.72; filter: brightness(0.96); }
+    50%      { opacity: 0.98; filter: brightness(1.04); }
+}
+/* ── Editorial marks — each must be obviously distinct from the others ──
+   emphasis = warm amber glow (soft shimmer around the word)
+   strong (**bold**)   = heavy weight + bright warm white, drop shadow
+   italic (*word*)     = real italic glyph + violet tint
+   highlight           = yellow rectangle behind (see .tps-highlight)
+   No CSS skewX() — that blurs text and shifts baselines. */
 .rd-w.tps-emphasis {
-    font-weight: var(--tps-cue-weight, 780);
-    letter-spacing: .012em;
-    border-radius: .14em;
-    box-shadow: inset 0 -.1em rgba(232,213,176,.18);
+    font-weight: var(--tps-cue-weight, 720);
+    letter-spacing: .01em;
+    color: rgba(255,228,162,.94);
     text-decoration-line: none;
-    text-shadow: 0 0 16px rgba(232,213,176,.18);
+    text-shadow: 0 0 14px rgba(255,210,128,.22), 0 0 22px rgba(232,170,80,.14);
 }
 .rd-w.tps-strong {
-    color: rgba(255,231,185,.92);
+    color: rgba(255,240,196,.96);
     font-weight: var(--tps-cue-weight, 900);
-    letter-spacing: .018em;
+    letter-spacing: .014em;
     text-decoration-line: none;
-    text-shadow: 0 1px 0 rgba(0,0,0,.22), 0 0 16px rgba(255,230,184,.18);
+    text-shadow: 0 1px 0 rgba(0,0,0,.26), 0 0 18px rgba(255,230,184,.22);
 }
 .rd-w.tps-italic {
     font-style: italic;
     font-synthesis-style: auto;
-    color: rgba(214,205,255,.9);
-    font-weight: var(--tps-cue-weight, 650);
-    letter-spacing: .018em;
+    color: rgba(218,210,255,.92);
+    font-weight: var(--tps-cue-weight, 600);
+    letter-spacing: .012em;
     text-decoration-line: none;
-    text-shadow: 0 0 12px rgba(198,210,255,.08);
-    transform: skewX(-9deg);
-    transform-origin: 50% 85%;
+    text-shadow: 0 0 12px rgba(198,210,255,.14);
 }
 .rd-w.tps-highlight {
     background: none;
@@ -510,29 +655,30 @@ span.rd-pause.rd-pause-long {
     box-shadow: none;
     content: none;
 }
+/* Per-word building — text glow grows with crescendo progress. Hairpin
+   comes from the group (.rd-g-building); single-word fallback is a mini
+   opening `<` under the word. */
 .rd-w.tps-building {
     font-weight: var(--tps-cue-weight, 700);
     position: relative;
     text-shadow:
         0 0 calc(5px + (12px * var(--tps-build-progress, 0))) rgba(240,212,141, calc(.08 + (.16 * var(--tps-build-progress, 0))));
 }
-.rd-w.tps-building::after {
+.rd-w.tps-building:not(.rd-g-building *)::before {
     content: "";
     position: absolute;
-    left: -.08em;
-    right: -.08em;
-    bottom: -.58em;
-    height: .86em;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 260' preserveAspectRatio='none' shape-rendering='geometricPrecision'%3E%3Cpath d='M24 130 L976 24 M24 130 L976 236' fill='none' stroke='%23F3DA9A' stroke-opacity='.78' stroke-width='19' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    left: -.04em;
+    right: -.04em;
+    bottom: -.38em;
+    height: .38em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 20 L116 4 M4 20 L116 36' stroke='%23F3DA9A' stroke-opacity='.82' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     pointer-events: none;
 }
-.rd-g-building > .rd-w.tps-building::after,
-.rd-g-building > .rd-w.rd-now.tps-building::after {
+.rd-g-building > .rd-w.tps-building::before {
     content: none;
-    background-image: none;
 }
 .rd-w.tps-melody {
     text-decoration-line: underline;
@@ -542,47 +688,60 @@ span.rd-pause.rd-pause-long {
     text-underline-offset: .26em;
     text-decoration-skip-ink: none;
 }
+/* Per-word legato — the visual slur is drawn at the group level
+   (.rd-g-legato::after). Single-word legato gets a mini arc so it's
+   still visible outside a group context. */
 .rd-w.tps-legato {
     letter-spacing: 0;
     position: relative;
     text-decoration-line: none;
 }
-.rd-w.tps-legato::after {
+.rd-w.tps-legato:not(.rd-g-legato *)::before {
     content: "";
     position: absolute;
-    left: -.1em;
-    right: -.1em;
-    bottom: -.48em;
-    height: .62em;
-    background-image: none;
-    border: .08em solid transparent;
-    border-bottom-color: rgba(141,213,226,.78);
-    border-radius: 50%;
+    left: -.04em;
+    right: -.04em;
+    bottom: -.36em;
+    height: .34em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 4 Q 50 28 96 4' stroke='%238DD5E2' stroke-opacity='.72' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
     pointer-events: none;
 }
-.rd-g-legato > .rd-w.tps-legato::after,
-.rd-g-legato > .rd-w.rd-now.tps-legato::after {
+.rd-g-legato > .rd-w.tps-legato::before {
     content: none;
-    background-image: none;
-    border-color: transparent;
-    border-width: 0;
 }
+
+/* Staccato — musical staccato notation places a DOT ABOVE each word.
+   Slight tightened tracking reinforces the "separate, punchy" feel. */
 .rd-w.tps-staccato {
-    font-weight: var(--tps-cue-weight, 750);
-    letter-spacing: .03em;
+    font-weight: var(--tps-cue-weight, 720);
+    letter-spacing: .01em;
     position: relative;
     text-decoration-line: none;
 }
-.rd-w.tps-staccato::after {
+.rd-w.tps-staccato::before {
     content: "";
     position: absolute;
-    left: .06em;
-    right: .06em;
-    bottom: -.16em;
-    height: 0;
-    background-image: none;
-    border-bottom: .12em dotted rgba(255,176,230,.62);
+    left: 50%;
+    top: -0.58em;
+    width: 0.22em;
+    height: 0.22em;
+    min-width: 7px;
+    min-height: 7px;
+    transform: translateX(-50%);
+    /* currentColor so the dot follows the word's state (idle dim, active
+       bright, read muted, previous/next-card dim) instead of staying a
+       fixed pink spot when the word itself has already faded. */
+    background: currentColor;
+    opacity: .74;
+    border-radius: 50%;
     pointer-events: none;
+}
+.rd-w.rd-now.tps-staccato::before {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(242,193,225,.38);
 }
 .rd-w.tps-energy {
     text-shadow:
@@ -651,35 +810,41 @@ span.rd-pause.rd-pause-long {
     box-shadow: 0 8px 20px rgba(0,0,0,.18), 0 0 16px rgba(127,219,255,.1);
     color: rgba(226,247,255,.86);
 }
+/* Stress — music-style single tick above the word plus faint underline;
+   no double-bar bracket (which read as "weird chrome" in earlier iterations). */
 .rd-w.tps-stress {
     padding-inline: .04em;
     position: relative;
     text-decoration-line: none;
 }
+/* Stress accent — the musical sforzando ">" mark above the word. A
+   horizontal wedge is much easier to read than a thin vertical tick,
+   matches the sheet-music convention operators recognise, and stays
+   tall enough to survive README-scale screenshots. */
 .rd-w.tps-stress::before {
-    color: rgba(255,224,128,.84);
-    content: "ˈ";
-    font-size: .62em;
-    font-weight: 900;
-    left: 50%;
-    line-height: 1;
-    pointer-events: none;
-    position: absolute;
-    text-shadow: 0 0 12px rgba(255,208,96,.22);
-    top: -.72em;
-    transform: translateX(-50%);
-}
-.rd-w.tps-stress::after {
     content: "";
     position: absolute;
-    left: .02em;
-    right: .02em;
-    bottom: -.32em;
-    height: .16em;
-    border-top: 2px solid rgba(255,208,96,.44);
-    border-bottom: 2px solid rgba(255,208,96,.44);
-    border-radius: 999px;
+    left: 50%;
+    top: -0.5em;
+    width: 0.5em;
+    height: 0.28em;
+    transform: translateX(-50%);
+    background: currentColor;
+    opacity: .78;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 22' fill='none' preserveAspectRatio='none'%3E%3Cpath d='M4 3 L34 11 L4 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 22' fill='none' preserveAspectRatio='none'%3E%3Cpath d='M4 3 L34 11 L4 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
     pointer-events: none;
+}
+.rd-w.rd-now.tps-stress::before {
+    opacity: 1;
+    width: 0.56em;
+    height: 0.32em;
+    top: -0.56em;
+    filter: drop-shadow(0 0 6px rgba(255,208,96,.5));
 }
 .rd-w.tps-aside {
     font-style: italic;
@@ -687,7 +852,11 @@ span.rd-pause.rd-pause-long {
 }
 .rd-w.tps-aside::before,
 .rd-w.tps-aside::after {
-    color: rgba(183,199,205,.54);
+    /* Same inheritance as sarcasm quotes: the parenthesis marks follow
+       the parent word's state instead of staying bright while the word
+       dims. */
+    color: inherit;
+    opacity: .7;
     font-style: normal;
     font-weight: 520;
     pointer-events: none;
@@ -709,147 +878,178 @@ span.rd-pause.rd-pause-long {
     text-decoration-thickness: 1.5px;
     text-underline-offset: .26em;
 }
+/* Sarcasm — pink color + curly quotes only. No strikethrough, no
+   dashed underline, no italic. The quotation marks alone say "don't take
+   this at face value". Simpler = calmer to read. */
 .rd-w.tps-sarcasm {
-    letter-spacing: .012em;
-    text-decoration-line: underline;
-    text-decoration-style: dashed;
-    text-decoration-color: rgba(255,138,163,.42);
-    text-underline-offset: .28em;
-    transform: skewX(-5deg);
-    transform-origin: 50% 85%;
-}
-.rd-edit-point {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: .58em;
-    height: .9em;
-    margin-inline: .1em .02em;
+    color: rgba(255,138,163,.94);
     position: relative;
-    vertical-align: -.08em;
+    padding-inline: 0.12em;
+    text-decoration-line: none;
 }
-.rd-edit-point::before,
-.rd-edit-point::after {
-    content: "";
-    position: absolute;
+.rd-w.tps-sarcasm::before,
+.rd-w.tps-sarcasm::after {
+    /* Inherit color from the word so the quotes track the word's current
+       state (idle / active / read / previous-card / next-card) instead of
+       staying bright while the word itself dims. Opacity keeps them a
+       touch softer than the glyph. */
+    color: inherit;
+    opacity: .78;
+    font-style: normal;
+    font-weight: 600;
+    pointer-events: none;
+}
+.rd-w.tps-sarcasm::before {
+    content: "\201C";
+    margin-inline-end: 0.04em;
+    font-size: 0.76em;
+}
+.rd-w.tps-sarcasm::after {
+    content: "\201D";
+    margin-inline-start: 0.04em;
+    font-size: 0.76em;
+}
+/* Edit point — a full-width cut-bar that breaks the line so the operator
+   immediately sees it's an editorial cut. One shape, three severities.
+   Severities only override tokens (--edit-color, --edit-label,
+   --edit-weight); the layout, border, padding and dimming lifecycle are
+   defined once on .rd-edit-point and inherited by every variant. */
+.rd-edit-point {
+    --edit-color: 255,214,120;
+    --edit-label: "cut";
+    --edit-weight: 700;
+    display: block;
+    width: 100%;
+    margin: 0.4em 0;
+    padding: 0;
+    text-align: center;
+    line-height: 1;
+    color: rgba(var(--edit-color),.72);
     pointer-events: none;
 }
 .rd-edit-point::before {
-    inset: .08em .22em;
-    border-left: 2px solid rgba(255,214,120,.55);
-    border-radius: 2px;
-    box-shadow: 0 0 10px rgba(255,214,120,.16);
+    content: var(--edit-label);
+    display: inline-block;
+    font-size: 0.42em;
+    font-weight: var(--edit-weight);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: inherit;
+    border: 1px solid rgba(var(--edit-color),.44);
+    border-radius: 999px;
+    padding: 0.3em 1.1em;
+    background: rgba(var(--edit-color),.1);
+    white-space: nowrap;
+    pointer-events: none;
 }
-.rd-edit-point-medium::before {
-    border-left-color: rgba(255,150,86,.72);
-    box-shadow: 0 0 12px rgba(255,150,86,.22);
+.rd-edit-point::after { content: none; }
+.rd-edit-point-medium {
+    --edit-color: 255,150,86;
+    --edit-label: "cut · review";
 }
-.rd-edit-point-medium::after {
-    inset: .18em .12em .18em auto;
-    width: .18em;
-    border-right: 2px solid rgba(255,150,86,.58);
-    border-radius: 2px;
+.rd-edit-point-high {
+    --edit-color: 255,92,92;
+    --edit-label: "hard cut";
+    --edit-weight: 800;
 }
-.rd-edit-point-high::before {
-    border-left-color: rgba(255,92,92,.86);
-    box-shadow: 0 0 16px rgba(255,92,92,.28);
-}
-.rd-edit-point-high::after {
-    inset: .08em auto .08em .27em;
-    width: .28em;
-    border-left: 2px solid rgba(255,92,92,.58);
-    border-right: 2px solid rgba(255,92,92,.58);
-    border-radius: 2px;
-    box-shadow: 0 0 14px rgba(255,92,92,.22);
-}
-.rd-w.rd-read.tps-pronunciation::after,
-.rd-w.rd-read.tps-phonetic::after,
-.rd-card-prev .rd-w.tps-pronunciation::after,
-.rd-card-prev .rd-w.tps-phonetic::after,
-.rd-card-next .rd-w.tps-pronunciation::after,
-.rd-card-next .rd-w.tps-phonetic::after {
-    content: none;
-}
-.rd-w.tps-fast,
-.rd-w.tps-xfast {
-    background-image: linear-gradient(90deg, transparent 0%, rgba(232,213,176,.18) 18%, rgba(232,130,92,.24) 50%, rgba(232,213,176,.18) 82%, transparent 100%);
-    background-position: 0 calc(100% - .05em);
-    background-repeat: no-repeat;
-    background-size: 100% 1px;
-    letter-spacing: var(--tps-word-letter-spacing, -0.03em);
-    text-decoration-line: underline;
-    text-decoration-style: solid;
-    text-decoration-color: rgba(232,130,92,.24);
-    text-decoration-thickness: 1px;
-    text-underline-offset: .25em;
-}
-.rd-w.tps-xfast {
-    letter-spacing: var(--tps-word-letter-spacing, -0.06em);
-    font-stretch: 92%;
-    font-variation-settings: "wdth" 92;
-    background-image: linear-gradient(90deg, transparent 0%, rgba(255,148,104,.22) 16%, rgba(255,98,84,.42) 50%, rgba(255,148,104,.22) 84%, transparent 100%);
-    background-size: 100% 2px;
-    text-decoration-color: rgba(255,98,84,.4);
-    text-decoration-thickness: 2px;
-}
-.rd-w.tps-normal {
-    letter-spacing: 0;
-}
+/* (old gradient fast/xfast treatment replaced by motion streaks above) */
 
 .rd-card-prev .rd-w,
 .rd-card-next .rd-w {
     color: rgba(232,213,176,.22) !important;
+    text-decoration-color: currentColor !important;
     text-shadow: none !important;
-    text-decoration-color: transparent !important;
     background: none !important;
     box-shadow: none !important;
 }
 
-.rd-card-prev .rd-g-highlight::before,
-.rd-card-next .rd-g-highlight::before,
-.rd-card-prev .rd-w.tps-highlight::before,
-.rd-card-next .rd-w.tps-highlight::before {
-    content: none !important;
-}
-
-/* Read words — flat dim, no decorations, no TPS color.
-   CRITICAL: do NOT reset letter-spacing or any property that changes
-   the computed width of the word — that shifts all subsequent words
-   and breaks the reader's positional memory. Only change visual
-   properties (color, shadow, decoration) that don't affect layout. */
+/* Read words — dim but KEEP every cue's visual signature (italic, weight,
+   underline style, etc.). The word must look identical to its upcoming
+   state except for brightness — the reader sees a consistent document,
+   not a "style-strip" on every already-read word.
+   CRITICAL: do NOT reset letter-spacing, font-style, font-weight, font-
+   size, or any property that could change the computed width/height of
+   the word. Only color/shadow/decoration-color get dimmed. */
 .rd-w.rd-read {
-    color: rgba(242,230,204,.12) !important;
+    color: rgba(242,230,204,.22) !important;
+    text-decoration-color: currentColor !important;
     text-shadow: none !important;
-    text-decoration: none !important;
     background: none !important;
     box-shadow: none !important;
-    font-style: normal !important;
-    /* letter-spacing intentionally NOT reset — preserves word width */
+    /* font-style, font-weight, text-decoration-line, letter-spacing —
+       intentionally preserved from the cue rule. */
 }
 
-.rd-w.rd-read.tps-highlight::before {
-    opacity: 0;
+/* ── Decoration dim lifecycle ──
+   ONE rule for every cue's decorative pseudo-elements so each tps-* cue
+   has identical behaviour across idle / active / read / previous-card /
+   next-card states. No more per-cue content:none or opacity:0 hacks —
+   the decoration stays on screen as a dim ghost so the reader recognises
+   the cue shape even on already-read text, and matches the word colour
+   instead of clinging to its original bright hue. */
+.rd-card-prev .rd-w::before,
+.rd-card-prev .rd-w::after,
+.rd-card-next .rd-w::before,
+.rd-card-next .rd-w::after {
+    opacity: .22 !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+.rd-w.rd-read::before,
+.rd-w.rd-read::after {
+    opacity: .3 !important;
+    box-shadow: none !important;
+    animation: none !important;
 }
 
-.rd-w.rd-read.tps-stress::before,
-.rd-card-prev .rd-w.tps-stress::before,
-.rd-card-next .rd-w.tps-stress::before {
-    content: none;
-}
-.rd-w.rd-read.tps-stress::after,
-.rd-card-prev .rd-w.tps-stress::after,
-.rd-card-next .rd-w.tps-stress::after {
-    content: none;
+/* Phonetic / pronunciation boxes must dim like the rest of the read text
+   instead of staying bright after the word has passed. The base cue rule
+   paints the glyph through -webkit-text-fill-color and wraps it in a
+   bordered gradient box, so the generic .rd-w.rd-read color/background
+   overrides don't reach those properties on their own. */
+.rd-w.rd-read.tps-pronunciation,
+.rd-w.rd-read.tps-phonetic,
+.rd-card-prev .rd-w.tps-pronunciation,
+.rd-card-prev .rd-w.tps-phonetic,
+.rd-card-next .rd-w.tps-pronunciation,
+.rd-card-next .rd-w.tps-phonetic {
+    -webkit-text-fill-color: rgba(242,230,204,.22) !important;
+    border-color: rgba(242,230,204,.14) !important;
+    background: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
 }
 
-/* Active word — underline accent, preserves TPS inline color */
+/* ── Active word ── Reading a book, not an animation show.
+   Static bright color + soft static glow. The ambient breath runs on the
+   CLUSTER (the whole paragraph) so every active word inherits the same
+   phase via CSS custom properties instead of each word starting its own
+   cycle from zero (which is what made it feel robotic). */
 .rd-w.rd-now {
-    color: rgba(242,230,204,.96);
-    text-shadow: 0 0 10px rgba(242,230,204,.08), 0 0 18px rgba(232,130,92,.04);
-    text-decoration: underline;
-    text-decoration-color: rgba(242,230,204,.22);
-    text-underline-offset: 8px;
-    text-decoration-thickness: 2px;
+    color: rgba(248,236,210,.96);
+    text-shadow:
+        0 0 calc(14px + 6px * var(--rd-breath, 0)) rgba(248,236,210, calc(.16 + .1 * var(--rd-breath, 0))),
+        0 0 calc(28px + 10px * var(--rd-breath, 0)) rgba(232,130,92, calc(.06 + .06 * var(--rd-breath, 0)));
+    /* Do NOT strip text-decoration-line here — that erased the wavy
+       underline of melody/rhetorical and the dotted underline of whisper
+       when the word became active. Each cue opts in to "no decoration"
+       in its own rd-now rule if needed. */
+}
+
+@property --rd-breath {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+@keyframes rd-cluster-breath {
+    0%, 100% { --rd-breath: 0; }
+    50%      { --rd-breath: 1; }
+}
+
+.rd-cluster-active,
+.rd-cluster-text {
+    animation: rd-cluster-breath 2.4s ease-in-out infinite;
 }
 
 /* Active word with TPS color — keep contrast but avoid neon glow */
@@ -865,7 +1065,7 @@ span.rd-pause.rd-pause-long {
 .rd-w.rd-now.tps-calm { color: #76E4C5; text-shadow: 0 0 20px rgba(118,228,197,.22); }
 .rd-w.rd-now.tps-energetic { color: #FF6640; text-shadow: 0 0 18px rgba(255,102,64,.28); }
 .rd-w.rd-now.tps-professional { color: #7DB6FF; text-shadow: 0 0 16px rgba(125,182,255,.22); }
-.rd-w.rd-now.tps-loud { color: #F5C895; font-size: 1.2em; text-shadow: 0 1px 0 rgba(0,0,0,.24), 0 0 18px rgba(242,193,139,.2); }
+.rd-w.rd-now.tps-loud { color: #F5C895; text-shadow: 0 1px 0 rgba(0,0,0,.24), 0 0 18px rgba(242,193,139,.2); }
 .rd-w.rd-now.tps-soft { color: #D1E3F7; text-shadow: 0 0 14px rgba(199,221,245,.12); }
 .rd-w.rd-now.tps-whisper { color: #DDD9E4; text-decoration-style: dotted; text-decoration-color: rgba(207,203,215,.32); text-shadow: 0 0 12px rgba(207,203,215,.1); }
 .rd-w.rd-now.tps-emphasis { color: #F1DFC2; text-decoration-line: none; text-shadow: 0 0 14px rgba(232,213,176,.16); }
@@ -875,19 +1075,8 @@ span.rd-pause.rd-pause-long {
 .rd-w.rd-now.tps-rhetorical { color: #BDEBFF; text-shadow: 0 0 14px rgba(116,206,255,.16); }
 .rd-w.rd-now.tps-sarcasm { color: #FF8AA3; text-shadow: 0 0 14px rgba(255,138,163,.14); }
 .rd-w.rd-now.tps-building { color: #F3DA9A; text-decoration-line: none; text-shadow: 0 0 calc(14px + (14px * var(--tps-build-progress, 0))) rgba(240,212,141, calc(.14 + (.16 * var(--tps-build-progress, 0)))); }
-.rd-w.rd-now.tps-building::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 260' preserveAspectRatio='none' shape-rendering='geometricPrecision'%3E%3Cpath d='M24 130 L976 24 M24 130 L976 236' fill='none' stroke='%23F6E0A8' stroke-opacity='.96' stroke-width='22' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
 .rd-w.rd-now.tps-legato { color: #A4E4F1; text-decoration-line: none; text-shadow: 0 0 14px rgba(141,213,226,.12); }
-.rd-w.rd-now.tps-legato::after {
-    border-bottom-color: rgba(164,228,241,.96);
-    border-width: .095em;
-}
 .rd-w.rd-now.tps-staccato { color: #F2C1E1; text-shadow: 0 0 14px rgba(236,181,216,.12); }
-.rd-w.rd-now.tps-staccato::after {
-    background-image: none;
-    border-bottom-color: rgba(242,193,225,.82);
-}
 .rd-w.rd-now.tps-energy { color: #D8FF72; text-shadow: 0 0 calc(12px + (18px * var(--tps-energy, 0))) rgba(216,255,114, calc(.14 + (.22 * var(--tps-energy, 0)))); }
 .rd-w.rd-now.tps-melody { color: #9FD8FF; text-decoration-style: wavy; text-decoration-color: rgba(145,210,255,.56); text-shadow: 0 0 14px rgba(145,210,255,.14); }
 .rd-w.rd-now.tps-pronunciation,
@@ -902,79 +1091,69 @@ span.rd-pause.rd-pause-long {
 }
 .rd-w.rd-now.tps-stress {
     color: #FFE080;
-    font-weight: var(--tps-cue-weight, 800);
     text-decoration-line: none;
     text-shadow: 0 0 16px rgba(255,208,96,.16);
 }
-.rd-w.rd-now.tps-stress::after {
-    border-top-color: rgba(255,224,128,.68);
-    border-bottom-color: rgba(255,224,128,.68);
-    border-top-width: 3px;
-    border-bottom-width: 3px;
+
+/* ── Per-emotion motion ──
+   Only INFINITE loops here. Every emotion either has a looping continuous
+   motion (mood-carrying emotions like warm/concerned/calm/excited) or NO
+   extra motion at all (event emotions like happy/sad/professional/focused/
+   motivational/urgent — their color carries the meaning). One-shot per-word
+   animations are gone: they restarted on every word and read as "robot".
+   Layout is never touched — only filter, opacity, background-position. */
+.rd-w.rd-now.tps-warm      { animation: rd-emo-warm 3s ease-in-out infinite; }
+.rd-w.rd-now.tps-concerned { animation: rd-emo-concerned 2.4s ease-in-out infinite; }
+.rd-w.rd-now.tps-calm      { animation: rd-emo-calm 3s ease-in-out infinite; }
+.rd-w.rd-now.tps-excited   { animation: rd-emo-excited-shimmer 2.8s ease-in-out infinite; }
+.rd-w.rd-now.tps-energetic { animation: rd-emo-energetic-pulse 1.6s ease-in-out infinite; }
+.rd-w.rd-now.tps-urgent    { animation: rd-emo-urgent-pulse 1.1s ease-in-out infinite; }
+/* focused / professional / motivational / happy / sad / neutral — only color,
+   no per-word motion. Their identity is in the hue; animation would just add
+   noise to the read. */
+
+@keyframes rd-emo-warm {
+    0%, 100% { filter: brightness(1)    saturate(1); }
+    50%      { filter: brightness(1.06) saturate(1.08); }
 }
-
-@keyframes tps-cue-gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes rd-emo-concerned {
+    0%, 100% { filter: brightness(0.96) saturate(0.9);  opacity: 0.96; }
+    50%      { filter: brightness(0.86) saturate(0.8);  opacity: 0.86; }
 }
-
-@keyframes tps-cue-active-pulse {
-    0%, 100% { filter: saturate(1); }
-    50% { filter: saturate(1.18) brightness(1.08); }
+@keyframes rd-emo-calm {
+    0%, 100% { filter: brightness(0.98) saturate(0.94); opacity: 0.96; }
+    50%      { filter: brightness(1.04) saturate(1.02); opacity: 1; }
 }
-
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-    .rd-w.rd-now.tps-warm,
-    .rd-w.rd-now.tps-concerned,
-    .rd-w.rd-now.tps-focused,
-    .rd-w.rd-now.tps-motivational,
-    .rd-w.rd-now.tps-neutral,
-    .rd-w.rd-now.tps-urgent,
-    .rd-w.rd-now.tps-happy,
-    .rd-w.rd-now.tps-excited,
-    .rd-w.rd-now.tps-sad,
-    .rd-w.rd-now.tps-calm,
-    .rd-w.rd-now.tps-energetic,
-    .rd-w.rd-now.tps-professional {
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .rd-w.rd-now.tps-warm { background-image: linear-gradient(135deg, #FFD9A3 0%, #FFB863 48%, #F08A24 100%); }
-    .rd-w.rd-now.tps-concerned { background-image: linear-gradient(135deg, #FFD1E0 0%, #F28BB8 58%, #B85C84 100%); }
-    .rd-w.rd-now.tps-focused { background-image: linear-gradient(135deg, #EDE4C8 0%, #7CFFB2 72%, #B7F7D2 100%); }
-    .rd-w.rd-now.tps-motivational { background-image: linear-gradient(135deg, #EDE4C8 0%, #BFA4FF 58%, #7F6AF2 100%); }
-    .rd-w.rd-now.tps-neutral { background-image: linear-gradient(135deg, #FFFFFF 0%, #DDE8F3 52%, #AAB8C8 100%); }
-    .rd-w.rd-now.tps-urgent { background-image: linear-gradient(135deg, #FFF0ED 0%, #FF4140 42%, #B80F1E 100%); }
-    .rd-w.rd-now.tps-happy { background-image: linear-gradient(135deg, #FFF3A3 0%, #FFE66D 55%, #FFB703 100%); }
-    .rd-w.rd-now.tps-excited {
-        animation: tps-cue-gradient-shift 2.4s ease-in-out infinite;
-        background-image: linear-gradient(115deg, #FF4FD8 0%, #8C52FF 48%, #36F4FF 100%);
-        background-size: 180% 180%;
-    }
-    .rd-w.rd-now.tps-sad { background-image: linear-gradient(135deg, #D6DCFF 0%, #9DB6FF 52%, #6D73D9 100%); }
-    .rd-w.rd-now.tps-calm { background-image: linear-gradient(135deg, #B8F4E3 0%, #76E4C5 52%, #5BC0EB 100%); }
-    .rd-w.rd-now.tps-energetic {
-        animation: tps-cue-gradient-shift 3.2s ease-in-out infinite;
-        background-image: linear-gradient(115deg, #FFE66D 0%, #FF6640 45%, #D61F35 72%, #FFE66D 100%);
-        background-size: 180% 180%;
-    }
-    .rd-w.rd-now.tps-professional { background-image: linear-gradient(135deg, #E9F4FF 0%, #7DB6FF 54%, #3C6FD9 100%); }
-    .rd-w.rd-now.tps-urgent {
-        animation: tps-cue-active-pulse 1.6s ease-in-out infinite;
-    }
-    .rd-w.rd-now.tps-excited {
-        animation: tps-cue-gradient-shift 2.4s ease-in-out infinite, tps-cue-active-pulse 1.6s ease-in-out infinite;
-    }
+@keyframes rd-emo-excited-shimmer {
+    0%, 100% { filter: brightness(1)    saturate(1.04) hue-rotate(0deg); }
+    50%      { filter: brightness(1.08) saturate(1.18) hue-rotate(10deg); }
+}
+@keyframes rd-emo-energetic-pulse {
+    0%, 100% { filter: brightness(1)    saturate(1); }
+    50%      { filter: brightness(1.1)  saturate(1.16); }
+}
+@keyframes rd-emo-urgent-pulse {
+    0%, 100% { filter: saturate(1)    brightness(1); }
+    50%      { filter: saturate(1.22) brightness(1.12); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .rd-w.rd-now,
+    .rd-w.rd-now.tps-warm,
+    .rd-w.rd-now.tps-professional,
+    .rd-w.rd-now.tps-focused,
+    .rd-w.rd-now.tps-concerned,
     .rd-w.rd-now.tps-urgent,
+    .rd-w.rd-now.tps-motivational,
     .rd-w.rd-now.tps-excited,
-    .rd-w.rd-now.tps-energetic {
-        animation: none;
+    .rd-w.rd-now.tps-happy,
+    .rd-w.rd-now.tps-sad,
+    .rd-w.rd-now.tps-calm,
+    .rd-w.rd-now.tps-energetic,
+    .rd-w.rd-now.tps-loud,
+    .rd-w.rd-now.tps-soft,
+    .rd-w.rd-now.tps-whisper {
+        animation: none !important;
     }
 }
 

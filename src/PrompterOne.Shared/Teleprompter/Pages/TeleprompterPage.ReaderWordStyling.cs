@@ -27,14 +27,21 @@ public partial class TeleprompterPage
     private const int ReaderCueWeightLoud = 900;
     private const int ReaderCueWeightStress = 820;
 
-    private static string? BuildReaderWordStyle(WordMetadata? metadata, int targetWpm, int effectiveWpm, double cueProgress)
+    private static string? BuildReaderWordStyle(WordMetadata? metadata, int targetWpm, int effectiveWpm, double cueProgress, int wordDurationMs)
     {
-        if (metadata is null)
+        var styles = new List<string>(4);
+
+        if (wordDurationMs > 0)
         {
-            return null;
+            var durationSeconds = Math.Max(0.18d, wordDurationMs / 1000d);
+            styles.Add(FormattableString.Invariant($"{TpsVisualCueContracts.WordDurationVariableName}:{durationSeconds:0.###}s;"));
         }
 
-        var styles = new List<string>(3);
+        if (metadata is null)
+        {
+            return styles.Count == 0 ? null : string.Concat(styles);
+        }
+
         var letterSpacingEm = ResolveReaderLetterSpacing(targetWpm, effectiveWpm);
         if (letterSpacingEm is double letterSpacing)
         {

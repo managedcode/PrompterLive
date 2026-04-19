@@ -10,7 +10,7 @@ public partial class TeleprompterPage
 {
     private const string DefaultReaderBlockName = "Reader Block";
     private const string DefaultReaderSectionName = "Section";
-    private const int LongPauseThresholdMilliseconds = 1500;
+    private const int LongPauseThresholdMilliseconds = 1000;
     private const int MediumPauseThresholdMilliseconds = 600;
     private const int MinimumReaderWordDurationMilliseconds = 120;
     private const int MinimumPauseDurationMilliseconds = 250;
@@ -191,7 +191,7 @@ public partial class TeleprompterPage
                 currentGroupIsHighlight = null;
                 currentGroupIsBuilding = null;
                 currentGroupIsLegato = null;
-                chunks.Add(new ReaderPauseViewModel(0, ReaderPauseBreathCssClass));
+                chunks.Add(new ReaderPauseViewModel(0, ReaderPauseBreathCssClass, TpsVisualCueContracts.PauseKindBreath));
                 continue;
             }
 
@@ -226,13 +226,8 @@ public partial class TeleprompterPage
                 currentGroupIsHighlight = null;
                 currentGroupIsBuilding = null;
                 currentGroupIsLegato = null;
-                chunks.Add(new ReaderPauseViewModel(
-                    pauseDuration,
-                    pauseDuration >= LongPauseThresholdMilliseconds
-                        ? ReaderPauseLongCssClass
-                        : pauseDuration >= MediumPauseThresholdMilliseconds
-                            ? ReaderPauseMediumCssClass
-                            : ReaderPauseCssClass));
+                var (pauseClass, pauseKind) = ResolvePauseClassification(pauseDuration);
+                chunks.Add(new ReaderPauseViewModel(pauseDuration, pauseClass, pauseKind));
                 continue;
             }
 
@@ -276,15 +271,17 @@ public partial class TeleprompterPage
             var effectiveWpm = ResolveEffectiveWpm(word.Metadata, targetWpm);
             var speedCueValue = ResolveReaderSpeedCueValue(targetWpm, effectiveWpm);
             var pronunciationGuide = ResolveReaderPronunciationGuide(word.Metadata);
+            var wordDurationMs = Math.Max(MinimumReaderWordDurationMilliseconds, (int)Math.Round(word.DisplayDuration.TotalMilliseconds));
             currentGroup.Add(new ReaderWordViewModel(
                 Text: pronunciationGuide ?? word.CleanText,
                 CssClass: BuildReaderWordBaseClass(word.Metadata, speedCueValue),
-                DurationMs: Math.Max(MinimumReaderWordDurationMilliseconds, (int)Math.Round(word.DisplayDuration.TotalMilliseconds)),
+                DurationMs: wordDurationMs,
                 Style: BuildReaderWordStyle(
                     word.Metadata,
                     targetWpm,
                     effectiveWpm,
-                    ResolveReaderCueProgress(compiledWords, compiledWordIndex)),
+                    ResolveReaderCueProgress(compiledWords, compiledWordIndex),
+                    wordDurationMs),
                 OriginalText: pronunciationGuide is null ? null : word.CleanText,
                 PronunciationGuide: pronunciationGuide,
                 EffectiveWpm: effectiveWpm,
@@ -303,6 +300,21 @@ public partial class TeleprompterPage
 
         FlushGroup(chunks, currentGroup, currentGroupIsEmphasis ?? false, currentGroupIsHighlight ?? false);
         return chunks;
+    }
+
+    private static (string CssClass, string Kind) ResolvePauseClassification(int durationMilliseconds)
+    {
+        if (durationMilliseconds >= LongPauseThresholdMilliseconds)
+        {
+            return (ReaderPauseLongCssClass, TpsVisualCueContracts.PauseKindSilence);
+        }
+
+        if (durationMilliseconds >= MediumPauseThresholdMilliseconds)
+        {
+            return (ReaderPauseMediumCssClass, TpsVisualCueContracts.PauseKindMedium);
+        }
+
+        return (ReaderPauseCssClass, TpsVisualCueContracts.PauseKindShort);
     }
 
     private static bool ShouldEndReaderGroup(string cleanText, int wordCount, int characterCount)
@@ -463,6 +475,13 @@ public partial class TeleprompterPage
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.EnergyAttributeName, metadata.EnergyLevel?.ToString(CultureInfo.InvariantCulture));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.MelodyAttributeName, metadata.MelodyLevel?.ToString(CultureInfo.InvariantCulture));
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.SpeedAttributeName, speedCueValue);
+        if (metadata.SpeedOverride is int speedOverrideWpm)
+        {
+            AddReaderWordAttribute(
+                ref attributes,
+                TpsVisualCueContracts.SpeedWpmAttributeName,
+                speedOverrideWpm.ToString(CultureInfo.InvariantCulture));
+        }
         AddReaderWordAttribute(ref attributes, TpsVisualCueContracts.EmphasisAttributeName, ResolveEmphasisValue(metadata));
 
         if (metadata.IsHighlight)

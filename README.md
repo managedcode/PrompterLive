@@ -89,7 +89,7 @@ In the teleprompter, the clean reading line keeps those cues visible through mus
 
 ![TPS cue styling in the teleprompter](docs/screenshots/readme/tps-teleprompter-cues.png)
 
-The screenshot matrix below is generated from `test-tps-cue-matrix.tps`. Each row uses one plain reader card, one normal sentence, and one isolated cue scope. The central focus word names the cue whenever possible, for example `[sad]sad[/sad]`, plus phrase-span examples where TPS tags intentionally wrap a short cue phrase.
+The screenshot matrix below is generated from `starter-tps-cue-matrix.tps`. Each row uses one plain reader card, one normal sentence, and one isolated cue scope. The central focus word names the cue whenever possible, for example `[sad]sad[/sad]`, plus phrase-span examples where TPS tags intentionally wrap a short cue phrase.
 
 | TPS cue | Reader meaning | Visible reader treatment | Reader screenshot |
 | --- | --- | --- | --- |

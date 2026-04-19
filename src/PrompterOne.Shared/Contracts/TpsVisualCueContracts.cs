@@ -6,6 +6,15 @@ public static class TpsVisualCueContracts
     public const string CueOpacityVariableName = "--tps-cue-opacity";
     public const string CueScaleVariableName = "--tps-cue-scale";
     public const string CueWeightVariableName = "--tps-cue-weight";
+    public const string WordDurationVariableName = "--tps-word-duration";
+    public const string PauseDurationVariableName = "--tps-pause-duration";
+    public const string PauseKindAttributeName = "data-pause-kind";
+    public const string PauseKindShort = "short";
+    public const string PauseKindMedium = "medium";
+    public const string PauseKindSilence = "silence";
+    public const string PauseKindBreath = "breath";
+    public const string PauseMillisecondsAttributeName = "data-pause-ms";
+    public const string SpeedWpmAttributeName = "data-tps-speed-wpm";
     public const string ArticulationAttributeName = "data-tps-articulation";
     public const string ArticulationLegato = "legato";
     public const string ArticulationStaccato = "staccato";

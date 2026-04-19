@@ -2,7 +2,7 @@ namespace PrompterOne.Shared.Services;
 
 internal static class LegacyLibrarySeedCatalog
 {
-    public const string CleanupVersion = "2026-03-31-runtime-cleanup-v1";
+    public const string CleanupVersion = "2026-04-19-cue-matrix-only-v2";
 
     private static readonly HashSet<string> LegacyDocumentIds = new(StringComparer.Ordinal)
     {
@@ -11,7 +11,12 @@ internal static class LegacyLibrarySeedCatalog
         "security-incident",
         "green-architecture",
         "quantum-computing",
-        "comprehensive-demo"
+        "comprehensive-demo",
+        "starter-product-launch-script",
+        "starter-security-incident-script",
+        "starter-ted-leadership-script",
+        "starter-green-architecture-script",
+        "starter-quantum-computing-script"
     };
 
     private static readonly HashSet<string> LegacyFolderIds = new(StringComparer.Ordinal)
@@ -22,7 +27,13 @@ internal static class LegacyLibrarySeedCatalog
         "podcasts",
         "news",
         "ted",
-        "internal"
+        "internal",
+        "starter-presentations",
+        "starter-product",
+        "starter-investors",
+        "starter-podcasts",
+        "starter-news-reports",
+        "starter-ted-talks"
     };
 
     public static bool IsLegacyDocument(BrowserStoredScriptDocumentDto document)

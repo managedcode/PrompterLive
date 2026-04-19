@@ -11,32 +11,16 @@ internal static class RuntimeLibrarySeedCatalog
 
     private static readonly SeedFolderDefinition[] FolderDefinitions =
     [
-        new("starter-presentations", "Presentations", null, 0),
-        new("starter-product", "Product", "starter-presentations", 0),
-        new("starter-investors", "Investors", "starter-presentations", 1),
-        new("starter-podcasts", "Podcasts", null, 1),
-        new("starter-news-reports", "News Reports", null, 2),
-        new("starter-ted-talks", "TED Talks", null, 3),
-        new("starter-internal", "Internal", null, 4)
+        new("starter-internal", "Internal", null, 0)
     ];
 
     private static readonly SeedDocumentDefinition[] DocumentDefinitions =
     [
-        new("starter-product-launch-script", "Product Launch", "starter-product-launch.tps", "starter-product"),
-        new("starter-security-incident-script", "Security Incident", "starter-security-incident.tps", "starter-news-reports"),
-        new("starter-ted-leadership-script", "TED: Leadership", "starter-ted-leadership.tps", "starter-ted-talks"),
-        new("starter-green-architecture-script", "Green Architecture", "starter-green-architecture.tps", "starter-investors"),
-        new("starter-quantum-computing-script", "Quantum Computing", "starter-quantum-computing.tps", "starter-internal"),
         new("starter-tps-cue-matrix-script", "TPS Cue Matrix", "starter-tps-cue-matrix.tps", "starter-internal")
     ];
 
     private static readonly DateTimeOffset[] DocumentTimestamps =
     [
-        new(2026, 3, 25, 9, 0, 0, TimeSpan.Zero),
-        new(2026, 3, 24, 8, 30, 0, TimeSpan.Zero),
-        new(2026, 3, 20, 12, 0, 0, TimeSpan.Zero),
-        new(2026, 3, 18, 10, 15, 0, TimeSpan.Zero),
-        new(2026, 3, 15, 16, 45, 0, TimeSpan.Zero),
         new(2026, 4, 16, 10, 0, 0, TimeSpan.Zero)
     ];
 

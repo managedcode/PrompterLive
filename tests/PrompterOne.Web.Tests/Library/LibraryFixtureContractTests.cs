@@ -4,8 +4,6 @@ public sealed class LibraryFixtureContractTests
 {
     private static readonly string RepoRoot = ResolveRepoRoot();
     private static readonly string RootDesignFolder = Path.Combine(RepoRoot, "design");
-    private static readonly string StarterTpsCueMatrixSeed = Path.Combine(RepoRoot, "src", "PrompterOne.Shared", "Library", "SeedData", "starter-tps-cue-matrix.tps");
-    private static readonly string TpsCueMatrixFixture = Path.Combine(RepoRoot, "tests", "TestData", "Scripts", "test-tps-cue-matrix.tps");
     private static readonly string[] FixtureRoots =
     [
         Path.Combine(RepoRoot, "src", "PrompterOne.Shared", "Library", "SeedData"),
@@ -42,12 +40,6 @@ public sealed class LibraryFixtureContractTests
             .ToArray();
 
         Assert.True(offenders.Length == 0, string.Join(Environment.NewLine, offenders));
-    }
-
-    [Test]
-    public void RuntimeTpsCueMatrixSeed_MatchesScreenshotFixture()
-    {
-        Assert.Equal(File.ReadAllText(TpsCueMatrixFixture), File.ReadAllText(StarterTpsCueMatrixSeed));
     }
 
     private static string ResolveRepoRoot() =>

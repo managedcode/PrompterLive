@@ -87,11 +87,7 @@ public sealed class ScriptAgentRuntime(
     private static ScriptAgentStructuredOutput ExtractStructuredOutput(AgentResponse response)
     {
         var output = ExtractOutput(response);
-        var structuredOutput = JsonSerializer.Deserialize<ScriptAgentStructuredOutput>(output, JsonOptions);
-        if (structuredOutput is null)
-        {
-            throw new InvalidOperationException("The agent did not return the required structured output.");
-        }
+        var structuredOutput = JsonSerializer.Deserialize<ScriptAgentStructuredOutput>(output, JsonOptions) ?? throw new InvalidOperationException("The agent did not return the required structured output.");
 
         structuredOutput.ChatMessage = structuredOutput.ChatMessage.Trim();
         structuredOutput.DocumentEdits ??= [];
