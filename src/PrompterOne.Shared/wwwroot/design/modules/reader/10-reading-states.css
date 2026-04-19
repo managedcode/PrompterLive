@@ -219,11 +219,11 @@
 .rd-g-legato::after {
     content: "";
     position: absolute;
-    left: -.06em;
-    right: -.06em;
-    bottom: -.38em;
-    height: .48em;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 32 Q 100 0 196 32' stroke='%238DD5E2' stroke-opacity='.72' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    left: -.04em;
+    right: -.04em;
+    bottom: -.16em;
+    height: .28em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 28' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 6 Q 100 24 196 6' stroke='%238DD5E2' stroke-opacity='.74' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
@@ -231,7 +231,7 @@
 }
 
 .rd-g-active.rd-g-legato::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 32 Q 100 0 196 32' stroke='%23A4E4F1' stroke-opacity='.96' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 28' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 6 Q 100 24 196 6' stroke='%23A4E4F1' stroke-opacity='.96' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
 .rd-g-emphasis {
@@ -501,30 +501,38 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     content: "";
     position: absolute;
     top: 50%;
-    left: 0;
-    /* Bigger soft beam — 3 em wide/tall so the falloff ring extends
-       well past the word edges. Alpha is deliberately TINY so the
-       beam reads as a subliminal reading cue rather than a glowing
-       spot — the operator senses motion across the letters without
-       the beam itself competing with the word's colour. */
-    width: 3em;
-    height: 3em;
-    margin-top: -1.5em;
-    transform: translateX(-50%);
+    left: 50%;
+    /* The beam is intentionally subtle: slightly wider than the cue
+       word, very soft, and animated with transform instead of `left`
+       so the sweep glides without the old ticky feel. */
+    width: calc(100% + 1.1em);
+    height: 2.15em;
+    transform: translate3d(-68%, -50%, 0) scale(.92);
     background: radial-gradient(
-        circle at center,
-        rgba(255, 230, 150, 0.1) 0%,
-        rgba(255, 230, 150, 0.05) 28%,
-        rgba(255, 230, 150, 0.02) 55%,
-        transparent 85%
+        ellipse at center,
+        rgba(255, 230, 150, 0.08) 0%,
+        rgba(255, 230, 150, 0.04) 38%,
+        rgba(255, 230, 150, 0.015) 64%,
+        transparent 86%
     );
-    animation: rd-flashlight-sweep var(--rd-beam-duration, 420ms) linear forwards;
+    filter: blur(1.5px);
+    opacity: 0;
+    animation: rd-flashlight-sweep var(--rd-beam-duration, 420ms) var(--rd-beam-easing, cubic-bezier(.28, .12, .22, 1)) forwards;
     pointer-events: none;
     z-index: -1;
 }
 @keyframes rd-flashlight-sweep {
-    0%   { left: 0%; }
-    100% { left: 100%; }
+    0% {
+        transform: translate3d(-68%, -50%, 0) scale(.92);
+        opacity: .16;
+    }
+    38% {
+        opacity: .24;
+    }
+    100% {
+        transform: translate3d(-32%, -50%, 0) scale(1.01);
+        opacity: 0;
+    }
 }
 
 /* ── Speed cues ──
@@ -594,8 +602,12 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-card-active .rd-w.tps-building:not(.rd-now):not(.rd-read) { color: rgba(240,212,141,.45); }
 .rd-card-active .rd-w.tps-legato:not(.rd-now):not(.rd-read) { color: rgba(141,213,226,.45); }
 .rd-card-active .rd-w.tps-staccato:not(.rd-now):not(.rd-read) { color: rgba(236,181,216,.45); }
-.rd-card-active .rd-w.tps-energy:not(.rd-now):not(.rd-read) { color: rgba(216,255,114,.45); }
-.rd-card-active .rd-w.tps-melody:not(.rd-now):not(.rd-read) { color: rgba(145,210,255,.45); }
+.rd-card-active .rd-w.tps-energy:not(.rd-now):not(.rd-read) {
+    color: hsl(calc(72 + (12 * var(--tps-energy, 0))) 100% calc(76% - (10% * var(--tps-energy, 0))) / calc(.34 + (.24 * var(--tps-energy, 0))));
+}
+.rd-card-active .rd-w.tps-melody:not(.rd-now):not(.rd-read) {
+    color: hsl(calc(202 + (10 * var(--tps-melody, 0))) 100% calc(82% - (10% * var(--tps-melody, 0))) / calc(.34 + (.24 * var(--tps-melody, 0))));
+}
 .rd-card-active .rd-w.tps-stress:not(.rd-now):not(.rd-read) {
     text-decoration-color: rgba(255,208,96,.2);
     color: rgba(242,230,204,.45);
@@ -624,12 +636,12 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     opacity: 0;
     background:
         radial-gradient(ellipse at center,
-            rgba(255,220,160,.13) 0%,
-            rgba(255,214,120,.07) 40%,
-            rgba(255,214,120,.02) 70%,
-            transparent 90%);
-    border-radius: 32px;
-    filter: blur(8px);
+            rgba(255,220,160,.09) 0%,
+            rgba(255,214,120,.045) 44%,
+            rgba(255,214,120,.015) 74%,
+            transparent 92%);
+    border-radius: 28px;
+    filter: blur(10px);
     transform: translate3d(0, 0, 0);
     /* Dynamic transition — JS sets `--rd-lens-duration` and
        `--rd-lens-easing` per move based on the target word's cue so the
@@ -644,8 +656,8 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
         transform var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
         width var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
         height var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
-        opacity .28s ease-out;
-    will-change: transform, width;
+        opacity .34s ease-out;
+    will-change: transform, width, height, opacity;
     /* z-index 0 leaves the lens behind in-flow (statically-positioned)
        children like `.rd-w`, so the word glyphs render on top of the
        soft glow. */
@@ -839,12 +851,9 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     content: none;
 }
 .rd-w.tps-melody {
-    text-decoration-line: underline;
-    text-decoration-style: wavy;
-    text-decoration-color: rgba(125,219,255,.24);
-    text-decoration-thickness: 1px;
-    text-underline-offset: .26em;
-    text-decoration-skip-ink: none;
+    position: relative;
+    text-decoration-line: none;
+    text-shadow: 0 0 calc(4px + (10px * var(--tps-melody, 0))) rgba(125,219,255, calc(.06 + (.12 * var(--tps-melody, 0))));
 }
 /* Per-word legato — the visual slur is drawn at the group level
    (.rd-g-legato::after). Single-word legato gets a mini arc so it's
@@ -859,9 +868,9 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     position: absolute;
     left: -.04em;
     right: -.04em;
-    bottom: -.36em;
-    height: .34em;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 4 Q 50 28 96 4' stroke='%238DD5E2' stroke-opacity='.72' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+    bottom: -.16em;
+    height: .22em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 22' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 5 Q 50 18 96 5' stroke='%238DD5E2' stroke-opacity='.72' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
@@ -911,13 +920,28 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     text-shadow: 0 0 12px rgba(236,181,216,.22);
 }
 .rd-w.tps-energy {
+    color: hsl(calc(74 + (12 * var(--tps-energy, 0))) 100% calc(78% - (10% * var(--tps-energy, 0))));
     text-shadow:
-        0 0 calc(8px + (14px * var(--tps-energy, 0))) rgba(216,255,114, calc(.1 + (.2 * var(--tps-energy, 0)))),
-        0 0 calc(4px + (10px * var(--tps-energy, 0))) rgba(242,230,204,.05);
+        0 0 calc(8px + (18px * var(--tps-energy, 0))) rgba(216,255,114, calc(.12 + (.24 * var(--tps-energy, 0)))),
+        0 0 calc(12px + (22px * var(--tps-energy, 0))) rgba(255,214,82, calc(.04 + (.12 * var(--tps-energy, 0))));
+    filter: saturate(calc(1.04 + (.24 * var(--tps-energy, 0)))) brightness(calc(.98 + (.12 * var(--tps-energy, 0))));
 }
 .rd-w.tps-melody {
-    text-decoration-color: rgba(145,210,255, calc(.22 + (.34 * var(--tps-melody, 0))));
-    text-decoration-thickness: calc(1px + (1.5px * var(--tps-melody, 0)));
+    color: hsl(calc(202 + (8 * var(--tps-melody, 0))) 100% calc(84% - (10% * var(--tps-melody, 0))));
+}
+.rd-w.tps-melody::after {
+    content: "";
+    position: absolute;
+    left: -.04em;
+    right: -.04em;
+    bottom: calc(-0.12em - (.08em * var(--tps-melody, 0)));
+    height: calc(.14em + (.16em * var(--tps-melody, 0)));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 28' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M2 14 C10 6 18 22 26 14 S42 6 50 14 S66 22 74 14 S90 6 98 14 S114 22 122 14 S138 6 146 14 S154 22 158 14' stroke='%2391D2FF' stroke-opacity='.92' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+    opacity: calc(.38 + (.42 * var(--tps-melody, 0)));
+    pointer-events: none;
 }
 /* Pronunciation / phonetic — the IPA or simplified guide IS the
    primary rehearsal text (AGENTS rule: "when a guide exists, it must
@@ -1341,8 +1365,21 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 }
 .rd-w.rd-now.tps-legato { color: #A4E4F1; text-decoration-line: none; text-shadow: 0 0 14px rgba(141,213,226,.12); }
 .rd-w.rd-now.tps-staccato { color: #F2C1E1; text-shadow: 0 0 14px rgba(236,181,216,.12); }
-.rd-w.rd-now.tps-energy { color: #D8FF72; text-shadow: 0 0 calc(12px + (18px * var(--tps-energy, 0))) rgba(216,255,114, calc(.14 + (.22 * var(--tps-energy, 0)))); }
-.rd-w.rd-now.tps-melody { color: #9FD8FF; text-decoration-style: wavy; text-decoration-color: rgba(145,210,255,.56); text-shadow: 0 0 14px rgba(145,210,255,.14); }
+.rd-w.rd-now.tps-energy {
+    color: hsl(calc(74 + (12 * var(--tps-energy, 0))) 100% calc(76% - (12% * var(--tps-energy, 0))));
+    text-shadow:
+        0 0 calc(12px + (22px * var(--tps-energy, 0))) rgba(216,255,114, calc(.16 + (.28 * var(--tps-energy, 0)))),
+        0 0 calc(18px + (26px * var(--tps-energy, 0))) rgba(255,214,82, calc(.06 + (.16 * var(--tps-energy, 0))));
+    filter: saturate(calc(1.08 + (.36 * var(--tps-energy, 0)))) brightness(calc(1 + (.16 * var(--tps-energy, 0))));
+}
+.rd-w.rd-now.tps-melody {
+    color: hsl(calc(202 + (8 * var(--tps-melody, 0))) 100% calc(80% - (10% * var(--tps-melody, 0))));
+    text-shadow: 0 0 calc(6px + (12px * var(--tps-melody, 0))) rgba(145,210,255, calc(.1 + (.14 * var(--tps-melody, 0))));
+}
+.rd-w.rd-now.tps-melody::after {
+    opacity: calc(.62 + (.28 * var(--tps-melody, 0)));
+    filter: drop-shadow(0 0 calc(3px + (6px * var(--tps-melody, 0))) rgba(145,210,255,.28));
+}
 .rd-w.rd-now.tps-pronunciation,
 .rd-w.rd-now.tps-phonetic {
     color: #EFE8FF;

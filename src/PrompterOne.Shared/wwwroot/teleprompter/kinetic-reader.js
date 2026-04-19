@@ -12,76 +12,142 @@
     const kineticReaderNamespace = "KineticReaderInterop";
     const ACTIVE_WORD_SELECTOR = ".rd-stage.rd-reading-active .rd-w.rd-now";
     const ACTIVE_WORD_CLASS = "rd-kinetic-active";
-    const KINETIC_TIMING = {
-        staccato: { ratio: 0.42, floor: 180, cap: 260 },
-        stress:   { ratio: 0.5,  floor: 220, cap: 340 },
-        loud:     { ratio: 0.7,  floor: 260, cap: 480 },
-        urgent:   { ratio: 0.72, floor: 260, cap: 460 },
-        energetic:{ ratio: 0.78, floor: 300, cap: 520 },
-        excited:  { ratio: 0.78, floor: 300, cap: 520 },
-        building: { ratio: 0.9,  floor: 340, cap: 640 },
-        calm:     { ratio: 0.95, floor: 380, cap: 700 },
-        legato:   { ratio: 1.0,  floor: 420, cap: 760 },
-        aside:    { ratio: 0.88, floor: 340, cap: 620 },
-        soft:     { ratio: 0.92, floor: 360, cap: 680 },
-        whisper:  { ratio: 0.92, floor: 360, cap: 680 },
-        slow:     { ratio: 0.92, floor: 360, cap: 680 },
-        xslow:    { ratio: 1.0,  floor: 400, cap: 760 },
-        sad:      { ratio: 0.95, floor: 380, cap: 700 }
-    };
     const KINETIC_DEFAULT = { ratio: 0.82, floor: 260, cap: 560 };
-    const KINETIC_PRIORITY = [
-        "staccato", "stress", "loud", "urgent", "energetic", "excited",
-        "building", "legato", "calm", "aside", "soft", "whisper",
-        "xslow", "slow", "sad"
-    ];
-
-    //  Cue → lens transition character. Easing captures the "feel"
-    //  (snap vs glide vs linear flow); the DURATION is derived from
-    //  the target beat's wall-clock duration so the lens never
-    //  promises a longer slide than the word / pause will last. At
-    //  fast WPM the glide tightens automatically instead of breaking.
-    //    ratio — portion of the target duration the glide occupies
-    //    cap   — hard ceiling so slow beats don't drag the glide
-    //    floor — minimum so fast beats still read as "slide"
-    const LENS_CUE_CHARACTER = {
-        staccato: { ratio: 0.35, floor: 120, cap: 220, easing: "cubic-bezier(.5, 0, .2, 1)" },
-        xfast:    { ratio: 0.75, floor: 160, cap: 260, easing: "cubic-bezier(.3, 0, .3, 1)" },
-        fast:     { ratio: 0.85, floor: 200, cap: 340, easing: "cubic-bezier(.3, 0, .3, 1)" },
-        urgent:   { ratio: 0.75, floor: 200, cap: 320, easing: "cubic-bezier(.3, 0, .3, 1)" },
-        legato:   { ratio: 1.1,  floor: 420, cap: 720, easing: "linear" },
-        calm:     { ratio: 1.0,  floor: 380, cap: 640, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        soft:     { ratio: 1.0,  floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        whisper:  { ratio: 1.0,  floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        slow:     { ratio: 1.0,  floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        xslow:    { ratio: 1.0,  floor: 380, cap: 680, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        sad:      { ratio: 1.0,  floor: 380, cap: 640, easing: "cubic-bezier(.22, 1, .36, 1)" },
-        aside:    { ratio: 0.9,  floor: 300, cap: 540, easing: "cubic-bezier(.22, 1, .36, 1)" }
-    };
+    const BEAM_DEFAULT = { ratio: 0.88, floor: 220, cap: 520, easing: "cubic-bezier(.28, .12, .22, 1)" };
     const LENS_CUE_DEFAULT = { ratio: 0.9, floor: 260, cap: 520, easing: "cubic-bezier(.22, 1, .36, 1)" };
-    const LENS_CUE_PRIORITY = [
-        "staccato", "xfast", "urgent", "legato", "xslow", "slow",
-        "whisper", "soft", "calm", "sad", "fast", "aside"
+
+    //  Keep cue-name ownership in one ordered registry instead of
+    //  parallel raw-string maps and priority arrays. The first
+    //  matching profile wins, so ordering here is intentional.
+    //
+    //  Cue → lens transition character. Easing captures the "feel"
+    //  (snap vs glide vs linear flow); the duration is still derived
+    //  from the target beat's wall-clock duration so the lens never
+    //  promises a longer slide than the word / pause will last.
+    const CUE_MOTION_PROFILES = [
+        {
+            cue: "staccato",
+            kinetic: { ratio: 0.42, floor: 180, cap: 260 },
+            beam: { ratio: 0.46, floor: 140, cap: 220, easing: "cubic-bezier(.5, 0, .24, 1)" },
+            lens: { ratio: 0.35, floor: 120, cap: 220, easing: "cubic-bezier(.5, 0, .2, 1)" }
+        },
+        { cue: "stress", kinetic: { ratio: 0.5, floor: 220, cap: 340 } },
+        {
+            cue: "loud",
+            kinetic: { ratio: 0.7, floor: 260, cap: 480 },
+            beam: { ratio: 0.72, floor: 220, cap: 340, easing: "cubic-bezier(.36, 0, .22, 1)" }
+        },
+        {
+            cue: "urgent",
+            kinetic: { ratio: 0.72, floor: 260, cap: 460 },
+            beam: { ratio: 0.64, floor: 180, cap: 300, easing: "cubic-bezier(.42, 0, .24, 1)" },
+            lens: { ratio: 0.75, floor: 200, cap: 320, easing: "cubic-bezier(.3, 0, .3, 1)" }
+        },
+        { cue: "energetic", kinetic: { ratio: 0.78, floor: 300, cap: 520 } },
+        { cue: "excited", kinetic: { ratio: 0.78, floor: 300, cap: 520 } },
+        {
+            cue: "building",
+            kinetic: { ratio: 0.9, floor: 340, cap: 640 },
+            beam: { ratio: 0.94, floor: 280, cap: 440, easing: "cubic-bezier(.24, .08, .18, 1)" }
+        },
+        {
+            cue: "legato",
+            kinetic: { ratio: 1.0, floor: 420, cap: 760 },
+            beam: { ratio: 1.02, floor: 320, cap: 620, easing: "linear" },
+            lens: { ratio: 1.1, floor: 420, cap: 720, easing: "linear" }
+        },
+        {
+            cue: "calm",
+            kinetic: { ratio: 0.95, floor: 380, cap: 700 },
+            beam: { ratio: 0.98, floor: 300, cap: 620, easing: "cubic-bezier(.2, .12, .12, 1)" },
+            lens: { ratio: 1.0, floor: 380, cap: 640, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "aside",
+            kinetic: { ratio: 0.88, floor: 340, cap: 620 },
+            beam: { ratio: 0.84, floor: 260, cap: 520, easing: "cubic-bezier(.26, .12, .18, 1)" },
+            lens: { ratio: 0.9, floor: 300, cap: 540, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "soft",
+            kinetic: { ratio: 0.92, floor: 360, cap: 680 },
+            beam: { ratio: 0.98, floor: 300, cap: 600, easing: "cubic-bezier(.2, .12, .12, 1)" },
+            lens: { ratio: 1.0, floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "whisper",
+            kinetic: { ratio: 0.92, floor: 360, cap: 680 },
+            beam: { ratio: 0.98, floor: 300, cap: 600, easing: "cubic-bezier(.2, .12, .12, 1)" },
+            lens: { ratio: 1.0, floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "xslow",
+            kinetic: { ratio: 1.0, floor: 400, cap: 760 },
+            beam: { ratio: 1.0, floor: 320, cap: 620, easing: "cubic-bezier(.22, .12, .16, 1)" },
+            lens: { ratio: 1.0, floor: 380, cap: 680, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "slow",
+            kinetic: { ratio: 0.92, floor: 360, cap: 680 },
+            beam: { ratio: 0.96, floor: 300, cap: 600, easing: "cubic-bezier(.22, .12, .16, 1)" },
+            lens: { ratio: 1.0, floor: 360, cap: 620, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "sad",
+            kinetic: { ratio: 0.95, floor: 380, cap: 700 },
+            beam: { ratio: 0.98, floor: 300, cap: 620, easing: "cubic-bezier(.22, .12, .16, 1)" },
+            lens: { ratio: 1.0, floor: 380, cap: 640, easing: "cubic-bezier(.22, 1, .36, 1)" }
+        },
+        {
+            cue: "xfast",
+            beam: { ratio: 0.6, floor: 160, cap: 240, easing: "cubic-bezier(.5, 0, .28, 1)" },
+            lens: { ratio: 0.75, floor: 160, cap: 260, easing: "cubic-bezier(.3, 0, .3, 1)" }
+        },
+        {
+            cue: "fast",
+            beam: { ratio: 0.72, floor: 180, cap: 300, easing: "cubic-bezier(.42, 0, .26, 1)" },
+            lens: { ratio: 0.85, floor: 200, cap: 340, easing: "cubic-bezier(.3, 0, .3, 1)" }
+        }
     ];
 
-    function resolveKineticTiming(cueTags) {
+    function resolveCueMotion(cueTags, key, fallback) {
         if (Array.isArray(cueTags) && cueTags.length > 0) {
-            for (const candidate of KINETIC_PRIORITY) {
-                if (cueTags.includes(candidate) && KINETIC_TIMING[candidate]) {
-                    return KINETIC_TIMING[candidate];
+            for (const profile of CUE_MOTION_PROFILES) {
+                if (cueTags.includes(profile.cue) && profile[key]) {
+                    return profile[key];
                 }
             }
         }
-        return KINETIC_DEFAULT;
+
+        return fallback;
+    }
+
+    function deriveMotionDuration(durationMs, timing) {
+        const safeDuration = Number(durationMs) > 0 ? Number(durationMs) : 400;
+        const raw = Math.round(safeDuration * timing.ratio);
+        return Math.max(timing.floor, Math.min(timing.cap, raw));
+    }
+
+    function resolveBeatDuration(durationMs, playbackRate) {
+        const safeDuration = Number(durationMs) > 0 ? Number(durationMs) : 400;
+        const safePlaybackRate = Number(playbackRate) > 0 ? Number(playbackRate) : 1;
+        return safeDuration / safePlaybackRate;
+    }
+
+    function resolveKineticTiming(cueTags) {
+        return resolveCueMotion(cueTags, "kinetic", KINETIC_DEFAULT);
+    }
+
+    function resolveBeamTiming(cueTags) {
+        return resolveCueMotion(cueTags, "beam", BEAM_DEFAULT);
     }
 
     function resolveKineticDuration(cueTags, durationMs, playbackRate) {
-        const timing = resolveKineticTiming(cueTags);
-        const safeDuration = Number(durationMs) > 0 ? Number(durationMs) : 400;
-        const safePlaybackRate = Number(playbackRate) > 0 ? Number(playbackRate) : 1;
-        const adjustedDuration = safeDuration / safePlaybackRate;
-        const raw = Math.round(adjustedDuration * timing.ratio);
-        return Math.max(timing.floor, Math.min(timing.cap, raw));
+        return deriveMotionDuration(resolveBeatDuration(durationMs, playbackRate), resolveKineticTiming(cueTags));
+    }
+
+    function resolveBeamDuration(cueTags, durationMs, playbackRate) {
+        return deriveMotionDuration(resolveBeatDuration(durationMs, playbackRate), resolveBeamTiming(cueTags));
     }
 
     function clearWordEnvelopes() {
@@ -93,25 +159,17 @@
             word.classList.remove(ACTIVE_WORD_CLASS);
             word.style.removeProperty("--rd-kinetic-duration");
             word.style.removeProperty("--rd-beam-duration");
+            word.style.removeProperty("--rd-beam-easing");
         }
     }
 
     function resolveLensCharacter(cueTags) {
-        if (Array.isArray(cueTags) && cueTags.length > 0) {
-            for (const candidate of LENS_CUE_PRIORITY) {
-                if (cueTags.includes(candidate) && LENS_CUE_CHARACTER[candidate]) {
-                    return LENS_CUE_CHARACTER[candidate];
-                }
-            }
-        }
-        return LENS_CUE_DEFAULT;
+        return resolveCueMotion(cueTags, "lens", LENS_CUE_DEFAULT);
     }
 
     function applyCueLensTiming(lens, cueTags, wordDurationMs) {
         const character = resolveLensCharacter(cueTags);
-        const safeWordMs = Number(wordDurationMs) > 0 ? Number(wordDurationMs) : 400;
-        const raw = Math.round(safeWordMs * character.ratio);
-        const clamped = Math.max(character.floor, Math.min(character.cap, raw));
+        const clamped = deriveMotionDuration(wordDurationMs, character);
         lens.style.setProperty("--rd-lens-duration", `${clamped}ms`);
         lens.style.setProperty("--rd-lens-easing", character.easing);
     }
@@ -129,8 +187,8 @@
         }
         const parentRect = parent.getBoundingClientRect();
 
-        const paddingX = Math.max(10, targetRect.width * 0.12);
-        const paddingY = Math.max(6, targetRect.height * 0.15);
+        const paddingX = Math.max(8, targetRect.width * 0.09);
+        const paddingY = Math.max(5, targetRect.height * 0.12);
 
         const left = targetRect.left - parentRect.left - paddingX;
         const top = targetRect.top - parentRect.top - paddingY;
@@ -169,11 +227,13 @@
             }
 
             const kineticDuration = resolveKineticDuration(cueTags, durationMs, playbackRate);
-            const beamDuration = Math.max(160, Math.round(kineticDuration * 0.92));
+            const beamTiming = resolveBeamTiming(cueTags);
+            const beamDuration = resolveBeamDuration(cueTags, durationMs, playbackRate);
 
             clearWordEnvelopes();
             word.style.setProperty("--rd-kinetic-duration", `${kineticDuration}ms`);
             word.style.setProperty("--rd-beam-duration", `${beamDuration}ms`);
+            word.style.setProperty("--rd-beam-easing", beamTiming.easing);
             //  Reflow between remove/add guarantees the CSS animation
             //  restarts even when the same DOM node becomes active again.
             void word.offsetWidth;

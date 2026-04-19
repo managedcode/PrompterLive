@@ -24,6 +24,7 @@ public partial class TeleprompterPage
     private const double ReaderCueOpacitySarcasm = 0.92d;
     private const double ReaderCueOpacitySoft = 0.86d;
     private const double ReaderCueOpacityWhisper = 0.76d;
+    private const double MinimumContourVisualStrength = 0.16d;
     private const int ReaderCueWeightLoud = 900;
     private const int ReaderCueWeightStress = 820;
 
@@ -240,8 +241,10 @@ public partial class TeleprompterPage
 
     private static double NormalizeTpsContourLevel(int? value) =>
         value is int level
-            ? (Math.Clamp(level, MinimumTpsContourLevel, MaximumTpsContourLevel) - MinimumTpsContourLevel) /
-              (double)(MaximumTpsContourLevel - MinimumTpsContourLevel)
+            ? MinimumContourVisualStrength +
+              ((Math.Clamp(level, MinimumTpsContourLevel, MaximumTpsContourLevel) - MinimumTpsContourLevel) /
+               (double)(MaximumTpsContourLevel - MinimumTpsContourLevel) *
+               (1d - MinimumContourVisualStrength))
             : 0d;
 
     private readonly record struct ReaderCueMetrics(double Opacity, int? Weight, double? BuildProgress);

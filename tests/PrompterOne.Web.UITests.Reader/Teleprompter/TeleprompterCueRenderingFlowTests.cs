@@ -159,8 +159,8 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(double.Parse(probe.LastBuildingWeight, CultureInfo.InvariantCulture)).IsGreaterThan(double.Parse(probe.FirstBuildingWeight, CultureInfo.InvariantCulture));
             await Assert.That(double.Parse(probe.EnergyWeight, CultureInfo.InvariantCulture)).IsGreaterThan(700d);
             await Assert.That(double.Parse(probe.MelodyWeight, CultureInfo.InvariantCulture)).IsGreaterThan(640d);
-            await Assert.That(double.Parse(probe.EnergyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.778d);
-            await Assert.That(double.Parse(probe.MelodyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.333d);
+            await Assert.That(double.Parse(probe.EnergyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.813d);
+            await Assert.That(double.Parse(probe.MelodyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.44d);
             await AssertReaderWordsDoNotOverlapAsync(cardText, InspirationCardIndex);
 
             await AdvanceToCardAsync(page, InspirationCardIndex);
@@ -200,6 +200,7 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             var activeCardIndex = 0;
             var readerStage = page.GetByTestId(UiTestIds.Teleprompter.Stage);
             var speedProbes = new Dictionary<string, CueMatrixSpeedProbe>(StringComparer.Ordinal);
+            var contourProbes = new Dictionary<string, CueMatrixContourProbe>(StringComparer.Ordinal);
             foreach (var capture in CueMatrixCaptures)
             {
                 activeCardIndex = await ActivateCueMatrixCardAsync(page, activeCardIndex, capture.CardIndex);
@@ -217,10 +218,17 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     speedProbes[capture.SpeedProbeKey] = await ReadCueMatrixSpeedProbeAsync(cardText, capture);
                 }
 
+                if (string.Equals(capture.AttributeName, TpsVisualCueContracts.EnergyAttributeName, StringComparison.Ordinal) ||
+                    string.Equals(capture.AttributeName, TpsVisualCueContracts.MelodyAttributeName, StringComparison.Ordinal))
+                {
+                    contourProbes[capture.StepName] = await ReadCueMatrixContourProbeAsync(cardText, capture);
+                }
+
                 await UiScenarioArtifacts.CaptureLocatorAsync(readerStage, CueMatrixScenario, capture.StepName);
             }
 
             await AssertCueMatrixSpeedTreatmentAsync(speedProbes);
+            await AssertCueMatrixContourTreatmentAsync(contourProbes);
         }
         finally
         {
@@ -824,6 +832,86 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             .Because("slow must broaden the word without becoming a spaced-letter display.");
     }
 
+    private static async Task<CueMatrixContourProbe> ReadCueMatrixContourProbeAsync(
+        Microsoft.Playwright.ILocator cardText,
+        CueMatrixCapture capture)
+    {
+        var probe = await cardText.EvaluateAsync<CueMatrixContourProbe>(
+            """
+            (host, args) => {
+                const normalize = value => (value ?? '')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[.,;:!?]+$/g, '');
+                const target = [...host.querySelectorAll(`[data-test="${args.activeWordTestId}"], [data-test^="${args.wordPrefix}"]`)]
+                    .find(candidate => normalize(candidate.textContent) === args.targetWord);
+                if (!(target instanceof HTMLElement)) {
+                    return null;
+                }
+
+                const targetStyle = getComputedStyle(target);
+                const afterStyle = getComputedStyle(target, '::after');
+                const readFilterValue = (filter, name) => {
+                    const match = (filter ?? '').match(new RegExp(`${name}\\(([^)]+)\\)`));
+                    return match ? Number.parseFloat(match[1]) || 0 : 0;
+                };
+                const readMaxShadowBlur = value => {
+                    const values = [...(value ?? '').matchAll(/(-?\d+(?:\.\d+)?)px/g)]
+                        .map(match => Number.parseFloat(match[1]))
+                        .filter(Number.isFinite);
+                    return values.length === 0 ? 0 : Math.max(...values);
+                };
+
+                return {
+                    glowRadiusPx: readMaxShadowBlur(targetStyle.textShadow),
+                    brightness: readFilterValue(targetStyle.filter, 'brightness'),
+                    saturation: readFilterValue(targetStyle.filter, 'saturate'),
+                    waveHeightPx: Number.parseFloat(afterStyle.height) || 0,
+                    waveOpacity: Number.parseFloat(afterStyle.opacity) || 0
+                };
+            }
+            """,
+            new
+            {
+                activeWordTestId = UiTestIds.Teleprompter.ActiveWord,
+                targetWord = capture.TargetWord,
+                wordPrefix = UiTestIds.Teleprompter.CardWordPrefix(capture.CardIndex)
+            });
+
+        await Assert.That(probe).IsNotNull();
+        return probe!;
+    }
+
+    private static async Task AssertCueMatrixContourTreatmentAsync(IReadOnlyDictionary<string, CueMatrixContourProbe> probes)
+    {
+        await Assert.That(probes.ContainsKey("53-contour-energy-low")).IsTrue();
+        await Assert.That(probes.ContainsKey("54-contour-energy-mid")).IsTrue();
+        await Assert.That(probes.ContainsKey("55-contour-energy-peak")).IsTrue();
+        await Assert.That(probes.ContainsKey("56-contour-melody-low")).IsTrue();
+        await Assert.That(probes.ContainsKey("57-contour-melody-mid")).IsTrue();
+        await Assert.That(probes.ContainsKey("58-contour-melody-peak")).IsTrue();
+
+        var energyLow = probes["53-contour-energy-low"];
+        var energyMid = probes["54-contour-energy-mid"];
+        var energyHigh = probes["55-contour-energy-peak"];
+        var melodyLow = probes["56-contour-melody-low"];
+        var melodyMid = probes["57-contour-melody-mid"];
+        var melodyHigh = probes["58-contour-melody-peak"];
+
+        await Assert.That(energyMid.GlowRadiusPx).IsGreaterThan(energyLow.GlowRadiusPx);
+        await Assert.That(energyHigh.GlowRadiusPx).IsGreaterThan(energyMid.GlowRadiusPx);
+        await Assert.That(energyMid.Brightness).IsGreaterThan(energyLow.Brightness);
+        await Assert.That(energyHigh.Brightness).IsGreaterThan(energyMid.Brightness);
+        await Assert.That(energyMid.Saturation).IsGreaterThan(energyLow.Saturation);
+        await Assert.That(energyHigh.Saturation).IsGreaterThan(energyMid.Saturation);
+
+        await Assert.That(melodyLow.WaveHeightPx).IsGreaterThan(0d);
+        await Assert.That(melodyMid.WaveHeightPx).IsGreaterThan(melodyLow.WaveHeightPx);
+        await Assert.That(melodyHigh.WaveHeightPx).IsGreaterThan(melodyMid.WaveHeightPx);
+        await Assert.That(melodyMid.WaveOpacity).IsGreaterThan(melodyLow.WaveOpacity);
+        await Assert.That(melodyHigh.WaveOpacity).IsGreaterThan(melodyMid.WaveOpacity);
+    }
+
     private static double ParseCssPixels(string value)
     {
         if (string.IsNullOrWhiteSpace(value) || string.Equals(value, "normal", StringComparison.Ordinal))
@@ -1096,5 +1184,18 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         public string LetterSpacing { get; init; } = string.Empty;
 
         public string FontSize { get; init; } = string.Empty;
+    }
+
+    private sealed class CueMatrixContourProbe
+    {
+        public double GlowRadiusPx { get; init; }
+
+        public double Brightness { get; init; }
+
+        public double Saturation { get; init; }
+
+        public double WaveHeightPx { get; init; }
+
+        public double WaveOpacity { get; init; }
     }
 }

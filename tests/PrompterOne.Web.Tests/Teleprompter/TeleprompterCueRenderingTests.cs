@@ -94,8 +94,8 @@ public sealed class TeleprompterCueRenderingTests : BunitContext
             Assert.True(stressWeight >= 820d, $"Expected stress weight to be strong, got {stressWeight}.");
             Assert.True(energyWeight > 700d, $"Expected energy weight to rise, got {energyWeight}.");
             Assert.True(melodyWeight > 640d, $"Expected melody weight to rise, got {melodyWeight}.");
-            Assert.Equal(0.778d, energyLevel);
-            Assert.Equal(0.333d, melodyLevel);
+            Assert.Equal(0.813d, energyLevel);
+            Assert.Equal(0.44d, melodyLevel);
             Assert.True(buildingLastProgress > buildingFirstProgress, $"Expected building progress to increase, got {buildingFirstProgress} then {buildingLastProgress}.");
             Assert.True(buildingLastWeight > buildingFirstWeight, $"Expected building weight to increase, got {buildingFirstWeight} then {buildingLastWeight}.");
         });
