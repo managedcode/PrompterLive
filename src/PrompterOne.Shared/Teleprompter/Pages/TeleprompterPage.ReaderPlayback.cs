@@ -127,7 +127,15 @@ public partial class TeleprompterPage
 
         if (_activeReaderWordIndex >= 0)
         {
-            RestartReaderPlaybackLoop(GetCurrentWordDelayMilliseconds());
+            //  If we stopped mid-pause-beat, advance past the pause on
+            //  resume instead of waiting another full word duration and
+            //  replaying the preceding word. A minimal loop tick kicks
+            //  the AdvanceReaderPlaybackAsync code into the "clear pause,
+            //  activate next word" branch.
+            var resumeDelayMs = _activeReaderPauseChunkIndex is not null
+                ? MinimumReaderLoopDelayMilliseconds
+                : GetCurrentWordDelayMilliseconds();
+            RestartReaderPlaybackLoop(resumeDelayMs);
             return;
         }
 
@@ -200,7 +208,12 @@ public partial class TeleprompterPage
             }
             else
             {
-                await AdvanceToCardAsync(GetNextPlaybackCardIndex(), CancellationToken.None);
+                //  Manual forward step off the last word always advances
+                //  upward — even on wrap-around.
+                await AdvanceToCardAsync(
+                    GetNextPlaybackCardIndex(),
+                    CancellationToken.None,
+                    explicitDirection: ReaderCardForwardStep);
             }
         }
 
@@ -302,7 +315,12 @@ public partial class TeleprompterPage
 
         if (!keepPlaybackState)
         {
-            _activeReaderPauseChunkIndex = null;
+            //  Pause-beat state is intentionally NOT cleared here — the
+            //  resume path in ToggleReaderPlaybackAsync reads it so a user
+            //  who stops mid-pause and hits play again skips past the
+            //  already-played pause rather than re-playing the preceding
+            //  word for its full duration (was a real bug found in a
+            //  playback trace review).
             SetReaderPlaybackState(false);
             _ = ClearKineticEnvelopesAsync();
         }
@@ -376,6 +394,7 @@ public partial class TeleprompterPage
             await ClearKineticEnvelopesAsync();
             UpdateReaderDisplayState(requestAlignment: false);
             await InvokeAsync(StateHasChanged);
+            await SlideFocusLensToPauseAsync(pauseBeat.ChunkIndex);
             return Math.Max(MinimumReaderLoopDelayMilliseconds, BuildScaledReaderDelayMilliseconds(pauseBeat.DurationMs));
         }
 
@@ -389,7 +408,11 @@ public partial class TeleprompterPage
             return GetCurrentWordDelayMilliseconds();
         }
 
-        await AdvanceToCardAsync(GetNextPlaybackCardIndex(), cancellationToken);
+        //  Playback loop always advances upward — even when wrapping
+        //  from the last card back to index 0. Without an explicit
+        //  direction, the wrap would compare 0 < lastIndex and fire
+        //  the backward-descent animation during normal forward play.
+        await AdvanceToCardAsync(GetNextPlaybackCardIndex(), cancellationToken, explicitDirection: ReaderCardForwardStep);
         return GetCurrentWordDelayMilliseconds();
     }
 
@@ -440,12 +463,23 @@ public partial class TeleprompterPage
         return null;
     }
 
-    private async Task AdvanceToCardAsync(int nextCardIndex, CancellationToken cancellationToken)
+    private Task AdvanceToCardAsync(int nextCardIndex, CancellationToken cancellationToken) =>
+        AdvanceToCardAsync(nextCardIndex, cancellationToken, explicitDirection: null);
+
+    private async Task AdvanceToCardAsync(
+        int nextCardIndex,
+        CancellationToken cancellationToken,
+        int? explicitDirection)
     {
         await CancelPendingReaderCardTransitionAsync();
         var previousCardIndex = _activeReaderCardIndex;
+        //  Hide the OLD card's focus lens explicitly — otherwise the
+        //  `.rd-focus-lens-active` class stays on it and, if the same
+        //  card comes back into view later, the lens would be visible
+        //  at a stale position until the first word re-activates.
+        await HideFocusLensAsync(previousCardIndex);
         var transition = BeginReaderCardTransitionScope(cancellationToken);
-        await PrepareReaderCardTransitionAsync(nextCardIndex);
+        await PrepareReaderCardTransitionAsync(nextCardIndex, explicitDirection);
         await PrepareReaderCardAlignmentAsync(nextCardIndex, 0);
         _readerTransitionSourceCardIndex = previousCardIndex;
         _activeReaderCardIndex = nextCardIndex;
@@ -521,6 +555,90 @@ public partial class TeleprompterPage
         UpdateReaderDisplayState(requestAlignment: false);
         await InvokeAsync(StateHasChanged);
         await FireKineticWordEnvelopeAsync(wordIndex);
+        await SlideFocusLensToActiveWordAsync(wordIndex);
+    }
+
+    private async Task SlideFocusLensToActiveWordAsync(int wordIndex)
+    {
+        if (!TryGetAlignmentWordId(_activeReaderCardIndex, wordIndex, out var wordId))
+        {
+            return;
+        }
+
+        //  Word's cue tags drive the lens transition character; its
+        //  scaled wall-clock duration sizes the glide so the lens never
+        //  over- or under-shoots the word's own time budget.
+        var word = ResolveReaderWordAt(_activeReaderCardIndex, wordIndex);
+        var cueTags = word is null
+            ? Array.Empty<string>()
+            : ExtractKineticCueTags(word.CssClass);
+        var scaledWordDurationMs = word is null
+            ? MinimumReaderLoopDelayMilliseconds
+            : BuildScaledReaderDelayMilliseconds(word.DurationMs);
+
+        await InvokeLensPositionAsync(wordId, cueTags, scaledWordDurationMs);
+    }
+
+    private Task SlideFocusLensToPauseAsync(int chunkIndex)
+    {
+        //  Pauses advance the lens as their own "beat". The lens glide
+        //  occupies ~0.9× the pause duration (default ratio), so short
+        //  pauses get a quick slide and long silence pills get a gentle
+        //  settle matching the operator's breathing moment.
+        var chunkId = UiDomIds.Teleprompter.CardChunk(_activeReaderCardIndex, chunkIndex);
+        var pauseDurationMs = ResolvePauseChunkDurationMs(_activeReaderCardIndex, chunkIndex);
+        var scaledPauseDurationMs = BuildScaledReaderDelayMilliseconds(pauseDurationMs);
+        return InvokeLensPositionAsync(chunkId, Array.Empty<string>(), scaledPauseDurationMs);
+    }
+
+    private int ResolvePauseChunkDurationMs(int cardIndex, int chunkIndex)
+    {
+        if (cardIndex < 0 || cardIndex >= _cards.Count)
+        {
+            return MinimumReaderLoopDelayMilliseconds;
+        }
+
+        var chunks = _cards[cardIndex].Chunks;
+        if (chunkIndex < 0 || chunkIndex >= chunks.Count)
+        {
+            return MinimumReaderLoopDelayMilliseconds;
+        }
+
+        return chunks[chunkIndex] is ReaderPauseViewModel pause
+            ? Math.Max(MinimumReaderLoopDelayMilliseconds, pause.DurationMs)
+            : MinimumReaderLoopDelayMilliseconds;
+    }
+
+    private async Task InvokeLensPositionAsync(
+        string targetId,
+        IReadOnlyList<string> cueTags,
+        int targetDurationMs)
+    {
+        var lensId = UiDomIds.Teleprompter.FocusLens(_activeReaderCardIndex);
+        try
+        {
+            await KineticInterop.PositionLensAsync(lensId, targetId, cueTags, targetDurationMs);
+        }
+        catch (JSException) { }
+        catch (InvalidOperationException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    private async Task HideFocusLensAsync(int cardIndex)
+    {
+        if (cardIndex < 0 || cardIndex >= _cards.Count)
+        {
+            return;
+        }
+
+        var lensId = UiDomIds.Teleprompter.FocusLens(cardIndex);
+        try
+        {
+            await KineticInterop.HideLensAsync(lensId);
+        }
+        catch (JSException) { }
+        catch (InvalidOperationException) { }
+        catch (TaskCanceledException) { }
     }
 
     //  Dispatch the kinetic envelope for the freshly-activated word. The

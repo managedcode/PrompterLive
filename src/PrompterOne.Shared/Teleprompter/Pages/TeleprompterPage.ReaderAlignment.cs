@@ -30,6 +30,21 @@ public partial class TeleprompterPage
             neutralizeCard: false,
             rerender: true,
             instantTransition: instant);
+
+        //  Font-size, text-width, or focal-point changes rewrite every
+        //  word's pixel position. The focus lens caches the last word's
+        //  bounding rect, so without a reposition call here it would
+        //  point at stale pixels after the settings change. Re-slide to
+        //  the current active word (or active pause) so the lens
+        //  follows the new layout.
+        if (_activeReaderPauseChunkIndex is { } pauseChunkIndex)
+        {
+            await SlideFocusLensToPauseAsync(pauseChunkIndex);
+        }
+        else if (_activeReaderWordIndex >= 0)
+        {
+            await SlideFocusLensToActiveWordAsync(_activeReaderWordIndex);
+        }
     }
 
     private string BuildReaderCardTextStyle(int cardIndex)
@@ -69,7 +84,13 @@ public partial class TeleprompterPage
     }
 
     private Task PrepareReaderCardAlignmentAsync(int cardIndex, int wordOrdinal) =>
-        AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: true, rerender: false, instantTransition: false);
+        //  Card preparation positions the incoming card's cluster text so
+        //  word 0 already sits on the focal line BEFORE the card fades in.
+        //  `instantTransition: true` prevents the text from visibly sliding
+        //  from y=0 to its final offset while the card is already on
+        //  screen — otherwise the user sees the text "jump back" once the
+        //  first word activates.
+        AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: true, rerender: false, instantTransition: true);
 
     private Task AlignReaderWordBeforeActivationAsync(int cardIndex, int wordOrdinal) =>
         AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: false, rerender: false, instantTransition: false);

@@ -100,6 +100,10 @@
     width: 100%;
     max-width: min(100%, var(--rd-stage-content-width, 940px));
     box-sizing: border-box;
+    /* relative positioning anchors the absolutely-placed `.rd-focus-lens`
+       child — the lens glides between active words in the lens's local
+       coordinate space so it scrolls up with the text automatically. */
+    position: relative;
     font-weight: 700;
     line-height: 1.9;
     color: rgba(242,230,204,.22);
@@ -523,42 +527,97 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     color: rgba(242,230,204,.42);
 }
 /* ── Cue colour in preview ──
-   Non-active cue words carry only a faint tint of their hue at the same
-   opacity as plain words (~0.42). The full cue colour and kinetic motion
-   are reserved for `.rd-now` so the focus word is always the dominant
-   visual and preview words read as gentle context, not competition.
-   Previous 0.62–0.82 opacities made cue words (loud, excited, stress,
-   …) outshine the currently-spoken word — a regression the user called
-   out: "чому лауд так видно? він не сфокусований". */
-.rd-g-active > .rd-w.tps-warm:not(.rd-now):not(.rd-read) { color: rgba(255,184,99,.42); }
-.rd-g-active > .rd-w.tps-concerned:not(.rd-now):not(.rd-read) { color: rgba(242,139,184,.42); }
-.rd-g-active > .rd-w.tps-focused:not(.rd-now):not(.rd-read) { color: rgba(124,255,178,.42); }
-.rd-g-active > .rd-w.tps-motivational:not(.rd-now):not(.rd-read) { color: rgba(191,164,255,.42); }
-.rd-g-active > .rd-w.tps-neutral:not(.rd-now):not(.rd-read) { color: rgba(237,242,247,.42); }
-.rd-g-active > .rd-w.tps-urgent:not(.rd-now):not(.rd-read) { color: rgba(255,120,120,.42); }
-.rd-g-active > .rd-w.tps-happy:not(.rd-now):not(.rd-read) { color: rgba(255,230,109,.42); }
-.rd-g-active > .rd-w.tps-excited:not(.rd-now):not(.rd-read) { color: rgba(255,144,220,.42); }
-.rd-g-active > .rd-w.tps-sad:not(.rd-now):not(.rd-read) { color: rgba(157,182,255,.42); }
-.rd-g-active > .rd-w.tps-calm:not(.rd-now):not(.rd-read) { color: rgba(118,228,197,.42); }
-.rd-g-active > .rd-w.tps-energetic:not(.rd-now):not(.rd-read) { color: rgba(255,150,110,.42); }
-.rd-g-active > .rd-w.tps-professional:not(.rd-now):not(.rd-read) { color: rgba(125,182,255,.42); }
-.rd-g-active > .rd-w.tps-loud:not(.rd-now):not(.rd-read) { color: rgba(242,193,139,.42); }
-.rd-g-active > .rd-w.tps-soft:not(.rd-now):not(.rd-read) { color: rgba(199,221,245,.42); }
-.rd-g-active > .rd-w.tps-whisper:not(.rd-now):not(.rd-read) { color: rgba(207,203,215,.42); }
-.rd-g-active > .rd-w.tps-aside:not(.rd-now):not(.rd-read) { color: rgba(183,199,205,.42); }
-.rd-g-active > .rd-w.tps-rhetorical:not(.rd-now):not(.rd-read) { color: rgba(205,179,233,.42); }
-.rd-g-active > .rd-w.tps-sarcasm:not(.rd-now):not(.rd-read) { color: rgba(255,138,163,.42); }
-.rd-g-active > .rd-w.tps-building:not(.rd-now):not(.rd-read) { color: rgba(240,212,141,.42); }
-.rd-g-active > .rd-w.tps-legato:not(.rd-now):not(.rd-read) { color: rgba(141,213,226,.42); }
-.rd-g-active > .rd-w.tps-staccato:not(.rd-now):not(.rd-read) { color: rgba(236,181,216,.42); }
-.rd-g-active > .rd-w.tps-energy:not(.rd-now):not(.rd-read) { color: rgba(216,255,114,.42); }
-.rd-g-active > .rd-w.tps-melody:not(.rd-now):not(.rd-read) { color: rgba(145,210,255,.42); }
-.rd-g-active > .rd-w.tps-stress:not(.rd-now):not(.rd-read) {
-    text-decoration-color: rgba(255,208,96,.16);
-    color: rgba(242,230,204,.42);
+   Cue words show a muted tint of their hue AS SOON AS the card is
+   active — scope is `.rd-card-active` (not `.rd-g-active`) so the
+   operator doesn't see cue colours appear only after the first word
+   activates. Otherwise the new card looks "plain" for a moment and
+   the cue colours pop in later ("коли заліте єкстаре — слова всі в
+   активні ап отм стають приглушені"). 0.45 keeps the tint gentle.
+   The `.rd-g-active > .rd-w ...` rule further below applies a slight
+   brightness boost to the CURRENT group's plain words — cue words
+   keep their hue constant and rely on the focus lens + rd-now rules
+   to show which word is the current beat. */
+.rd-card-active .rd-w.tps-warm:not(.rd-now):not(.rd-read) { color: rgba(255,184,99,.45); }
+.rd-card-active .rd-w.tps-concerned:not(.rd-now):not(.rd-read) { color: rgba(242,139,184,.45); }
+.rd-card-active .rd-w.tps-focused:not(.rd-now):not(.rd-read) { color: rgba(124,255,178,.45); }
+.rd-card-active .rd-w.tps-motivational:not(.rd-now):not(.rd-read) { color: rgba(191,164,255,.45); }
+.rd-card-active .rd-w.tps-neutral:not(.rd-now):not(.rd-read) { color: rgba(237,242,247,.45); }
+.rd-card-active .rd-w.tps-urgent:not(.rd-now):not(.rd-read) { color: rgba(255,120,120,.45); }
+.rd-card-active .rd-w.tps-happy:not(.rd-now):not(.rd-read) { color: rgba(255,230,109,.45); }
+.rd-card-active .rd-w.tps-excited:not(.rd-now):not(.rd-read) { color: rgba(255,144,220,.45); }
+.rd-card-active .rd-w.tps-sad:not(.rd-now):not(.rd-read) { color: rgba(157,182,255,.45); }
+.rd-card-active .rd-w.tps-calm:not(.rd-now):not(.rd-read) { color: rgba(118,228,197,.45); }
+.rd-card-active .rd-w.tps-energetic:not(.rd-now):not(.rd-read) { color: rgba(255,150,110,.45); }
+.rd-card-active .rd-w.tps-professional:not(.rd-now):not(.rd-read) { color: rgba(125,182,255,.45); }
+.rd-card-active .rd-w.tps-loud:not(.rd-now):not(.rd-read) { color: rgba(242,193,139,.45); }
+.rd-card-active .rd-w.tps-soft:not(.rd-now):not(.rd-read) { color: rgba(199,221,245,.45); }
+.rd-card-active .rd-w.tps-whisper:not(.rd-now):not(.rd-read) { color: rgba(207,203,215,.45); }
+.rd-card-active .rd-w.tps-aside:not(.rd-now):not(.rd-read) { color: rgba(183,199,205,.45); }
+.rd-card-active .rd-w.tps-rhetorical:not(.rd-now):not(.rd-read) { color: rgba(205,179,233,.45); }
+.rd-card-active .rd-w.tps-sarcasm:not(.rd-now):not(.rd-read) { color: rgba(255,138,163,.45); }
+.rd-card-active .rd-w.tps-building:not(.rd-now):not(.rd-read) { color: rgba(240,212,141,.45); }
+.rd-card-active .rd-w.tps-legato:not(.rd-now):not(.rd-read) { color: rgba(141,213,226,.45); }
+.rd-card-active .rd-w.tps-staccato:not(.rd-now):not(.rd-read) { color: rgba(236,181,216,.45); }
+.rd-card-active .rd-w.tps-energy:not(.rd-now):not(.rd-read) { color: rgba(216,255,114,.45); }
+.rd-card-active .rd-w.tps-melody:not(.rd-now):not(.rd-read) { color: rgba(145,210,255,.45); }
+.rd-card-active .rd-w.tps-stress:not(.rd-now):not(.rd-read) {
+    text-decoration-color: rgba(255,208,96,.2);
+    color: rgba(242,230,204,.45);
 }
 .rd-g-active.rd-g-emphasis { text-decoration-line: none; }
-.rd-g-active > .rd-w.tps-highlight:not(.rd-now):not(.rd-read) { color: rgba(255,235,184,.42); }
+.rd-card-active .rd-w.tps-highlight:not(.rd-now):not(.rd-read) { color: rgba(255,235,184,.45); }
+
+/* ── Focus lens (slide flow) ──
+   A single translucent warm ellipse that glides between active words.
+   The lens is the SOLE source of "slide flow" motion through the text:
+     · Preview words keep their stable cluster dimming.
+     · The focus word's own color change is crisp (.22s transition).
+     · The lens carries the visual sense of motion by smoothly sliding
+       from the previous word's position to the new word's position
+       over .55s (a bit longer than a typical word at 140 WPM so the
+       glide always feels gentler than the word rhythm).
+   Pure transform + width transitions — no layout side-effects, no
+   baseline shift, no impact on neighbouring words. */
+.rd-focus-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    opacity: 0;
+    background:
+        radial-gradient(ellipse at center,
+            rgba(255,220,160,.13) 0%,
+            rgba(255,214,120,.07) 40%,
+            rgba(255,214,120,.02) 70%,
+            transparent 90%);
+    border-radius: 32px;
+    filter: blur(8px);
+    transform: translate3d(0, 0, 0);
+    /* Dynamic transition — JS sets `--rd-lens-duration` and
+       `--rd-lens-easing` per move based on the target word's cue so the
+       glide matches cue psychology:
+         staccato / xfast  → snap (0.15s / 0.22s)
+         loud / stress / default → 0.42s ease-out
+         soft / calm / slow / sad → 0.55s ease-out (gentler)
+         legato             → 0.6s linear (smoothest glide)
+       The lens is the only visible "motion" between words, so its
+       timing carries the whole feel of the reading rhythm. */
+    transition:
+        transform var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
+        width var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
+        height var(--rd-lens-duration, .42s) var(--rd-lens-easing, cubic-bezier(.22, 1, .36, 1)),
+        opacity .28s ease-out;
+    will-change: transform, width;
+    /* z-index 0 leaves the lens behind in-flow (statically-positioned)
+       children like `.rd-w`, so the word glyphs render on top of the
+       soft glow. */
+    z-index: 0;
+}
+.rd-focus-lens-active {
+    opacity: 1;
+}
 
 /* Word states — layout-stable visual transitions only.
    0.32s transition keeps up with reader pace (typical word 350-500ms) so
@@ -570,18 +629,18 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w {
     display: inline-block;
     position: relative;
-    /* Scale from the bottom of the line-box so the word "breathes"
-       upward without moving the baseline — satisfies the AGENTS rule
-       "active focus word baseline must remain vertically stable". */
-    transform-origin: center bottom;
+    /* Short, crisp transitions so words do NOT leave bright trails
+       behind the focus. The sense of "slide-flow" is carried by the
+       separate `.rd-focus-lens` element which glides between active
+       words, not by stretching per-word color fades. */
     transition:
-        color .32s cubic-bezier(.25,.8,.25,1),
-        background-color .32s cubic-bezier(.25,.8,.25,1),
-        opacity .32s cubic-bezier(.25,.8,.25,1),
-        text-decoration-color .32s cubic-bezier(.25,.8,.25,1),
-        text-shadow .32s cubic-bezier(.25,.8,.25,1),
-        transform .32s cubic-bezier(.25,.8,.25,1),
-        filter .32s cubic-bezier(.25,.8,.25,1);
+        color .22s cubic-bezier(.25,.8,.25,1),
+        background-color .22s cubic-bezier(.25,.8,.25,1),
+        opacity .22s cubic-bezier(.25,.8,.25,1),
+        text-decoration-color .22s cubic-bezier(.25,.8,.25,1),
+        text-shadow .22s cubic-bezier(.25,.8,.25,1),
+        transform .28s cubic-bezier(.25,.8,.25,1),
+        filter .22s cubic-bezier(.25,.8,.25,1);
 }
 
 .rd-w[data-tps-volume],
@@ -605,49 +664,48 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    and text-shadow ONLY. They MUST NOT change font-size, line-height, margin,
    or any transform that could shift the word's baseline or visual height —
    the active focus word must never hop up or down when it becomes rd-now.
-   Heavy font-weight is scoped to `.rd-now` so preview words do NOT look
-   bolder than plain context; the volume cue blossoms only on the word
-   the operator is reading. */
+   Layout-affecting properties (font-weight, font-style, letter-spacing)
+   are applied on the BASE cue class (preview + active both) so a word's
+   width never changes when it becomes rd-now. Otherwise the neighbouring
+   words visibly slide as each cue word activates — the user's complaint:
+   "ці віперали лауди не мають змінювати позицію інших слів". Only
+   colour, glow, filter, opacity — properties that stay inside the word's
+   box — differ between preview and active. */
 .rd-w.tps-loud {
+    font-weight: var(--tps-cue-weight, 820);
     letter-spacing: .018em;
 }
-/* Loud — bold weight + warm kinetic halo land together only when the
-   word becomes the focus. The WAAPI envelope animates --tps-kin-loud
-   over the word's real duration. */
 .rd-w.rd-now.tps-loud {
-    font-weight: var(--tps-cue-weight, 880);
     text-shadow:
         0 1px 0 rgba(0,0,0,.24),
-        0 0 calc(14px + 22px * var(--tps-kin-loud, 0)) rgba(245,200,139, calc(.2 + .42 * var(--tps-kin-loud, 0))),
-        0 0 calc(8px + 10px * var(--tps-kin-loud, 0)) rgba(255,214,146, calc(.08 + .22 * var(--tps-kin-loud, 0)));
+        0 0 calc(18px + 38px * var(--tps-kin-loud, 0)) rgba(245,200,139, calc(.28 + .58 * var(--tps-kin-loud, 0))),
+        0 0 calc(10px + 18px * var(--tps-kin-loud, 0)) rgba(255,214,146, calc(.12 + .34 * var(--tps-kin-loud, 0)));
 }
 .rd-w.tps-soft {
-    /* Soft preview is just plain — the hush only manifests when the
-       word is the active focus. */
+    font-weight: var(--tps-cue-weight, 520);
     opacity: var(--tps-cue-opacity, 1);
 }
 .rd-w.rd-now.tps-soft {
-    font-weight: var(--tps-cue-weight, 520);
     opacity: calc(.78 + .22 * var(--tps-kin-soft, 0));
     text-shadow:
         0 0 calc(10px + 10px * var(--tps-kin-soft, 0)) rgba(199,221,245, calc(.1 + .16 * var(--tps-kin-soft, 0)));
 }
-/* Whisper preview: only the dotted underline hint. Italic + light weight
-   + mask only manifest when the word is the active focus, so preview
-   stays calm and doesn't compete with the current focus word. */
+/* Whisper carries its full layout signature (italic, light weight,
+   dotted underline, soft mask) in EVERY state so width stays stable.
+   rd-now adds the kinetic opacity shimmer only. */
 .rd-w.tps-whisper {
+    font-style: italic;
+    font-weight: var(--tps-cue-weight, 480);
     text-decoration-line: underline;
     text-decoration-style: dotted;
     text-decoration-color: rgba(207,203,215,.22);
     text-decoration-thickness: 1px;
     text-underline-offset: .32em;
+    -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.94) 0%, #000 20%, #000 80%, rgba(0,0,0,.94) 100%);
+            mask-image: linear-gradient(90deg, rgba(0,0,0,.94) 0%, #000 20%, #000 80%, rgba(0,0,0,.94) 100%);
 }
 .rd-w.rd-now.tps-whisper {
-    font-style: italic;
-    font-weight: var(--tps-cue-weight, 480);
     opacity: calc(.72 + .28 * var(--tps-kin-whisper, 0));
-    -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.92) 0%, #000 20%, #000 80%, rgba(0,0,0,.92) 100%);
-            mask-image: linear-gradient(90deg, rgba(0,0,0,.92) 0%, #000 20%, #000 80%, rgba(0,0,0,.92) 100%);
 }
 
 /* ── Editorial marks — each must be obviously distinct from the others ──
@@ -655,37 +713,37 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    strong (**bold**)   = heavy weight + bright warm white, drop shadow
    italic (*word*)     = real italic glyph + violet tint
    highlight           = yellow rectangle behind (see .tps-highlight)
-   No CSS skewX() — that blurs text and shifts baselines.
-   Heavy weight and full cue colour are scoped to `.rd-now` so editorial
-   marks hint their intent in preview via letter-spacing only and
-   blossom on the word the operator is actually reading. */
+   Layout properties (font-weight, font-style, letter-spacing) live on
+   the BASE cue class so width stays stable across preview/active —
+   changing weight between states would shift neighbouring words. Only
+   colour, glow, and text-shadow differ between preview and rd-now. */
 .rd-w.tps-emphasis {
+    font-weight: var(--tps-cue-weight, 720);
     letter-spacing: .01em;
     text-decoration-line: none;
 }
 .rd-w.rd-now.tps-emphasis {
-    font-weight: var(--tps-cue-weight, 720);
     color: rgba(255,228,162,.94);
     text-shadow: 0 0 14px rgba(255,210,128,.22), 0 0 22px rgba(232,170,80,.14);
 }
 .rd-w.tps-strong {
+    font-weight: var(--tps-cue-weight, 880);
     letter-spacing: .014em;
     text-decoration-line: none;
 }
 .rd-w.rd-now.tps-strong {
     color: rgba(255,240,196,.96);
-    font-weight: var(--tps-cue-weight, 900);
     text-shadow: 0 1px 0 rgba(0,0,0,.26), 0 0 18px rgba(255,230,184,.22);
 }
 .rd-w.tps-italic {
     font-style: italic;
     font-synthesis-style: auto;
+    font-weight: var(--tps-cue-weight, 600);
     letter-spacing: .012em;
     text-decoration-line: none;
 }
 .rd-w.rd-now.tps-italic {
     color: rgba(218,210,255,.92);
-    font-weight: var(--tps-cue-weight, 600);
     text-shadow: 0 0 12px rgba(198,210,255,.14);
 }
 .rd-w.tps-highlight {
@@ -800,9 +858,16 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     border-radius: 50%;
     pointer-events: none;
 }
+/* Staccato dot pulses bright at the start of the word via the
+   `--tps-kin-staccato` WAAPI envelope (brief front-loaded spike,
+   then settles). Readers perceive this as a crisp detached note. */
 .rd-w.rd-now.tps-staccato::before {
-    opacity: 1;
-    box-shadow: 0 0 12px rgba(242,193,225,.38);
+    opacity: calc(.7 + .3 * var(--tps-kin-staccato, 0));
+    box-shadow: 0 0 calc(10px + 12px * var(--tps-kin-staccato, 0)) rgba(242,193,225, calc(.2 + .32 * var(--tps-kin-staccato, 0)));
+}
+.rd-w.rd-now.tps-staccato {
+    text-shadow:
+        0 0 calc(10px + 10px * var(--tps-kin-staccato, 0)) rgba(236,181,216, calc(.12 + .22 * var(--tps-kin-staccato, 0)));
 }
 .rd-w.tps-energy {
     text-shadow:
@@ -1095,53 +1160,52 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w.rd-now {
     color: rgba(248,236,210,.96);
     will-change: transform, filter;
-    /* ── Kinetic transform (cue-only) ──
-       A teleprompter MUST read smooth (legato) by default. Scale is
-       therefore NOT driven by the generic `--tps-kin-now` envelope —
-       every plain word would pulse and the whole line would read as
-       staccato. Only explicit cue vars contribute, so kinetic motion
-       appears exactly on the words that carry a loud/soft/whisper/
-       urgent/stress/energetic/building cue, and calm/aside/legato/
-       plain words glide through the focal line without bouncing. The
-       base `.rd-w` rule anchors `transform-origin: center bottom` so
-       scaling grows upward and the baseline stays stable (AGENTS rule
-       "active focus word baseline must remain vertically stable"). */
-    transform: scale(calc(
-        1
-        + .055 * var(--tps-kin-loud, 0)
-        + .08  * var(--tps-kin-stress, 0)
-        + .045 * var(--tps-kin-urgent, 0)
-        + .04  * var(--tps-kin-energetic, 0)
-        + .025 * var(--tps-kin-building, 0)
-        - .032 * var(--tps-kin-soft, 0)
-        - .05  * var(--tps-kin-whisper, 0)
-    ));
-    /* Shadow blends two layers: the per-word envelope (--tps-kin-now,
-       driven by WAAPI over the word's real duration) and the slow
-       cluster-wide --rd-breath which sweeps every active word in sync
-       with the paragraph's ambient breathing. The sum feels like a wave
-       rolling through the line instead of discrete per-word blinks. */
+    /* ── Kinetic transform (horizontal-only) ──
+       A teleprompter MUST keep the line height and baseline perfectly
+       stable so the operator's eye can read calmly. Scale is therefore
+       NOT used here — scaling a word visibly resizes the glyph and
+       feels as if the line is growing, which breaks reading flow. The
+       only transform allowed is a signed translateX driven by cue-
+       specific `--tps-kin-*-x` envelopes (urgent, stress, energetic).
+       Think of Apple's "wrong-password" shake: the word flicks side to
+       side without ever changing size or pushing adjacent words off
+       the baseline. Cues that do NOT carry a shake variable (loud,
+       soft, whisper, calm, legato, aside, building) stay perfectly
+       still — their identity comes from weight, colour, blur, opacity,
+       and glow on `.rd-now`. */
+    transform: translate3d(calc(
+          8px   * var(--tps-kin-urgent-x, 0)
+        + 5px   * var(--tps-kin-stress-x, 0)
+        + 4px   * var(--tps-kin-energetic-x, 0)
+        + 2.5px * var(--tps-kin-whisper-x, 0)
+    ), 0, 0);
+    /* Shadow is driven entirely by per-word kinetic envelopes (WAAPI on
+       `--tps-kin-now` + cue-specific vars). No ambient cluster-wide
+       breathing oscillator — a 2.4s background pulse would add a
+       metronomic feel on top of the reader's word rhythm and break
+       the "pure legato flow" the user asked for. The lens + word
+       color crossfade are the only timing signals; per-word envelopes
+       shape the active word, nothing pulses in the background. */
     text-shadow:
-        0 0 calc(14px + 26px * var(--tps-kin-now, 0) + 6px * var(--rd-breath, 0)) rgba(248,236,210, calc(.18 + .34 * var(--tps-kin-now, 0) + .08 * var(--rd-breath, 0))),
-        0 0 calc(28px + 34px * var(--tps-kin-now, 0) + 8px * var(--rd-breath, 0)) rgba(232,130,92, calc(.06 + .22 * var(--tps-kin-now, 0) + .06 * var(--rd-breath, 0)));
+        0 0 calc(14px + 26px * var(--tps-kin-now, 0)) rgba(248,236,210, calc(.18 + .34 * var(--tps-kin-now, 0))),
+        0 0 calc(28px + 34px * var(--tps-kin-now, 0)) rgba(232,130,92, calc(.06 + .22 * var(--tps-kin-now, 0)));
     /* Composite filter — cue vars mix into one filter chain so whisper
        gets a real mist (blur), loud/urgent/energetic brighten, and
        whisper/soft dim without overriding each other. */
     filter:
-        brightness(calc(1 + .22 * var(--tps-kin-now, 0)
-                          + .06 * var(--rd-breath, 0)
-                          + .22 * var(--tps-kin-loud, 0)
-                          + .2  * var(--tps-kin-urgent, 0)
-                          + .12 * var(--tps-kin-energetic, 0)
-                          - .12 * var(--tps-kin-whisper, 0)
-                          - .04 * var(--tps-kin-soft, 0)))
-        saturate(calc(1 + .08 * var(--tps-kin-now, 0)
-                        + .22 * var(--tps-kin-loud, 0)
-                        + .34 * var(--tps-kin-urgent, 0)
-                        + .24 * var(--tps-kin-energetic, 0)
-                        - .2  * var(--tps-kin-whisper, 0)))
-        blur(calc(.9px * var(--tps-kin-whisper, 0)))
-        drop-shadow(0 0 calc(2px + 10px * var(--tps-kin-now, 0) + 4px * var(--rd-breath, 0)) rgba(248,236,210, calc(.0 + .24 * var(--tps-kin-now, 0) + .06 * var(--rd-breath, 0))));
+        brightness(calc(1 + .18 * var(--tps-kin-now, 0)
+                          + .32 * var(--tps-kin-loud, 0)
+                          + .28 * var(--tps-kin-urgent, 0)
+                          + .18 * var(--tps-kin-energetic, 0)
+                          - .18 * var(--tps-kin-whisper, 0)
+                          - .08 * var(--tps-kin-soft, 0)))
+        saturate(calc(1 + .06 * var(--tps-kin-now, 0)
+                        + .38 * var(--tps-kin-loud, 0)
+                        + .48 * var(--tps-kin-urgent, 0)
+                        + .34 * var(--tps-kin-energetic, 0)
+                        - .28 * var(--tps-kin-whisper, 0)))
+        blur(calc(1.2px * var(--tps-kin-whisper, 0)))
+        drop-shadow(0 0 8px rgba(248,236,210, calc(.18 + .14 * var(--tps-kin-loud, 0))));
     /* Do NOT strip text-decoration-line here — that erased the wavy
        underline of melody/rhetorical and the dotted underline of whisper
        when the word became active. Each cue opts in to "no decoration"
@@ -1151,31 +1215,26 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 /* Kinetic @property registrations — declaring these lets the browser
    interpolate them as numbers (smoothly tweening filter and shadow math)
    instead of bumping in discrete jumps. */
-@property --tps-kin-now       { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-loud      { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-soft      { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-whisper   { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-urgent    { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-stress    { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-calm      { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-energetic { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-building  { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-now         { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-loud        { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-soft        { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-whisper     { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-whisper-x   { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-urgent      { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-urgent-x    { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-stress      { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-stress-x    { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-staccato    { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-calm        { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-energetic   { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-energetic-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --tps-kin-building    { syntax: "<number>"; inherits: false; initial-value: 0; }
 
-@property --rd-breath {
-    syntax: "<number>";
-    inherits: true;
-    initial-value: 0;
-}
-
-@keyframes rd-cluster-breath {
-    0%, 100% { --rd-breath: 0; }
-    50%      { --rd-breath: 1; }
-}
-
-.rd-cluster-active,
-.rd-cluster-text {
-    animation: rd-cluster-breath 2.4s ease-in-out infinite;
-}
+/* Ambient `rd-cluster-breath` animation removed: a 2.4s infinite
+   background pulse added a metronomic feel to every active word and
+   fought the "pure legato flow" the reader must deliver by default.
+   Per-word WAAPI envelopes already carry the active word's "alive"
+   character — no cluster-wide oscillator needed. */
 
 /* Active word with TPS color — keep contrast but avoid neon glow */
 .rd-w.rd-now.tps-warm { color: #FFB863; text-shadow: 0 0 18px rgba(255,184,99,.24); }
@@ -1193,13 +1252,24 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w.rd-now.tps-loud { color: #F5C895; text-shadow: 0 1px 0 rgba(0,0,0,.24), 0 0 18px rgba(242,193,139,.2); }
 .rd-w.rd-now.tps-soft { color: #D1E3F7; text-shadow: 0 0 14px rgba(199,221,245,.12); }
 .rd-w.rd-now.tps-whisper { color: #DDD9E4; text-decoration-style: dotted; text-decoration-color: rgba(207,203,215,.32); text-shadow: 0 0 12px rgba(207,203,215,.1); }
-.rd-w.rd-now.tps-emphasis { color: #F1DFC2; text-decoration-line: none; text-shadow: 0 0 14px rgba(232,213,176,.16); }
-.rd-w.rd-now.tps-strong { color: #FFE6B8; text-decoration-line: none; text-shadow: 0 0 14px rgba(255,230,184,.18); }
-.rd-w.rd-now.tps-italic { color: #E6DCFF; text-decoration-line: none; text-shadow: 0 0 14px rgba(198,210,255,.16); }
+/* rd-now rules for emphasis/strong/italic live in the earlier block
+   at ~line 725 — they carry the richer two-layer warm/cream/violet
+   shadow design. Duplicates here were overriding with flatter
+   single-shadow colours and have been removed. */
 .rd-w.rd-now.tps-aside { color: #B7C7CD; text-shadow: 0 0 14px rgba(183,199,205,.1); }
 .rd-w.rd-now.tps-rhetorical { color: #BDEBFF; text-shadow: 0 0 14px rgba(116,206,255,.16); }
 .rd-w.rd-now.tps-sarcasm { color: #FF8AA3; text-shadow: 0 0 14px rgba(255,138,163,.14); }
-.rd-w.rd-now.tps-building { color: #F3DA9A; text-decoration-line: none; text-shadow: 0 0 calc(14px + (14px * var(--tps-build-progress, 0))) rgba(240,212,141, calc(.14 + (.16 * var(--tps-build-progress, 0)))); }
+/* Building crescendo — static `--tps-build-progress` grows across the
+   building run (per-word from C# ResolveReaderCueProgress); dynamic
+   `--tps-kin-building` ramps 0→1 through this word's own wall-clock
+   time via the WAAPI envelope. Combining them reads as "intensity
+   rising through the phrase AND inside each note". */
+.rd-w.rd-now.tps-building {
+    color: #F3DA9A;
+    text-decoration-line: none;
+    text-shadow: 0 0 calc(14px + 14px * var(--tps-build-progress, 0) + 8px * var(--tps-kin-building, 0))
+                 rgba(240,212,141, calc(.14 + .16 * var(--tps-build-progress, 0) + .1 * var(--tps-kin-building, 0)));
+}
 .rd-w.rd-now.tps-legato { color: #A4E4F1; text-decoration-line: none; text-shadow: 0 0 14px rgba(141,213,226,.12); }
 .rd-w.rd-now.tps-staccato { color: #F2C1E1; text-shadow: 0 0 14px rgba(236,181,216,.12); }
 .rd-w.rd-now.tps-energy { color: #D8FF72; text-shadow: 0 0 calc(12px + (18px * var(--tps-energy, 0))) rgba(216,255,114, calc(.14 + (.22 * var(--tps-energy, 0)))); }
@@ -1218,6 +1288,25 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     color: #FFE080;
     text-decoration-line: none;
     text-shadow: 0 0 16px rgba(255,208,96,.16);
+}
+
+/* ── Calm / aside / legato — gentle breath via --tps-kin-calm ──
+   These cues share the calmFloatKeyframes envelope in JS, which ramps
+   `--tps-kin-calm` 0 → 1 → 0 across the word's real duration. Hooking
+   that variable into a subtle text-shadow swell makes the active word
+   feel "alive" without adding any horizontal/scale motion — matches
+   the "legato = smooth stillness, but not dead" principle. */
+.rd-w.rd-now.tps-calm {
+    text-shadow:
+        0 0 calc(14px + 10px * var(--tps-kin-calm, 0)) rgba(118,228,197, calc(.18 + .16 * var(--tps-kin-calm, 0)));
+}
+.rd-w.rd-now.tps-legato {
+    text-shadow:
+        0 0 calc(14px + 10px * var(--tps-kin-calm, 0)) rgba(141,213,226, calc(.16 + .18 * var(--tps-kin-calm, 0)));
+}
+.rd-w.rd-now.tps-aside {
+    text-shadow:
+        0 0 calc(12px + 8px * var(--tps-kin-calm, 0)) rgba(183,199,205, calc(.12 + .14 * var(--tps-kin-calm, 0)));
 }
 
 /* ── Per-emotion motion ──

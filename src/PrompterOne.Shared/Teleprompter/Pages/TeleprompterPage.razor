@@ -104,6 +104,9 @@
                                    id="@UiDomIds.Teleprompter.CardText(entry.index)"
                                    style="@BuildReaderCardTextStyle(entry.index)"
                                    data-test="@UiTestIds.Teleprompter.CardText(entry.index)">
+                                    <span class="rd-focus-lens"
+                                          id="@UiDomIds.Teleprompter.FocusLens(entry.index)"
+                                          aria-hidden="true"></span>
                                     @for (var chunkIndex = 0; chunkIndex < entry.card.Chunks.Count; chunkIndex++)
                                     {
                                         var chunk = entry.card.Chunks[chunkIndex];
@@ -133,6 +136,7 @@
                                         else if (chunk is ReaderPauseViewModel pause)
                                         {
                                             <span class="@BuildReaderPauseCssClass(entry.index, chunkIndex, pause)"
+                                                  id="@UiDomIds.Teleprompter.CardChunk(entry.index, chunkIndex)"
                                                   @attributes="BuildReaderPauseDataAttributes(pause)"></span>
                                         }
                                         else if (chunk is ReaderEditPointViewModel editPoint)

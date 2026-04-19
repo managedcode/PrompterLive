@@ -101,6 +101,11 @@ public static class UiDomIds
 
         public static string CardText(int index) => $"rd-card-text-{index}";
 
+        public static string FocusLens(int cardIndex) => $"rd-focus-lens-{cardIndex}";
+
+        public static string CardChunk(int cardIndex, int chunkIndex) =>
+            $"rd-card-chunk-{cardIndex}-{chunkIndex}";
+
         public static string CardWord(int cardIndex, int groupIndex, int wordIndex) =>
             $"rd-card-word-{cardIndex}-{groupIndex}-{wordIndex}";
 
