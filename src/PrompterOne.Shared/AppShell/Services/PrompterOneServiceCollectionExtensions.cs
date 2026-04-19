@@ -108,6 +108,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<LearnRsvpLayoutInterop>();
         services.AddScoped<MicrophoneLevelInterop>();
         services.AddScoped<TeleprompterReaderInterop>();
+        services.AddScoped<KineticReaderInterop>();
         services.AddScoped<AppBootstrapper>();
         services.AddScoped<AiSpotlightHotkeyInterop>();
         services.AddScoped<AiSpotlightService>();

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 
@@ -301,8 +302,21 @@ public partial class TeleprompterPage
 
         if (!keepPlaybackState)
         {
+            _activeReaderPauseChunkIndex = null;
             SetReaderPlaybackState(false);
+            _ = ClearKineticEnvelopesAsync();
         }
+    }
+
+    private async Task ClearKineticEnvelopesAsync()
+    {
+        try
+        {
+            await KineticInterop.ClearAsync();
+        }
+        catch (JSException) { }
+        catch (InvalidOperationException) { }
+        catch (TaskCanceledException) { }
     }
 
     private void SetReaderPlaybackState(bool isPlaying)
@@ -350,6 +364,25 @@ public partial class TeleprompterPage
             return MinimumReaderLoopDelayMilliseconds;
         }
 
+        //  Pause beat: the word we just finished is the last word of its
+        //  group and is followed by a pause chunk. The pause takes over as
+        //  the active beat (its own "word") so the operator sees the pill
+        //  or dots light up while the previous word dims to read-state.
+        if (_activeReaderPauseChunkIndex is null &&
+            _activeReaderWordIndex >= 0 &&
+            FindTrailingPauseChunk(_activeReaderCardIndex, _activeReaderWordIndex) is { } pauseBeat)
+        {
+            _activeReaderPauseChunkIndex = pauseBeat.ChunkIndex;
+            await ClearKineticEnvelopesAsync();
+            UpdateReaderDisplayState(requestAlignment: false);
+            await InvokeAsync(StateHasChanged);
+            return Math.Max(MinimumReaderLoopDelayMilliseconds, BuildScaledReaderDelayMilliseconds(pauseBeat.DurationMs));
+        }
+
+        //  Pause beat finished — clear the marker so the next word can take
+        //  the active slot cleanly.
+        _activeReaderPauseChunkIndex = null;
+
         if (_activeReaderWordIndex < cardWordCount - 1)
         {
             await ActivateReaderWordAsync(_activeReaderWordIndex + 1, alignBeforeActivation: true);
@@ -358,6 +391,53 @@ public partial class TeleprompterPage
 
         await AdvanceToCardAsync(GetNextPlaybackCardIndex(), cancellationToken);
         return GetCurrentWordDelayMilliseconds();
+    }
+
+    //  Locate a trailing pause that should play as its own beat after the
+    //  given word ordinal. Returns the pause's chunk index and duration if
+    //  the word is the last child of its group AND the next chunk is a
+    //  pause with a real duration. Breath markers (duration 0) are treated
+    //  as visual-only and do not stop playback.
+    private (int ChunkIndex, int DurationMs)? FindTrailingPauseChunk(int cardIndex, int wordOrdinal)
+    {
+        if (cardIndex < 0 || cardIndex >= _cards.Count || wordOrdinal < 0)
+        {
+            return null;
+        }
+
+        var card = _cards[cardIndex];
+        var remaining = wordOrdinal;
+        for (var chunkIndex = 0; chunkIndex < card.Chunks.Count; chunkIndex++)
+        {
+            if (card.Chunks[chunkIndex] is not ReaderGroupViewModel group)
+            {
+                continue;
+            }
+
+            if (remaining >= group.Words.Count)
+            {
+                remaining -= group.Words.Count;
+                continue;
+            }
+
+            var isLastWordOfGroup = remaining == group.Words.Count - 1;
+            if (!isLastWordOfGroup)
+            {
+                return null;
+            }
+
+            var nextChunkIndex = chunkIndex + 1;
+            if (nextChunkIndex < card.Chunks.Count &&
+                card.Chunks[nextChunkIndex] is ReaderPauseViewModel pause &&
+                pause.DurationMs > 0)
+            {
+                return (nextChunkIndex, pause.DurationMs);
+            }
+
+            return null;
+        }
+
+        return null;
     }
 
     private async Task AdvanceToCardAsync(int nextCardIndex, CancellationToken cancellationToken)
@@ -370,6 +450,7 @@ public partial class TeleprompterPage
         _readerTransitionSourceCardIndex = previousCardIndex;
         _activeReaderCardIndex = nextCardIndex;
         _activeReaderWordIndex = -1;
+        _activeReaderPauseChunkIndex = null;
         _preparedReaderCardIndex = null;
         UpdateReaderDisplayState(requestAlignment: false);
         await InvokeAsync(StateHasChanged);
@@ -414,7 +495,10 @@ public partial class TeleprompterPage
             {
                 if (remainingIndex == 0)
                 {
-                    return BuildScaledReaderDelayMilliseconds(word.DurationMs + word.PauseAfterMs);
+                    //  PauseAfterMs is NOT added here — trailing pauses run
+                    //  as their own beat (see FindTrailingPauseChunk). The
+                    //  word's active state owns only its spoken time.
+                    return BuildScaledReaderDelayMilliseconds(word.DurationMs);
                 }
 
                 remainingIndex--;
@@ -431,10 +515,102 @@ public partial class TeleprompterPage
             await AlignReaderWordBeforeActivationAsync(_activeReaderCardIndex, wordIndex);
         }
 
+        //  Any pending pause beat ends the moment a word takes the stage.
+        _activeReaderPauseChunkIndex = null;
         _activeReaderWordIndex = wordIndex;
         UpdateReaderDisplayState(requestAlignment: false);
         await InvokeAsync(StateHasChanged);
+        await FireKineticWordEnvelopeAsync(wordIndex);
     }
+
+    //  Dispatch the kinetic envelope for the freshly-activated word. The
+    //  duration is the same scaled wall-clock budget the reader loop will
+    //  wait before advancing, so WAAPI finishes exactly on the handoff.
+    //  Cue tags come from the word's composed CSS class so there is one
+    //  authoritative source for cue metadata and no stringly-typed map.
+    private async Task FireKineticWordEnvelopeAsync(int wordIndex)
+    {
+        var word = ResolveReaderWordAt(_activeReaderCardIndex, wordIndex);
+        if (word is null)
+        {
+            return;
+        }
+
+        var wordDuration = word.DurationMs > 0 ? word.DurationMs : MinimumReaderLoopDelayMilliseconds;
+        var scaledDurationMs = BuildScaledReaderDelayMilliseconds(wordDuration);
+        var cueTags = ExtractKineticCueTags(word.CssClass);
+
+        try
+        {
+            await KineticInterop.ActivateWordAsync(scaledDurationMs, cueTags, 1d);
+        }
+        catch (JSException)
+        {
+            //  JS module not loaded yet (prerender or before index.html
+            //  script tag settles). Safe to swallow — next word will
+            //  pick up once the bridge is ready.
+        }
+        catch (InvalidOperationException)
+        {
+            //  JSRuntime is unavailable during Blazor prerender.
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    private ReaderWordViewModel? ResolveReaderWordAt(int cardIndex, int wordIndex)
+    {
+        if (cardIndex < 0 || cardIndex >= _cards.Count || wordIndex < 0)
+        {
+            return null;
+        }
+
+        var remaining = wordIndex;
+        foreach (var chunk in _cards[cardIndex].Chunks)
+        {
+            if (chunk is not ReaderGroupViewModel group)
+            {
+                continue;
+            }
+
+            foreach (var word in group.Words)
+            {
+                if (remaining == 0)
+                {
+                    return word;
+                }
+                remaining--;
+            }
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<string> ExtractKineticCueTags(string cssClass)
+    {
+        if (string.IsNullOrWhiteSpace(cssClass))
+        {
+            return Array.Empty<string>();
+        }
+
+        var tokens = cssClass.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var tags = new List<string>(tokens.Length);
+        foreach (var token in tokens)
+        {
+            if (token.StartsWith(KineticCueClassPrefix, StringComparison.Ordinal))
+            {
+                var tag = token[KineticCueClassPrefix.Length..];
+                if (tag.Length > 0)
+                {
+                    tags.Add(tag);
+                }
+            }
+        }
+        return tags;
+    }
+
+    private const string KineticCueClassPrefix = "tps-";
 
     private int GetNextPlaybackCardIndex() =>
         _cards.Count == 0

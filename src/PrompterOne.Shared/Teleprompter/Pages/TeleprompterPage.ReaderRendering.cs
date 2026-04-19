@@ -45,6 +45,7 @@ public partial class TeleprompterPage
     private const string ReaderVerticalGuideCssClass = "rd-guide-v";
     private const string ReaderVerticalGuideLeftCssClass = "rd-guide-v-l";
     private const string ReaderVerticalGuideRightCssClass = "rd-guide-v-r";
+    private const string ReaderPauseActiveCssClass = "rd-pause-active";
     private const string ReaderWordActiveCssClass = "rd-now";
     private const string ReaderWordCssClass = "rd-w";
     private const string ReaderWordReadCssClass = "rd-read";
@@ -443,10 +444,22 @@ public partial class TeleprompterPage
             return ReaderWordReadCssClass;
         }
 
-        return wordOrdinal == _activeReaderWordIndex
-            ? ReaderWordActiveCssClass
-            : null;
+        if (wordOrdinal == _activeReaderWordIndex)
+        {
+            // During a pause beat the pause itself is the active element —
+            // the word that just finished must look "spoken", not "current".
+            return _activeReaderPauseChunkIndex is not null
+                ? ReaderWordReadCssClass
+                : ReaderWordActiveCssClass;
+        }
+
+        return null;
     }
+
+    private string BuildReaderPauseCssClass(int cardIndex, int chunkIndex, ReaderPauseViewModel pause) =>
+        cardIndex == _activeReaderCardIndex && _activeReaderPauseChunkIndex == chunkIndex
+            ? BuildClassList(pause.CssClass, ReaderPauseActiveCssClass)
+            : pause.CssClass;
 
     private string BuildEdgeSegmentStyle(ReaderCardViewModel card, int index)
     {

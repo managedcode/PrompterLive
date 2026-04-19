@@ -14,6 +14,7 @@ public partial class TeleprompterPage
     private const int MediumPauseThresholdMilliseconds = 600;
     private const int MinimumReaderWordDurationMilliseconds = 120;
     private const int MinimumPauseDurationMilliseconds = 250;
+    private const int BreathBeatDurationMilliseconds = 320;
     private const string NeutralEmotionKey = "neutral";
     private const string ReaderPauseCssClass = "rd-pause";
     private const string ReaderPauseBreathCssClass = "rd-pause rd-pause-breath";
@@ -191,7 +192,12 @@ public partial class TeleprompterPage
                 currentGroupIsHighlight = null;
                 currentGroupIsBuilding = null;
                 currentGroupIsLegato = null;
-                chunks.Add(new ReaderPauseViewModel(0, ReaderPauseBreathCssClass, TpsVisualCueContracts.PauseKindBreath));
+                //  Breath is a real inhale beat — give it a visible wall-
+                //  clock window so the playback loop lights the breath mark
+                //  as its own "word" and the operator sees when to breathe,
+                //  matching the pause-beat contract (see
+                //  AdvanceReaderPlaybackAsync + FindTrailingPauseChunk).
+                chunks.Add(new ReaderPauseViewModel(BreathBeatDurationMilliseconds, ReaderPauseBreathCssClass, TpsVisualCueContracts.PauseKindBreath));
                 continue;
             }
 

@@ -132,7 +132,7 @@
                                         }
                                         else if (chunk is ReaderPauseViewModel pause)
                                         {
-                                            <span class="@pause.CssClass"
+                                            <span class="@BuildReaderPauseCssClass(entry.index, chunkIndex, pause)"
                                                   @attributes="BuildReaderPauseDataAttributes(pause)"></span>
                                         }
                                         else if (chunk is ReaderEditPointViewModel editPoint)

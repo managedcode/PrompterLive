@@ -72,7 +72,7 @@ public partial class TeleprompterPage
         AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: true, rerender: false, instantTransition: false);
 
     private Task AlignReaderWordBeforeActivationAsync(int cardIndex, int wordOrdinal) =>
-        AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: false, rerender: false, instantTransition: true);
+        AlignReaderCardTextAsync(cardIndex, wordOrdinal, neutralizeCard: false, rerender: false, instantTransition: false);
 
     private async Task RestorePendingReaderTextTransitionsAsync()
     {

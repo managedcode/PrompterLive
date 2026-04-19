@@ -48,6 +48,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;
     [Inject] private TeleprompterReaderInterop ReaderInterop { get; set; } = null!;
+    [Inject] private KineticReaderInterop KineticInterop { get; set; } = null!;
     [Inject] private IUserSettingsStore UserSettingsStore { get; set; } = null!;
 
     [Parameter]
@@ -73,6 +74,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private bool _loadState = true;
     private int _activeReaderCardIndex;
     private int _activeReaderWordIndex;
+    private int? _activeReaderPauseChunkIndex;
     private int _readerFontSize = DefaultReaderFontSize;
     private int _readerFocalPointPercent = DefaultReaderFocalPointPercent;
     private int _readerBaseTpsWpm = ReaderDefaultPlaybackSpeedWpm;
@@ -183,6 +185,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
         _activeReaderCardIndex = 0;
         _activeReaderWordIndex = -1;
+        _activeReaderPauseChunkIndex = null;
         SetReaderPlaybackState(false);
         _isReaderCountdownActive = false;
         _isReaderFullscreenActive = false;
