@@ -37,8 +37,4 @@ public sealed class KineticReaderInterop(IJSRuntime jsRuntime)
             cueTags,
             targetDurationMs);
 
-    public ValueTask SetPlaybackRateAsync(double playbackRate) =>
-        _jsRuntime.InvokeVoidAsync(
-            KineticReaderInteropMethodNames.SetPlaybackRate,
-            playbackRate);
 }

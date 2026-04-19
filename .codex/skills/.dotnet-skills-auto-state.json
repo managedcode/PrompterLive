@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectRoot": "/Users/ksemenenko/Developer/PrompterOne",
+  "Skills": [
+    "dotnet-aspnet-core",
+    "dotnet-blazor",
+    "dotnet-managedcode-markitdown",
+    "dotnet-managedcode-mimetypes",
+    "dotnet-managedcode-storage",
+    "dotnet-microsoft-agent-framework",
+    "dotnet-microsoft-extensions",
+    "dotnet-tunit",
+    "minimal-api-file-upload"
+  ],
+  "UpdatedAt": "2026-04-19T19:43:04.02392+00:00"
+}

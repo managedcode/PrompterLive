@@ -9,5 +9,4 @@ internal static class KineticReaderInteropMethodNames
     public const string CommitFrame = NamespacePrefix + ".commitFrame";
     public const string HideLens = NamespacePrefix + ".hideLens";
     public const string PositionLens = NamespacePrefix + ".positionLens";
-    public const string SetPlaybackRate = NamespacePrefix + ".setPlaybackRate";
 }

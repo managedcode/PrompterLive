@@ -491,6 +491,56 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     100% { opacity: 0.78; }
 }
 
+/* ── Reading flashlight sweep ──
+   A soft warm circle that sweeps left → right inside the active word.
+   Implemented as a pseudo-element positioned ABSOLUTELY over the
+   word, sized 2 em × 2 em with a soft radial gradient inside it.
+   The pseudo is centred horizontally on its `left` percentage via
+   `transform: translateX(-50%)`, and the `left` property is animated
+   from 0 % to 100 % of the parent word's width. Because the pseudo
+   floats above the word and can extend beyond its bounding box (no
+   overflow clipping), there is no hard edge — the gradient ring
+   fades smoothly no matter how close the centre is to a word edge.
+   Cue classes that already use `::before` for their own glyph
+   (staccato dot, sarcasm quotes, aside parens, stress accent,
+   highlight yellow rect, building hairpin, legato arc) are
+   excluded from this rule so the beam never overrides cue chrome;
+   those cues communicate through their own visual character. */
+/* Beam is scoped to `.rd-stage.rd-reading-active` so it only fires
+   DURING actual playback — at the start of a segment (new card just
+   appeared, or playback stopped) there is no beam, only the word's
+   own colour + text-shadow. The `.rd-reading-active` class is added
+   to `.rd-stage` only while `_isReaderPlaying` is true in C#. */
+.rd-stage.rd-reading-active .rd-w.rd-now:not(.tps-staccato):not(.tps-sarcasm):not(.tps-aside):not(.tps-stress):not(.tps-highlight):not(.tps-building):not(.tps-legato):not(.tps-pronunciation):not(.tps-phonetic)::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    /* Bigger soft beam — 3 em wide/tall so the falloff ring extends
+       well past the word edges. Alpha is deliberately TINY so the
+       beam reads as a subliminal reading cue rather than a glowing
+       spot — the operator senses motion across the letters without
+       the beam itself competing with the word's colour. */
+    width: 3em;
+    height: 3em;
+    margin-top: -1.5em;
+    transform: translateX(-50%);
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 230, 150, 0.1) 0%,
+        rgba(255, 230, 150, 0.05) 28%,
+        rgba(255, 230, 150, 0.02) 55%,
+        transparent 85%
+    );
+    animation: rd-flashlight-sweep 660ms linear forwards;
+    pointer-events: none;
+    z-index: -1;
+}
+@keyframes rd-flashlight-sweep {
+    0%   { left: 0%; }
+    100% { left: 100%; }
+}
+
 /* ── Speed cues ──
    Speed is communicated through letter-spacing only. No font-stretch,
    no font-variation-settings, no padding — every one of those shifts the
@@ -629,6 +679,10 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w {
     display: inline-block;
     position: relative;
+    /* Scale growth anchors at the text baseline (line-box bottom) so
+       a bigger/smaller word grows upward or shrinks upward — the
+       baseline stays pinned and neighbouring words never shift. */
+    transform-origin: center bottom;
     /* Short, crisp transitions so words do NOT leave bright trails
        behind the focus. The sense of "slide-flow" is carried by the
        separate `.rd-focus-lens` element which glides between active
@@ -844,11 +898,17 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     content: "";
     position: absolute;
     left: 50%;
-    top: -0.58em;
-    width: 0.22em;
-    height: 0.22em;
-    min-width: 7px;
-    min-height: 7px;
+    /* Staccato dot sits just above the cap-height of the word, NOT
+       above the whole line-box. The previous `-0.58em` offset put the
+       dot more than a line-gap away from the glyph — it read as a
+       disconnected floating pixel rather than a musical staccato mark
+       attached to the note. `0.18em` above the word's own box keeps
+       the dot visually tied to the letter tops. */
+    top: -0.18em;
+    width: 0.2em;
+    height: 0.2em;
+    min-width: 6px;
+    min-height: 6px;
     transform: translateX(-50%);
     /* currentColor so the dot follows the word's state (idle dim, active
        bright, read muted, previous/next-card dim) instead of staying a
@@ -878,63 +938,46 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     text-decoration-color: rgba(145,210,255, calc(.22 + (.34 * var(--tps-melody, 0))));
     text-decoration-thickness: calc(1px + (1.5px * var(--tps-melody, 0)));
 }
+/* Pronunciation / phonetic — the IPA or simplified guide IS the
+   primary rehearsal text (AGENTS rule: "when a guide exists, it must
+   be large enough to read as primary rehearsal text"). So the guide
+   reads as clean colored glyphs — NO bordered box, NO input-field
+   look. The original spelling appears as a compact caption label
+   above so the operator keeps the connection between guide and word
+   without the heavy "form input" chrome. */
 .rd-w.tps-pronunciation,
 .rd-w.tps-phonetic {
-    -webkit-text-fill-color: rgba(239,232,255,.98);
-    background: linear-gradient(180deg, rgba(47,39,78,.66), rgba(24,20,42,.42));
-    border: 1px solid rgba(194,169,255,.34);
-    border-radius: 6px;
-    box-shadow: 0 0 22px rgba(194,169,255,.12);
     color: rgba(239,232,255,.98);
-    font-weight: var(--tps-cue-weight, 840);
-    letter-spacing: .035em;
-    line-height: 1.12;
-    padding: .02em .2em .06em;
+    font-weight: var(--tps-cue-weight, 820);
+    letter-spacing: .025em;
     text-decoration-line: none;
-    text-shadow: 0 1px 10px rgba(194,169,255,.2);
+    text-shadow: 0 0 16px rgba(194,169,255,.22);
 }
 .rd-w.tps-phonetic {
-    -webkit-text-fill-color: rgba(226,247,255,.98);
-    background: linear-gradient(180deg, rgba(28,48,72,.68), rgba(16,27,44,.48));
-    border-color: rgba(127,219,255,.36);
-    box-shadow: 0 0 22px rgba(127,219,255,.12);
     color: rgba(226,247,255,.98);
-    text-shadow: 0 1px 10px rgba(127,219,255,.2);
+    text-shadow: 0 0 16px rgba(127,219,255,.22);
 }
 .rd-w.tps-pronunciation::after,
 .rd-w.tps-phonetic::after {
-    -webkit-text-fill-color: rgba(234,224,255,.86);
-    background: linear-gradient(180deg, rgba(31,25,52,.72), rgba(18,15,31,.5));
-    border: 1px solid rgba(194,169,255,.24);
-    border-radius: 6px;
-    bottom: calc(100% + .08em);
-    box-shadow: 0 8px 20px rgba(0,0,0,.18), 0 0 16px rgba(194,169,255,.1);
-    color: rgba(234,224,255,.86);
     content: attr(data-original-text);
-    font-size: clamp(12px, .28em, 18px);
-    font-style: normal;
-    font-weight: 760;
-    left: 50%;
-    letter-spacing: .02em;
-    line-height: 1.12;
-    min-width: 2em;
-    padding: .08em .32em .1em;
-    pointer-events: none;
     position: absolute;
-    text-align: center;
-    text-transform: none;
-    text-shadow: 0 1px 10px rgba(194,169,255,.18);
-    top: auto;
+    bottom: calc(100% + .05em);
+    left: 50%;
     transform: translateX(-50%);
+    color: rgba(234,224,255,.55);
+    font-size: .34em;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: .08em;
+    line-height: 1;
+    text-transform: lowercase;
+    text-shadow: none;
     white-space: nowrap;
+    pointer-events: none;
     z-index: 2;
 }
 .rd-w.tps-phonetic::after {
-    -webkit-text-fill-color: rgba(226,247,255,.86);
-    background: linear-gradient(180deg, rgba(23,41,62,.74), rgba(14,25,42,.54));
-    border-color: rgba(127,219,255,.28);
-    box-shadow: 0 8px 20px rgba(0,0,0,.18), 0 0 16px rgba(127,219,255,.1);
-    color: rgba(226,247,255,.86);
+    color: rgba(226,247,255,.55);
 }
 /* Stress — music-style single tick above the word plus faint underline;
    no double-bar bracket (which read as "weird chrome" in earlier iterations). */
@@ -1159,76 +1202,123 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    text-shadow; WAAPI owns the timing. */
 .rd-w.rd-now {
     color: rgba(248,236,210,.96);
-    will-change: transform, filter;
-    /* ── Kinetic transform (horizontal-only) ──
-       A teleprompter MUST keep the line height and baseline perfectly
-       stable so the operator's eye can read calmly. Scale is therefore
-       NOT used here — scaling a word visibly resizes the glyph and
-       feels as if the line is growing, which breaks reading flow. The
-       only transform allowed is a signed translateX driven by cue-
-       specific `--tps-kin-*-x` envelopes (urgent, stress, energetic).
-       Think of Apple's "wrong-password" shake: the word flicks side to
-       side without ever changing size or pushing adjacent words off
-       the baseline. Cues that do NOT carry a shake variable (loud,
-       soft, whisper, calm, legato, aside, building) stay perfectly
-       still — their identity comes from weight, colour, blur, opacity,
-       and glow on `.rd-now`. */
-    transform: translate3d(calc(
-          8px   * var(--tps-kin-urgent-x, 0)
-        + 5px   * var(--tps-kin-stress-x, 0)
-        + 4px   * var(--tps-kin-energetic-x, 0)
-        + 2.5px * var(--tps-kin-whisper-x, 0)
-    ), 0, 0);
-    /* Shadow is driven entirely by per-word kinetic envelopes (WAAPI on
-       `--tps-kin-now` + cue-specific vars). No ambient cluster-wide
-       breathing oscillator — a 2.4s background pulse would add a
-       metronomic feel on top of the reader's word rhythm and break
-       the "pure legato flow" the user asked for. The lens + word
-       color crossfade are the only timing signals; per-word envelopes
-       shape the active word, nothing pulses in the background. */
+    /* Base active-word glow — applied statically. Per-cue kinetic
+       motion is driven by CSS @keyframes animations defined below
+       (rd-cue-loud, rd-cue-urgent, rd-cue-stress, …), NOT by WAAPI
+       + `@property` custom-property interpolation. CSS @keyframes
+       fire deterministically on every engine the moment a class
+       matches — no browser quirks, no repaint issues. */
     text-shadow:
-        0 0 calc(14px + 26px * var(--tps-kin-now, 0)) rgba(248,236,210, calc(.18 + .34 * var(--tps-kin-now, 0))),
-        0 0 calc(28px + 34px * var(--tps-kin-now, 0)) rgba(232,130,92, calc(.06 + .22 * var(--tps-kin-now, 0)));
-    /* Composite filter — cue vars mix into one filter chain so whisper
-       gets a real mist (blur), loud/urgent/energetic brighten, and
-       whisper/soft dim without overriding each other. */
-    filter:
-        brightness(calc(1 + .18 * var(--tps-kin-now, 0)
-                          + .32 * var(--tps-kin-loud, 0)
-                          + .28 * var(--tps-kin-urgent, 0)
-                          + .18 * var(--tps-kin-energetic, 0)
-                          - .18 * var(--tps-kin-whisper, 0)
-                          - .08 * var(--tps-kin-soft, 0)))
-        saturate(calc(1 + .06 * var(--tps-kin-now, 0)
-                        + .38 * var(--tps-kin-loud, 0)
-                        + .48 * var(--tps-kin-urgent, 0)
-                        + .34 * var(--tps-kin-energetic, 0)
-                        - .28 * var(--tps-kin-whisper, 0)))
-        blur(calc(1.2px * var(--tps-kin-whisper, 0)))
-        drop-shadow(0 0 8px rgba(248,236,210, calc(.18 + .14 * var(--tps-kin-loud, 0))));
-    /* Do NOT strip text-decoration-line here — that erased the wavy
-       underline of melody/rhetorical and the dotted underline of whisper
-       when the word became active. Each cue opts in to "no decoration"
-       in its own rd-now rule if needed. */
+        0 0 18px rgba(248,236,210,.36),
+        0 0 34px rgba(232,130,92,.18);
 }
 
-/* Kinetic @property registrations — declaring these lets the browser
-   interpolate them as numbers (smoothly tweening filter and shadow math)
-   instead of bumping in discrete jumps. */
-@property --tps-kin-now         { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-loud        { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-soft        { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-whisper     { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-whisper-x   { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-urgent      { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-urgent-x    { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-stress      { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-stress-x    { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-staccato    { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-calm        { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-energetic   { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-energetic-x { syntax: "<number>"; inherits: false; initial-value: 0; }
-@property --tps-kin-building    { syntax: "<number>"; inherits: false; initial-value: 0; }
+/* ── Per-cue kinetic animations (pure CSS @keyframes) ──
+   Each cue class owns its own `animation` shorthand. When a word
+   gets `.rd-now` + `.tps-X`, the matching animation fires once from
+   0 %. Duration + easing pick the cue's character: sforzando hits
+   fast, legato/calm glide slowly, staccato snaps briefly, urgent
+   shakes rapidly. `forwards` keeps the word at its settled state
+   until `.rd-now` is removed; the `.rd-w` base transition then fades
+   color/shadow back to the preview. */
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-loud {
+    animation: rd-cue-loud 560ms cubic-bezier(.2, 0, .3, 1) forwards;
+}
+@keyframes rd-cue-loud {
+    0%   { transform: scale(1);     text-shadow: 0 0 14px rgba(245,200,139,.2); }
+    15%  { transform: scale(1.09);  text-shadow: 0 0 46px rgba(245,200,139,.8), 0 0 22px rgba(255,214,146,.4); }
+    55%  { transform: scale(1.065); text-shadow: 0 0 32px rgba(245,200,139,.55), 0 0 16px rgba(255,214,146,.28); }
+    100% { transform: scale(1.04);  text-shadow: 0 0 22px rgba(245,200,139,.38), 0 0 12px rgba(255,214,146,.2); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-soft {
+    animation: rd-cue-soft 560ms ease-out forwards;
+}
+@keyframes rd-cue-soft {
+    0%   { transform: scale(1);    opacity: 1;    text-shadow: 0 0 10px rgba(199,221,245,.16); }
+    50%  { transform: scale(.96);  opacity: .86;  text-shadow: 0 0 20px rgba(199,221,245,.26); }
+    100% { transform: scale(.98);  opacity: .92;  text-shadow: 0 0 14px rgba(199,221,245,.2); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-whisper {
+    animation: rd-cue-whisper 680ms ease-out forwards;
+}
+@keyframes rd-cue-whisper {
+    0%   { transform: scale(1) translateX(0);         opacity: 1;  filter: blur(0); }
+    60%  { transform: scale(.94) translateX(-2.5px);  opacity: .76; filter: blur(.8px); }
+    100% { transform: scale(.96) translateX(-3px);    opacity: .82; filter: blur(1px); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-urgent {
+    animation: rd-cue-urgent 620ms linear forwards;
+}
+@keyframes rd-cue-urgent {
+    0%   { transform: translateX(0)    scale(1);    filter: brightness(1)    saturate(1); }
+    7%   { transform: translateX(-8px) scale(1.02); filter: brightness(1.28) saturate(1.48); }
+    17%  { transform: translateX(8px)  scale(1.02); filter: brightness(1.24) saturate(1.42); }
+    30%  { transform: translateX(-6px) scale(1.015);filter: brightness(1.2)  saturate(1.36); }
+    44%  { transform: translateX(4px)  scale(1.01); filter: brightness(1.16) saturate(1.3); }
+    60%  { transform: translateX(-2px) scale(1);    filter: brightness(1.1)  saturate(1.2); }
+    78%  { transform: translateX(1px)  scale(1);    filter: brightness(1.05) saturate(1.1); }
+    100% { transform: translateX(0)    scale(1);    filter: brightness(1)    saturate(1); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-stress {
+    animation: rd-cue-stress 420ms ease-out forwards;
+}
+@keyframes rd-cue-stress {
+    0%   { transform: scale(1)    translateX(0); }
+    10%  { transform: scale(1.08) translateX(5px); }
+    25%  { transform: scale(1.06) translateX(-3px); }
+    50%  { transform: scale(1.03) translateX(1px); }
+    100% { transform: scale(1.02) translateX(0); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-staccato {
+    animation: rd-cue-staccato 320ms ease-out forwards;
+}
+@keyframes rd-cue-staccato {
+    0%   { transform: scale(1);    filter: brightness(1); }
+    12%  { transform: scale(1.07); filter: brightness(1.25); }
+    30%  { transform: scale(1.02); filter: brightness(1.12); }
+    100% { transform: scale(1.01); filter: brightness(1); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-energetic,
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-excited {
+    animation: rd-cue-energetic 620ms ease-in-out forwards;
+}
+@keyframes rd-cue-energetic {
+    0%   { transform: scale(1)    translateX(0); }
+    22%  { transform: scale(1.04) translateX(4px); }
+    50%  { transform: scale(1.025) translateX(-4px); }
+    78%  { transform: scale(1.03) translateX(2px); }
+    100% { transform: scale(1.01) translateX(0); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-building {
+    animation: rd-cue-building 700ms linear forwards;
+}
+@keyframes rd-cue-building {
+    0%   { transform: scale(1);    text-shadow: 0 0 10px rgba(240,212,141,.12); }
+    100% { transform: scale(1.04); text-shadow: 0 0 24px rgba(240,212,141,.4); }
+}
+
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-calm,
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-legato,
+.rd-stage.rd-reading-active .rd-w.rd-now.tps-aside {
+    animation: rd-cue-calm 700ms ease-in-out forwards;
+}
+@keyframes rd-cue-calm {
+    0%   { text-shadow: 0 0 12px rgba(118,228,197,.14); }
+    50%  { text-shadow: 0 0 24px rgba(118,228,197,.32); }
+    100% { text-shadow: 0 0 16px rgba(118,228,197,.22); }
+}
+
+/* @property registrations removed — cue kinetics are now CSS
+   @keyframes on `.rd-w.rd-now.tps-*` directly. No custom-property
+   interpolation involved. */
 
 /* Ambient `rd-cluster-breath` animation removed: a 2.4s infinite
    background pulse added a metronomic feel to every active word and
@@ -1337,25 +1427,12 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    no per-word motion. Their identity is in the hue; animation would just add
    noise to the read. */
 
-@media (prefers-reduced-motion: reduce) {
-    .rd-w.rd-now,
-    .rd-w.rd-now.tps-warm,
-    .rd-w.rd-now.tps-professional,
-    .rd-w.rd-now.tps-focused,
-    .rd-w.rd-now.tps-concerned,
-    .rd-w.rd-now.tps-urgent,
-    .rd-w.rd-now.tps-motivational,
-    .rd-w.rd-now.tps-excited,
-    .rd-w.rd-now.tps-happy,
-    .rd-w.rd-now.tps-sad,
-    .rd-w.rd-now.tps-calm,
-    .rd-w.rd-now.tps-energetic,
-    .rd-w.rd-now.tps-loud,
-    .rd-w.rd-now.tps-soft,
-    .rd-w.rd-now.tps-whisper {
-        animation: none !important;
-    }
-}
+/* NOTE: the legacy `@media (prefers-reduced-motion: reduce)` override
+   that killed CSS animations on active words was removed — cue
+   kinetics are carried entirely by WAAPI + transitions + composite
+   transform, NOT by CSS `@keyframes animation`, so that rule was
+   dead. Cue animations now fire regardless of the OS motion pref so
+   loud grows, urgent shakes, whisper drifts on every rig. */
 
 /* Active word with strong emphasis */
 .rd-g-emphasis .rd-w.rd-now {
