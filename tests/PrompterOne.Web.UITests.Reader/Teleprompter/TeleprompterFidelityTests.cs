@@ -274,6 +274,9 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
         // lands, the paragraph must stop drifting and keep the active word
         // anchored to the guide.
         await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
+        await TeleprompterReaderAlignmentAssertions.AssertWordAlignedToGuideAsync(
+            page,
+            BrowserTestConstants.Teleprompter.ActiveWordSelector);
         var settled = await CaptureParagraphMotionSampleAsync(page);
         await page.WaitForTimeoutAsync(ImmediateAlignmentFollowUpDelayMilliseconds);
         var confirmed = await CaptureParagraphMotionSampleAsync(page);
