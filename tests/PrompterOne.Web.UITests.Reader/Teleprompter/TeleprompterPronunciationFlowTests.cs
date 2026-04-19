@@ -25,10 +25,7 @@ public sealed class TeleprompterPronunciationFlowTests(StandaloneAppFixture fixt
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
 
-            for (var index = 0; index < InspirationCardIndex; index++)
-            {
-                await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
-            }
+            await AdvanceToCardAsync(page, InspirationCardIndex);
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.Card(InspirationCardIndex))).ToHaveAttributeAsync(
                 UiDataAttributes.Teleprompter.CardState,
@@ -106,5 +103,17 @@ public sealed class TeleprompterPronunciationFlowTests(StandaloneAppFixture fixt
         }
 
         return double.Parse(value.Replace("px", string.Empty, StringComparison.Ordinal), CultureInfo.InvariantCulture);
+    }
+
+    private static async Task AdvanceToCardAsync(Microsoft.Playwright.IPage page, int targetCardIndex)
+    {
+        for (var index = 0; index < targetCardIndex; index++)
+        {
+            await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Card(index + 1))).ToHaveAttributeAsync(
+                UiDataAttributes.Teleprompter.CardState,
+                UiDataAttributes.Teleprompter.ActiveState,
+                new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+        }
     }
 }

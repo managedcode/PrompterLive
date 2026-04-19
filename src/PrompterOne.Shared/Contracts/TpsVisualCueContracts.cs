@@ -6,7 +6,6 @@ public static class TpsVisualCueContracts
     public const string CueOpacityVariableName = "--tps-cue-opacity";
     public const string CueScaleVariableName = "--tps-cue-scale";
     public const string CueWeightVariableName = "--tps-cue-weight";
-    public const string WordDurationVariableName = "--tps-word-duration";
     public const string PauseDurationVariableName = "--tps-pause-duration";
     public const string PauseKindAttributeName = "data-pause-kind";
     public const string PauseKindShort = "short";

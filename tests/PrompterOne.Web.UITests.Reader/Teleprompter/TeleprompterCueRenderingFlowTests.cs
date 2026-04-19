@@ -163,23 +163,10 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(double.Parse(probe.MelodyTone, CultureInfo.InvariantCulture)).IsEqualTo(0.333d);
             await AssertReaderWordsDoNotOverlapAsync(cardText, InspirationCardIndex);
 
-            for (var index = 0; index < InspirationCardIndex; index++)
-            {
-                await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
-            }
+            await AdvanceToCardAsync(page, InspirationCardIndex);
 
             await Expect(cardText).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            var activeWord = page.GetByTestId(UiTestIds.Teleprompter.ActiveWord);
-            for (var index = 0; index < 60; index++)
-            {
-                var text = await activeWord.TextContentAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-                if (text?.Contains("steady", StringComparison.OrdinalIgnoreCase) == true)
-                {
-                    break;
-                }
-
-                await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
-            }
+            var activeWord = await AdvanceUntilActiveWordContainsAsync(page, "steady", 60);
 
             await Expect(activeWord).ToContainTextAsync("steady", new()
             {
@@ -257,6 +244,47 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             UiDataAttributes.Teleprompter.ActiveState,
             new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
         return activeCardIndex;
+    }
+
+    private static async Task AdvanceToCardAsync(Microsoft.Playwright.IPage page, int targetCardIndex)
+    {
+        for (var index = 0; index < targetCardIndex; index++)
+        {
+            await page.GetByTestId(UiTestIds.Teleprompter.NextBlock).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Card(index + 1))).ToHaveAttributeAsync(
+                UiDataAttributes.Teleprompter.CardState,
+                UiDataAttributes.Teleprompter.ActiveState,
+                new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+        }
+    }
+
+    private static async Task<ILocator> AdvanceUntilActiveWordContainsAsync(
+        Microsoft.Playwright.IPage page,
+        string expectedText,
+        int stepLimit)
+    {
+        var activeWord = page.GetByTestId(UiTestIds.Teleprompter.ActiveWord);
+
+        for (var index = 0; index < stepLimit; index++)
+        {
+            var currentText = await activeWord.TextContentAsync(new()
+            {
+                Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
+            }) ?? string.Empty;
+
+            if (currentText.Contains(expectedText, StringComparison.OrdinalIgnoreCase))
+            {
+                return activeWord;
+            }
+
+            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+            await Expect(activeWord).Not.ToHaveTextAsync(currentText, new()
+            {
+                Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
+            });
+        }
+
+        return activeWord;
     }
 
     private static async Task ActivateCueMatrixTargetWordAsync(
@@ -397,8 +425,14 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     targetLetterSpacing: targetStyle?.letterSpacing ?? '',
                     targetBackgroundImage: targetStyle?.backgroundImage ?? '',
                     targetBoxShadow: targetStyle?.boxShadow ?? '',
+                    targetTextShadow: targetStyle?.textShadow ?? '',
                     targetBeforeBackgroundImage: targetBeforeStyle?.backgroundImage ?? '',
+                    targetBeforeBackgroundColor: targetBeforeStyle?.backgroundColor ?? '',
+                    targetBeforeBorderRadius: targetBeforeStyle?.borderRadius ?? '',
                     targetBeforeContent: targetBeforeStyle?.content ?? '',
+                    targetBeforeHeight: targetBeforeStyle?.height ?? '',
+                    targetBeforeMaskImage: targetBeforeStyle?.webkitMaskImage ?? targetBeforeStyle?.maskImage ?? '',
+                    targetBeforeWidth: targetBeforeStyle?.width ?? '',
                     targetTextDecorationLine: targetStyle?.textDecorationLine ?? '',
                     targetTextDecorationStyle: targetStyle?.textDecorationStyle ?? '',
                     targetTextDecorationThickness: targetStyle?.textDecorationThickness ?? '',
@@ -513,7 +547,9 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         {
             var buildingHairpinImage = HasVisiblePseudoBackground(probe.TargetGroupAfterBackgroundImage)
                 ? probe.TargetGroupAfterBackgroundImage
-                : probe.TargetAfterBackgroundImage;
+                : HasVisiblePseudoBackground(probe.TargetBeforeBackgroundImage)
+                    ? probe.TargetBeforeBackgroundImage
+                    : probe.TargetAfterBackgroundImage;
             await Assert.That(HasVisiblePseudoBackground(buildingHairpinImage))
                 .IsTrue()
                 .Because("Expected building delivery to read as a crescendo-style hairpin cue.");
@@ -546,41 +582,25 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         {
             if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationLegato, StringComparison.Ordinal))
             {
-                var hasGroupLegatoSlur = string.Equals(probe.TargetGroupAfterBorderBottomStyle, "solid", StringComparison.Ordinal);
-                var legatoSlurImage = hasGroupLegatoSlur
+                var legatoSlurImage = HasVisiblePseudoBackground(probe.TargetGroupAfterBackgroundImage)
                     ? probe.TargetGroupAfterBackgroundImage
-                    : probe.TargetAfterBackgroundImage;
-                var legatoSlurStyle = hasGroupLegatoSlur
-                    ? probe.TargetGroupAfterBorderBottomStyle
-                    : probe.TargetAfterBorderBottomStyle;
-                var legatoSlurWidth = hasGroupLegatoSlur
-                    ? probe.TargetGroupAfterBorderBottomWidth
-                    : probe.TargetAfterBorderBottomWidth;
-                var legatoSlurColor = hasGroupLegatoSlur
-                    ? probe.TargetGroupAfterBorderBottomColor
-                    : probe.TargetAfterBorderBottomColor;
+                    : probe.TargetBeforeBackgroundImage;
 
-                await Assert.That(IsDisabledPseudoBackground(legatoSlurImage))
+                await Assert.That(HasVisiblePseudoBackground(legatoSlurImage))
                     .IsTrue()
-                    .Because("Expected legato to use a vector border arc instead of a stretched background image.");
+                    .Because("Expected legato to render a visible slur cue.");
+                await Assert.That(legatoSlurImage)
+                    .Contains("image/svg+xml")
+                    .Because("Expected legato to use a crisp vector slur.");
                 await Assert.That(legatoSlurImage)
                     .DoesNotContain("radial-gradient")
                     .Because("Expected legato slurs to avoid jagged radial-gradient rastering.");
                 await Assert.That(legatoSlurImage)
                     .DoesNotContain("linear-gradient")
                     .Because("Expected legato slurs to avoid pixel-stepped gradient strokes.");
-                await Assert.That(legatoSlurStyle)
-                    .IsEqualTo("solid")
-                    .Because("Expected legato to render as a continuous music-like slur stroke.");
-                await Assert.That(ParseCssPixels(legatoSlurWidth))
-                    .IsGreaterThan(0d)
-                    .Because("Expected legato slur stroke width to be visible at README screenshot scale.");
-                await Assert.That(legatoSlurColor)
-                    .IsNotEqualTo("rgba(0, 0, 0, 0)")
-                    .Because("Expected legato slur stroke color to be visible.");
                 if (capture.ExpectedAttributeMatchCount > 1)
                 {
-                    await Assert.That(IsDisabledPseudoContent(probe.TargetAfterContent))
+                    await Assert.That(IsDisabledPseudoContent(probe.TargetBeforeContent))
                         .IsTrue()
                         .Because("Expected phrase legato to render one group-level slur, not one slur per word.");
                     await Assert.That(probe.TargetGroupWidth)
@@ -597,15 +617,24 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             }
             else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.ArticulationStaccato, StringComparison.Ordinal))
             {
-                await Assert.That(IsDisabledPseudoBackground(probe.TargetAfterBackgroundImage))
+                await Assert.That(IsDisabledPseudoContent(probe.TargetBeforeContent))
+                    .IsFalse()
+                    .Because("Expected staccato to render a visible dot marker.");
+                await Assert.That(IsDisabledPseudoBackground(probe.TargetBeforeBackgroundImage))
                     .IsTrue()
-                    .Because("Expected staccato dots to avoid radial-gradient rastering.");
-                await Assert.That(probe.TargetAfterBorderBottomStyle)
-                    .IsEqualTo("dotted")
-                    .Because("Expected staccato to read as music-like dots.");
-                await Assert.That(ParseCssPixels(probe.TargetAfterBorderBottomWidth))
+                    .Because("Expected staccato dots to avoid rasterized image backgrounds.");
+                await Assert.That(ParseCssPixels(probe.TargetBeforeWidth))
                     .IsGreaterThan(0d)
                     .Because("Expected staccato dots to stay visible at README screenshot scale.");
+                await Assert.That(ParseCssPixels(probe.TargetBeforeHeight))
+                    .IsGreaterThan(0d)
+                    .Because("Expected staccato dots to stay visible at README screenshot scale.");
+                await Assert.That(probe.TargetBeforeBorderRadius)
+                    .IsNotEqualTo("0px")
+                    .Because("Expected staccato to read as a dot, not a square block.");
+                await Assert.That(probe.TargetBeforeBackgroundColor)
+                    .IsNotEqualTo("rgba(0, 0, 0, 0)")
+                    .Because("Expected staccato dot color to remain visible.");
                 await Assert.That(ParseCssPixels(probe.TargetLetterSpacing))
                     .IsGreaterThan(0d)
                     .Because("Expected staccato to separate the cue word rhythm.");
@@ -617,24 +646,27 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             await Assert.That(ParseCssNumber(probe.TargetFontWeight))
                 .IsGreaterThanOrEqualTo(750d)
                 .Because("Expected stress to carry visible rehearsal weight.");
-            await Assert.That(probe.TargetBeforeContent)
-                .Contains("ˈ")
-                .Because("Expected stress to show a stress mark above the cue word.");
+            await Assert.That(IsDisabledPseudoContent(probe.TargetBeforeContent))
+                .IsFalse()
+                .Because("Expected stress to render a visible mark above the cue word.");
             await Assert.That(probe.TargetTextDecorationLine)
                 .DoesNotContain("underline")
                 .Because("Expected stress to use a dedicated vector stress mark instead of generic text-decoration underlines.");
-            await Assert.That(probe.TargetAfterBorderTopStyle)
-                .IsEqualTo("solid")
-                .Because("Expected stress to render the top stroke of its double stress mark.");
-            await Assert.That(probe.TargetAfterBorderBottomStyle)
-                .IsEqualTo("solid")
-                .Because("Expected stress to render the bottom stroke of its double stress mark.");
-            await Assert.That(ParseCssPixels(probe.TargetAfterBorderTopWidth))
-                .IsGreaterThanOrEqualTo(2d)
-                .Because("Expected stress to have a readable top stress stroke.");
-            await Assert.That(ParseCssPixels(probe.TargetAfterBorderBottomWidth))
-                .IsGreaterThanOrEqualTo(2d)
-                .Because("Expected stress to have a readable bottom stress stroke.");
+            await Assert.That(probe.TargetBeforeMaskImage)
+                .Contains("image/svg+xml")
+                .Because("Expected stress to use a crisp vector wedge mark.");
+            await Assert.That(probe.TargetBeforeMaskImage)
+                .DoesNotContain("linear-gradient")
+                .Because("Expected stress to avoid pixel-stepped gradient strokes.");
+            await Assert.That(probe.TargetBeforeBackgroundColor)
+                .IsNotEqualTo("rgba(0, 0, 0, 0)")
+                .Because("Expected stress mark color to remain visible.");
+            await Assert.That(ParseCssPixels(probe.TargetBeforeWidth))
+                .IsGreaterThan(0d)
+                .Because("Expected stress mark width to stay visible at README screenshot scale.");
+            await Assert.That(ParseCssPixels(probe.TargetBeforeHeight))
+                .IsGreaterThan(0d)
+                .Because("Expected stress mark height to stay visible at README screenshot scale.");
         }
 
         if (!string.IsNullOrWhiteSpace(capture.ExpectedEditPointPriority))
@@ -683,7 +715,7 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
             }
             else if (string.Equals(capture.AttributeValue, TpsVisualCueContracts.EmphasisTag, StringComparison.Ordinal))
             {
-                await Assert.That(probe.TargetBoxShadow)
+                await Assert.That(probe.TargetTextShadow)
                     .DoesNotContain("none")
                     .Because("Expected bracketed emphasis to use a distinct editorial marker, not plain markdown bold.");
             }
@@ -1000,9 +1032,21 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
 
         public string TargetBoxShadow { get; init; } = string.Empty;
 
+        public string TargetTextShadow { get; init; } = string.Empty;
+
         public string TargetBeforeBackgroundImage { get; init; } = string.Empty;
 
+        public string TargetBeforeBackgroundColor { get; init; } = string.Empty;
+
+        public string TargetBeforeBorderRadius { get; init; } = string.Empty;
+
         public string TargetBeforeContent { get; init; } = string.Empty;
+
+        public string TargetBeforeHeight { get; init; } = string.Empty;
+
+        public string TargetBeforeMaskImage { get; init; } = string.Empty;
+
+        public string TargetBeforeWidth { get; init; } = string.Empty;
 
         public string TargetTextDecorationLine { get; init; } = string.Empty;
 

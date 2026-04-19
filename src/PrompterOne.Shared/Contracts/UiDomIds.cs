@@ -90,7 +90,6 @@ public static class UiDomIds
         public const string FontValue = "rd-font-val";
         public const string FocalGuide = "rd-guide-h";
         public const string HeaderSegment = "rd-header-segment";
-        public const string PauseFill = "rd-pause-fill";
         public const string ProgressFill = "rd-progress-fill";
         public const string SpeedValue = "rd-speed-val";
         public const string Stage = "rd-stage";

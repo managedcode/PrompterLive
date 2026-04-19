@@ -1,17 +1,40 @@
-// Kinetic reader — thin JS bridge used by Blazor playback.
+// Kinetic reader — JS bridge for word-envelope timing and the focus lens.
 //
-// All cue kinetic animations (loud, soft, whisper, urgent, stress,
-// staccato, energetic, excited, building, calm, legato, aside) are
-// pure CSS `@keyframes` defined on `.rd-stage.rd-reading-active
-// .rd-w.rd-now.tps-*` in 10-reading-states.css. CSS fires them
-// automatically on class match, every engine repaints. No WAAPI,
-// no `@property` custom-property interpolation, no hacks.
+// Word cue motion still lives in CSS `@keyframes`, but JS owns the
+// exact wall-clock duration. On every new active word we:
+//   1. resolve the actual spoken duration for that cue;
+//   2. write CSS variables for the kinetic/beam timing;
+//   3. toggle `.rd-kinetic-active` so the CSS animation restarts cleanly.
 //
-// This module is now only responsible for the focus lens (the soft
-// warm aura that glides BETWEEN words) and the `commitFrame()` helper
-// used by card transitions to force a paint between snap and animate.
+// This keeps the visual envelope aligned with the reader loop without
+// pushing layout-affecting work into JS.
 (function () {
     const kineticReaderNamespace = "KineticReaderInterop";
+    const ACTIVE_WORD_SELECTOR = ".rd-stage.rd-reading-active .rd-w.rd-now";
+    const ACTIVE_WORD_CLASS = "rd-kinetic-active";
+    const KINETIC_TIMING = {
+        staccato: { ratio: 0.42, floor: 180, cap: 260 },
+        stress:   { ratio: 0.5,  floor: 220, cap: 340 },
+        loud:     { ratio: 0.7,  floor: 260, cap: 480 },
+        urgent:   { ratio: 0.72, floor: 260, cap: 460 },
+        energetic:{ ratio: 0.78, floor: 300, cap: 520 },
+        excited:  { ratio: 0.78, floor: 300, cap: 520 },
+        building: { ratio: 0.9,  floor: 340, cap: 640 },
+        calm:     { ratio: 0.95, floor: 380, cap: 700 },
+        legato:   { ratio: 1.0,  floor: 420, cap: 760 },
+        aside:    { ratio: 0.88, floor: 340, cap: 620 },
+        soft:     { ratio: 0.92, floor: 360, cap: 680 },
+        whisper:  { ratio: 0.92, floor: 360, cap: 680 },
+        slow:     { ratio: 0.92, floor: 360, cap: 680 },
+        xslow:    { ratio: 1.0,  floor: 400, cap: 760 },
+        sad:      { ratio: 0.95, floor: 380, cap: 700 }
+    };
+    const KINETIC_DEFAULT = { ratio: 0.82, floor: 260, cap: 560 };
+    const KINETIC_PRIORITY = [
+        "staccato", "stress", "loud", "urgent", "energetic", "excited",
+        "building", "legato", "calm", "aside", "soft", "whisper",
+        "xslow", "slow", "sad"
+    ];
 
     //  Cue → lens transition character. Easing captures the "feel"
     //  (snap vs glide vs linear flow); the DURATION is derived from
@@ -40,6 +63,38 @@
         "staccato", "xfast", "urgent", "legato", "xslow", "slow",
         "whisper", "soft", "calm", "sad", "fast", "aside"
     ];
+
+    function resolveKineticTiming(cueTags) {
+        if (Array.isArray(cueTags) && cueTags.length > 0) {
+            for (const candidate of KINETIC_PRIORITY) {
+                if (cueTags.includes(candidate) && KINETIC_TIMING[candidate]) {
+                    return KINETIC_TIMING[candidate];
+                }
+            }
+        }
+        return KINETIC_DEFAULT;
+    }
+
+    function resolveKineticDuration(cueTags, durationMs, playbackRate) {
+        const timing = resolveKineticTiming(cueTags);
+        const safeDuration = Number(durationMs) > 0 ? Number(durationMs) : 400;
+        const safePlaybackRate = Number(playbackRate) > 0 ? Number(playbackRate) : 1;
+        const adjustedDuration = safeDuration / safePlaybackRate;
+        const raw = Math.round(adjustedDuration * timing.ratio);
+        return Math.max(timing.floor, Math.min(timing.cap, raw));
+    }
+
+    function clearWordEnvelopes() {
+        for (const word of document.querySelectorAll(`.${ACTIVE_WORD_CLASS}`)) {
+            if (!(word instanceof HTMLElement)) {
+                continue;
+            }
+
+            word.classList.remove(ACTIVE_WORD_CLASS);
+            word.style.removeProperty("--rd-kinetic-duration");
+            word.style.removeProperty("--rd-beam-duration");
+        }
+    }
 
     function resolveLensCharacter(cueTags) {
         if (Array.isArray(cueTags) && cueTags.length > 0) {
@@ -103,16 +158,31 @@
     }
 
     window[kineticReaderNamespace] = {
-        //  Kept as an API surface for `ActivateReaderWordAsync` in C#.
-        //  Cue kinetics are CSS-only now, so this is a no-op beyond
-        //  giving the C# side a single awaitable round-trip for the
-        //  word-activation lifecycle.
-        activateWord() {
-            /* CSS @keyframes handles it */
+        //  Restart the active word's CSS envelope with runtime-derived
+        //  timing so cue motion tracks the reader loop instead of a
+        //  fixed stylesheet duration.
+        activateWord(durationMs, cueTags, playbackRate) {
+            const word = document.querySelector(ACTIVE_WORD_SELECTOR);
+            if (!(word instanceof HTMLElement)) {
+                clearWordEnvelopes();
+                return;
+            }
+
+            const kineticDuration = resolveKineticDuration(cueTags, durationMs, playbackRate);
+            const beamDuration = Math.max(160, Math.round(kineticDuration * 0.92));
+
+            clearWordEnvelopes();
+            word.style.setProperty("--rd-kinetic-duration", `${kineticDuration}ms`);
+            word.style.setProperty("--rd-beam-duration", `${beamDuration}ms`);
+            //  Reflow between remove/add guarantees the CSS animation
+            //  restarts even when the same DOM node becomes active again.
+            void word.offsetWidth;
+            word.classList.add(ACTIVE_WORD_CLASS);
         },
 
         //  Fade every focus lens out. Called on playback stop / reset.
         clearAll() {
+            clearWordEnvelopes();
             for (const lens of document.querySelectorAll(".rd-focus-lens")) {
                 lens.classList.remove("rd-focus-lens-active");
             }

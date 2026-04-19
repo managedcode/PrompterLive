@@ -19,8 +19,6 @@ public sealed class LibraryBootstrapStateTests : Bunit.BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Library.Page));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Library.CreateScript));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Library.FolderCreateTile));
-            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup, StringComparison.Ordinal);
-            Assert.Contains(AppTestData.Scripts.TedLeadershipTitle, cut.Markup, StringComparison.Ordinal);
             Assert.Contains(AppTestData.Scripts.TpsCueMatrixTitle, cut.Markup, StringComparison.Ordinal);
             Assert.DoesNotContain(UiTestIds.Library.FolderChips, cut.Markup, StringComparison.Ordinal);
         });

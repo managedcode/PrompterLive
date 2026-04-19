@@ -1,16 +1,6 @@
 /* Module: 20-controls.css */
 /* Reader controls, guides, sliders, previews, and ambient overlays. */
 
-/* Next cluster */
-.rd-cluster-next {
-    opacity: .1;
-}
-.rd-cluster-next p {
-    font-size: 20px;
-    color: var(--t3);
-}
-.rd-cluster-next .rd-cluster-emotion { margin-bottom: 10px; }
-
 /* Center guide — subtle horizontal line where eyes focus */
 .rd-center-guide {
     display: none;
@@ -59,27 +49,6 @@
     left: -3px;
     width: 7px;
     background: linear-gradient(to right, transparent, rgba(232,213,176,.04), transparent);
-}
-
-/* Pause indicator */
-.rd-pause-indicator {
-    position: absolute;
-    bottom: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 3px;
-    background: var(--gold-07);
-    border-radius: 2px;
-    overflow: hidden;
-    opacity: 0;
-}
-.rd-pause-indicator.active { opacity: 1; }
-.rd-pause-fill {
-    height: 100%;
-    background: white;
-    border-radius: 2px;
-    width: 0%;
 }
 
 /* Edge progress bar — full width at bottom */

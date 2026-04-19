@@ -267,14 +267,23 @@ public sealed class TeleprompterFidelityTests(StandaloneAppFixture fixture)
             """,
             nextValue);
 
-        var immediate = await CaptureParagraphMotionSampleAsync(page);
+        // Font-size changes intentionally reflow the paragraph first and then
+        // re-align the active word to the guide on the next render pass. That
+        // makes the "right after input dispatch" sample inherently racy.
+        // Validate the post-settle contract instead: once the realignment
+        // lands, the paragraph must stop drifting and keep the active word
+        // anchored to the guide.
         await page.WaitForTimeoutAsync(ParagraphMotionSettleDelayMilliseconds);
         var settled = await CaptureParagraphMotionSampleAsync(page);
+        await page.WaitForTimeoutAsync(ImmediateAlignmentFollowUpDelayMilliseconds);
+        var confirmed = await CaptureParagraphMotionSampleAsync(page);
 
-        await Assert.That(string.IsNullOrWhiteSpace(immediate.ActiveText)).IsFalse();
-        await Assert.That(settled.ActiveText).IsEqualTo(immediate.ActiveText);
-        await Assert.That(Math.Abs(immediate.TextTop - settled.TextTop)).IsBetween(0d, ParagraphMotionTolerancePixels);
-        await Assert.That(Math.Abs(immediate.ActiveCenterDelta - settled.ActiveCenterDelta)).IsBetween(0d, ParagraphMotionTolerancePixels);
+        await Assert.That(string.IsNullOrWhiteSpace(settled.ActiveText)).IsFalse();
+        await Assert.That(confirmed.ActiveText).IsEqualTo(settled.ActiveText);
+        await Assert.That(Math.Abs(settled.TextTop - confirmed.TextTop)).IsBetween(0d, ParagraphMotionTolerancePixels);
+        await Assert.That(Math.Abs(settled.ActiveCenterDelta)).IsBetween(0d, BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+        await Assert.That(Math.Abs(confirmed.ActiveCenterDelta)).IsBetween(0d, BrowserTestConstants.Teleprompter.AlignmentTolerancePx);
+        await Assert.That(Math.Abs(settled.ActiveCenterDelta - confirmed.ActiveCenterDelta)).IsBetween(0d, ParagraphMotionTolerancePixels);
     }
 
     private static Task<ReaderParagraphMotionSample> CaptureParagraphMotionSampleAsync(Microsoft.Playwright.IPage page) =>

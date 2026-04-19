@@ -9,7 +9,10 @@ public partial class TeleprompterPage
 {
     private const string AttachReaderCameraOperation = "Teleprompter camera attach";
     private const int MinimumReaderLoopDelayMilliseconds = 120;
-    private const int ReaderCardTransitionMilliseconds = 760;
+    // Keep the C# wait budget locked to `.rd-card` transition timing in
+    // `10-reading-states.css` so card normalization never lags behind the
+    // actual visual handoff.
+    private const int ReaderCardTransitionMilliseconds = 700;
 
     private Task DecreaseReaderPlaybackSpeedAsync() => ChangeReaderPlaybackSpeedAsync(-ReaderPlaybackSpeedStepWpm);
 

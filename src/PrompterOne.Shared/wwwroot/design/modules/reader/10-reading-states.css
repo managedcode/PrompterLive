@@ -48,15 +48,6 @@
     pointer-events: none;
 }
 
-/* Previous cluster (legacy, keep for non-card views) */
-.rd-cluster-prev {
-    opacity: .06;
-}
-.rd-cluster-prev p {
-    font-size: 22px;
-    color: var(--t3);
-}
-
 /* Active cluster — no visible border, text floats over gradient */
 .rd-cluster-active {
     padding: 36px 0;
@@ -144,11 +135,6 @@
 .rd-card-prev .rd-g-emphasis,
 .rd-card-next .rd-g-emphasis {
     text-decoration-color: rgba(232,213,176,.08);
-}
-
-/* ── Semantic phrase groups ── */
-.rd-phrase {
-    display: inline;
 }
 
 /* ── Semantic word groups — prevent mid-phrase line breaks ──
@@ -511,7 +497,7 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    appeared, or playback stopped) there is no beam, only the word's
    own colour + text-shadow. The `.rd-reading-active` class is added
    to `.rd-stage` only while `_isReaderPlaying` is true in C#. */
-.rd-stage.rd-reading-active .rd-w.rd-now:not(.tps-staccato):not(.tps-sarcasm):not(.tps-aside):not(.tps-stress):not(.tps-highlight):not(.tps-building):not(.tps-legato):not(.tps-pronunciation):not(.tps-phonetic)::before {
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active:not(.tps-staccato):not(.tps-sarcasm):not(.tps-aside):not(.tps-stress):not(.tps-highlight):not(.tps-building):not(.tps-legato):not(.tps-pronunciation):not(.tps-phonetic)::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -532,7 +518,7 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
         rgba(255, 230, 150, 0.02) 55%,
         transparent 85%
     );
-    animation: rd-flashlight-sweep 660ms linear forwards;
+    animation: rd-flashlight-sweep var(--rd-beam-duration, 420ms) linear forwards;
     pointer-events: none;
     z-index: -1;
 }
@@ -732,17 +718,16 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w.rd-now.tps-loud {
     text-shadow:
         0 1px 0 rgba(0,0,0,.24),
-        0 0 calc(18px + 38px * var(--tps-kin-loud, 0)) rgba(245,200,139, calc(.28 + .58 * var(--tps-kin-loud, 0))),
-        0 0 calc(10px + 18px * var(--tps-kin-loud, 0)) rgba(255,214,146, calc(.12 + .34 * var(--tps-kin-loud, 0)));
+        0 0 22px rgba(245,200,139,.38),
+        0 0 12px rgba(255,214,146,.2);
 }
 .rd-w.tps-soft {
     font-weight: var(--tps-cue-weight, 520);
     opacity: var(--tps-cue-opacity, 1);
 }
 .rd-w.rd-now.tps-soft {
-    opacity: calc(.78 + .22 * var(--tps-kin-soft, 0));
-    text-shadow:
-        0 0 calc(10px + 10px * var(--tps-kin-soft, 0)) rgba(199,221,245, calc(.1 + .16 * var(--tps-kin-soft, 0)));
+    opacity: .92;
+    text-shadow: 0 0 14px rgba(199,221,245,.2);
 }
 /* Whisper carries its full layout signature (italic, light weight,
    dotted underline, soft mask) in EVERY state so width stays stable.
@@ -759,7 +744,7 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
             mask-image: linear-gradient(90deg, rgba(0,0,0,.94) 0%, #000 20%, #000 80%, rgba(0,0,0,.94) 100%);
 }
 .rd-w.rd-now.tps-whisper {
-    opacity: calc(.72 + .28 * var(--tps-kin-whisper, 0));
+    opacity: .82;
 }
 
 /* ── Editorial marks — each must be obviously distinct from the others ──
@@ -837,7 +822,7 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     text-shadow:
         0 0 calc(5px + (12px * var(--tps-build-progress, 0))) rgba(240,212,141, calc(.08 + (.16 * var(--tps-build-progress, 0))));
 }
-.rd-w.tps-building:not(.rd-g-building *)::before {
+.rd-g:not(.rd-g-building) > .rd-w.tps-building::before {
     content: "";
     position: absolute;
     left: -.04em;
@@ -869,7 +854,7 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     position: relative;
     text-decoration-line: none;
 }
-.rd-w.tps-legato:not(.rd-g-legato *)::before {
+.rd-g:not(.rd-g-legato) > .rd-w.tps-legato::before {
     content: "";
     position: absolute;
     left: -.04em;
@@ -918,16 +903,12 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     border-radius: 50%;
     pointer-events: none;
 }
-/* Staccato dot pulses bright at the start of the word via the
-   `--tps-kin-staccato` WAAPI envelope (brief front-loaded spike,
-   then settles). Readers perceive this as a crisp detached note. */
 .rd-w.rd-now.tps-staccato::before {
-    opacity: calc(.7 + .3 * var(--tps-kin-staccato, 0));
-    box-shadow: 0 0 calc(10px + 12px * var(--tps-kin-staccato, 0)) rgba(242,193,225, calc(.2 + .32 * var(--tps-kin-staccato, 0)));
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(242,193,225,.42);
 }
 .rd-w.rd-now.tps-staccato {
-    text-shadow:
-        0 0 calc(10px + 10px * var(--tps-kin-staccato, 0)) rgba(236,181,216, calc(.12 + .22 * var(--tps-kin-staccato, 0)));
+    text-shadow: 0 0 12px rgba(236,181,216,.22);
 }
 .rd-w.tps-energy {
     text-shadow:
@@ -1222,93 +1203,93 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
    until `.rd-now` is removed; the `.rd-w` base transition then fades
    color/shadow back to the preview. */
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-loud {
-    animation: rd-cue-loud 560ms cubic-bezier(.2, 0, .3, 1) forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-loud {
+    animation: rd-cue-loud var(--rd-kinetic-duration, 560ms) cubic-bezier(.2, 0, .3, 1) forwards;
 }
 @keyframes rd-cue-loud {
     0%   { transform: scale(1);     text-shadow: 0 0 14px rgba(245,200,139,.2); }
-    15%  { transform: scale(1.09);  text-shadow: 0 0 46px rgba(245,200,139,.8), 0 0 22px rgba(255,214,146,.4); }
-    55%  { transform: scale(1.065); text-shadow: 0 0 32px rgba(245,200,139,.55), 0 0 16px rgba(255,214,146,.28); }
-    100% { transform: scale(1.04);  text-shadow: 0 0 22px rgba(245,200,139,.38), 0 0 12px rgba(255,214,146,.2); }
+    15%  { transform: scale(1.07);  text-shadow: 0 0 40px rgba(245,200,139,.7), 0 0 18px rgba(255,214,146,.34); }
+    55%  { transform: scale(1.05);  text-shadow: 0 0 30px rgba(245,200,139,.5), 0 0 14px rgba(255,214,146,.24); }
+    100% { transform: scale(1.03);  text-shadow: 0 0 22px rgba(245,200,139,.38), 0 0 12px rgba(255,214,146,.2); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-soft {
-    animation: rd-cue-soft 560ms ease-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-soft {
+    animation: rd-cue-soft var(--rd-kinetic-duration, 560ms) ease-out forwards;
 }
 @keyframes rd-cue-soft {
     0%   { transform: scale(1);    opacity: 1;    text-shadow: 0 0 10px rgba(199,221,245,.16); }
-    50%  { transform: scale(.96);  opacity: .86;  text-shadow: 0 0 20px rgba(199,221,245,.26); }
-    100% { transform: scale(.98);  opacity: .92;  text-shadow: 0 0 14px rgba(199,221,245,.2); }
+    50%  { transform: scale(.975); opacity: .86;  text-shadow: 0 0 18px rgba(199,221,245,.24); }
+    100% { transform: scale(.985); opacity: .92;  text-shadow: 0 0 14px rgba(199,221,245,.2); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-whisper {
-    animation: rd-cue-whisper 680ms ease-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-whisper {
+    animation: rd-cue-whisper var(--rd-kinetic-duration, 680ms) ease-out forwards;
 }
 @keyframes rd-cue-whisper {
     0%   { transform: scale(1) translateX(0);         opacity: 1;  filter: blur(0); }
-    60%  { transform: scale(.94) translateX(-2.5px);  opacity: .76; filter: blur(.8px); }
-    100% { transform: scale(.96) translateX(-3px);    opacity: .82; filter: blur(1px); }
+    60%  { transform: scale(.97) translateX(-1.5px);  opacity: .76; filter: blur(.8px); }
+    100% { transform: scale(.98) translateX(-2px);    opacity: .82; filter: blur(1px); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-urgent {
-    animation: rd-cue-urgent 620ms linear forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-urgent {
+    animation: rd-cue-urgent var(--rd-kinetic-duration, 620ms) linear forwards;
 }
 @keyframes rd-cue-urgent {
     0%   { transform: translateX(0)    scale(1);    filter: brightness(1)    saturate(1); }
-    7%   { transform: translateX(-8px) scale(1.02); filter: brightness(1.28) saturate(1.48); }
-    17%  { transform: translateX(8px)  scale(1.02); filter: brightness(1.24) saturate(1.42); }
-    30%  { transform: translateX(-6px) scale(1.015);filter: brightness(1.2)  saturate(1.36); }
-    44%  { transform: translateX(4px)  scale(1.01); filter: brightness(1.16) saturate(1.3); }
-    60%  { transform: translateX(-2px) scale(1);    filter: brightness(1.1)  saturate(1.2); }
-    78%  { transform: translateX(1px)  scale(1);    filter: brightness(1.05) saturate(1.1); }
+    7%   { transform: translateX(-5px) scale(1.018); filter: brightness(1.24) saturate(1.42); }
+    17%  { transform: translateX(5px)  scale(1.018); filter: brightness(1.2)  saturate(1.36); }
+    30%  { transform: translateX(-4px) scale(1.012); filter: brightness(1.16) saturate(1.28); }
+    44%  { transform: translateX(3px)  scale(1.008); filter: brightness(1.12) saturate(1.22); }
+    60%  { transform: translateX(-2px) scale(1);     filter: brightness(1.08) saturate(1.14); }
+    78%  { transform: translateX(1px)  scale(1);     filter: brightness(1.04) saturate(1.08); }
     100% { transform: translateX(0)    scale(1);    filter: brightness(1)    saturate(1); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-stress {
-    animation: rd-cue-stress 420ms ease-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-stress {
+    animation: rd-cue-stress var(--rd-kinetic-duration, 420ms) ease-out forwards;
 }
 @keyframes rd-cue-stress {
     0%   { transform: scale(1)    translateX(0); }
-    10%  { transform: scale(1.08) translateX(5px); }
-    25%  { transform: scale(1.06) translateX(-3px); }
-    50%  { transform: scale(1.03) translateX(1px); }
+    10%  { transform: scale(1.06) translateX(3px); }
+    25%  { transform: scale(1.045) translateX(-2px); }
+    50%  { transform: scale(1.02) translateX(1px); }
     100% { transform: scale(1.02) translateX(0); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-staccato {
-    animation: rd-cue-staccato 320ms ease-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-staccato {
+    animation: rd-cue-staccato var(--rd-kinetic-duration, 320ms) ease-out forwards;
 }
 @keyframes rd-cue-staccato {
     0%   { transform: scale(1);    filter: brightness(1); }
-    12%  { transform: scale(1.07); filter: brightness(1.25); }
+    12%  { transform: scale(1.05); filter: brightness(1.22); }
     30%  { transform: scale(1.02); filter: brightness(1.12); }
     100% { transform: scale(1.01); filter: brightness(1); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-energetic,
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-excited {
-    animation: rd-cue-energetic 620ms ease-in-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-energetic,
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-excited {
+    animation: rd-cue-energetic var(--rd-kinetic-duration, 620ms) ease-in-out forwards;
 }
 @keyframes rd-cue-energetic {
     0%   { transform: scale(1)    translateX(0); }
-    22%  { transform: scale(1.04) translateX(4px); }
-    50%  { transform: scale(1.025) translateX(-4px); }
-    78%  { transform: scale(1.03) translateX(2px); }
+    22%  { transform: scale(1.03) translateX(3px); }
+    50%  { transform: scale(1.02) translateX(-3px); }
+    78%  { transform: scale(1.025) translateX(2px); }
     100% { transform: scale(1.01) translateX(0); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-building {
-    animation: rd-cue-building 700ms linear forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-building {
+    animation: rd-cue-building var(--rd-kinetic-duration, 700ms) linear forwards;
 }
 @keyframes rd-cue-building {
     0%   { transform: scale(1);    text-shadow: 0 0 10px rgba(240,212,141,.12); }
-    100% { transform: scale(1.04); text-shadow: 0 0 24px rgba(240,212,141,.4); }
+    100% { transform: scale(1.03); text-shadow: 0 0 22px rgba(240,212,141,.36); }
 }
 
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-calm,
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-legato,
-.rd-stage.rd-reading-active .rd-w.rd-now.tps-aside {
-    animation: rd-cue-calm 700ms ease-in-out forwards;
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-calm,
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-legato,
+.rd-stage.rd-reading-active .rd-w.rd-now.rd-kinetic-active.tps-aside {
+    animation: rd-cue-calm var(--rd-kinetic-duration, 700ms) ease-in-out forwards;
 }
 @keyframes rd-cue-calm {
     0%   { text-shadow: 0 0 12px rgba(118,228,197,.14); }
@@ -1349,16 +1330,14 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
 .rd-w.rd-now.tps-aside { color: #B7C7CD; text-shadow: 0 0 14px rgba(183,199,205,.1); }
 .rd-w.rd-now.tps-rhetorical { color: #BDEBFF; text-shadow: 0 0 14px rgba(116,206,255,.16); }
 .rd-w.rd-now.tps-sarcasm { color: #FF8AA3; text-shadow: 0 0 14px rgba(255,138,163,.14); }
-/* Building crescendo — static `--tps-build-progress` grows across the
-   building run (per-word from C# ResolveReaderCueProgress); dynamic
-   `--tps-kin-building` ramps 0→1 through this word's own wall-clock
-   time via the WAAPI envelope. Combining them reads as "intensity
-   rising through the phrase AND inside each note". */
+/* Building crescendo keeps its phrase-level progression from
+   `--tps-build-progress`; the runtime kinetic envelope now comes from
+   the CSS keyframe above instead of a second custom-property track. */
 .rd-w.rd-now.tps-building {
     color: #F3DA9A;
     text-decoration-line: none;
-    text-shadow: 0 0 calc(14px + 14px * var(--tps-build-progress, 0) + 8px * var(--tps-kin-building, 0))
-                 rgba(240,212,141, calc(.14 + .16 * var(--tps-build-progress, 0) + .1 * var(--tps-kin-building, 0)));
+    text-shadow: 0 0 calc(14px + 14px * var(--tps-build-progress, 0))
+                 rgba(240,212,141, calc(.14 + .16 * var(--tps-build-progress, 0)));
 }
 .rd-w.rd-now.tps-legato { color: #A4E4F1; text-decoration-line: none; text-shadow: 0 0 14px rgba(141,213,226,.12); }
 .rd-w.rd-now.tps-staccato { color: #F2C1E1; text-shadow: 0 0 14px rgba(236,181,216,.12); }
@@ -1380,52 +1359,9 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     text-shadow: 0 0 16px rgba(255,208,96,.16);
 }
 
-/* ── Calm / aside / legato — gentle breath via --tps-kin-calm ──
-   These cues share the calmFloatKeyframes envelope in JS, which ramps
-   `--tps-kin-calm` 0 → 1 → 0 across the word's real duration. Hooking
-   that variable into a subtle text-shadow swell makes the active word
-   feel "alive" without adding any horizontal/scale motion — matches
-   the "legato = smooth stillness, but not dead" principle. */
-.rd-w.rd-now.tps-calm {
-    text-shadow:
-        0 0 calc(14px + 10px * var(--tps-kin-calm, 0)) rgba(118,228,197, calc(.18 + .16 * var(--tps-kin-calm, 0)));
-}
-.rd-w.rd-now.tps-legato {
-    text-shadow:
-        0 0 calc(14px + 10px * var(--tps-kin-calm, 0)) rgba(141,213,226, calc(.16 + .18 * var(--tps-kin-calm, 0)));
-}
-.rd-w.rd-now.tps-aside {
-    text-shadow:
-        0 0 calc(12px + 8px * var(--tps-kin-calm, 0)) rgba(183,199,205, calc(.12 + .14 * var(--tps-kin-calm, 0)));
-}
-
-/* ── Per-emotion motion ──
-   Only INFINITE loops here. Every emotion either has a looping continuous
-   motion (mood-carrying emotions like warm/concerned/calm/excited) or NO
-   extra motion at all (event emotions like happy/sad/professional/focused/
-   motivational/urgent — their color carries the meaning). One-shot per-word
-   animations are gone: they restarted on every word and read as "robot".
-   Layout is never touched — only filter, opacity, background-position. */
-/* Emotion kinetic boosts — fixed-duration infinite loops are gone; the
-   WAAPI engine drives --tps-kin-urgent / --tps-kin-energetic / … over
-   the real word duration, and these rules read those numerics to
-   reinforce the underlying cue colour while the word is being spoken. */
-.rd-w.rd-now.tps-urgent {
-    text-shadow: 0 0 calc(16px + 12px * var(--tps-kin-urgent, 0)) rgba(255,65,64, calc(.28 + .28 * var(--tps-kin-urgent, 0)));
-}
-.rd-w.rd-now.tps-energetic {
-    text-shadow: 0 0 calc(14px + 14px * var(--tps-kin-energetic, 0)) rgba(255,102,64, calc(.22 + .26 * var(--tps-kin-energetic, 0)));
-}
-.rd-w.rd-now.tps-excited {
-    text-shadow: 0 0 calc(14px + 14px * var(--tps-kin-energetic, 0)) rgba(255,79,216, calc(.28 + .28 * var(--tps-kin-energetic, 0))),
-                 0 0 calc(22px + 12px * var(--tps-kin-energetic, 0)) rgba(54,244,255, calc(.08 + .14 * var(--tps-kin-energetic, 0)));
-}
-.rd-w.rd-now.tps-stress {
-    text-shadow: 0 0 calc(14px + 14px * var(--tps-kin-stress, 0)) rgba(255,208,96, calc(.14 + .28 * var(--tps-kin-stress, 0)));
-}
 /* focused / professional / motivational / happy / sad / neutral — only color,
-   no per-word motion. Their identity is in the hue; animation would just add
-   noise to the read. */
+   no extra per-word motion. Their identity is in the hue; animation would
+   just add noise to the read. */
 
 /* NOTE: the legacy `@media (prefers-reduced-motion: reduce)` override
    that killed CSS animations on active words was removed — cue

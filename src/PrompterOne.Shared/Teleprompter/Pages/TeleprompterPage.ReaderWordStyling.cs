@@ -31,12 +31,6 @@ public partial class TeleprompterPage
     {
         var styles = new List<string>(4);
 
-        if (wordDurationMs > 0)
-        {
-            var durationSeconds = Math.Max(0.18d, wordDurationMs / 1000d);
-            styles.Add(FormattableString.Invariant($"{TpsVisualCueContracts.WordDurationVariableName}:{durationSeconds:0.###}s;"));
-        }
-
         if (metadata is null)
         {
             return styles.Count == 0 ? null : string.Concat(styles);
