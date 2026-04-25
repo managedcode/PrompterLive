@@ -33,6 +33,12 @@
                             @Text(UiTextKey.EditorWorkspaceSourceTab)
                         </button>
                         <button type="button"
+                                class="@GetWorkspaceTabCss(EditorWorkspaceTab.Rendered)"
+                                @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Rendered)"
+                                data-test="@UiTestIds.Editor.RenderedTab">
+                            @Text(UiTextKey.EditorWorkspaceRenderedTab)
+                        </button>
+                        <button type="button"
                                 class="@GetWorkspaceTabCss(EditorWorkspaceTab.Graph)"
                                 @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Graph)"
                                 data-test="@UiTestIds.Editor.GraphTab">
@@ -59,6 +65,13 @@
                                            OnSelectionChanged="OnSelectionChangedAsync"
                                            OnHistoryRequested="OnHistoryRequestedAsync"
                                            OnCommandRequested="OnCommandRequestedAsync" />
+                    }
+                    else if (_workspaceTab == EditorWorkspaceTab.Rendered)
+                    {
+                        <EditorRenderedTextView Segments="@BuildRenderedSegments()"
+                                                FallbackText="@BuildRenderedFallbackText()"
+                                                FallbackLabel="@Text(UiTextKey.EditorWorkspaceRenderedTab)"
+                                                TextChanged="OnRenderedTextChangedAsync" />
                     }
                     else
                     {

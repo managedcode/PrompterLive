@@ -491,6 +491,7 @@ public enum UiTextKey
     EditorMetadataToggleExpand,
     EditorMetadataToggleCollapse,
     EditorWorkspaceSourceTab,
+    EditorWorkspaceRenderedTab,
     EditorWorkspaceGraphTab,
     EditorMetadataSplitSection,
     EditorMetadataSplitHint,

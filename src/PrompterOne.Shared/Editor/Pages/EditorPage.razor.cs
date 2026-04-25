@@ -144,6 +144,7 @@ public partial class EditorPage
     private enum EditorWorkspaceTab
     {
         Source,
+        Rendered,
         Graph
     }
 }

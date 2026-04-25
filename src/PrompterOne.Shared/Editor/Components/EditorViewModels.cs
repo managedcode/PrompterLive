@@ -45,6 +45,29 @@ public sealed record EditorLocalRevisionViewModel(
     string Title,
     string DocumentName);
 
+public sealed record EditorRenderedSegmentViewModel(
+    int Index,
+    string Number,
+    string Name,
+    string EmotionLabel,
+    string TargetWpmLabel,
+    string DurationLabel,
+    IReadOnlyList<EditorRenderedBlockViewModel> Blocks);
+
+public sealed record EditorRenderedBlockViewModel(
+    int SegmentIndex,
+    int BlockIndex,
+    string Number,
+    string Name,
+    string EmotionLabel,
+    string TargetWpmLabel,
+    string Text);
+
+public sealed record EditorRenderedBlockTextChange(
+    int SegmentIndex,
+    int BlockIndex,
+    string Text);
+
 public sealed record EditorNavigationTarget(
     int SegmentIndex,
     int? BlockIndex,

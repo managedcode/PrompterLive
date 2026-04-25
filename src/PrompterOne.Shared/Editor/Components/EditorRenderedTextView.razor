@@ -1,0 +1,81 @@
+@namespace PrompterOne.Shared.Components.Editor
+
+<div class="editor-rendered-view" data-test="@UiTestIds.Editor.RenderedView">
+    <div class="editor-rendered-strip" data-test="@UiTestIds.Editor.RenderedStrip">
+        @if (Segments.Count == 0)
+        {
+            <section class="editor-rendered-card editor-rendered-card--empty" data-test="@UiTestIds.Editor.RenderedEmpty">
+                <span class="editor-rendered-empty-mark">1</span>
+                <textarea class="editor-rendered-text editor-rendered-text--empty"
+                          aria-label="@FallbackLabel"
+                          data-test="@UiTestIds.Editor.RenderedFallbackText"
+                          value="@FallbackText"
+                          @oninput="OnFallbackInputAsync"></textarea>
+            </section>
+        }
+        else
+        {
+            @foreach (var segment in Segments)
+            {
+                <section class="editor-rendered-card" data-test="@UiTestIds.Editor.RenderedSegment(segment.Index)">
+                    <header class="editor-rendered-card-header">
+                        <span class="editor-rendered-number">@segment.Number</span>
+                        <span class="editor-rendered-meta">@segment.TargetWpmLabel</span>
+                    </header>
+                    <div class="editor-rendered-segment-title">@segment.Name</div>
+                    <div class="editor-rendered-segment-detail">
+                        <span>@segment.EmotionLabel</span>
+                        @if (!string.IsNullOrWhiteSpace(segment.DurationLabel))
+                        {
+                            <span>@segment.DurationLabel</span>
+                        }
+                    </div>
+
+                    @foreach (var block in segment.Blocks)
+                    {
+                        <article class="editor-rendered-block" data-test="@UiTestIds.Editor.RenderedBlock(block.SegmentIndex, block.BlockIndex)">
+                            <div class="editor-rendered-block-head">
+                                <span class="editor-rendered-block-number">@block.Number</span>
+                                <span class="editor-rendered-block-title">@block.Name</span>
+                            </div>
+                            <textarea class="editor-rendered-text"
+                                      aria-label="@block.Name"
+                                      data-test="@UiTestIds.Editor.RenderedBlockText(block.SegmentIndex, block.BlockIndex)"
+                                      value="@block.Text"
+                                      @oninput="@((ChangeEventArgs args) => OnBlockInputAsync(block, args))"></textarea>
+                            <div class="editor-rendered-block-meta">
+                                @if (!string.IsNullOrWhiteSpace(block.EmotionLabel))
+                                {
+                                    <span>@block.EmotionLabel</span>
+                                }
+                                <span>@block.TargetWpmLabel</span>
+                            </div>
+                        </article>
+                    }
+                </section>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string FallbackText { get; set; } = string.Empty;
+
+    [Parameter] public string FallbackLabel { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<EditorRenderedSegmentViewModel> Segments { get; set; } = [];
+
+    [Parameter] public EventCallback<EditorRenderedBlockTextChange> TextChanged { get; set; }
+
+    private Task OnBlockInputAsync(EditorRenderedBlockViewModel block, ChangeEventArgs args) =>
+        TextChanged.InvokeAsync(new EditorRenderedBlockTextChange(
+            block.SegmentIndex,
+            block.BlockIndex,
+            args.Value?.ToString() ?? string.Empty));
+
+    private Task OnFallbackInputAsync(ChangeEventArgs args) =>
+        TextChanged.InvokeAsync(new EditorRenderedBlockTextChange(
+            0,
+            0,
+            args.Value?.ToString() ?? string.Empty));
+}

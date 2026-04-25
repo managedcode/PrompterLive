@@ -2685,6 +2685,9 @@
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Source</value>
   </data>
+  <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
+    <value>Cards</value>
+  </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Graph</value>
   </data>

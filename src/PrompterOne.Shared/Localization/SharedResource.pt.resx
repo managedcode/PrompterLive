@@ -1284,6 +1284,9 @@
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Fonte</value>
   </data>
+  <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
+    <value>Cartões</value>
+  </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Grafo</value>
   </data>

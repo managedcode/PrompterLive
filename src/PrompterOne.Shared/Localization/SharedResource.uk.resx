@@ -1521,6 +1521,9 @@
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Джерело</value>
   </data>
+  <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
+    <value>Картки</value>
+  </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Граф</value>
   </data>

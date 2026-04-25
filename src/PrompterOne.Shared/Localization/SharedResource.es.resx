@@ -1506,6 +1506,9 @@
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Fuente</value>
   </data>
+  <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
+    <value>Tarjetas</value>
+  </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Grafo</value>
   </data>

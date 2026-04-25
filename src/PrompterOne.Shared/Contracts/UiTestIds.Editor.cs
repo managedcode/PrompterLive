@@ -132,6 +132,11 @@ public static partial class UiTestIds
         public const string PauseTwoSeconds = "editor-pause-two-seconds";
         public const string Profile = "editor-profile";
         public const string Redo = "editor-redo";
+        public const string RenderedEmpty = "editor-rendered-empty";
+        public const string RenderedFallbackText = "editor-rendered-fallback-text";
+        public const string RenderedStrip = "editor-rendered-strip";
+        public const string RenderedTab = "editor-rendered-tab";
+        public const string RenderedView = "editor-rendered-view";
         public const string SourceHighlight = "editor-source-highlight";
         public const string SourceInput = "editor-source-input";
         public const string SourceGutter = "editor-source-gutter";
@@ -183,6 +188,12 @@ public static partial class UiTestIds
         public static string LocalHistoryItem(int index) => $"editor-local-history-item-{index}";
 
         public static string LocalHistoryRestore(int index) => $"editor-local-history-restore-{index}";
+
+        public static string RenderedBlock(int segmentIndex, int blockIndex) => $"editor-rendered-block-{segmentIndex}-{blockIndex}";
+
+        public static string RenderedBlockText(int segmentIndex, int blockIndex) => $"editor-rendered-block-text-{segmentIndex}-{blockIndex}";
+
+        public static string RenderedSegment(int segmentIndex) => $"editor-rendered-segment-{segmentIndex}";
 
         public static string SplitResultItem(int index) => $"editor-split-result-item-{index}";
 

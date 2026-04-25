@@ -209,6 +209,9 @@ internal static partial class BrowserTestConstants
         public const string NewDraftProbeText = "dc";
         public const string SecondProbeCharacter = "c";
         public const string BodyHeading = "## [Intro|140WPM|warm]";
+        public const string OpeningBlockHeading = "### [Opening Block|140WPM]";
+        public const string RenderedOpeningProbe = "Good morning everyone";
+        public const string RenderedOpeningRewrite = "Good morning everyone, welcome from cards mode.";
         public const string DisplayDuration = "12:34";
         public const string HeaderContinuationText = " B";
         public const string LegacyActiveBlockLabel = "ACTIVE BLOCK";

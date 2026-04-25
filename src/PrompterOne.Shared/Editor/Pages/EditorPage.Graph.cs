@@ -25,6 +25,11 @@ public partial class EditorPage
         {
             _metadataRailSelectedTab = EditorMetadataRailTab.Metadata;
         }
+
+        if (tab == EditorWorkspaceTab.Rendered)
+        {
+            _sourcePanel = null;
+        }
     }
 
     private async Task RebuildScriptGraphAsync(bool force = false)

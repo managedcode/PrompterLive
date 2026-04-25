@@ -67,6 +67,56 @@ public sealed class EditorVisualSourceTests : BunitContext
     }
 
     [Test]
+    public async Task EditorPage_RenderedCardsViewHidesTpsSyntaxAndEditsBlockText()
+    {
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.EditorDemo);
+        var cut = Render<EditorPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
+            Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
+        });
+
+        await cut.FindByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+
+        cut.WaitForAssertion(() =>
+        {
+            var renderedText = cut.FindByTestId(
+                    UiTestIds.Editor.RenderedBlockText(
+                        EditorVisualTestSource.IntroSegmentIndex,
+                        EditorVisualTestSource.OpeningBlockIndex))
+                .GetAttribute("value") ?? string.Empty;
+
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedView));
+            Assert.Contains(EditorVisualTestSource.RenderedOpeningProbe, renderedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.RawSegmentPrefix, renderedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.RawTagOpen, renderedText, StringComparison.Ordinal);
+            Assert.DoesNotContain(EditorVisualTestSource.RawTagClose, renderedText, StringComparison.Ordinal);
+        });
+
+        await cut.FindByTestId(
+                UiTestIds.Editor.RenderedBlockText(
+                    EditorVisualTestSource.IntroSegmentIndex,
+                    EditorVisualTestSource.OpeningBlockIndex))
+            .InputAsync(EditorVisualTestSource.RenderedOpeningRewrite);
+        await cut.FindByTestId(UiTestIds.Editor.SourceTab).ClickAsync();
+
+        cut.WaitForAssertion(() =>
+        {
+            var visibleSource = cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty;
+            var persistedText = _harness.Session.State.Text;
+
+            Assert.Contains(EditorVisualTestSource.RenderedOpeningRewrite, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.OpeningBlockHeading, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(AppTestData.Editor.BodyHeading, visibleSource, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.FrontMatterFence, persistedText, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.RenderedOpeningRewrite, persistedText, StringComparison.Ordinal);
+        }, TimeSpan.FromMilliseconds(EditorVisualTestSource.AutosaveAssertionTimeout));
+    }
+
+    [Test]
     public void EditorPage_DoesNotRenderInventedAiPanelSurface()
     {
         Services.GetRequiredService<NavigationManager>()
@@ -88,6 +138,14 @@ public sealed class EditorVisualSourceTests : BunitContext
         public const string AuthorPersistenceLine = "author: \"Test Speaker\"";
         public const string HighlightedLine = "[highlight]Stay with us[/highlight]";
         public const string CallToActionHeading = "## [Call to Action|150WPM|motivational]";
+        public const string OpeningBlockHeading = "### [Opening Block|140WPM]";
+        public const string RawSegmentPrefix = "##";
+        public const string RawTagClose = "]";
+        public const string RawTagOpen = "[";
+        public const string RenderedOpeningProbe = "Good morning everyone";
+        public const string RenderedOpeningRewrite = "Good morning everyone, welcome from cards mode.";
+        public const int IntroSegmentIndex = 0;
+        public const int OpeningBlockIndex = 0;
         public const int AutosaveAssertionTimeout = 5_000;
         public const string RewrittenBody =
             """
