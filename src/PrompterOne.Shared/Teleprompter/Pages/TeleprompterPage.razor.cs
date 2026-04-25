@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Core.Services.Editor;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
+using PrompterOne.Shared.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -46,10 +48,12 @@ public partial class TeleprompterPage : IAsyncDisposable
     [Inject] private IMediaSceneService MediaSceneService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
+    [Inject] private TpsFrontMatterDocumentService FrontMatterService { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;
     [Inject] private TeleprompterReaderInterop ReaderInterop { get; set; } = null!;
     [Inject] private KineticReaderInterop KineticInterop { get; set; } = null!;
     [Inject] private IUserSettingsStore UserSettingsStore { get; set; } = null!;
+    [Inject] private EditorBlockAttachmentStore EditorBlockAttachmentStore { get; set; } = null!;
 
     [Parameter]
     [SupplyParameterFromQuery(Name = AppRoutes.ScriptIdQueryKey)]
@@ -59,6 +63,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private ElementReference _screenRoot;
     private ReaderCameraLayerViewModel _cameraLayer = ReaderCameraLayerViewModel.Placeholder;
     private IReadOnlyList<ReaderCardViewModel> _cards = [];
+    private IReadOnlyList<EditorBlockAttachment> _blockAttachments = [];
     private StudioSettings _studioSettings = StudioSettings.Default;
     private bool _activateReaderCameraAfterRender;
     private bool _areWidthGuidesActive;
@@ -118,6 +123,7 @@ public partial class TeleprompterPage : IAsyncDisposable
                 {
                     await Bootstrapper.EnsureReadyAsync();
                     await EnsureSessionLoadedAsync();
+                    await LoadReaderBlockAttachmentsAsync(SessionService.State.ScriptId);
                     await PopulateReaderStateAsync();
                     await PopulateCameraStateAsync();
                     StateHasChanged();

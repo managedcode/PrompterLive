@@ -2,7 +2,9 @@ using System.Globalization;
 using PrompterOne.Core.Models.CompiledScript;
 using PrompterOne.Core.Models.Documents;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Shared.Components.Editor;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -34,7 +36,14 @@ public partial class TeleprompterPage
             return [];
         }
 
-        var seeds = BuildReaderCardSeeds(scriptData, SessionService.State.CompiledScript);
+        var sourceBody = FrontMatterService.Parse(SessionService.State.Text).Body;
+        var attachmentsByBlock = _blockAttachments
+            .GroupBy(attachment => attachment.BlockKey, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => (IReadOnlyList<EditorBlockAttachmentViewModel>)group.Select(MapReaderAttachment).ToList(),
+                StringComparer.Ordinal);
+        var seeds = BuildReaderCardSeeds(scriptData, SessionService.State.CompiledScript, sourceBody, attachmentsByBlock);
         if (seeds.Count == 0)
         {
             return [];
@@ -45,14 +54,16 @@ public partial class TeleprompterPage
 
     private static List<ReaderCardSeed> BuildReaderCardSeeds(
         ScriptData scriptData,
-        PrompterOne.Core.Models.CompiledScript.CompiledScript? compiledScript)
+        PrompterOne.Core.Models.CompiledScript.CompiledScript? compiledScript,
+        string sourceBody,
+        IReadOnlyDictionary<string, IReadOnlyList<EditorBlockAttachmentViewModel>> attachmentsByBlock)
     {
         var seeds = new List<ReaderCardSeed>();
         for (var segmentIndex = 0; segmentIndex < scriptData.Segments!.Length; segmentIndex++)
         {
             var segment = scriptData.Segments[segmentIndex];
             var compiledSegment = compiledScript?.Segments.ElementAtOrDefault(segmentIndex);
-            AppendReaderCardSeeds(seeds, segment, compiledSegment, scriptData.TargetWpm);
+            AppendReaderCardSeeds(seeds, segment, compiledSegment, scriptData.TargetWpm, sourceBody, attachmentsByBlock, segmentIndex);
         }
 
         return seeds;
@@ -62,7 +73,10 @@ public partial class TeleprompterPage
         ICollection<ReaderCardSeed> seeds,
         ScriptSegment segment,
         CompiledSegment? compiledSegment,
-        int baseWpm)
+        int baseWpm,
+        string sourceBody,
+        IReadOnlyDictionary<string, IReadOnlyList<EditorBlockAttachmentViewModel>> attachmentsByBlock,
+        int segmentIndex)
     {
         var segmentEmotion = ResolveEmotionKey(segment.Emotion);
         var segmentAccent = ResolveAccentColor(segment.AccentColor, segmentEmotion);
@@ -81,6 +95,11 @@ public partial class TeleprompterPage
 
             var emotionKey = ResolveEmotionKey(block.Emotion ?? segment.Emotion);
             var targetWpm = block.WpmOverride ?? segment.WpmOverride ?? baseWpm;
+            var blockKey = EditorBlockAttachmentKeyBuilder.BuildFromBlockName(
+                sourceBody,
+                block.Name,
+                segmentIndex,
+                blockIndex);
             var durationMilliseconds = Math.Max(
                 1000,
                 (int)Math.Ceiling(words.Sum(word => word.DisplayDuration.TotalMilliseconds)));
@@ -98,7 +117,8 @@ public partial class TeleprompterPage
                 DurationMilliseconds: durationMilliseconds,
                 WidthPercentString: string.Empty,
                 EdgeColor: string.Empty,
-                Chunks: BuildReaderChunks(words, targetWpm)));
+                Chunks: BuildReaderChunks(words, targetWpm),
+                Attachments: attachmentsByBlock.GetValueOrDefault(blockKey) ?? []));
         }
     }
 
@@ -168,8 +188,52 @@ public partial class TeleprompterPage
                 WidthPercentString: $"{Math.Max(8d, seed.WordCount * 100d / totalWords):0.##}%",
                 EdgeColor: ToAlphaColor(seed.AccentColor, 0.35),
                 Chunks: seed.Chunks,
+                Attachments: seed.Attachments,
                 TestId: UiTestIds.Teleprompter.Card(index)))
             .ToList();
+    }
+
+    private async Task LoadReaderBlockAttachmentsAsync(string? scriptId)
+    {
+        _blockAttachments = await EditorBlockAttachmentStore.LoadAsync(scriptId);
+    }
+
+    private static EditorBlockAttachmentViewModel MapReaderAttachment(EditorBlockAttachment attachment) =>
+        new(
+            attachment.Id,
+            attachment.FileName,
+            FormatReaderAttachmentKind(attachment.ContentType),
+            FormatReaderAttachmentSize(attachment.Size),
+            attachment.PreviewDataUrl);
+
+    private static string FormatReaderAttachmentKind(string contentType)
+    {
+        if (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Image";
+        }
+
+        if (contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Video";
+        }
+
+        if (contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Audio";
+        }
+
+        return "File";
+    }
+
+    private static string FormatReaderAttachmentSize(long size)
+    {
+        const double Kilobyte = 1024d;
+        const double Megabyte = Kilobyte * 1024d;
+
+        return size >= Megabyte
+            ? string.Create(CultureInfo.InvariantCulture, $"{size / Megabyte:0.#} MB")
+            : string.Create(CultureInfo.InvariantCulture, $"{Math.Max(1d, size / Kilobyte):0.#} KB");
     }
 
     private static IReadOnlyList<ReaderChunkViewModel> BuildReaderChunks(IEnumerable<CompiledWord> words, int targetWpm)

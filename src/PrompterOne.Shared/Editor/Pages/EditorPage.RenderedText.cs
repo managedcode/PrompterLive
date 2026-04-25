@@ -23,6 +23,13 @@ public partial class EditorPage
         }
 
         var compiledSegments = SessionService.State.CompiledScript?.Segments;
+        var attachmentsByBlock = _blockAttachments
+            .GroupBy(attachment => attachment.BlockKey, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(MapAttachment).ToList(),
+                StringComparer.Ordinal);
+
         return _segments
             .Select(segment =>
             {
@@ -38,14 +45,23 @@ public partial class EditorPage
                         .Select(block =>
                         {
                             var compiledBlock = ElementAtOrNull(compiledSegment?.Blocks, block.Index);
+                            var blockKey = EditorBlockAttachmentKeyBuilder.Build(
+                                _sourceText,
+                                block.StartIndex,
+                                block.EndIndex,
+                                segment.Index,
+                                block.Index,
+                                block.Name);
                             return new EditorRenderedBlockViewModel(
                                 segment.Index,
                                 block.Index,
+                                blockKey,
                                 $"{segment.Index + 1}.{block.Index + 1}",
                                 block.Name,
                                 block.EmotionLabel,
                                 block.TargetWpmLabel,
-                                BuildBlockDisplayText(block, compiledBlock));
+                                BuildBlockDisplayText(block, compiledBlock),
+                                attachmentsByBlock.GetValueOrDefault(blockKey) ?? []);
                         })
                         .ToList());
             })
@@ -85,6 +101,45 @@ public partial class EditorPage
         }
 
         await ApplyMutationAsync(result.Text, result.Selection);
+    }
+
+    private async Task OnRenderedBlockAttachmentRequestedAsync(EditorRenderedBlockAttachmentRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(SessionService.State.ScriptId))
+        {
+            return;
+        }
+
+        var file = request.File;
+        await using var stream = file.OpenReadStream(MaxBlockAttachmentBytes);
+        using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory);
+        var bytes = memory.ToArray();
+        var previewDataUrl = file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)
+            ? $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}"
+            : null;
+
+        var attachment = new EditorBlockAttachment(
+            Id: Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture),
+            BlockKey: request.BlockKey,
+            FileName: string.IsNullOrWhiteSpace(file.Name) ? request.BlockName : file.Name,
+            ContentType: string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType,
+            Size: file.Size,
+            PreviewDataUrl: previewDataUrl,
+            AddedAt: DateTimeOffset.UtcNow);
+
+        _blockAttachments = _blockAttachments
+            .Concat([attachment])
+            .OrderBy(candidate => candidate.AddedAt)
+            .ToList();
+
+        await EditorBlockAttachmentStore.SaveAsync(SessionService.State.ScriptId, _blockAttachments);
+        StateHasChanged();
+    }
+
+    private async Task LoadRenderedBlockAttachmentsAsync(string? scriptId)
+    {
+        _blockAttachments = await EditorBlockAttachmentStore.LoadAsync(scriptId);
     }
 
     private EditorOutlineBlockViewModel? FindRenderedBlock(EditorRenderedBlockTextChange change) =>
@@ -207,6 +262,44 @@ public partial class EditorPage
 
     private static string FormatRenderedCardNumber(int number) =>
         number.ToString(CultureInfo.InvariantCulture);
+
+    private static EditorBlockAttachmentViewModel MapAttachment(EditorBlockAttachment attachment) =>
+        new(
+            attachment.Id,
+            attachment.FileName,
+            FormatAttachmentKind(attachment.ContentType),
+            FormatAttachmentSize(attachment.Size),
+            attachment.PreviewDataUrl);
+
+    private static string FormatAttachmentKind(string contentType)
+    {
+        if (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Image";
+        }
+
+        if (contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Video";
+        }
+
+        if (contentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Audio";
+        }
+
+        return "File";
+    }
+
+    private static string FormatAttachmentSize(long size)
+    {
+        const double Kilobyte = 1024d;
+        const double Megabyte = Kilobyte * 1024d;
+
+        return size >= Megabyte
+            ? string.Create(CultureInfo.InvariantCulture, $"{size / Megabyte:0.#} MB")
+            : string.Create(CultureInfo.InvariantCulture, $"{Math.Max(1d, size / Kilobyte):0.#} KB");
+    }
 
     private static T? ElementAtOrNull<T>(IReadOnlyList<T>? values, int index) where T : class =>
         values is not null && index >= 0 && index < values.Count

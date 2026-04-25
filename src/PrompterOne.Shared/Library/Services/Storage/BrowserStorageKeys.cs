@@ -4,6 +4,7 @@ public static class BrowserStorageKeys
 {
     public const string DocumentLibrary = "prompterone.library.v1";
     public const string DocumentSeedVersion = "prompterone.library.seed-version";
+    public const string EditorBlockAttachmentKeyPrefix = "editor-block-attachments.";
     public const string EditorLocalHistoryKeyPrefix = "editor-local-history.";
     public const string FolderLibrary = "prompterone.folders.v1";
     public const string FolderSeedVersion = "prompterone.folders.seed-version";

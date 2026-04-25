@@ -191,6 +191,15 @@ public static partial class UiTestIds
 
         public static string RenderedBlock(int segmentIndex, int blockIndex) => $"editor-rendered-block-{segmentIndex}-{blockIndex}";
 
+        public static string RenderedBlockAttachment(int segmentIndex, int blockIndex, int attachmentIndex) =>
+            $"editor-rendered-block-attachment-{segmentIndex}-{blockIndex}-{attachmentIndex}";
+
+        public static string RenderedBlockAttachmentInput(int segmentIndex, int blockIndex) =>
+            $"editor-rendered-block-attachment-input-{segmentIndex}-{blockIndex}";
+
+        public static string RenderedBlockAttachments(int segmentIndex, int blockIndex) =>
+            $"editor-rendered-block-attachments-{segmentIndex}-{blockIndex}";
+
         public static string RenderedBlockMoveDown(int segmentIndex, int blockIndex) => $"editor-rendered-block-move-down-{segmentIndex}-{blockIndex}";
 
         public static string RenderedBlockMoveUp(int segmentIndex, int blockIndex) => $"editor-rendered-block-move-up-{segmentIndex}-{blockIndex}";

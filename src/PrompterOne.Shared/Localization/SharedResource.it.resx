@@ -1635,6 +1635,12 @@
   <data name="EditorRenderedMoveBlockDown" xml:space="preserve">
     <value>Sposta blocco giù</value>
   </data>
+  <data name="EditorRenderedAttachMedia" xml:space="preserve">
+    <value>Allega media</value>
+  </data>
+  <data name="EditorRenderedAttachmentsLabel" xml:space="preserve">
+    <value>Allegati del blocco</value>
+  </data>
   <data name="HeaderOpenScript" xml:space="preserve">
     <value>Importare</value>
   </data>

@@ -105,6 +105,30 @@
                                     <span class="rd-emo-name">@entry.card.EmotionLabel</span>
                                     <span class="rd-emo-wpm">@entry.card.TargetWpm <small>@Text(UiTextKey.CommonWpm)</small></span>
                                 </div>
+                                @if (entry.card.Attachments.Count > 0)
+                                {
+                                    <div class="rd-attachments"
+                                         data-test="@UiTestIds.Teleprompter.CardAttachments(entry.index)">
+                                        @foreach (var attachment in entry.card.Attachments.Select((value, index) => (value, index)))
+                                        {
+                                            <div class="rd-attachment"
+                                                 data-test="@UiTestIds.Teleprompter.CardAttachment(entry.index, attachment.index)">
+                                                @if (!string.IsNullOrWhiteSpace(attachment.value.PreviewDataUrl))
+                                                {
+                                                    <img class="rd-attachment-thumb"
+                                                         src="@attachment.value.PreviewDataUrl"
+                                                         alt="" />
+                                                }
+                                                else
+                                                {
+                                                    <span class="rd-attachment-icon" aria-hidden="true">▣</span>
+                                                }
+                                                <span class="rd-attachment-name">@attachment.value.FileName</span>
+                                                <span class="rd-attachment-meta">@attachment.value.KindLabel · @attachment.value.SizeLabel</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
                                 <p class="rd-cluster-text"
                                    id="@UiDomIds.Teleprompter.CardText(entry.index)"
                                    style="@BuildReaderCardTextStyle(entry.index)"

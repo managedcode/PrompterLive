@@ -71,6 +71,7 @@
                         <EditorRenderedTextView Segments="@BuildRenderedSegments()"
                                                 FallbackText="@BuildRenderedFallbackText()"
                                                 FallbackLabel="@Text(UiTextKey.EditorWorkspaceRenderedTab)"
+                                                AttachmentRequested="OnRenderedBlockAttachmentRequestedAsync"
                                                 BlockReorderRequested="OnRenderedBlockReorderRequestedAsync"
                                                 TextChanged="OnRenderedTextChangedAsync" />
                     }

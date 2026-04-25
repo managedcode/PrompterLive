@@ -1,4 +1,5 @@
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Components.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -17,7 +18,8 @@ public partial class TeleprompterPage
         int DurationMilliseconds,
         string WidthPercentString,
         string EdgeColor,
-        IReadOnlyList<ReaderChunkViewModel> Chunks);
+        IReadOnlyList<ReaderChunkViewModel> Chunks,
+        IReadOnlyList<EditorBlockAttachmentViewModel> Attachments);
 
     private sealed record ReaderCardViewModel(
         string SectionName,
@@ -33,6 +35,7 @@ public partial class TeleprompterPage
         string WidthPercentString,
         string EdgeColor,
         IReadOnlyList<ReaderChunkViewModel> Chunks,
+        IReadOnlyList<EditorBlockAttachmentViewModel> Attachments,
         string TestId);
 
     private abstract record ReaderChunkViewModel;

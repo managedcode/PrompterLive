@@ -155,6 +155,37 @@
     outline: none;
 }
 
+.editor-rendered-attach {
+    position: relative;
+    display: inline-grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgba(137, 148, 169, .34);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .78);
+    color: #4c5a70;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.editor-rendered-attach:hover,
+.editor-rendered-attach:focus-within {
+    border-color: rgba(56, 112, 214, .48);
+    color: #244f9f;
+}
+
+.editor-rendered-attach-input {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    font-size: 48px;
+    opacity: 0;
+}
+
 .editor-rendered-block-title {
     min-width: 0;
     overflow: hidden;
@@ -190,6 +221,62 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.editor-rendered-attachments {
+    display: grid;
+    gap: 8px;
+}
+
+.editor-rendered-attachment {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 9px;
+    align-items: center;
+    min-width: 0;
+    padding: 7px 8px;
+    border: 1px solid rgba(218, 224, 234, .92);
+    border-radius: 7px;
+    background: rgba(248, 250, 252, .84);
+}
+
+.editor-rendered-attachment-thumb,
+.editor-rendered-attachment-icon {
+    grid-row: span 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+}
+
+.editor-rendered-attachment-thumb {
+    object-fit: cover;
+}
+
+.editor-rendered-attachment-icon {
+    display: inline-grid;
+    place-items: center;
+    background: rgba(226, 232, 240, .82);
+    color: #64748b;
+    font-size: 14px;
+}
+
+.editor-rendered-attachment-name {
+    min-width: 0;
+    overflow: hidden;
+    color: #2f3645;
+    font-size: 12px;
+    font-weight: 760;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.editor-rendered-attachment-meta {
+    color: #8a94a5;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
 }
 
 @media (max-width: 760px) {

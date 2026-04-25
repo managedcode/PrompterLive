@@ -69,6 +69,11 @@ public static partial class UiTestIds
 
         public static string Card(int index) => $"teleprompter-card-{index}";
 
+        public static string CardAttachment(int cardIndex, int attachmentIndex) =>
+            $"teleprompter-card-attachment-{cardIndex}-{attachmentIndex}";
+
+        public static string CardAttachments(int cardIndex) => $"teleprompter-card-attachments-{cardIndex}";
+
         public static string CardCluster(int index) => $"{Card(index)}-cluster";
 
         public static string CardGroup(int cardIndex, int groupIndex) => $"teleprompter-card-group-{cardIndex}-{groupIndex}";

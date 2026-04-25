@@ -2826,6 +2826,12 @@
   <data name="EditorRenderedMoveBlockDown" xml:space="preserve">
     <value>Move block down</value>
   </data>
+  <data name="EditorRenderedAttachMedia" xml:space="preserve">
+    <value>Attach media</value>
+  </data>
+  <data name="EditorRenderedAttachmentsLabel" xml:space="preserve">
+    <value>Block attachments</value>
+  </data>
   <data name="DiagnosticsEyebrow" xml:space="preserve">
     <value>Diagnostics</value>
   </data>

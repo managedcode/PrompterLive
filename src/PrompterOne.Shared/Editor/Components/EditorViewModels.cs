@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Editor;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace PrompterOne.Shared.Components.Editor;
 
@@ -57,16 +58,30 @@ public sealed record EditorRenderedSegmentViewModel(
 public sealed record EditorRenderedBlockViewModel(
     int SegmentIndex,
     int BlockIndex,
+    string BlockKey,
     string Number,
     string Name,
     string EmotionLabel,
     string TargetWpmLabel,
-    string Text);
+    string Text,
+    IReadOnlyList<EditorBlockAttachmentViewModel> Attachments);
+
+public sealed record EditorBlockAttachmentViewModel(
+    string Id,
+    string FileName,
+    string KindLabel,
+    string SizeLabel,
+    string? PreviewDataUrl);
 
 public sealed record EditorRenderedBlockTextChange(
     int SegmentIndex,
     int BlockIndex,
     string Text);
+
+public sealed record EditorRenderedBlockAttachmentRequest(
+    string BlockKey,
+    string BlockName,
+    IBrowserFile File);
 
 public sealed record EditorRenderedBlockReorderRequest(
     int SourceSegmentIndex,

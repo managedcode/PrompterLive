@@ -75,6 +75,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<AppShellFilePickerInterop>();
         services.AddScoped<EditorDocumentSaveCoordinator>();
         services.AddScoped<EditorLocalRevisionStore>();
+        services.AddScoped<EditorBlockAttachmentStore>();
 
         services.AddScoped<ILibraryFolderRepository, BrowserLibraryFolderRepository>();
         services.AddScoped<IScriptRepository, BrowserScriptRepository>();

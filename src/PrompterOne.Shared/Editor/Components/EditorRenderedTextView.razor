@@ -1,4 +1,5 @@
 @namespace PrompterOne.Shared.Components.Editor
+@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Localization
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
@@ -64,6 +65,14 @@
                                             disabled="@(!CanMoveBlock(block, 1))"
                                             @onclick="() => MoveBlockByOffsetAsync(block, 1)"
                                             data-test="@UiTestIds.Editor.RenderedBlockMoveDown(block.SegmentIndex, block.BlockIndex)">↓</button>
+                                    <label class="editor-rendered-attach"
+                                           title="@Text(UiTextKey.EditorRenderedAttachMedia)">
+                                        <span aria-hidden="true">＋</span>
+                                        <InputFile class="editor-rendered-attach-input"
+                                                   aria-label="@Text(UiTextKey.EditorRenderedAttachMedia)"
+                                                   OnChange="@((InputFileChangeEventArgs args) => OnAttachmentInputAsync(block, args))"
+                                                   data-test="@UiTestIds.Editor.RenderedBlockAttachmentInput(block.SegmentIndex, block.BlockIndex)" />
+                                    </label>
                                 </span>
                             </div>
                             <textarea class="editor-rendered-text"
@@ -78,6 +87,31 @@
                                 }
                                 <span>@block.TargetWpmLabel</span>
                             </div>
+                            @if (block.Attachments.Count > 0)
+                            {
+                                <div class="editor-rendered-attachments"
+                                     aria-label="@Text(UiTextKey.EditorRenderedAttachmentsLabel)"
+                                     data-test="@UiTestIds.Editor.RenderedBlockAttachments(block.SegmentIndex, block.BlockIndex)">
+                                    @foreach (var attachment in block.Attachments.Select((value, index) => (value, index)))
+                                    {
+                                        <div class="editor-rendered-attachment"
+                                             data-test="@UiTestIds.Editor.RenderedBlockAttachment(block.SegmentIndex, block.BlockIndex, attachment.index)">
+                                            @if (!string.IsNullOrWhiteSpace(attachment.value.PreviewDataUrl))
+                                            {
+                                                <img class="editor-rendered-attachment-thumb"
+                                                     src="@attachment.value.PreviewDataUrl"
+                                                     alt="" />
+                                            }
+                                            else
+                                            {
+                                                <span class="editor-rendered-attachment-icon" aria-hidden="true">▣</span>
+                                            }
+                                            <span class="editor-rendered-attachment-name">@attachment.value.FileName</span>
+                                            <span class="editor-rendered-attachment-meta">@attachment.value.KindLabel · @attachment.value.SizeLabel</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </article>
                     }
                 </section>
@@ -97,6 +131,8 @@
 
     [Parameter] public EventCallback<EditorRenderedBlockReorderRequest> BlockReorderRequested { get; set; }
 
+    [Parameter] public EventCallback<EditorRenderedBlockAttachmentRequest> AttachmentRequested { get; set; }
+
     private EditorRenderedBlockViewModel? _draggedBlock;
 
     private EditorRenderedBlockViewModel? _dragOverBlock;
@@ -112,6 +148,15 @@
             0,
             0,
             args.Value?.ToString() ?? string.Empty));
+
+    private Task OnAttachmentInputAsync(EditorRenderedBlockViewModel block, InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        return AttachmentRequested.InvokeAsync(new EditorRenderedBlockAttachmentRequest(
+            block.BlockKey,
+            block.Name,
+            file));
+    }
 
     private void OnBlockDragStart(EditorRenderedBlockViewModel block)
     {
