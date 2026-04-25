@@ -105,6 +105,9 @@
   <data name="LibrarySortWpm" xml:space="preserve">
     <value>PPM</value>
   </data>
+  <data name="LibraryToneMetadata" xml:space="preserve">
+    <value>Tom</value>
+  </data>
   <data name="LibraryCreateFolderTitle" xml:space="preserve">
     <value>Criar pasta</value>
   </data>

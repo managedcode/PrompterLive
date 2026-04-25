@@ -10,6 +10,7 @@
         <LibraryScriptCard Card="@card"
                            FolderOptions="@FolderOptions"
                            OrganizationTerminology="OrganizationTerminology"
+                           ShowToneMetadata="ShowToneMetadata"
                            IsMenuOpen="@IsCardMenuOpen(card.Id)"
                            OnCardClick="@(() => HandleCardClickAsync(card.Id))"
                            OnDeleteScript="@(() => HandleDeleteScriptAsync(card.Id))"
@@ -60,6 +61,8 @@
 
     [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
         LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
+
+    [Parameter] public bool ShowToneMetadata { get; set; } = true;
 
     [Parameter, EditorRequired] public EventCallback<string> OnOpenScript { get; set; }
 

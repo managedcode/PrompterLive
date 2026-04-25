@@ -11,6 +11,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
 {
     private const string ActiveStateValue = "active";
     private const string ClosedExpandedStateValue = "closed";
+    private const string InactiveStateValue = "inactive";
     private const string OpenExpandedStateValue = "open";
     private readonly AppHarness _harness;
 
@@ -87,6 +88,36 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         var createdFolder = (await _harness.FolderRepository.ListAsync())
             .Single(folder => folder.Name == showName);
         Assert.Null(createdFolder.ParentId);
+    }
+
+    [Test]
+    public void LibraryPage_ToneMetadataToggle_HidesAndRestoresToneBadge()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.ToneMetadataToggle).GetAttribute("data-active"));
+            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup);
+            Assert.Contains(UiTestIds.Library.CardTone(AppTestData.Scripts.DemoId), cut.Markup, StringComparison.Ordinal);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.ToneMetadataToggle).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Library.ToneMetadataToggle).GetAttribute("data-active"));
+            Assert.DoesNotContain(UiTestIds.Library.CardTone(AppTestData.Scripts.DemoId), cut.Markup, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Library.CardDuration(AppTestData.Scripts.DemoId), cut.Markup, StringComparison.Ordinal);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.ToneMetadataToggle).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.ToneMetadataToggle).GetAttribute("data-active"));
+            Assert.Contains(UiTestIds.Library.CardTone(AppTestData.Scripts.DemoId), cut.Markup, StringComparison.Ordinal);
+        });
     }
 
     [Test]
@@ -228,6 +259,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             SelectedFolderId: roadshowsFolder.Id,
             SortMode: LibrarySortMode.Date,
             OrganizationMode: LibraryOrganizationMode.Folders,
+            ShowToneMetadata: true,
             ExpandedFolderIds: [AppTestData.Folders.PresentationsId, roadshowsFolder.Id]);
 
         var cut = Render<LibraryPage>();

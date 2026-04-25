@@ -28,6 +28,7 @@ public static partial class UiTestIds
         public const string SortDuration = "library-sort-duration";
         public const string SortName = "library-sort-name";
         public const string SortWpm = "library-sort-wpm";
+        public const string ToneMetadataToggle = "library-tone-metadata-toggle";
 
         public static string BreadcrumbCurrent(string folderId) => $"library-breadcrumb-{folderId}";
 
@@ -52,6 +53,8 @@ public static partial class UiTestIds
         public static string CardDuration(string scriptId) => $"library-card-duration-{scriptId}";
 
         public static string CardSegmentCount(string scriptId) => $"library-card-segment-count-{scriptId}";
+
+        public static string CardTone(string scriptId) => $"library-card-tone-{scriptId}";
 
         public static string CardWordCount(string scriptId) => $"library-card-word-count-{scriptId}";
 

@@ -44,6 +44,7 @@ public partial class LibraryPage : ComponentBase, IDisposable
     private string _selectedFolderId = LibrarySelectionKeys.All;
     private LibrarySortMode _sortMode = LibrarySortMode.Name;
     private LibraryOrganizationMode _organizationMode = LibraryOrganizationMode.Folders;
+    private bool _showToneMetadata = true;
     private IReadOnlyList<StoredLibraryFolder> _folders = [];
     private IReadOnlyList<LibraryCardViewModel> _allCards = [];
     private IReadOnlyList<LibraryCardViewModel> _cards = [];

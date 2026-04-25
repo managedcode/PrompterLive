@@ -37,12 +37,19 @@
                         @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
                         data-active="@(GetSortModeState(LibrarySortMode.Wpm))"
                         data-test="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
+                <button class="sort-btn tone-toggle @(_showToneMetadata ? "active" : null)"
+                        type="button"
+                        aria-pressed="@(_showToneMetadata ? "true" : "false")"
+                        @onclick="ToggleToneMetadataAsync"
+                        data-active="@(_showToneMetadata ? ActiveStateValue : InactiveStateValue)"
+                        data-test="@UiTestIds.Library.ToneMetadataToggle">@Text(UiTextKey.LibraryToneMetadata)</button>
             </div>
 
             <LibraryCardsGrid Cards="_cards"
                               DismissMenuRevision="_dismissCardMenuRevision"
                               FolderOptions="_folderOptions"
                               OrganizationTerminology="OrganizationTerminology"
+                              ShowToneMetadata="_showToneMetadata"
                               OnOpenScript="OpenScriptAsync"
                               OnDuplicateScript="DuplicateScriptAsync"
                               OnMoveScript="MoveScriptAsync"

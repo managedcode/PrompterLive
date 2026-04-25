@@ -105,6 +105,9 @@
   <data name="LibrarySortWpm" xml:space="preserve">
     <value>WPM</value>
   </data>
+  <data name="LibraryToneMetadata" xml:space="preserve">
+    <value>Ton</value>
+  </data>
   <data name="LibraryCreateFolderTitle" xml:space="preserve">
     <value>Ordner erstellen</value>
   </data>

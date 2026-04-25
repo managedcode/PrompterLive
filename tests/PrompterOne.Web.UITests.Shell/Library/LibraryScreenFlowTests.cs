@@ -246,6 +246,39 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Test]
+    public Task LibraryScreen_ToneMetadataToggle_HidesToneAsTopLevelCardIndicator() =>
+        RunPageAsync(async page =>
+        {
+            await ShellRouteDriver.OpenLibraryAsync(page);
+
+            var toneToggle = page.GetByTestId(UiTestIds.Library.ToneMetadataToggle);
+            var demoTone = page.GetByTestId(UiTestIds.Library.CardTone(BrowserTestConstants.Scripts.DemoId));
+            await Expect(toneToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(demoTone).ToHaveTextAsync(BrowserTestConstants.Library.DemoToneLabel);
+            await Expect(page.GetByTestId(UiTestIds.Library.CardDuration(BrowserTestConstants.Scripts.DemoId))).ToBeVisibleAsync();
+
+            await UiInteractionDriver.ClickAndContinueAsync(toneToggle, noWaitAfter: true);
+
+            await Expect(toneToggle).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.InactiveValue);
+            await Expect(demoTone).ToHaveCountAsync(0);
+            await Expect(page.GetByTestId(UiTestIds.Library.CardDuration(BrowserTestConstants.Scripts.DemoId))).ToBeVisibleAsync();
+
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.Library,
+                UiTestIds.Library.Page,
+                "library-tone-toggle-reload");
+            await Expect(page.GetByTestId(UiTestIds.Library.ToneMetadataToggle)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.InactiveValue);
+            await Expect(page.GetByTestId(UiTestIds.Library.CardTone(BrowserTestConstants.Scripts.DemoId))).ToHaveCountAsync(0);
+        });
+
+    [Test]
     public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
         RunPageAsync(async page =>
         {

@@ -40,6 +40,7 @@ public enum UiTextKey
     LibrarySortDate,
     LibrarySortDuration,
     LibrarySortWpm,
+    LibraryToneMetadata,
     LibraryCreateFolderTitle,
     LibraryCreateFolderDescription,
     LibraryCreateProjectTitle,

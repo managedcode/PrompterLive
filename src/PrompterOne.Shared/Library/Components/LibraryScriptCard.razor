@@ -97,7 +97,10 @@
             <div class="dcover-orb dcover-orb2"></div>
             <h3 class="dcard-title">@Card.Title</h3>
             <div class="dcover-meta">
-                <span class="dcover-emo">@Card.Emotion</span>
+                @if (ShowToneMetadata)
+                {
+                    <span class="dcover-emo" data-test="@UiTestIds.Library.CardTone(Card.Id)">@Card.Emotion</span>
+                }
                 <span>@Card.ModeLabel</span>
                 <span data-test="@UiTestIds.Library.CardDuration(Card.Id)">@Card.DurationLabel</span>
             </div>
@@ -151,6 +154,7 @@
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
     [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
         LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
+    [Parameter] public bool ShowToneMetadata { get; set; } = true;
     [Parameter] public bool IsMenuOpen { get; set; }
     [Parameter] public EventCallback OnCardClick { get; set; }
     [Parameter] public EventCallback OnDeleteScript { get; set; }
