@@ -4,7 +4,7 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="dcards-grid">
+<div class="dcards-grid" data-test="@UiTestIds.Library.CardsGrid">
     @foreach (var card in Cards)
     {
         <LibraryScriptCard Card="@card"

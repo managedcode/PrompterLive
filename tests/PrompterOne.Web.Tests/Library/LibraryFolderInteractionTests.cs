@@ -133,6 +133,30 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Test]
+    public void LibraryPage_ProjectSortOrdersCardsByFolderName_AndPersistsSelection()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() => Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup));
+
+        cut.FindByTestId(UiTestIds.Library.SortProject).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.SortProject).GetAttribute("data-active"));
+            Assert.Equal(AppTestData.Scripts.LearnWpmBoundaryTitle, ResolveFirstCardTitle(cut));
+        });
+
+        cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.SortProject).GetAttribute("data-active"));
+            Assert.Equal(AppTestData.Scripts.LearnWpmBoundaryTitle, ResolveFirstCardTitle(cut));
+        });
+    }
+
+    [Test]
     public async Task LibraryPage_CancelsFolderOverlay_WithoutCreatingFolder()
     {
         var cut = Render<LibraryPage>();
@@ -284,4 +308,9 @@ public sealed class LibraryFolderInteractionTests : BunitContext
             Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.SortDate).GetAttribute("data-active"));
         });
     }
+
+    private static string ResolveFirstCardTitle(IRenderedComponent<LibraryPage> cut) =>
+        cut.Find($"[data-test='{UiTestIds.Library.CardsGrid}'] article.dcard:not(.dcard-create) .dcard-title")
+            .TextContent
+            .Trim();
 }

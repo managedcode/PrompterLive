@@ -37,6 +37,14 @@
                         @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
                         data-active="@(GetSortModeState(LibrarySortMode.Wpm))"
                         data-test="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Author)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Author)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Author))"
+                        data-test="@UiTestIds.Library.SortAuthor">@Text(UiTextKey.LibrarySortAuthor)</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Project)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Project)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Project))"
+                        data-test="@UiTestIds.Library.SortProject">@Text(UiTextKey.LibrarySortProject)</button>
                 <button class="sort-btn tone-toggle @(_showToneMetadata ? "active" : null)"
                         type="button"
                         aria-pressed="@(_showToneMetadata ? "true" : "false")"

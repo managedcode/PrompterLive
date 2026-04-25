@@ -279,6 +279,36 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Test]
+    public Task LibraryScreen_ProjectSortPersistsAcrossReloads() =>
+        RunPageAsync(async page =>
+        {
+            await ShellRouteDriver.OpenLibraryAsync(page);
+
+            var firstCardTitle = page
+                .Locator($"[data-test='{UiTestIds.Library.CardsGrid}'] article.dcard:not(.dcard-create) .dcard-title")
+                .First;
+
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.SortProject));
+
+            await Expect(page.GetByTestId(UiTestIds.Library.SortProject)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(firstCardTitle).ToHaveTextAsync(BrowserTestConstants.Scripts.HugeDraftTitle);
+
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.Library,
+                UiTestIds.Library.Page,
+                "library-project-sort-reload");
+            await Expect(page.GetByTestId(UiTestIds.Library.SortProject)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(firstCardTitle).ToHaveTextAsync(BrowserTestConstants.Scripts.HugeDraftTitle);
+            await Expect(page.GetByTestId(UiTestIds.Library.SortDuration)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Library.SortWpm)).ToBeVisibleAsync();
+        });
+
+    [Test]
     public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
         RunPageAsync(async page =>
         {

@@ -5,5 +5,7 @@ public enum LibrarySortMode
     Name,
     Date,
     Duration,
-    Wpm
+    Wpm,
+    Author,
+    Project
 }

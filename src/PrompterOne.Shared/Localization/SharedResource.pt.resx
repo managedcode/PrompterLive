@@ -105,6 +105,12 @@
   <data name="LibrarySortWpm" xml:space="preserve">
     <value>PPM</value>
   </data>
+  <data name="LibrarySortAuthor" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="LibrarySortProject" xml:space="preserve">
+    <value>Projeto</value>
+  </data>
   <data name="LibraryToneMetadata" xml:space="preserve">
     <value>Tom</value>
   </data>

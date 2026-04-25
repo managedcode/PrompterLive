@@ -80,10 +80,29 @@ public partial class LibraryPage
             LibrarySortMode.Date => cards.OrderByDescending(card => card.UpdatedAt),
             LibrarySortMode.Duration => cards.OrderByDescending(card => card.Duration),
             LibrarySortMode.Wpm => cards.OrderByDescending(card => card.AverageWpm),
+            LibrarySortMode.Author => cards
+                .OrderBy(card => card.Author, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase),
+            LibrarySortMode.Project => cards
+                .OrderBy(card => ResolveProjectSortLabel(card), StringComparer.OrdinalIgnoreCase)
+                .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase),
             _ => cards
                 .OrderBy(card => card.DisplayOrder)
                 .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase)
         };
+
+    private string ResolveProjectSortLabel(LibraryCardViewModel card)
+    {
+        if (string.IsNullOrWhiteSpace(card.FolderId))
+        {
+            return string.Empty;
+        }
+
+        return _folders
+            .FirstOrDefault(folder => string.Equals(folder.Id, card.FolderId, StringComparison.Ordinal))
+            ?.Name
+            ?? string.Empty;
+    }
 
     private string? GetSortClass(LibrarySortMode sortMode) => _sortMode == sortMode ? "active" : null;
 

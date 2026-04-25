@@ -28,7 +28,10 @@ public static partial class UiTestIds
         public const string SortDuration = "library-sort-duration";
         public const string SortName = "library-sort-name";
         public const string SortWpm = "library-sort-wpm";
+        public const string SortAuthor = "library-sort-author";
+        public const string SortProject = "library-sort-project";
         public const string ToneMetadataToggle = "library-tone-metadata-toggle";
+        public const string CardsGrid = "library-cards-grid";
 
         public static string BreadcrumbCurrent(string folderId) => $"library-breadcrumb-{folderId}";
 
