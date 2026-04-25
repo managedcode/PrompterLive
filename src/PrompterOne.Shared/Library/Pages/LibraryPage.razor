@@ -11,6 +11,9 @@
     <LibrarySidebar Folders="_folderNodes"
                     AllScriptCount="_allCards.Count"
                     IsAllSelected="IsAllSelected"
+                    OrganizationTerminology="OrganizationTerminology"
+                    SelectedOrganizationMode="_organizationMode"
+                    OnOrganizationModeChanged="SetOrganizationMode"
                     OnSelectFolder="SelectFolder"
                     OnStartCreateFolder="StartCreateFolder" />
 
@@ -39,6 +42,7 @@
             <LibraryCardsGrid Cards="_cards"
                               DismissMenuRevision="_dismissCardMenuRevision"
                               FolderOptions="_folderOptions"
+                              OrganizationTerminology="OrganizationTerminology"
                               OnOpenScript="OpenScriptAsync"
                               OnDuplicateScript="DuplicateScriptAsync"
                               OnMoveScript="MoveScriptAsync"
@@ -54,6 +58,7 @@
 @if (_isCreatingFolder)
 {
     <LibraryFolderCreateModal FolderOptions="@_folderOptions"
+                              OrganizationTerminology="OrganizationTerminology"
                               FolderDraftName="@_folderDraftName"
                               FolderDraftParentId="@_folderDraftParentId"
                               OnCancelCreateFolder="CancelCreateFolder"

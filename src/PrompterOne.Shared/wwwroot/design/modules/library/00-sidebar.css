@@ -65,6 +65,44 @@
     min-height: 0;
     overflow-y: auto;
 }
+.lib-organization-switcher {
+    padding: 0 10px 14px;
+}
+.lib-organization-label {
+    display: block;
+    margin: 0 4px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--t4);
+}
+.lib-organization-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+}
+.lib-organization-option {
+    min-width: 0;
+    min-height: 28px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid rgba(245,200,80,.06);
+    color: var(--t4);
+    font-size: 11px;
+    font-weight: 650;
+    text-align: center;
+}
+.lib-organization-option:hover {
+    background: var(--glass2);
+    color: var(--t2);
+}
+.lib-organization-option.active {
+    background: linear-gradient(135deg, rgba(245,200,80,.09), rgba(196,168,130,.07));
+    border-color: rgba(245,200,80,.16);
+    color: #E8D5B0;
+}
 .lib-folders-header {
     display: flex;
     align-items: center;
@@ -221,13 +259,35 @@ html.theme-light .lib-folders-header,
 body.theme-light .lib-folders-header,
 html[data-theme="light"] .folder-add-btn,
 html.theme-light .folder-add-btn,
-body.theme-light .folder-add-btn {
+body.theme-light .folder-add-btn,
+html[data-theme="light"] .lib-organization-label,
+html.theme-light .lib-organization-label,
+body.theme-light .lib-organization-label {
     color: rgba(92,77,61,.62);
+}
+
+html[data-theme="light"] .lib-organization-option,
+html.theme-light .lib-organization-option,
+body.theme-light .lib-organization-option {
+    background: rgba(255,255,255,.48);
+    border-color: rgba(107,90,72,.1);
+    color: rgba(92,77,61,.64);
+}
+
+html[data-theme="light"] .lib-organization-option.active,
+html.theme-light .lib-organization-option.active,
+body.theme-light .lib-organization-option.active {
+    background: rgba(139,115,85,.1);
+    border-color: rgba(139,115,85,.2);
+    color: #5C4D3D;
 }
 
 html[data-theme="light"] .folder-add-btn:hover,
 html.theme-light .folder-add-btn:hover,
 body.theme-light .folder-add-btn:hover,
+html[data-theme="light"] .lib-organization-option:hover,
+html.theme-light .lib-organization-option:hover,
+body.theme-light .lib-organization-option:hover,
 html[data-theme="light"] .folder-item:hover,
 html.theme-light .folder-item:hover,
 body.theme-light .folder-item:hover,

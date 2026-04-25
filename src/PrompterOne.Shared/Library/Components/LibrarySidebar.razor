@@ -35,13 +35,28 @@
     </nav>
 
     <div class="lib-folders-section">
+        <div class="lib-organization-switcher" data-test="@UiTestIds.Library.OrganizationModeGroup">
+            <span class="lib-organization-label">@Text(UiTextKey.LibraryOrganizationModeLabel)</span>
+            <div class="lib-organization-options">
+                @foreach (var option in LibraryOrganizationTerminologyCatalog.All)
+                {
+                    <button class="@GetOrganizationModeClass(option.Mode)"
+                            type="button"
+                            data-active="@(option.Mode == SelectedOrganizationMode ? ActiveStateValue : InactiveStateValue)"
+                            data-test="@UiTestIds.Library.OrganizationModeOption(option.Value)"
+                            @onclick="() => HandleOrganizationModeChangedAsync(option.Mode)">
+                        @Text(option.OptionLabelKey)
+                    </button>
+                }
+            </div>
+        </div>
         <div class="lib-folders-header">
-            <span data-test="@UiTestIds.Library.SectionFoldersTitle">@Text(UiTextKey.LibraryFolders)</span>
+            <span data-test="@UiTestIds.Library.SectionFoldersTitle">@Text(OrganizationTerminology.SectionTitleKey)</span>
             <TooltipAnchor OwnerTestId="@UiTestIds.Library.FolderCreateStart"
                            Placement="TooltipPlacement.LeftCenter"
-                           Text="@Text(UiTextKey.TooltipCreateFolder)">
+                           Text="@Text(OrganizationTerminology.CreateTooltipKey)">
                 <button class="folder-add-btn"
-                        aria-label="@Text(UiTextKey.TooltipCreateFolder)"
+                        aria-label="@Text(OrganizationTerminology.CreateTooltipKey)"
                         @onclick="HandleStartCreateAsync"
                         data-test="@UiTestIds.Library.FolderCreateStart">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -79,13 +94,28 @@
 
     [Parameter, EditorRequired] public bool IsAllSelected { get; set; }
 
+    [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
+        LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
+
+    [Parameter, EditorRequired] public LibraryOrganizationMode SelectedOrganizationMode { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<LibraryOrganizationMode> OnOrganizationModeChanged { get; set; }
+
     [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }
 
     [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
 
     private Task HandleSelectAllAsync() => OnSelectFolder.InvokeAsync(LibrarySelectionKeys.All);
 
+    private Task HandleOrganizationModeChangedAsync(LibraryOrganizationMode mode) =>
+        OnOrganizationModeChanged.InvokeAsync(mode);
+
     private Task HandleStartCreateAsync() => OnStartCreateFolder.InvokeAsync();
+
+    private string GetOrganizationModeClass(LibraryOrganizationMode mode) =>
+        mode == SelectedOrganizationMode
+            ? "lib-organization-option active"
+            : "lib-organization-option";
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

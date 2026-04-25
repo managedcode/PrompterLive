@@ -20,6 +20,7 @@ internal static partial class BrowserTestConstants
         public const string AriaPressedFalseValue = "false";
         public const string AriaPressedTrueValue = "true";
         public const string DataTestAttribute = "data-test";
+        public const string PlaceholderAttribute = "placeholder";
         public const string ValueAttribute = "value";
     }
 
@@ -185,6 +186,8 @@ internal static partial class BrowserTestConstants
         public const string PresentationsName = "Presentations";
         public const string TedTalksId = "test-ted-talks";
         public const string RoadshowsId = "roadshows";
+        public const string RoadshowSeasonId = "roadshow-season";
+        public const string RoadshowSeasonName = "Roadshow Season";
         public const string RoadshowsName = "Roadshows";
         public const string TedTalksName = "TED Talks";
     }
@@ -196,6 +199,11 @@ internal static partial class BrowserTestConstants
         public const string FileNameSearchQuery = "test-quantum-computing.tps";
         public const string SearchQuery = "Quantum";
         public const string ModeLabel = "Actor";
+        public const string ShowModeValue = "shows";
+        public const string ShowsLabel = "Shows";
+        public const string NewShowLabel = "New show";
+        public const string CreateShowTitle = "Create Show";
+        public const string ShowPlaceholder = "Morning show";
     }
 
     public static class Editor
@@ -1053,6 +1061,7 @@ internal static partial class BrowserTestConstants
         public static string LeadershipCard => UiTestIds.Library.Card(Scripts.LeadershipId);
         public static string PresentationsFolder => UiTestIds.Library.Folder(Folders.PresentationsId);
         public static string QuantumCard => UiTestIds.Library.Card(Scripts.QuantumId);
+        public static string RoadshowSeasonFolder => UiTestIds.Library.Folder(Folders.RoadshowSeasonId);
         public static string RoadshowsFolder => UiTestIds.Library.Folder(Folders.RoadshowsId);
         public static string TedTalksFolder => UiTestIds.Library.Folder(Folders.TedTalksId);
     }

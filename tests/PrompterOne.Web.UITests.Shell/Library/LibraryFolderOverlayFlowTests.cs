@@ -78,4 +78,56 @@ public sealed class LibraryFolderOverlayFlowTests(StandaloneAppFixture fixture)
             await page.Context.CloseAsync();
         }
     }
+
+    [Test]
+    public async Task OrganizationMode_ShowsShowTerminology_AndStillCreatesFolderBackedGroup()
+    {
+        var page = await _fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await ShellRouteDriver.OpenLibraryAsync(page);
+
+            await Expect(page.GetByTestId(UiTestIds.Library.OrganizationModeGroup)).ToBeVisibleAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.OrganizationModeOption(BrowserTestConstants.Library.ShowModeValue)),
+                noWaitAfter: true);
+
+            await Expect(page.GetByTestId(UiTestIds.Library.SectionFoldersTitle))
+                .ToHaveTextAsync(BrowserTestConstants.Library.ShowsLabel);
+            await Expect(page.GetByTestId(UiTestIds.Library.FolderCreateTile))
+                .ToContainTextAsync(BrowserTestConstants.Library.NewShowLabel);
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.FolderCreateStart),
+                noWaitAfter: true);
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderTitle))
+                .ToHaveTextAsync(BrowserTestConstants.Library.CreateShowTitle);
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderName))
+                .ToHaveAttributeAsync(BrowserTestConstants.Html.PlaceholderAttribute, BrowserTestConstants.Library.ShowPlaceholder);
+
+            await page.GetByTestId(UiTestIds.Library.NewFolderName).FillAsync(BrowserTestConstants.Folders.RoadshowSeasonName);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Library.NewFolderSubmit),
+                noWaitAfter: true);
+
+            await Expect(page.GetByTestId(UiTestIds.Library.NewFolderOverlay)).ToBeHiddenAsync();
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowSeasonFolder)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.LibraryBreadcrumbCurrent))
+                .ToHaveTextAsync(BrowserTestConstants.Folders.RoadshowSeasonName);
+
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.Library,
+                UiTestIds.Library.Page,
+                "library-organization-show-reload");
+            await Expect(page.GetByTestId(UiTestIds.Library.SectionFoldersTitle))
+                .ToHaveTextAsync(BrowserTestConstants.Library.ShowsLabel);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.RoadshowSeasonFolder)).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
 }

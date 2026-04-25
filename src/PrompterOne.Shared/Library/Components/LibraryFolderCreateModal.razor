@@ -20,8 +20,8 @@
                 </svg>
             </div>
             <div class="lib-folder-modal-copy">
-                <h2 id="library-folder-modal-title" data-test="@UiTestIds.Library.NewFolderTitle">@Text(UiTextKey.LibraryCreateFolderTitle)</h2>
-                <p>@Text(UiTextKey.LibraryCreateFolderDescription)</p>
+                <h2 id="library-folder-modal-title" data-test="@UiTestIds.Library.NewFolderTitle">@Text(OrganizationTerminology.CreateTitleKey)</h2>
+                <p>@Text(OrganizationTerminology.CreateDescriptionKey)</p>
             </div>
         </div>
 
@@ -31,12 +31,12 @@
                 <input class="folder-form-input"
                        value="@FolderDraftName"
                        @oninput="HandleFolderNameInput"
-                       placeholder="@Text(UiTextKey.LibraryFolderPlaceholder)"
+                       placeholder="@Text(OrganizationTerminology.PlaceholderKey)"
                        autofocus
                        data-test="@UiTestIds.Library.NewFolderName" />
             </label>
             <label class="folder-form-label">
-                <span>@Text(UiTextKey.CommonParent)</span>
+                <span>@Text(OrganizationTerminology.ParentLabelKey)</span>
                 <select class="folder-form-select"
                         value="@FolderDraftParentId"
                         @onchange="HandleFolderParentChange"
@@ -65,6 +65,9 @@
 
 @code {
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
+
+    [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
+        LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
 
     [Parameter, EditorRequired] public string FolderDraftName { get; set; } = string.Empty;
 

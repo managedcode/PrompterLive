@@ -21,6 +21,7 @@ public static partial class UiTestIds
         public const string NewFolderSubmit = "library-new-folder-submit";
         public const string NewFolderTitle = "library-new-folder-title";
         public const string OpenSettings = "library-open-settings";
+        public const string OrganizationModeGroup = "library-organization-mode-group";
         public const string SectionFoldersTitle = "library-section-folders-title";
         public const string SortLabel = "library-sort-label";
         public const string SortDate = "library-sort-date";
@@ -61,5 +62,7 @@ public static partial class UiTestIds
         public static string FolderChip(string folderId) => $"library-folder-chip-{folderId}";
 
         public static string Move(string scriptId, string folderId) => $"library-move-{scriptId}-{folderId}";
+
+        public static string OrganizationModeOption(string mode) => $"library-organization-mode-{mode}";
     }
 }

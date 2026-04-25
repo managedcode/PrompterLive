@@ -49,6 +49,47 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Test]
+    public async Task LibraryPage_OrganizationTerminologySwitch_PreservesFolderRepositoryBehavior()
+    {
+        const string showName = "Roadshow Season";
+
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("Folders", cut.FindByTestId(UiTestIds.Library.SectionFoldersTitle).TextContent.Trim());
+            Assert.Contains("Product Launch", cut.Markup);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.OrganizationModeOption("shows")).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("Shows", cut.FindByTestId(UiTestIds.Library.SectionFoldersTitle).TextContent.Trim());
+            Assert.Contains("New show", cut.FindByTestId(UiTestIds.Library.FolderCreateTile).TextContent);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.FolderCreateStart).Click();
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("Create Show", cut.FindByTestId(UiTestIds.Library.NewFolderTitle).TextContent.Trim());
+            Assert.Equal("Morning show", cut.FindByTestId(UiTestIds.Library.NewFolderName).GetAttribute("placeholder"));
+        });
+        cut.FindByTestId(UiTestIds.Library.NewFolderName).Input(showName);
+        cut.FindByTestId(UiTestIds.Library.NewFolderSubmit).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(showName, cut.Markup);
+            Assert.Equal("Shows", cut.FindByTestId(UiTestIds.Library.SectionFoldersTitle).TextContent.Trim());
+        });
+
+        var createdFolder = (await _harness.FolderRepository.ListAsync())
+            .Single(folder => folder.Name == showName);
+        Assert.Null(createdFolder.ParentId);
+    }
+
+    [Test]
     public async Task LibraryPage_CancelsFolderOverlay_WithoutCreatingFolder()
     {
         var cut = Render<LibraryPage>();
@@ -186,6 +227,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         _harness.JsRuntime.SavedValues["prompterone.library"] = new LibraryViewState(
             SelectedFolderId: roadshowsFolder.Id,
             SortMode: LibrarySortMode.Date,
+            OrganizationMode: LibraryOrganizationMode.Folders,
             ExpandedFolderIds: [AppTestData.Folders.PresentationsId, roadshowsFolder.Id]);
 
         var cut = Render<LibraryPage>();

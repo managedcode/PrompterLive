@@ -9,6 +9,7 @@
     {
         <LibraryScriptCard Card="@card"
                            FolderOptions="@FolderOptions"
+                           OrganizationTerminology="OrganizationTerminology"
                            IsMenuOpen="@IsCardMenuOpen(card.Id)"
                            OnCardClick="@(() => HandleCardClickAsync(card.Id))"
                            OnDeleteScript="@(() => HandleDeleteScriptAsync(card.Id))"
@@ -43,7 +44,7 @@
                     <line x1="9" y1="14" x2="15" y2="14" />
                 </svg>
             </div>
-            <span class="dcreate-label">@Text(UiTextKey.LibraryNewFolder)</span>
+            <span class="dcreate-label">@Text(OrganizationTerminology.NewItemLabelKey)</span>
         </div>
     </article>
 </div>
@@ -56,6 +57,9 @@
     [Parameter] public int DismissMenuRevision { get; set; }
 
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
+
+    [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
+        LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
 
     [Parameter, EditorRequired] public EventCallback<string> OnOpenScript { get; set; }
 

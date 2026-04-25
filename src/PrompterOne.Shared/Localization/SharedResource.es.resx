@@ -45,6 +45,48 @@
   <data name="LibraryNewFolder" xml:space="preserve">
     <value>Nueva carpeta</value>
   </data>
+  <data name="LibraryOrganizationModeLabel" xml:space="preserve">
+    <value>Organizar como</value>
+  </data>
+  <data name="LibraryOrganizationFolders" xml:space="preserve">
+    <value>Carpetas</value>
+  </data>
+  <data name="LibraryOrganizationProjects" xml:space="preserve">
+    <value>Proyectos</value>
+  </data>
+  <data name="LibraryOrganizationShows" xml:space="preserve">
+    <value>Shows</value>
+  </data>
+  <data name="LibraryOrganizationEpisodes" xml:space="preserve">
+    <value>Episodios</value>
+  </data>
+  <data name="LibraryOrganizationSequences" xml:space="preserve">
+    <value>Secuencias</value>
+  </data>
+  <data name="LibraryProjects" xml:space="preserve">
+    <value>Proyectos</value>
+  </data>
+  <data name="LibraryNewProject" xml:space="preserve">
+    <value>Nuevo proyecto</value>
+  </data>
+  <data name="LibraryShows" xml:space="preserve">
+    <value>Shows</value>
+  </data>
+  <data name="LibraryNewShow" xml:space="preserve">
+    <value>Nuevo show</value>
+  </data>
+  <data name="LibraryEpisodes" xml:space="preserve">
+    <value>Episodios</value>
+  </data>
+  <data name="LibraryNewEpisode" xml:space="preserve">
+    <value>Nuevo episodio</value>
+  </data>
+  <data name="LibrarySequences" xml:space="preserve">
+    <value>Secuencias</value>
+  </data>
+  <data name="LibraryNewSequence" xml:space="preserve">
+    <value>Nueva secuencia</value>
+  </data>
   <data name="LibrarySettings" xml:space="preserve">
     <value>Configuración</value>
   </data>
@@ -68,6 +110,30 @@
   </data>
   <data name="LibraryCreateFolderDescription" xml:space="preserve">
     <value>Organiza los guiones en colecciones anidadas sin alterar la cuadrícula de la biblioteca.</value>
+  </data>
+  <data name="LibraryCreateProjectTitle" xml:space="preserve">
+    <value>Crear proyecto</value>
+  </data>
+  <data name="LibraryCreateProjectDescription" xml:space="preserve">
+    <value>Agrupa guiones bajo un proyecto manteniendo la misma estructura local de biblioteca.</value>
+  </data>
+  <data name="LibraryCreateShowTitle" xml:space="preserve">
+    <value>Crear show</value>
+  </data>
+  <data name="LibraryCreateShowDescription" xml:space="preserve">
+    <value>Agrupa guiones como un show sin quitar el flujo de carpetas.</value>
+  </data>
+  <data name="LibraryCreateEpisodeTitle" xml:space="preserve">
+    <value>Crear episodio</value>
+  </data>
+  <data name="LibraryCreateEpisodeDescription" xml:space="preserve">
+    <value>Agrupa guiones como un episodio conservando las herramientas de organización existentes.</value>
+  </data>
+  <data name="LibraryCreateSequenceTitle" xml:space="preserve">
+    <value>Crear secuencia</value>
+  </data>
+  <data name="LibraryCreateSequenceDescription" xml:space="preserve">
+    <value>Agrupa guiones como una secuencia para pases, sets o segmentos ordenados.</value>
   </data>
   <data name="HeaderSearchPlaceholder" xml:space="preserve">
     <value>Buscar títulos, archivos o contenido...</value>
@@ -135,6 +201,18 @@
   <data name="CommonParent" xml:space="preserve">
     <value>Principal</value>
   </data>
+  <data name="CommonParentProject" xml:space="preserve">
+    <value>Proyecto principal</value>
+  </data>
+  <data name="CommonParentShow" xml:space="preserve">
+    <value>Show principal</value>
+  </data>
+  <data name="CommonParentEpisode" xml:space="preserve">
+    <value>Episodio principal</value>
+  </data>
+  <data name="CommonParentSequence" xml:space="preserve">
+    <value>Secuencia principal</value>
+  </data>
   <data name="CommonTopLevel" xml:space="preserve">
     <value>Nivel superior</value>
   </data>
@@ -146,6 +224,18 @@
   </data>
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Roadshows</value>
+  </data>
+  <data name="LibraryProjectPlaceholder" xml:space="preserve">
+    <value>Lanzamiento de producto</value>
+  </data>
+  <data name="LibraryShowPlaceholder" xml:space="preserve">
+    <value>Show matutino</value>
+  </data>
+  <data name="LibraryEpisodePlaceholder" xml:space="preserve">
+    <value>Episodio 1</value>
+  </data>
+  <data name="LibrarySequencePlaceholder" xml:space="preserve">
+    <value>Acto 1</value>
   </data>
   <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
     <value>Conexión</value>
@@ -428,6 +518,18 @@
   </data>
   <data name="TooltipCreateFolder" xml:space="preserve">
     <value>Crear carpeta</value>
+  </data>
+  <data name="TooltipCreateProject" xml:space="preserve">
+    <value>Crear proyecto</value>
+  </data>
+  <data name="TooltipCreateShow" xml:space="preserve">
+    <value>Crear show</value>
+  </data>
+  <data name="TooltipCreateEpisode" xml:space="preserve">
+    <value>Crear episodio</value>
+  </data>
+  <data name="TooltipCreateSequence" xml:space="preserve">
+    <value>Crear secuencia</value>
   </data>
   <data name="TooltipMoreScriptActions" xml:space="preserve">
     <value>Más acciones del guion</value>
@@ -1670,6 +1772,18 @@
   </data>
   <data name="CommonNoFolder" xml:space="preserve">
     <value>Sin carpeta</value>
+  </data>
+  <data name="CommonNoProject" xml:space="preserve">
+    <value>Sin proyecto</value>
+  </data>
+  <data name="CommonNoShow" xml:space="preserve">
+    <value>Sin show</value>
+  </data>
+  <data name="CommonNoEpisode" xml:space="preserve">
+    <value>Sin episodio</value>
+  </data>
+  <data name="CommonNoSequence" xml:space="preserve">
+    <value>Sin secuencia</value>
   </data>
   <data name="CommonMoveToEllipsis" xml:space="preserve">
     <value>Convidar a...</value>

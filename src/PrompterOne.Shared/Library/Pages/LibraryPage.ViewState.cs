@@ -13,6 +13,12 @@ public partial class LibraryPage
         await PersistViewStateAsync();
     }
 
+    private async Task SetOrganizationMode(LibraryOrganizationMode mode)
+    {
+        _organizationMode = mode;
+        await PersistViewStateAsync();
+    }
+
     private void RebuildLibraryView()
     {
         _folderNodes = LibraryFolderTreeBuilder.BuildTree(_folders, _allCards, _selectedFolderId, _expandedFolderIds);
@@ -117,6 +123,7 @@ public partial class LibraryPage
             ? LibrarySelectionKeys.All
             : storedState.SelectedFolderId;
         _sortMode = storedState.SortMode;
+        _organizationMode = storedState.OrganizationMode;
         _expandedFolderIds = storedState.ExpandedFolderIds
             .Where(folderId => !string.IsNullOrWhiteSpace(folderId))
             .ToHashSet(StringComparer.Ordinal);
@@ -127,6 +134,7 @@ public partial class LibraryPage
         var state = new LibraryViewState(
             SelectedFolderId: _selectedFolderId,
             SortMode: _sortMode,
+            OrganizationMode: _organizationMode,
             ExpandedFolderIds: _expandedFolderIds.OrderBy(value => value, StringComparer.Ordinal).ToArray());
 
         return SettingsStore.SaveAsync(LibrarySettingsKey, state);

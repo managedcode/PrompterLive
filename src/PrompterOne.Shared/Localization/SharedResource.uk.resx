@@ -45,6 +45,48 @@
   <data name="LibraryNewFolder" xml:space="preserve">
     <value>Нова папка</value>
   </data>
+  <data name="LibraryOrganizationModeLabel" xml:space="preserve">
+    <value>Організувати як</value>
+  </data>
+  <data name="LibraryOrganizationFolders" xml:space="preserve">
+    <value>Папки</value>
+  </data>
+  <data name="LibraryOrganizationProjects" xml:space="preserve">
+    <value>Проєкти</value>
+  </data>
+  <data name="LibraryOrganizationShows" xml:space="preserve">
+    <value>Шоу</value>
+  </data>
+  <data name="LibraryOrganizationEpisodes" xml:space="preserve">
+    <value>Епізоди</value>
+  </data>
+  <data name="LibraryOrganizationSequences" xml:space="preserve">
+    <value>Послідовності</value>
+  </data>
+  <data name="LibraryProjects" xml:space="preserve">
+    <value>Проєкти</value>
+  </data>
+  <data name="LibraryNewProject" xml:space="preserve">
+    <value>Новий проєкт</value>
+  </data>
+  <data name="LibraryShows" xml:space="preserve">
+    <value>Шоу</value>
+  </data>
+  <data name="LibraryNewShow" xml:space="preserve">
+    <value>Нове шоу</value>
+  </data>
+  <data name="LibraryEpisodes" xml:space="preserve">
+    <value>Епізоди</value>
+  </data>
+  <data name="LibraryNewEpisode" xml:space="preserve">
+    <value>Новий епізод</value>
+  </data>
+  <data name="LibrarySequences" xml:space="preserve">
+    <value>Послідовності</value>
+  </data>
+  <data name="LibraryNewSequence" xml:space="preserve">
+    <value>Нова послідовність</value>
+  </data>
   <data name="LibrarySettings" xml:space="preserve">
     <value>Налаштування</value>
   </data>
@@ -68,6 +110,30 @@
   </data>
   <data name="LibraryCreateFolderDescription" xml:space="preserve">
     <value>Організуйте сценарії у вкладені колекції, не порушуючи сітку бібліотеки.</value>
+  </data>
+  <data name="LibraryCreateProjectTitle" xml:space="preserve">
+    <value>Створити проєкт</value>
+  </data>
+  <data name="LibraryCreateProjectDescription" xml:space="preserve">
+    <value>Групуйте сценарії в проєкт, залишаючи ту саму локальну структуру бібліотеки.</value>
+  </data>
+  <data name="LibraryCreateShowTitle" xml:space="preserve">
+    <value>Створити шоу</value>
+  </data>
+  <data name="LibraryCreateShowDescription" xml:space="preserve">
+    <value>Групуйте сценарії як шоу, не прибираючи роботу з папками.</value>
+  </data>
+  <data name="LibraryCreateEpisodeTitle" xml:space="preserve">
+    <value>Створити епізод</value>
+  </data>
+  <data name="LibraryCreateEpisodeDescription" xml:space="preserve">
+    <value>Групуйте сценарії як епізод, зберігаючи наявні інструменти організації.</value>
+  </data>
+  <data name="LibraryCreateSequenceTitle" xml:space="preserve">
+    <value>Створити послідовність</value>
+  </data>
+  <data name="LibraryCreateSequenceDescription" xml:space="preserve">
+    <value>Групуйте сценарії як послідовність для запланованих виступів, сетів або впорядкованих сегментів.</value>
   </data>
   <data name="HeaderSearchPlaceholder" xml:space="preserve">
     <value>Шукати назви, файли або вміст...</value>
@@ -141,6 +207,18 @@
   <data name="CommonParent" xml:space="preserve">
     <value>Батьківська папка</value>
   </data>
+  <data name="CommonParentProject" xml:space="preserve">
+    <value>Батьківський проєкт</value>
+  </data>
+  <data name="CommonParentShow" xml:space="preserve">
+    <value>Батьківське шоу</value>
+  </data>
+  <data name="CommonParentEpisode" xml:space="preserve">
+    <value>Батьківський епізод</value>
+  </data>
+  <data name="CommonParentSequence" xml:space="preserve">
+    <value>Батьківська послідовність</value>
+  </data>
   <data name="CommonTopLevel" xml:space="preserve">
     <value>Верхній рівень</value>
   </data>
@@ -152,6 +230,18 @@
   </data>
   <data name="LibraryFolderPlaceholder" xml:space="preserve">
     <value>Роудшоу</value>
+  </data>
+  <data name="LibraryProjectPlaceholder" xml:space="preserve">
+    <value>Запуск продукту</value>
+  </data>
+  <data name="LibraryShowPlaceholder" xml:space="preserve">
+    <value>Ранкове шоу</value>
+  </data>
+  <data name="LibraryEpisodePlaceholder" xml:space="preserve">
+    <value>Епізод 1</value>
+  </data>
+  <data name="LibrarySequencePlaceholder" xml:space="preserve">
+    <value>Акт 1</value>
   </data>
   <data name="DiagnosticsConnectivityEyebrow" xml:space="preserve">
     <value>З’єднання</value>
@@ -464,6 +554,18 @@
   </data>
   <data name="TooltipCreateFolder" xml:space="preserve">
     <value>Створити папку</value>
+  </data>
+  <data name="TooltipCreateProject" xml:space="preserve">
+    <value>Створити проєкт</value>
+  </data>
+  <data name="TooltipCreateShow" xml:space="preserve">
+    <value>Створити шоу</value>
+  </data>
+  <data name="TooltipCreateEpisode" xml:space="preserve">
+    <value>Створити епізод</value>
+  </data>
+  <data name="TooltipCreateSequence" xml:space="preserve">
+    <value>Створити послідовність</value>
   </data>
   <data name="TooltipMoreScriptActions" xml:space="preserve">
     <value>Більше дій зі сценарієм</value>
@@ -1670,6 +1772,18 @@
   </data>
   <data name="CommonNoFolder" xml:space="preserve">
     <value>Немає папки</value>
+  </data>
+  <data name="CommonNoProject" xml:space="preserve">
+    <value>Немає проєкту</value>
+  </data>
+  <data name="CommonNoShow" xml:space="preserve">
+    <value>Немає шоу</value>
+  </data>
+  <data name="CommonNoEpisode" xml:space="preserve">
+    <value>Немає епізоду</value>
+  </data>
+  <data name="CommonNoSequence" xml:space="preserve">
+    <value>Немає послідовності</value>
   </data>
   <data name="CommonMoveToEllipsis" xml:space="preserve">
     <value>Перейти до...</value>
