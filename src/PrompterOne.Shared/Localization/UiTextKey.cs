@@ -528,6 +528,8 @@ public enum UiTextKey
     EditorWorkspaceSourceTab,
     EditorWorkspaceRenderedTab,
     EditorWorkspaceGraphTab,
+    EditorRenderedMoveBlockUp,
+    EditorRenderedMoveBlockDown,
     EditorMetadataSplitSection,
     EditorMetadataSplitHint,
     EditorStructureSection,

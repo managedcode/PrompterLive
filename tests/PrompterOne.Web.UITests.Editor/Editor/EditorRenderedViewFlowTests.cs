@@ -12,6 +12,22 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
     private const string RawTagClose = "]";
     private const int IntroSegmentIndex = 0;
     private const int OpeningBlockIndex = 0;
+    private const int ClosingBlockIndex = 2;
+    private const string ReorderScript = """
+        # Reorder Probe
+        ## [Scene|140WPM|neutral]
+        ### [Opening|Speaker:Host|140WPM|warm]
+        Alpha opening block.
+
+        ### [Middle|Speaker:Host|140WPM|focused]
+        Bravo middle block.
+
+        ### [Closing|Speaker:Host|140WPM|calm]
+        Charlie closing block.
+        """;
+    private const string OpeningHeading = "### [Opening|Speaker:Host|140WPM|warm]";
+    private const string MiddleHeading = "### [Middle|Speaker:Host|140WPM|focused]";
+    private const string ClosingHeading = "### [Closing|Speaker:Host|140WPM|calm]";
 
     [Test]
     public Task EditorScreen_RenderedCardsViewHidesSyntaxAndWritesBackToSource() =>
@@ -47,5 +63,36 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
             var sourceValue = await sourceInput.InputValueAsync();
             await Assert.That(sourceValue).Contains(BrowserTestConstants.Editor.OpeningBlockHeading);
             await Assert.That(sourceValue).Contains(BrowserTestConstants.Editor.BodyHeading);
+        });
+
+    [Test]
+    public Task EditorScreen_RenderedCardsView_ReordersBlocksWithFallbackAndDragDrop() =>
+        RunPageAsync(async page =>
+        {
+            await EditorIsolatedDraftDriver.CreateDraftAsync(page, "Rendered reorder probe");
+            await EditorMonacoDriver.SetTextAsync(page, ReorderScript);
+            await page.GetByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+
+            await page.GetByTestId(UiTestIds.Editor.RenderedBlockMoveDown(IntroSegmentIndex, OpeningBlockIndex)).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.SourceTab).ClickAsync();
+            var sourceInput = EditorMonacoDriver.SourceInput(page);
+            await Expect(sourceInput)
+                .ToHaveValueAsync(
+                    new Regex($"{Regex.Escape(MiddleHeading)}[\\s\\S]+{Regex.Escape(OpeningHeading)}[\\s\\S]+{Regex.Escape(ClosingHeading)}"),
+                    new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
+
+            await page.GetByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, ClosingBlockIndex))
+                .DragToAsync(page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, OpeningBlockIndex)));
+            await page.GetByTestId(UiTestIds.Editor.SourceTab).ClickAsync();
+            await Expect(sourceInput)
+                .ToHaveValueAsync(
+                    new Regex($"{Regex.Escape(ClosingHeading)}[\\s\\S]+{Regex.Escape(MiddleHeading)}[\\s\\S]+{Regex.Escape(OpeningHeading)}"),
+                    new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
+
+            var sourceValue = await sourceInput.InputValueAsync();
+            await Assert.That(sourceValue).Contains("Alpha opening block.");
+            await Assert.That(sourceValue).Contains("Bravo middle block.");
+            await Assert.That(sourceValue).Contains("Charlie closing block.");
         });
 }

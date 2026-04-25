@@ -68,6 +68,13 @@ public sealed record EditorRenderedBlockTextChange(
     int BlockIndex,
     string Text);
 
+public sealed record EditorRenderedBlockReorderRequest(
+    int SourceSegmentIndex,
+    int SourceBlockIndex,
+    int TargetSegmentIndex,
+    int TargetBlockIndex,
+    bool InsertAfterTarget);
+
 public sealed record EditorNavigationTarget(
     int SegmentIndex,
     int? BlockIndex,

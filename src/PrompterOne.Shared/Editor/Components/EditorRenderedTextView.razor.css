@@ -86,6 +86,21 @@
     flex-direction: column;
     gap: 10px;
     min-width: 0;
+    padding-block: 6px;
+    border-radius: 6px;
+    transition:
+        background-color .16s ease,
+        box-shadow .16s ease,
+        opacity .16s ease;
+}
+
+.editor-rendered-block--dragging {
+    opacity: .62;
+}
+
+.editor-rendered-block--drop-target {
+    background: rgba(56, 112, 214, .08);
+    box-shadow: inset 3px 0 0 rgba(56, 112, 214, .42);
 }
 
 .editor-rendered-block-head {
@@ -93,6 +108,51 @@
     align-items: center;
     gap: 9px;
     min-width: 0;
+}
+
+.editor-rendered-block-drag-handle {
+    flex: 0 0 auto;
+    color: #a1aaba;
+    cursor: grab;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1;
+    user-select: none;
+}
+
+.editor-rendered-block-actions {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 4px;
+    margin-inline-start: auto;
+}
+
+.editor-rendered-block-move {
+    display: inline-grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    border: 1px solid rgba(137, 148, 169, .34);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .78);
+    color: #4c5a70;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.editor-rendered-block-move:disabled {
+    cursor: default;
+    opacity: .38;
+}
+
+.editor-rendered-block-move:not(:disabled):hover,
+.editor-rendered-block-move:not(:disabled):focus-visible {
+    border-color: rgba(56, 112, 214, .48);
+    color: #244f9f;
+    outline: none;
 }
 
 .editor-rendered-block-title {

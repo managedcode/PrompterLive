@@ -1629,6 +1629,12 @@
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Graphe</value>
   </data>
+  <data name="EditorRenderedMoveBlockUp" xml:space="preserve">
+    <value>Déplacer le bloc vers le haut</value>
+  </data>
+  <data name="EditorRenderedMoveBlockDown" xml:space="preserve">
+    <value>Déplacer le bloc vers le bas</value>
+  </data>
   <data name="HeaderOpenScript" xml:space="preserve">
     <value>Importer</value>
   </data>

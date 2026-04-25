@@ -1,4 +1,7 @@
 @namespace PrompterOne.Shared.Components.Editor
+@using Microsoft.Extensions.Localization
+@using PrompterOne.Shared.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <div class="editor-rendered-view" data-test="@UiTestIds.Editor.RenderedView">
     <div class="editor-rendered-strip" data-test="@UiTestIds.Editor.RenderedStrip">
@@ -33,10 +36,35 @@
 
                     @foreach (var block in segment.Blocks)
                     {
-                        <article class="editor-rendered-block" data-test="@UiTestIds.Editor.RenderedBlock(block.SegmentIndex, block.BlockIndex)">
+                        <article class="@GetBlockCssClass(block)"
+                                 draggable="true"
+                                 @ondragstart="() => OnBlockDragStart(block)"
+                                 @ondragend="OnBlockDragEnd"
+                                 @ondragenter="() => OnBlockDragEnter(block)"
+                                 @ondragleave="() => OnBlockDragLeave(block)"
+                                 @ondragover:preventDefault="true"
+                                 @ondrop="() => OnBlockDropAsync(block)"
+                                 @ondrop:preventDefault="true"
+                                 data-test="@UiTestIds.Editor.RenderedBlock(block.SegmentIndex, block.BlockIndex)">
                             <div class="editor-rendered-block-head">
+                                <span class="editor-rendered-block-drag-handle"
+                                      aria-hidden="true">⋮⋮</span>
                                 <span class="editor-rendered-block-number">@block.Number</span>
                                 <span class="editor-rendered-block-title">@block.Name</span>
+                                <span class="editor-rendered-block-actions">
+                                    <button type="button"
+                                            class="editor-rendered-block-move"
+                                            aria-label="@Text(UiTextKey.EditorRenderedMoveBlockUp)"
+                                            disabled="@(!CanMoveBlock(block, -1))"
+                                            @onclick="() => MoveBlockByOffsetAsync(block, -1)"
+                                            data-test="@UiTestIds.Editor.RenderedBlockMoveUp(block.SegmentIndex, block.BlockIndex)">↑</button>
+                                    <button type="button"
+                                            class="editor-rendered-block-move"
+                                            aria-label="@Text(UiTextKey.EditorRenderedMoveBlockDown)"
+                                            disabled="@(!CanMoveBlock(block, 1))"
+                                            @onclick="() => MoveBlockByOffsetAsync(block, 1)"
+                                            data-test="@UiTestIds.Editor.RenderedBlockMoveDown(block.SegmentIndex, block.BlockIndex)">↓</button>
+                                </span>
                             </div>
                             <textarea class="editor-rendered-text"
                                       aria-label="@block.Name"
@@ -67,6 +95,12 @@
 
     [Parameter] public EventCallback<EditorRenderedBlockTextChange> TextChanged { get; set; }
 
+    [Parameter] public EventCallback<EditorRenderedBlockReorderRequest> BlockReorderRequested { get; set; }
+
+    private EditorRenderedBlockViewModel? _draggedBlock;
+
+    private EditorRenderedBlockViewModel? _dragOverBlock;
+
     private Task OnBlockInputAsync(EditorRenderedBlockViewModel block, ChangeEventArgs args) =>
         TextChanged.InvokeAsync(new EditorRenderedBlockTextChange(
             block.SegmentIndex,
@@ -78,4 +112,105 @@
             0,
             0,
             args.Value?.ToString() ?? string.Empty));
+
+    private void OnBlockDragStart(EditorRenderedBlockViewModel block)
+    {
+        _draggedBlock = block;
+        _dragOverBlock = null;
+    }
+
+    private void OnBlockDragEnter(EditorRenderedBlockViewModel block)
+    {
+        if (_draggedBlock is not null && !IsSameBlock(_draggedBlock, block))
+        {
+            _dragOverBlock = block;
+        }
+    }
+
+    private void OnBlockDragLeave(EditorRenderedBlockViewModel block)
+    {
+        if (_dragOverBlock is not null && IsSameBlock(_dragOverBlock, block))
+        {
+            _dragOverBlock = null;
+        }
+    }
+
+    private async Task OnBlockDropAsync(EditorRenderedBlockViewModel target)
+    {
+        var dragged = _draggedBlock;
+        _draggedBlock = null;
+        _dragOverBlock = null;
+        if (dragged is null || IsSameBlock(dragged, target))
+        {
+            return;
+        }
+
+        await BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
+            dragged.SegmentIndex,
+            dragged.BlockIndex,
+            target.SegmentIndex,
+            target.BlockIndex,
+            IsBefore(dragged, target)));
+    }
+
+    private void OnBlockDragEnd()
+    {
+        _draggedBlock = null;
+        _dragOverBlock = null;
+    }
+
+    private async Task MoveBlockByOffsetAsync(EditorRenderedBlockViewModel block, int offset)
+    {
+        var blocks = FlattenBlocks();
+        var index = blocks.FindIndex(candidate => IsSameBlock(candidate, block));
+        var targetIndex = index + offset;
+        if (index < 0 || targetIndex < 0 || targetIndex >= blocks.Count)
+        {
+            return;
+        }
+
+        var target = blocks[targetIndex];
+        await BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
+            block.SegmentIndex,
+            block.BlockIndex,
+            target.SegmentIndex,
+            target.BlockIndex,
+            offset > 0));
+    }
+
+    private bool CanMoveBlock(EditorRenderedBlockViewModel block, int offset)
+    {
+        var blocks = FlattenBlocks();
+        var index = blocks.FindIndex(candidate => IsSameBlock(candidate, block));
+        var targetIndex = index + offset;
+        return index >= 0 && targetIndex >= 0 && targetIndex < blocks.Count;
+    }
+
+    private string GetBlockCssClass(EditorRenderedBlockViewModel block)
+    {
+        var tokens = new List<string> { "editor-rendered-block" };
+        if (_draggedBlock is not null && IsSameBlock(_draggedBlock, block))
+        {
+            tokens.Add("editor-rendered-block--dragging");
+        }
+
+        if (_dragOverBlock is not null && IsSameBlock(_dragOverBlock, block))
+        {
+            tokens.Add("editor-rendered-block--drop-target");
+        }
+
+        return string.Join(' ', tokens);
+    }
+
+    private List<EditorRenderedBlockViewModel> FlattenBlocks() =>
+        Segments.SelectMany(segment => segment.Blocks).ToList();
+
+    private static bool IsSameBlock(EditorRenderedBlockViewModel left, EditorRenderedBlockViewModel right) =>
+        left.SegmentIndex == right.SegmentIndex && left.BlockIndex == right.BlockIndex;
+
+    private static bool IsBefore(EditorRenderedBlockViewModel source, EditorRenderedBlockViewModel target) =>
+        source.SegmentIndex < target.SegmentIndex ||
+        (source.SegmentIndex == target.SegmentIndex && source.BlockIndex < target.BlockIndex);
+
+    private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

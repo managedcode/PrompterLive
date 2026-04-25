@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using PrompterOne.Core.Models.CompiledScript;
 using PrompterOne.Core.Models.Editor;
 using PrompterOne.Shared.Components.Editor;
+using PrompterOne.Shared.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -73,6 +74,17 @@ public partial class EditorPage
             _sourceText.AsSpan(range.End));
         var caret = Math.Clamp(range.Start + insertion.Length, 0, nextText.Length);
         await ApplyMutationAsync(nextText, new EditorSelectionRange(caret, caret));
+    }
+
+    private async Task OnRenderedBlockReorderRequestedAsync(EditorRenderedBlockReorderRequest request)
+    {
+        var result = EditorRenderedBlockReorderService.Reorder(_sourceText, _segments, request);
+        if (result is null)
+        {
+            return;
+        }
+
+        await ApplyMutationAsync(result.Text, result.Selection);
     }
 
     private EditorOutlineBlockViewModel? FindRenderedBlock(EditorRenderedBlockTextChange change) =>
