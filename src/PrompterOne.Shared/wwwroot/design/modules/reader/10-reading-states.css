@@ -711,6 +711,30 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
     opacity: var(--tps-cue-opacity);
     vertical-align: baseline;
 }
+.rd-speed-cue-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline: .22em .08em;
+    padding: .12em .38em;
+    border: 1px solid rgba(238,219,177,.2);
+    border-radius: 6px;
+    background: rgba(16,15,13,.42);
+    color: rgba(244,226,184,.78);
+    font-family: var(--mono);
+    font-size: .28em;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    transform: translateY(-.46em);
+    vertical-align: baseline;
+    white-space: nowrap;
+}
+.rd-w.rd-now + .rd-speed-cue-label {
+    border-color: rgba(246,225,174,.42);
+    background: rgba(246,225,174,.16);
+    color: rgba(255,242,208,.96);
+}
 /* ── Volume ──
    Volume cues encode loudness through font-weight, letter-spacing, opacity,
    and text-shadow ONLY. They MUST NOT change font-size, line-height, margin,

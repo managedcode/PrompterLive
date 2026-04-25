@@ -377,6 +377,36 @@
     letter-spacing: 0.5px;
     white-space: nowrap;
 }
+.rd-speed-cue-display {
+    display: grid;
+    grid-template-columns: minmax(38px, 1fr);
+    gap: 4px;
+    width: 44px;
+}
+.rd-speed-cue-display-btn {
+    height: 24px;
+    min-width: 0;
+    padding: 0 4px;
+    border: 1px solid rgba(232,213,176,.14);
+    border-radius: 7px;
+    background: rgba(255,255,255,.045);
+    color: rgba(232,213,176,.62);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+.rd-speed-cue-display-btn:hover,
+.rd-speed-cue-display-btn:focus-visible {
+    border-color: rgba(232,213,176,.32);
+    color: rgba(244,232,204,.86);
+}
+.rd-speed-cue-display-btn.active {
+    border-color: rgba(232,213,176,.44);
+    background: rgba(232,213,176,.14);
+    color: rgba(255,244,216,.95);
+}
 
 /* Vertical range input */
 .rd-vslider {

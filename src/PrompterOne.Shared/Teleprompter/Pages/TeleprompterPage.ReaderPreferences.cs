@@ -26,6 +26,22 @@ public partial class TeleprompterPage
             ShowCameraScene = _isReaderCameraActive
         });
 
+    private async Task SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode displayMode)
+    {
+        var normalizedDisplayMode = NormalizeReaderSpeedCueDisplayMode(displayMode);
+        if (_readerSpeedCueDisplayMode == normalizedDisplayMode)
+        {
+            return;
+        }
+
+        _readerSpeedCueDisplayMode = normalizedDisplayMode;
+        await PersistReaderSettingsAsync(currentSettings => currentSettings with
+        {
+            SpeedCueDisplayMode = normalizedDisplayMode
+        });
+        StateHasChanged();
+    }
+
     private async Task PersistReaderSettingsAsync(Func<ReaderSettings, ReaderSettings> update)
     {
         var currentSettings = SessionService.State.ReaderSettings;
@@ -47,4 +63,9 @@ public partial class TeleprompterPage
 
     private static double BuildReaderScrollSpeedSetting(int speedWpm) =>
         Math.Round((double)speedWpm, 2, MidpointRounding.AwayFromZero);
+
+    private static ReaderSpeedCueDisplayMode NormalizeReaderSpeedCueDisplayMode(ReaderSpeedCueDisplayMode displayMode) =>
+        Enum.IsDefined(typeof(ReaderSpeedCueDisplayMode), displayMode)
+            ? displayMode
+            : ReaderSettingsDefaults.SpeedCueDisplayMode;
 }

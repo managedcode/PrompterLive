@@ -2,8 +2,10 @@ using System.Globalization;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Pages;
+using PrompterOne.Shared.Storage;
 using PrompterOne.Shared.Tests;
 
 namespace PrompterOne.Web.Tests;
@@ -39,8 +41,11 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private const string SpeedOffsetsNormalWord = "center";
     private const string SpeedOffsetsResumedSlowWord = "gentle";
     private const string SpeedOffsetsSlowWord = "steady";
+    private const string SpeedOffsetsSlowMultiplier = "x0.9";
     private const string SpeedOffsetsSlowWpm = "126";
     private const string SpeedOffsetsFastWpm = "154";
+    private const string SpeedCueDisplayModeMultiplierValue = "multiplier";
+    private const string SpeedCueDisplayModeWpmValue = "wpm";
     private const string WordLetterSpacingVariableName = "--tps-word-letter-spacing";
     private const string TeleprompterWord = "teleprompter";
     private const string TeleprompterPronunciation = "TELE-promp-ter";
@@ -155,6 +160,11 @@ public sealed class TeleprompterFidelityTests : BunitContext
 
             Assert.Equal("slow", slowWord.GetAttribute(TpsVisualCueContracts.SpeedAttributeName));
             Assert.Equal(SpeedOffsetsSlowWpm, slowWord.GetAttribute(UiDataAttributes.Teleprompter.EffectiveWordsPerMinute));
+            Assert.Equal(BuildWordsPerMinuteLabel(SpeedOffsetsSlowWpm), slowWord.GetAttribute(UiDataAttributes.Teleprompter.SpeedCueLabel));
+            Assert.Equal(SpeedCueDisplayModeWpmValue, slowWord.GetAttribute(UiDataAttributes.Teleprompter.SpeedCueDisplayMode));
+            Assert.Equal(
+                BuildWordsPerMinuteLabel(SpeedOffsetsSlowWpm),
+                FindReaderSpeedCueLabelByText(cut, SpeedOffsetsCardIndex, BuildWordsPerMinuteLabel(SpeedOffsetsSlowWpm)).TextContent.Trim());
             Assert.Null(slowWord.GetAttribute("title"));
             Assert.Contains("--tps-word-letter-spacing:", slowWord.GetAttribute("style"), StringComparison.Ordinal);
             Assert.True(GetLetterSpacingEm(slowWord) >= MinimumVisibleOffsetSlowLetterSpacingEm);
@@ -177,6 +187,39 @@ public sealed class TeleprompterFidelityTests : BunitContext
             Assert.True(GetWordDurationMilliseconds(slowWord) > GetWordDurationMilliseconds(normalWord));
             Assert.True(GetWordDurationMilliseconds(resumedSlowWord) > GetWordDurationMilliseconds(normalWord));
             Assert.True(GetWordDurationMilliseconds(normalWord) > GetWordDurationMilliseconds(fastWord));
+        });
+    }
+
+    [Test]
+    public async Task TeleprompterPage_SpeedCueDisplayToggleShowsMultiplierLabels()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterSpeedOffsets);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayWpm).GetAttribute("data-active"));
+            Assert.NotNull(FindReaderSpeedCueLabelByText(cut, SpeedOffsetsCardIndex, BuildWordsPerMinuteLabel(SpeedOffsetsSlowWpm)));
+        });
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
+
+        cut.WaitForAssertion(() =>
+        {
+            var slowWord = FindReaderWordByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsSlowWord);
+            var savedSettings = harness.JsRuntime.GetSavedValue<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings);
+            var visibleLabel = FindReaderSpeedCueLabelByText(cut, SpeedOffsetsCardIndex, SpeedOffsetsSlowMultiplier);
+
+            Assert.Equal(SpeedOffsetsSlowMultiplier, slowWord.GetAttribute(UiDataAttributes.Teleprompter.SpeedCueLabel));
+            Assert.Equal(SpeedCueDisplayModeMultiplierValue, slowWord.GetAttribute(UiDataAttributes.Teleprompter.SpeedCueDisplayMode));
+            Assert.Equal(SpeedOffsetsSlowMultiplier, visibleLabel.TextContent.Trim());
+            Assert.Equal(SpeedCueDisplayModeMultiplierValue, visibleLabel.GetAttribute(UiDataAttributes.Teleprompter.SpeedCueDisplayMode));
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayWpm).GetAttribute("data-active"));
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).GetAttribute("data-active"));
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, savedSettings.SpeedCueDisplayMode);
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, harness.Session.State.ReaderSettings.SpeedCueDisplayMode);
         });
     }
 
@@ -267,6 +310,12 @@ public sealed class TeleprompterFidelityTests : BunitContext
     private static AngleSharp.Dom.IElement FindReaderWordByText(IRenderedComponent<TeleprompterPage> cut, int cardIndex, string text) =>
         cut.FindAll($"[data-test^='{UiTestIds.Teleprompter.CardWordPrefix(cardIndex)}']")
             .Single(element => string.Equals(element.TextContent.Trim(), text, StringComparison.Ordinal));
+
+    private static AngleSharp.Dom.IElement FindReaderSpeedCueLabelByText(IRenderedComponent<TeleprompterPage> cut, int cardIndex, string text) =>
+        cut.FindAll($"[data-test^='{UiTestIds.Teleprompter.CardWordSpeedCueLabelPrefix(cardIndex)}']")
+            .First(element => string.Equals(element.TextContent.Trim(), text, StringComparison.Ordinal));
+
+    private static string BuildWordsPerMinuteLabel(string speedWpm) => $"{speedWpm} WPM";
 
     private static int GetWordDurationMilliseconds(AngleSharp.Dom.IElement word) =>
         int.Parse(word.GetAttribute("data-ms")!, CultureInfo.InvariantCulture);

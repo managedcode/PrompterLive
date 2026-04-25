@@ -19,6 +19,9 @@ public sealed class TeleprompterControlRailTests : BunitContext
     private const string MirrorHorizontalTooltipText = "Mirror the reader horizontally";
     private const string MirrorVerticalTooltipText = "Mirror the reader vertically";
     private const string OrientationTooltipText = "Rotate the reader between landscape and portrait";
+    private const string SpeedCueDisplayMultiplierTooltipText = "Show speed cues as multipliers";
+    private const string SpeedCueDisplayTooltipText = "Choose how speed cue labels appear";
+    private const string SpeedCueDisplayWpmTooltipText = "Show speed cues as WPM";
     private const string WidthSliderTooltipText = "Adjust the reader text width";
 
     [Test]
@@ -66,6 +69,13 @@ public sealed class TeleprompterControlRailTests : BunitContext
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipFontSizeKey, FontSliderTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipFocalKey, FocalSliderTooltipText);
             AssertTooltip(cut, UiTestIds.Teleprompter.AlignmentTooltipWidthKey, WidthSliderTooltipText);
+            AssertTooltip(cut, UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey, SpeedCueDisplayTooltipText);
+            Assert.Equal(
+                SpeedCueDisplayWpmTooltipText,
+                cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayWpm).GetAttribute("aria-label"));
+            Assert.Equal(
+                SpeedCueDisplayMultiplierTooltipText,
+                cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).GetAttribute("aria-label"));
         });
     }
 

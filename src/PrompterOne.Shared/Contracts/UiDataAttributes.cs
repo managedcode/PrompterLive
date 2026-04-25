@@ -23,6 +23,8 @@ public static class UiDataAttributes
         public const string OriginalText = "data-original-text";
         public const string PauseMilliseconds = "data-pause-ms";
         public const string Pronunciation = "data-pronunciation";
+        public const string SpeedCueDisplayMode = "data-speed-cue-display-mode";
+        public const string SpeedCueLabel = "data-speed-cue-label";
         public const string TotalMilliseconds = "data-total-ms";
         public const string TotalSeconds = "data-total-seconds";
         public const string WordState = "data-reader-word-state";

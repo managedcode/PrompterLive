@@ -49,7 +49,8 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             MirrorVertical: true,
             TextAlignment: ReaderTextAlignment.Right,
             TextOrientation: ReaderTextOrientation.Portrait,
-            FocalPointPercent: PersistedFocalPointPercent);
+            FocalPointPercent: PersistedFocalPointPercent,
+            SpeedCueDisplayMode: ReaderSpeedCueDisplayMode.Multiplier);
 
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.TeleprompterDemo);
@@ -84,6 +85,8 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Equal(
                 RightAlignmentValue,
                 cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("data-reader-text-alignment"));
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayWpm).GetAttribute("data-active"));
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).GetAttribute("data-active"));
             Assert.Contains(PortraitOrientationTransform, clusterWrapStyle, StringComparison.Ordinal);
             Assert.Contains(HorizontalMirrorTransform, clusterWrapStyle, StringComparison.Ordinal);
             Assert.Contains(VerticalMirrorTransform, clusterWrapStyle, StringComparison.Ordinal);
@@ -114,6 +117,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         await cut.FindByTestId(UiTestIds.Teleprompter.MirrorVerticalToggle).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
 
         cut.WaitForAssertion(() =>
@@ -151,12 +155,14 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.True(savedSettings.MirrorVertical);
             Assert.Equal(ReaderTextAlignment.Justify, savedSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, savedSettings.TextOrientation);
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, savedSettings.SpeedCueDisplayMode);
             Assert.Equal(expectedShowCameraScene, savedSettings.ShowCameraScene);
             Assert.Equal(expectedCameraAttribute, cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground).GetAttribute("data-camera-autostart"));
             Assert.True(harness.Session.State.ReaderSettings.MirrorText);
             Assert.True(harness.Session.State.ReaderSettings.MirrorVertical);
             Assert.Equal(ReaderTextAlignment.Justify, harness.Session.State.ReaderSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, harness.Session.State.ReaderSettings.TextOrientation);
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, harness.Session.State.ReaderSettings.SpeedCueDisplayMode);
             Assert.Equal(expectedUpdatedSpeedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
             Assert.Equal(expectedShowCameraScene, harness.Session.State.ReaderSettings.ShowCameraScene);
         }, PersistenceAssertionTimeout);

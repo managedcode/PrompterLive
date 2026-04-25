@@ -49,6 +49,10 @@ public static partial class UiTestIds
         public const string ProgressLabel = "teleprompter-progress-label";
         public const string ProgressSegments = "teleprompter-progress-segments";
         public const string SpeedDown = "teleprompter-speed-down";
+        public const string SpeedCueDisplayMode = "teleprompter-speed-cue-display-mode";
+        public const string SpeedCueDisplayMultiplier = "teleprompter-speed-cue-display-multiplier";
+        public const string SpeedCueDisplayTooltipKey = "speed-cue-display";
+        public const string SpeedCueDisplayWpm = "teleprompter-speed-cue-display-wpm";
         public const string SpeedUp = "teleprompter-speed-up";
         public const string SpeedValue = "teleprompter-speed-value";
         public const string Sliders = "teleprompter-sliders";
@@ -77,6 +81,11 @@ public static partial class UiTestIds
             $"teleprompter-card-word-{cardIndex}-{groupIndex}-{wordIndex}";
 
         public static string CardWordPrefix(int cardIndex) => $"teleprompter-card-word-{cardIndex}-";
+
+        public static string CardWordSpeedCueLabel(int cardIndex, int groupIndex, int wordIndex) =>
+            $"teleprompter-speed-cue-label-{cardIndex}-{groupIndex}-{wordIndex}";
+
+        public static string CardWordSpeedCueLabelPrefix(int cardIndex) => $"teleprompter-speed-cue-label-{cardIndex}-";
 
         public static string ProgressSegmentFill(int index) => $"teleprompter-progress-segment-fill-{index}";
 

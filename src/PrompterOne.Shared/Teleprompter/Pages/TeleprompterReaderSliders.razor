@@ -1,5 +1,6 @@
 @namespace PrompterOne.Shared.Pages
 @using Microsoft.AspNetCore.Components.Web
+@using PrompterOne.Core.Models.Workspace
 @using PrompterOne.Shared.Contracts
 
 <div class="rd-sliders" data-test="@UiTestIds.Teleprompter.Sliders">
@@ -84,6 +85,34 @@
               role="tooltip"
               data-test="@BuildTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)">@WidthTitle</span>
     </div>
+    <div class="rd-rail-tip-anchor"
+         @onmouseenter="@(() => HandleTooltipPointerEnter(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
+         @onmouseleave="@(() => HandleTooltipPointerLeave(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
+         @onfocusin="@(() => HandleTooltipFocusIn(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
+         @onfocusout="@(() => HandleTooltipFocusOut(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
+         @onpointerdown="@(() => HandleTooltipPointerDown(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
+         @onkeydown="@((KeyboardEventArgs args) => HandleTooltipKeyDown(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey, args))">
+        <div class="rd-speed-cue-display" data-test="@UiTestIds.Teleprompter.SpeedCueDisplayMode">
+            <button type="button"
+                    class="@BuildSpeedCueDisplayButtonCssClass(ReaderSpeedCueDisplayMode.WordsPerMinute)"
+                    aria-label="@SpeedCueDisplayWpmTitle"
+                    aria-pressed="@BuildBooleanDataAttribute(IsWordsPerMinuteMode)"
+                    data-active="@BuildBooleanDataAttribute(IsWordsPerMinuteMode)"
+                    data-test="@UiTestIds.Teleprompter.SpeedCueDisplayWpm"
+                    @onclick="OnSetSpeedCueDisplayWpm">WPM</button>
+            <button type="button"
+                    class="@BuildSpeedCueDisplayButtonCssClass(ReaderSpeedCueDisplayMode.Multiplier)"
+                    aria-label="@SpeedCueDisplayMultiplierTitle"
+                    aria-pressed="@BuildBooleanDataAttribute(IsMultiplierMode)"
+                    data-active="@BuildBooleanDataAttribute(IsMultiplierMode)"
+                    data-test="@UiTestIds.Teleprompter.SpeedCueDisplayMultiplier"
+                    @onclick="OnSetSpeedCueDisplayMultiplier">x1.5</button>
+        </div>
+        <span id="@BuildTooltipDomId(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey)"
+              class="@BuildTooltipCssClass(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey, false)"
+              role="tooltip"
+              data-test="@BuildTooltipTestId(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey)">@SpeedCueDisplayTitle</span>
+    </div>
 </div>
 
 @code {
@@ -104,7 +133,13 @@
     [Parameter, EditorRequired] public string FocalTitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnFontInput { get; set; }
     [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnFocalInput { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnSetSpeedCueDisplayMultiplier { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnSetSpeedCueDisplayWpm { get; set; }
     [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnWidthInput { get; set; }
+    [Parameter] public ReaderSpeedCueDisplayMode SpeedCueDisplayMode { get; set; } = ReaderSettingsDefaults.SpeedCueDisplayMode;
+    [Parameter, EditorRequired] public string SpeedCueDisplayMultiplierTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SpeedCueDisplayTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SpeedCueDisplayWpmTitle { get; set; } = string.Empty;
     [Parameter] public Action<string>? TooltipFocusIn { get; set; }
     [Parameter] public Action<string>? TooltipFocusOut { get; set; }
     [Parameter] public Action<string, KeyboardEventArgs>? TooltipKeyDown { get; set; }
@@ -122,6 +157,17 @@
     private string BuildTooltipDomId(string key) => TooltipDomIdFactory(key);
 
     private string BuildTooltipTestId(string key) => TooltipTestIdFactory(key);
+
+    private bool IsMultiplierMode => SpeedCueDisplayMode == ReaderSpeedCueDisplayMode.Multiplier;
+
+    private bool IsWordsPerMinuteMode => SpeedCueDisplayMode == ReaderSpeedCueDisplayMode.WordsPerMinute;
+
+    private string BuildSpeedCueDisplayButtonCssClass(ReaderSpeedCueDisplayMode displayMode) =>
+        SpeedCueDisplayMode == displayMode
+            ? "rd-speed-cue-display-btn active"
+            : "rd-speed-cue-display-btn";
+
+    private static string BuildBooleanDataAttribute(bool value) => value ? "true" : "false";
 
     private void HandleTooltipFocusIn(string key) => TooltipFocusIn?.Invoke(key);
 

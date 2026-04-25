@@ -80,6 +80,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private int _readerBaseTpsWpm = ReaderDefaultPlaybackSpeedWpm;
     private int _readerPlaybackSpeedWpm = ReaderDefaultPlaybackSpeedWpm;
     private int _readerTextWidthPercent = DefaultReaderTextWidthPercent;
+    private ReaderSpeedCueDisplayMode _readerSpeedCueDisplayMode = ReaderSettingsDefaults.SpeedCueDisplayMode;
     private ReaderTextAlignment _readerTextAlignment = ReaderSettingsDefaults.TextAlignment;
     private ReaderTextOrientation _readerTextOrientation = ReaderSettingsDefaults.TextOrientation;
     private int _totalDurationMilliseconds = 1000;
@@ -181,6 +182,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         _isReaderMirrorHorizontal = SessionService.State.ReaderSettings.MirrorText;
         _isReaderMirrorVertical = SessionService.State.ReaderSettings.MirrorVertical;
         _readerTextWidthPercent = NormalizeReaderTextWidth(SessionService.State.ReaderSettings.TextWidth);
+        _readerSpeedCueDisplayMode = NormalizeReaderSpeedCueDisplayMode(SessionService.State.ReaderSettings.SpeedCueDisplayMode);
         _readerTextAlignment = NormalizeReaderTextAlignment(SessionService.State.ReaderSettings.TextAlignment);
         _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
         _activeReaderCardIndex = 0;

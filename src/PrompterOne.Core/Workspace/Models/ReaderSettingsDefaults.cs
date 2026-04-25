@@ -14,4 +14,5 @@ public static class ReaderSettingsDefaults
     public const bool ShowProgress = true;
     public const bool ShowCameraScene = false;
     public const int FocalPointPercent = 30;
+    public const ReaderSpeedCueDisplayMode SpeedCueDisplayMode = ReaderSpeedCueDisplayMode.WordsPerMinute;
 }

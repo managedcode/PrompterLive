@@ -432,6 +432,15 @@
   <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
     <value>Налаштувати ширину тексту суфлера</value>
   </data>
+  <data name="TooltipReaderSpeedCueDisplay" xml:space="preserve">
+    <value>Виберіть, як показувати позначки швидкості</value>
+  </data>
+  <data name="TooltipReaderSpeedCueDisplayWpm" xml:space="preserve">
+    <value>Показувати позначки швидкості як WPM</value>
+  </data>
+  <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
+    <value>Показувати позначки швидкості як множники</value>
+  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Менший текст</value>
   </data>

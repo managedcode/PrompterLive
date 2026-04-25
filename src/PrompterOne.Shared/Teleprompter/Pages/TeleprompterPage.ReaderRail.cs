@@ -16,6 +16,12 @@ public partial class TeleprompterPage
 
     private string ReaderFontSliderTitle => Text(UiTextKey.TooltipAdjustReaderTextSize);
 
+    private string ReaderSpeedCueDisplayMultiplierTitle => Text(UiTextKey.TooltipReaderSpeedCueDisplayMultiplier);
+
+    private string ReaderSpeedCueDisplayTitle => Text(UiTextKey.TooltipReaderSpeedCueDisplay);
+
+    private string ReaderSpeedCueDisplayWpmTitle => Text(UiTextKey.TooltipReaderSpeedCueDisplayWpm);
+
     private string ReaderFullscreenTitle => Text(UiTextKey.TooltipToggleBrowserFullscreen);
 
     private string ReaderMirrorHorizontalTitle => Text(UiTextKey.TooltipMirrorReaderHorizontally);

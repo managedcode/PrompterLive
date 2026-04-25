@@ -76,8 +76,8 @@
 
     .rd-sliders,
     .rd-left-rail {
-        gap: 12px;
-        padding: 8px 4px;
+        gap: 8px;
+        padding: 6px 4px;
     }
 
     .rd-left-rail {
@@ -119,8 +119,18 @@
         font-size: 8px;
     }
 
+    .rd-speed-cue-display {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 70px;
+    }
+
+    .rd-speed-cue-display-btn {
+        height: 22px;
+        font-size: 8px;
+    }
+
     .rd-vslider {
-        height: 74px;
+        height: 68px;
     }
 
     .rd-mirror-btn {
@@ -163,7 +173,7 @@
 @media (max-height: 400px) {
     .rd-sliders,
     .rd-mirror-controls {
-        gap: 8px;
+        gap: 6px;
         padding: 6px 4px;
     }
 
@@ -176,6 +186,15 @@
     }
 
     .rd-slider-val {
+        font-size: 7px;
+    }
+
+    .rd-speed-cue-display {
+        width: 64px;
+    }
+
+    .rd-speed-cue-display-btn {
+        height: 20px;
         font-size: 7px;
     }
 

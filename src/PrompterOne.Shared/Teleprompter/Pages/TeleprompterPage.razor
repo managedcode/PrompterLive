@@ -58,6 +58,10 @@
                                        FontValue="@_readerFontSize" FocalMax="@ReaderMaxFocalPointPercent" FocalMin="@ReaderMinFocalPointPercent"
                                        FocalTitle="@ReaderFocalSliderTitle" FocalValue="@_readerFocalPointPercent" OnFontInput="HandleReaderFontSizeInputAsync"
                                        OnFocalInput="HandleReaderFocalPointInputAsync" OnWidthInput="HandleReaderTextWidthInputAsync"
+                                       OnSetSpeedCueDisplayMultiplier="@(() => SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode.Multiplier))"
+                                       OnSetSpeedCueDisplayWpm="@(() => SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode.WordsPerMinute))"
+                                       SpeedCueDisplayMode="@_readerSpeedCueDisplayMode" SpeedCueDisplayMultiplierTitle="@ReaderSpeedCueDisplayMultiplierTitle"
+                                       SpeedCueDisplayTitle="@ReaderSpeedCueDisplayTitle" SpeedCueDisplayWpmTitle="@ReaderSpeedCueDisplayWpmTitle"
                                        TooltipCssClassFactory="BuildRailTooltipCssClass" TooltipDomIdFactory="BuildRailTooltipDomId"
                                        TooltipFocusIn="HandleRailTooltipFocusIn" TooltipFocusOut="HandleRailTooltipFocusOut"
                                        TooltipKeyDown="HandleRailTooltipKeyDown" TooltipPointerDown="HandleRailTooltipPointerDown"
@@ -121,11 +125,18 @@
                                                 @for (var wordIndex = 0; wordIndex < group.Words.Count; wordIndex++)
                                                 {
                                                     var word = group.Words[wordIndex];
+                                                    var speedCueLabel = BuildReaderWordSpeedCueLabel(word, entry.card.TargetWpm);
                                                     <span class="@BuildReaderWordCssClass(entry.index, chunkIndex, wordIndex)"
                                                           id="@UiDomIds.Teleprompter.CardWord(entry.index, chunkIndex, wordIndex)"
-                                                          @attributes="BuildReaderWordDataAttributes(word, entry.index, chunkIndex, wordIndex)"
+                                                          @attributes="BuildReaderWordDataAttributes(word, entry.card.TargetWpm, entry.index, chunkIndex, wordIndex)"
                                                           style="@word.Style"
                                                           data-test="@BuildReaderWordTestId(entry.index, chunkIndex, wordIndex)">@word.Text</span>
+                                                    @if (!string.IsNullOrWhiteSpace(speedCueLabel))
+                                                    {
+                                                        <span class="rd-speed-cue-label"
+                                                              @attributes="BuildReaderSpeedCueLabelDataAttributes(speedCueLabel)"
+                                                              data-test="@UiTestIds.Teleprompter.CardWordSpeedCueLabel(entry.index, chunkIndex, wordIndex)">@speedCueLabel</span>
+                                                    }
                                                     @if (wordIndex < group.Words.Count - 1)
                                                     {
                                                         @(" ")

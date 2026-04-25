@@ -396,6 +396,15 @@
   <data name="TooltipAdjustReaderTextWidth" xml:space="preserve">
     <value>Lesetextbreite anpassen</value>
   </data>
+  <data name="TooltipReaderSpeedCueDisplay" xml:space="preserve">
+    <value>Anzeige der Geschwindigkeitsmarken auswählen</value>
+  </data>
+  <data name="TooltipReaderSpeedCueDisplayWpm" xml:space="preserve">
+    <value>Geschwindigkeitsmarken als WPM anzeigen</value>
+  </data>
+  <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
+    <value>Geschwindigkeitsmarken als Multiplikatoren anzeigen</value>
+  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Kleinerer Text</value>
   </data>

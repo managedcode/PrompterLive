@@ -14,6 +14,9 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
     private const int SpeedOffsetsCardIndex = 0;
     private const int StatisticsCardIndex = 2;
     private const int InspirationCardIndex = 6;
+    private const string SpeedCueDisplayModeMultiplierValue = "multiplier";
+    private const string SpeedCueDisplayModeWpmValue = "wpm";
+    private const string SpeedOffsetsSlowMultiplier = "x0.9";
 
     [Test]
     public async Task TeleprompterProductLaunch_FullTpsScenario_CapturesArtifactsAndKeepsAlignment()
@@ -77,6 +80,10 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
 
             await Assert.That(slowWord.SpeedCue).IsEqualTo(TpsVisualCueContracts.SpeedCueSlow);
             await Assert.That(slowWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm);
+            await Assert.That(slowWord.SpeedCueLabel).IsEqualTo(BuildWordsPerMinuteLabel(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm));
+            await Assert.That(slowWord.SpeedCueDisplayMode).IsEqualTo(SpeedCueDisplayModeWpmValue);
+            await Assert.That(slowWord.VisibleSpeedCueLabel).IsEqualTo(BuildWordsPerMinuteLabel(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWpm));
+            await Assert.That(slowWord.VisibleSpeedCueDisplayMode).IsEqualTo(SpeedCueDisplayModeWpmValue);
             await Assert.That(slowWord.Title).IsEqualTo(string.Empty);
 
             await Assert.That(normalWord.EffectiveWpm).IsEqualTo(BrowserTestConstants.TeleprompterFlow.SpeedOffsetsNormalWpm);
@@ -97,6 +104,16 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
             await Assert.That(ParsePixels(slowWord.LetterSpacing) > ParsePixels(normalWord.LetterSpacing)).IsTrue();
             await Assert.That(ParsePixels(resumedSlowWord.LetterSpacing) > ParsePixels(normalWord.LetterSpacing)).IsTrue();
             await Assert.That(ParsePixels(fastWord.LetterSpacing) < ParsePixels(normalWord.LetterSpacing)).IsTrue();
+
+            await page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier))
+                .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.Teleprompter.ActiveStateValue);
+
+            var multiplierSlowWord = await GetWordProbeAsync(page, SpeedOffsetsCardIndex, BrowserTestConstants.TeleprompterFlow.SpeedOffsetsSlowWord);
+            await Assert.That(multiplierSlowWord.SpeedCueLabel).IsEqualTo(SpeedOffsetsSlowMultiplier);
+            await Assert.That(multiplierSlowWord.SpeedCueDisplayMode).IsEqualTo(SpeedCueDisplayModeMultiplierValue);
+            await Assert.That(multiplierSlowWord.VisibleSpeedCueLabel).IsEqualTo(SpeedOffsetsSlowMultiplier);
+            await Assert.That(multiplierSlowWord.VisibleSpeedCueDisplayMode).IsEqualTo(SpeedCueDisplayModeMultiplierValue);
         }
         finally
         {
@@ -179,7 +196,7 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
 
                 const computed = window.getComputedStyle(word);
                 const card = word.closest(`[${args.cardStateAttributeName}]`);
-                return {
+                const probe = {
                     cardState: card instanceof HTMLElement ? card.getAttribute(args.cardStateAttributeName) ?? '' : '',
                     style: word.getAttribute('style') ?? '',
                     title: word.getAttribute('title') ?? '',
@@ -193,10 +210,23 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                     speedCue: word.getAttribute(args.speedAttributeName) ?? '',
                     highlightCue: word.getAttribute(args.highlightAttributeName) ?? '',
                     stressCue: word.getAttribute(args.stressAttributeName) ?? '',
+                    speedCueLabel: word.getAttribute(args.speedCueLabelAttributeName) ?? '',
+                    speedCueDisplayMode: word.getAttribute(args.speedCueDisplayModeAttributeName) ?? '',
+                    visibleSpeedCueLabel: '',
+                    visibleSpeedCueDisplayMode: '',
                     letterSpacing: computed.letterSpacing ?? '',
                     color: computed.color ?? '',
                     backgroundColor: computed.backgroundColor ?? ''
                 };
+
+                const visibleLabel = word.nextElementSibling;
+                if (visibleLabel instanceof HTMLElement &&
+                    visibleLabel.getAttribute('data-test')?.startsWith(args.speedCueLabelPrefix)) {
+                    probe.visibleSpeedCueLabel = visibleLabel.textContent?.trim() ?? '';
+                    probe.visibleSpeedCueDisplayMode = visibleLabel.getAttribute(args.speedCueDisplayModeAttributeName) ?? '';
+                }
+
+                return probe;
             }
             """,
             new
@@ -211,6 +241,9 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
                 wordPrefix = UiTestIds.Teleprompter.CardWordPrefix(cardIndex),
                 pronunciationAttributeName = UiDataAttributes.Teleprompter.Pronunciation,
                 speedAttributeName = TpsVisualCueContracts.SpeedAttributeName,
+                speedCueDisplayModeAttributeName = UiDataAttributes.Teleprompter.SpeedCueDisplayMode,
+                speedCueLabelAttributeName = UiDataAttributes.Teleprompter.SpeedCueLabel,
+                speedCueLabelPrefix = UiTestIds.Teleprompter.CardWordSpeedCueLabelPrefix(cardIndex),
                 stressAttributeName = TpsVisualCueContracts.StressAttributeName,
                 volumeAttributeName = TpsVisualCueContracts.VolumeAttributeName,
                 deliveryAttributeName = TpsVisualCueContracts.DeliveryAttributeName
@@ -233,6 +266,8 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
     private static int ParseMilliseconds(string value) =>
         int.Parse(value, CultureInfo.InvariantCulture);
 
+    private static string BuildWordsPerMinuteLabel(string speedWpm) => $"{speedWpm} WPM";
+
     private sealed class ReaderWordProbe
     {
         public string CardState { get; set; } = string.Empty;
@@ -246,8 +281,12 @@ public sealed class TeleprompterFullFlowTests(StandaloneAppFixture fixture)
         public string VolumeCue { get; set; } = string.Empty;
         public string DeliveryCue { get; set; } = string.Empty;
         public string SpeedCue { get; set; } = string.Empty;
+        public string SpeedCueDisplayMode { get; set; } = string.Empty;
+        public string SpeedCueLabel { get; set; } = string.Empty;
         public string HighlightCue { get; set; } = string.Empty;
         public string StressCue { get; set; } = string.Empty;
+        public string VisibleSpeedCueDisplayMode { get; set; } = string.Empty;
+        public string VisibleSpeedCueLabel { get; set; } = string.Empty;
         public string LetterSpacing { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
         public string BackgroundColor { get; set; } = string.Empty;

@@ -1,6 +1,7 @@
 using System.Globalization;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -49,6 +50,9 @@ public partial class TeleprompterPage
     private const string ReaderWordActiveCssClass = "rd-now";
     private const string ReaderWordCssClass = "rd-w";
     private const string ReaderWordReadCssClass = "rd-read";
+    private const string ReaderSpeedCueDisplayMultiplierValue = "multiplier";
+    private const string ReaderSpeedCueDisplayWordsPerMinuteValue = "wpm";
+    private const string ReaderSpeedMultiplierPrefix = "x";
     private const string ReaderWordsPerMinuteSuffix = "WPM";
 
     private void UpdateReaderDisplayState(bool instantAlignment = false, bool requestAlignment = true)
@@ -381,10 +385,12 @@ public partial class TeleprompterPage
 
     private IReadOnlyDictionary<string, object> BuildReaderWordDataAttributes(
         ReaderWordViewModel word,
+        int targetWpm,
         int cardIndex,
         int chunkIndex,
         int wordIndex)
     {
+        var speedCueLabel = BuildReaderWordSpeedCueLabel(word, targetWpm);
         var attributes = new Dictionary<string, object>(StringComparer.Ordinal)
         {
             [UiDataAttributes.Teleprompter.DurationMilliseconds] = word.DurationMs,
@@ -407,6 +413,15 @@ public partial class TeleprompterPage
             attributes,
             UiDataAttributes.Teleprompter.WordState,
             BuildReaderWordStateDataAttribute(cardIndex, chunkIndex, wordIndex));
+        AddOptionalDataAttribute(
+            attributes,
+            UiDataAttributes.Teleprompter.SpeedCueLabel,
+            speedCueLabel);
+
+        if (!string.IsNullOrWhiteSpace(speedCueLabel))
+        {
+            attributes[UiDataAttributes.Teleprompter.SpeedCueDisplayMode] = BuildReaderSpeedCueDisplayModeDataAttribute();
+        }
 
         if (word.Attributes is not null)
         {
@@ -418,6 +433,13 @@ public partial class TeleprompterPage
 
         return attributes;
     }
+
+    private IReadOnlyDictionary<string, object> BuildReaderSpeedCueLabelDataAttributes(string speedCueLabel) =>
+        new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [UiDataAttributes.Teleprompter.SpeedCueLabel] = speedCueLabel,
+            [UiDataAttributes.Teleprompter.SpeedCueDisplayMode] = BuildReaderSpeedCueDisplayModeDataAttribute()
+        };
 
     private string ResolveReaderCardCssClass(int index) =>
         index == _activeReaderCardIndex
@@ -473,6 +495,33 @@ public partial class TeleprompterPage
             : $"{BuildProgressPercent():0}% · {_activeReaderCardIndex + 1} / {_cards.Count}";
 
     private string BuildReaderSpeedLabel() => $"{_readerPlaybackSpeedWpm} {ReaderWordsPerMinuteSuffix}";
+
+    private string? BuildReaderWordSpeedCueLabel(ReaderWordViewModel word, int targetWpm)
+    {
+        if (!ShouldShowReaderSpeedCueLabel(word) || word.EffectiveWpm is not int effectiveWpm)
+        {
+            return null;
+        }
+
+        return _readerSpeedCueDisplayMode == ReaderSpeedCueDisplayMode.Multiplier
+            ? BuildReaderSpeedMultiplierLabel(targetWpm, effectiveWpm)
+            : $"{effectiveWpm.ToString(CultureInfo.InvariantCulture)} {Text(UiTextKey.CommonWpm)}";
+    }
+
+    private string BuildReaderSpeedCueDisplayModeDataAttribute() =>
+        _readerSpeedCueDisplayMode == ReaderSpeedCueDisplayMode.Multiplier
+            ? ReaderSpeedCueDisplayMultiplierValue
+            : ReaderSpeedCueDisplayWordsPerMinuteValue;
+
+    private static string BuildReaderSpeedMultiplierLabel(int targetWpm, int effectiveWpm)
+    {
+        var ratio = effectiveWpm / (double)Math.Max(MinimumReaderReferenceWpm, targetWpm);
+        return ReaderSpeedMultiplierPrefix + ratio.ToString("0.##", CultureInfo.InvariantCulture);
+    }
+
+    private static bool ShouldShowReaderSpeedCueLabel(ReaderWordViewModel word) =>
+        word.EffectiveWpm.HasValue &&
+        word.Attributes?.ContainsKey(TpsVisualCueContracts.SpeedAttributeName) == true;
 
     private static string BuildReaderProgressSegmentStyle(ReaderCardViewModel card) =>
         $"flex:{BuildReaderProgressSegmentFlexWeight(card)} 1 0;min-width:0;";
