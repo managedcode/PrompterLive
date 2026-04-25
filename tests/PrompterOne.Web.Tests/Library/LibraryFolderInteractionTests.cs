@@ -121,6 +121,18 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Test]
+    public void LibraryPage_CardPlaybackActionsUseClearModeLabels()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal("Practice", cut.FindByTestId(UiTestIds.Library.CardLearn(AppTestData.Scripts.DemoId)).TextContent.Trim());
+            Assert.Equal("Teleprompter", cut.FindByTestId(UiTestIds.Library.CardRead(AppTestData.Scripts.DemoId)).TextContent.Trim());
+        });
+    }
+
+    [Test]
     public async Task LibraryPage_CancelsFolderOverlay_WithoutCreatingFolder()
     {
         var cut = Render<LibraryPage>();

@@ -1639,10 +1639,10 @@
     <value>{0:N0} слова</value>
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
-    <value>вчитися</value>
+    <value>Практика</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
-    <value>Прочитайте</value>
+    <value>Телесуфлер</value>
   </data>
   <data name="LibraryDefaultAuthor" xml:space="preserve">
     <value>Ви</value>

@@ -1639,10 +1639,10 @@
     <value>{0:N0} Wörter</value>
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
-    <value>Lernen</value>
+    <value>Üben</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
-    <value>Lesen</value>
+    <value>Teleprompter</value>
   </data>
   <data name="LibraryDefaultAuthor" xml:space="preserve">
     <value>Du</value>

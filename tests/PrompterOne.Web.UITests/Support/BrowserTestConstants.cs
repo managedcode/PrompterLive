@@ -205,6 +205,8 @@ internal static partial class BrowserTestConstants
         public const string CreateShowTitle = "Create Show";
         public const string ShowPlaceholder = "Morning show";
         public const string DemoToneLabel = "Warm";
+        public const string PracticeActionLabel = "Practice";
+        public const string TeleprompterActionLabel = "Teleprompter";
     }
 
     public static class Editor

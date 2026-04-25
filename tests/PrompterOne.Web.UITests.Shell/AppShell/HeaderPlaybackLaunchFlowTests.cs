@@ -19,6 +19,11 @@ public sealed class HeaderPlaybackLaunchFlowTests(StandaloneAppFixture fixture)
 
             await ShellRouteDriver.OpenLibraryAsync(page);
 
+            await Expect(page.GetByTestId(UiTestIds.Library.CardLearn(BrowserTestConstants.Scripts.QuantumId)))
+                .ToHaveTextAsync(BrowserTestConstants.Library.PracticeActionLabel);
+            await Expect(page.GetByTestId(UiTestIds.Library.CardRead(BrowserTestConstants.Scripts.QuantumId)))
+                .ToHaveTextAsync(BrowserTestConstants.Library.TeleprompterActionLabel);
+
             await UiInteractionDriver.ClickAndContinueAsync(
                 page.GetByTestId(UiTestIds.Library.CardLearn(BrowserTestConstants.Scripts.QuantumId)),
                 noWaitAfter: true);

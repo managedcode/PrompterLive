@@ -1417,10 +1417,10 @@
     <value>Palavras {0:N0}</value>
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
-    <value>Aprender</value>
+    <value>Praticar</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
-    <value>Ler</value>
+    <value>Teleprompter</value>
   </data>
   <data name="LibraryDefaultAuthor" xml:space="preserve">
     <value>Você</value>

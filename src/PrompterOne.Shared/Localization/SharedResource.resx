@@ -592,10 +592,10 @@
     <value>{0:N0} words</value>
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
-    <value>Read</value>
+    <value>Teleprompter</value>
   </data>
   <data name="LibraryDefaultAuthor" xml:space="preserve">
     <value>You</value>
