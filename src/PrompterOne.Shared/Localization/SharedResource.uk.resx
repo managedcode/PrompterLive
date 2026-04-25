@@ -318,6 +318,48 @@
   <data name="SettingsNavLanguage" xml:space="preserve">
     <value>Мова</value>
   </data>
+  <data name="SettingsNavHelp" xml:space="preserve">
+    <value>Довідка</value>
+  </data>
+  <data name="SettingsHelpSectionDescription" xml:space="preserve">
+    <value>Вивчіть робочий процес PrompterOne, основи TPS, режими репетиції та поведінку локальних файлів, не виходячи із застосунку.</value>
+  </data>
+  <data name="SettingsHelpAppFlowTitle" xml:space="preserve">
+    <value>Робочий процес PrompterOne</value>
+  </data>
+  <data name="SettingsHelpAppFlowSubtitle" xml:space="preserve">
+    <value>Від бібліотеки сценаріїв до живої подачі</value>
+  </data>
+  <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
+    <value>Почніть у Library, напишіть або імпортуйте сценарій в Editor, перейдіть у Cards, коли потрібне візуальне редагування без синтаксису TPS, репетируйте в Learn, читайте в Teleprompter і використовуйте Go Live, коли готові записувати або транслювати.</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
+    <value>Основи стандарту TPS</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsSubtitle" xml:space="preserve">
+    <value>Звичайний текст із легкими підказками для виконання</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsCopy" xml:space="preserve">
+    <value>TPS зберігає сценарій читабельним і водночас додає структуру та намір подачі. Використовуйте заголовки ## для сегментів, заголовки ### для блоків, значення WPM для темпу, емоції для тону й підказки в дужках, як-от паузи, швидкість, вимова, акцент і нотатки щодо подачі.</value>
+  </data>
+  <data name="SettingsHelpModesTitle" xml:space="preserve">
+    <value>Режими письма та репетиції</value>
+  </data>
+  <data name="SettingsHelpModesSubtitle" xml:space="preserve">
+    <value>Виберіть поверхню під конкретну задачу</value>
+  </data>
+  <data name="SettingsHelpModesCopy" xml:space="preserve">
+    <value>Source призначений для сирого редагування TPS, Cards — для редагування відрендерених блоків, Graph показує структуру сценарію, Learn використовує RSVP для практики слово за словом, Teleprompter є живим рідером, а Go Live поєднує читання з камерою, записом і керуванням трансляцією.</value>
+  </data>
+  <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
+    <value>Локальні файли та історія</value>
+  </data>
+  <data name="SettingsHelpLocalFilesSubtitle" xml:space="preserve">
+    <value>Спершу автозбереження, імпорт і експорт за потреби</value>
+  </data>
+  <data name="SettingsHelpLocalFilesCopy" xml:space="preserve">
+    <value>PrompterOne зберігає сценарії та налаштування локально в браузері. Використовуйте Import і Export для файлів на диску, покладайтеся на локальне автозбереження під час письма та використовуйте локальну історію, щоб відновити попередні редакції поточного сценарію.</value>
+  </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Скорочення</value>
   </data>

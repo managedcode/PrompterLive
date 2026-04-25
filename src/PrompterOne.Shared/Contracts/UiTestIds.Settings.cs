@@ -32,6 +32,11 @@ public static partial class UiTestIds
         public const string FeedbackOpen = "settings-feedback-open";
         public const string FeedbackPanel = "settings-feedback-panel";
         public const string FilesExportsCard = "settings-files-exports-card";
+        public const string HelpAppFlowCard = "settings-help-app-flow-card";
+        public const string HelpLocalFilesCard = "settings-help-local-files-card";
+        public const string HelpModesCard = "settings-help-modes-card";
+        public const string HelpPanel = "settings-help-panel";
+        public const string HelpTpsBasicsCard = "settings-help-tps-basics-card";
         public const string LanguagePanel = "settings-language-panel";
         public const string LanguagePreferencesCard = "settings-language-preferences-card";
         public const string LanguageSelect = "settings-language-select";
@@ -72,6 +77,7 @@ public static partial class UiTestIds
         public const string NavCloud = "settings-nav-cloud";
         public const string NavFeedback = "settings-nav-feedback";
         public const string NavFiles = "settings-nav-files";
+        public const string NavHelp = "settings-nav-help";
         public const string NavMics = "settings-nav-mics";
         public const string NavRecording = "settings-nav-recording";
         public const string NavShortcuts = "settings-nav-shortcuts";

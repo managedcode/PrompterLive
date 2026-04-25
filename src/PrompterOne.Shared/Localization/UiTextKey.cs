@@ -205,6 +205,7 @@ public enum UiTextKey
     SettingsNavAi,
     SettingsNavAppearance,
     SettingsNavLanguage,
+    SettingsNavHelp,
     SettingsNavShortcuts,
     SettingsNavFeedback,
     SettingsNavAbout,

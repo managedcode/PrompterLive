@@ -11,6 +11,7 @@ public enum SettingsSection
     Ai,
     Appearance,
     Language,
+    Help,
     Shortcuts,
     Feedback,
     About

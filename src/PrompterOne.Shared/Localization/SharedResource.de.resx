@@ -312,6 +312,48 @@
   <data name="SettingsNavLanguage" xml:space="preserve">
     <value>Sprache</value>
   </data>
+  <data name="SettingsNavHelp" xml:space="preserve">
+    <value>Hilfe</value>
+  </data>
+  <data name="SettingsHelpSectionDescription" xml:space="preserve">
+    <value>Lernen Sie den PrompterOne-Ablauf, TPS-Grundlagen, Probenmodi und das Verhalten lokaler Dateien kennen, ohne die App zu verlassen.</value>
+  </data>
+  <data name="SettingsHelpAppFlowTitle" xml:space="preserve">
+    <value>PrompterOne-Ablauf</value>
+  </data>
+  <data name="SettingsHelpAppFlowSubtitle" xml:space="preserve">
+    <value>Von der Skriptbibliothek bis zur Live-Ausgabe</value>
+  </data>
+  <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
+    <value>Beginnen Sie in Library, schreiben oder importieren Sie ein Skript in Editor, wechseln Sie zu Cards, wenn Sie visuell ohne TPS-Syntax bearbeiten möchten, proben Sie in Learn, lesen Sie in Teleprompter und verwenden Sie Go Live, wenn Sie aufnehmen oder streamen möchten.</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
+    <value>TPS-Standardgrundlagen</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsSubtitle" xml:space="preserve">
+    <value>Einfacher Text mit leichten Performance-Hinweisen</value>
+  </data>
+  <data name="SettingsHelpTpsBasicsCopy" xml:space="preserve">
+    <value>TPS hält ein Skript lesbar und ergänzt Struktur sowie Vortragsabsicht. Verwenden Sie ##-Überschriften für Segmente, ###-Überschriften für Blöcke, WPM-Werte für das Tempo, Emotionen für den Ton und Klammerhinweise wie Pausen, Geschwindigkeit, Aussprache, Betonung und Vortragsnotizen.</value>
+  </data>
+  <data name="SettingsHelpModesTitle" xml:space="preserve">
+    <value>Schreib- und Probenmodi</value>
+  </data>
+  <data name="SettingsHelpModesSubtitle" xml:space="preserve">
+    <value>Wählen Sie die Oberfläche für die jeweilige Aufgabe</value>
+  </data>
+  <data name="SettingsHelpModesCopy" xml:space="preserve">
+    <value>Source dient der direkten TPS-Bearbeitung, Cards der Bearbeitung gerenderter Blöcke, Graph zeigt die Skriptstruktur, Learn nutzt RSVP für Wort-für-Wort-Übung, Teleprompter ist der Live-Reader, und Go Live kombiniert Lesen mit Kamera-, Aufnahme- und Streaming-Steuerung.</value>
+  </data>
+  <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
+    <value>Lokale Dateien und Verlauf</value>
+  </data>
+  <data name="SettingsHelpLocalFilesSubtitle" xml:space="preserve">
+    <value>Zuerst Autosave, Import und Export bei Bedarf</value>
+  </data>
+  <data name="SettingsHelpLocalFilesCopy" xml:space="preserve">
+    <value>PrompterOne speichert Skripte und Einstellungen lokal im Browser. Verwenden Sie Import und Export für Dateien auf der Festplatte, verlassen Sie sich beim Schreiben auf lokales Autosave und nutzen Sie den lokalen Verlauf, um frühere Versionen des aktuellen Skripts wiederherzustellen.</value>
+  </data>
   <data name="SettingsNavFeedback" xml:space="preserve">
     <value>Feedback</value>
   </data>

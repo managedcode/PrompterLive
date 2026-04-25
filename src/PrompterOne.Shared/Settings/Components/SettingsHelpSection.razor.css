@@ -1,0 +1,14 @@
+.set-help-example {
+    display: block;
+    margin-top: 12px;
+    padding: 12px;
+    overflow-x: auto;
+    border: 1px solid rgba(145, 158, 178, .18);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, .06);
+    color: var(--set-text, #1f2937);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.55;
+    white-space: nowrap;
+}

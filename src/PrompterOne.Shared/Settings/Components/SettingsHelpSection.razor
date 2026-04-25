@@ -1,0 +1,53 @@
+@namespace PrompterOne.Shared.Components.Settings
+@using PrompterOne.Shared.Components
+
+<section class="set-section set-panel"
+         id="set-help"
+         style="@DisplayStyle"
+         data-test="@UiTestIds.Settings.HelpPanel">
+    <h3 class="set-section-title">@HelpSectionTitle</h3>
+    <p class="set-section-desc">@HelpSectionDescription</p>
+
+    <div class="set-device-list">
+        <SettingsExpandableCard Title="@AppFlowTitle"
+                                Subtitle="@AppFlowSubtitle"
+                                IconTone="UiIconSurfaceTone.Sky"
+                                TestId="@UiTestIds.Settings.HelpAppFlowCard"
+                                IsOpen="@IsCardOpen(AppFlowCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(AppFlowCardId))">
+            <UiIcon Kind="UiIconKind.BookOpen" Size="17" />
+            <p class="set-card-copy">@AppFlowCopy</p>
+        </SettingsExpandableCard>
+
+        <SettingsExpandableCard Title="@TpsBasicsTitle"
+                                Subtitle="@TpsBasicsSubtitle"
+                                IconTone="UiIconSurfaceTone.Indigo"
+                                TestId="@UiTestIds.Settings.HelpTpsBasicsCard"
+                                IsOpen="@IsCardOpen(TpsBasicsCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(TpsBasicsCardId))">
+            <UiIcon Kind="UiIconKind.TextLines" Size="17" />
+            <p class="set-card-copy">@TpsBasicsCopy</p>
+            <code class="set-help-example">## [Segment|140WPM|neutral]<br />### [Block|Speaker:Host|120WPM|warm]<br />Text [pause:1s] continues.</code>
+        </SettingsExpandableCard>
+
+        <SettingsExpandableCard Title="@ModesTitle"
+                                Subtitle="@ModesSubtitle"
+                                IconTone="UiIconSurfaceTone.Emerald"
+                                TestId="@UiTestIds.Settings.HelpModesCard"
+                                IsOpen="@IsCardOpen(ModesCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(ModesCardId))">
+            <UiIcon Kind="UiIconKind.Spark" Size="17" />
+            <p class="set-card-copy">@ModesCopy</p>
+        </SettingsExpandableCard>
+
+        <SettingsExpandableCard Title="@LocalFilesTitle"
+                                Subtitle="@LocalFilesSubtitle"
+                                IconTone="UiIconSurfaceTone.Gold"
+                                TestId="@UiTestIds.Settings.HelpLocalFilesCard"
+                                IsOpen="@IsCardOpen(LocalFilesCardId)"
+                                OnToggle="@(() => ToggleCard.InvokeAsync(LocalFilesCardId))">
+            <UiIcon Kind="UiIconKind.Folder" Size="17" />
+            <p class="set-card-copy">@LocalFilesCopy</p>
+        </SettingsExpandableCard>
+    </div>
+</section>

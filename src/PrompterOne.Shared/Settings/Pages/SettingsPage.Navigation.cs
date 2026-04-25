@@ -20,6 +20,7 @@ public partial class SettingsPage
         new(SettingsSection.Ai, UiIconKind.Spark, UiTextKey.SettingsNavAi, UiTestIds.Settings.NavAi),
         new(SettingsSection.Appearance, UiIconKind.Theme, UiTextKey.SettingsNavAppearance, UiTestIds.Settings.NavAppearance),
         new(SettingsSection.Language, UiIconKind.Message, UiTextKey.SettingsNavLanguage, UiTestIds.Settings.NavLanguage),
+        new(SettingsSection.Help, UiIconKind.BookOpen, UiTextKey.SettingsNavHelp, UiTestIds.Settings.NavHelp),
         new(SettingsSection.Shortcuts, UiIconKind.Keyboard, UiTextKey.SettingsNavShortcuts, UiTestIds.Settings.NavShortcuts),
         new(SettingsSection.Feedback, UiIconKind.Message, UiTextKey.SettingsNavFeedback, UiTestIds.Settings.NavFeedback),
         new(SettingsSection.About, UiIconKind.HelpCircle, UiTextKey.SettingsNavAbout, UiTestIds.Settings.NavAbout)
