@@ -13,10 +13,10 @@ public partial class SettingsPage
     [
         new(SettingsSection.Cloud, UiIconKind.Cloud, UiTextKey.SettingsNavCloud, UiTestIds.Settings.NavCloud),
         new(SettingsSection.Files, UiIconKind.Folder, UiTextKey.SettingsNavFiles, UiTestIds.Settings.NavFiles),
+        new(SettingsSection.Recording, UiIconKind.RecordTarget, UiTextKey.SettingsNavRecording, UiTestIds.Settings.NavRecording),
         new(SettingsSection.Cameras, UiIconKind.Camera, UiTextKey.SettingsNavCameras, UiTestIds.Settings.NavCameras),
         new(SettingsSection.Mics, UiIconKind.Microphone, UiTextKey.SettingsNavMicrophones, UiTestIds.Settings.NavMics),
         new(SettingsSection.Streaming, UiIconKind.ArrowRight, UiTextKey.SettingsNavStreaming, UiTestIds.Settings.NavStreaming),
-        new(SettingsSection.Recording, UiIconKind.RecordTarget, UiTextKey.SettingsNavRecording, UiTestIds.Settings.NavRecording),
         new(SettingsSection.Ai, UiIconKind.Spark, UiTextKey.SettingsNavAi, UiTestIds.Settings.NavAi),
         new(SettingsSection.Appearance, UiIconKind.Theme, UiTextKey.SettingsNavAppearance, UiTestIds.Settings.NavAppearance),
         new(SettingsSection.Language, UiIconKind.Message, UiTextKey.SettingsNavLanguage, UiTestIds.Settings.NavLanguage),

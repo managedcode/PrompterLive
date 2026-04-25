@@ -7,6 +7,12 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class SettingsLayoutFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
+    private static readonly ResponsiveViewport[] SettingsNavigationReachabilityViewports =
+    [
+        new("iphone-medium-portrait", BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth, BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight),
+        new("ipad-mini-landscape", BrowserTestConstants.ResponsiveLayout.IpadMiniHeight, BrowserTestConstants.ResponsiveLayout.IpadMiniWidth)
+    ];
+
     private sealed class ElementBounds
     {
         public double Left { get; set; }
@@ -58,6 +64,40 @@ public sealed class SettingsLayoutFlowTests(StandaloneAppFixture fixture) : AppU
                 BrowserTestConstants.SettingsFlow.DesktopLayoutStep);
         });
 
+    [Test]
+    public Task SettingsNavigation_PrioritizesRecordingBeforeCaptureAndStreamingControls() =>
+        RunPageAsync(async page =>
+        {
+            await ShellRouteDriver.OpenSettingsAsync(page);
+
+            var navOrder = await ReadSettingsNavigationOrderAsync(page);
+
+            await Assert.That(IndexOf(navOrder, UiTestIds.Settings.NavRecording))
+                .IsLessThan(IndexOf(navOrder, UiTestIds.Settings.NavCameras));
+            await Assert.That(IndexOf(navOrder, UiTestIds.Settings.NavRecording))
+                .IsLessThan(IndexOf(navOrder, UiTestIds.Settings.NavMics));
+            await Assert.That(IndexOf(navOrder, UiTestIds.Settings.NavRecording))
+                .IsLessThan(IndexOf(navOrder, UiTestIds.Settings.NavStreaming));
+        });
+
+    [Test]
+    public Task SettingsNavigation_RecordingPanelRemainsReachableAcrossResponsiveLayouts() =>
+        RunPageAsync(async page =>
+        {
+            foreach (var viewport in SettingsNavigationReachabilityViewports)
+            {
+                await page.SetViewportSizeAsync(viewport.Width, viewport.Height);
+                await ShellRouteDriver.OpenSettingsAsync(page, viewport.Name);
+
+                var recordingNav = page.GetByTestId(UiTestIds.Settings.NavRecording);
+                await recordingNav.ScrollIntoViewIfNeededAsync();
+                await UiInteractionDriver.ClickAndContinueAsync(recordingNav);
+
+                await Expect(page.GetByTestId(UiTestIds.Settings.RecordingPanel)).ToBeVisibleAsync(
+                    new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            }
+        });
+
     private static Task<ElementBounds> ReadBoundsAsync(ILocator locator) =>
         locator.EvaluateAsync<ElementBounds>(
             """
@@ -70,4 +110,25 @@ public sealed class SettingsLayoutFlowTests(StandaloneAppFixture fixture) : AppU
                 };
             }
             """);
+
+    private static Task<string[]> ReadSettingsNavigationOrderAsync(IPage page) =>
+        page.EvaluateAsync<string[]>(
+            """
+            () => Array.from(document.querySelectorAll('.set-nav [data-test]'))
+                .map(element => element.getAttribute('data-test') ?? '')
+                .filter(Boolean)
+            """);
+
+    private static int IndexOf(IReadOnlyList<string> values, string value)
+    {
+        for (var index = 0; index < values.Count; index++)
+        {
+            if (string.Equals(values[index], value, StringComparison.Ordinal))
+            {
+                return index;
+            }
+        }
+
+        throw new InvalidOperationException($"Expected settings navigation item '{value}' to be present.");
+    }
 }
