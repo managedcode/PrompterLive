@@ -558,6 +558,12 @@
   <data name="TooltipMoreScriptActions" xml:space="preserve">
     <value>More script actions</value>
   </data>
+  <data name="TooltipAddFavorite" xml:space="preserve">
+    <value>Add favorite</value>
+  </data>
+  <data name="TooltipRemoveFavorite" xml:space="preserve">
+    <value>Remove favorite</value>
+  </data>
   <data name="TooltipDeleteScript" xml:space="preserve">
     <value>Delete script</value>
   </data>

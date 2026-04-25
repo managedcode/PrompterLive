@@ -1,4 +1,31 @@
-/* 3-dot context menu */
+/* Favorite pin + 3-dot context menu */
+.dcard-fav-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--gold-12);
+    color: rgba(232,213,176,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .94;
+    transition: opacity .18s ease, background .18s ease, color .18s ease;
+}
+.dcard-fav-btn.active {
+    color: #F5C850;
+    background: rgba(245,200,80,.14);
+    border-color: rgba(245,200,80,.28);
+}
+.dcard:hover .dcard-fav-btn,
+.dcard:focus-within .dcard-fav-btn { opacity: 1; }
+.dcard-fav-btn:hover { background: rgba(0,0,0,.6); color: #F5C850; }
+
 .dcard-menu-wrap {
     position: absolute;
     top: 10px;
@@ -25,13 +52,15 @@
 .dcard-menu-btn:hover { background: rgba(0,0,0,.6); color: #E8D5B0; }
 
 @media (hover: hover) and (pointer: fine) {
-    .dcard-menu-btn {
+    .dcard-menu-btn,
+    .dcard-fav-btn:not(.active) {
         opacity: 0;
     }
 }
 
 @media (max-width: 720px) {
-    .dcard-menu-btn {
+    .dcard-menu-btn,
+    .dcard-fav-btn {
         opacity: 1;
     }
 }
@@ -234,7 +263,10 @@
 
 html[data-theme="light"] .dcard-menu-btn,
 html.theme-light .dcard-menu-btn,
-body.theme-light .dcard-menu-btn {
+body.theme-light .dcard-menu-btn,
+html[data-theme="light"] .dcard-fav-btn,
+html.theme-light .dcard-fav-btn,
+body.theme-light .dcard-fav-btn {
     background: rgba(107,90,72,.06);
     color: rgba(107,90,72,.5);
     border-color: rgba(107,90,72,.1);
@@ -242,9 +274,20 @@ body.theme-light .dcard-menu-btn {
 
 html[data-theme="light"] .dcard-menu-btn:hover,
 html.theme-light .dcard-menu-btn:hover,
-body.theme-light .dcard-menu-btn:hover {
+body.theme-light .dcard-menu-btn:hover,
+html[data-theme="light"] .dcard-fav-btn:hover,
+html.theme-light .dcard-fav-btn:hover,
+body.theme-light .dcard-fav-btn:hover {
     background: rgba(107,90,72,.15);
     color: #5C4D3D;
+}
+
+html[data-theme="light"] .dcard-fav-btn.active,
+html.theme-light .dcard-fav-btn.active,
+body.theme-light .dcard-fav-btn.active {
+    background: rgba(245,200,80,.2);
+    border-color: rgba(139,115,85,.22);
+    color: #8B7355;
 }
 
 html[data-theme="light"] .dcard-dropdown,

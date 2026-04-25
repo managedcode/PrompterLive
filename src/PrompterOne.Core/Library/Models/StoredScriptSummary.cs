@@ -8,7 +8,8 @@ public sealed partial record StoredScriptSummary(
     string DocumentName,
     DateTimeOffset UpdatedAt,
     int WordCount,
-    string? FolderId = null)
+    string? FolderId = null,
+    bool IsFavorite = false)
 {
     private const string LandingUpdatedLabelFormat = "MMM dd • hh:mm tt";
 

@@ -543,6 +543,12 @@
   <data name="TooltipMoreScriptActions" xml:space="preserve">
     <value>Mais ações do roteiro</value>
   </data>
+  <data name="TooltipAddFavorite" xml:space="preserve">
+    <value>Adicionar favorito</value>
+  </data>
+  <data name="TooltipRemoveFavorite" xml:space="preserve">
+    <value>Remover favorito</value>
+  </data>
   <data name="TooltipDeleteScript" xml:space="preserve">
     <value>Excluir roteiro</value>
   </data>

@@ -19,6 +19,7 @@
                            OnMoveScript="@(folderId => HandleMoveScriptAsync(card.Id, folderId))"
                            OnOpenScript="@(() => HandleOpenScriptAsync(card.Id))"
                            OnReadScript="@(() => OnReadScript.InvokeAsync(card.Id))"
+                           OnToggleFavorite="@(() => HandleToggleFavoriteAsync(card.Id))"
                            OnToggleMenu="@(() => ToggleCardMenu(card.Id))" />
     }
 
@@ -69,6 +70,8 @@
     [Parameter, EditorRequired] public EventCallback<string> OnDuplicateScript { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<LibraryMoveRequest> OnMoveScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnToggleFavorite { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<string> OnDeleteScript { get; set; }
 
@@ -131,6 +134,12 @@
     {
         ClearOpenCardMenu();
         await OnMoveScript.InvokeAsync(new LibraryMoveRequest(cardId, folderId));
+    }
+
+    private async Task HandleToggleFavoriteAsync(string cardId)
+    {
+        ClearOpenCardMenu();
+        await OnToggleFavorite.InvokeAsync(cardId);
     }
 
     private async Task HandleDeleteScriptAsync(string cardId)

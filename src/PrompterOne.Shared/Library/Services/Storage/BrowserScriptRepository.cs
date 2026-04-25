@@ -42,7 +42,8 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
                 document.DocumentName,
                 document.UpdatedAt,
                 CountWords(document.Text),
-                document.FolderId))
+                document.FolderId,
+                document.IsFavorite))
             .ToList();
     }
 
@@ -67,14 +68,18 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
             ? $"{BrowserStorageSlugifier.Slugify(title)}.tps"
             : documentName;
 
-        var persistedFolderId = await ResolveFolderIdAsync(existingId, folderId, cancellationToken);
+        var existingDocument = string.IsNullOrWhiteSpace(existingId)
+            ? null
+            : await GetAsync(existingId, cancellationToken);
+        var persistedFolderId = ResolveFolderId(existingDocument, folderId);
         var document = new StoredScriptDocument(
             Id: string.IsNullOrWhiteSpace(existingId) ? BrowserStorageSlugifier.Slugify(Path.GetFileNameWithoutExtension(documentName)) : existingId,
             Title: title,
             Text: text ?? string.Empty,
             DocumentName: documentName,
             UpdatedAt: DateTimeOffset.UtcNow,
-            FolderId: persistedFolderId);
+            FolderId: persistedFolderId,
+            IsFavorite: existingDocument?.IsFavorite ?? false);
 
         var documents = await LoadMutableDocumentsAsync(cancellationToken);
         UpsertDocument(documents, ToDto(document));
@@ -97,6 +102,19 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
         await SaveStoredDocumentsAsync(documents, cancellationToken);
     }
 
+    public async Task SetFavoriteAsync(string id, bool isFavorite, CancellationToken cancellationToken = default)
+    {
+        var documents = await LoadMutableDocumentsAsync(cancellationToken);
+        var index = documents.FindIndex(document => string.Equals(document.Id, id, StringComparison.Ordinal));
+        if (index < 0)
+        {
+            return;
+        }
+
+        documents[index].IsFavorite = isFavorite;
+        await SaveStoredDocumentsAsync(documents, cancellationToken);
+    }
+
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         var documents = await LoadMutableDocumentsAsync(cancellationToken);
@@ -108,22 +126,15 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
         await SaveStoredDocumentsAsync(documents, cancellationToken);
     }
 
-    private async Task<string?> ResolveFolderIdAsync(
-        string? existingId,
-        string? folderId,
-        CancellationToken cancellationToken)
+    private static string? ResolveFolderId(
+        StoredScriptDocument? existingDocument,
+        string? folderId)
     {
         if (!string.IsNullOrWhiteSpace(folderId))
         {
             return folderId;
         }
 
-        if (string.IsNullOrWhiteSpace(existingId))
-        {
-            return null;
-        }
-
-        var existingDocument = await GetAsync(existingId, cancellationToken);
         return existingDocument?.FolderId;
     }
 
@@ -222,7 +233,8 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
             dto.Text ?? string.Empty,
             dto.DocumentName ?? DefaultDocumentName,
             dto.UpdatedAt,
-            string.IsNullOrWhiteSpace(dto.FolderId) ? null : dto.FolderId);
+            string.IsNullOrWhiteSpace(dto.FolderId) ? null : dto.FolderId,
+            dto.IsFavorite);
 
     private string Text(UiTextKey key) => _localizer[key.ToString()];
 
@@ -234,7 +246,8 @@ public sealed class BrowserScriptRepository(IJSRuntime jsRuntime, IStringLocaliz
             Text = document.Text,
             DocumentName = document.DocumentName,
             UpdatedAt = document.UpdatedAt,
-            FolderId = document.FolderId
+            FolderId = document.FolderId,
+            IsFavorite = document.IsFavorite
         };
 
     private static List<BrowserStoredScriptDocumentDto> MergeDocuments(params IEnumerable<BrowserStoredScriptDocumentDto>[] sources)

@@ -157,6 +157,42 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Test]
+    public void LibraryPage_FavoriteButtonPinsScriptAndFavoritesFilterPersists()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(InactiveStateValue, cut.FindByTestId(UiTestIds.Library.CardFavorite(AppTestData.Scripts.DemoId)).GetAttribute("data-active"));
+            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.CardFavorite(AppTestData.Scripts.DemoId)).Click();
+
+        cut.WaitForAssertion(() =>
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.CardFavorite(AppTestData.Scripts.DemoId)).GetAttribute("data-active")));
+
+        cut.FindByTestId(UiTestIds.Library.FolderFavorites).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.FolderFavorites).GetAttribute("data-active"));
+            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup);
+            Assert.DoesNotContain(AppTestData.Scripts.SecurityIncidentTitle, cut.Markup);
+        });
+
+        cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.FolderFavorites).GetAttribute("data-active"));
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.CardFavorite(AppTestData.Scripts.DemoId)).GetAttribute("data-active"));
+            Assert.Contains(AppTestData.Scripts.DemoTitle, cut.Markup);
+            Assert.DoesNotContain(AppTestData.Scripts.SecurityIncidentTitle, cut.Markup);
+        });
+    }
+
+    [Test]
     public async Task LibraryPage_CancelsFolderOverlay_WithoutCreatingFolder()
     {
         var cut = Render<LibraryPage>();

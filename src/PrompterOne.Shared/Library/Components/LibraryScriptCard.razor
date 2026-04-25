@@ -8,6 +8,22 @@
          style="--emo:@Card.AccentColor"
          @onclick="HandleCardClickAsync"
          data-test="@Card.TestId">
+    <TooltipAnchor OwnerTestId="@UiTestIds.Library.CardFavorite(Card.Id)"
+                   Placement="TooltipPlacement.RightCenter"
+                   Text="@FavoriteTooltipText">
+        <button class="@FavoriteButtonClass"
+                type="button"
+                aria-label="@FavoriteTooltipText"
+                aria-pressed="@(Card.IsFavorite ? "true" : "false")"
+                data-active="@(Card.IsFavorite ? "active" : "inactive")"
+                data-test="@UiTestIds.Library.CardFavorite(Card.Id)"
+                @onclick:stopPropagation="true"
+                @onclick="HandleToggleFavoriteAsync">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+        </button>
+    </TooltipAnchor>
     <div class="@MenuWrapCssClass"
          data-expanded="@MenuExpandedState"
          data-test="@UiTestIds.Library.CardMenuWrap(Card.Id)"
@@ -150,6 +166,14 @@
 
     private string MenuWrapCssClass => IsMenuOpen ? CardMenuWrapOpenClass : CardMenuWrapClass;
 
+    private string FavoriteButtonClass => Card.IsFavorite
+        ? "dcard-fav-btn active"
+        : "dcard-fav-btn";
+
+    private string FavoriteTooltipText => Card.IsFavorite
+        ? Text(UiTextKey.TooltipRemoveFavorite)
+        : Text(UiTextKey.TooltipAddFavorite);
+
     [Parameter, EditorRequired] public LibraryCardViewModel Card { get; set; } = null!;
     [Parameter, EditorRequired] public IReadOnlyList<LibraryFolderOptionViewModel> FolderOptions { get; set; } = [];
     [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
@@ -163,6 +187,7 @@
     [Parameter] public EventCallback<string?> OnMoveScript { get; set; }
     [Parameter] public EventCallback OnOpenScript { get; set; }
     [Parameter] public EventCallback OnReadScript { get; set; }
+    [Parameter] public EventCallback OnToggleFavorite { get; set; }
     [Parameter] public EventCallback OnToggleMenu { get; set; }
 
     private string BuildSegmentCountLabel(int segmentCount) =>
@@ -185,6 +210,8 @@
     private Task HandleOpenScriptAsync() => OnOpenScript.InvokeAsync();
 
     private Task HandleReadScriptAsync() => OnReadScript.InvokeAsync();
+
+    private Task HandleToggleFavoriteAsync() => OnToggleFavorite.InvokeAsync();
 
     private Task HandleToggleMenuAsync() => OnToggleMenu.InvokeAsync();
 

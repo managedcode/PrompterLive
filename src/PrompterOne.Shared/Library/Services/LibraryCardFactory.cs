@@ -95,6 +95,7 @@ internal static class LibraryCardFactory
             DocumentName: document.DocumentName,
             SearchText: BuildSearchText(summary.Title, ResolveAuthor(parsed.Metadata, localizer), document.DocumentName, document.Text),
             FolderId: summary.FolderId,
+            IsFavorite: summary.IsFavorite,
             DisplayOrder: displayOrder,
             TestId: UiTestIds.Library.Card(summary.Id));
     }

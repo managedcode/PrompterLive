@@ -309,6 +309,44 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
         });
 
     [Test]
+    public Task LibraryScreen_FavoriteButtonPinsScriptAndFavoritesFilterPersists() =>
+        RunPageAsync(async page =>
+        {
+            await ShellRouteDriver.OpenLibraryAsync(page);
+
+            var demoFavorite = page.GetByTestId(UiTestIds.Library.CardFavorite(BrowserTestConstants.Scripts.DemoId));
+            await Expect(demoFavorite).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.InactiveValue);
+
+            await UiInteractionDriver.ClickAndContinueAsync(demoFavorite, noWaitAfter: true);
+
+            await Expect(demoFavorite).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Library.FolderFavorites));
+
+            await Expect(page.GetByTestId(UiTestIds.Library.FolderFavorites)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.DemoCard)).ToContainTextAsync(BrowserTestConstants.Scripts.ProductLaunchTitle);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
+
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.Library,
+                UiTestIds.Library.Page,
+                "library-favorite-filter-reload");
+            await Expect(page.GetByTestId(UiTestIds.Library.FolderFavorites)).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(page.GetByTestId(UiTestIds.Library.CardFavorite(BrowserTestConstants.Scripts.DemoId))).ToHaveAttributeAsync(
+                BrowserTestConstants.State.ActiveAttribute,
+                BrowserTestConstants.State.ActiveValue);
+            await Expect(page.GetByTestId(BrowserTestConstants.Elements.SecurityIncidentCard)).ToBeHiddenAsync();
+        });
+
+    [Test]
     public Task LibraryScreen_RootBreadcrumb_RendersSingleAllScriptsLabel() =>
         RunPageAsync(async page =>
         {

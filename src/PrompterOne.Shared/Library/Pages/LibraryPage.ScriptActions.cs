@@ -80,6 +80,24 @@ public partial class LibraryPage
                 await PersistViewStateAsync();
             });
 
+    private Task ToggleFavoriteAsync(string id) =>
+        RunLibraryOperationAsync(
+            MoveScriptOperation,
+            Text(UiTextKey.LibraryMoveScriptMessage),
+            async () =>
+            {
+                await Bootstrapper.EnsureReadyAsync();
+                var card = _allCards.FirstOrDefault(candidate => string.Equals(candidate.Id, id, StringComparison.Ordinal));
+                if (card is null)
+                {
+                    return;
+                }
+
+                var nextFavoriteState = !card.IsFavorite;
+                await ScriptRepository.SetFavoriteAsync(id, nextFavoriteState);
+                ApplyFavoriteScript(id, nextFavoriteState);
+            });
+
     private Task DeleteScriptAsync(string id) =>
         RunLibraryOperationAsync(
             DeleteScriptOperation,
@@ -102,6 +120,17 @@ public partial class LibraryPage
         _allCards = _allCards
             .Select(card => string.Equals(card.Id, request.ScriptId, StringComparison.Ordinal)
                 ? card with { FolderId = request.FolderId }
+                : card)
+            .ToList();
+
+        RebuildLibraryView();
+    }
+
+    private void ApplyFavoriteScript(string id, bool isFavorite)
+    {
+        _allCards = _allCards
+            .Select(card => string.Equals(card.Id, id, StringComparison.Ordinal)
+                ? card with { IsFavorite = isFavorite }
                 : card)
             .ToList();
 

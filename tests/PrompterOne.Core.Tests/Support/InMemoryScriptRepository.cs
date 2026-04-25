@@ -26,7 +26,9 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
                 document.Title,
                 document.DocumentName,
                 document.UpdatedAt,
-                CountWords(document.Text)))
+                CountWords(document.Text),
+                document.FolderId,
+                document.IsFavorite))
             .ToList();
 
         return Task.FromResult<IReadOnlyList<StoredScriptSummary>>(summaries);
@@ -61,7 +63,8 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
             text ?? string.Empty,
             normalizedDocumentName,
             DateTimeOffset.UtcNow,
-            persistedFolderId);
+            persistedFolderId,
+            _documents.TryGetValue(id, out var existingDocument) && existingDocument.IsFavorite);
 
         _documents[id] = document;
         return Task.FromResult(document);
@@ -76,6 +79,16 @@ internal sealed class InMemoryScriptRepository : IScriptRepository
                 UpdatedAt = DateTimeOffset.UtcNow,
                 FolderId = string.IsNullOrWhiteSpace(folderId) ? null : folderId
             };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task SetFavoriteAsync(string id, bool isFavorite, CancellationToken cancellationToken = default)
+    {
+        if (_documents.TryGetValue(id, out var document))
+        {
+            _documents[id] = document with { IsFavorite = isFavorite };
         }
 
         return Task.CompletedTask;

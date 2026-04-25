@@ -18,6 +18,7 @@ public sealed record LibraryCardViewModel(
     string DocumentName,
     string SearchText,
     string? FolderId,
+    bool IsFavorite,
     int DisplayOrder,
     string TestId)
 {

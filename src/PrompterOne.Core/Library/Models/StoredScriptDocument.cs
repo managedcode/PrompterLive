@@ -6,4 +6,5 @@ public sealed partial record StoredScriptDocument(
     string Text,
     string DocumentName,
     DateTimeOffset UpdatedAt,
-    string? FolderId = null);
+    string? FolderId = null,
+    bool IsFavorite = false);

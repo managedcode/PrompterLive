@@ -9,6 +9,7 @@ public static partial class UiTestIds
         public const string CreateScript = "library-create-script";
         public const string CreateScriptSurface = "library-create-script-surface";
         public const string FolderAll = "library-folder-all";
+        public const string FolderFavorites = "library-folder-favorites";
         public const string FolderChips = "library-folder-chips";
         public const string FolderCreateStart = "library-folder-create-start";
         public const string FolderCreateTile = "library-folder-create-tile";
@@ -44,6 +45,8 @@ public static partial class UiTestIds
         public static string CardDelete(string scriptId) => $"library-card-delete-{scriptId}";
 
         public static string CardLearn(string scriptId) => $"library-card-learn-{scriptId}";
+
+        public static string CardFavorite(string scriptId) => $"library-card-favorite-{scriptId}";
 
         public static string CardMenu(string scriptId) => $"library-card-menu-{scriptId}";
 

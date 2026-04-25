@@ -26,11 +26,15 @@
             </svg>
             @Text(UiTextKey.LibraryRecent)
         </a>
-        <a class="nav-item">
+        <a class="nav-item @(IsFavoritesSelected ? "active" : null)"
+           @onclick="HandleSelectFavoritesAsync"
+           data-active="@(IsFavoritesSelected ? ActiveStateValue : InactiveStateValue)"
+           data-test="@UiTestIds.Library.FolderFavorites">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
             @Text(UiTextKey.LibraryFavorites)
+            <span class="nav-count">@FavoriteScriptCount</span>
         </a>
     </nav>
 
@@ -94,6 +98,10 @@
 
     [Parameter, EditorRequired] public bool IsAllSelected { get; set; }
 
+    [Parameter, EditorRequired] public bool IsFavoritesSelected { get; set; }
+
+    [Parameter, EditorRequired] public int FavoriteScriptCount { get; set; }
+
     [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
         LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders);
 
@@ -106,6 +114,8 @@
     [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
 
     private Task HandleSelectAllAsync() => OnSelectFolder.InvokeAsync(LibrarySelectionKeys.All);
+
+    private Task HandleSelectFavoritesAsync() => OnSelectFolder.InvokeAsync(LibrarySelectionKeys.Favorites);
 
     private Task HandleOrganizationModeChangedAsync(LibraryOrganizationMode mode) =>
         OnOrganizationModeChanged.InvokeAsync(mode);

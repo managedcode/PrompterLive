@@ -113,6 +113,7 @@ public partial class LibraryPage
     {
         if (string.IsNullOrWhiteSpace(folderId)
             || string.Equals(folderId, LibrarySelectionKeys.All, StringComparison.Ordinal)
+            || string.Equals(folderId, LibrarySelectionKeys.Favorites, StringComparison.Ordinal)
             || string.Equals(folderId, LibrarySelectionKeys.Root, StringComparison.Ordinal))
         {
             return;

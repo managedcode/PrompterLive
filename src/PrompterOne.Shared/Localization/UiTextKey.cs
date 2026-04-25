@@ -305,6 +305,8 @@ public enum UiTextKey
     TooltipCreateEpisode,
     TooltipCreateSequence,
     TooltipMoreScriptActions,
+    TooltipAddFavorite,
+    TooltipRemoveFavorite,
     TooltipDeleteScript,
     TooltipAccentGold,
     TooltipAccentBlue,

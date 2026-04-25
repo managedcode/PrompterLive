@@ -579,6 +579,12 @@
   <data name="TooltipMoreScriptActions" xml:space="preserve">
     <value>Більше дій зі сценарієм</value>
   </data>
+  <data name="TooltipAddFavorite" xml:space="preserve">
+    <value>Додати в обране</value>
+  </data>
+  <data name="TooltipRemoveFavorite" xml:space="preserve">
+    <value>Прибрати з обраного</value>
+  </data>
   <data name="TooltipDeleteScript" xml:space="preserve">
     <value>Видалити сценарій</value>
   </data>

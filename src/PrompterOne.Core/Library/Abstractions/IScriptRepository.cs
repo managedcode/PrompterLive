@@ -20,5 +20,7 @@ public interface IScriptRepository
 
     Task MoveToFolderAsync(string id, string? folderId, CancellationToken cancellationToken = default);
 
+    Task SetFavoriteAsync(string id, bool isFavorite, CancellationToken cancellationToken = default);
+
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

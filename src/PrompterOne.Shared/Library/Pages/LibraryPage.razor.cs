@@ -55,6 +55,8 @@ public partial class LibraryPage : ComponentBase, IDisposable
 
     private bool IsAllSelected => string.Equals(_selectedFolderId, LibrarySelectionKeys.All, StringComparison.Ordinal);
 
+    private bool IsFavoritesSelected => string.Equals(_selectedFolderId, LibrarySelectionKeys.Favorites, StringComparison.Ordinal);
+
     private LibraryOrganizationTerminology OrganizationTerminology =>
         LibraryOrganizationTerminologyCatalog.Resolve(_organizationMode);
 

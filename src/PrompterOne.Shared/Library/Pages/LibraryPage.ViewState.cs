@@ -37,6 +37,8 @@ public partial class LibraryPage
     {
         var cards = IsAllSelected
             ? _allCards
+            : IsFavoritesSelected
+                ? _allCards.Where(card => card.IsFavorite)
             : _allCards.Where(card => card.FolderId is not null && CollectVisibleFolderIds(_selectedFolderId).Contains(card.FolderId));
 
         return ApplySearchFilter(cards);
@@ -113,6 +115,11 @@ public partial class LibraryPage
             return Text(UiTextKey.LibraryAllScripts);
         }
 
+        if (IsFavoritesSelected)
+        {
+            return Text(UiTextKey.LibraryFavorites);
+        }
+
         return _folders
             .FirstOrDefault(folder => string.Equals(folder.Id, _selectedFolderId, StringComparison.Ordinal))
             ?.Name
@@ -126,6 +133,7 @@ public partial class LibraryPage
             .ToHashSet(StringComparer.Ordinal);
 
         if (!string.Equals(_selectedFolderId, LibrarySelectionKeys.All, StringComparison.Ordinal)
+            && !string.Equals(_selectedFolderId, LibrarySelectionKeys.Favorites, StringComparison.Ordinal)
             && !validFolderIds.Contains(_selectedFolderId))
         {
             _selectedFolderId = LibrarySelectionKeys.All;

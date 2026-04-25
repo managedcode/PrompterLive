@@ -13,4 +13,6 @@ public sealed class BrowserStoredScriptDocumentDto
     public DateTimeOffset UpdatedAt { get; set; }
 
     public string? FolderId { get; set; }
+
+    public bool IsFavorite { get; set; }
 }
