@@ -4,6 +4,7 @@ public static class UiDataAttributes
 {
     public static class Editor
     {
+        public const string EmotionMarker = "data-editor-emotion-marker";
         public const string IconShape = "data-editor-icon-shape";
         public const string IconShapeDot = "dot";
         public const string IconShapeGlyph = "glyph";
@@ -20,6 +21,7 @@ public static class UiDataAttributes
         public const string CardState = "data-reader-card-state";
         public const string DurationMilliseconds = "data-ms";
         public const string EffectiveWordsPerMinute = "data-effective-wpm";
+        public const string EmotionMarker = "data-reader-emotion-marker";
         public const string OriginalText = "data-original-text";
         public const string PauseMilliseconds = "data-pause-ms";
         public const string Pronunciation = "data-pronunciation";

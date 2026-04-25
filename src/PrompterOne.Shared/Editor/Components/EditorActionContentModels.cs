@@ -140,10 +140,9 @@ internal static class EditorActionContents
         string metaText,
         EditorActionContentTone tone) =>
         new(
-            LeadingText: "●",
+            LeadingText: metaText,
             LeadingTone: tone,
             Label: label,
-            MetaText: metaText,
             LeadingBold: true);
 
     public static EditorActionContentDescriptor LabelTrigger(

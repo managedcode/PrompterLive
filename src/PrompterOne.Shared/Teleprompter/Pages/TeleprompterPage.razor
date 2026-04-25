@@ -100,7 +100,8 @@
                             <div class="rd-cluster rd-cluster-active"
                                  data-test="@UiTestIds.Teleprompter.CardCluster(entry.index)">
                                 <div class="rd-cluster-emotion">
-                                    <span class="rd-emo-dot" style="background:@entry.card.AccentColor"></span>
+                                    <span class="rd-emo-marker"
+                                          aria-label="@entry.card.EmotionLabel">@entry.card.EmotionMarker</span>
                                     <span class="rd-emo-name">@entry.card.EmotionLabel</span>
                                     <span class="rd-emo-wpm">@entry.card.TargetWpm <small>@Text(UiTextKey.CommonWpm)</small></span>
                                 </div>
@@ -130,7 +131,16 @@
                                                           id="@UiDomIds.Teleprompter.CardWord(entry.index, chunkIndex, wordIndex)"
                                                           @attributes="BuildReaderWordDataAttributes(word, entry.card.TargetWpm, entry.index, chunkIndex, wordIndex)"
                                                           style="@word.Style"
-                                                          data-test="@BuildReaderWordTestId(entry.index, chunkIndex, wordIndex)">@word.Text</span>
+                                                          data-test="@BuildReaderWordTestId(entry.index, chunkIndex, wordIndex)">
+                                                        @if (!string.IsNullOrWhiteSpace(word.EmotionMarker))
+                                                        {
+                                                            <span class="rd-emotion-marker"
+                                                                  aria-label="@word.EmotionLabel"
+                                                                  @attributes="BuildReaderEmotionMarkerDataAttributes(word)"
+                                                                  data-test="@UiTestIds.Teleprompter.CardWordEmotionMarker(entry.index, chunkIndex, wordIndex)"></span>
+                                                        }
+                                                        @word.Text
+                                                    </span>
                                                     @if (!string.IsNullOrWhiteSpace(speedCueLabel))
                                                     {
                                                         <span class="rd-speed-cue-label"

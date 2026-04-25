@@ -72,11 +72,14 @@
     transition: opacity .3s;
 }
 .rd-cluster-emotion:hover { opacity: .7; }
-.rd-emo-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
+.rd-emo-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4em;
+    height: 1.4em;
+    font-size: 15px;
+    line-height: 1;
 }
 .rd-emo-name {
     font-size: 12px;
@@ -693,6 +696,24 @@ span.rd-pause.rd-pause-active.rd-pause-long::before {
         text-shadow .22s cubic-bezier(.25,.8,.25,1),
         transform .28s cubic-bezier(.25,.8,.25,1),
         filter .22s cubic-bezier(.25,.8,.25,1);
+}
+
+.rd-emotion-marker {
+    position: absolute;
+    left: -.9em;
+    top: .18em;
+    width: 0;
+    height: 0;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.rd-emotion-marker::before {
+    content: attr(data-reader-emotion-marker);
+    display: block;
+    font-size: .52em;
+    line-height: 1;
+    opacity: .82;
 }
 
 .rd-w[data-tps-volume],

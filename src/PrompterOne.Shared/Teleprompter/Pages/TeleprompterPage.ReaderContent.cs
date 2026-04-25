@@ -90,6 +90,7 @@ public partial class TeleprompterPage
                 DisplayName: string.IsNullOrWhiteSpace(block.Name) ? segment.Name : block.Name,
                 EmotionKey: emotionKey,
                 EmotionLabel: FormatEmotionLabel(emotionKey),
+                EmotionMarker: TpsEmotionMarkers.ResolveMarker(emotionKey),
                 BackgroundClass: ResolveReaderBackgroundClass(emotionKey),
                 AccentColor: segmentAccent,
                 TargetWpm: targetWpm,
@@ -158,6 +159,7 @@ public partial class TeleprompterPage
                 DisplayName: seed.DisplayName,
                 EmotionKey: seed.EmotionKey,
                 EmotionLabel: seed.EmotionLabel,
+                EmotionMarker: seed.EmotionMarker,
                 BackgroundClass: seed.BackgroundClass,
                 AccentColor: seed.AccentColor,
                 TargetWpm: seed.TargetWpm,
@@ -277,6 +279,7 @@ public partial class TeleprompterPage
             var effectiveWpm = ResolveEffectiveWpm(word.Metadata, targetWpm);
             var speedCueValue = ResolveReaderSpeedCueValue(targetWpm, effectiveWpm);
             var pronunciationGuide = ResolveReaderPronunciationGuide(word.Metadata);
+            var emotionCueValue = ResolveEmotionKey(word.Metadata?.InlineEmotionHint, string.Empty);
             var wordDurationMs = Math.Max(MinimumReaderWordDurationMilliseconds, (int)Math.Round(word.DisplayDuration.TotalMilliseconds));
             currentGroup.Add(new ReaderWordViewModel(
                 Text: pronunciationGuide ?? word.CleanText,
@@ -290,6 +293,8 @@ public partial class TeleprompterPage
                     wordDurationMs),
                 OriginalText: pronunciationGuide is null ? null : word.CleanText,
                 PronunciationGuide: pronunciationGuide,
+                EmotionMarker: TpsEmotionMarkers.ResolveMarker(emotionCueValue),
+                EmotionLabel: string.IsNullOrWhiteSpace(emotionCueValue) ? null : FormatEmotionLabel(emotionCueValue),
                 EffectiveWpm: effectiveWpm,
                 Attributes: BuildReaderWordAttributes(word.Metadata, speedCueValue)));
 

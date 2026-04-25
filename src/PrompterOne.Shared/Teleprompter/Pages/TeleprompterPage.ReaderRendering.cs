@@ -403,6 +403,10 @@ public partial class TeleprompterPage
             word.EffectiveWpm);
         AddOptionalDataAttribute(
             attributes,
+            UiDataAttributes.Teleprompter.EmotionMarker,
+            word.EmotionMarker);
+        AddOptionalDataAttribute(
+            attributes,
             UiDataAttributes.Teleprompter.OriginalText,
             word.OriginalText);
         AddOptionalDataAttribute(
@@ -439,6 +443,13 @@ public partial class TeleprompterPage
         {
             [UiDataAttributes.Teleprompter.SpeedCueLabel] = speedCueLabel,
             [UiDataAttributes.Teleprompter.SpeedCueDisplayMode] = BuildReaderSpeedCueDisplayModeDataAttribute()
+        };
+
+    private static IReadOnlyDictionary<string, object> BuildReaderEmotionMarkerDataAttributes(
+        ReaderWordViewModel word) =>
+        new Dictionary<string, object>(StringComparer.Ordinal)
+        {
+            [UiDataAttributes.Teleprompter.EmotionMarker] = word.EmotionMarker ?? string.Empty
         };
 
     private string ResolveReaderCardCssClass(int index) =>

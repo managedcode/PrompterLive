@@ -593,6 +593,11 @@ public static class EditorMarkupRenderer
             if (!string.IsNullOrWhiteSpace(EmotionValue))
             {
                 AppendAttribute(builder, TpsVisualCueContracts.EmotionAttributeName, EmotionValue);
+                var marker = TpsEmotionMarkers.ResolveMarker(EmotionValue);
+                if (!string.IsNullOrWhiteSpace(marker))
+                {
+                    AppendAttribute(builder, UiDataAttributes.Editor.EmotionMarker, marker);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(VolumeValue))

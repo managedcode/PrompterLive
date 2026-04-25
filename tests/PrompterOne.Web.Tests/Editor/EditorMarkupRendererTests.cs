@@ -1,3 +1,4 @@
+using System.Net;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Rendering;
 
@@ -33,6 +34,17 @@ public sealed class EditorMarkupRendererTests
         Assert.Contains("<span class=\"mk-tag\">[pronunciation:TELE-promp-ter]</span>", markup);
         Assert.Contains("<span class=\"mk-phonetic\">TELE-promp-ter</span> <span class=\"mk-phonetic-word\">teleprompter</span>", markup);
         Assert.Contains("technology.<span class=\"mk-tag\">[/180WPM]</span>", markup);
+    }
+
+    [Test]
+    public void Render_RendersEmotionMarkerAttributeBesideEmotionCue()
+    {
+        var markup = EditorMarkupRenderer.Render("Open with [warm]confidence[/warm] today.").Value;
+
+        Assert.Contains(
+            $"<span class=\"mk-emo-warm\" {TpsVisualCueContracts.EmotionAttributeName}=\"warm\" {UiDataAttributes.Editor.EmotionMarker}=\"{WebUtility.HtmlEncode(TpsEmotionMarkers.ResolveMarker("warm"))}\">confidence</span>",
+            markup,
+            StringComparison.Ordinal);
     }
 
     [Test]

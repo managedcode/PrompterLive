@@ -9,6 +9,7 @@ public partial class TeleprompterPage
         string DisplayName,
         string EmotionKey,
         string EmotionLabel,
+        string EmotionMarker,
         string BackgroundClass,
         string AccentColor,
         int TargetWpm,
@@ -23,6 +24,7 @@ public partial class TeleprompterPage
         string DisplayName,
         string EmotionKey,
         string EmotionLabel,
+        string EmotionMarker,
         string BackgroundClass,
         string AccentColor,
         int TargetWpm,
@@ -52,6 +54,8 @@ public partial class TeleprompterPage
         string? Style = null,
         string? OriginalText = null,
         string? PronunciationGuide = null,
+        string? EmotionMarker = null,
+        string? EmotionLabel = null,
         int? EffectiveWpm = null,
         IReadOnlyDictionary<string, object>? Attributes = null);
 

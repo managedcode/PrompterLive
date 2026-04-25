@@ -80,6 +80,11 @@ public static partial class UiTestIds
         public static string CardWord(int cardIndex, int groupIndex, int wordIndex) =>
             $"teleprompter-card-word-{cardIndex}-{groupIndex}-{wordIndex}";
 
+        public static string CardWordEmotionMarker(int cardIndex, int groupIndex, int wordIndex) =>
+            $"teleprompter-emotion-marker-{cardIndex}-{groupIndex}-{wordIndex}";
+
+        public static string CardWordEmotionMarkerPrefix(int cardIndex) => $"teleprompter-emotion-marker-{cardIndex}-";
+
         public static string CardWordPrefix(int cardIndex) => $"teleprompter-card-word-{cardIndex}-";
 
         public static string CardWordSpeedCueLabel(int cardIndex, int groupIndex, int wordIndex) =>

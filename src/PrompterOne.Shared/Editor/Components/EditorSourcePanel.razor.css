@@ -425,41 +425,62 @@ body.theme-light .ed-main ::deep .monaco-editor .line-numbers.active-line-number
     color:#796B57 !important;
 }
 .ed-main ::deep .mk-emo-warm,
-.ed-main ::deep .po-inline-emotion-warm{color:#FFB840;}
+.ed-main ::deep .po-inline-emotion-warm{--ed-emotion-marker:"😊";color:#FFB840;}
 .ed-main ::deep .po-tag-emotion-warm{--ed-tag-color:#FFB840;}
 .ed-main ::deep .mk-emo-concerned,
-.ed-main ::deep .po-inline-emotion-concerned{color:#FF7A7A;}
+.ed-main ::deep .po-inline-emotion-concerned{--ed-emotion-marker:"😟";color:#FF7A7A;}
 .ed-main ::deep .po-tag-emotion-concerned{--ed-tag-color:#FF7A7A;}
 .ed-main ::deep .mk-emo-focused,
-.ed-main ::deep .po-inline-emotion-focused{color:#4AE0A0;}
+.ed-main ::deep .po-inline-emotion-focused{--ed-emotion-marker:"🎯";color:#4AE0A0;}
 .ed-main ::deep .po-tag-emotion-focused{--ed-tag-color:#4AE0A0;}
 .ed-main ::deep .mk-emo-motivational,
-.ed-main ::deep .po-inline-emotion-motivational{color:#C88AFF;}
+.ed-main ::deep .po-inline-emotion-motivational{--ed-emotion-marker:"💪";color:#C88AFF;}
 .ed-main ::deep .po-tag-emotion-motivational{--ed-tag-color:#C88AFF;}
 .ed-main ::deep .mk-emo-neutral,
-.ed-main ::deep .po-inline-emotion-neutral{color:#8ECFFF;}
+.ed-main ::deep .po-inline-emotion-neutral{--ed-emotion-marker:"😐";color:#8ECFFF;}
 .ed-main ::deep .po-tag-emotion-neutral{--ed-tag-color:#8ECFFF;}
 .ed-main ::deep .mk-emo-urgent,
-.ed-main ::deep .po-inline-emotion-urgent{color:#FF6060;text-shadow:0 0 8px rgba(255,96,96,.18);}
+.ed-main ::deep .po-inline-emotion-urgent{--ed-emotion-marker:"🚨";color:#FF6060;text-shadow:0 0 8px rgba(255,96,96,.18);}
 .ed-main ::deep .po-tag-emotion-urgent{--ed-tag-color:#FF6060;}
 .ed-main ::deep .mk-emo-happy,
-.ed-main ::deep .po-inline-emotion-happy{color:#FFE87A;}
+.ed-main ::deep .po-inline-emotion-happy{--ed-emotion-marker:"😄";color:#FFE87A;}
 .ed-main ::deep .po-tag-emotion-happy{--ed-tag-color:#FFE87A;}
 .ed-main ::deep .mk-emo-excited,
-.ed-main ::deep .po-inline-emotion-excited{color:#FF8AC8;}
+.ed-main ::deep .po-inline-emotion-excited{--ed-emotion-marker:"🚀";color:#FF8AC8;}
 .ed-main ::deep .po-tag-emotion-excited{--ed-tag-color:#FF8AC8;}
 .ed-main ::deep .mk-emo-sad,
-.ed-main ::deep .po-inline-emotion-sad{color:#A0A8FF;}
+.ed-main ::deep .po-inline-emotion-sad{--ed-emotion-marker:"😢";color:#A0A8FF;}
 .ed-main ::deep .po-tag-emotion-sad{--ed-tag-color:#A0A8FF;}
 .ed-main ::deep .mk-emo-calm,
-.ed-main ::deep .po-inline-emotion-calm{color:#5EECC2;}
+.ed-main ::deep .po-inline-emotion-calm{--ed-emotion-marker:"😌";color:#5EECC2;}
 .ed-main ::deep .po-tag-emotion-calm{--ed-tag-color:#5EECC2;}
 .ed-main ::deep .mk-emo-energetic,
-.ed-main ::deep .po-inline-emotion-energetic{color:#FFA050;}
+.ed-main ::deep .po-inline-emotion-energetic{--ed-emotion-marker:"⚡";color:#FFA050;}
 .ed-main ::deep .po-tag-emotion-energetic{--ed-tag-color:#FFA050;}
 .ed-main ::deep .mk-emo-professional,
-.ed-main ::deep .po-inline-emotion-professional{color:#80B8FF;}
+.ed-main ::deep .po-inline-emotion-professional{--ed-emotion-marker:"💼";color:#80B8FF;}
 .ed-main ::deep .po-tag-emotion-professional{--ed-tag-color:#80B8FF;}
+.ed-main ::deep .mk-emo-warm{--ed-emotion-marker:"😊";}
+.ed-main ::deep .mk-emo-concerned{--ed-emotion-marker:"😟";}
+.ed-main ::deep .mk-emo-focused{--ed-emotion-marker:"🎯";}
+.ed-main ::deep .mk-emo-motivational{--ed-emotion-marker:"💪";}
+.ed-main ::deep .mk-emo-neutral{--ed-emotion-marker:"😐";}
+.ed-main ::deep .mk-emo-urgent{--ed-emotion-marker:"🚨";}
+.ed-main ::deep .mk-emo-happy{--ed-emotion-marker:"😄";}
+.ed-main ::deep .mk-emo-excited{--ed-emotion-marker:"🚀";}
+.ed-main ::deep .mk-emo-sad{--ed-emotion-marker:"😢";}
+.ed-main ::deep .mk-emo-calm{--ed-emotion-marker:"😌";}
+.ed-main ::deep .mk-emo-energetic{--ed-emotion-marker:"⚡";}
+.ed-main ::deep .mk-emo-professional{--ed-emotion-marker:"💼";}
+.ed-main ::deep [class*="mk-emo-"]::before,
+.ed-main ::deep [class*="po-inline-emotion-"]::before{
+    content:var(--ed-emotion-marker);
+    display:inline-block;
+    margin-inline-end:.24em;
+    font-size:.9em;
+    line-height:1;
+    vertical-align:-.05em;
+}
 .ed-main ::deep [data-tps-volume],
 .ed-main ::deep [data-tps-delivery],
 .ed-main ::deep [data-tps-articulation],

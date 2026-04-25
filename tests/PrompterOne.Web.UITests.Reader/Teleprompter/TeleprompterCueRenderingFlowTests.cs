@@ -356,6 +356,13 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     .replace(/[.,;:!?]+$/g, '');
                 const words = [...host.querySelectorAll(`[data-test="${args.activeWordTestId}"], [data-test^="${args.wordPrefix}"]`)];
                 const target = words.find(candidate => normalize(candidate.textContent) === args.targetWord);
+                const marker = target instanceof HTMLElement
+                    ? target.querySelector(`[data-test^="${args.emotionMarkerPrefix}"]`)
+                    : null;
+                const normalizeContent = value => (value ?? '').replace(/^["']|["']$/g, '');
+                const markerContent = marker instanceof HTMLElement
+                    ? normalizeContent(getComputedStyle(marker, '::before').content)
+                    : '';
                 const attributeWords = args.attributeName && args.attributeValue
                     ? words.filter(candidate => candidate?.getAttribute(args.attributeName) === args.attributeValue)
                     : [];
@@ -412,6 +419,11 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 return {
                     rawTagsVisible: /\[[^\]]+\]/.test(host.textContent ?? ''),
                     targetText: target?.textContent?.trim() ?? '',
+                    emotionMarkerText: markerContent,
+                    emotionMarkerLabel: marker?.getAttribute('aria-label')?.toLowerCase() ?? '',
+                    emotionMarkerData: marker?.getAttribute(args.emotionMarkerAttributeName)
+                        ?? target?.getAttribute(args.emotionMarkerAttributeName)
+                        ?? '',
                     originalText: target?.getAttribute(args.originalTextAttributeName) ?? '',
                     attributeValue: args.attributeName ? target?.getAttribute(args.attributeName) ?? '' : '',
                     attributeMatchCount: attributeWords.length,
@@ -471,6 +483,8 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 attributeValue = capture.AttributeValue,
                 activeWordTestId = UiTestIds.Teleprompter.ActiveWord,
                 editPointAttributeName = TpsVisualCueContracts.EditPointAttributeName,
+                emotionMarkerAttributeName = UiDataAttributes.Teleprompter.EmotionMarker,
+                emotionMarkerPrefix = UiTestIds.Teleprompter.CardWordEmotionMarkerPrefix(capture.CardIndex),
                 expectedEditPointPriority = capture.ExpectedEditPointPriority,
                 originalTextAttributeName = UiDataAttributes.Teleprompter.OriginalText,
                 targetWord = capture.TargetWord,
@@ -501,6 +515,19 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                     .IsEqualTo(capture.ExpectedAttributeMatchCount)
                     .Because($"Expected cue example '{capture.CueLabel}' to style the expected cue scope.");
             }
+        }
+
+        if (string.Equals(capture.AttributeName, TpsVisualCueContracts.EmotionAttributeName, StringComparison.Ordinal))
+        {
+            await Assert.That(probe.EmotionMarkerText)
+                .IsNotEqualTo(string.Empty)
+                .Because($"Expected emotion cue '{capture.CueLabel}' to show an emoji marker, not only a color.");
+            await Assert.That(probe.EmotionMarkerText)
+                .IsEqualTo(probe.EmotionMarkerData)
+                .Because($"Expected emotion cue '{capture.CueLabel}' to keep the visible marker in its data contract.");
+            await Assert.That(probe.EmotionMarkerLabel)
+                .Contains(capture.AttributeValue ?? string.Empty)
+                .Because($"Expected emotion cue '{capture.CueLabel}' to expose a readable marker label.");
         }
 
         if (string.Equals(capture.AttributeName, UiDataAttributes.Teleprompter.Pronunciation, StringComparison.Ordinal))
@@ -1081,6 +1108,12 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
         public bool RawTagsVisible { get; init; }
 
         public string TargetText { get; init; } = string.Empty;
+
+        public string EmotionMarkerText { get; init; } = string.Empty;
+
+        public string EmotionMarkerLabel { get; init; } = string.Empty;
+
+        public string EmotionMarkerData { get; init; } = string.Empty;
 
         public string OriginalText { get; init; } = string.Empty;
 
