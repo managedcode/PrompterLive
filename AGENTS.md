@@ -543,6 +543,7 @@ Repo-specific design rules:
 - Never force-push to `main`.
 - Never approve or merge on behalf of a human maintainer.
 - The agent may commit locally after the required tests and validation commands pass, but it must not push, merge, or otherwise publish repo changes until the user gives an explicit command to do so.
+- When the user explicitly authorizes an issue-backlog implementation run, work open GitHub issues one at a time on `main`, commit with the issue number, push `main` after the required checks pass, assign the issue to `byskyphy`, and comment with the pushed commit and verification summary for review.
 
 ### Boundaries
 
