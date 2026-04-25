@@ -38,6 +38,10 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
     private const string MillisecondPauseCompletionLabel = "[pause:1000ms]";
     private const string LowEditPointCompletionLabel = "[edit_point:low]";
     private const string MediumEditPointCompletionLabel = "[edit_point:medium]";
+    private const string XslowCompletionLabel = "[xslow]text[/xslow]";
+    private const string LoudCompletionLabel = "[loud]text[/loud]";
+    private const string SarcasmCompletionLabel = "[sarcasm]text[/sarcasm]";
+    private const string NeutralCompletionLabel = "[neutral]text[/neutral]";
     private const string EnergyCompletionLabel = "[energy:8]text[/energy]";
     private const string MelodyCompletionLabel = "[melody:4]text[/melody]";
     private const string LegatoCompletionLabel = "[legato]text[/legato]";
@@ -54,11 +58,11 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         .Select(archetype => BuildArchetypeSegmentCompletionLabel(ToDisplayLabel(archetype)))
         .ToArray();
     private static readonly string[] ExpectedVendoredWrapperLabels =
-        TpsSpec.Emotions.Select(BuildWrapCompletionLabel)
+        TpsSpec.RelativeSpeedTags.Select(BuildWrapCompletionLabel)
             .Concat(TpsSpec.VolumeLevels.Select(BuildWrapCompletionLabel))
             .Concat(TpsSpec.DeliveryModes.Select(BuildWrapCompletionLabel))
             .Concat(TpsSpec.ArticulationStyles.Select(BuildWrapCompletionLabel))
-            .Concat(TpsSpec.RelativeSpeedTags.Select(BuildWrapCompletionLabel))
+            .Concat(TpsSpec.Emotions.Select(BuildWrapCompletionLabel))
             .ToArray();
 
     public static IEnumerable<string> ArchetypeSegmentCompletionLabels => ExpectedArchetypeSegmentCompletionLabels;
@@ -132,6 +136,28 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             await Assert.That(staccatoCompletion.Documentation).Contains("staccato");
             await Assert.That(archetypeSegmentCompletion.Detail).IsEqualTo("Segment header (archetype)");
             await Assert.That(archetypeSegmentCompletion.InsertText).Contains("Archetype:${3:Coach}");
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Test]
+    public async Task EditorScreen_CompletionsPrioritizeSpeedAndImpactWrappersBeforeGeneralizedEmotion()
+    {
+        var page = await OpenEditorAsync();
+
+        try
+        {
+            await EditorMonacoDriver.SetTextAsync(page, "[");
+            var completions = await EditorMonacoDriver.GetCompletionsAsync(page, TitleLineNumber, CompletionStartColumn);
+
+            var neutralIndex = IndexOfCompletion(completions, NeutralCompletionLabel);
+
+            await Assert.That(IndexOfCompletion(completions, XslowCompletionLabel)).IsLessThan(neutralIndex);
+            await Assert.That(IndexOfCompletion(completions, LoudCompletionLabel)).IsLessThan(neutralIndex);
+            await Assert.That(IndexOfCompletion(completions, SarcasmCompletionLabel)).IsLessThan(neutralIndex);
         }
         finally
         {
@@ -345,6 +371,19 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
         var completion = completions.Suggestions.SingleOrDefault(suggestion => string.Equals(suggestion.Label, label, StringComparison.Ordinal));
         return completion
             ?? throw new InvalidOperationException($"Unable to locate Monaco completion '{label}'.");
+    }
+
+    private static int IndexOfCompletion(EditorMonacoCompletionList completions, string label)
+    {
+        for (var index = 0; index < completions.Suggestions.Count; index++)
+        {
+            if (string.Equals(completions.Suggestions[index].Label, label, StringComparison.Ordinal))
+            {
+                return index;
+            }
+        }
+
+        throw new InvalidOperationException($"Unable to locate Monaco completion '{label}'.");
     }
 
     private static int FindColumn(string line, string fragment)

@@ -11,11 +11,23 @@ public sealed class EditorToolbarCatalogContractTests
             .Select(group => group.Label);
 
     [Test]
-    public void TopToolbarDropdowns_FollowVendoredTpsOrder()
+    public void TopToolbarSections_PrioritizeImpactAndSpeed_BeforeGeneralizedEmotion()
+    {
+        var sectionKeys = EditorToolbarCatalog.Sections.Select(section => section.Key).ToArray();
+
+        Assert.True(IndexOf(sectionKeys, "voice") < IndexOf(sectionKeys, "speed"));
+        Assert.True(IndexOf(sectionKeys, "speed") < IndexOf(sectionKeys, "emotion"));
+    }
+
+    [Test]
+    public void TopToolbarDropdowns_FollowVendoredTpsActionOrder()
     {
         var emotionGroup = FindTopDropdownGroup("emotion", "TPS Emotions");
         var deliveryGroup = FindTopDropdownGroup("emotion", "Delivery Modes");
         var speedGroup = FindTopDropdownGroup("speed", "Speed Presets");
+        var emotionGroups = FindTopSection("emotion").DropdownGroups;
+
+        Assert.True(IndexOfGroup(emotionGroups, "Delivery Modes") < IndexOfGroup(emotionGroups, "TPS Emotions"));
 
         Assert.Equal(
             [
@@ -44,11 +56,14 @@ public sealed class EditorToolbarCatalogContractTests
     }
 
     [Test]
-    public void FloatingToolbarDropdowns_FollowVendoredTpsOrder()
+    public void FloatingToolbarDropdowns_FollowVendoredTpsActionOrder()
     {
         var emotionGroup = FindFloatingDropdownGroup(EditorToolbarMenuIds.FloatingEmotion, "TPS Emotions");
         var deliveryGroup = FindFloatingDropdownGroup(EditorToolbarMenuIds.FloatingEmotion, "Delivery Modes");
         var speedGroup = FindFloatingDropdownGroup(EditorToolbarMenuIds.FloatingSpeed, "Speed Presets");
+        var emotionGroups = FindFloatingMenu(EditorToolbarMenuIds.FloatingEmotion).DropdownGroups;
+
+        Assert.True(IndexOfGroup(emotionGroups, "Delivery Modes") < IndexOfGroup(emotionGroups, "TPS Emotions"));
 
         Assert.Equal(
             [
@@ -118,6 +133,26 @@ public sealed class EditorToolbarCatalogContractTests
 
     private static EditorFloatingMenuDescriptor FindFloatingMenu(string menuId) =>
         Assert.Single(EditorToolbarCatalog.FloatingMenus, candidate => string.Equals(candidate.MenuId, menuId, StringComparison.Ordinal));
+
+    private static int IndexOf(IReadOnlyList<string> values, string value)
+    {
+        var index = Array.IndexOf(values.ToArray(), value);
+        Assert.True(index >= 0, $"Expected '{value}' to be present.");
+        return index;
+    }
+
+    private static int IndexOfGroup(IReadOnlyList<EditorToolbarDropdownGroupDescriptor> groups, string label)
+    {
+        for (var index = 0; index < groups.Count; index++)
+        {
+            if (string.Equals(groups[index].Label, label, StringComparison.Ordinal))
+            {
+                return index;
+            }
+        }
+
+        throw new InvalidOperationException($"Expected group '{label}' to be present.");
+    }
 
     private static string NormalizeFloatingKey(string key) =>
         key.Replace("float-", string.Empty, StringComparison.Ordinal)

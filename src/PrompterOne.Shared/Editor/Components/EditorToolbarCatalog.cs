@@ -109,21 +109,21 @@ public static class EditorToolbarCatalog
                 ..EditorTpsMenuCatalog.BuildToolbarVoiceGroups()
             ]),
         new(
-            "emotion",
-            "Emotion",
-            EditorToolbarMenuIds.Emotion,
-            "editor-menu-emotion",
-            null,
+            "speed",
+            "Speed",
+            EditorToolbarMenuIds.Speed,
+            "editor-menu-speed",
+            "tb-dropdown--speed",
             [
-                Toggle(
-                    EditorToolbarMenuIds.Emotion,
-                    "editor-emotion-trigger",
-                    "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text",
-                    EditorActionContents.Trigger(EditorActionIconKind.SemanticDotEmotion, EditorActionIconTone.Emotion),
-                    "tb-btn tb-has-dropdown tb-tip tb-btn--emotion")
+                Wrap("speed-xslow", EditorActionContents.Glyph("×.6", EditorActionContentTone.SpeedXslow, bold: true, mono: true), "Extra slow — base WPM × 0.6. Use for critical warnings, very careful delivery. [xslow]text[/xslow]", "editor-toolbar-speed-xslow", "[xslow]", "[/xslow]", cssClass: "tb-btn tb-speed tb-tip tb-speed--xslow"),
+                Wrap("speed-slow", EditorActionContents.Glyph("×.8", EditorActionContentTone.SpeedSlow, bold: true, mono: true), "Slow — base WPM × 0.8. Use for important points, emphasis. [slow]text[/slow]", "editor-toolbar-speed-slow", "[slow]", "[/slow]", cssClass: "tb-btn tb-speed tb-tip tb-speed--slow"),
+                Wrap("speed-normal", EditorActionContents.Glyph("×1", EditorActionContentTone.SpeedNormal, bold: true, mono: true), "Normal speed — resets to base WPM × 1.0. [normal]text[/normal]", "editor-speed-normal", "[normal]", "[/normal]", cssClass: "tb-btn tb-speed tb-tip tb-speed--normal"),
+                Wrap("speed-fast", EditorActionContents.Glyph("×1.25", EditorActionContentTone.SpeedFast, bold: true, mono: true), "Fast — base WPM × 1.25. Use for quick mentions, asides. [fast]text[/fast]", "editor-toolbar-speed-fast", "[fast]", "[/fast]", cssClass: "tb-btn tb-speed tb-tip tb-speed--fast"),
+                Wrap("speed-xfast", EditorActionContents.Glyph("×1.5", EditorActionContentTone.SpeedXfast, bold: true, mono: true), "Extra fast — base WPM × 1.5. Use for rapid transitions, low-importance text. [xfast]text[/xfast]", "editor-toolbar-speed-xfast", "[xfast]", "[/xfast]", cssClass: "tb-btn tb-speed tb-tip tb-speed--xfast"),
+                Toggle(EditorToolbarMenuIds.Speed, "editor-speed-trigger", "Custom WPM and more speed options", EditorActionContents.Trigger(EditorActionIconKind.Lightning), "tb-btn tb-has-dropdown tb-tip tb-btn--speed")
             ],
             [
-                ..EditorTpsMenuCatalog.BuildToolbarEmotionGroups()
+                ..EditorTpsMenuCatalog.BuildToolbarSpeedGroups()
             ]),
         new(
             "pause",
@@ -140,21 +140,21 @@ public static class EditorToolbarCatalog
                 ..EditorTpsMenuCatalog.BuildToolbarPauseGroups()
             ]),
         new(
-            "speed",
-            "Speed",
-            EditorToolbarMenuIds.Speed,
-            "editor-menu-speed",
-            "tb-dropdown--speed",
+            "emotion",
+            "Emotion",
+            EditorToolbarMenuIds.Emotion,
+            "editor-menu-emotion",
+            null,
             [
-                Wrap("speed-xslow", EditorActionContents.Glyph("×.6", EditorActionContentTone.SpeedXslow, bold: true, mono: true), "Extra slow — base WPM × 0.6. Use for critical warnings, very careful delivery. [xslow]text[/xslow]", "editor-toolbar-speed-xslow", "[xslow]", "[/xslow]", cssClass: "tb-btn tb-speed tb-tip tb-speed--xslow"),
-                Wrap("speed-slow", EditorActionContents.Glyph("×.8", EditorActionContentTone.SpeedSlow, bold: true, mono: true), "Slow — base WPM × 0.8. Use for important points, emphasis. [slow]text[/slow]", "editor-toolbar-speed-slow", "[slow]", "[/slow]", cssClass: "tb-btn tb-speed tb-tip tb-speed--slow"),
-                Wrap("speed-normal", EditorActionContents.Glyph("×1", EditorActionContentTone.SpeedNormal, bold: true, mono: true), "Normal speed — resets to base WPM × 1.0. [normal]text[/normal]", "editor-speed-normal", "[normal]", "[/normal]", cssClass: "tb-btn tb-speed tb-tip tb-speed--normal"),
-                Wrap("speed-fast", EditorActionContents.Glyph("×1.25", EditorActionContentTone.SpeedFast, bold: true, mono: true), "Fast — base WPM × 1.25. Use for quick mentions, asides. [fast]text[/fast]", "editor-toolbar-speed-fast", "[fast]", "[/fast]", cssClass: "tb-btn tb-speed tb-tip tb-speed--fast"),
-                Wrap("speed-xfast", EditorActionContents.Glyph("×1.5", EditorActionContentTone.SpeedXfast, bold: true, mono: true), "Extra fast — base WPM × 1.5. Use for rapid transitions, low-importance text. [xfast]text[/xfast]", "editor-toolbar-speed-xfast", "[xfast]", "[/xfast]", cssClass: "tb-btn tb-speed tb-tip tb-speed--xfast"),
-                Toggle(EditorToolbarMenuIds.Speed, "editor-speed-trigger", "Custom WPM and more speed options", EditorActionContents.Trigger(EditorActionIconKind.Lightning), "tb-btn tb-has-dropdown tb-tip tb-btn--speed")
+                Toggle(
+                    EditorToolbarMenuIds.Emotion,
+                    "editor-emotion-trigger",
+                    "Emotion — applies mood-based color styling and presentation hints. Used on segments, blocks, or inline text",
+                    EditorActionContents.Trigger(EditorActionIconKind.SemanticDotEmotion, EditorActionIconTone.Emotion),
+                    "tb-btn tb-has-dropdown tb-tip tb-btn--emotion")
             ],
             [
-                ..EditorTpsMenuCatalog.BuildToolbarSpeedGroups()
+                ..EditorTpsMenuCatalog.BuildToolbarEmotionGroups()
             ]),
         new(
             "insert",

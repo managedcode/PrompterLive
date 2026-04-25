@@ -44,11 +44,11 @@ export function createTpsLanguageSpec(runtimeCatalog) {
         createWrapperCompletion("emphasis", "[emphasis]${1:text}[/emphasis]", "Emphasis wrapper", "Wrap words that should land harder."),
         createWrapperCompletion("highlight", "[highlight]${1:text}[/highlight]", "Highlight wrapper", "Mark words that should read as visually highlighted."),
         createWrapperCompletion("stress", "[stress]${1:me}[/stress]", "Stress wrapper", "Wrap the stressed syllable or letters inside a word."),
-        ...articulationTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Articulation wrapper", `Apply a ${name} articulation contour to the wrapped text.`)),
-        ...emotionTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Emotion wrapper", `Apply the ${name} delivery color and feel to the wrapped text.`)),
+        ...speedTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Speed wrapper", speedDocumentationByName[name] ?? "Adjust the delivery pace for the wrapped text.")),
         ...volumeTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Volume wrapper", `Wrap text that should be delivered as ${name}.`)),
         ...deliveryTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Delivery wrapper", `Wrap text that should be delivered as ${name}.`)),
-        ...speedTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Speed wrapper", speedDocumentationByName[name] ?? "Adjust the delivery pace for the wrapped text."))
+        ...articulationTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Articulation wrapper", `Apply a ${name} articulation contour to the wrapped text.`)),
+        ...emotionTagNames.map(name => createWrapperCompletion(name, "[" + name + "]${1:text}[/" + name + "]", "Emotion wrapper", `Apply the ${name} delivery color and feel to the wrapped text.`))
     ];
 
     const markdownWrapperSpecs = [

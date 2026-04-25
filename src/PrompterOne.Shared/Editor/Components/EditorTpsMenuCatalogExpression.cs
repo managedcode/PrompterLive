@@ -6,6 +6,12 @@ internal static partial class EditorTpsMenuCatalog
 {
     private static IReadOnlyList<EditorTpsMenuGroupDefinition> CreateEmotionGroupDefinitions() =>
     [
+        new("Delivery Modes", [
+            Wrap("delivery-sarcasm", "float-delivery-sarcasm", "editor-delivery-sarcasm", UiTestIds.Editor.FloatingDeliverySarcasm, EditorActionContents.Label("SARC", "Sarcasm", "[sarcasm]", EditorActionContentTone.DeliverySarcasm), "Apply a sarcastic delivery cue. [sarcasm]text[/sarcasm]", "[sarcasm]", "[/sarcasm]"),
+            Wrap("delivery-aside", "float-delivery-aside", "editor-delivery-aside", "editor-float-delivery-aside", EditorActionContents.Label("ASIDE", "Aside", "[aside]", EditorActionContentTone.DeliveryAside), "Mark the phrase as an aside. [aside]text[/aside]", "[aside]", "[/aside]"),
+            Wrap("delivery-rhetorical", "float-delivery-rhetorical", "editor-delivery-rhetorical", "editor-float-delivery-rhetorical", EditorActionContents.Label("WHY?", "Rhetorical", "[rhetorical]", EditorActionContentTone.DeliveryRhetorical), "Use rhetorical delivery without changing emotion. [rhetorical]text[/rhetorical]", "[rhetorical]", "[/rhetorical]"),
+            Wrap("delivery-building", "float-delivery-building", "editor-delivery-building", "editor-float-delivery-building", EditorActionContents.Label("BUILD", "Building", "[building]", EditorActionContentTone.DeliveryBuilding), "Gradually build intensity through the phrase. [building]text[/building]", "[building]", "[/building]")
+        ]),
         new("TPS Emotions", [
             Wrap("emotion-neutral", "float-emotion-neutral", "editor-emotion-neutral", "editor-float-emotion-neutral", EditorActionContents.Emotion("Neutral", "😐", EditorActionContentTone.EmotionNeutral), "Default balanced tone. Inline: [neutral]text[/neutral]", "[neutral]", "[/neutral]"),
             Wrap("emotion-warm", "float-emotion-warm", "editor-emotion-warm", "editor-float-emotion-warm", EditorActionContents.Emotion("Warm", "😊", EditorActionContentTone.EmotionWarm), "Friendly, welcoming tone. Inline: [warm]text[/warm]", "[warm]", "[/warm]"),
@@ -19,12 +25,6 @@ internal static partial class EditorTpsMenuCatalog
             Wrap("emotion-sad", "float-emotion-sad", "editor-emotion-sad", "editor-float-emotion-sad", EditorActionContents.Emotion("Sad", "😢", EditorActionContentTone.EmotionSad), "Melancholy, somber. Inline: [sad]text[/sad]", "[sad]", "[/sad]"),
             Wrap("emotion-calm", "float-emotion-calm", "editor-emotion-calm", "editor-float-emotion-calm", EditorActionContents.Emotion("Calm", "😌", EditorActionContentTone.EmotionCalm), "Peaceful, relaxed. Inline: [calm]text[/calm]", "[calm]", "[/calm]"),
             Wrap("emotion-energetic", "float-emotion-energetic", "editor-emotion-energetic", "editor-float-emotion-energetic", EditorActionContents.Emotion("Energetic", "⚡", EditorActionContentTone.EmotionEnergetic), "High energy, dynamic. Inline: [energetic]text[/energetic]", "[energetic]", "[/energetic]")
-        ]),
-        new("Delivery Modes", [
-            Wrap("delivery-sarcasm", "float-delivery-sarcasm", "editor-delivery-sarcasm", UiTestIds.Editor.FloatingDeliverySarcasm, EditorActionContents.Label("SARC", "Sarcasm", "[sarcasm]", EditorActionContentTone.DeliverySarcasm), "Apply a sarcastic delivery cue. [sarcasm]text[/sarcasm]", "[sarcasm]", "[/sarcasm]"),
-            Wrap("delivery-aside", "float-delivery-aside", "editor-delivery-aside", "editor-float-delivery-aside", EditorActionContents.Label("ASIDE", "Aside", "[aside]", EditorActionContentTone.DeliveryAside), "Mark the phrase as an aside. [aside]text[/aside]", "[aside]", "[/aside]"),
-            Wrap("delivery-rhetorical", "float-delivery-rhetorical", "editor-delivery-rhetorical", "editor-float-delivery-rhetorical", EditorActionContents.Label("WHY?", "Rhetorical", "[rhetorical]", EditorActionContentTone.DeliveryRhetorical), "Use rhetorical delivery without changing emotion. [rhetorical]text[/rhetorical]", "[rhetorical]", "[/rhetorical]"),
-            Wrap("delivery-building", "float-delivery-building", "editor-delivery-building", "editor-float-delivery-building", EditorActionContents.Label("BUILD", "Building", "[building]", EditorActionContentTone.DeliveryBuilding), "Gradually build intensity through the phrase. [building]text[/building]", "[building]", "[/building]")
         ], HasSeparatorBefore: true)
     ];
 

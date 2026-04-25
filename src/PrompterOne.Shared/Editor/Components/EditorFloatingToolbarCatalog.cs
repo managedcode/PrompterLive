@@ -25,15 +25,15 @@ internal static class EditorFloatingToolbarCatalog
         ],
         [
             EditorFloatingToolbarActionFactory.Wrap("float-voice-loud", EditorActionContents.Icon(EditorActionIconKind.SpeakerHigh), "Loud [loud]", UiTestIds.Editor.FloatingVoiceLoud, "[loud]", "[/loud]", cssClass: "efb-btn efb-btn--voice-action"),
+            EditorFloatingToolbarActionFactory.Wrap("float-slow", EditorActionContents.Glyph(".8×", EditorActionContentTone.SpeedSlow, bold: true, mono: true), "Slow [slow]", UiTestIds.Editor.FloatingSlow, "[slow]", "[/slow]"),
+            EditorFloatingToolbarActionFactory.Wrap("float-fast", EditorActionContents.Glyph("1.25×", EditorActionContentTone.SpeedFast, bold: true, mono: true), "Fast [fast]", "editor-float-fast", "[fast]", "[/fast]"),
             EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingVoice, EditorActionContents.Trigger(EditorActionIconKind.SemanticDotVoice, EditorActionIconTone.Voice), "Voice cues", UiTestIds.Editor.FloatingVoice, "efb-btn efb-btn--voice-menu"),
+            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingSpeed, EditorActionContents.Trigger(EditorActionIconKind.Lightning), "Speed cues", UiTestIds.Editor.FloatingSpeedTrigger, "efb-btn efb-btn--speed"),
             EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingEmotion, EditorActionContents.Trigger(EditorActionIconKind.SemanticDotEmotion, EditorActionIconTone.Emotion), "Emotion and delivery", UiTestIds.Editor.FloatingEmotion, "efb-btn efb-btn--emotion-menu")
         ],
         [
-            EditorFloatingToolbarActionFactory.Wrap("float-slow", EditorActionContents.Glyph(".8×", EditorActionContentTone.SpeedSlow, bold: true, mono: true), "Slow [slow]", UiTestIds.Editor.FloatingSlow, "[slow]", "[/slow]"),
-            EditorFloatingToolbarActionFactory.Wrap("float-fast", EditorActionContents.Glyph("1.25×", EditorActionContentTone.SpeedFast, bold: true, mono: true), "Fast [fast]", "editor-float-fast", "[fast]", "[/fast]"),
             EditorFloatingToolbarActionFactory.Insert("float-pause", EditorActionContents.Icon(EditorActionIconKind.PauseBars), "Breath [breath]", UiTestIds.Editor.FloatingPause, "[breath]", cssClass: "efb-btn efb-btn--pause"),
-            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingPause, EditorActionContents.Trigger(EditorActionIconKind.PauseClock), "Pause cues", UiTestIds.Editor.FloatingPauseTrigger, "efb-btn efb-btn--pause"),
-            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingSpeed, EditorActionContents.Trigger(EditorActionIconKind.Lightning), "Speed cues", UiTestIds.Editor.FloatingSpeedTrigger, "efb-btn efb-btn--speed")
+            EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingPause, EditorActionContents.Trigger(EditorActionIconKind.PauseClock), "Pause cues", UiTestIds.Editor.FloatingPauseTrigger, "efb-btn efb-btn--pause")
         ],
         [
             EditorFloatingToolbarActionFactory.Toggle(EditorToolbarMenuIds.FloatingInsert, EditorActionContents.Trigger(EditorActionIconKind.EditPoint), "Insert TPS helpers", UiTestIds.Editor.FloatingInsert, "efb-btn efb-btn--insert")
@@ -49,11 +49,12 @@ internal static class EditorFloatingToolbarCatalog
             "Voice Cues",
             EditorTpsMenuCatalog.BuildFloatingVoiceGroups()),
         new(
-            EditorToolbarMenuIds.FloatingEmotion,
-            UiTestIds.Editor.FloatingEmotion,
-            UiTestIds.Editor.FloatingEmotionMenu,
-            "Emotion",
-            EditorTpsMenuCatalog.BuildFloatingEmotionGroups()),
+            EditorToolbarMenuIds.FloatingSpeed,
+            UiTestIds.Editor.FloatingSpeedTrigger,
+            UiTestIds.Editor.FloatingSpeedMenu,
+            "Speed",
+            EditorTpsMenuCatalog.BuildFloatingSpeedGroups(),
+            "efb-dropdown--wide"),
         new(
             EditorToolbarMenuIds.FloatingPause,
             UiTestIds.Editor.FloatingPauseTrigger,
@@ -61,12 +62,11 @@ internal static class EditorFloatingToolbarCatalog
             "Pause",
             EditorTpsMenuCatalog.BuildFloatingPauseGroups()),
         new(
-            EditorToolbarMenuIds.FloatingSpeed,
-            UiTestIds.Editor.FloatingSpeedTrigger,
-            UiTestIds.Editor.FloatingSpeedMenu,
-            "Speed",
-            EditorTpsMenuCatalog.BuildFloatingSpeedGroups(),
-            "efb-dropdown--wide"),
+            EditorToolbarMenuIds.FloatingEmotion,
+            UiTestIds.Editor.FloatingEmotion,
+            UiTestIds.Editor.FloatingEmotionMenu,
+            "Emotion",
+            EditorTpsMenuCatalog.BuildFloatingEmotionGroups()),
         new(
             EditorToolbarMenuIds.FloatingInsert,
             UiTestIds.Editor.FloatingInsert,
