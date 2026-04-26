@@ -24,6 +24,46 @@
     overflow-x: hidden;
 }
 
+#screen-library[data-sidebar-state="closed"] .lib-sidebar {
+    display: none;
+}
+
+.lib-sidebar-topbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: -4px -6px 8px 0;
+}
+
+.lib-sidebar-toggle,
+.lib-sidebar-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+    color: var(--t4);
+    border: 1px solid rgba(245,200,80,.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.lib-sidebar-toggle:hover,
+.lib-sidebar-close:hover {
+    background: var(--glass2);
+    color: var(--t2);
+    border-color: rgba(245,200,80,.16);
+}
+
+.lib-sidebar-toggle[data-sidebar-state="open"] {
+    color: #E8D5B0;
+    background: rgba(245,200,80,.06);
+}
+
+.lib-sidebar-scrim {
+    display: none;
+}
+
 .lib-logo {
     display: flex;
     align-items: center;
@@ -239,6 +279,31 @@ body.theme-light .lib-sidebar {
     border-color: rgba(107,90,72,.08);
 }
 
+html[data-theme="light"] .lib-sidebar-toggle,
+html.theme-light .lib-sidebar-toggle,
+body.theme-light .lib-sidebar-toggle,
+html[data-theme="light"] .lib-sidebar-close,
+html.theme-light .lib-sidebar-close,
+body.theme-light .lib-sidebar-close {
+    background: rgba(255,255,255,.55);
+    border-color: rgba(107,90,72,.1);
+    color: rgba(92,77,61,.62);
+}
+
+html[data-theme="light"] .lib-sidebar-toggle:hover,
+html.theme-light .lib-sidebar-toggle:hover,
+body.theme-light .lib-sidebar-toggle:hover,
+html[data-theme="light"] .lib-sidebar-close:hover,
+html.theme-light .lib-sidebar-close:hover,
+body.theme-light .lib-sidebar-close:hover,
+html[data-theme="light"] .lib-sidebar-toggle[data-sidebar-state="open"],
+html.theme-light .lib-sidebar-toggle[data-sidebar-state="open"],
+body.theme-light .lib-sidebar-toggle[data-sidebar-state="open"] {
+    background: rgba(139,115,85,.1);
+    border-color: rgba(139,115,85,.2);
+    color: #5C4D3D;
+}
+
 html[data-theme="light"] .lib-logo span,
 html.theme-light .lib-logo span,
 body.theme-light .lib-logo span {
@@ -390,27 +455,31 @@ body.theme-light .lib-nav-bottom {
 /* ---- Mobile: sidebar becomes compact horizontal nav ---- */
 @media (max-width: 640px) {
     #screen-library.screen.active {
-        flex-direction: column;
+        flex-direction: row;
     }
 
-    .lib-sidebar {
-        width: 100%;
-        flex-shrink: 0;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 6px;
-        padding: 10px 12px;
-        border-right: none;
-        border-bottom: var(--glass-border-light);
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
+    #screen-library[data-sidebar-state="open"] .lib-sidebar {
+        position: fixed;
+        top: var(--app-header-height);
+        left: 0;
+        bottom: 0;
+        z-index: 70;
+        width: min(82vw, 280px);
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 0;
+        padding: 12px;
+        border-right: var(--glass-border-light);
+        border-bottom: none;
+        overflow-x: hidden;
+        overflow-y: auto;
+        box-shadow: 18px 0 44px rgba(0,0,0,.28);
     }
 
     .lib-nav {
-        flex-direction: row;
-        gap: 4px;
+        flex-direction: column;
+        gap: 2px;
         flex-shrink: 0;
     }
 
@@ -419,7 +488,7 @@ body.theme-light .lib-nav-bottom {
         padding: 6px 10px;
         font-size: 12px;
         border-radius: 8px;
-        white-space: nowrap;
+        white-space: normal;
     }
 
     .nav-item svg {
@@ -428,13 +497,14 @@ body.theme-light .lib-nav-bottom {
     }
 
     .lib-folders-section {
-        display: none;
+        display: block;
+        max-height: none;
     }
 
     .lib-nav-bottom {
-        margin-top: 0;
-        border-top: none;
-        padding-top: 0;
+        margin-top: auto;
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
         flex-shrink: 0;
     }
 
@@ -446,6 +516,14 @@ body.theme-light .lib-nav-bottom {
     .lib-nav-bottom .nav-item svg {
         width: 14px;
         height: 14px;
+    }
+
+    #screen-library[data-sidebar-state="open"] .lib-sidebar-scrim {
+        display: block;
+        position: fixed;
+        inset: var(--app-header-height) 0 0 0;
+        z-index: 60;
+        background: rgba(0,0,0,.18);
     }
 }
 

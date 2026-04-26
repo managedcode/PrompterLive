@@ -5,6 +5,9 @@ public static partial class UiTestIds
     public static class Library
     {
         public const string Sidebar = "library-sidebar";
+        public const string SidebarClose = "library-sidebar-close";
+        public const string SidebarScrim = "library-sidebar-scrim";
+        public const string SidebarToggle = "library-sidebar-toggle";
         public const string Page = "library-page";
         public const string CreateScript = "library-create-script";
         public const string CreateScriptSurface = "library-create-script-surface";

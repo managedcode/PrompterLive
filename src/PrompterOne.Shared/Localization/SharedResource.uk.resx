@@ -87,6 +87,12 @@
   <data name="LibraryNewSequence" xml:space="preserve">
     <value>Нова послідовність</value>
   </data>
+  <data name="LibraryOpenSidebar" xml:space="preserve">
+    <value>Відкрити бічну панель</value>
+  </data>
+  <data name="LibraryCloseSidebar" xml:space="preserve">
+    <value>Закрити бічну панель</value>
+  </data>
   <data name="LibrarySettings" xml:space="preserve">
     <value>Налаштування</value>
   </data>

@@ -108,6 +108,7 @@
     align-items: center;
     gap: 6px;
     margin-bottom: 20px;
+    min-width: 0;
 }
 .sort-label { font-size: 12px; color: var(--t4); margin-right: 4px; }
 .sort-btn {

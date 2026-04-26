@@ -87,6 +87,12 @@
   <data name="LibraryNewSequence" xml:space="preserve">
     <value>New sequence</value>
   </data>
+  <data name="LibraryOpenSidebar" xml:space="preserve">
+    <value>Open sidebar</value>
+  </data>
+  <data name="LibraryCloseSidebar" xml:space="preserve">
+    <value>Close sidebar</value>
+  </data>
   <data name="LibrarySettings" xml:space="preserve">
     <value>Settings</value>
   </data>

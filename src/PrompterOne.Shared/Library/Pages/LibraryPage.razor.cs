@@ -5,6 +5,7 @@ using PrompterOne.Core.Models.Library;
 using PrompterOne.Core.Services;
 using PrompterOne.Core.Services.Preview;
 using PrompterOne.Shared.Components.Library;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
 
@@ -39,6 +40,7 @@ public partial class LibraryPage : ComponentBase, IDisposable
     [Inject] private TpsDocumentReader TpsDocumentReader { get; set; } = null!;
     private bool _loadLibrary = true;
     private bool _isCreatingFolder;
+    private bool _isSidebarOpen = true;
     private string _folderDraftName = string.Empty;
     private string _folderDraftParentId = LibrarySelectionKeys.Root;
     private string _selectedFolderId = LibrarySelectionKeys.All;
@@ -61,4 +63,13 @@ public partial class LibraryPage : ComponentBase, IDisposable
         LibraryOrganizationTerminologyCatalog.Resolve(_organizationMode);
 
     private void HandleLibrarySurfaceClick() => _dismissCardMenuRevision++;
+
+    private string SidebarStateValue => _isSidebarOpen ? "open" : "closed";
+
+    private UiTextKey SidebarToggleLabelKey =>
+        _isSidebarOpen ? UiTextKey.LibraryCloseSidebar : UiTextKey.LibraryOpenSidebar;
+
+    private void ToggleSidebar() => _isSidebarOpen = !_isSidebarOpen;
+
+    private void CloseSidebar() => _isSidebarOpen = false;
 }

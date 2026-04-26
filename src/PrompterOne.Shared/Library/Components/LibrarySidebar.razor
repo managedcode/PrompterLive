@@ -4,7 +4,21 @@
 @using PrompterOne.Shared.Localization
 @inject IStringLocalizer<SharedResource> Localizer
 
-<div class="lib-sidebar" data-test="@UiTestIds.Library.Sidebar">
+<aside id="library-sidebar-panel"
+       class="lib-sidebar"
+       aria-hidden="@AriaHiddenValue"
+       data-sidebar-state="@(IsOpen ? "open" : "closed")"
+       data-test="@UiTestIds.Library.Sidebar">
+    <div class="lib-sidebar-topbar">
+        <button class="lib-sidebar-close"
+                type="button"
+                title="@Text(UiTextKey.LibraryCloseSidebar)"
+                aria-label="@Text(UiTextKey.LibraryCloseSidebar)"
+                data-test="@UiTestIds.Library.SidebarClose"
+                @onclick="HandleCloseAsync">
+            <UiIcon Kind="UiIconKind.PanelLeft" Size="16" />
+        </button>
+    </div>
     <nav class="lib-nav">
         <a class="nav-item @(IsAllSelected ? "active" : null)"
            @onclick="HandleSelectAllAsync"
@@ -86,7 +100,7 @@
             @Text(UiTextKey.LibrarySettings)
         </a>
     </nav>
-</div>
+</aside>
 
 @code {
     private const string ActiveStateValue = "active";
@@ -100,6 +114,8 @@
 
     [Parameter, EditorRequired] public bool IsFavoritesSelected { get; set; }
 
+    [Parameter, EditorRequired] public bool IsOpen { get; set; }
+
     [Parameter, EditorRequired] public int FavoriteScriptCount { get; set; }
 
     [Parameter, EditorRequired] public LibraryOrganizationTerminology OrganizationTerminology { get; set; } =
@@ -111,7 +127,11 @@
 
     [Parameter, EditorRequired] public EventCallback<string> OnSelectFolder { get; set; }
 
+    [Parameter, EditorRequired] public EventCallback OnClose { get; set; }
+
     [Parameter, EditorRequired] public EventCallback OnStartCreateFolder { get; set; }
+
+    private string AriaHiddenValue => IsOpen ? "false" : "true";
 
     private Task HandleSelectAllAsync() => OnSelectFolder.InvokeAsync(LibrarySelectionKeys.All);
 
@@ -121,6 +141,8 @@
         OnOrganizationModeChanged.InvokeAsync(mode);
 
     private Task HandleStartCreateAsync() => OnStartCreateFolder.InvokeAsync();
+
+    private Task HandleCloseAsync() => OnClose.InvokeAsync();
 
     private string GetOrganizationModeClass(LibraryOrganizationMode mode) =>
         mode == SelectedOrganizationMode

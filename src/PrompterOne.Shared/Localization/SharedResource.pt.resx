@@ -87,6 +87,12 @@
   <data name="LibraryNewSequence" xml:space="preserve">
     <value>Nova sequência</value>
   </data>
+  <data name="LibraryOpenSidebar" xml:space="preserve">
+    <value>Abrir barra lateral</value>
+  </data>
+  <data name="LibraryCloseSidebar" xml:space="preserve">
+    <value>Fechar barra lateral</value>
+  </data>
   <data name="LibrarySettings" xml:space="preserve">
     <value>Configurações</value>
   </data>

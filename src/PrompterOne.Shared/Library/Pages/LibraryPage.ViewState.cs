@@ -86,7 +86,7 @@ public partial class LibraryPage
                 .OrderBy(card => card.Author, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase),
             LibrarySortMode.Project => cards
-                .OrderBy(card => ResolveProjectSortLabel(card), StringComparer.OrdinalIgnoreCase)
+                .OrderBy(ResolveProjectSortLabel, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(card => card.Title, StringComparer.OrdinalIgnoreCase),
             _ => cards
                 .OrderBy(card => card.DisplayOrder)

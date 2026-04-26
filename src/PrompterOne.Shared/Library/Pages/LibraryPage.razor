@@ -6,22 +6,47 @@
 
 <div id="screen-library"
      class="screen active"
+     data-sidebar-state="@SidebarStateValue"
      data-test="@UiTestIds.Library.Page"
      @onclick="HandleLibrarySurfaceClick">
     <LibrarySidebar Folders="_folderNodes"
                     AllScriptCount="_allCards.Count"
                     IsAllSelected="IsAllSelected"
                     IsFavoritesSelected="IsFavoritesSelected"
+                    IsOpen="_isSidebarOpen"
                     FavoriteScriptCount="_allCards.Count(card => card.IsFavorite)"
                     OrganizationTerminology="OrganizationTerminology"
                     SelectedOrganizationMode="_organizationMode"
                     OnOrganizationModeChanged="SetOrganizationMode"
                     OnSelectFolder="SelectFolder"
+                    OnClose="CloseSidebar"
                     OnStartCreateFolder="StartCreateFolder" />
+
+    @if (_isSidebarOpen)
+    {
+        <button class="lib-sidebar-scrim"
+                type="button"
+                aria-label="@Text(UiTextKey.LibraryCloseSidebar)"
+                data-test="@UiTestIds.Library.SidebarScrim"
+                @onclick="CloseSidebar"
+                @onclick:stopPropagation="true"></button>
+    }
 
     <main class="lib-main">
         <div class="lib-scroll">
             <div class="lib-sort-bar">
+                <button class="lib-sidebar-toggle"
+                        type="button"
+                        title="@Text(SidebarToggleLabelKey)"
+                        aria-label="@Text(SidebarToggleLabelKey)"
+                        aria-controls="library-sidebar-panel"
+                        aria-expanded="@(_isSidebarOpen ? "true" : "false")"
+                        data-sidebar-state="@SidebarStateValue"
+                        data-test="@UiTestIds.Library.SidebarToggle"
+                        @onclick="ToggleSidebar"
+                        @onclick:stopPropagation="true">
+                    <UiIcon Kind="UiIconKind.PanelLeft" Size="16" />
+                </button>
                 <span class="sort-label" data-test="@UiTestIds.Library.SortLabel">@Text(UiTextKey.LibrarySortBy)</span>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
                         @onclick="() => SetSortMode(LibrarySortMode.Name)"

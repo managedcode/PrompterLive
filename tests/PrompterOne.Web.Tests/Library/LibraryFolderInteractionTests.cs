@@ -121,6 +121,40 @@ public sealed class LibraryFolderInteractionTests : BunitContext
     }
 
     [Test]
+    public void LibraryPage_SidebarToggleClosesAndReopensSidebar()
+    {
+        var cut = Render<LibraryPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(OpenExpandedStateValue, cut.FindByTestId(UiTestIds.Library.Page).GetAttribute("data-sidebar-state"));
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Library.SidebarToggle).GetAttribute("aria-expanded"));
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Library.Sidebar).GetAttribute("aria-hidden"));
+            Assert.Contains(UiTestIds.Library.SidebarClose, cut.Markup, StringComparison.Ordinal);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.SidebarClose).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(ClosedExpandedStateValue, cut.FindByTestId(UiTestIds.Library.Page).GetAttribute("data-sidebar-state"));
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Library.SidebarToggle).GetAttribute("aria-expanded"));
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Library.Sidebar).GetAttribute("aria-hidden"));
+            Assert.DoesNotContain(UiTestIds.Library.SidebarScrim, cut.Markup, StringComparison.Ordinal);
+        });
+
+        cut.FindByTestId(UiTestIds.Library.SidebarToggle).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(OpenExpandedStateValue, cut.FindByTestId(UiTestIds.Library.Page).GetAttribute("data-sidebar-state"));
+            Assert.Equal("true", cut.FindByTestId(UiTestIds.Library.SidebarToggle).GetAttribute("aria-expanded"));
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Library.Sidebar).GetAttribute("aria-hidden"));
+            Assert.Contains(UiTestIds.Library.SidebarScrim, cut.Markup, StringComparison.Ordinal);
+        });
+    }
+
+    [Test]
     public void LibraryPage_CardPlaybackActionsUseClearModeLabels()
     {
         var cut = Render<LibraryPage>();

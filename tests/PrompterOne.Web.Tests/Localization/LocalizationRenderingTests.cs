@@ -30,7 +30,14 @@ public sealed class LocalizationRenderingTests : BunitContext
             .Add(component => component.Folders, [])
             .Add(component => component.AllScriptCount, 5)
             .Add(component => component.IsAllSelected, true)
+            .Add(component => component.IsFavoritesSelected, false)
+            .Add(component => component.IsOpen, true)
+            .Add(component => component.FavoriteScriptCount, 2)
+            .Add(component => component.OrganizationTerminology, LibraryOrganizationTerminologyCatalog.Resolve(LibraryOrganizationMode.Folders))
+            .Add(component => component.SelectedOrganizationMode, LibraryOrganizationMode.Folders)
+            .Add(component => component.OnOrganizationModeChanged, EventCallback.Factory.Create<LibraryOrganizationMode>(this, _ => Task.CompletedTask))
             .Add(component => component.OnSelectFolder, EventCallback.Factory.Create<string>(this, _ => Task.CompletedTask))
+            .Add(component => component.OnClose, EventCallback.Factory.Create(this, () => Task.CompletedTask))
             .Add(component => component.OnStartCreateFolder, EventCallback.Factory.Create(this, () => Task.CompletedTask)));
 
         Assert.Contains(Text(UiTextKey.LibraryAllScripts), cut.Markup);

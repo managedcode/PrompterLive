@@ -486,8 +486,8 @@ public sealed class GoLivePageTests : BunitContext
             RecordingStartedAt = DateTimeOffset.UtcNow
         });
 
-        string firstActiveBlockTitle = string.Empty;
-        string firstNextBlockTitle = string.Empty;
+        var firstActiveBlockTitle = string.Empty;
+        var firstNextBlockTitle = string.Empty;
         cut.WaitForAssertion(() =>
         {
             Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockContext));

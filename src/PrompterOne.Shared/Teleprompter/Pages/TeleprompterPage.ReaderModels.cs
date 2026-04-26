@@ -1,5 +1,5 @@
-using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Components.Editor;
+using PrompterOne.Shared.Contracts;
 
 namespace PrompterOne.Shared.Pages;
 

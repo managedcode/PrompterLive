@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
-using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.Localization;
 
 namespace PrompterOne.Shared.Components.Settings;

@@ -36,6 +36,11 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
 
     private const string StartupScenarioName = "library-startup";
     private const string StartupScenarioStep = "loaded";
+    private const string SidebarStateAttributeName = "data-sidebar-state";
+    private const string SidebarToggleScenarioName = "library-sidebar-toggle";
+    private const string SidebarToggleClosedStep = "01-closed";
+    private const string SidebarToggleOpenStep = "02-open";
+    private const string AriaExpandedAttributeName = "aria-expanded";
 
     [Test]
     public Task LibraryScreen_NavigatesIntoEditorAndSettings() =>
@@ -446,5 +451,59 @@ public sealed class LibraryScreenFlowTests(StandaloneAppFixture fixture) : AppUi
                 demoCardMenu,
                 page.GetByTestId(UiTestIds.Library.CardMenuDropdown(BrowserTestConstants.Scripts.DemoId)),
                 noWaitAfter: true);
+        });
+
+    [Test]
+    public Task LibraryScreen_SidebarToggleClosesAndReopensOnTouchViewport() =>
+        RunPageAsync(async page =>
+        {
+            var viewport = new ResponsiveViewport(
+                "iphone-medium-portrait",
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumWidth,
+                BrowserTestConstants.ResponsiveLayout.IphoneMediumHeight);
+
+            await page.SetViewportSizeAsync(viewport.Width, viewport.Height);
+            await ShellRouteDriver.OpenLibraryAsync(page);
+
+            var pageRoot = page.GetByTestId(UiTestIds.Library.Page);
+            var sidebar = page.GetByTestId(UiTestIds.Library.Sidebar);
+            var toggle = page.GetByTestId(UiTestIds.Library.SidebarToggle);
+            var close = page.GetByTestId(UiTestIds.Library.SidebarClose);
+
+            await Expect(pageRoot).ToHaveAttributeAsync(SidebarStateAttributeName, BrowserTestConstants.State.OpenValue);
+            await Expect(toggle).ToHaveAttributeAsync(AriaExpandedAttributeName, BrowserTestConstants.Html.AriaPressedTrueValue);
+            await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page,
+                toggle,
+                UiTestIds.Library.SidebarToggle,
+                BrowserTestConstants.ResponsiveLayout.LibraryRouteName,
+                viewport);
+            await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page,
+                close,
+                UiTestIds.Library.SidebarClose,
+                BrowserTestConstants.ResponsiveLayout.LibraryRouteName,
+                viewport);
+
+            await UiInteractionDriver.ClickAndContinueAsync(close);
+
+            await Expect(pageRoot).ToHaveAttributeAsync(SidebarStateAttributeName, BrowserTestConstants.State.ClosedValue);
+            await Expect(toggle).ToHaveAttributeAsync(AriaExpandedAttributeName, BrowserTestConstants.Html.AriaPressedFalseValue);
+            await Expect(sidebar).ToBeHiddenAsync();
+            UiScenarioArtifacts.ResetScenario(SidebarToggleScenarioName);
+            await UiScenarioArtifacts.CapturePageAsync(page, SidebarToggleScenarioName, SidebarToggleClosedStep);
+
+            await UiInteractionDriver.ClickAndContinueAsync(toggle);
+
+            await Expect(pageRoot).ToHaveAttributeAsync(SidebarStateAttributeName, BrowserTestConstants.State.OpenValue);
+            await Expect(toggle).ToHaveAttributeAsync(AriaExpandedAttributeName, BrowserTestConstants.Html.AriaPressedTrueValue);
+            await Expect(sidebar).ToBeVisibleAsync();
+            await ResponsiveLayoutAssertions.AssertVisibleWithinViewportAsync(
+                page,
+                close,
+                UiTestIds.Library.SidebarClose,
+                BrowserTestConstants.ResponsiveLayout.LibraryRouteName,
+                viewport);
+            await UiScenarioArtifacts.CapturePageAsync(page, SidebarToggleScenarioName, SidebarToggleOpenStep);
         });
 }

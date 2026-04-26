@@ -34,6 +34,8 @@ public enum UiTextKey
     LibraryNewEpisode,
     LibrarySequences,
     LibraryNewSequence,
+    LibraryOpenSidebar,
+    LibraryCloseSidebar,
     LibrarySettings,
     LibrarySortBy,
     LibrarySortName,
