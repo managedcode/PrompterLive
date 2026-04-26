@@ -143,13 +143,6 @@
                 </svg>
                 <span class="dcard-act-label">@Text(UiTextKey.LibraryCardLearn)</span>
             </button>
-            <button class="dcard-act dcard-act-prep"
-                    @onclick:stopPropagation="true"
-                    @onclick="HandlePrepScriptAsync"
-                    data-test="@UiTestIds.Library.CardPrep(Card.Id)">
-                <UiIcon Kind="UiIconKind.TextLines" Size="14" />
-                <span class="dcard-act-label">@Text(UiTextKey.LibraryCardPrep)</span>
-            </button>
             <button class="dcard-act dcard-act-go"
                     @onclick:stopPropagation="true"
                     @onclick="HandleReadScriptAsync"
@@ -191,7 +184,6 @@
     [Parameter] public EventCallback OnDeleteScript { get; set; }
     [Parameter] public EventCallback OnDuplicateScript { get; set; }
     [Parameter] public EventCallback OnLearnScript { get; set; }
-    [Parameter] public EventCallback OnPrepScript { get; set; }
     [Parameter] public EventCallback<string?> OnMoveScript { get; set; }
     [Parameter] public EventCallback OnOpenScript { get; set; }
     [Parameter] public EventCallback OnReadScript { get; set; }
@@ -212,8 +204,6 @@
     private Task HandleDuplicateScriptAsync() => OnDuplicateScript.InvokeAsync();
 
     private Task HandleLearnScriptAsync() => OnLearnScript.InvokeAsync();
-
-    private Task HandlePrepScriptAsync() => OnPrepScript.InvokeAsync();
 
     private Task HandleMoveScriptAsync(string? folderId) => OnMoveScript.InvokeAsync(folderId);
 

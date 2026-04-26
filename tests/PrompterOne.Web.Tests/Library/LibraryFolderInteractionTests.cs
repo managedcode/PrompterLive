@@ -162,7 +162,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal("Practice", cut.FindByTestId(UiTestIds.Library.CardLearn(AppTestData.Scripts.DemoId)).TextContent.Trim());
-            Assert.Equal("Prep", cut.FindByTestId(UiTestIds.Library.CardPrep(AppTestData.Scripts.DemoId)).TextContent.Trim());
+            Assert.DoesNotContain(UiTestIds.Library.CardPrep(AppTestData.Scripts.DemoId), cut.Markup, StringComparison.Ordinal);
             Assert.Equal("Teleprompter", cut.FindByTestId(UiTestIds.Library.CardRead(AppTestData.Scripts.DemoId)).TextContent.Trim());
         });
     }

@@ -72,6 +72,11 @@ public partial class LearnPage : IAsyncDisposable
 
     protected override Task OnParametersSetAsync()
     {
+        if (TryRedirectLegacyPrepRoute())
+        {
+            return Task.CompletedTask;
+        }
+
         StopPlaybackLoop();
         _loadState = true;
         _focusScreenAfterRender = true;
@@ -157,6 +162,21 @@ public partial class LearnPage : IAsyncDisposable
     private Task StepRsvpForwardAsync() => StepRsvpWordAsync(RsvpStepSmall);
 
     private Task StepRsvpForwardLargeAsync() => StepRsvpToIndexAsync(ResolveNextPhraseIndex());
+
+    private bool TryRedirectLegacyPrepRoute()
+    {
+        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (!relativePath.StartsWith("prep", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var suffix = relativePath.Length > AppRoutes.Prep.Length - 1
+            ? relativePath[(AppRoutes.Prep.Length - 1)..]
+            : string.Empty;
+        Navigation.NavigateTo(AppRoutes.Learn + suffix, replace: true);
+        return true;
+    }
 
     private Task RestartCurrentPhraseAsync() => StepRsvpToIndexAsync(ResolveCurrentPhraseStartIndex());
 

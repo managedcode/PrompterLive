@@ -40,12 +40,6 @@ public partial class LibraryPage
         return Task.CompletedTask;
     }
 
-    private Task PrepScriptAsync(string id)
-    {
-        Navigation.NavigateTo(AppRoutes.PrepWithId(id));
-        return Task.CompletedTask;
-    }
-
     private Task ReadScriptAsync(string id)
     {
         Navigation.NavigateTo(AppRoutes.TeleprompterWithId(id));

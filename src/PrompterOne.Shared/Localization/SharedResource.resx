@@ -208,10 +208,10 @@
     <value>Export .txt</value>
   </data>
   <data name="HeaderLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="HeaderPrep" xml:space="preserve">
-    <value>Prep</value>
+    <value>Practice</value>
   </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Read</value>
@@ -340,7 +340,7 @@
     <value>Help</value>
   </data>
   <data name="SettingsHelpSectionDescription" xml:space="preserve">
-    <value>Learn the PrompterOne workflow, TPS basics, rehearsal modes, and local file behavior without leaving the app.</value>
+    <value>Explore the PrompterOne workflow, TPS basics, rehearsal modes, and local file behavior without leaving the app.</value>
   </data>
   <data name="SettingsHelpAppFlowTitle" xml:space="preserve">
     <value>PrompterOne workflow</value>
@@ -349,7 +349,7 @@
     <value>From script library to live delivery</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Start in Library, write or import a script in Editor, switch to Cards when you want visual editing without TPS syntax, rehearse in Learn, read in Teleprompter, and use Go Live when you are ready to record or stream.</value>
+    <value>Start in Library, write or import a script in Editor, switch to Cards when you want visual editing without TPS syntax, rehearse in Practice, read in Teleprompter, and use Go Live when you are ready to record or stream.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>TPS standard basics</value>
@@ -367,7 +367,7 @@
     <value>Choose the surface that matches the job</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source is for raw TPS editing, Cards is for rendered block editing, Graph shows the script structure, Learn uses RSVP for word-by-word practice, Teleprompter is the live reader, and Go Live combines reading with camera, recording, and streaming controls.</value>
+    <value>Source is for raw TPS editing, Cards is for rendered block editing, Graph shows the script structure, Practice uses RSVP for word-by-word practice, Teleprompter is the live reader, and Go Live combines reading with camera, recording, and streaming controls.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Local files and history</value>
@@ -505,7 +505,7 @@
     <value>Keyboard Shortcuts</value>
   </data>
   <data name="SettingsShortcutsSectionDescription" xml:space="preserve">
-    <value>Review the current keyboard controls for the editor, Learn, Teleprompter, and Go Live surfaces.</value>
+    <value>Review the current keyboard controls for the editor, Practice, Teleprompter, and Go Live surfaces.</value>
   </data>
   <data name="TooltipDecreaseSpeed" xml:space="preserve">
     <value>Decrease speed</value>
@@ -673,7 +673,7 @@
     <value>Practice</value>
   </data>
   <data name="LibraryCardPrep" xml:space="preserve">
-    <value>Prep</value>
+    <value>Practice</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Teleprompter</value>
@@ -703,7 +703,7 @@
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
   <data name="LearnNotesTitle" xml:space="preserve">
-    <value>Prep notes</value>
+    <value>Notes</value>
   </data>
   <data name="LearnNotesSectionFormat" xml:space="preserve">
     <value>Section: {0}</value>
@@ -715,7 +715,7 @@
     <value>Add note</value>
   </data>
   <data name="LearnNotesEmpty" xml:space="preserve">
-    <value>No prep notes yet.</value>
+    <value>No notes yet.</value>
   </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Screen not found</value>
@@ -1708,7 +1708,7 @@
     <value>Core authoring shortcuts</value>
   </data>
   <data name="SettingsHotkeysGroupLearnTitle" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="SettingsHotkeysGroupLearnSubtitle" xml:space="preserve">
     <value>RSVP rehearsal controls</value>
@@ -1747,7 +1747,7 @@
     <value>Back to editor</value>
   </data>
   <data name="SettingsHotkeyLearnBackDescription" xml:space="preserve">
-    <value>Leave Learn and return to the current script.</value>
+    <value>Leave Practice and return to the current script.</value>
   </data>
   <data name="SettingsHotkeyLearnPlayPauseLabel" xml:space="preserve">
     <value>Play or pause</value>
@@ -2389,7 +2389,7 @@
     <value>Open Editor</value>
   </data>
   <data name="OnboardingOpenLearn" xml:space="preserve">
-    <value>Open Learn</value>
+    <value>Open Practice</value>
   </data>
   <data name="OnboardingOpenTeleprompter" xml:space="preserve">
     <value>Open Teleprompter</value>
@@ -2410,7 +2410,7 @@
     <value>Editor</value>
   </data>
   <data name="OnboardingStepLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="OnboardingStepTeleprompter" xml:space="preserve">
     <value>Teleprompter</value>
@@ -2431,7 +2431,7 @@
     <value>Search scripts by title, file name, or the text inside the script.</value>
   </data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve">
-    <value>One TPS script powers Editor, Learn, Teleprompter, and Go Live instead of separate copies.</value>
+    <value>One TPS script powers Editor, Practice, Teleprompter, and Go Live instead of separate copies.</value>
   </data>
   <data name="OnboardingWelcomeBulletLocal" xml:space="preserve">
     <value>Your workspace stays local-first in this browser, with autosave, history, import, and export built in.</value>
@@ -2449,7 +2449,7 @@
     <value>TPS stays portable: you can version it, diff it, import it, and export it without locking your script into a proprietary project file.</value>
   </data>
   <data name="OnboardingTpsBulletRuntime" xml:space="preserve">
-    <value>PrompterOne runs that same TPS source through Editor, Learn, Teleprompter, and Go Live so authoring, rehearsal, and live playback stay aligned.</value>
+    <value>PrompterOne runs that same TPS source through Editor, Practice, Teleprompter, and Go Live so authoring, rehearsal, and live playback stay aligned.</value>
   </data>
   <data name="OnboardingTpsBulletGlossary" xml:space="preserve">
     <value>Terms like segment, block, effective WPM, archetype, compiler, and player come from the official TPS spec and glossary.</value>
@@ -2479,7 +2479,7 @@
     <value>Rehearse with RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
-    <value>Learn uses RSVP, or Rapid Serial Visual Presentation, to show one word at a time in a focused rhythm so you can practice pacing, articulation, and retention.</value>
+    <value>Practice uses RSVP, or Rapid Serial Visual Presentation, to show one word at a time in a focused rhythm so you can practice pacing, articulation, and retention.</value>
   </data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve">
     <value>RSVP keeps the active word centered while nearby context stays visible.</value>
@@ -2488,7 +2488,7 @@
     <value>Speed controls and TPS timing cues help you rehearse closer to the spoken cadence.</value>
   </data>
   <data name="OnboardingLearnBulletContext" xml:space="preserve">
-    <value>Use Learn for repetition, memory reinforcement, and pacing feedback before you go on camera.</value>
+    <value>Use Practice for repetition, memory reinforcement, and pacing feedback before you go on camera.</value>
   </data>
   <data name="OnboardingTeleprompterEyebrow" xml:space="preserve">
     <value>LIVE READING</value>
@@ -2536,7 +2536,7 @@
     <value>Reopen the guided tour</value>
   </data>
   <data name="OnboardingReopenBody" xml:space="preserve">
-    <value>Use this when you want to revisit PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter, and Go Live.</value>
+    <value>Use this when you want to revisit PrompterOne, TPS, RSVP, Editor, Practice, Teleprompter, and Go Live.</value>
   </data>
   <data name="EditorFindPlaceholder" xml:space="preserve">
     <value>Find in script</value>

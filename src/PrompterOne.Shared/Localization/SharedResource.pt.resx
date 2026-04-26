@@ -199,7 +199,7 @@
     <value>Estudar</value>
   </data>
   <data name="HeaderPrep" xml:space="preserve">
-    <value>Preparar</value>
+    <value>Practice</value>
   </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Ler</value>
@@ -337,7 +337,7 @@
     <value>Da biblioteca de roteiros à entrega ao vivo</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Comece em Library, escreva ou importe um roteiro no Editor, mude para Cards quando quiser edição visual sem sintaxe TPS, ensaie em Learn, leia no Teleprompter e use Go Live quando estiver pronto para gravar ou transmitir.</value>
+    <value>Comece em Library, escreva ou importe um roteiro no Editor, mude para Cards quando quiser edição visual sem sintaxe TPS, ensaie em Practice, leia no Teleprompter e use Go Live quando estiver pronto para gravar ou transmitir.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Conceitos básicos do padrão TPS</value>
@@ -355,7 +355,7 @@
     <value>Escolha a superfície adequada para o trabalho</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source é para editar TPS bruto, Cards para editar blocos renderizados, Graph mostra a estrutura do roteiro, Learn usa RSVP para praticar palavra por palavra, Teleprompter é o leitor ao vivo e Go Live combina leitura com câmera, gravação e controles de streaming.</value>
+    <value>Source é para editar TPS bruto, Cards para editar blocos renderizados, Graph mostra a estrutura do roteiro, Practice usa RSVP para praticar palavra por palavra, Teleprompter é o leitor ao vivo e Go Live combina leitura com câmera, gravação e controles de streaming.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Arquivos locais e histórico</value>
@@ -850,7 +850,7 @@
     <value>Abrir Editor</value>
   </data>
   <data name="OnboardingOpenLearn" xml:space="preserve">
-    <value>Abrir Learn</value>
+    <value>Abrir Practice</value>
   </data>
   <data name="OnboardingOpenTeleprompter" xml:space="preserve">
     <value>Abrir teleprompter</value>
@@ -871,7 +871,7 @@
     <value>Editor</value>
   </data>
   <data name="OnboardingStepLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="OnboardingStepTeleprompter" xml:space="preserve">
     <value>Teleprompter</value>
@@ -892,7 +892,7 @@
     <value>Use a busca da biblioteca para encontrar roteiros por título, nome do arquivo ou texto dentro do roteiro.</value>
   </data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve">
-    <value>Um único roteiro TPS alimenta Editor, Learn, Teleprompter e Go Live em vez de cópias separadas.</value>
+    <value>Um único roteiro TPS alimenta Editor, Practice, Teleprompter e Go Live em vez de cópias separadas.</value>
   </data>
   <data name="OnboardingWelcomeBulletLocal" xml:space="preserve">
     <value>Seu workspace continua local-first neste navegador, com salvamento automático, histórico, importação e exportação integrados.</value>
@@ -910,7 +910,7 @@
     <value>TPS continua portátil: você pode versionar, comparar, importar e exportar sem prender o roteiro a um arquivo de projeto proprietário.</value>
   </data>
   <data name="OnboardingTpsBulletRuntime" xml:space="preserve">
-    <value>O PrompterOne usa a mesma fonte TPS no Editor, Learn, Teleprompter e Go Live para manter autoria, ensaio e leitura ao vivo alinhados.</value>
+    <value>O PrompterOne usa a mesma fonte TPS no Editor, Practice, Teleprompter e Go Live para manter autoria, ensaio e leitura ao vivo alinhados.</value>
   </data>
   <data name="OnboardingTpsBulletGlossary" xml:space="preserve">
     <value>Termos como segment, block, WPM efetivo, archetype, compiler e player vêm da especificação e do glossário oficiais do TPS.</value>
@@ -940,7 +940,7 @@
     <value>Ensaie com RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
-    <value>O Learn usa RSVP, ou Rapid Serial Visual Presentation, para mostrar palavras em um ritmo focado e assim treinar cadência, articulação e retenção sem varrer um parágrafo inteiro.</value>
+    <value>O Practice usa RSVP, ou Rapid Serial Visual Presentation, para mostrar palavras em um ritmo focado e assim treinar cadência, articulação e retenção sem varrer um parágrafo inteiro.</value>
   </data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve">
     <value>O RSVP reduz o deslocamento dos olhos mantendo a palavra ativa centralizada enquanto o contexto próximo continua visível.</value>
@@ -949,7 +949,7 @@
     <value>Os controles de velocidade e as pistas de tempo do TPS ajudam você a ensaiar mais perto da cadência real da fala.</value>
   </data>
   <data name="OnboardingLearnBulletContext" xml:space="preserve">
-    <value>Use Learn quando precisar de repetição, reforço de memória e feedback de ritmo antes de entrar em câmera.</value>
+    <value>Use Practice quando precisar de repetição, reforço de memória e feedback de ritmo antes de entrar em câmera.</value>
   </data>
   <data name="OnboardingTeleprompterEyebrow" xml:space="preserve">
     <value>LEITURA AO VIVO</value>
@@ -997,7 +997,7 @@
     <value>Reabrir o tour guiado</value>
   </data>
   <data name="OnboardingReopenBody" xml:space="preserve">
-    <value>Use isso quando quiser rever PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter e Go Live.</value>
+    <value>Use isso quando quiser rever PrompterOne, TPS, RSVP, Editor, Practice, Teleprompter e Go Live.</value>
   </data>
   <data name="EditorFindPlaceholder" xml:space="preserve">
     <value>Buscar no roteiro</value>
@@ -1498,7 +1498,7 @@
     <value>Atalhos de teclado</value>
   </data>
   <data name="SettingsShortcutsSectionDescription" xml:space="preserve">
-    <value>Revise os controles de teclado atuais para o editor, as superfícies Learn, Teleprompter e Go Live.</value>
+    <value>Revise os controles de teclado atuais para o editor, as superfícies Practice, Teleprompter e Go Live.</value>
   </data>
   <data name="LibraryCardBadgeTps" xml:space="preserve">
     <value>TPS</value>
@@ -1510,7 +1510,7 @@
     <value>Praticar</value>
   </data>
   <data name="LibraryCardPrep" xml:space="preserve">
-    <value>Preparar</value>
+    <value>Practice</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Teleprompter</value>
@@ -1540,7 +1540,7 @@
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
   <data name="LearnNotesTitle" xml:space="preserve">
-    <value>Notas de preparação</value>
+    <value>Notas</value>
   </data>
   <data name="LearnNotesSectionFormat" xml:space="preserve">
     <value>Seção: {0}</value>
@@ -1552,7 +1552,7 @@
     <value>Adicionar nota</value>
   </data>
   <data name="LearnNotesEmpty" xml:space="preserve">
-    <value>Ainda não há notas de preparação.</value>
+    <value>Ainda não há notas.</value>
   </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Tela não encontrada</value>
@@ -2494,7 +2494,7 @@
     <value>Voltar ao editor</value>
   </data>
   <data name="SettingsHotkeyLearnBackDescription" xml:space="preserve">
-    <value>Saia do Learn e retorne ao script atual.</value>
+    <value>Saia do Practice e retorne ao script atual.</value>
   </data>
   <data name="SettingsHotkeyLearnPlayPauseLabel" xml:space="preserve">
     <value>Reproduzir ou pausar</value>

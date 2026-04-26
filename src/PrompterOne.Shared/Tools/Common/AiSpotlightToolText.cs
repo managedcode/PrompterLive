@@ -19,8 +19,7 @@ internal static class AiSpotlightToolText
 
     public const string OpenLibrary = "open library";
     public const string OpenEditor = "open editor";
-    public const string OpenLearn = "open learn mode";
-    public const string OpenPrep = "open prep mode";
+    public const string OpenLearn = "open practice mode";
     public const string OpenTeleprompter = "open teleprompter";
     public const string OpenGoLive = "open go live";
     public const string OpenSettings = "open settings";
@@ -125,15 +124,15 @@ internal static class AiSpotlightToolText
     public const string MediaAudioOutputSelect = "select the browser audio output";
     public const string MediaScreenCaptureRequest = "request screen capture access";
 
-    public const string LearnStateRead = "read Learn playback state and progress";
-    public const string LearnPlay = "start Learn playback";
-    public const string LearnPause = "pause Learn playback";
-    public const string LearnStepBackward = "step Learn playback backward";
-    public const string LearnStepForward = "step Learn playback forward";
-    public const string LearnSpeedSet = "set Learn RSVP speed";
-    public const string LearnLoopToggle = "toggle Learn loop mode";
-    public const string LearnNotesList = "list Learn prep notes for the current section";
-    public const string LearnNoteAdd = "add a Learn prep note for the current section";
+    public const string LearnStateRead = "read Practice playback state and progress";
+    public const string LearnPlay = "start Practice playback";
+    public const string LearnPause = "pause Practice playback";
+    public const string LearnStepBackward = "step Practice playback backward";
+    public const string LearnStepForward = "step Practice playback forward";
+    public const string LearnSpeedSet = "set Practice RSVP speed";
+    public const string LearnLoopToggle = "toggle Practice loop mode";
+    public const string LearnNotesList = "list Practice notes for the current section";
+    public const string LearnNoteAdd = "add a Practice note for the current section";
 
     public const string TeleprompterStateRead = "read teleprompter playback state and progress";
     public const string TeleprompterPlay = "start teleprompter playback";

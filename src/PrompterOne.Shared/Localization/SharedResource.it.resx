@@ -199,7 +199,7 @@
     <value>Studia</value>
   </data>
   <data name="HeaderPrep" xml:space="preserve">
-    <value>Preparazione</value>
+    <value>Practice</value>
   </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Leggi</value>
@@ -337,7 +337,7 @@
     <value>Dalla libreria degli script alla lettura live</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Inizia in Library, scrivi o importa uno script in Editor, passa a Cards quando vuoi modificare visivamente senza sintassi TPS, fai pratica in Learn, leggi in Teleprompter e usa Go Live quando sei pronto per registrare o trasmettere.</value>
+    <value>Inizia in Library, scrivi o importa uno script in Editor, passa a Cards quando vuoi modificare visivamente senza sintassi TPS, fai pratica in Practice, leggi in Teleprompter e usa Go Live quando sei pronto per registrare o trasmettere.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Basi dello standard TPS</value>
@@ -355,7 +355,7 @@
     <value>Scegli la superficie adatta al lavoro</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source serve per modificare il TPS grezzo, Cards per modificare blocchi renderizzati, Graph mostra la struttura dello script, Learn usa RSVP per esercitarsi parola per parola, Teleprompter è il reader live e Go Live combina lettura con controlli per camera, registrazione e streaming.</value>
+    <value>Source serve per modificare il TPS grezzo, Cards per modificare blocchi renderizzati, Graph mostra la struttura dello script, Practice usa RSVP per esercitarsi parola per parola, Teleprompter è il reader live e Go Live combina lettura con controlli per camera, registrazione e streaming.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>File locali e cronologia</value>
@@ -1072,7 +1072,7 @@
     <value>Apri editor</value>
   </data>
   <data name="OnboardingOpenLearn" xml:space="preserve">
-    <value>Apri Learn</value>
+    <value>Apri Practice</value>
   </data>
   <data name="OnboardingOpenTeleprompter" xml:space="preserve">
     <value>Apri teleprompter</value>
@@ -1093,7 +1093,7 @@
     <value>Editor</value>
   </data>
   <data name="OnboardingStepLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="OnboardingStepTeleprompter" xml:space="preserve">
     <value>Teleprompter</value>
@@ -1114,7 +1114,7 @@
     <value>Usa la ricerca della libreria per trovare script per titolo, nome file o testo contenuto nello script.</value>
   </data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve">
-    <value>Un solo script TPS alimenta Editor, Learn, Teleprompter e Go Live invece di copie separate.</value>
+    <value>Un solo script TPS alimenta Editor, Practice, Teleprompter e Go Live invece di copie separate.</value>
   </data>
   <data name="OnboardingWelcomeBulletLocal" xml:space="preserve">
     <value>Il tuo workspace resta local-first in questo browser, con salvataggio automatico, cronologia, importazione ed esportazione integrati.</value>
@@ -1132,7 +1132,7 @@
     <value>TPS resta portabile: puoi versionarlo, confrontarlo, importarlo ed esportarlo senza bloccare lo script in un file di progetto proprietario.</value>
   </data>
   <data name="OnboardingTpsBulletRuntime" xml:space="preserve">
-    <value>PrompterOne usa la stessa fonte TPS in Editor, Learn, Teleprompter e Go Live così authoring, prova e lettura live restano allineati.</value>
+    <value>PrompterOne usa la stessa fonte TPS in Editor, Practice, Teleprompter e Go Live così authoring, prova e lettura live restano allineati.</value>
   </data>
   <data name="OnboardingTpsBulletGlossary" xml:space="preserve">
     <value>Termini come segment, block, WPM effettivo, archetype, compiler e player vengono dalla specifica e dal glossario TPS ufficiali.</value>
@@ -1162,7 +1162,7 @@
     <value>Prova con RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
-    <value>Learn usa RSVP, o Rapid Serial Visual Presentation, per mostrare le parole con un ritmo focalizzato così da allenare cadenza, articolazione e memorizzazione senza scorrere un intero paragrafo.</value>
+    <value>Practice usa RSVP, o Rapid Serial Visual Presentation, per mostrare le parole con un ritmo focalizzato così da allenare cadenza, articolazione e memorizzazione senza scorrere un intero paragrafo.</value>
   </data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve">
     <value>RSVP riduce il movimento degli occhi mantenendo centrata la parola attiva mentre il contesto vicino resta visibile.</value>
@@ -1171,7 +1171,7 @@
     <value>I controlli di velocità e gli indizi temporali TPS aiutano a provare più vicino alla vera cadenza parlata.</value>
   </data>
   <data name="OnboardingLearnBulletContext" xml:space="preserve">
-    <value>Usa Learn quando ti servono ripetizione, rinforzo della memoria e feedback sul ritmo prima di andare in camera.</value>
+    <value>Usa Practice quando ti servono ripetizione, rinforzo della memoria e feedback sul ritmo prima di andare in camera.</value>
   </data>
   <data name="OnboardingTeleprompterEyebrow" xml:space="preserve">
     <value>LETTURA DAL VIVO</value>
@@ -1219,7 +1219,7 @@
     <value>Riapri il tour guidato</value>
   </data>
   <data name="OnboardingReopenBody" xml:space="preserve">
-    <value>Usalo quando vuoi rivedere PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter e Go Live.</value>
+    <value>Usalo quando vuoi rivedere PrompterOne, TPS, RSVP, Editor, Practice, Teleprompter e Go Live.</value>
   </data>
   <data name="EditorFindPlaceholder" xml:space="preserve">
     <value>Cerca nello script</value>
@@ -1732,7 +1732,7 @@
     <value>Esercitati</value>
   </data>
   <data name="LibraryCardPrep" xml:space="preserve">
-    <value>Preparazione</value>
+    <value>Practice</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Teleprompter</value>
@@ -1762,7 +1762,7 @@
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
   <data name="LearnNotesTitle" xml:space="preserve">
-    <value>Note di preparazione</value>
+    <value>Note</value>
   </data>
   <data name="LearnNotesSectionFormat" xml:space="preserve">
     <value>Sezione: {0}</value>
@@ -1774,7 +1774,7 @@
     <value>Aggiungi nota</value>
   </data>
   <data name="LearnNotesEmpty" xml:space="preserve">
-    <value>Nessuna nota di preparazione.</value>
+    <value>Ancora nessuna nota.</value>
   </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Schermata non trovata</value>

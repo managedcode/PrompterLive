@@ -37,7 +37,7 @@ public sealed class AiSpotlightToolCatalogTests
         Assert.Equal(tools.Length, tools.Select(static tool => tool.Name).Distinct(StringComparer.Ordinal).Count());
         Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.NavLibrary && tool.Route == AppRoutes.Library);
         Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.NavGoLive && tool.Route == AppRoutes.GoLiveWithId("draft"));
-        Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.NavPrep && tool.Route == AppRoutes.PrepWithId("draft"));
+        Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.NavLearn && tool.Route == AppRoutes.LearnWithId("draft"));
         Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.SettingsMicrophones && tool.Scope == "settings");
         Assert.Contains(tools, static tool => tool.Name == HotkeyToolName(AppHotkeyIds.Definitions.GlobalOpenAssistant) && tool.HotkeyAction == AppHotkeyAction.GlobalOpenAssistant);
         Assert.Contains(tools, static tool => tool.Name == AiSpotlightToolNames.GraphInspect && tool.Kind == AiSpotlightSuggestionKind.Graph);

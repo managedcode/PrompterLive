@@ -116,6 +116,7 @@ Rule format:
 - TPS archetype cues must not create reader-facing decorative word styles; archetypes are structural/semantic context for block markup, LLM guidance, and assistant reasoning unless a later task explicitly defines a user-visible archetype treatment.
 - User-facing file transfer actions in the shell should use `Import` and `Export` wording instead of `Open Script` and `Save File`, because the app also has its own internal script/workspace structure.
 - File workflows must stay local-first inside PrompterOne: scripts need in-app autosave and an internal change-history path in the browser environment, not only external disk import/export actions.
+- RSVP rehearsal must not expose separate `Learn` and `Prep` user-facing entry points when they open the same workflow; use one clear user-facing `Practice` surface unless a future task defines a functionally distinct preparation mode.
 - Hotkey work must target PrompterOne’s own browser surfaces and settings inventory only; do not design around OBS commands or claim OBS integration paths that the product does not have.
 - When the vendored TPS SDK already owns parsing or compile semantics, prefer removing redundant local TPS parser wrappers and keep only thin PrompterOne adapters that translate SDK models into app-owned contracts.
 - After syncing the vendored TPS SDK, delete repo-local TPS catalogs, constants, wrappers, or helper code that only duplicate the SDK contract; do not keep parallel spec copies in `Core` once consumers can read the vendored SDK directly.

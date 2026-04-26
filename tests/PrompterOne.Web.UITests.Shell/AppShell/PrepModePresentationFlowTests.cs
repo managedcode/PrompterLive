@@ -7,11 +7,11 @@ namespace PrompterOne.Web.UITests;
 public sealed class PrepModePresentationFlowTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
-    private const string Scenario = "prep-mode-presentation";
-    private const string PrepLaunchStep = "library-prep-launch";
+    private const string Scenario = "practice-mode-presentation";
+    private const string PracticeLaunchStep = "library-practice-launch";
 
     [Test]
-    public Task LibraryPrepAction_OpensAdditivePrepRoute_AndLearnRouteRemainsAvailable() =>
+    public Task LibraryPracticeAction_IsSingleRehearsalEntry_AndPrepRouteRedirects() =>
         RunPageAsync(async page =>
         {
             UiScenarioArtifacts.ResetScenario(Scenario);
@@ -25,28 +25,20 @@ public sealed class PrepModePresentationFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Library.CardLearn(BrowserTestConstants.Scripts.QuantumId)))
                 .ToHaveTextAsync(BrowserTestConstants.Library.PracticeActionLabel);
             await Expect(page.GetByTestId(UiTestIds.Library.CardPrep(BrowserTestConstants.Scripts.QuantumId)))
-                .ToHaveTextAsync(BrowserTestConstants.Library.PrepActionLabel);
+                .ToHaveCountAsync(0);
             await Expect(page.GetByTestId(UiTestIds.Library.CardRead(BrowserTestConstants.Scripts.QuantumId)))
                 .ToHaveTextAsync(BrowserTestConstants.Library.TeleprompterActionLabel);
 
             await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Library.CardPrep(BrowserTestConstants.Scripts.QuantumId)),
+                page.GetByTestId(UiTestIds.Library.CardLearn(BrowserTestConstants.Scripts.QuantumId)),
                 noWaitAfter: true);
-            await PlaybackRouteDriver.WaitForLearnReadyAsync(page, BrowserTestConstants.Routes.PrepQuantum);
+            await PlaybackRouteDriver.WaitForLearnReadyAsync(page, BrowserTestConstants.Routes.LearnQuantum);
             await Expect(page.GetByTestId(UiTestIds.Learn.NotesPanel)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Header.Title))
                 .ToHaveTextAsync(BrowserTestConstants.Scripts.QuantumTitle);
-            await UiScenarioArtifacts.CapturePageAsync(page, Scenario, PrepLaunchStep);
+            await UiScenarioArtifacts.CapturePageAsync(page, Scenario, PracticeLaunchStep);
 
-            await UiInteractionDriver.ClickAndContinueAsync(
-                page.GetByTestId(UiTestIds.Header.Back),
-                noWaitAfter: true);
-            await BrowserRouteDriver.WaitForRouteAsync(page, BrowserTestConstants.Routes.EditorQuantum);
-            await EditorMonacoDriver.WaitUntilReadyAsync(page);
-
-            await PlaybackRouteDriver.OpenLearnAsync(
-                page,
-                BrowserTestConstants.Routes.LearnQuantum,
-                $"{Scenario}-{UiTestIds.Learn.Page}");
+            await page.GotoAsync(BrowserTestConstants.Routes.PrepQuantum);
+            await PlaybackRouteDriver.WaitForLearnReadyAsync(page, BrowserTestConstants.Routes.LearnQuantum);
         });
 }

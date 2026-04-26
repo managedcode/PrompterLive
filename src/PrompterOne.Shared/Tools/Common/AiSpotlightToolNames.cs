@@ -20,7 +20,6 @@ internal static class AiSpotlightToolNames
     public const string NavLibrary = "nav_library";
     public const string NavEditor = "nav_editor";
     public const string NavLearn = "nav_learn";
-    public const string NavPrep = "nav_prep";
     public const string NavTeleprompter = "nav_teleprompter";
     public const string NavGoLive = "nav_go_live";
     public const string NavSettings = "nav_settings";

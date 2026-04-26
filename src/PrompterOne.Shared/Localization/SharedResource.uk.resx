@@ -211,7 +211,7 @@
     <value>Вивчати</value>
   </data>
   <data name="HeaderPrep" xml:space="preserve">
-    <value>Підготовка</value>
+    <value>Practice</value>
   </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Читати</value>
@@ -349,7 +349,7 @@
     <value>Від бібліотеки сценаріїв до живої подачі</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Почніть у Library, напишіть або імпортуйте сценарій в Editor, перейдіть у Cards, коли потрібне візуальне редагування без синтаксису TPS, репетируйте в Learn, читайте в Teleprompter і використовуйте Go Live, коли готові записувати або транслювати.</value>
+    <value>Почніть у Library, напишіть або імпортуйте сценарій в Editor, перейдіть у Cards, коли потрібне візуальне редагування без синтаксису TPS, репетируйте в Practice, читайте в Teleprompter і використовуйте Go Live, коли готові записувати або транслювати.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Основи стандарту TPS</value>
@@ -367,7 +367,7 @@
     <value>Виберіть поверхню під конкретну задачу</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source призначений для сирого редагування TPS, Cards — для редагування відрендерених блоків, Graph показує структуру сценарію, Learn використовує RSVP для практики слово за словом, Teleprompter є живим рідером, а Go Live поєднує читання з камерою, записом і керуванням трансляцією.</value>
+    <value>Source призначений для сирого редагування TPS, Cards — для редагування відрендерених блоків, Graph показує структуру сценарію, Practice використовує RSVP для практики слово за словом, Teleprompter є живим рідером, а Go Live поєднує читання з камерою, записом і керуванням трансляцією.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Локальні файли та історія</value>
@@ -526,7 +526,7 @@
     <value>Клавіатурні скорочення</value>
   </data>
   <data name="SettingsShortcutsSectionDescription" xml:space="preserve">
-    <value>Перегляньте поточні клавіатурні команди для редактора, Learn, Teleprompter і Go Live.</value>
+    <value>Перегляньте поточні клавіатурні команди для редактора, Practice, Teleprompter і Go Live.</value>
   </data>
   <data name="TooltipDecreaseSpeed" xml:space="preserve">
     <value>Зменшити швидкість</value>
@@ -1114,7 +1114,7 @@
     <value>Відкрити редактор</value>
   </data>
   <data name="OnboardingOpenLearn" xml:space="preserve">
-    <value>Відкрити Learn</value>
+    <value>Відкрити Practice</value>
   </data>
   <data name="OnboardingOpenTeleprompter" xml:space="preserve">
     <value>Відкрити телесуфлер</value>
@@ -1135,7 +1135,7 @@
     <value>Редактор</value>
   </data>
   <data name="OnboardingStepLearn" xml:space="preserve">
-    <value>Learn</value>
+    <value>Practice</value>
   </data>
   <data name="OnboardingStepTeleprompter" xml:space="preserve">
     <value>Телесуфлер</value>
@@ -1156,7 +1156,7 @@
     <value>Використовуйте пошук у бібліотеці, щоб знаходити сценарії за назвою, назвою файлу або текстом усередині сценарію.</value>
   </data>
   <data name="OnboardingWelcomeBulletModes" xml:space="preserve">
-    <value>Один TPS-сценарій живить Editor, Learn, Teleprompter і Go Live замість окремих копій.</value>
+    <value>Один TPS-сценарій живить Editor, Practice, Teleprompter і Go Live замість окремих копій.</value>
   </data>
   <data name="OnboardingWelcomeBulletLocal" xml:space="preserve">
     <value>Ваш workspace лишається local-first у цьому браузері з autosave, history, import та export.</value>
@@ -1174,7 +1174,7 @@
     <value>TPS лишається переносним: його можна версіонувати, diff-ити, імпортувати й експортувати без прив’язки сценарію до закритого project file.</value>
   </data>
   <data name="OnboardingTpsBulletRuntime" xml:space="preserve">
-    <value>PrompterOne проганяє той самий TPS-сценарій через Editor, Learn, Teleprompter і Go Live, тому авторинг, репетиція й live playback лишаються узгодженими.</value>
+    <value>PrompterOne проганяє той самий TPS-сценарій через Editor, Practice, Teleprompter і Go Live, тому авторинг, репетиція й live playback лишаються узгодженими.</value>
   </data>
   <data name="OnboardingTpsBulletGlossary" xml:space="preserve">
     <value>Терміни segment, block, effective WPM, archetype, compiler і player походять з офіційної TPS-специфікації та glossary.</value>
@@ -1204,7 +1204,7 @@
     <value>Репетируйте з RSVP</value>
   </data>
   <data name="OnboardingLearnBody" xml:space="preserve">
-    <value>Learn використовує RSVP, або Rapid Serial Visual Presentation, щоб показувати слова у сфокусованому ритмі й тренувати темп, артикуляцію та запам’ятовування без сканування всього абзацу.</value>
+    <value>Practice використовує RSVP, або Rapid Serial Visual Presentation, щоб показувати слова у сфокусованому ритмі й тренувати темп, артикуляцію та запам’ятовування без сканування всього абзацу.</value>
   </data>
   <data name="OnboardingLearnBulletRsvp" xml:space="preserve">
     <value>RSVP зменшує рух очей, тримаючи активне слово по центру, а сусідній контекст — видимим.</value>
@@ -1213,7 +1213,7 @@
     <value>Керування швидкістю та TPS-таймінг дають змогу проганяти сценарій ближче до реального spoken cadence.</value>
   </data>
   <data name="OnboardingLearnBulletContext" xml:space="preserve">
-    <value>Використовуйте Learn, коли потрібні повторення, підсилення пам’яті та feedback по темпу перед камерою.</value>
+    <value>Використовуйте Practice, коли потрібні повторення, підсилення пам’яті та feedback по темпу перед камерою.</value>
   </data>
   <data name="OnboardingTeleprompterEyebrow" xml:space="preserve">
     <value>ЖИВЕ ЧИТАННЯ</value>
@@ -1261,7 +1261,7 @@
     <value>Відкрити тур знову</value>
   </data>
   <data name="OnboardingReopenBody" xml:space="preserve">
-    <value>Скористайся цим, коли захочеш знову переглянути PrompterOne, TPS, RSVP, Editor, Learn, Teleprompter і Go Live.</value>
+    <value>Скористайся цим, коли захочеш знову переглянути PrompterOne, TPS, RSVP, Editor, Practice, Teleprompter і Go Live.</value>
   </data>
   <data name="EditorFindPlaceholder" xml:space="preserve">
     <value>Шукати в сценарії</value>
@@ -1732,7 +1732,7 @@
     <value>Практика</value>
   </data>
   <data name="LibraryCardPrep" xml:space="preserve">
-    <value>Підготовка</value>
+    <value>Practice</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Телесуфлер</value>
@@ -1762,7 +1762,7 @@
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
   <data name="LearnNotesTitle" xml:space="preserve">
-    <value>Нотатки підготовки</value>
+    <value>Нотатки</value>
   </data>
   <data name="LearnNotesSectionFormat" xml:space="preserve">
     <value>Розділ: {0}</value>
@@ -1774,7 +1774,7 @@
     <value>Додати нотатку</value>
   </data>
   <data name="LearnNotesEmpty" xml:space="preserve">
-    <value>Нотаток підготовки ще немає.</value>
+    <value>Нотаток ще немає.</value>
   </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Екран не знайдено</value>
