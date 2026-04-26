@@ -139,7 +139,10 @@ internal static partial class BrowserTestConstants
         public const int StepForwardLargeWordCount = 5;
         public const string ShortcutScenarioName = "learn-keyboard-shortcuts";
         public const string ShortcutStep = "01-loop-and-speed";
+        public const string ShortcutNavigationScenarioName = "learn-keyboard-navigation-shortcuts";
+        public const string ShortcutNavigationStep = "01-word-navigation";
         public const string LoopPressedValue = "true";
+        public const string SpeedAfterDecreaseText = "250";
         public const string SpeedAfterIncreaseText = "260";
     }
 
@@ -161,6 +164,8 @@ internal static partial class BrowserTestConstants
         public const string PauseToggleIconSelector = $"[{Html.DataTestAttribute}='{UiTestIds.Teleprompter.PauseIcon}']";
         public const string ShortcutScenarioName = "teleprompter-keyboard-shortcuts";
         public const string ShortcutStep = "01-mirror-and-justify";
+        public const string ShortcutInputFocusScenarioName = "teleprompter-keyboard-input-focus";
+        public const string ShortcutInputFocusStep = "01-slider-focus-contained";
     }
 
     public static class RapidInput
@@ -986,13 +991,16 @@ internal static partial class BrowserTestConstants
         public const string PageDown = "PageDown";
         public const string PageUp = "PageUp";
         public const string Digit2 = "2";
+        public const string Digit3 = "3";
         public const string Digit4 = "4";
         public const string Enter = "Enter";
         public const string F = "f";
         public const string H = "h";
         public const string L = "l";
+        public const string O = "o";
         public const string R = "r";
         public const string Space = "Space";
+        public const string V = "v";
         public const string SelectAll = "ControlOrMeta+A";
         public const string OpenAssistant = "ControlOrMeta+K";
         public const string Backspace = "Backspace";
