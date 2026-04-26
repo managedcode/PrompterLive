@@ -367,13 +367,14 @@ jobs:
             range_label="Initial release range ending at ${GITHUB_SHA}"
           fi
 
-          mapfile -t issue_numbers < <(
+          issue_numbers="$(
             git log --format='%B' "$commit_range" \
               | grep -Eo '#[0-9]+' \
               | tr -d '#' \
               | sort -n \
-              | uniq
-          )
+              | uniq \
+              || true
+          )"
 
           issues_file="$RUNNER_TEMP/release-issues.md"
           {
@@ -381,20 +382,18 @@ jobs:
             echo
 
             issue_count=0
-            for issue_number in "${issue_numbers[@]}"; do
-              issue_json="$(
+            for issue_number in $issue_numbers; do
+              issue_line="$(
                 gh api "repos/${GH_REPO}/issues/${issue_number}" \
-                  --jq 'select(.pull_request == null) | {number, title, url: .html_url}' \
+                  --jq 'select(.pull_request == null) | "- [#\(.number)](\(.html_url)) \(.title)"' \
                   2>/dev/null || true
               )"
 
-              if [ -z "$issue_json" ]; then
+              if [ -z "$issue_line" ]; then
                 continue
               fi
 
-              issue_title="$(jq -r '.title' <<<"$issue_json")"
-              issue_url="$(jq -r '.url' <<<"$issue_json")"
-              echo "- [#${issue_number}](${issue_url}) ${issue_title}"
+              echo "$issue_line"
               issue_count=$((issue_count + 1))
             done
 
