@@ -487,7 +487,7 @@
     <value>Tempo erhöhen</value>
   </data>
   <data name="TooltipBackFiveWords" xml:space="preserve">
-    <value>5 Wörter zurück</value>
+    <value>Vorherige Phrase</value>
   </data>
   <data name="TooltipBackOneWord" xml:space="preserve">
     <value>1 Wort zurück</value>
@@ -498,11 +498,14 @@
   <data name="TooltipPausePlayback" xml:space="preserve">
     <value>Wiedergabe pausieren</value>
   </data>
+  <data name="TooltipRestartPhrase" xml:space="preserve">
+    <value>Phrase neu starten</value>
+  </data>
   <data name="TooltipForwardOneWord" xml:space="preserve">
     <value>1 Wort vor</value>
   </data>
   <data name="TooltipForwardFiveWords" xml:space="preserve">
-    <value>5 Wörter vor</value>
+    <value>Nächste Phrase</value>
   </data>
   <data name="TooltipLoopPlaybackOn" xml:space="preserve">
     <value>Schleifenwiedergabe ist an</value>
@@ -2722,7 +2725,7 @@
     <value>Vorheriger Phrasensprung</value>
   </data>
   <data name="SettingsHotkeyLearnStepBackwardLargeDescription" xml:space="preserve">
-    <value>Gehen Sie fünf Wörter zurück.</value>
+    <value>Zur vorherigen Phrase springen.</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLabel" xml:space="preserve">
     <value>Nächstes Wort</value>
@@ -2734,7 +2737,7 @@
     <value>Nächster Phrasensprung</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLargeDescription" xml:space="preserve">
-    <value>Gehen Sie fünf Wörter vor.</value>
+    <value>Zur nächsten Phrase springen.</value>
   </data>
   <data name="SettingsHotkeyLearnLoopLabel" xml:space="preserve">
     <value>Loop-Wiedergabe</value>

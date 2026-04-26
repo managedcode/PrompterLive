@@ -508,7 +508,7 @@
     <value>Increase speed</value>
   </data>
   <data name="TooltipBackFiveWords" xml:space="preserve">
-    <value>Back 5 words</value>
+    <value>Previous phrase</value>
   </data>
   <data name="TooltipBackOneWord" xml:space="preserve">
     <value>Back 1 word</value>
@@ -519,11 +519,14 @@
   <data name="TooltipPausePlayback" xml:space="preserve">
     <value>Pause playback</value>
   </data>
+  <data name="TooltipRestartPhrase" xml:space="preserve">
+    <value>Restart phrase</value>
+  </data>
   <data name="TooltipForwardOneWord" xml:space="preserve">
     <value>Forward 1 word</value>
   </data>
   <data name="TooltipForwardFiveWords" xml:space="preserve">
-    <value>Forward 5 words</value>
+    <value>Next phrase</value>
   </data>
   <data name="TooltipLoopPlaybackOn" xml:space="preserve">
     <value>Loop playback is on</value>
@@ -1753,7 +1756,7 @@
     <value>Previous phrase jump</value>
   </data>
   <data name="SettingsHotkeyLearnStepBackwardLargeDescription" xml:space="preserve">
-    <value>Step back five words.</value>
+    <value>Jump to the previous phrase.</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLabel" xml:space="preserve">
     <value>Next word</value>
@@ -1765,7 +1768,7 @@
     <value>Next phrase jump</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLargeDescription" xml:space="preserve">
-    <value>Step forward five words.</value>
+    <value>Jump to the next phrase.</value>
   </data>
   <data name="SettingsHotkeyLearnLoopLabel" xml:space="preserve">
     <value>Loop playback</value>

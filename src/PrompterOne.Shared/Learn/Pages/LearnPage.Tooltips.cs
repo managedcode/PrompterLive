@@ -25,6 +25,8 @@ public partial class LearnPage
         ? Text(UiTextKey.TooltipPausePlayback)
         : Text(UiTextKey.TooltipPlayPlayback);
 
+    private string RestartPhraseTooltip => Text(UiTextKey.TooltipRestartPhrase);
+
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 
     private string Format(UiTextKey key, params object[] arguments) =>

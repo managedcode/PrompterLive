@@ -529,7 +529,7 @@
     <value>Збільшити швидкість</value>
   </data>
   <data name="TooltipBackFiveWords" xml:space="preserve">
-    <value>Назад на 5 слів</value>
+    <value>Попередня фраза</value>
   </data>
   <data name="TooltipBackOneWord" xml:space="preserve">
     <value>Назад на 1 слово</value>
@@ -540,11 +540,14 @@
   <data name="TooltipPausePlayback" xml:space="preserve">
     <value>Поставити відтворення на паузу</value>
   </data>
+  <data name="TooltipRestartPhrase" xml:space="preserve">
+    <value>Перезапустити фразу</value>
+  </data>
   <data name="TooltipForwardOneWord" xml:space="preserve">
     <value>Вперед на 1 слово</value>
   </data>
   <data name="TooltipForwardFiveWords" xml:space="preserve">
-    <value>Вперед на 5 слів</value>
+    <value>Наступна фраза</value>
   </data>
   <data name="TooltipLoopPlaybackOn" xml:space="preserve">
     <value>Зациклене відтворення увімкнено</value>
@@ -2722,7 +2725,7 @@
     <value>Перехід до попередньої фрази</value>
   </data>
   <data name="SettingsHotkeyLearnStepBackwardLargeDescription" xml:space="preserve">
-    <value>Відступіть п'ять слів назад.</value>
+    <value>Перейти до попередньої фрази.</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLabel" xml:space="preserve">
     <value>Наступне слово</value>
@@ -2734,7 +2737,7 @@
     <value>Перехід наступної фрази</value>
   </data>
   <data name="SettingsHotkeyLearnStepForwardLargeDescription" xml:space="preserve">
-    <value>Крок вперед п'ять слів.</value>
+    <value>Перейти до наступної фрази.</value>
   </data>
   <data name="SettingsHotkeyLearnLoopLabel" xml:space="preserve">
     <value>Циклічне відтворення</value>

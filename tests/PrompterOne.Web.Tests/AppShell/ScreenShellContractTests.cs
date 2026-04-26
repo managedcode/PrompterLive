@@ -79,6 +79,7 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackwardLarge));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackward));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.PlayToggle));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.RestartPhrase));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForward));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForwardLarge));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.LoopToggle));

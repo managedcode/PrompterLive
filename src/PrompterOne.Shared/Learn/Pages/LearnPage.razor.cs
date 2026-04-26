@@ -22,7 +22,6 @@ public partial class LearnPage : IAsyncDisposable
     private const int RsvpMaxSpeed = 600;
     private const int RsvpMinSpeed = 100;
     private const int RsvpSpeedStep = 10;
-    private const int RsvpStepLarge = 5;
     private const int RsvpStepSmall = 1;
     private const string WpmSuffix = " WPM";
     [Inject] private AppBootstrapper Bootstrapper { get; set; } = null!;
@@ -150,13 +149,15 @@ public partial class LearnPage : IAsyncDisposable
 
     private Task IncreaseRsvpSpeedAsync() => ChangeRsvpSpeedAsync(RsvpSpeedStep);
 
-    private Task StepRsvpBackwardLargeAsync() => StepRsvpWordAsync(-RsvpStepLarge);
+    private Task StepRsvpBackwardLargeAsync() => StepRsvpToIndexAsync(ResolvePreviousPhraseIndex());
 
     private Task StepRsvpBackwardAsync() => StepRsvpWordAsync(-RsvpStepSmall);
 
     private Task StepRsvpForwardAsync() => StepRsvpWordAsync(RsvpStepSmall);
 
-    private Task StepRsvpForwardLargeAsync() => StepRsvpWordAsync(RsvpStepLarge);
+    private Task StepRsvpForwardLargeAsync() => StepRsvpToIndexAsync(ResolveNextPhraseIndex());
+
+    private Task RestartCurrentPhraseAsync() => StepRsvpToIndexAsync(ResolveCurrentPhraseStartIndex());
 
     private async Task NavigateBackToEditorAsync()
     {

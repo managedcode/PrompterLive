@@ -423,8 +423,13 @@
 .rsvp-play-side-slot {
     width: 34px;
     height: 34px;
-    visibility: hidden;
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rsvp-restart-phrase {
+    opacity: .72;
 }
 
 .rsvp-play-row {

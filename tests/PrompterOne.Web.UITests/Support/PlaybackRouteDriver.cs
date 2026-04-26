@@ -30,6 +30,7 @@ internal static class PlaybackRouteDriver
         await Expect(page.GetByTestId(UiTestIds.Learn.Word)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.ProgressLabel)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.PlayToggle)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Learn.RestartPhrase)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.StepForward)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Learn.StepForwardLarge)).ToBeVisibleAsync();
     }

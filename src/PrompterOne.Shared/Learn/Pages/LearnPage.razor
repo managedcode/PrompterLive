@@ -138,7 +138,14 @@
                 </TooltipAnchor>
             </div>
             <div class="rsvp-play-band">
-                <div class="rsvp-play-side-slot" aria-hidden="true"></div>
+                <div class="rsvp-play-side-slot">
+                    <TooltipAnchor OwnerTestId="@UiTestIds.Learn.RestartPhrase" Text="@RestartPhraseTooltip">
+                        <button class="rsvp-btn rsvp-btn-sm rsvp-restart-phrase"
+                                @onclick="RestartCurrentPhraseAsync"
+                                aria-label="@RestartPhraseTooltip"
+                                data-test="@UiTestIds.Learn.RestartPhrase"><UiIcon Kind="UiIconKind.RecordTarget" Size="15" StrokeWidth="2.4m" /></button>
+                    </TooltipAnchor>
+                </div>
                 <div class="rsvp-play-row">
                     <TooltipAnchor OwnerTestId="@UiTestIds.Learn.StepBackwardLarge" Text="@BackFiveWordsTooltip">
                         <button class="rsvp-btn"

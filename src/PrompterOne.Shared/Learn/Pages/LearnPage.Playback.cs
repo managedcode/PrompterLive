@@ -73,16 +73,67 @@ public partial class LearnPage
 
     private async Task StepRsvpWordAsync(int delta)
     {
+        await StepRsvpToIndexAsync(_currentIndex + delta);
+    }
+
+    private async Task StepRsvpToIndexAsync(int index)
+    {
         if (_timeline.Count == 0)
         {
             return;
         }
 
-        _currentIndex = ResolveNavigationIndex(_currentIndex + delta);
+        _currentIndex = ResolveNavigationIndex(index);
         UpdateDisplayedState();
         RestartPlaybackLoopIfActive();
         await InvokeAsync(StateHasChanged);
         await AwaitPendingFocusLayoutSyncAsync();
+    }
+
+    private int ResolveCurrentPhraseStartIndex()
+    {
+        if (_timeline.Count == 0)
+        {
+            return 0;
+        }
+
+        var currentEntry = _timeline[Math.Clamp(_currentIndex, 0, _timeline.Count - 1)];
+        return currentEntry.SentenceStartIndex;
+    }
+
+    private int ResolveNextPhraseIndex()
+    {
+        if (_timeline.Count == 0)
+        {
+            return 0;
+        }
+
+        var currentEntry = _timeline[Math.Clamp(_currentIndex, 0, _timeline.Count - 1)];
+        return currentEntry.SentenceEndIndex + 1;
+    }
+
+    private int ResolvePreviousPhraseIndex()
+    {
+        if (_timeline.Count == 0)
+        {
+            return 0;
+        }
+
+        var currentEntry = _timeline[Math.Clamp(_currentIndex, 0, _timeline.Count - 1)];
+        if (_currentIndex > currentEntry.SentenceStartIndex)
+        {
+            return currentEntry.SentenceStartIndex;
+        }
+
+        var previousIndex = currentEntry.SentenceStartIndex - 1;
+        if (previousIndex < 0)
+        {
+            return _isLoopEnabled
+                ? _timeline[^1].SentenceStartIndex
+                : 0;
+        }
+
+        return _timeline[previousIndex].SentenceStartIndex;
     }
 
     private void RestartPlaybackLoopIfActive()

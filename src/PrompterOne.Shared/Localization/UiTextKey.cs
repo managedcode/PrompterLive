@@ -279,6 +279,7 @@ public enum UiTextKey
     TooltipBackOneWord,
     TooltipPlayPlayback,
     TooltipPausePlayback,
+    TooltipRestartPhrase,
     TooltipForwardOneWord,
     TooltipForwardFiveWords,
     TooltipLoopPlaybackOn,

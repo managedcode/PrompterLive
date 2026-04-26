@@ -25,6 +25,7 @@ public static partial class UiTestIds
         public const string PlayIcon = "learn-play-icon";
         public const string ProgressFill = "learn-progress-fill";
         public const string ProgressLabel = "learn-progress-label";
+        public const string RestartPhrase = "learn-restart-phrase";
         public const string SpeedValue = "learn-speed-value";
         public const string SpeedDown = "learn-speed-down";
         public const string SpeedUp = "learn-speed-up";

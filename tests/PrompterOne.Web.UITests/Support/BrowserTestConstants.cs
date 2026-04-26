@@ -136,7 +136,9 @@ internal static partial class BrowserTestConstants
         public const string StopAtEndStep = "01-stop-at-end";
         public const string LoopWrapScenarioName = "learn-loop-wrap";
         public const string LoopWrapStep = "01-loop-wrap";
-        public const int StepForwardLargeWordCount = 5;
+        public const string OpeningPhraseFirstWord = "Good";
+        public const string OpeningPhraseInnerWord = "welcome";
+        public const string PurposePhraseFirstWord = "Today";
         public const string ShortcutScenarioName = "learn-keyboard-shortcuts";
         public const string ShortcutStep = "01-loop-and-speed";
         public const string ShortcutNavigationScenarioName = "learn-keyboard-navigation-shortcuts";

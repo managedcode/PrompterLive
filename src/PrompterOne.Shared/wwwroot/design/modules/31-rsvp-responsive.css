@@ -204,12 +204,14 @@
     }
 
     .rsvp-play-band {
-        grid-template-columns: max-content;
-        gap: 0;
+        grid-template-columns: 28px max-content 28px;
+        gap: 8px;
     }
 
     .rsvp-play-side-slot {
-        display: none;
+        display: flex;
+        width: 28px;
+        height: 28px;
     }
 
     .rsvp-play-row {

@@ -55,6 +55,7 @@ public sealed class LearnKeyboardShortcutFlowTests(StandaloneAppFixture fixture)
 
             await page.GetByTestId(UiTestIds.Learn.Page).FocusAsync();
             var initialProgress = await ReadProgressStateAsync(page);
+            await ExpectFocusWordAsync(page, BrowserTestConstants.Learn.OpeningPhraseFirstWord);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.ArrowRight);
             var afterForward = await ReadProgressStateAsync(page);
@@ -72,14 +73,25 @@ public sealed class LearnKeyboardShortcutFlowTests(StandaloneAppFixture fixture)
             var afterLargeForward = await ReadProgressStateAsync(page);
 
             await Assert.That(afterLargeForward.CurrentWordNumber)
-                .IsEqualTo(initialProgress.CurrentWordNumber + BrowserTestConstants.Learn.StepForwardLargeWordCount);
+                .IsGreaterThan(afterForward.CurrentWordNumber);
             await Assert.That(afterLargeForward.TotalWordCount).IsEqualTo(initialProgress.TotalWordCount);
+            await ExpectFocusWordAsync(page, BrowserTestConstants.Learn.PurposePhraseFirstWord);
 
             await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.PageUp);
             var afterLargeBackward = await ReadProgressStateAsync(page);
 
             await Assert.That(afterLargeBackward.CurrentWordNumber).IsEqualTo(initialProgress.CurrentWordNumber);
             await Assert.That(afterLargeBackward.TotalWordCount).IsEqualTo(initialProgress.TotalWordCount);
+            await ExpectFocusWordAsync(page, BrowserTestConstants.Learn.OpeningPhraseFirstWord);
+
+            for (var stepIndex = 0; stepIndex < 4; stepIndex++)
+            {
+                await page.Keyboard.PressAsync(BrowserTestConstants.Keyboard.ArrowRight);
+            }
+
+            await ExpectFocusWordAsync(page, BrowserTestConstants.Learn.OpeningPhraseInnerWord);
+            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Learn.RestartPhrase));
+            await ExpectFocusWordAsync(page, BrowserTestConstants.Learn.OpeningPhraseFirstWord);
 
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
@@ -96,5 +108,13 @@ public sealed class LearnKeyboardShortcutFlowTests(StandaloneAppFixture fixture)
         return new ProgressState(
             int.Parse(match.Groups["current"].Value, CultureInfo.InvariantCulture),
             int.Parse(match.Groups["total"].Value, CultureInfo.InvariantCulture));
+    }
+
+    private static async Task ExpectFocusWordAsync(Microsoft.Playwright.IPage page, string expectedWord)
+    {
+        var rawWord = await page.GetByTestId(UiTestIds.Learn.Word).TextContentAsync();
+        var actualWord = string.Concat((rawWord ?? string.Empty).Where(character => !char.IsWhiteSpace(character)));
+
+        await Assert.That(actualWord).IsEqualTo(expectedWord);
     }
 }

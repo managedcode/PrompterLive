@@ -114,12 +114,6 @@ public sealed class LearnPlaybackStateTests(StandaloneAppFixture fixture) : AppU
     private static async Task MoveToWordNumberAsync(IPage page, int targetWordNumber)
     {
         var progress = await ReadProgressStateAsync(page);
-        while (progress.CurrentWordNumber + BrowserTestConstants.Learn.StepForwardLargeWordCount <= targetWordNumber)
-        {
-            await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Learn.StepForwardLarge));
-            progress = await ReadProgressStateAsync(page);
-        }
-
         while (progress.CurrentWordNumber < targetWordNumber)
         {
             await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Learn.StepForward));
