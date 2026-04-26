@@ -8,6 +8,7 @@ public static partial class UiTestIds
         public const string ContextLeft = "learn-context-left";
         public const string ContextRight = "learn-context-right";
         public const string Display = "learn-display";
+        public const string ActivePhraseHighlight = "learn-active-phrase-highlight";
         public const string FocusRow = "learn-focus-row";
         public const string LoopToggle = "learn-loop-toggle";
         public const string NextPhrase = "learn-next-phrase";

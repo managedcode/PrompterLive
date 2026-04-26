@@ -33,6 +33,9 @@
                 </div>
 
                 <div class="rsvp-h-row" @ref="_focusRow" data-test="@UiTestIds.Learn.FocusRow">
+                    <div class="rsvp-active-phrase-highlight"
+                         aria-hidden="true"
+                         data-test="@UiTestIds.Learn.ActivePhraseHighlight"></div>
                     <div class="rsvp-lane rsvp-lane-left">
                         <div class="rsvp-ctx-left" id="@UiDomIds.Learn.ContextLeft" data-test="@UiTestIds.Learn.ContextLeft">
                             @foreach (var word in _leftContextWords)

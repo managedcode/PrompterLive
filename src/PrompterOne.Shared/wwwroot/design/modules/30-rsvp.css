@@ -104,6 +104,8 @@
     min-width: 0;
     display: flex;
     align-items: baseline;
+    position: relative;
+    z-index: 1;
 }
 
 .rsvp-lane-left {
@@ -151,6 +153,21 @@
     overflow: visible;
     position: relative;
     z-index: 1;
+}
+
+.rsvp-active-phrase-highlight {
+    position: absolute;
+    left: clamp(34px, 9vw, 170px);
+    right: clamp(34px, 9vw, 170px);
+    bottom: 24px;
+    height: 48px;
+    border-radius: 999px;
+    border-bottom: 2px solid rgba(232, 213, 176, .24);
+    background:
+        linear-gradient(90deg, transparent 0%, rgba(232, 213, 176, .055) 18%, rgba(232, 213, 176, .085) 50%, rgba(232, 213, 176, .055) 82%, transparent 100%);
+    box-shadow: 0 12px 36px rgba(232, 213, 176, .045);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Focus word — large, centered, with ORP highlight */

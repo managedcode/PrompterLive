@@ -12,6 +12,12 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
     private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
     private readonly record struct FocusWordSlackMeasurement(double SlackPx);
+    private readonly record struct ActivePhraseHighlightMeasurement(
+        double HighlightWidthPx,
+        double RowWidthPx,
+        double WordWidthPx,
+        string BorderBottomStyle,
+        string BackgroundImage);
     private readonly record struct OrpDeltaMeasurement(double DeltaPx);
     private readonly record struct VisibleContextWordGapMeasurement(double LeftWordGapPx, double RightWordGapPx);
 
@@ -69,6 +75,38 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
 
             await Assert.That(leftContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
             await Assert.That(rightContextCount).IsEqualTo(BrowserTestConstants.Learn.ContextWordCount);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Test]
+    public async Task LearnScreen_ActivePhraseHighlightMarksMoreThanTheCurrentWord()
+    {
+        const string scenario = "learn-active-phrase-highlight";
+        const string step = "active-phrase-highlight";
+        var page = await fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            UiScenarioArtifacts.ResetScenario(scenario);
+
+            await ReaderRouteDriver.OpenLearnAsync(page, BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Learn.ActivePhraseHighlight)).ToBeVisibleAsync();
+            await WaitForLearnLayoutReadyAsync(page);
+
+            var measurement = await MeasureActivePhraseHighlightAsync(page);
+
+            await Assert.That(measurement.HighlightWidthPx > measurement.WordWidthPx * 1.45).IsTrue().Because($"Expected the RSVP active phrase highlight to span beyond only the current word, but highlight={measurement.HighlightWidthPx:0.##}px and word={measurement.WordWidthPx:0.##}px.");
+            await Assert.That(measurement.HighlightWidthPx <= measurement.RowWidthPx).IsTrue().Because($"Expected the RSVP active phrase highlight to stay inside the focus row, but highlight={measurement.HighlightWidthPx:0.##}px and row={measurement.RowWidthPx:0.##}px.");
+            await Assert.That(measurement.BorderBottomStyle).IsEqualTo("solid");
+            await Assert.That(measurement.BackgroundImage).IsNotEqualTo("none");
+
+            await UiScenarioArtifacts.CapturePageAsync(page, scenario, step);
         }
         finally
         {
@@ -460,6 +498,44 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 left = UiTestIds.Learn.ContextLeft,
                 focus = UiTestIds.Learn.Word,
                 right = UiTestIds.Learn.ContextRight
+            });
+
+    private static Task<ActivePhraseHighlightMeasurement> MeasureActivePhraseHighlightAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<ActivePhraseHighlightMeasurement>(
+            """
+            ids => {
+                const highlight = document.querySelector(`[data-test="${ids.highlight}"]`);
+                const row = document.querySelector(`[data-test="${ids.row}"]`);
+                const word = document.querySelector(`[data-test="${ids.word}"]`);
+                if (!highlight || !row || !word) {
+                    return {
+                        highlightWidthPx: 0,
+                        rowWidthPx: 0,
+                        wordWidthPx: 0,
+                        borderBottomStyle: '',
+                        backgroundImage: 'none'
+                    };
+                }
+
+                const highlightRect = highlight.getBoundingClientRect();
+                const rowRect = row.getBoundingClientRect();
+                const wordRect = word.getBoundingClientRect();
+                const style = getComputedStyle(highlight);
+
+                return {
+                    highlightWidthPx: highlightRect.width,
+                    rowWidthPx: rowRect.width,
+                    wordWidthPx: wordRect.width,
+                    borderBottomStyle: style.borderBottomStyle,
+                    backgroundImage: style.backgroundImage
+                };
+            }
+            """,
+            new
+            {
+                highlight = UiTestIds.Learn.ActivePhraseHighlight,
+                row = UiTestIds.Learn.FocusRow,
+                word = UiTestIds.Learn.Word
             });
 
     private static Task<VisibleContextWordGapMeasurement> MeasureVisibleContextWordGapsAsync(Microsoft.Playwright.IPage page) =>
