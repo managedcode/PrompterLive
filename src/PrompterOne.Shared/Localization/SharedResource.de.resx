@@ -147,6 +147,9 @@
   <data name="HeaderSearchPlaceholder" xml:space="preserve">
     <value>Nach Titeln, Dateien oder Inhalten suchen...</value>
   </data>
+  <data name="HeaderHome" xml:space="preserve">
+    <value>Startseite</value>
+  </data>
   <data name="HeaderNewScript" xml:space="preserve">
     <value>Neues Skript</value>
   </data>

@@ -19,6 +19,7 @@ internal static partial class BrowserTestConstants
         public const string AriaPressedAttribute = "aria-pressed";
         public const string AriaPressedFalseValue = "false";
         public const string AriaPressedTrueValue = "true";
+        public const string DataIconKindAttribute = "data-icon-kind";
         public const string DataTestAttribute = "data-test";
         public const string PlaceholderAttribute = "placeholder";
         public const string ValueAttribute = "value";

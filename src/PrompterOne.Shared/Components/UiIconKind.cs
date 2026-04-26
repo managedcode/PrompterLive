@@ -28,6 +28,7 @@ public enum UiIconKind
     ExportArrow,
     Folder,
     HelpCircle,
+    Home,
     Keyboard,
     LayoutPanel,
     LayoutFull,

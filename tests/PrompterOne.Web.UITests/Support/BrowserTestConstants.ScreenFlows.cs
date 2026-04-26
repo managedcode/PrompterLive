@@ -187,6 +187,8 @@ internal static partial class BrowserTestConstants
         public const string SettingsTitle = "Settings";
         public const string HeaderChromeScenario = "app-shell-header-chrome";
         public const string HeaderChromeReachableStep = "01-actions-reachable";
+        public const string HomeAccessibleLabel = "Home";
+        public const string HomeIconKindValue = "home";
         public const string LiveWidgetScenario = "app-shell-live-widget";
         public const string LiveWidgetViewportName = "iphone-medium-portrait";
         public const int LiveWidgetTimerPollAttempts = 5;

@@ -130,6 +130,7 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
                 await page.SetViewportSizeAsync(viewport.Width, viewport.Height);
 
                 await ShellRouteDriver.OpenLibraryAsync(page, viewport.Name);
+                await AssertHeaderHomeIconContractAsync(page);
                 await AssertHeaderControlsReachableAsync(
                     page,
                     BrowserTestConstants.ResponsiveLayout.LibraryRouteName,
@@ -194,6 +195,16 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
             await ReadCssPropertyAsync(page, UiTestIds.Header.GoLive, BackgroundColorProperty),
             await ReadCssPropertyAsync(page, UiTestIds.Header.GoLiveIcon, ColorProperty),
             await ReadCssPropertyAsync(page, UiTestIds.Header.GoLiveDot, BackgroundColorProperty));
+    }
+
+    private static async Task AssertHeaderHomeIconContractAsync(IPage page)
+    {
+        await Expect(page.GetByTestId(UiTestIds.Header.Home)).ToHaveAttributeAsync(
+            "aria-label",
+            BrowserTestConstants.AppShellFlow.HomeAccessibleLabel);
+        await Expect(page.GetByTestId(UiTestIds.Header.HomeBrandMark)).ToHaveAttributeAsync(
+            BrowserTestConstants.Html.DataIconKindAttribute,
+            BrowserTestConstants.AppShellFlow.HomeIconKindValue);
     }
 
     private static Task<string> ReadCssPropertyAsync(IPage page, string testId, string propertyName) =>

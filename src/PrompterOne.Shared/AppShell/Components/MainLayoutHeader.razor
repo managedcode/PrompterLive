@@ -8,11 +8,14 @@
         data-reader-muted="@(IsReaderMuted ? EnabledStateValue : DisabledStateValue)">
     <button type="button"
             class="app-header-left app-header-home"
+            title="@HomeLabel"
+            aria-label="@HomeLabel"
             @onclick="HandleHomeClickAsync"
             data-test="@UiTestIds.Header.Home">
         <div class="logo-icon"
+             data-icon-kind="home"
              data-test="@UiTestIds.Header.HomeBrandMark">
-            <AppBrandMark />
+            <UiIcon Kind="UiIconKind.Home" Size="22" StrokeWidth="@HomeIconStrokeWidth" />
         </div>
         <span class="app-logo-text" data-test="@UiTestIds.Header.Brand">PrompterOne</span>
     </button>
@@ -247,6 +250,7 @@
 @code {
     private const string DisabledStateValue = "false";
     private const string EnabledStateValue = "true";
+    private const decimal HomeIconStrokeWidth = 1.9m;
 
     [Parameter, EditorRequired] public string CssClass { get; set; } = string.Empty;
     [Parameter] public bool IsReaderMuted { get; set; }
@@ -265,6 +269,7 @@
     [Parameter] public string? HeaderSubtitleDomId { get; set; }
     [Parameter, EditorRequired] public string HeaderSubtitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string HeaderTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string HomeLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string AiSpotlightLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string AiSpotlightShortcutLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ImportActionButtonTestId { get; set; } = string.Empty;

@@ -7,6 +7,8 @@ namespace PrompterOne.Web.Tests;
 
 public sealed class MainLayoutHeaderImportProgressTests : BunitContext
 {
+    private const string HomeIconKindValue = "home";
+    private const string HomeLabel = "Home";
     private const string ImportFileName = "board-review.docx";
     private const string ImportLabel = "Import";
     private const string ProgressLabel = "Preparing script";
@@ -54,6 +56,21 @@ public sealed class MainLayoutHeaderImportProgressTests : BunitContext
     }
 
     [Test]
+    public void MainLayoutHeader_HomeControl_UsesRecognizableHomeIcon()
+    {
+        var cut = RenderHeader();
+
+        var home = cut.FindByTestId(UiTestIds.Header.Home);
+        var homeIcon = cut.FindByTestId(UiTestIds.Header.HomeBrandMark);
+
+        Assert.Equal(HomeLabel, home.GetAttribute("aria-label"));
+        Assert.Equal(HomeLabel, home.GetAttribute("title"));
+        Assert.Equal(HomeIconKindValue, homeIcon.GetAttribute("data-icon-kind"));
+        Assert.Contains("<svg", homeIcon.InnerHtml, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("PrompterOne", cut.FindByTestId(UiTestIds.Header.Brand).TextContent.Trim());
+    }
+
+    [Test]
     public void MainLayoutHeader_SubtitleBackText_InvokesBackAction()
     {
         var backClicked = false;
@@ -83,6 +100,7 @@ public sealed class MainLayoutHeaderImportProgressTests : BunitContext
             parameters.Add(component => component.CssClass, "app-header");
             parameters.Add(component => component.HeaderSubtitle, headerSubtitle);
             parameters.Add(component => component.HeaderTitle, headerTitle);
+            parameters.Add(component => component.HomeLabel, HomeLabel);
             parameters.Add(component => component.ImportActionButtonTestId, UiTestIds.Header.EditorImportScriptButton);
             parameters.Add(component => component.ImportActionIconTestId, UiTestIds.Header.EditorImportScriptIcon);
             parameters.Add(component => component.ImportActionInputId, UiDomIds.AppShell.EditorImportScriptInput);

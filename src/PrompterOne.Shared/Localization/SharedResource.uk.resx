@@ -147,6 +147,9 @@
   <data name="HeaderSearchPlaceholder" xml:space="preserve">
     <value>Шукати назви, файли або вміст...</value>
   </data>
+  <data name="HeaderHome" xml:space="preserve">
+    <value>На головну</value>
+  </data>
   <data name="HeaderNewScript" xml:space="preserve">
     <value>Новий сценарій</value>
   </data>

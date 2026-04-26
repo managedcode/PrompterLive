@@ -108,6 +108,7 @@ public enum UiTextKey
     OnboardingGoLiveBulletProgram,
     OnboardingGoLiveBulletRecording,
     OnboardingGoLiveBulletRouting,
+    HeaderHome,
     HeaderNewScript,
     HeaderOpenScript,
     HeaderImportReading,
