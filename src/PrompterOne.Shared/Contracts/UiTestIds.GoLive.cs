@@ -22,6 +22,10 @@ public static partial class UiTestIds
         public const string LiveKitServer = "go-live-livekit-server";
         public const string LiveKitToggle = "go-live-livekit-toggle";
         public const string LiveKitToken = "go-live-livekit-token";
+        public const string LocalRecordingAudioButton = "go-live-local-recording-audio-button";
+        public const string LocalRecordingControls = "go-live-local-recording-controls";
+        public const string LocalRecordingStatus = "go-live-local-recording-status";
+        public const string LocalRecordingVideoButton = "go-live-local-recording-video-button";
         public const string ModeDirector = "go-live-mode-director";
         public const string ModeStudio = "go-live-mode-studio";
         public const string OpenHome = Back;

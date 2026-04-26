@@ -174,10 +174,13 @@
                                              Title="@Text(GoLiveText.Chrome.LivePreviewTitle)" />
                     <GoLiveStudioSidebar ActiveTab="@_activeStudioTab"
                                          AudioChannels="@AudioChannels"
+                                         CanControlLocalRecording="@CanControlProgram"
                                          CreateRoom="CreateRoomAsync"
                                          CueArmed="@_cueArmed"
                                          Destinations="@DestinationSummary"
+                                         HasPrimaryMicrophone="@HasPrimaryMicrophone"
                                          IsRoomActive="@IsRoomActive"
+                                         IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
                                          MuteAllGuests="@_muteAllGuests"
                                          Participants="@Participants"
                                          RoomCode="@RoomCode"
@@ -187,6 +190,7 @@
                                          StatusMetrics="@StatusMetrics"
                                          TalkbackEnabled="@_talkbackEnabled"
                                          ToggleDestination="ToggleDestinationSummaryAsync"
+                                         ToggleLocalRecording="ToggleRecordingSessionAsync"
                                          ToggleMuteAllGuests="ToggleMuteAllGuestsAsync"
                                          ToggleTalkback="ToggleTalkbackAsync" />
                 </aside>

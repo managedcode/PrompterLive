@@ -79,6 +79,41 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Test]
+    public void GoLivePage_LocalRecordingControls_ShowBrowserLocalStatesAndToggleRecording()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                Recording = new RecordingProfile(IsEnabled: true)
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveDemo);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.LocalRecordingControls));
+            Assert.Contains("Browser-local", cut.FindByTestId(UiTestIds.GoLive.LocalRecordingStatus).TextContent, StringComparison.Ordinal);
+            Assert.Equal("stopped", cut.FindByTestId(UiTestIds.GoLive.LocalRecordingVideoButton).GetAttribute("data-state"));
+            Assert.Equal("stopped", cut.FindByTestId(UiTestIds.GoLive.LocalRecordingAudioButton).GetAttribute("data-state"));
+        });
+
+        cut.FindByTestId(UiTestIds.GoLive.LocalRecordingVideoButton).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(
+                _harness.JsRuntime.Invocations,
+                invocation => string.Equals(invocation, StartLocalRecordingInteropMethod, StringComparison.Ordinal));
+            Assert.Equal("recording", cut.FindByTestId(UiTestIds.GoLive.LocalRecordingVideoButton).GetAttribute("data-state"));
+            Assert.Equal("recording", cut.FindByTestId(UiTestIds.GoLive.LocalRecordingAudioButton).GetAttribute("data-state"));
+        });
+    }
+
+    [Test]
     public void GoLivePage_StartStream_WithVdoNinjaArmed_CallsVdoNinjaOutputInterop()
     {
         SeedSceneState(CreateTwoCameraScene());

@@ -26,6 +26,35 @@
         @if (ActiveTab == GoLiveStudioTab.Stream)
         {
             <div class="gl-tab-content active">
+                <div class="gl-info-section"
+                     data-test="@UiTestIds.GoLive.LocalRecordingControls">
+                    <span class="gl-info-label">Local recording</span>
+                    <div class="gl-local-rec-grid">
+                        <button type="button"
+                                class="gl-local-rec-btn @(IsRecordingActive ? "active" : null)"
+                                disabled="@(!CanControlLocalRecording)"
+                                data-state="@LocalRecordingState"
+                                data-test="@UiTestIds.GoLive.LocalRecordingVideoButton"
+                                @onclick="ToggleLocalRecording">
+                            <UiIcon Kind="UiIconKind.Video" Size="13" />
+                            <strong>Video</strong>
+                            <span>@LocalRecordingVideoStatus</span>
+                        </button>
+                        <button type="button"
+                                class="gl-local-rec-btn @(IsRecordingActive ? "active" : null)"
+                                disabled="@(!CanControlLocalRecording || !HasPrimaryMicrophone)"
+                                data-state="@(HasPrimaryMicrophone ? LocalRecordingState : UnavailableStateValue)"
+                                data-test="@UiTestIds.GoLive.LocalRecordingAudioButton"
+                                @onclick="ToggleLocalRecording">
+                            <UiIcon Kind="UiIconKind.Microphone" Size="13" />
+                            <strong>Audio</strong>
+                            <span>@LocalRecordingAudioStatus</span>
+                        </button>
+                    </div>
+                    <p class="gl-local-rec-copy"
+                       data-test="@UiTestIds.GoLive.LocalRecordingStatus">@LocalRecordingDetail</p>
+                </div>
+
                 <div class="gl-info-section">
                     <span class="gl-info-label">@Text(GoLiveText.Sidebar.DestinationsLabel)</span>
                     <div class="gl-dest-list">
@@ -229,13 +258,19 @@
     private const string ActiveMeterStateValue = "active";
     private const string DisabledStateValue = "false";
     private const string EnabledStateValue = "true";
+    private const string RecordingStateValue = "recording";
+    private const string StoppedStateValue = "stopped";
+    private const string UnavailableStateValue = "unavailable";
 
     [Parameter] public GoLiveStudioTab ActiveTab { get; set; }
     [Parameter] public IReadOnlyList<GoLiveAudioChannelViewModel> AudioChannels { get; set; } = [];
+    [Parameter] public bool CanControlLocalRecording { get; set; }
     [Parameter] public EventCallback CreateRoom { get; set; }
     [Parameter] public bool CueArmed { get; set; }
     [Parameter] public IReadOnlyList<GoLiveDestinationSummaryViewModel> Destinations { get; set; } = [];
     [Parameter] public bool IsRoomActive { get; set; }
+    [Parameter] public bool IsRecordingActive { get; set; }
+    [Parameter] public bool HasPrimaryMicrophone { get; set; }
     [Parameter] public bool MuteAllGuests { get; set; }
     [Parameter] public IReadOnlyList<GoLiveRoomParticipantViewModel> Participants { get; set; } = [];
     [Parameter] public string RoomCode { get; set; } = string.Empty;
@@ -244,6 +279,7 @@
     [Parameter] public EventCallback SendCue { get; set; }
     [Parameter] public IReadOnlyList<GoLiveMetricViewModel> StatusMetrics { get; set; } = [];
     [Parameter] public EventCallback<string> ToggleDestination { get; set; }
+    [Parameter] public EventCallback ToggleLocalRecording { get; set; }
     [Parameter] public EventCallback ToggleMuteAllGuests { get; set; }
     [Parameter] public EventCallback ToggleTalkback { get; set; }
     [Parameter] public bool TalkbackEnabled { get; set; }
@@ -251,6 +287,32 @@
     private bool _cueArmed => CueArmed;
     private bool _muteAllGuests => MuteAllGuests;
     private bool _talkbackEnabled => TalkbackEnabled;
+
+    private string LocalRecordingState =>
+        !CanControlLocalRecording
+            ? UnavailableStateValue
+            : IsRecordingActive
+                ? RecordingStateValue
+                : StoppedStateValue;
+
+    private string LocalRecordingVideoStatus =>
+        !CanControlLocalRecording
+            ? "Unavailable"
+            : IsRecordingActive
+                ? "Recording"
+                : "Stopped";
+
+    private string LocalRecordingAudioStatus =>
+        !HasPrimaryMicrophone
+            ? "Unavailable"
+            : IsRecordingActive
+                ? "Recording"
+                : "Stopped";
+
+    private string LocalRecordingDetail =>
+        !CanControlLocalRecording
+            ? "Camera permission or a local source is required."
+            : "Browser-local audio/video export. No stream or cloud upload.";
 
     private string Text(string key) => Localizer[key];
 }

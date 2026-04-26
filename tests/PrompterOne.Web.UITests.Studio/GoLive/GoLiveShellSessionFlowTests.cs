@@ -296,6 +296,55 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
     }
 
     [Test]
+    public async Task GoLivePage_LocalRecordingControls_ToggleBrowserLocalRecordingStates()
+    {
+        var page = await _fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
+            await GoLiveTestSeedHelper.SeedBrowserLocalRecordingPreferencesAsync(page);
+            await StudioRouteDriver.OpenGoLiveAsync(page);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingControls)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingStatus)).ToContainTextAsync("Browser-local");
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingVideoButton))
+                .ToHaveAttributeAsync("data-state", "stopped");
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingAudioButton))
+                .ToHaveAttributeAsync("data-state", "stopped");
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.LocalRecordingVideoButton),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeActiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingVideoButton))
+                .ToHaveAttributeAsync("data-state", "recording");
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingAudioButton))
+                .ToHaveAttributeAsync("data-state", "recording");
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.LocalRecordingAudioButton),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeInactiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingVideoButton))
+                .ToHaveAttributeAsync("data-state", "stopped");
+            await Expect(page.GetByTestId(UiTestIds.GoLive.LocalRecordingAudioButton))
+                .ToHaveAttributeAsync("data-state", "stopped");
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Test]
     public async Task GoLivePage_StartRecording_FilePickerSave_ProducesDecodableProgramVideoAndAudio()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);

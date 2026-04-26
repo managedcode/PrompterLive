@@ -72,6 +72,59 @@
     flex-direction: column;
 }
 
+.gl-local-rec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.gl-local-rec-btn {
+    display: grid;
+    min-height: 70px;
+    min-width: 0;
+    align-content: center;
+    justify-items: center;
+    gap: 4px;
+    padding: 9px 8px;
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .035);
+    color: rgba(248, 241, 226, .7);
+    cursor: pointer;
+}
+
+.gl-local-rec-btn:hover:not(:disabled) {
+    border-color: rgba(255, 141, 141, .28);
+    background: rgba(255, 141, 141, .08);
+}
+
+.gl-local-rec-btn.active {
+    border-color: rgba(255, 107, 107, .45);
+    background: rgba(255, 107, 107, .14);
+    color: rgba(255, 245, 224, .94);
+}
+
+.gl-local-rec-btn:disabled {
+    cursor: not-allowed;
+    opacity: .48;
+}
+
+.gl-local-rec-btn strong {
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.gl-local-rec-btn span,
+.gl-local-rec-copy {
+    color: rgba(248, 241, 226, .48);
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+.gl-local-rec-copy {
+    margin: 8px 0 0;
+}
+
 .gl-destination-card {
     display: flex;
     flex-direction: column;
