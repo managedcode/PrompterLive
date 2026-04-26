@@ -355,8 +355,7 @@ jobs:
               --exclude-drafts \
               --limit 50 \
               --json tagName \
-              --jq ".[] | select(.tagName != \"$RELEASE_TAG\") | .tagName" \
-              | head -n 1
+              --jq "map(select(.tagName != \"$RELEASE_TAG\")) | first | .tagName // \"\""
           )"
 
           if [ -n "$previous_tag" ] && git rev-parse --verify "${previous_tag}^{commit}" >/dev/null 2>&1; then
