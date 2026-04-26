@@ -36,6 +36,7 @@
     let pickerCallCount = 0;
     let savedBlob = null;
     let savedFileName = "";
+    const savedRecordings = [];
 
     function normalizePart(part) {
         if (part instanceof Blob) {
@@ -72,8 +73,18 @@
             hasBlob: savedBlob instanceof Blob,
             mimeType: savedBlob?.type ?? "",
             pickerCallCount,
+            savedRecordingCount: savedRecordings.length,
             sizeBytes: savedBlob?.size ?? 0
         };
+    }
+
+    function getSavedRecordingsState() {
+        return savedRecordings.map(recording => ({
+            fileName: recording.fileName,
+            hasBlob: recording.blob instanceof Blob,
+            mimeType: recording.blob?.type ?? "",
+            sizeBytes: recording.blob?.size ?? 0
+        }));
     }
 
     function hasDecodedAudio(videoElement) {
@@ -329,6 +340,10 @@
                     },
                     async close() {
                         savedBlob = new Blob(parts, { type: outputMimeType });
+                        savedRecordings.push({
+                            blob: savedBlob,
+                            fileName: savedFileName
+                        });
                     }
                 };
             }
@@ -338,10 +353,12 @@
     window[harnessGlobalName] = Object.freeze({
         analyzeSavedRecording,
         getSavedRecordingState,
+        getSavedRecordingsState,
         reset() {
             pickerCallCount = 0;
             savedBlob = null;
             savedFileName = "";
+            savedRecordings.length = 0;
         }
     });
 })();

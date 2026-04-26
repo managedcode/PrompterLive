@@ -364,6 +364,94 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
     }
 
     [Test]
+    public async Task GoLivePage_RecordingBlockNavigation_FilePickerSave_ExportsSeparateBlockTakeFiles()
+    {
+        var page = await _fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await page.AddInitScriptAsync(scriptPath: GetRecordingFileHarnessScriptPath());
+            await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
+            await GoLiveFlowTests.SeedRecordingPreferencesAsync(
+                page,
+                SettingsPagePreferences.Default with
+                {
+                    HasSeenOnboarding = true,
+                    RecordingFolder = RecordingPreferenceCatalog.LocationLabels.LocalFile
+                });
+            await StudioRouteDriver.OpenGoLiveRouteAsync(page, BrowserTestConstants.Routes.GoLiveLeadership);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockContextToggle),
+                noWaitAfter: true);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.StartRecording),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeMetadataReadyScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var firstRuntimeState = await page.EvaluateAsync<JsonElement>(
+                BrowserTestConstants.GoLive.GetRuntimeStateScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId);
+            var firstFileName = firstRuntimeState.GetProperty("recording").GetProperty("fileName").GetString() ?? string.Empty;
+            await Assert.That(firstFileName).Contains("take-01");
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockNextControl),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.SavedRecordingCountReadyScript,
+                1,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeFileChangedScript,
+                new object[] { BrowserTestConstants.GoLive.RuntimeSessionId, firstFileName },
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var secondRuntimeState = await page.EvaluateAsync<JsonElement>(
+                BrowserTestConstants.GoLive.GetRuntimeStateScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId);
+            var secondFileName = secondRuntimeState.GetProperty("recording").GetProperty("fileName").GetString() ?? string.Empty;
+            await Assert.That(secondFileName).Contains("take-02");
+            await Assert.That(secondFileName).IsNotEqualTo(firstFileName);
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.StartRecording),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeInactiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.Media.SavedRecordingCountReadyScript,
+                2,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            var savedRecordings = await page.EvaluateAsync<JsonElement>(BrowserTestConstants.Media.GetSavedRecordingsStateScript);
+            var savedFiles = savedRecordings
+                .EnumerateArray()
+                .Select(recording => new
+                {
+                    FileName = recording.GetProperty("fileName").GetString() ?? string.Empty,
+                    SizeBytes = recording.GetProperty("sizeBytes").GetInt64()
+                })
+                .ToArray();
+
+            await Assert.That(savedFiles.Length).IsGreaterThanOrEqualTo(2);
+            await Assert.That(savedFiles.Any(file => file.FileName.Contains("take-01", StringComparison.OrdinalIgnoreCase))).IsTrue();
+            await Assert.That(savedFiles.Any(file => file.FileName.Contains("take-02", StringComparison.OrdinalIgnoreCase))).IsTrue();
+            await Assert.That(savedFiles.All(file => file.SizeBytes > 0)).IsTrue();
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Test]
     public async Task GoLivePage_AudioTab_ShowsLiveMicrophoneProgramAndRecordingLevels()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);

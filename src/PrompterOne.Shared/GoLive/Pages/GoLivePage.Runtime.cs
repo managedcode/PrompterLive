@@ -14,5 +14,5 @@ public partial class GoLivePage
             _activeSceneLayout != GoLiveSceneLayout.Full,
             _studioSettings.Streaming,
             _recordingPreferences,
-            _sessionTitle);
+            BuildRecordingFileStem());
 }

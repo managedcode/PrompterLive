@@ -596,6 +596,8 @@ internal static partial class BrowserTestConstants
             $$"""sessionId => Boolean(window["{{AppMediaRuntime.GoLive.OutputNamespace}}"].getSessionState(sessionId)?.recording?.active)""";
         public static string RecordingRuntimeMetadataReadyScript =>
             $$"""sessionId => { const state = window["{{AppMediaRuntime.GoLive.OutputNamespace}}"].getSessionState(sessionId); return Boolean(state?.recording?.active && state?.recording?.fileName && state?.recording?.mimeType && (state?.recording?.sizeBytes ?? 0) > 0); }""";
+        public static string RecordingRuntimeFileChangedScript =>
+            $$"""([sessionId, previousFileName]) => { const state = window["{{AppMediaRuntime.GoLive.OutputNamespace}}"].getSessionState(sessionId); return Boolean(state?.recording?.active && state?.recording?.fileName && state.recording.fileName !== previousFileName && state?.recording?.mimeType && (state?.recording?.sizeBytes ?? 0) > 0); }""";
         public static string RecordingRuntimeInactiveScript =>
             $$"""sessionId => !Boolean(window["{{AppMediaRuntime.GoLive.OutputNamespace}}"].getSessionState(sessionId)?.recording?.active)""";
         public static string RecordingRuntimeUsesProgramSourceScript =>

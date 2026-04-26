@@ -23,6 +23,16 @@ public sealed class GoLiveOutputInterop(IJSRuntime jsRuntime)
             request).AsTask();
     }
 
+    public Task RotateLocalRecordingTakeAsync(
+        string sessionId,
+        GoLiveOutputRuntimeRequest request)
+    {
+        return _jsRuntime.InvokeVoidAsync(
+            GoLiveOutputInteropMethodNames.RotateLocalRecordingTake,
+            sessionId,
+            request).AsTask();
+    }
+
     public Task StartLiveKitAsync(
         string sessionId,
         GoLiveOutputRuntimeRequest request)

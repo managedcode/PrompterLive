@@ -19,6 +19,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
 {
     private const int RecordingAudioBitrateKbps = 256;
     private const int RecordingVideoBitrateKbps = 12000;
+    private const string RotateLocalRecordingTakeInteropMethod = GoLiveOutputInteropMethodNames.RotateLocalRecordingTake;
     private const string SceneSettingsStorageKey = BrowserAppSettingsKeys.SceneSettings;
     private const string StartLocalRecordingInteropMethod = GoLiveOutputInteropMethodNames.StartLocalRecording;
     private const string StreamingResolutionLabel = "1920 × 1080";
@@ -302,6 +303,51 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     }
 
     [Test]
+    public async Task GoLivePage_RecordingBlockNavigation_WhileRecording_RotatesTakeWithNextBlockFileStem()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                Recording = new RecordingProfile(IsEnabled: true)
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveLeadership);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.RecordingBlockContextToggle).Click());
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.StartRecording).Click());
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockActive));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNext));
+        });
+        var firstBlockTitle = GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockActive));
+        var secondBlockTitle = GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNext));
+
+        var startInvocation = Assert.Single(
+            _harness.JsRuntime.InvocationRecords,
+            record => string.Equals(record.Identifier, StartLocalRecordingInteropMethod, StringComparison.Ordinal));
+        var startRequest = Assert.IsType<GoLiveOutputRuntimeRequest>(startInvocation.Arguments[1]);
+        Assert.Contains("take 01", startRequest.Recording.FileStem, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(firstBlockTitle, startRequest.Recording.FileStem, StringComparison.Ordinal);
+
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNextControl).Click());
+
+        var rotateInvocation = Assert.Single(
+            _harness.JsRuntime.InvocationRecords,
+            record => string.Equals(record.Identifier, RotateLocalRecordingTakeInteropMethod, StringComparison.Ordinal));
+        var rotateRequest = Assert.IsType<GoLiveOutputRuntimeRequest>(rotateInvocation.Arguments[1]);
+        Assert.Contains("take 02", rotateRequest.Recording.FileStem, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(secondBlockTitle, rotateRequest.Recording.FileStem, StringComparison.Ordinal);
+        Assert.DoesNotContain(firstBlockTitle, rotateRequest.Recording.FileStem, StringComparison.Ordinal);
+    }
+
+    [Test]
     public void GoLivePage_StartRecording_WithLocalFilePreference_PrefersFilePickerExport()
     {
         SeedSceneState(CreateSceneWithTwoAudioInputs());
@@ -413,4 +459,7 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
     {
         _harness.JsRuntime.SavedValues[SettingsPagePreferences.StorageKey] = preferences;
     }
+
+    private static string GetCueTitle(AngleSharp.Dom.IElement element) =>
+        element.QuerySelector("strong")?.TextContent.Trim() ?? string.Empty;
 }

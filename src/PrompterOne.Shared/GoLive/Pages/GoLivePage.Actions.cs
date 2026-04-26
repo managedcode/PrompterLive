@@ -55,17 +55,26 @@ public partial class GoLivePage
         return Task.CompletedTask;
     }
 
-    private Task MoveRecordingBlockContextAsync(int direction)
+    private async Task MoveRecordingBlockContextAsync(int direction)
     {
-        var blocks = RecordingBlocks;
-        if (blocks.Count == 0)
+        await RunSerializedInteractionAsync(async () =>
         {
-            _recordingBlockIndex = 0;
-            return Task.CompletedTask;
-        }
+            var blocks = RecordingBlocks;
+            if (blocks.Count == 0)
+            {
+                _recordingBlockIndex = 0;
+                return;
+            }
 
-        _recordingBlockIndex = Math.Clamp(_recordingBlockIndex + direction, 0, blocks.Count - 1);
-        return Task.CompletedTask;
+            var previousIndex = _recordingBlockIndex;
+            _recordingBlockIndex = Math.Clamp(_recordingBlockIndex + direction, 0, blocks.Count - 1);
+            if (_recordingBlockIndex == previousIndex || !GoLiveSession.State.IsRecordingActive)
+            {
+                return;
+            }
+
+            await GoLiveOutputRuntime.RotateRecordingTakeAsync(BuildRuntimeRequest(SelectedCamera));
+        });
     }
 
     private int NormalizeRecordingBlockIndex() => NormalizeRecordingBlockIndex(RecordingBlocks.Count);

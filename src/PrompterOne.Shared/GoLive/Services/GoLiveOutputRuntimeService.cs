@@ -34,6 +34,19 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
         await RefreshStateAsync();
     }
 
+    public async Task RotateRecordingTakeAsync(GoLiveOutputRuntimeRequest request)
+    {
+        if (!State.RecordingActive || !request.CanStartRecording)
+        {
+            return;
+        }
+
+        await _interop.RotateLocalRecordingTakeAsync(
+            GoLiveOutputRuntimeContract.SessionId,
+            request);
+        await RefreshStateAsync();
+    }
+
     public async Task UpdateProgramSourceAsync(GoLiveOutputRuntimeRequest request)
     {
         if (!State.HasActiveOutputs)

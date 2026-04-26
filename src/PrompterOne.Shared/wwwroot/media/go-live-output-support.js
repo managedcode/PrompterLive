@@ -368,6 +368,25 @@
         }
     }
 
+    function resetRecordingSink(session, resetProfile = false) {
+        session.recordingChunks = [];
+        session.recordingFileHandle = null;
+        session.recordingFileName = "";
+        session.recordingSaveMode = "";
+        session.recordingBytes = 0;
+        session.recordingWritable = null;
+        session.recordingWritePromise = Promise.resolve();
+
+        if (!resetProfile) {
+            return;
+        }
+
+        session.recordingMimeType = "";
+        session.recordingRequestedAudioCodec = "";
+        session.recordingRequestedContainer = "";
+        session.recordingRequestedVideoCodec = "";
+    }
+
     function queueRecordingWrite(session, data) {
         session.recordingBytes += data.size;
         session.recordingWritePromise = session.recordingWritePromise.then(() => session.recordingWritable.write(data));
@@ -481,6 +500,7 @@
         finalizeRecording,
         normalizeRequest,
         prepareRecordingSink,
+        resetRecordingSink,
         resolveSupportedRecordingMimeType,
         startRecordingSegment,
         stopRecordingSegment

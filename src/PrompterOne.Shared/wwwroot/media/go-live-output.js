@@ -375,6 +375,27 @@
             session.recordingActive = true;
         },
 
+        async rotateLocalRecordingTake(sessionId, rawRequest) {
+            const session = outputSessions.get(sessionId);
+            if (!session || !session.recordingActive) {
+                return;
+            }
+
+            const support = getSupport();
+            const request = await ensureProgramSession(session, rawRequest);
+
+            await support.stopRecordingSegment(session);
+            await support.finalizeRecording(session);
+            support.resetRecordingSink(session, false);
+
+            session.recordingRequestedContainer = request.recording.containerLabel;
+            session.recordingRequestedVideoCodec = request.recording.videoCodecLabel;
+            session.recordingRequestedAudioCodec = request.recording.audioCodecLabel;
+            await support.prepareRecordingSink(session, request, session.recordingMimeType);
+            await support.startRecordingSegment(session);
+            session.recordingActive = true;
+        },
+
         async startVdoNinjaSession(sessionId, rawRequest) {
             const session = ensureSession(sessionId);
             try {
@@ -409,17 +430,7 @@
             await getSupport().finalizeRecording(session);
             session.recordingActive = false;
 
-            session.recordingChunks = [];
-            session.recordingFileHandle = null;
-            session.recordingFileName = "";
-            session.recordingMimeType = "";
-            session.recordingRequestedAudioCodec = "";
-            session.recordingRequestedContainer = "";
-            session.recordingRequestedVideoCodec = "";
-            session.recordingSaveMode = "";
-            session.recordingBytes = 0;
-            session.recordingWritable = null;
-            session.recordingWritePromise = Promise.resolve();
+            getSupport().resetRecordingSink(session, true);
             await cleanupSessionIfIdle(sessionId, session);
         },
 

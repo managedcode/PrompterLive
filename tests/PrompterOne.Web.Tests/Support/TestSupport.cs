@@ -266,6 +266,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
     private const string CrossTabInitializeIdentifier = "PrompterOneCrossTabInterop.initialize";
     private const string CrossTabPublishIdentifier = "PrompterOneCrossTabInterop.publish";
     private const string GoLiveGetSessionStateIdentifier = GoLiveOutputInteropMethodNames.GetSessionState;
+    private const string GoLiveRotateLocalRecordingTakeIdentifier = GoLiveOutputInteropMethodNames.RotateLocalRecordingTake;
     private const string GoLiveStartLiveKitIdentifier = GoLiveOutputInteropMethodNames.StartLiveKitSession;
     private const string GoLiveStartLocalRecordingIdentifier = GoLiveOutputInteropMethodNames.StartLocalRecording;
     private const string GoLiveRemoteGetSessionStateIdentifier = GoLiveRemoteSourceInteropMethodNames.GetSessionState;
@@ -461,6 +462,17 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
         }
 
         if (string.Equals(identifier, GoLiveStartLocalRecordingIdentifier, StringComparison.Ordinal))
+        {
+            var existingSnapshot = GoLiveSessions.GetValueOrDefault(targetSessionId);
+            GoLiveSessions[targetSessionId] = BuildGoLiveSnapshot(
+                args,
+                liveKitActive: existingSnapshot?.LiveKit?.Active == true,
+                recordingActive: true,
+                vdoNinjaActive: existingSnapshot?.VdoNinja?.Active == true);
+            return true;
+        }
+
+        if (string.Equals(identifier, GoLiveRotateLocalRecordingTakeIdentifier, StringComparison.Ordinal))
         {
             var existingSnapshot = GoLiveSessions.GetValueOrDefault(targetSessionId);
             GoLiveSessions[targetSessionId] = BuildGoLiveSnapshot(

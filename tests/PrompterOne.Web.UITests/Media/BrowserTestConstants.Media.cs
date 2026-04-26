@@ -86,6 +86,8 @@ internal static partial class BrowserTestConstants
             $$"""([videoId]) => window["{{HarnessGlobal}}"].getRequestLog().some(request => request.hasVideo === true && request.hasAudio === false && request.resolvedVideoDeviceId === videoId)""";
         public static string GetSavedRecordingStateScript =>
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()""";
+        public static string GetSavedRecordingsStateScript =>
+            $$"""() => window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingsState()""";
         public static string AnalyzeSavedRecordingScript =>
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].analyzeSavedRecording()""";
         public static Regex BlankTextRegex { get; } = new(@"^\s*$", RegexOptions.Compiled);
@@ -93,5 +95,7 @@ internal static partial class BrowserTestConstants
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].reset()""";
         public static string SavedRecordingReadyScript =>
             $$"""() => Boolean(window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()?.hasBlob && (window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()?.sizeBytes ?? 0) > 0)""";
+        public static string SavedRecordingCountReadyScript =>
+            $$"""count => (window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()?.savedRecordingCount ?? 0) >= count""";
     }
 }

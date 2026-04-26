@@ -23,6 +23,9 @@ public partial class GoLivePage
     private const string DownloadSaveMode = "download";
     private const string FileSystemSaveMode = "file-system";
     private const string MetricSeparator = " • ";
+    private const string RecordingTakeFileStemSeparator = " take ";
+    private const string RecordingTakeNumberFormat = "00";
+    private const string RecordingTakeTitleFallback = "Block";
     private const string ResolutionSeparator = " × ";
 
     private string _activeSceneId = GoLiveText.Surface.PrimarySceneId;
@@ -232,6 +235,32 @@ public partial class GoLivePage
         AddRecordingBlockCue(cues, blocks, activeIndex, Text(UiTextKey.EditorStructureActiveBlock.ToString()), UiTestIds.GoLive.RecordingBlockActive, isActive: true);
         AddRecordingBlockCue(cues, blocks, activeIndex + 1, Text(UiTextKey.EditorFindNext.ToString()), UiTestIds.GoLive.RecordingBlockNext, isActive: false);
         return cues;
+    }
+
+    private string BuildRecordingFileStem()
+    {
+        var blocks = RecordingBlocks;
+        if (blocks.Count == 0)
+        {
+            return _sessionTitle;
+        }
+
+        var activeIndex = NormalizeRecordingBlockIndex(blocks.Count);
+        var blockTitle = blocks[activeIndex].Title;
+        if (string.IsNullOrWhiteSpace(blockTitle))
+        {
+            blockTitle = string.Concat(
+                RecordingTakeTitleFallback,
+                " ",
+                (activeIndex + 1).ToString(RecordingTakeNumberFormat, CultureInfo.InvariantCulture));
+        }
+
+        return string.Concat(
+            _sessionTitle,
+            RecordingTakeFileStemSeparator,
+            (activeIndex + 1).ToString(RecordingTakeNumberFormat, CultureInfo.InvariantCulture),
+            " ",
+            blockTitle.Trim());
     }
 
     private static void AddRecordingBlockCue(
