@@ -117,7 +117,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
 
             await page.GetByTestId(UiTestIds.Header.EditorExportNative).ClickAsync();
             var nativeFile = await WaitForSavedFileAsync(page, FilePickerMode);
-            await AssertExportedSourceFileAsync(nativeFile, ExpectedDocumentName);
+            await AssertNativeExportedFileAsync(nativeFile, ExpectedDocumentName);
 
             await page.EvaluateAsync(HarnessResetScript);
 
@@ -168,5 +168,18 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
         await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
         await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
         await Assert.That(savedFile.GetProperty("text").GetString()).IsEqualTo(EditedScript);
+    }
+
+    private static async Task AssertNativeExportedFileAsync(JsonElement savedFile, string expectedFileName)
+    {
+        var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
+
+        await Assert.That(savedFile.GetProperty("mode").GetString()).IsEqualTo(FilePickerMode);
+        await Assert.That(savedFile.GetProperty("fileName").GetString()).IsEqualTo(expectedFileName);
+        await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
+        await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
+        await Assert.That(savedText).StartsWith("---");
+        await Assert.That(savedText).Contains(SavedFileTitleLine);
+        await Assert.That(savedText).Contains(EditedScript);
     }
 }
