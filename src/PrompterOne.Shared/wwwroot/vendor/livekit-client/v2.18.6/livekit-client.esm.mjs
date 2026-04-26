@@ -3869,6 +3869,9 @@ const DisconnectReason = /* @__PURE__ */proto3.makeEnum("livekit.DisconnectReaso
 }, {
   no: 15,
   name: "MEDIA_FAILURE"
+}, {
+  no: 16,
+  name: "AGENT_ERROR"
 }]);
 const ReconnectReason = /* @__PURE__ */proto3.makeEnum("livekit.ReconnectReason", [{
   no: 0,
@@ -3917,6 +3920,13 @@ const AudioTrackFeature = /* @__PURE__ */proto3.makeEnum("livekit.AudioTrackFeat
 }, {
   no: 6,
   name: "TF_PRECONNECT_BUFFER"
+}]);
+const PacketTrailerFeature = /* @__PURE__ */proto3.makeEnum("livekit.PacketTrailerFeature", [{
+  no: 0,
+  name: "PTF_USER_TIMESTAMP"
+}, {
+  no: 1,
+  name: "PTF_FRAME_ID"
 }]);
 const Room$1 = /* @__PURE__ */proto3.makeMessageType("livekit.Room", () => [{
   no: 1,
@@ -4069,6 +4079,12 @@ const ParticipantPermission = /* @__PURE__ */proto3.makeMessageType("livekit.Par
   kind: "scalar",
   T: 8
   /* ScalarType.BOOL */
+}, {
+  no: 13,
+  name: "can_manage_agent_session",
+  kind: "scalar",
+  T: 8
+  /* ScalarType.BOOL */
 }]);
 const ParticipantInfo = /* @__PURE__ */proto3.makeMessageType("livekit.ParticipantInfo", () => [{
   no: 1,
@@ -4172,6 +4188,12 @@ const ParticipantInfo = /* @__PURE__ */proto3.makeMessageType("livekit.Participa
   kind: "message",
   T: DataTrackInfo$1,
   repeated: true
+}, {
+  no: 20,
+  name: "client_protocol",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }]);
 const ParticipantInfo_State = /* @__PURE__ */proto3.makeEnum("livekit.ParticipantInfo.State", [{
   no: 0,
@@ -4385,6 +4407,12 @@ const TrackInfo = /* @__PURE__ */proto3.makeMessageType("livekit.TrackInfo", () 
   name: "backup_codec_policy",
   kind: "enum",
   T: proto3.getEnumType(BackupCodecPolicy$1)
+}, {
+  no: 21,
+  name: "packet_trailer_features",
+  kind: "enum",
+  T: proto3.getEnumType(PacketTrailerFeature),
+  repeated: true
 }]);
 const DataTrackInfo$1 = /* @__PURE__ */proto3.makeMessageType("livekit.DataTrackInfo", () => [{
   no: 1,
@@ -4889,6 +4917,12 @@ const RpcRequest = /* @__PURE__ */proto3.makeMessageType("livekit.RpcRequest", (
   kind: "scalar",
   T: 13
   /* ScalarType.UINT32 */
+}, {
+  no: 6,
+  name: "compressed_payload",
+  kind: "scalar",
+  T: 12
+  /* ScalarType.BYTES */
 }]);
 const RpcAck = /* @__PURE__ */proto3.makeMessageType("livekit.RpcAck", () => [{
   no: 1,
@@ -4914,6 +4948,12 @@ const RpcResponse = /* @__PURE__ */proto3.makeMessageType("livekit.RpcResponse",
   name: "error",
   kind: "message",
   T: RpcError$1,
+  oneof: "value"
+}, {
+  no: 4,
+  name: "compressed_payload",
+  kind: "scalar",
+  T: 12,
   oneof: "value"
 }]);
 const RpcError$1 = /* @__PURE__ */proto3.makeMessageType("livekit.RpcError", () => [{
@@ -5062,6 +5102,12 @@ const ClientInfo = /* @__PURE__ */proto3.makeMessageType("livekit.ClientInfo", (
   kind: "scalar",
   T: 9
   /* ScalarType.STRING */
+}, {
+  no: 12,
+  name: "client_protocol",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }]);
 const ClientInfo_SDK = /* @__PURE__ */proto3.makeEnum("livekit.ClientInfo.SDK", [{
   no: 0,
@@ -5383,6 +5429,13 @@ const SubscribedAudioCodec = /* @__PURE__ */proto3.makeMessageType("livekit.Subs
   T: 8
   /* ScalarType.BOOL */
 }]);
+const JobRestartPolicy = /* @__PURE__ */proto3.makeEnum("livekit.JobRestartPolicy", [{
+  no: 0,
+  name: "JRP_ON_FAILURE"
+}, {
+  no: 1,
+  name: "JRP_NEVER"
+}]);
 const RoomAgentDispatch = /* @__PURE__ */proto3.makeMessageType("livekit.RoomAgentDispatch", () => [{
   no: 1,
   name: "agent_name",
@@ -5395,6 +5448,11 @@ const RoomAgentDispatch = /* @__PURE__ */proto3.makeMessageType("livekit.RoomAge
   kind: "scalar",
   T: 9
   /* ScalarType.STRING */
+}, {
+  no: 3,
+  name: "restart_policy",
+  kind: "enum",
+  T: proto3.getEnumType(JobRestartPolicy)
 }]);
 const SignalTarget = /* @__PURE__ */proto3.makeEnum("livekit.SignalTarget", [{
   no: 0,
@@ -5831,6 +5889,12 @@ const AddTrackRequest = /* @__PURE__ */proto3.makeMessageType("livekit.AddTrackR
   name: "audio_features",
   kind: "enum",
   T: proto3.getEnumType(AudioTrackFeature),
+  repeated: true
+}, {
+  no: 18,
+  name: "packet_trailer_features",
+  kind: "enum",
+  T: proto3.getEnumType(PacketTrailerFeature),
   repeated: true
 }]);
 const PublishDataTrackRequest = /* @__PURE__ */proto3.makeMessageType("livekit.PublishDataTrackRequest", () => [{
@@ -6936,63 +7000,6 @@ const MediaSectionsRequirement = /* @__PURE__ */proto3.makeMessageType("livekit.
   T: 13
   /* ScalarType.UINT32 */
 }]);
-const EncodedFileType = /* @__PURE__ */proto3.makeEnum("livekit.EncodedFileType", [{
-  no: 0,
-  name: "DEFAULT_FILETYPE"
-}, {
-  no: 1,
-  name: "MP4"
-}, {
-  no: 2,
-  name: "OGG"
-}, {
-  no: 3,
-  name: "MP3"
-}]);
-const SegmentedFileProtocol = /* @__PURE__ */proto3.makeEnum("livekit.SegmentedFileProtocol", [{
-  no: 0,
-  name: "DEFAULT_SEGMENTED_FILE_PROTOCOL"
-}, {
-  no: 1,
-  name: "HLS_PROTOCOL"
-}]);
-const SegmentedFileSuffix = /* @__PURE__ */proto3.makeEnum("livekit.SegmentedFileSuffix", [{
-  no: 0,
-  name: "INDEX"
-}, {
-  no: 1,
-  name: "TIMESTAMP"
-}]);
-const ImageFileSuffix = /* @__PURE__ */proto3.makeEnum("livekit.ImageFileSuffix", [{
-  no: 0,
-  name: "IMAGE_SUFFIX_INDEX"
-}, {
-  no: 1,
-  name: "IMAGE_SUFFIX_TIMESTAMP"
-}, {
-  no: 2,
-  name: "IMAGE_SUFFIX_NONE_OVERWRITE"
-}]);
-const StreamProtocol = /* @__PURE__ */proto3.makeEnum("livekit.StreamProtocol", [{
-  no: 0,
-  name: "DEFAULT_PROTOCOL"
-}, {
-  no: 1,
-  name: "RTMP"
-}, {
-  no: 2,
-  name: "SRT"
-}]);
-const AudioMixing = /* @__PURE__ */proto3.makeEnum("livekit.AudioMixing", [{
-  no: 0,
-  name: "DEFAULT_MIXING"
-}, {
-  no: 1,
-  name: "DUAL_CHANNEL_AGENT"
-}, {
-  no: 2,
-  name: "DUAL_CHANNEL_ALTERNATE"
-}]);
 const EncodingOptionsPreset = /* @__PURE__ */proto3.makeEnum("livekit.EncodingOptionsPreset", [{
   no: 0,
   name: "H264_720P_30"
@@ -7018,143 +7025,148 @@ const EncodingOptionsPreset = /* @__PURE__ */proto3.makeEnum("livekit.EncodingOp
   no: 7,
   name: "PORTRAIT_H264_1080P_60"
 }]);
-const RoomCompositeEgressRequest = /* @__PURE__ */proto3.makeMessageType("livekit.RoomCompositeEgressRequest", () => [{
+const EncodedFileType = /* @__PURE__ */proto3.makeEnum("livekit.EncodedFileType", [{
+  no: 0,
+  name: "DEFAULT_FILETYPE"
+}, {
   no: 1,
-  name: "room_name",
-  kind: "scalar",
-  T: 9
-  /* ScalarType.STRING */
+  name: "MP4"
 }, {
   no: 2,
-  name: "layout",
-  kind: "scalar",
-  T: 9
-  /* ScalarType.STRING */
+  name: "OGG"
 }, {
   no: 3,
-  name: "audio_only",
-  kind: "scalar",
-  T: 8
-  /* ScalarType.BOOL */
+  name: "MP3"
+}]);
+const StreamProtocol = /* @__PURE__ */proto3.makeEnum("livekit.StreamProtocol", [{
+  no: 0,
+  name: "DEFAULT_PROTOCOL"
 }, {
-  no: 15,
-  name: "audio_mixing",
-  kind: "enum",
-  T: proto3.getEnumType(AudioMixing)
+  no: 1,
+  name: "RTMP"
+}, {
+  no: 2,
+  name: "SRT"
+}, {
+  no: 3,
+  name: "WEBSOCKET"
+}]);
+const SegmentedFileProtocol = /* @__PURE__ */proto3.makeEnum("livekit.SegmentedFileProtocol", [{
+  no: 0,
+  name: "DEFAULT_SEGMENTED_FILE_PROTOCOL"
+}, {
+  no: 1,
+  name: "HLS_PROTOCOL"
+}]);
+const SegmentedFileSuffix = /* @__PURE__ */proto3.makeEnum("livekit.SegmentedFileSuffix", [{
+  no: 0,
+  name: "INDEX"
+}, {
+  no: 1,
+  name: "TIMESTAMP"
+}]);
+const ImageFileSuffix = /* @__PURE__ */proto3.makeEnum("livekit.ImageFileSuffix", [{
+  no: 0,
+  name: "IMAGE_SUFFIX_INDEX"
+}, {
+  no: 1,
+  name: "IMAGE_SUFFIX_TIMESTAMP"
+}, {
+  no: 2,
+  name: "IMAGE_SUFFIX_NONE_OVERWRITE"
+}]);
+const AudioMixing = /* @__PURE__ */proto3.makeEnum("livekit.AudioMixing", [{
+  no: 0,
+  name: "DEFAULT_MIXING"
+}, {
+  no: 1,
+  name: "DUAL_CHANNEL_AGENT"
+}, {
+  no: 2,
+  name: "DUAL_CHANNEL_ALTERNATE"
+}]);
+const EncodingOptions = /* @__PURE__ */proto3.makeMessageType("livekit.EncodingOptions", () => [{
+  no: 1,
+  name: "width",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
+}, {
+  no: 2,
+  name: "height",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
+}, {
+  no: 3,
+  name: "depth",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }, {
   no: 4,
-  name: "video_only",
+  name: "framerate",
   kind: "scalar",
-  T: 8
-  /* ScalarType.BOOL */
+  T: 5
+  /* ScalarType.INT32 */
 }, {
   no: 5,
-  name: "custom_base_url",
-  kind: "scalar",
-  T: 9
-  /* ScalarType.STRING */
+  name: "audio_codec",
+  kind: "enum",
+  T: proto3.getEnumType(AudioCodec)
 }, {
   no: 6,
-  name: "file",
-  kind: "message",
-  T: EncodedFileOutput,
-  oneof: "output"
+  name: "audio_bitrate",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }, {
   no: 7,
-  name: "stream",
-  kind: "message",
-  T: StreamOutput,
-  oneof: "output"
-}, {
-  no: 10,
-  name: "segments",
-  kind: "message",
-  T: SegmentedFileOutput,
-  oneof: "output"
+  name: "audio_frequency",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }, {
   no: 8,
-  name: "preset",
+  name: "video_codec",
   kind: "enum",
-  T: proto3.getEnumType(EncodingOptionsPreset),
-  oneof: "options"
+  T: proto3.getEnumType(VideoCodec)
 }, {
   no: 9,
-  name: "advanced",
-  kind: "message",
-  T: EncodingOptions,
-  oneof: "options"
+  name: "video_bitrate",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
+}, {
+  no: 10,
+  name: "key_frame_interval",
+  kind: "scalar",
+  T: 1
+  /* ScalarType.DOUBLE */
 }, {
   no: 11,
-  name: "file_outputs",
-  kind: "message",
-  T: EncodedFileOutput,
-  repeated: true
+  name: "audio_quality",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }, {
   no: 12,
-  name: "stream_outputs",
-  kind: "message",
-  T: StreamOutput,
-  repeated: true
-}, {
-  no: 13,
-  name: "segment_outputs",
-  kind: "message",
-  T: SegmentedFileOutput,
-  repeated: true
-}, {
-  no: 14,
-  name: "image_outputs",
-  kind: "message",
-  T: ImageOutput,
-  repeated: true
-}, {
-  no: 16,
-  name: "webhooks",
-  kind: "message",
-  T: WebhookConfig,
-  repeated: true
+  name: "video_quality",
+  kind: "scalar",
+  T: 5
+  /* ScalarType.INT32 */
 }]);
-const EncodedFileOutput = /* @__PURE__ */proto3.makeMessageType("livekit.EncodedFileOutput", () => [{
+const StreamOutput = /* @__PURE__ */proto3.makeMessageType("livekit.StreamOutput", () => [{
   no: 1,
-  name: "file_type",
+  name: "protocol",
   kind: "enum",
-  T: proto3.getEnumType(EncodedFileType)
+  T: proto3.getEnumType(StreamProtocol)
 }, {
   no: 2,
-  name: "filepath",
+  name: "urls",
   kind: "scalar",
-  T: 9
-  /* ScalarType.STRING */
-}, {
-  no: 6,
-  name: "disable_manifest",
-  kind: "scalar",
-  T: 8
-  /* ScalarType.BOOL */
-}, {
-  no: 3,
-  name: "s3",
-  kind: "message",
-  T: S3Upload,
-  oneof: "output"
-}, {
-  no: 4,
-  name: "gcp",
-  kind: "message",
-  T: GCPUpload,
-  oneof: "output"
-}, {
-  no: 5,
-  name: "azure",
-  kind: "message",
-  T: AzureBlobUpload,
-  oneof: "output"
-}, {
-  no: 7,
-  name: "aliOSS",
-  kind: "message",
-  T: AliOSSUpload,
-  oneof: "output"
+  T: 9,
+  repeated: true
 }]);
 const SegmentedFileOutput = /* @__PURE__ */proto3.makeMessageType("livekit.SegmentedFileOutput", () => [{
   no: 1,
@@ -7455,89 +7467,6 @@ const ProxyConfig = /* @__PURE__ */proto3.makeMessageType("livekit.ProxyConfig",
   T: 9
   /* ScalarType.STRING */
 }]);
-const StreamOutput = /* @__PURE__ */proto3.makeMessageType("livekit.StreamOutput", () => [{
-  no: 1,
-  name: "protocol",
-  kind: "enum",
-  T: proto3.getEnumType(StreamProtocol)
-}, {
-  no: 2,
-  name: "urls",
-  kind: "scalar",
-  T: 9,
-  repeated: true
-}]);
-const EncodingOptions = /* @__PURE__ */proto3.makeMessageType("livekit.EncodingOptions", () => [{
-  no: 1,
-  name: "width",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 2,
-  name: "height",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 3,
-  name: "depth",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 4,
-  name: "framerate",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 5,
-  name: "audio_codec",
-  kind: "enum",
-  T: proto3.getEnumType(AudioCodec)
-}, {
-  no: 6,
-  name: "audio_bitrate",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 11,
-  name: "audio_quality",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 7,
-  name: "audio_frequency",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 8,
-  name: "video_codec",
-  kind: "enum",
-  T: proto3.getEnumType(VideoCodec)
-}, {
-  no: 9,
-  name: "video_bitrate",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 12,
-  name: "video_quality",
-  kind: "scalar",
-  T: 5
-  /* ScalarType.INT32 */
-}, {
-  no: 10,
-  name: "key_frame_interval",
-  kind: "scalar",
-  T: 1
-  /* ScalarType.DOUBLE */
-}]);
 const AutoParticipantEgress = /* @__PURE__ */proto3.makeMessageType("livekit.AutoParticipantEgress", () => [{
   no: 1,
   name: "preset",
@@ -7595,6 +7524,144 @@ const AutoTrackEgress = /* @__PURE__ */proto3.makeMessageType("livekit.AutoTrack
   oneof: "output"
 }, {
   no: 6,
+  name: "aliOSS",
+  kind: "message",
+  T: AliOSSUpload,
+  oneof: "output"
+}]);
+const RoomCompositeEgressRequest = /* @__PURE__ */proto3.makeMessageType("livekit.RoomCompositeEgressRequest", () => [{
+  no: 1,
+  name: "room_name",
+  kind: "scalar",
+  T: 9
+  /* ScalarType.STRING */
+}, {
+  no: 2,
+  name: "layout",
+  kind: "scalar",
+  T: 9
+  /* ScalarType.STRING */
+}, {
+  no: 3,
+  name: "audio_only",
+  kind: "scalar",
+  T: 8
+  /* ScalarType.BOOL */
+}, {
+  no: 15,
+  name: "audio_mixing",
+  kind: "enum",
+  T: proto3.getEnumType(AudioMixing)
+}, {
+  no: 4,
+  name: "video_only",
+  kind: "scalar",
+  T: 8
+  /* ScalarType.BOOL */
+}, {
+  no: 5,
+  name: "custom_base_url",
+  kind: "scalar",
+  T: 9
+  /* ScalarType.STRING */
+}, {
+  no: 6,
+  name: "file",
+  kind: "message",
+  T: EncodedFileOutput,
+  oneof: "output"
+}, {
+  no: 7,
+  name: "stream",
+  kind: "message",
+  T: StreamOutput,
+  oneof: "output"
+}, {
+  no: 10,
+  name: "segments",
+  kind: "message",
+  T: SegmentedFileOutput,
+  oneof: "output"
+}, {
+  no: 8,
+  name: "preset",
+  kind: "enum",
+  T: proto3.getEnumType(EncodingOptionsPreset),
+  oneof: "options"
+}, {
+  no: 9,
+  name: "advanced",
+  kind: "message",
+  T: EncodingOptions,
+  oneof: "options"
+}, {
+  no: 11,
+  name: "file_outputs",
+  kind: "message",
+  T: EncodedFileOutput,
+  repeated: true
+}, {
+  no: 12,
+  name: "stream_outputs",
+  kind: "message",
+  T: StreamOutput,
+  repeated: true
+}, {
+  no: 13,
+  name: "segment_outputs",
+  kind: "message",
+  T: SegmentedFileOutput,
+  repeated: true
+}, {
+  no: 14,
+  name: "image_outputs",
+  kind: "message",
+  T: ImageOutput,
+  repeated: true
+}, {
+  no: 16,
+  name: "webhooks",
+  kind: "message",
+  T: WebhookConfig,
+  repeated: true
+}]);
+const EncodedFileOutput = /* @__PURE__ */proto3.makeMessageType("livekit.EncodedFileOutput", () => [{
+  no: 1,
+  name: "file_type",
+  kind: "enum",
+  T: proto3.getEnumType(EncodedFileType)
+}, {
+  no: 2,
+  name: "filepath",
+  kind: "scalar",
+  T: 9
+  /* ScalarType.STRING */
+}, {
+  no: 6,
+  name: "disable_manifest",
+  kind: "scalar",
+  T: 8
+  /* ScalarType.BOOL */
+}, {
+  no: 3,
+  name: "s3",
+  kind: "message",
+  T: S3Upload,
+  oneof: "output"
+}, {
+  no: 4,
+  name: "gcp",
+  kind: "message",
+  T: GCPUpload,
+  oneof: "output"
+}, {
+  no: 5,
+  name: "azure",
+  kind: "message",
+  T: AzureBlobUpload,
+  oneof: "output"
+}, {
+  no: 7,
   name: "aliOSS",
   kind: "message",
   T: AliOSSUpload,
@@ -7675,6 +7742,16 @@ const RoomConfiguration = /* @__PURE__ */proto3.makeMessageType("livekit.RoomCon
   kind: "message",
   T: RoomAgentDispatch,
   repeated: true
+}, {
+  no: 12,
+  name: "tags",
+  kind: "map",
+  K: 9,
+  V: {
+    kind: "scalar",
+    T: 9
+    /* ScalarType.STRING */
+  }
 }]);
 const TokenSourceRequest = /* @__PURE__ */proto3.makeMessageType("livekit.TokenSourceRequest", () => [{
   no: 1,
@@ -8627,6 +8704,11 @@ function wrapPeerConnectionEvent(window, eventNameToWrap, wrapper) {
   if (!window.RTCPeerConnection) {
     return;
   }
+  const addEventListener = Object.getOwnPropertyDescriptor(EventTarget.prototype, 'addEventListener');
+  if (!addEventListener.writable) {
+    log$4('Unable to polyfill events');
+    return;
+  }
   const proto = window.RTCPeerConnection.prototype;
   const nativeAddEventListener = proto.addEventListener;
   proto.addEventListener = function (nativeEventName, cb) {
@@ -8769,7 +8851,7 @@ function detectBrowser(window) {
     // Chrome 74 removed webkitGetUserMedia on http as well so we need the
     // more complicated fallback to webkitRTCPeerConnection.
     result.browser = 'chrome';
-    result.version = parseInt(extractVersion(navigator.userAgent, /Chrom(e|ium)\/(\d+)\./, 2));
+    result.version = parseInt(extractVersion(navigator.userAgent, /Chrom(e|ium)\/(\d+)\./, 2)) || null;
   } else if (window.RTCPeerConnection && navigator.userAgent.match(/AppleWebKit\/(\d+)\./)) {
     // Safari.
     result.browser = 'safari';
@@ -9043,7 +9125,11 @@ function shimGetUserMedia$2(window, browserDetails) {
 function shimMediaStream(window) {
   window.MediaStream = window.MediaStream || window.webkitMediaStream;
 }
-function shimOnTrack$1(window) {
+function shimOnTrack$1(window, browserDetails) {
+  if (browserDetails.version > 102) {
+    // Unified plan is supported so no need to do anything.
+    return;
+  }
   if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in window.RTCPeerConnection.prototype)) {
     Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
       get() {
@@ -9206,7 +9292,10 @@ function shimGetSendersWithDtmf(window) {
     });
   }
 }
-function shimSenderReceiverGetStats(window) {
+function shimSenderReceiverGetStats(window, browserDetails) {
+  if (browserDetails.version >= 67) {
+    return;
+  }
   if (!(typeof window === 'object' && window.RTCPeerConnection && window.RTCRtpSender && window.RTCRtpReceiver)) {
     return;
   }
@@ -9573,6 +9662,10 @@ function shimPeerConnection$1(window, browserDetails) {
 
 // Attempt to fix ONN in plan-b mode.
 function fixNegotiationNeeded(window, browserDetails) {
+  if (browserDetails.version > 102) {
+    // Plan-B is no longer supported.
+    return;
+  }
   wrapPeerConnectionEvent(window, 'negotiationneeded', e => {
     const pc = e.target;
     if (browserDetails.version < 72 || pc.getConfiguration && pc.getConfiguration().sdpSemantics === 'plan-b') {
@@ -9708,6 +9801,15 @@ function shimPeerConnection(window, browserDetails) {
       window.RTCPeerConnection.prototype[method] = methodObj[method];
     });
   }
+}
+function shimGetStats(window, browserDetails) {
+  if (typeof window !== 'object' || !(window.RTCPeerConnection || window.mozRTCPeerConnection)) {
+    return; // probably media.peerconnection.enabled=false in about:config
+  }
+  if (browserDetails.version >= 151) {
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1056433
+    return;
+  }
   const modernStatsTypes = {
     inboundrtp: 'inbound-rtp',
     outboundrtp: 'outbound-rtp',
@@ -9718,6 +9820,10 @@ function shimPeerConnection(window, browserDetails) {
   const nativeGetStats = window.RTCPeerConnection.prototype.getStats;
   window.RTCPeerConnection.prototype.getStats = function getStats() {
     const [selector, onSucc, onErr] = arguments;
+    if (this.signalingState === 'closed') {
+      // No longer required in FF151+
+      return Promise.resolve(new Map());
+    }
     return nativeGetStats.apply(this, [selector || null]).then(stats => {
       if (browserDetails.version < 53 && !onSucc) {
         // Shim only promise getStats with spec-hyphens in type names
@@ -9932,7 +10038,7 @@ function shimCreateAnswer(window) {
     }
     return origCreateAnswer.apply(this, arguments);
   };
-}var firefoxShim=/*#__PURE__*/Object.freeze({__proto__:null,shimAddTransceiver:shimAddTransceiver,shimCreateAnswer:shimCreateAnswer,shimCreateOffer:shimCreateOffer,shimGetDisplayMedia:shimGetDisplayMedia,shimGetParameters:shimGetParameters,shimGetUserMedia:shimGetUserMedia$1,shimOnTrack:shimOnTrack,shimPeerConnection:shimPeerConnection,shimRTCDataChannel:shimRTCDataChannel,shimReceiverGetStats:shimReceiverGetStats,shimRemoveStream:shimRemoveStream,shimSenderGetStats:shimSenderGetStats});/*
+}var firefoxShim=/*#__PURE__*/Object.freeze({__proto__:null,shimAddTransceiver:shimAddTransceiver,shimCreateAnswer:shimCreateAnswer,shimCreateOffer:shimCreateOffer,shimGetDisplayMedia:shimGetDisplayMedia,shimGetParameters:shimGetParameters,shimGetStats:shimGetStats,shimGetUserMedia:shimGetUserMedia$1,shimOnTrack:shimOnTrack,shimPeerConnection:shimPeerConnection,shimRTCDataChannel:shimRTCDataChannel,shimReceiverGetStats:shimReceiverGetStats,shimRemoveStream:shimRemoveStream,shimSenderGetStats:shimSenderGetStats});/*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
  *  Use of this source code is governed by a BSD-style license
@@ -10367,7 +10473,7 @@ function requireSdp() {
       const type = candidate.type;
       sdp.push('typ');
       sdp.push(type);
-      if (type !== 'host' && candidate.relatedAddress && candidate.relatedPort) {
+      if (type !== 'host' && candidate.relatedAddress && candidate.relatedPort !== undefined) {
         sdp.push('raddr');
         sdp.push(candidate.relatedAddress);
         sdp.push('rport');
@@ -10440,6 +10546,8 @@ function requireSdp() {
     // Parses a fmtp line, returns dictionary. Sample input:
     // a=fmtp:96 vbr=on;cng=on
     // Also deals with vbr=on; cng=on
+    // Non-key-value such as telephone-events `0-15` get parsed as
+    // {`0-15`:undefined}
     SDPUtils.parseFmtp = function (line) {
       const parsed = {};
       let kv;
@@ -11213,15 +11321,21 @@ function shimMaxMessageSize(window, browserDetails) {
     return origSetRemoteDescription.apply(this, arguments);
   };
 }
-function shimSendThrowTypeError(window) {
+function shimSendThrowTypeError(window, browserDetails) {
   if (!(window.RTCPeerConnection && 'createDataChannel' in window.RTCPeerConnection.prototype)) {
+    return;
+  }
+  if (browserDetails.browser === 'chrome' && browserDetails.version > 149) {
+    // Fixed by https://issues.chromium.org/issues/490588131
     return;
   }
 
   // Note: Although Firefox >= 57 has a native implementation, the maximum
   //       message size can be reset for all data channels at a later stage.
   //       See: https://bugzilla.mozilla.org/show_bug.cgi?id=1426831
-
+  if (browserDetails.browser === 'firefox' && browserDetails.version > 60) {
+    return;
+  }
   function wrapDcSend(dc, pc) {
     const origDataChannelSend = dc.send;
     dc.send = function send() {
@@ -11459,16 +11573,16 @@ function adapterFactory() {
       shimGetUserMedia$2(window, browserDetails);
       shimMediaStream(window);
       shimPeerConnection$1(window, browserDetails);
-      shimOnTrack$1(window);
+      shimOnTrack$1(window, browserDetails);
       shimAddTrackRemoveTrack(window, browserDetails);
       shimGetSendersWithDtmf(window);
-      shimSenderReceiverGetStats(window);
+      shimSenderReceiverGetStats(window, browserDetails);
       fixNegotiationNeeded(window, browserDetails);
       shimRTCIceCandidate(window);
       shimRTCIceCandidateRelayProtocol(window);
       shimConnectionState(window);
       shimMaxMessageSize(window, browserDetails);
-      shimSendThrowTypeError(window);
+      shimSendThrowTypeError(window, browserDetails);
       removeExtmapAllowMixed(window, browserDetails);
       break;
     case 'firefox':
@@ -11485,6 +11599,7 @@ function adapterFactory() {
       shimParameterlessSetLocalDescription(window);
       shimGetUserMedia$1(window, browserDetails);
       shimPeerConnection(window, browserDetails);
+      shimGetStats(window, browserDetails);
       shimOnTrack(window);
       shimRemoveStream(window);
       shimSenderGetStats(window);
@@ -11497,7 +11612,7 @@ function adapterFactory() {
       shimRTCIceCandidate(window);
       shimConnectionState(window);
       shimMaxMessageSize(window, browserDetails);
-      shimSendThrowTypeError(window);
+      shimSendThrowTypeError(window, browserDetails);
       break;
     case 'safari':
       if (!safariShim || !options.shimSafari) {
@@ -11522,7 +11637,7 @@ function adapterFactory() {
       shimRTCIceCandidate(window);
       shimRTCIceCandidateRelayProtocol(window);
       shimMaxMessageSize(window, browserDetails);
-      shimSendThrowTypeError(window);
+      shimSendThrowTypeError(window, browserDetails);
       removeExtmapAllowMixed(window, browserDetails);
       break;
     default:
@@ -11629,7 +11744,7 @@ function getMatch(exp, ua) {
 }
 function getOSVersion(ua) {
   return ua.includes('mac os') ? getMatch(/\(.+?(\d+_\d+(:?_\d+)?)/, ua, 1).replace(/_/g, '.') : undefined;
-}var version$1 = "2.18.1";const version = version$1;
+}var version$1 = "2.18.6";const version = version$1;
 const protocolVersion = 16;/** Base error that all LiveKit specific custom errors inherit from. */
 class LivekitError extends Error {
   constructor(code, message, options) {
@@ -12383,6 +12498,8 @@ var EngineEvent;
   EngineEvent["DataTrackSubscriberHandles"] = "dataTrackSubscriberHandles";
   EngineEvent["DataTrackPacketReceived"] = "dataTrackPacketReceived";
   EngineEvent["Joined"] = "joined";
+  EngineEvent["TokenRefreshed"] = "tokenRefreshed";
+  EngineEvent["ServerRegionsReported"] = "serverRegionsReported";
 })(EngineEvent || (EngineEvent = {}));
 var TrackEvent;
 (function (TrackEvent) {
@@ -15938,6 +16055,10 @@ class SignalClient {
         const resp = yield fetch(validateUrl);
         switch (resp.status) {
           case 404:
+            const errorMsg = yield resp.text();
+            if (errorMsg.includes('requested room does not exist')) {
+              return ConnectionError.notAllowed(errorMsg, resp.status);
+            }
             return ConnectionError.serviceNotFound('v1 RTC path not found. Consider upgrading your LiveKit server version', 'v0-rtc');
           case 401:
           case 403:
@@ -17043,6 +17164,7 @@ class PCTransport extends eventsExports.EventEmitter {
       if (!this._pc) {
         return;
       }
+      this.pendingInitialOffer = undefined;
       this._pc.close();
       this._pc.onconnectionstatechange = null;
       this._pc.oniceconnectionstatechange = null;
@@ -17130,7 +17252,7 @@ class PCTransport extends eventsExports.EventEmitter {
         this.remoteStereoMids = stereoMids;
         this.remoteNackMids = nackMids;
       } else if (sd.type === 'answer') {
-        if (this.pendingInitialOffer) {
+        if (this.pendingInitialOffer && this._pc) {
           const initialOffer = this.pendingInitialOffer;
           this.pendingInitialOffer = undefined;
           const sdpParsed = libExports.parse((_a = initialOffer.sdp) !== null && _a !== void 0 ? _a : '');
@@ -17452,8 +17574,9 @@ class PCTransport extends eventsExports.EventEmitter {
   }
   setMungedSDP(sd, munged, remote) {
     return __awaiter(this, void 0, void 0, function* () {
+      var _a, _b;
+      const originalSdp = sd.sdp;
       if (munged) {
-        const originalSdp = sd.sdp;
         sd.sdp = munged;
         try {
           this.log.debug("setting munged ".concat(remote ? 'remote' : 'local', " description"), this.logContext);
@@ -17466,16 +17589,17 @@ class PCTransport extends eventsExports.EventEmitter {
         } catch (e) {
           this.log.warn("not able to set ".concat(sd.type, ", falling back to unmodified sdp"), Object.assign(Object.assign({}, this.logContext), {
             error: e,
-            sdp: munged
+            mungedSdp: munged,
+            originalSdp
           }));
           sd.sdp = originalSdp;
         }
       }
       try {
         if (remote) {
-          yield this.pc.setRemoteDescription(sd);
+          yield (_a = this._pc) === null || _a === void 0 ? void 0 : _a.setRemoteDescription(sd);
         } else {
-          yield this.pc.setLocalDescription(sd);
+          yield (_b = this._pc) === null || _b === void 0 ? void 0 : _b.setLocalDescription(sd);
         }
       } catch (e) {
         let msg = 'unknown error';
@@ -17488,6 +17612,9 @@ class PCTransport extends eventsExports.EventEmitter {
           error: msg,
           sdp: sd.sdp
         };
+        if (munged && munged !== originalSdp) {
+          fields.mungedSdp = munged;
+        }
         if (!remote && this.pc.remoteDescription) {
           fields.remoteSdp = this.pc.remoteDescription;
         }
@@ -17511,9 +17638,6 @@ class PCTransport extends eventsExports.EventEmitter {
         let maxID = 0;
         sdp.media.forEach(m => {
           var _a;
-          if (m.type !== 'video') {
-            return;
-          }
           (_a = m.ext) === null || _a === void 0 ? void 0 : _a.forEach(ext => {
             if (ext.value > maxID) {
               maxID = ext.value;
@@ -17980,192 +18104,6 @@ class PCTransportManager {
       }();
     });
   }
-}const DEFAULT_MAX_AGE_MS = 5000;
-const STOP_REFETCH_DELAY_MS = 30000;
-class RegionUrlProvider {
-  static fetchRegionSettings(serverUrl, token, signal) {
-    return __awaiter(this, void 0, void 0, function* () {
-      const unlock = yield RegionUrlProvider.fetchLock.lock();
-      try {
-        const regionSettingsResponse = yield fetch("".concat(getCloudConfigUrl(serverUrl), "/regions"), {
-          headers: {
-            authorization: "Bearer ".concat(token)
-          },
-          signal
-        });
-        if (regionSettingsResponse.ok) {
-          const maxAge = extractMaxAgeFromRequestHeaders(regionSettingsResponse.headers);
-          const maxAgeInMs = maxAge ? maxAge * 1000 : DEFAULT_MAX_AGE_MS;
-          const regionSettings = yield regionSettingsResponse.json();
-          return {
-            regionSettings,
-            updatedAtInMs: Date.now(),
-            maxAgeInMs
-          };
-        } else {
-          if (regionSettingsResponse.status === 401) {
-            throw ConnectionError.notAllowed("Could not fetch region settings: ".concat(regionSettingsResponse.statusText), regionSettingsResponse.status);
-          } else {
-            throw ConnectionError.internal("Could not fetch region settings: ".concat(regionSettingsResponse.statusText));
-          }
-        }
-      } catch (e) {
-        if (e instanceof ConnectionError) {
-          // rethrow connection errors
-          throw e;
-        } else if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
-          throw ConnectionError.cancelled("Region fetching was aborted");
-        } else {
-          // wrap other errors as connection errors
-          throw ConnectionError.serverUnreachable("Could not fetch region settings, ".concat(e instanceof Error ? "".concat(e.name, ": ").concat(e.message) : e));
-        }
-      } finally {
-        unlock();
-      }
-    });
-  }
-  static scheduleRefetch(url, token, maxAgeInMs) {
-    return __awaiter(this, void 0, void 0, function* () {
-      const timeout = RegionUrlProvider.settingsTimeouts.get(url.hostname);
-      clearTimeout(timeout);
-      RegionUrlProvider.settingsTimeouts.set(url.hostname, setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-        try {
-          const newSettings = yield RegionUrlProvider.fetchRegionSettings(url, token);
-          RegionUrlProvider.updateCachedRegionSettings(url, token, newSettings);
-        } catch (error) {
-          if (error instanceof ConnectionError && error.reason === ConnectionErrorReason.NotAllowed) {
-            livekitLogger.debug('token is not valid, cancelling auto region refresh');
-            return;
-          }
-          livekitLogger.debug('auto refetching of region settings failed', {
-            error
-          });
-          // continue retrying with the same max age
-          RegionUrlProvider.scheduleRefetch(url, token, maxAgeInMs);
-        }
-      }), maxAgeInMs));
-    });
-  }
-  static updateCachedRegionSettings(url, token, settings) {
-    RegionUrlProvider.cache.set(url.hostname, settings);
-    RegionUrlProvider.scheduleRefetch(url, token, settings.maxAgeInMs);
-  }
-  static stopRefetch(hostname) {
-    const timeout = RegionUrlProvider.settingsTimeouts.get(hostname);
-    if (timeout) {
-      clearTimeout(timeout);
-      RegionUrlProvider.settingsTimeouts.delete(hostname);
-    }
-  }
-  static scheduleCleanup(hostname) {
-    let tracker = RegionUrlProvider.connectionTrackers.get(hostname);
-    if (!tracker) {
-      return;
-    }
-    // Cancel any existing cleanup timeout
-    if (tracker.cleanupTimeout) {
-      clearTimeout(tracker.cleanupTimeout);
-    }
-    // Schedule cleanup to stop refetch after delay
-    tracker.cleanupTimeout = setTimeout(() => {
-      const currentTracker = RegionUrlProvider.connectionTrackers.get(hostname);
-      if (currentTracker && currentTracker.connectionCount === 0) {
-        livekitLogger.debug('stopping region refetch after disconnect delay', {
-          hostname
-        });
-        RegionUrlProvider.stopRefetch(hostname);
-      }
-      if (currentTracker) {
-        currentTracker.cleanupTimeout = undefined;
-      }
-    }, STOP_REFETCH_DELAY_MS);
-  }
-  static cancelCleanup(hostname) {
-    const tracker = RegionUrlProvider.connectionTrackers.get(hostname);
-    if (tracker === null || tracker === void 0 ? void 0 : tracker.cleanupTimeout) {
-      clearTimeout(tracker.cleanupTimeout);
-      tracker.cleanupTimeout = undefined;
-    }
-  }
-  notifyConnected() {
-    const hostname = this.serverUrl.hostname;
-    let tracker = RegionUrlProvider.connectionTrackers.get(hostname);
-    if (!tracker) {
-      tracker = {
-        connectionCount: 0
-      };
-      RegionUrlProvider.connectionTrackers.set(hostname, tracker);
-    }
-    tracker.connectionCount++;
-    // Cancel any scheduled cleanup since we have an active connection
-    RegionUrlProvider.cancelCleanup(hostname);
-  }
-  notifyDisconnected() {
-    const hostname = this.serverUrl.hostname;
-    const tracker = RegionUrlProvider.connectionTrackers.get(hostname);
-    if (!tracker) {
-      return;
-    }
-    tracker.connectionCount = Math.max(0, tracker.connectionCount - 1);
-    // If no more connections, schedule cleanup
-    if (tracker.connectionCount === 0) {
-      RegionUrlProvider.scheduleCleanup(hostname);
-    }
-  }
-  constructor(url, token) {
-    this.attemptedRegions = [];
-    this.serverUrl = new URL(url);
-    this.token = token;
-  }
-  updateToken(token) {
-    this.token = token;
-  }
-  isCloud() {
-    return isCloud(this.serverUrl);
-  }
-  getServerUrl() {
-    return this.serverUrl;
-  }
-  /** @internal */
-  fetchRegionSettings(abortSignal) {
-    return __awaiter(this, void 0, void 0, function* () {
-      return RegionUrlProvider.fetchRegionSettings(this.serverUrl, this.token, abortSignal);
-    });
-  }
-  getNextBestRegionUrl(abortSignal) {
-    return __awaiter(this, void 0, void 0, function* () {
-      if (!this.isCloud()) {
-        throw Error('region availability is only supported for LiveKit Cloud domains');
-      }
-      let cachedSettings = RegionUrlProvider.cache.get(this.serverUrl.hostname);
-      if (!cachedSettings || Date.now() - cachedSettings.updatedAtInMs > cachedSettings.maxAgeInMs) {
-        cachedSettings = yield this.fetchRegionSettings(abortSignal);
-        RegionUrlProvider.updateCachedRegionSettings(this.serverUrl, this.token, cachedSettings);
-      }
-      const regionsLeft = cachedSettings.regionSettings.regions.filter(region => !this.attemptedRegions.find(attempted => attempted.url === region.url));
-      if (regionsLeft.length > 0) {
-        const nextRegion = regionsLeft[0];
-        this.attemptedRegions.push(nextRegion);
-        livekitLogger.debug("next region: ".concat(nextRegion.region));
-        return nextRegion.url;
-      } else {
-        return null;
-      }
-    });
-  }
-  resetAttempts() {
-    this.attemptedRegions = [];
-  }
-  setServerReportedRegions(settings) {
-    RegionUrlProvider.updateCachedRegionSettings(this.serverUrl, this.token, settings);
-  }
-}
-RegionUrlProvider.cache = new Map();
-RegionUrlProvider.settingsTimeouts = new Map();
-RegionUrlProvider.connectionTrackers = new Map();
-RegionUrlProvider.fetchLock = new _();
-function getCloudConfigUrl(serverUrl) {
-  return "".concat(serverUrl.protocol.replace('ws', 'http'), "//").concat(serverUrl.host, "/settings");
 }// SPDX-FileCopyrightText: 2024 LiveKit, Inc.
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -18631,10 +18569,23 @@ class LocalTrack extends Track {
         if (stopProcessor && this.processor) {
           yield this.internalStopProcessor();
         }
-        return this;
       } finally {
         unlock();
       }
+      yield this.onSenderTrackSwapped();
+      return this;
+    });
+  }
+  /**
+   * Hook invoked after the MediaStreamTrack on the sender has been swapped
+   * (via replaceTrack, setProcessor, or stopProcessor). Fires outside the
+   * trackChangeLock so subclasses can do asynchronous work such as polling
+   * for new dimensions without blocking other track operations.
+   */
+  onSenderTrackSwapped() {
+    return __awaiter(this, void 0, void 0, function* () {
+      // base implementation is a no-op; LocalVideoTrack overrides this to
+      // recompute sender encoding parameters.
     });
   }
   restart(constraints, isUnmuting) {
@@ -18879,6 +18830,7 @@ class LocalTrack extends Track {
         } finally {
           unlock();
         }
+        yield _this3.onSenderTrackSwapped();
       }();
     });
   }
@@ -18901,6 +18853,7 @@ class LocalTrack extends Track {
         } finally {
           unlock();
         }
+        yield _this4.onSenderTrackSwapped();
       }();
     });
   }
@@ -19844,6 +19797,106 @@ class LocalVideoTrack extends LocalTrack {
           if (e_3) throw e_3.error;
         }
       }
+      // The new MediaStreamTrack may have different dimensions than the previous one
+      // (e.g. switching between cameras with different native resolutions), which would
+      // leave the sender's encoding parameters (scaleResolutionDownBy, maxBitrate, etc.)
+      // based on the old dimensions. Recompute them so the encoded output matches the
+      // new source.
+      yield this.onSenderTrackSwapped();
+    });
+  }
+  onSenderTrackSwapped() {
+    return __awaiter(this, void 0, void 0, function* () {
+      yield this.refreshSenderEncodings();
+    });
+  }
+  /**
+   * Recomputes encoding parameters for this track's senders based on the current
+   * MediaStreamTrack dimensions and reapplies them via setParameters. This is a no-op
+   * if the track hasn't been published yet or if the track is in performance-optimized
+   * mode (which manages its own encodings).
+   */
+  refreshSenderEncodings() {
+    return __awaiter(this, void 0, void 0, function* () {
+      var _a;
+      if (!this.sender || !this.publishOptions || this.optimizeForPerformance) {
+        return;
+      }
+      const unlock = yield this.senderLock.lock();
+      try {
+        let dims;
+        try {
+          dims = yield this.waitForDimensions();
+        } catch (e) {
+          this.log.warn('could not determine new track dimensions, skipping encoding recompute', Object.assign(Object.assign({}, this.logContext), {
+            error: e
+          }));
+          return;
+        }
+        if (this.lastEncodedDimensions && this.lastEncodedDimensions.width === dims.width && this.lastEncodedDimensions.height === dims.height) {
+          return;
+        }
+        const isScreenShare = this.source === Track.Source.ScreenShare;
+        const newEncodings = computeVideoEncodings(isScreenShare, dims.width, dims.height, Object.assign({}, this.publishOptions));
+        yield this.applyEncodingsToSender(this.sender, newEncodings);
+        this.encodings = newEncodings;
+        this.lastEncodedDimensions = dims;
+        for (const [codec, sc] of this.simulcastCodecs) {
+          if (!sc.sender || ((_a = sc.sender.transport) === null || _a === void 0 ? void 0 : _a.state) === 'closed') {
+            continue;
+          }
+          if (!isBackupVideoCodec(codec)) {
+            continue;
+          }
+          const backupOpts = Object.assign({}, this.publishOptions);
+          const backupEncodings = computeTrackBackupEncodings(this, codec, backupOpts);
+          if (!backupEncodings) {
+            continue;
+          }
+          yield this.applyEncodingsToSender(sc.sender, backupEncodings);
+          sc.encodings = backupEncodings;
+        }
+      } catch (e) {
+        this.log.warn('failed to apply recomputed encodings', Object.assign(Object.assign({}, this.logContext), {
+          error: e
+        }));
+      } finally {
+        unlock();
+      }
+    });
+  }
+  applyEncodingsToSender(sender, encodings) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const params = sender.getParameters();
+      if (!params.encodings || params.encodings.length !== encodings.length) {
+        return;
+      }
+      params.encodings.forEach((existing, idx) => {
+        // preserve disabled layers (dynacast / Firefox workaround in
+        // setPublishingLayersForSender set scaleResolutionDownBy/maxBitrate to sentinel
+        // values for disabled layers — don't clobber those).
+        if (existing.active === false) {
+          return;
+        }
+        const next = encodings[idx];
+        if (next.scaleResolutionDownBy !== undefined) {
+          existing.scaleResolutionDownBy = next.scaleResolutionDownBy;
+        }
+        if (next.maxBitrate !== undefined) {
+          existing.maxBitrate = next.maxBitrate;
+        }
+        if (next.maxFramerate !== undefined) {
+          existing.maxFramerate = next.maxFramerate;
+        }
+        if (next.priority !== undefined) {
+          existing.priority = next.priority;
+          existing.networkPriority = next.priority;
+        }
+      });
+      this.log.debug('updating sender encodings after track restart', Object.assign(Object.assign({}, this.logContext), {
+        encodings: params.encodings
+      }));
+      yield sender.setParameters(params);
     });
   }
   setProcessor(processor_1) {
@@ -20256,6 +20309,7 @@ class RTCEngine extends eventsExports.EventEmitter {
     /** specifies how often an initial join connection is allowed to retry */
     this.maxJoinAttempts = 1;
     this.shouldFailNext = false;
+    this.shouldFailOnV1Path = false;
     this.log = livekitLogger;
     this.reliableDataSequence = 1;
     this.reliableMessageBuffer = new DataPacketBuffer();
@@ -20266,6 +20320,7 @@ class RTCEngine extends eventsExports.EventEmitter {
     this.midToTrackId = {};
     /** used to indicate whether the browser is currently waiting to reconnect */
     this.isWaitingForNetworkReconnect = false;
+    this.bufferStatusLowClosingFuture = new Future();
     this.handleDataChannel = _a => __awaiter(this, [_a], void 0, function (_ref) {
       var _this = this;
       let {
@@ -20414,10 +20469,10 @@ class RTCEngine extends eventsExports.EventEmitter {
       }
       this.log.debug("reconnecting in ".concat(delay, "ms"), this.logContext);
       this.clearReconnectTimeout();
-      if (this.token && this.regionUrlProvider) {
+      if (this.token) {
         // token may have been refreshed, we do not want to recreate the regionUrlProvider
         // since the current engine may have inherited a regional url
-        this.regionUrlProvider.updateToken(this.token);
+        this.emit(EngineEvent.TokenRefreshed, this.token);
       }
       this.reconnectTimeout = CriticalTimers.setTimeout(() => this.attemptReconnect(disconnectReason).finally(() => this.reconnectTimeout = undefined), delay);
     };
@@ -20517,6 +20572,13 @@ class RTCEngine extends eventsExports.EventEmitter {
     this.client.onRequestResponse = response => this.emit(EngineEvent.SignalRequestResponse, response);
     this.client.onParticipantUpdate = updates => this.emit(EngineEvent.ParticipantUpdate, updates);
     this.client.onJoined = joinResponse => this.emit(EngineEvent.Joined, joinResponse);
+    this.on(EngineEvent.Closing, () => {
+      var _a, _b;
+      (_b = (_a = this.bufferStatusLowClosingFuture).reject) === null || _b === void 0 ? void 0 : _b.call(_a, new UnexpectedConnectionState('engine closed'));
+    });
+    // Swallow the rejection at the source so it doesn't surface as an unhandled promise rejection
+    // when no waitForBufferStatusLow callers are attached.
+    this.bufferStatusLowClosingFuture.promise.catch(() => {});
   }
   /** @internal */
   get logContext() {
@@ -20533,7 +20595,7 @@ class RTCEngine extends eventsExports.EventEmitter {
       var _this2 = this;
       let useV0Path = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
       return function* () {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e, _f;
         _this2._isNewlyCreated = false;
         _this2.url = url;
         _this2.token = token;
@@ -20557,6 +20619,10 @@ class RTCEngine extends eventsExports.EventEmitter {
           if (abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.aborted) {
             throw ConnectionError.cancelled('Connection aborted');
           }
+          if (!useV0Path && _this2.shouldFailOnV1Path) {
+            _this2.shouldFailOnV1Path = false;
+            throw ConnectionError.serviceNotFound('Simulated v1 path failure', 'v0-rtc');
+          }
           const joinResponse = yield _this2.client.join(url, token, opts, abortSignal, useV0Path, offerProto);
           _this2._isClosed = false;
           _this2.latestJoinResponse = joinResponse;
@@ -20578,7 +20644,25 @@ class RTCEngine extends eventsExports.EventEmitter {
           _this2.registerOnLineListener();
           _this2.clientConfiguration = joinResponse.clientConfiguration;
           _this2.emit(EngineEvent.SignalConnected, joinResponse);
-          return joinResponse;
+          let serverInfo = joinResponse.serverInfo;
+          if (!serverInfo) {
+            serverInfo = {
+              version: joinResponse.serverVersion,
+              region: joinResponse.serverRegion
+            };
+          }
+          _this2.log.debug("connected to Livekit Server ".concat(Object.entries(serverInfo).map(_ref2 => {
+            let [key, value] = _ref2;
+            return "".concat(key, ": ").concat(value);
+          }).join(', ')), {
+            room: (_d = joinResponse.room) === null || _d === void 0 ? void 0 : _d.name,
+            roomSid: (_e = joinResponse.room) === null || _e === void 0 ? void 0 : _e.sid,
+            identity: (_f = joinResponse.participant) === null || _f === void 0 ? void 0 : _f.identity
+          });
+          return {
+            joinResponse,
+            serverInfo
+          };
         } catch (e) {
           if (e instanceof ConnectionError) {
             if (e.reason === ConnectionErrorReason.ServerUnreachable) {
@@ -20588,6 +20672,10 @@ class RTCEngine extends eventsExports.EventEmitter {
               }
             } else if (e.reason === ConnectionErrorReason.ServiceNotFound) {
               _this2.log.warn("Initial connection failed: ".concat(e.message, " \u2013 Retrying"));
+              if (_this2.pcManager) {
+                _this2.pcManager.onStateChange = undefined;
+                yield _this2.cleanupPeerConnections();
+              }
               return _this2.join(url, token, opts, abortSignal, true);
             }
           }
@@ -20663,6 +20751,14 @@ class RTCEngine extends eventsExports.EventEmitter {
     return __awaiter(this, void 0, void 0, function* () {
       yield this.client.close();
       this.client.resetCallbacks();
+      // Any in-flight addTrack requests are orphaned by the signal reconnect — the new session
+      // won't deliver `trackPublishedResponse` for them, so reject the pending resolvers and
+      // clear the map. Otherwise a subsequent `addTrack` call with the same client id (e.g. a
+      // publish retry after a `NegotiationError`) throws `TrackInvalidError`.
+      for (const cid of Object.keys(this.pendingTrackResolvers)) {
+        this.pendingTrackResolvers[cid].reject();
+      }
+      this.pendingTrackResolvers = {};
     });
   }
   addTrack(req) {
@@ -20727,8 +20823,8 @@ class RTCEngine extends eventsExports.EventEmitter {
     });
   }
   /* @internal */
-  setRegionUrlProvider(provider) {
-    this.regionUrlProvider = provider;
+  setRegionStrategy(strategy) {
+    this.regionStrategy = strategy;
   }
   configure(joinResponse, useSinglePeerConnection) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -20849,9 +20945,8 @@ class RTCEngine extends eventsExports.EventEmitter {
       this.emit(EngineEvent.LocalTrackSubscribed, trackSid);
     };
     this.client.onTokenRefresh = token => {
-      var _a;
       this.token = token;
-      (_a = this.regionUrlProvider) === null || _a === void 0 ? void 0 : _a.updateToken(token);
+      this.emit(EngineEvent.TokenRefreshed, token);
     };
     this.client.onRemoteMuteChanged = (trackSid, muted) => {
       this.emit(EngineEvent.RemoteMute, trackSid, muted);
@@ -20887,13 +20982,9 @@ class RTCEngine extends eventsExports.EventEmitter {
       this.log.debug('client leave request', Object.assign(Object.assign({}, this.logContext), {
         reason: leave === null || leave === void 0 ? void 0 : leave.reason
       }));
-      if (leave.regions && this.regionUrlProvider) {
+      if (leave.regions) {
         this.log.debug('updating regions', this.logContext);
-        this.regionUrlProvider.setServerReportedRegions({
-          updatedAtInMs: Date.now(),
-          maxAgeInMs: DEFAULT_MAX_AGE_MS,
-          regionSettings: leave.regions
-        });
+        this.emit(EngineEvent.ServerRegionsReported, leave.regions);
       }
       switch (leave.action) {
         case LeaveRequest_Action.DISCONNECT:
@@ -21179,7 +21270,7 @@ class RTCEngine extends eventsExports.EventEmitter {
             throw new SignalReconnectError();
           }
           // in case a regionUrl is passed, the region URL takes precedence
-          joinResponse = yield this.join(regionUrl !== null && regionUrl !== void 0 ? regionUrl : this.url, this.token, this.signalOpts, undefined, !this.options.singlePeerConnection);
+          joinResponse = (yield this.join(regionUrl !== null && regionUrl !== void 0 ? regionUrl : this.url, this.token, this.signalOpts, undefined, !this.options.singlePeerConnection)).joinResponse;
         } catch (e) {
           if (e instanceof ConnectionError && e.reason === ConnectionErrorReason.NotAllowed) {
             throw new UnexpectedConnectionState('could not reconnect, token might be expired');
@@ -21197,17 +21288,17 @@ class RTCEngine extends eventsExports.EventEmitter {
         if (this.client.currentState !== SignalConnectionState.CONNECTED) {
           throw new SignalReconnectError('Signal connection got severed during reconnect');
         }
-        (_a = this.regionUrlProvider) === null || _a === void 0 ? void 0 : _a.resetAttempts();
+        (_a = this.regionStrategy) === null || _a === void 0 ? void 0 : _a.resetAttempts();
         // reconnect success
         this.emit(EngineEvent.Restarted);
       } catch (error) {
-        const nextRegionUrl = yield (_b = this.regionUrlProvider) === null || _b === void 0 ? void 0 : _b.getNextBestRegionUrl();
+        const nextRegionUrl = yield (_b = this.regionStrategy) === null || _b === void 0 ? void 0 : _b.getNextUrl();
         if (nextRegionUrl) {
           yield this.restartConnection(nextRegionUrl);
           return;
         } else {
           // no more regions to try (or we're not on cloud)
-          (_c = this.regionUrlProvider) === null || _c === void 0 ? void 0 : _c.resetAttempts();
+          (_c = this.regionStrategy) === null || _c === void 0 ? void 0 : _c.resetAttempts();
           throw error;
         }
       }
@@ -21441,19 +21532,26 @@ class RTCEngine extends eventsExports.EventEmitter {
     });
   }
   waitForBufferStatusLow(kind) {
-    return new TypedPromise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-      if (this.isBufferStatusLow(kind)) {
-        resolve();
-      } else {
-        const onClosing = () => reject(new UnexpectedConnectionState('engine closed'));
-        this.once(EngineEvent.Closing, onClosing);
-        while (!this.dcBufferStatus.get(kind)) {
-          yield sleep(10);
+    return __awaiter(this, void 0, void 0, function* () {
+      return new TypedPromise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+        if (this.isClosed) {
+          reject(new UnexpectedConnectionState('engine closed'));
         }
-        this.off(EngineEvent.Closing, onClosing);
-        resolve();
-      }
-    }));
+        if (this.isBufferStatusLow(kind)) {
+          resolve();
+        } else {
+          const dc = this.dataChannelForKind(kind);
+          if (!dc) {
+            reject(new UnexpectedConnectionState("DataChannel not found, kind: ".concat(kind)));
+            return;
+          }
+          this.bufferStatusLowClosingFuture.promise.catch(e => reject(e));
+          dc.addEventListener('bufferedamountlow', () => resolve(), {
+            once: true
+          });
+        }
+      }));
+    });
   }
   /**
    * @internal
@@ -21677,6 +21775,11 @@ class RTCEngine extends eventsExports.EventEmitter {
     // debugging method to fail the next reconnect/resume attempt
     this.shouldFailNext = true;
   }
+  /* @internal */
+  failNextV1Path() {
+    // debugging method to fail the next connection attempt for /rtc/v1 to trigger the fallback version
+    this.shouldFailOnV1Path = true;
+  }
   dataChannelsInfo() {
     const infos = [];
     const getInfo = (dc, target) => {
@@ -21719,8 +21822,8 @@ class RTCEngine extends eventsExports.EventEmitter {
     var _a;
     const mid = (_a = this.pcManager) === null || _a === void 0 ? void 0 : _a.getMidForReceiver(receiver);
     if (mid) {
-      const match = Object.entries(this.midToTrackId).find(_ref2 => {
-        let [key] = _ref2;
+      const match = Object.entries(this.midToTrackId).find(_ref3 => {
+        let [key] = _ref3;
         return key === mid;
       });
       if (match) {
@@ -21736,6 +21839,196 @@ function applyUserDataCompat(newObj, oldObj) {
   const destinationIdentities = newObj.destinationIdentities.length !== 0 ? newObj.destinationIdentities : oldObj.destinationIdentities;
   newObj.destinationIdentities = destinationIdentities;
   oldObj.destinationIdentities = destinationIdentities;
+}const DEFAULT_MAX_AGE_MS = 5000;
+const STOP_REFETCH_DELAY_MS = 30000;
+class RegionUrlProvider {
+  static fetchRegionSettings(serverUrl, token, signal) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const unlock = yield RegionUrlProvider.fetchLock.lock();
+      try {
+        const regionSettingsResponse = yield fetch("".concat(getCloudConfigUrl(serverUrl), "/regions"), {
+          headers: {
+            authorization: "Bearer ".concat(token)
+          },
+          signal
+        });
+        if (regionSettingsResponse.ok) {
+          const maxAge = extractMaxAgeFromRequestHeaders(regionSettingsResponse.headers);
+          const maxAgeInMs = maxAge ? maxAge * 1000 : DEFAULT_MAX_AGE_MS;
+          const regionSettings = yield regionSettingsResponse.json();
+          return {
+            regionSettings,
+            updatedAtInMs: Date.now(),
+            maxAgeInMs
+          };
+        } else {
+          if (regionSettingsResponse.status === 401) {
+            throw ConnectionError.notAllowed("Could not fetch region settings: ".concat(regionSettingsResponse.statusText), regionSettingsResponse.status);
+          } else {
+            throw ConnectionError.internal("Could not fetch region settings: ".concat(regionSettingsResponse.statusText));
+          }
+        }
+      } catch (e) {
+        if (e instanceof ConnectionError) {
+          // rethrow connection errors
+          throw e;
+        } else if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+          throw ConnectionError.cancelled("Region fetching was aborted");
+        } else {
+          // wrap other errors as connection errors
+          throw ConnectionError.serverUnreachable("Could not fetch region settings, ".concat(e instanceof Error ? "".concat(e.name, ": ").concat(e.message) : e));
+        }
+      } finally {
+        unlock();
+      }
+    });
+  }
+  static scheduleRefetch(url, token, maxAgeInMs) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const timeout = RegionUrlProvider.settingsTimeouts.get(url.hostname);
+      clearTimeout(timeout);
+      RegionUrlProvider.settingsTimeouts.set(url.hostname, setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+        try {
+          const newSettings = yield RegionUrlProvider.fetchRegionSettings(url, token);
+          RegionUrlProvider.updateCachedRegionSettings(url, token, newSettings);
+        } catch (error) {
+          if (error instanceof ConnectionError && error.reason === ConnectionErrorReason.NotAllowed) {
+            livekitLogger.debug('token is not valid, cancelling auto region refresh');
+            return;
+          }
+          livekitLogger.debug('auto refetching of region settings failed', {
+            error
+          });
+          // continue retrying with the same max age
+          RegionUrlProvider.scheduleRefetch(url, token, maxAgeInMs);
+        }
+      }), maxAgeInMs));
+    });
+  }
+  static updateCachedRegionSettings(url, token, settings) {
+    RegionUrlProvider.cache.set(url.hostname, settings);
+    RegionUrlProvider.scheduleRefetch(url, token, settings.maxAgeInMs);
+  }
+  static stopRefetch(hostname) {
+    const timeout = RegionUrlProvider.settingsTimeouts.get(hostname);
+    if (timeout) {
+      clearTimeout(timeout);
+      RegionUrlProvider.settingsTimeouts.delete(hostname);
+    }
+  }
+  static scheduleCleanup(hostname) {
+    let tracker = RegionUrlProvider.connectionTrackers.get(hostname);
+    if (!tracker) {
+      return;
+    }
+    // Cancel any existing cleanup timeout
+    if (tracker.cleanupTimeout) {
+      clearTimeout(tracker.cleanupTimeout);
+    }
+    // Schedule cleanup to stop refetch after delay
+    tracker.cleanupTimeout = setTimeout(() => {
+      const currentTracker = RegionUrlProvider.connectionTrackers.get(hostname);
+      if (currentTracker && currentTracker.connectionCount === 0) {
+        livekitLogger.debug('stopping region refetch after disconnect delay', {
+          hostname
+        });
+        RegionUrlProvider.stopRefetch(hostname);
+      }
+      if (currentTracker) {
+        currentTracker.cleanupTimeout = undefined;
+      }
+    }, STOP_REFETCH_DELAY_MS);
+  }
+  static cancelCleanup(hostname) {
+    const tracker = RegionUrlProvider.connectionTrackers.get(hostname);
+    if (tracker === null || tracker === void 0 ? void 0 : tracker.cleanupTimeout) {
+      clearTimeout(tracker.cleanupTimeout);
+      tracker.cleanupTimeout = undefined;
+    }
+  }
+  notifyConnected() {
+    const hostname = this.serverUrl.hostname;
+    let tracker = RegionUrlProvider.connectionTrackers.get(hostname);
+    if (!tracker) {
+      tracker = {
+        connectionCount: 0
+      };
+      RegionUrlProvider.connectionTrackers.set(hostname, tracker);
+    }
+    tracker.connectionCount++;
+    // Cancel any scheduled cleanup since we have an active connection
+    RegionUrlProvider.cancelCleanup(hostname);
+  }
+  notifyDisconnected() {
+    const hostname = this.serverUrl.hostname;
+    const tracker = RegionUrlProvider.connectionTrackers.get(hostname);
+    if (!tracker) {
+      return;
+    }
+    tracker.connectionCount = Math.max(0, tracker.connectionCount - 1);
+    // If no more connections, schedule cleanup
+    if (tracker.connectionCount === 0) {
+      RegionUrlProvider.scheduleCleanup(hostname);
+    }
+  }
+  constructor(url, token) {
+    this.attemptedRegions = [];
+    this.serverUrl = new URL(url);
+    this.token = token;
+  }
+  updateToken(token) {
+    var _a;
+    this.token = token;
+    const url = this.getServerUrl();
+    const settings = RegionUrlProvider.cache.get(url.hostname);
+    RegionUrlProvider.scheduleRefetch(this.serverUrl, this.token, (_a = settings === null || settings === void 0 ? void 0 : settings.maxAgeInMs) !== null && _a !== void 0 ? _a : DEFAULT_MAX_AGE_MS);
+  }
+  isCloud() {
+    return isCloud(this.serverUrl);
+  }
+  getServerUrl() {
+    return this.serverUrl;
+  }
+  /** @internal */
+  fetchRegionSettings(abortSignal) {
+    return __awaiter(this, void 0, void 0, function* () {
+      return RegionUrlProvider.fetchRegionSettings(this.serverUrl, this.token, abortSignal);
+    });
+  }
+  getNextBestRegionUrl(abortSignal) {
+    return __awaiter(this, void 0, void 0, function* () {
+      if (!this.isCloud()) {
+        throw Error('region availability is only supported for LiveKit Cloud domains');
+      }
+      let cachedSettings = RegionUrlProvider.cache.get(this.serverUrl.hostname);
+      if (!cachedSettings || Date.now() - cachedSettings.updatedAtInMs > cachedSettings.maxAgeInMs) {
+        cachedSettings = yield this.fetchRegionSettings(abortSignal);
+        RegionUrlProvider.updateCachedRegionSettings(this.serverUrl, this.token, cachedSettings);
+      }
+      const regionsLeft = cachedSettings.regionSettings.regions.filter(region => !this.attemptedRegions.find(attempted => attempted.url === region.url));
+      if (regionsLeft.length > 0) {
+        const nextRegion = regionsLeft[0];
+        this.attemptedRegions.push(nextRegion);
+        livekitLogger.debug("next region: ".concat(nextRegion.region));
+        return nextRegion.url;
+      } else {
+        return null;
+      }
+    });
+  }
+  resetAttempts() {
+    this.attemptedRegions = [];
+  }
+  setServerReportedRegions(settings) {
+    RegionUrlProvider.updateCachedRegionSettings(this.serverUrl, this.token, settings);
+  }
+}
+RegionUrlProvider.cache = new Map();
+RegionUrlProvider.settingsTimeouts = new Map();
+RegionUrlProvider.connectionTrackers = new Map();
+RegionUrlProvider.fetchLock = new _();
+function getCloudConfigUrl(serverUrl) {
+  return "".concat(serverUrl.protocol.replace('ws', 'http'), "//").concat(serverUrl.host, "/settings");
 }class BaseStreamReader {
   get info() {
     return this._info;
@@ -22017,6 +22310,24 @@ class TextStreamReader extends BaseStreamReader {
     this.textStreamControllers = new Map();
     this.byteStreamHandlers = new Map();
     this.textStreamHandlers = new Map();
+    this.isConnected = false;
+    this.bufferedPackets = [];
+  }
+  setConnected(connected) {
+    this.isConnected = connected;
+    if (connected) {
+      this.flushBufferedPackets();
+    }
+  }
+  flushBufferedPackets() {
+    const packets = this.bufferedPackets;
+    this.bufferedPackets = [];
+    for (const {
+      packet,
+      encryptionType
+    } of packets) {
+      this.handleDataStreamPacket(packet, encryptionType);
+    }
   }
   registerTextStreamHandler(topic, callback) {
     if (this.textStreamHandlers.has(topic)) {
@@ -22039,6 +22350,7 @@ class TextStreamReader extends BaseStreamReader {
   clearControllers() {
     this.byteStreamControllers.clear();
     this.textStreamControllers.clear();
+    this.bufferedPackets = [];
   }
   validateParticipantHasNoActiveDataStreams(participantIdentity) {
     // Terminate any in flight data stream receives from the given participant
@@ -22057,92 +22369,95 @@ class TextStreamReader extends BaseStreamReader {
     }
   }
   handleDataStreamPacket(packet, encryptionType) {
-    return __awaiter(this, void 0, void 0, function* () {
-      switch (packet.value.case) {
-        case 'streamHeader':
-          return this.handleStreamHeader(packet.value.value, packet.participantIdentity, encryptionType);
-        case 'streamChunk':
-          return this.handleStreamChunk(packet.value.value, encryptionType);
-        case 'streamTrailer':
-          return this.handleStreamTrailer(packet.value.value, encryptionType);
-        default:
-          throw new Error("DataPacket of value \"".concat(packet.value.case, "\" is not data stream related!"));
-      }
-    });
+    if (!this.isConnected) {
+      this.bufferedPackets.push({
+        packet,
+        encryptionType
+      });
+      return;
+    }
+    switch (packet.value.case) {
+      case 'streamHeader':
+        return this.handleStreamHeader(packet.value.value, packet.participantIdentity, encryptionType);
+      case 'streamChunk':
+        return this.handleStreamChunk(packet.value.value, encryptionType);
+      case 'streamTrailer':
+        return this.handleStreamTrailer(packet.value.value, encryptionType);
+      default:
+        throw new Error("DataPacket of value \"".concat(packet.value.case, "\" is not data stream related!"));
+    }
   }
   handleStreamHeader(streamHeader, participantIdentity, encryptionType) {
-    return __awaiter(this, void 0, void 0, function* () {
-      var _a;
-      if (streamHeader.contentHeader.case === 'byteHeader') {
-        const streamHandlerCallback = this.byteStreamHandlers.get(streamHeader.topic);
-        if (!streamHandlerCallback) {
-          this.log.debug('ignoring incoming byte stream due to no handler for topic', streamHeader.topic);
-          return;
-        }
-        let streamController;
-        const info = {
-          id: streamHeader.streamId,
-          name: (_a = streamHeader.contentHeader.value.name) !== null && _a !== void 0 ? _a : 'unknown',
-          mimeType: streamHeader.mimeType,
-          size: streamHeader.totalLength ? Number(streamHeader.totalLength) : undefined,
-          topic: streamHeader.topic,
-          timestamp: bigIntToNumber(streamHeader.timestamp),
-          attributes: streamHeader.attributes,
-          encryptionType
-        };
-        const stream = new ReadableStream({
-          start: controller => {
-            streamController = controller;
-            if (this.textStreamControllers.has(streamHeader.streamId)) {
-              throw new DataStreamError("A data stream read is already in progress for a stream with id ".concat(streamHeader.streamId, "."), DataStreamErrorReason.AlreadyOpened);
-            }
-            this.byteStreamControllers.set(streamHeader.streamId, {
-              info,
-              controller: streamController,
-              startTime: Date.now(),
-              sendingParticipantIdentity: participantIdentity
-            });
-          }
-        });
-        streamHandlerCallback(new ByteStreamReader(info, stream, bigIntToNumber(streamHeader.totalLength)), {
-          identity: participantIdentity
-        });
-      } else if (streamHeader.contentHeader.case === 'textHeader') {
-        const streamHandlerCallback = this.textStreamHandlers.get(streamHeader.topic);
-        if (!streamHandlerCallback) {
-          this.log.debug('ignoring incoming text stream due to no handler for topic', streamHeader.topic);
-          return;
-        }
-        let streamController;
-        const info = {
-          id: streamHeader.streamId,
-          mimeType: streamHeader.mimeType,
-          size: streamHeader.totalLength ? Number(streamHeader.totalLength) : undefined,
-          topic: streamHeader.topic,
-          timestamp: Number(streamHeader.timestamp),
-          attributes: streamHeader.attributes,
-          encryptionType,
-          attachedStreamIds: streamHeader.contentHeader.value.attachedStreamIds
-        };
-        const stream = new ReadableStream({
-          start: controller => {
-            streamController = controller;
-            if (this.textStreamControllers.has(streamHeader.streamId)) {
-              throw new DataStreamError("A data stream read is already in progress for a stream with id ".concat(streamHeader.streamId, "."), DataStreamErrorReason.AlreadyOpened);
-            }
-            this.textStreamControllers.set(streamHeader.streamId, {
-              info,
-              controller: streamController,
-              startTime: Date.now(),
-              sendingParticipantIdentity: participantIdentity
-            });
-          }
-        });
-        streamHandlerCallback(new TextStreamReader(info, stream, bigIntToNumber(streamHeader.totalLength)), {
-          identity: participantIdentity
-        });
+    var _a;
+    if (streamHeader.contentHeader.case === 'byteHeader') {
+      const streamHandlerCallback = this.byteStreamHandlers.get(streamHeader.topic);
+      if (!streamHandlerCallback) {
+        this.log.debug('ignoring incoming byte stream due to no handler for topic', streamHeader.topic);
+        return;
       }
-    });
+      let streamController;
+      const info = {
+        id: streamHeader.streamId,
+        name: (_a = streamHeader.contentHeader.value.name) !== null && _a !== void 0 ? _a : 'unknown',
+        mimeType: streamHeader.mimeType,
+        size: streamHeader.totalLength ? Number(streamHeader.totalLength) : undefined,
+        topic: streamHeader.topic,
+        timestamp: bigIntToNumber(streamHeader.timestamp),
+        attributes: streamHeader.attributes,
+        encryptionType
+      };
+      const stream = new ReadableStream({
+        start: controller => {
+          streamController = controller;
+          if (this.textStreamControllers.has(streamHeader.streamId)) {
+            throw new DataStreamError("A data stream read is already in progress for a stream with id ".concat(streamHeader.streamId, "."), DataStreamErrorReason.AlreadyOpened);
+          }
+          this.byteStreamControllers.set(streamHeader.streamId, {
+            info,
+            controller: streamController,
+            startTime: Date.now(),
+            sendingParticipantIdentity: participantIdentity
+          });
+        }
+      });
+      streamHandlerCallback(new ByteStreamReader(info, stream, bigIntToNumber(streamHeader.totalLength)), {
+        identity: participantIdentity
+      });
+    } else if (streamHeader.contentHeader.case === 'textHeader') {
+      const streamHandlerCallback = this.textStreamHandlers.get(streamHeader.topic);
+      if (!streamHandlerCallback) {
+        this.log.debug('ignoring incoming text stream due to no handler for topic', streamHeader.topic);
+        return;
+      }
+      let streamController;
+      const info = {
+        id: streamHeader.streamId,
+        mimeType: streamHeader.mimeType,
+        size: streamHeader.totalLength ? Number(streamHeader.totalLength) : undefined,
+        topic: streamHeader.topic,
+        timestamp: Number(streamHeader.timestamp),
+        attributes: streamHeader.attributes,
+        encryptionType,
+        attachedStreamIds: streamHeader.contentHeader.value.attachedStreamIds
+      };
+      const stream = new ReadableStream({
+        start: controller => {
+          streamController = controller;
+          if (this.textStreamControllers.has(streamHeader.streamId)) {
+            throw new DataStreamError("A data stream read is already in progress for a stream with id ".concat(streamHeader.streamId, "."), DataStreamErrorReason.AlreadyOpened);
+          }
+          this.textStreamControllers.set(streamHeader.streamId, {
+            info,
+            controller: streamController,
+            startTime: Date.now(),
+            sendingParticipantIdentity: participantIdentity
+          });
+        }
+      });
+      streamHandlerCallback(new TextStreamReader(info, stream, bigIntToNumber(streamHeader.totalLength)), {
+        identity: participantIdentity
+      });
+    }
   }
   handleStreamChunk(chunk, encryptionType) {
     const fileBuffer = this.byteStreamControllers.get(chunk.streamId);
@@ -22865,8 +23180,8 @@ class DataTrackPacketHeader extends Serializable {
   }
   extensionsMetrics() {
     const lengthBytes = this.extensions.toBinaryLengthBytes();
-    const lengthWords = Math.ceil(lengthBytes / 4);
-    const paddingLengthBytes = lengthWords * 4 - lengthBytes;
+    const lengthWords = Math.ceil((EXT_WORDS_INDICATOR_SIZE + lengthBytes) / 4);
+    const paddingLengthBytes = lengthWords * 4 - EXT_WORDS_INDICATOR_SIZE - lengthBytes;
     return {
       lengthBytes,
       lengthWords,
@@ -23007,7 +23322,7 @@ class DataTrackPacketHeader extends Serializable {
       // field represents the "number of additional bytes" long the extensions section is. This is
       // potentially unintuitive so I wanted to call it out.
       const extensionWords = rtpOrientedExtensionWords + 1;
-      let extensionLengthBytes = 4 * extensionWords;
+      let extensionLengthBytes = 4 * extensionWords - EXT_WORDS_INDICATOR_SIZE;
       if (byteIndex + extensionLengthBytes > dataView.byteLength) {
         throw DataTrackDeserializeError.headerOverrun();
       }
@@ -23412,55 +23727,82 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
     let bufferSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : READABLE_STREAM_DEFAULT_BUFFER_SIZE;
     let streamController = null;
     const sfuSubscriptionComplete = new Future();
+    const detachSignal = () => {
+      signal === null || signal === void 0 ? void 0 : signal.removeEventListener('abort', onAbort);
+    };
+    const cleanup = () => {
+      detachSignal();
+      if (!streamController) {
+        log$1.warn("ReadableStream subscribed to ".concat(sid, " was not started."));
+        return;
+      }
+      const descriptor = this.descriptors.get(sid);
+      if (!descriptor) {
+        log$1.warn("Unknown track ".concat(sid, ", skipping cancel..."));
+        return;
+      }
+      if (descriptor.subscription.type !== 'active') {
+        log$1.warn("Subscription for track ".concat(sid, " is not active, skipping cancel..."));
+        return;
+      }
+      descriptor.subscription.streamControllers.delete(streamController);
+      // If no active stream controllers are left, also unsubscribe on the SFU end.
+      if (descriptor.subscription.streamControllers.size === 0) {
+        this.unSubscribeRequest(descriptor.info.sid);
+      }
+    };
+    const onAbort = () => {
+      var _a;
+      if (!streamController) {
+        return;
+      }
+      const currentDescriptor = this.descriptors.get(sid);
+      if ((currentDescriptor === null || currentDescriptor === void 0 ? void 0 : currentDescriptor.subscription.type) === 'active') {
+        currentDescriptor.subscription.streamControllers.delete(streamController);
+      }
+      streamController.error(DataTrackSubscribeError.cancelled());
+      (_a = sfuSubscriptionComplete.reject) === null || _a === void 0 ? void 0 : _a.call(sfuSubscriptionComplete, DataTrackSubscribeError.cancelled());
+      cleanup();
+    };
     const stream = new ReadableStream({
       start: controller => {
         streamController = controller;
-        const onAbort = () => {
-          var _a;
-          controller.error(DataTrackSubscribeError.cancelled());
-          (_a = sfuSubscriptionComplete.reject) === null || _a === void 0 ? void 0 : _a.call(sfuSubscriptionComplete, DataTrackSubscribeError.cancelled());
-        };
         this.subscribeRequest(sid, signal).then(() => __awaiter(this, void 0, void 0, function* () {
-          var _a;
-          signal === null || signal === void 0 ? void 0 : signal.addEventListener('abort', onAbort);
+          var _a, _b, _c;
           const descriptor = this.descriptors.get(sid);
           if (!descriptor) {
             log$1.error("Unknown track ".concat(sid));
+            const err = DataTrackSubscribeError.disconnected();
+            controller.error(err);
+            (_a = sfuSubscriptionComplete.reject) === null || _a === void 0 ? void 0 : _a.call(sfuSubscriptionComplete, err);
             return;
           }
           if (descriptor.subscription.type !== 'active') {
             log$1.error("Subscription for track ".concat(sid, " is not active"));
+            const err = DataTrackSubscribeError.disconnected();
+            controller.error(err);
+            (_b = sfuSubscriptionComplete.reject) === null || _b === void 0 ? void 0 : _b.call(sfuSubscriptionComplete, err);
             return;
           }
-          descriptor.subscription.streamControllers.add(controller);
-          (_a = sfuSubscriptionComplete.resolve) === null || _a === void 0 ? void 0 : _a.call(sfuSubscriptionComplete);
+          // Attach the abort signal, aborting immediately if the abort signal was fired while
+          // subscribeRequest was in flight.
+          if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+            onAbort();
+            return;
+          }
+          signal === null || signal === void 0 ? void 0 : signal.addEventListener('abort', onAbort);
+          descriptor.subscription.streamControllers.set(controller, detachSignal);
+          (_c = sfuSubscriptionComplete.resolve) === null || _c === void 0 ? void 0 : _c.call(sfuSubscriptionComplete);
         })).catch(err => {
           var _a;
+          // subscribeRequest rejected (cancelled, timed out, disconnected). The signal
+          // listener was never attached in this path, so nothing to detach.
           controller.error(err);
           (_a = sfuSubscriptionComplete.reject) === null || _a === void 0 ? void 0 : _a.call(sfuSubscriptionComplete, err);
-        }).finally(() => {
-          signal === null || signal === void 0 ? void 0 : signal.removeEventListener('abort', onAbort);
         });
       },
       cancel: () => {
-        if (!streamController) {
-          log$1.warn("ReadableStream subscribed to ".concat(sid, " was not started."));
-          return;
-        }
-        const descriptor = this.descriptors.get(sid);
-        if (!descriptor) {
-          log$1.warn("Unknown track ".concat(sid, ", skipping cancel..."));
-          return;
-        }
-        if (descriptor.subscription.type !== 'active') {
-          log$1.warn("Subscription for track ".concat(sid, " is not active, skipping cancel..."));
-          return;
-        }
-        descriptor.subscription.streamControllers.delete(streamController);
-        // If no active stream controllers are left, also unsubscribe on the SFU end.
-        if (descriptor.subscription.streamControllers.size === 0) {
-          this.unSubscribeRequest(descriptor.info.sid);
-        }
+        cleanup();
       }
     }, new CountQueuingStrategy({
       highWaterMark: bufferSize
@@ -23598,9 +23940,7 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
       log$1.warn("Unexpected descriptor state in unSubscribeRequest, expected active, found ".concat((_a = descriptor.subscription) === null || _a === void 0 ? void 0 : _a.type));
       return;
     }
-    for (const controller of descriptor.subscription.streamControllers) {
-      controller.close();
-    }
+    this.closeStreamControllers(descriptor.subscription.streamControllers, sid);
     // FIXME: this might be wrong? Shouldn't this only occur if it is the last subscription to
     // terminate?
     const previousDescriptorSubscription = descriptor.subscription;
@@ -23612,6 +23952,23 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
       sid,
       subscribe: false
     });
+  }
+  /** Detach abort-signal listeners and close all downstream stream controllers for an active
+   * subscription. Used when the subscription is being torn down by the manager (unsubscribe,
+   * unpublish, or shutdown). */
+  closeStreamControllers(streamControllers, sid) {
+    for (const [controller, detachSignal] of streamControllers) {
+      // Detach before close so we don't leak a listener on the user's AbortSignal.
+      detachSignal();
+      try {
+        controller.close();
+      } catch (err) {
+        // Defensive: if the controller has already been errored (e.g. by a racing abort whose
+        // listener removed itself before we got here), close() throws. There's nothing
+        // meaningful to do other than log — the stream is already terminal.
+        log$1.warn("Failed to close readable stream for track ".concat(sid, ": ").concat(err));
+      }
+    }
   }
   /** SFU notification that track publications have changed.
    *
@@ -23694,6 +24051,7 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
     }
     this.descriptors.delete(sid);
     if (descriptor.subscription.type === 'active') {
+      this.closeStreamControllers(descriptor.subscription.streamControllers, sid);
       this.subscriptionHandles.delete(descriptor.subscription.subcriptionHandle);
     }
     this.emit('trackUnpublished', {
@@ -23743,7 +24101,7 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
             type: 'active',
             subcriptionHandle: assignedHandle,
             pipeline,
-            streamControllers: new Set()
+            streamControllers: new Map()
           };
           this.subscriptionHandles.set(assignedHandle, sid);
           (_b = (_a = previousDescriptorSubscription.completionFuture).resolve) === null || _b === void 0 ? void 0 : _b.call(_a);
@@ -23780,7 +24138,7 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
         return;
       }
       // Broadcast to all downstream subscribers
-      for (const controller of descriptor.subscription.streamControllers) {
+      for (const controller of descriptor.subscription.streamControllers.keys()) {
         if (controller.desiredSize !== null && controller.desiredSize <= 0) {
           log$1.warn("Cannot send frame to subscribers: readable stream is full (desiredSize is ".concat(controller.desiredSize, "). To increase this threshold, set a higher 'options.highWaterMark' when calling .subscribe()."));
           continue;
@@ -23836,6 +24194,9 @@ class IncomingDataTrackManager extends eventsExports.EventEmitter {
       });
       if (descriptor.subscription.type === 'pending') {
         (_b = (_a = descriptor.subscription.completionFuture).reject) === null || _b === void 0 ? void 0 : _b.call(_a, DataTrackSubscribeError.disconnected());
+      }
+      if (descriptor.subscription.type === 'active') {
+        this.closeStreamControllers(descriptor.subscription.streamControllers, descriptor.info.sid);
       }
     }
     this.descriptors.clear();
@@ -25041,10 +25402,17 @@ class HTMLElementInfo {
       }
     };
     this.onEnterPiP = () => {
-      var _a, _b, _c;
+      var _a, _b;
       (_b = (_a = window.documentPictureInPicture) === null || _a === void 0 ? void 0 : _a.window) === null || _b === void 0 ? void 0 : _b.addEventListener('pagehide', this.onLeavePiP);
-      this.isPiP = isElementInPiP(this.element);
-      (_c = this.handleVisibilityChanged) === null || _c === void 0 ? void 0 : _c.call(this);
+      // Document PiP: the browser may fire 'enter' before the app has appended its subtree into
+      // documentPictureInPicture.window. Defer so pipWin.document.contains(video) is reliable.
+      queueMicrotask(() => {
+        requestAnimationFrame(() => {
+          var _a;
+          this.isPiP = isElementInPiP(this.element);
+          (_a = this.handleVisibilityChanged) === null || _a === void 0 ? void 0 : _a.call(this);
+        });
+      });
     };
     this.onLeavePiP = () => {
       var _a;
@@ -25794,6 +26162,7 @@ class Participant extends eventsExports.EventEmitter {
     this.participantTrackPermissions = [];
     this.allParticipantsAllowedToSubscribe = true;
     this.encryptionType = Encryption_Type.NONE;
+    this.e2eeStateMutex = new _();
     this.enabledPublishVideoCodecs = [];
     this.pendingAcks = new Map();
     this.pendingResponses = new Map();
@@ -26209,8 +26578,17 @@ class Participant extends eventsExports.EventEmitter {
   /** @internal */
   setE2EEEnabled(enabled) {
     return __awaiter(this, void 0, void 0, function* () {
-      this.encryptionType = enabled ? Encryption_Type.GCM : Encryption_Type.NONE;
-      yield this.republishAllTracks(undefined, false);
+      const unlock = yield this.e2eeStateMutex.lock();
+      try {
+        this.encryptionType = enabled ? Encryption_Type.GCM : Encryption_Type.NONE;
+        yield Promise.all(this.pendingPublishPromises.values());
+        if (this.trackPublications.size === 0 || Array.from(this.trackPublications.values()).every(pub => pub.isEncrypted === enabled)) {
+          return;
+        }
+        yield this.republishAllTracks(undefined, false);
+      } finally {
+        unlock();
+      }
     });
   }
   setTrackEnabled(source, enabled, options, publishOptions) {
@@ -26307,11 +26685,12 @@ class Participant extends eventsExports.EventEmitter {
         if (track && track.track) {
           // screenshare cannot be muted, unpublish instead
           if (source === Track.Source.ScreenShare) {
-            track = yield this.unpublishTrack(track.track);
+            const unpublishPromises = [this.unpublishTrack(track.track)];
             const screenAudioTrack = this.getTrackPublication(Track.Source.ScreenShareAudio);
             if (screenAudioTrack && screenAudioTrack.track) {
-              this.unpublishTrack(screenAudioTrack.track);
+              unpublishPromises.push(this.unpublishTrack(screenAudioTrack.track));
             }
+            [track] = yield Promise.all(unpublishPromises);
           } else {
             yield track.mute();
           }
@@ -26442,10 +26821,42 @@ class Participant extends eventsExports.EventEmitter {
       return this.publishOrRepublishTrack(track, options);
     });
   }
+  /**
+   * Waits for the engine's next `Restarted` event. Unlike `engine.waitForRestarted`, this does
+   * not short-circuit when `pcState === Connected` — at the point this is called (right after a
+   * `NegotiationError`) the PC transport is still connected, but `fullReconnectOnNext` has been
+   * set and `attemptReconnect` is queued via setTimeout. We need to wait for that restart to
+   * actually complete (which clears `pendingTrackResolvers` via `cleanupClient`) before retrying.
+   */
+  waitForNextEngineRestart() {
+    let timeoutMs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 15000;
+    return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        clearTimeout(timeout);
+        this.engine.off(EngineEvent.Restarted, onRestarted);
+        this.engine.off(EngineEvent.Closing, onClosing);
+      };
+      const onRestarted = () => {
+        cleanup();
+        resolve();
+      };
+      const onClosing = () => {
+        cleanup();
+        reject(new Error('engine closed before restart completed'));
+      };
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('timed out waiting for engine restart'));
+      }, timeoutMs);
+      this.engine.once(EngineEvent.Restarted, onRestarted);
+      this.engine.once(EngineEvent.Closing, onClosing);
+    });
+  }
   publishOrRepublishTrack(track_1, options_1) {
     return __awaiter(this, arguments, void 0, function (track, options) {
       var _this2 = this;
       let isRepublish = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      let hasRetriedAfterNegotiationError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       return function* () {
         var _a, _b, _c, _d;
         if (isLocalAudioTrack(track)) {
@@ -26576,6 +26987,14 @@ class Participant extends eventsExports.EventEmitter {
           const publication = yield publishPromise;
           return publication;
         } catch (e) {
+          if (!hasRetriedAfterNegotiationError && e instanceof NegotiationError) {
+            _this2.log.warn('negotiation due to track publish failed, retrying after reconnect', Object.assign(Object.assign({}, _this2.logContext), {
+              error: e
+            }));
+            _this2.pendingPublishPromises.delete(track);
+            yield _this2.waitForNextEngineRestart();
+            return yield _this2.publishOrRepublishTrack(track, options, isRepublish, true);
+          }
           throw e;
         } finally {
           _this2.pendingPublishPromises.delete(track);
@@ -26815,7 +27234,11 @@ class Participant extends eventsExports.EventEmitter {
           resolve(ti);
         } catch (err) {
           if (track.sender && ((_a = this.engine.pcManager) === null || _a === void 0 ? void 0 : _a.publisher)) {
-            this.engine.pcManager.publisher.removeTrack(track.sender);
+            try {
+              this.engine.pcManager.publisher.removeTrack(track.sender);
+            } catch (e) {
+              this.log.error(e, this.logContext);
+            }
             yield this.engine.negotiate().catch(negotiateErr => {
               this.log.error('failed to negotiate after removing track due to failed add track request', Object.assign(Object.assign(Object.assign({}, this.logContext), getLogContextFromTrack(track)), {
                 error: negotiateErr
@@ -26859,6 +27282,19 @@ class Participant extends eventsExports.EventEmitter {
       // save options for when it needs to be republished again
       publication.options = opts;
       track.sid = ti.sid;
+      // keep publish options on the video track so that it can recompute encoding
+      // parameters when the MediaStreamTrack is restarted (e.g. after switching cameras).
+      // Seed the dimensions we encoded at publish time so the first no-op restart
+      // (e.g. unmute with unchanged constraints) can skip the recompute.
+      if (isLocalVideoTrack(track)) {
+        track.publishOptions = opts;
+        if (req.width && req.height) {
+          track.lastEncodedDimensions = {
+            width: req.width,
+            height: req.height
+          };
+        }
+      }
       this.log.debug("publishing ".concat(track.kind, " with encodings"), Object.assign(Object.assign({}, this.logContext), {
         encodings,
         trackInfo: ti
@@ -27058,13 +27494,19 @@ class Participant extends eventsExports.EventEmitter {
               negotiationNeeded = true;
             }
           }
-          if (this.engine.removeTrack(trackSender)) {
+          try {
+            negotiationNeeded = this.engine.removeTrack(trackSender);
+          } catch (e) {
+            this.log.warn(e, this.logContext);
             negotiationNeeded = true;
           }
           if (isLocalVideoTrack(track)) {
             for (const [, trackInfo] of track.simulcastCodecs) {
               if (trackInfo.sender) {
-                if (this.engine.removeTrack(trackInfo.sender)) {
+                try {
+                  negotiationNeeded = this.engine.removeTrack(trackInfo.sender);
+                } catch (e) {
+                  this.log.warn(e, this.logContext);
                   negotiationNeeded = true;
                 }
                 trackInfo.sender = undefined;
@@ -27574,14 +28016,14 @@ class DeferrableMap extends Map {
     this.pending = new Map();
   }
   set(key, value) {
-    var _a;
+    var _a, _b;
     super.set(key, value);
     // Resolve any futures waiting on this key.
-    const futures = this.pending.get(key);
+    const futures = (_a = this.pending) === null || _a === void 0 ? void 0 : _a.get(key);
     if (futures) {
       for (const future of futures) {
         if (!future.isResolved) {
-          (_a = future.resolve) === null || _a === void 0 ? void 0 : _a.call(future, value);
+          (_b = future.resolve) === null || _b === void 0 ? void 0 : _b.call(future, value);
         }
       }
       this.pending.delete(key);
@@ -27589,7 +28031,7 @@ class DeferrableMap extends Map {
     return this;
   }
   get [Symbol.toStringTag]() {
-    return 'WaitableMap';
+    return 'DeferrableMap';
   }
   getDeferred(key, signal) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -27912,8 +28354,13 @@ class DeferrableMap extends Map {
   }
 }class RemoteParticipant extends Participant {
   /** @internal */
-  static fromParticipantInfo(signalClient, pi, loggerOptions) {
-    return new RemoteParticipant(signalClient, pi.sid, pi.identity, pi.name, pi.metadata, pi.attributes, loggerOptions, pi.kind);
+  static fromParticipantInfo(signalClient, pi, loggerOptions, manager) {
+    return new RemoteParticipant(signalClient, pi.sid, pi.identity, pi.name, pi.metadata, pi.attributes, loggerOptions, pi.kind, pi.dataTracks.map(dti => {
+      const info = DataTrackInfo.from(dti);
+      return new RemoteDataTrack(info, manager, {
+        publisherIdentity: pi.identity
+      });
+    }));
   }
   get logContext() {
     return Object.assign(Object.assign({}, super.logContext), {
@@ -27924,12 +28371,15 @@ class DeferrableMap extends Map {
   /** @internal */
   constructor(signalClient, sid, identity, name, metadata, attributes, loggerOptions) {
     let kind = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : ParticipantInfo_Kind.STANDARD;
+    let remoteDataTracks = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : [];
     super(sid, identity || '', name, metadata, attributes, loggerOptions, kind);
     this.signalClient = signalClient;
     this.trackPublications = new Map();
     this.audioTrackPublications = new Map();
     this.videoTrackPublications = new Map();
-    this.dataTracks = new DeferrableMap();
+    this.dataTracks = new DeferrableMap(remoteDataTracks.map(remoteDataTrack => {
+      return [remoteDataTrack.info.name, remoteDataTrack];
+    }));
     this.volumeMap = new Map();
   }
   addTrackPublication(publication) {
@@ -28227,6 +28677,7 @@ class Room extends eventsExports.EventEmitter {
     /** reflects the sender encryption status of the local participant */
     this.isE2EEEnabled = false;
     this.audioEnabled = true;
+    this.e2eeStateMutex = new _();
     this.isVideoPlaybackBlocked = false;
     this.log = livekitLogger;
     this.bufferedEvents = [];
@@ -28341,30 +28792,17 @@ class Room extends eventsExports.EventEmitter {
       return this.connectFuture.promise;
     });
     this.connectSignal = (url, token, engine, connectOptions, roomOptions, abortController) => __awaiter(this, void 0, void 0, function* () {
-      var _a, _b, _c;
-      const joinResponse = yield engine.join(url, token, {
+      const {
+        joinResponse,
+        serverInfo
+      } = yield engine.join(url, token, {
         autoSubscribe: connectOptions.autoSubscribe,
         adaptiveStream: typeof roomOptions.adaptiveStream === 'object' ? true : roomOptions.adaptiveStream,
         maxRetries: connectOptions.maxRetries,
         e2eeEnabled: !!this.e2eeManager,
         websocketTimeout: connectOptions.websocketTimeout
       }, abortController.signal, !roomOptions.singlePeerConnection);
-      let serverInfo = joinResponse.serverInfo;
-      if (!serverInfo) {
-        serverInfo = {
-          version: joinResponse.serverVersion,
-          region: joinResponse.serverRegion
-        };
-      }
       this.serverInfo = serverInfo;
-      this.log.debug("connected to Livekit Server ".concat(Object.entries(serverInfo).map(_ref => {
-        let [key, value] = _ref;
-        return "".concat(key, ": ").concat(value);
-      }).join(', ')), {
-        room: (_a = joinResponse.room) === null || _a === void 0 ? void 0 : _a.name,
-        roomSid: (_b = joinResponse.room) === null || _b === void 0 ? void 0 : _b.sid,
-        identity: (_c = joinResponse.participant) === null || _c === void 0 ? void 0 : _c.identity
-      });
       if (!serverInfo.version) {
         throw new UnsupportedServer('unknown server version');
       }
@@ -28406,7 +28844,7 @@ class Room extends eventsExports.EventEmitter {
         this.maybeCreateEngine();
       }
       if ((_b = this.regionUrlProvider) === null || _b === void 0 ? void 0 : _b.isCloud()) {
-        this.engine.setRegionUrlProvider(this.regionUrlProvider);
+        this.engine.setRegionStrategy(this.createRegionStrategy());
       }
       this.acquireAudioContext();
       this.connOptions = Object.assign(Object.assign({}, roomConnectOptionDefaults), opts);
@@ -29002,10 +29440,10 @@ class Room extends eventsExports.EventEmitter {
       this.emit(RoomEvent.LocalDataTrackPublished, event.track);
     }).on('trackUnpublished', event => {
       this.emit(RoomEvent.LocalDataTrackUnpublished, event.sid);
-    }).on('packetAvailable', _ref2 => {
+    }).on('packetAvailable', _ref => {
       let {
         bytes
-      } = _ref2;
+      } = _ref;
       this.engine.sendLossyBytes(bytes, DataChannelKind.DATA_TRACK_LOSSY, 'wait');
     });
     this.disconnectLock = new _();
@@ -29095,19 +29533,26 @@ class Room extends eventsExports.EventEmitter {
    */
   setE2EEEnabled(enabled) {
     return __awaiter(this, void 0, void 0, function* () {
-      if (this.e2eeManager) {
-        yield Promise.all([this.localParticipant.setE2EEEnabled(enabled)]);
-        if (this.localParticipant.identity !== '') {
-          this.e2eeManager.setParticipantCryptorEnabled(enabled, this.localParticipant.identity);
+      const unlock = yield this.e2eeStateMutex.lock();
+      try {
+        if (this.e2eeManager) {
+          if (this.isE2EEEnabled !== enabled) {
+            yield this.localParticipant.setE2EEEnabled(enabled);
+            if (this.localParticipant.identity !== '') {
+              this.e2eeManager.setParticipantCryptorEnabled(enabled, this.localParticipant.identity);
+            }
+          }
+        } else {
+          throw Error('e2ee not configured, please set e2ee settings within the room options');
         }
-      } else {
-        throw Error('e2ee not configured, please set e2ee settings within the room options');
+      } finally {
+        unlock();
       }
     });
   }
   setupE2EE() {
     // when encryption is enabled via `options.encryption`, we enable data channel encryption
-    var _a;
+    var _a, _b;
     const dcEncryptionEnabled = !!this.options.encryption;
     const e2eeOptions = this.options.encryption || this.options.e2ee;
     if (e2eeOptions) {
@@ -29128,6 +29573,7 @@ class Room extends eventsExports.EventEmitter {
         this.emit(RoomEvent.EncryptionError, error, participant);
       });
       (_a = this.e2eeManager) === null || _a === void 0 ? void 0 : _a.setup(this);
+      (_b = this.e2eeManager) === null || _b === void 0 ? void 0 : _b.setupEngine(this.engine);
     }
   }
   get logContext() {
@@ -29227,18 +29673,7 @@ class Room extends eventsExports.EventEmitter {
     }).on(EngineEvent.DCBufferStatusChanged, (status, kind) => {
       this.emit(RoomEvent.DCBufferStatusChanged, status, kind);
     }).on(EngineEvent.LocalTrackSubscribed, subscribedSid => {
-      const trackPublication = this.localParticipant.getTrackPublications().find(_ref3 => {
-        let {
-          trackSid
-        } = _ref3;
-        return trackSid === subscribedSid;
-      });
-      if (!trackPublication) {
-        this.log.warn('could not find local track subscription for subscribed event', this.logContext);
-        return;
-      }
-      this.localParticipant.emit(ParticipantEvent.LocalTrackSubscribed, trackPublication);
-      this.emitWhenConnected(RoomEvent.LocalTrackSubscribed, trackPublication, this.localParticipant);
+      this.handleLocalTrackSubscribed(subscribedSid);
     }).on(EngineEvent.RoomMoved, roomMoved => {
       this.log.debug('room moved', roomMoved);
       if (roomMoved.room) {
@@ -29274,8 +29709,8 @@ class Room extends eventsExports.EventEmitter {
       }
       this.outgoingDataTrackManager.receivedSfuUnpublishResponse(event.info.pubHandle);
     }).on(EngineEvent.DataTrackSubscriberHandles, event => {
-      const handleToSidMapping = new Map(Object.entries(event.subHandles).map(_ref4 => {
-        let [key, value] = _ref4;
+      const handleToSidMapping = new Map(Object.entries(event.subHandles).map(_ref2 => {
+        let [key, value] = _ref2;
         return [parseInt(key, 10), value.trackSid];
       }));
       this.incomingDataTrackManager.receivedSfuSubscriberHandles(handleToSidMapping);
@@ -29293,6 +29728,16 @@ class Room extends eventsExports.EventEmitter {
         return [participant.identity, participant.dataTracks.map(info => DataTrackInfo.from(info))];
       }));
       this.incomingDataTrackManager.receiveSfuPublicationUpdates(mapped);
+    }).on(EngineEvent.TokenRefreshed, token => {
+      var _a;
+      (_a = this.regionUrlProvider) === null || _a === void 0 ? void 0 : _a.updateToken(token);
+    }).on(EngineEvent.ServerRegionsReported, regions => {
+      var _a;
+      (_a = this.regionUrlProvider) === null || _a === void 0 ? void 0 : _a.setServerReportedRegions({
+        regionSettings: regions,
+        updatedAtInMs: Date.now(),
+        maxAgeInMs: DEFAULT_MAX_AGE_MS
+      });
     });
     if (this.localParticipant) {
       this.localParticipant.setupEngine(this.engine);
@@ -29303,6 +29748,17 @@ class Room extends eventsExports.EventEmitter {
     if (this.outgoingDataStreamManager) {
       this.outgoingDataStreamManager.setupEngine(this.engine);
     }
+  }
+  createRegionStrategy() {
+    return {
+      getNextUrl: signal => __awaiter(this, void 0, void 0, function* () {
+        return this.regionUrlProvider ? this.regionUrlProvider.getNextBestRegionUrl(signal) : null;
+      }),
+      resetAttempts: () => {
+        var _a;
+        return (_a = this.regionUrlProvider) === null || _a === void 0 ? void 0 : _a.resetAttempts();
+      }
+    };
   }
   /**
    * getLocalDevices abstracts navigator.mediaDevices.enumerateDevices.
@@ -29380,6 +29836,9 @@ class Room extends eventsExports.EventEmitter {
         case 'signal-reconnect':
           // @ts-expect-error function is private
           yield this.engine.client.handleOnClose('simulate disconnect');
+          break;
+        case 'fail-on-v1-path':
+          this.engine.failNextV1Path();
           break;
         case 'speaker':
           req = new SimulateScenario({
@@ -29704,6 +30163,56 @@ class Room extends eventsExports.EventEmitter {
       this.emit(RoomEvent.EncryptionError, new Error("Encrypted ".concat(publication.source, " track received from participant ").concat(participant.sid, ", but room does not have encryption enabled!")));
     }
   }
+  handleLocalTrackSubscribed(subscribedSid) {
+    const findPublication = () => this.localParticipant.getTrackPublications().find(_ref3 => {
+      let {
+        trackSid
+      } = _ref3;
+      return trackSid === subscribedSid;
+    });
+    const trackPublication = findPublication();
+    if (trackPublication) {
+      this.emitLocalTrackSubscribed(trackPublication);
+      return;
+    }
+    // the track publication may not be registered yet if the server signals
+    // the subscription before publishTrack has finished adding the publication.
+    // defer with a timeout until LocalTrackPublished fires for the matching trackSid
+    this.log.debug('deferring LocalTrackSubscribed, publication not yet available', Object.assign(Object.assign({}, this.logContext), {
+      subscribedSid
+    }));
+    const TIMEOUT_MS = 10000;
+    let timer;
+    const onPublished = pub => {
+      if (pub.trackSid === subscribedSid) {
+        cleanup();
+        this.emitLocalTrackSubscribed(pub);
+      }
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      this.localParticipant.off(ParticipantEvent.LocalTrackPublished, onPublished);
+      this.off(RoomEvent.Disconnected, cleanup);
+    };
+    this.localParticipant.on(ParticipantEvent.LocalTrackPublished, onPublished);
+    this.once(RoomEvent.Disconnected, cleanup);
+    timer = setTimeout(() => {
+      cleanup();
+      // final attempt in case the publication was added without emitting the event
+      const pub = findPublication();
+      if (pub) {
+        this.emitLocalTrackSubscribed(pub);
+      } else {
+        this.log.warn('could not find local track publication for LocalTrackSubscribed event after timeout', Object.assign(Object.assign({}, this.logContext), {
+          subscribedSid
+        }));
+      }
+    }, TIMEOUT_MS);
+  }
+  emitLocalTrackSubscribed(trackPublication) {
+    this.localParticipant.emit(ParticipantEvent.LocalTrackSubscribed, trackPublication);
+    this.emitWhenConnected(RoomEvent.LocalTrackSubscribed, trackPublication, this.localParticipant);
+  }
   handleDisconnect() {
     let shouldStopTracks = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
     let reason = arguments.length > 1 ? arguments[1] : undefined;
@@ -29908,7 +30417,7 @@ class Room extends eventsExports.EventEmitter {
       participant = RemoteParticipant.fromParticipantInfo(this.engine.client, info, {
         loggerContextCb: () => this.logContext,
         loggerName: this.options.loggerName
-      });
+      }, this.incomingDataTrackManager);
     } else {
       participant = new RemoteParticipant(this.engine.client, '', identity, undefined, undefined, undefined, {
         loggerContextCb: () => this.logContext,
@@ -30058,12 +30567,13 @@ class Room extends eventsExports.EventEmitter {
       return false;
     }
     this.state = state;
+    this.incomingDataStreamManager.setConnected(state === ConnectionState.Connected);
     this.emit(RoomEvent.ConnectionStateChanged, this.state);
     return true;
   }
   emitBufferedEvents() {
-    this.bufferedEvents.forEach(_ref5 => {
-      let [ev, args] = _ref5;
+    this.bufferedEvents.forEach(_ref4 => {
+      let [ev, args] = _ref4;
       this.emit(ev, ...args);
     });
     this.bufferedEvents = [];
@@ -31268,7 +31778,9 @@ function decodeTokenPayload(token) {
     } = payload,
     rest = __rest(payload, ["roomConfig"]);
   const mappedPayload = Object.assign(Object.assign({}, rest), {
-    roomConfig: payload.roomConfig ? RoomConfiguration.fromJson(payload.roomConfig) : undefined
+    roomConfig: payload.roomConfig ? RoomConfiguration.fromJson(payload.roomConfig, {
+      ignoreUnknownFields: true
+    }) : undefined
   });
   return mappedPayload;
 }
@@ -31601,4 +32113,50 @@ function facingModeFromDeviceLabel(deviceLabel) {
 function isFacingModeValue(item) {
   const allowedValues = ['user', 'environment', 'left', 'right'];
   return item === undefined || allowedValues.includes(item);
-}export{AudioPresets,BackupCodecPolicy,BaseKeyProvider,CheckStatus,Checker,ConnectionCheck,ConnectionError,ConnectionErrorReason,ConnectionQuality,ConnectionState,CriticalTimers,CryptorError,CryptorErrorReason,CryptorEvent,DataPacket_Kind,DataStreamError,DataStreamErrorReason,DataTrackPacket,DefaultReconnectPolicy,DeviceUnsupportedError,DisconnectReason,EncryptionEvent,Encryption_Type,EngineEvent,ExternalE2EEKeyProvider,KeyHandlerEvent,KeyProviderEvent,LivekitError,LivekitReasonedError,LocalAudioTrack,LocalDataTrack,LocalParticipant,LocalTrack,LocalTrackPublication,LocalTrackRecorder,LocalVideoTrack,LogLevel,LoggerNames,MediaDeviceFailure,_ as Mutex,NegotiationError,Participant,ParticipantEvent,ParticipantInfo_Kind as ParticipantKind,PublishDataError,PublishTrackError,RemoteAudioTrack,RemoteDataTrack,RemoteParticipant,RemoteTrack,RemoteTrackPublication,RemoteVideoTrack,Room,RoomEvent,RpcError,ScreenSharePresets,SignalReconnectError,SignalRequestError,SimulatedError,SubscriptionError,TokenSource,TokenSourceConfigurable,TokenSourceFixed,Track,TrackEvent,TrackInvalidError,TrackPublication,TrackType,UnexpectedConnectionState,UnsupportedServer,VideoPreset,VideoPresets,VideoPresets43,VideoQuality,areTokenSourceFetchOptionsEqual,asEncryptablePacket,attachToElement,attributeTypings as attributes,audioCodecs,compareVersions,createAudioAnalyser,createE2EEKey,createKeyMaterialFromBuffer,createKeyMaterialFromString,createLocalAudioTrack,createLocalScreenTracks,createLocalTracks,createLocalVideoTrack,decodeTokenPayload,deriveKeys,detachTrack,facingModeFromDeviceLabel,facingModeFromLocalTrack,getBrowser,getEmptyAudioStreamTrack,getEmptyVideoStreamTrack,getLogger,importKey,isAudioCodec,isAudioTrack,isBackupCodec,isBackupVideoCodec,isBrowserSupported,isE2EESupported,isInsertableStreamSupported,isLocalParticipant,isLocalTrack,isRemoteParticipant,isRemoteTrack,isScriptTransformSupported,isVideoCodec,isVideoFrame,isVideoTrack,needsRbspUnescaping,parseRbsp,protocolVersion,ratchet,setLogExtension,setLogLevel,supportsAV1,supportsAdaptiveStream,supportsAudioOutputSelection,supportsDynacast,supportsVP9,version,videoCodecs,writeRbsp};//# sourceMappingURL=livekit-client.esm.mjs.map
+}const SerializerSymbol = Symbol.for('lk.serializer');
+function isSerializer(v) {
+  return typeof v === 'object' && v !== null && 'symbol' in v && v.symbol === SerializerSymbol;
+}
+/** @internal */
+function base(params) {
+  return Object.assign(Object.assign({}, params), {
+    symbol: SerializerSymbol
+  });
+}
+/**
+ * JSON serializer — `JSON.parse` on the way in, `JSON.stringify` on the way out.
+ * Defaults to `any` so individual handlers can annotate their own payload types.
+ */
+function json() {
+  return base({
+    parse: rawString => JSON.parse(rawString),
+    serialize: val => JSON.stringify(val)
+  });
+}
+/** Raw string serializer — passes payloads through as plain strings with no encoding. */
+function raw() {
+  return base({
+    parse: rawString => rawString,
+    serialize: val => val
+  });
+}
+/** Custom serializer - allows custom defined parse and serialize functions */
+function custom(params) {
+  return base(params);
+}
+/**
+ * Serializer helpers for message payload encoding.
+ *
+ * @example
+ * ```ts
+ * const a = serializers.raw(); // Serializer<string, string>
+ * const b = serializer.json<{ foo: string }, { bar: string }>(); // Serializer<{ foo: string }, { bar: string }>
+ * ```
+ *
+ * @beta
+ */
+const serializers = {
+  json,
+  raw,
+  custom
+};export{AudioPresets,BackupCodecPolicy,BaseKeyProvider,CheckStatus,Checker,ConnectionCheck,ConnectionError,ConnectionErrorReason,ConnectionQuality,ConnectionState,CriticalTimers,CryptorError,CryptorErrorReason,CryptorEvent,DataPacket_Kind,DataStreamError,DataStreamErrorReason,DataTrackPacket,DefaultReconnectPolicy,DeviceUnsupportedError,DisconnectReason,EncryptionEvent,Encryption_Type,EngineEvent,ExternalE2EEKeyProvider,KeyHandlerEvent,KeyProviderEvent,LivekitError,LivekitReasonedError,LocalAudioTrack,LocalDataTrack,LocalParticipant,LocalTrack,LocalTrackPublication,LocalTrackRecorder,LocalVideoTrack,LogLevel,LoggerNames,MediaDeviceFailure,_ as Mutex,NegotiationError,Participant,ParticipantEvent,ParticipantInfo_Kind as ParticipantKind,PublishDataError,PublishTrackError,RemoteAudioTrack,RemoteDataTrack,RemoteParticipant,RemoteTrack,RemoteTrackPublication,RemoteVideoTrack,Room,RoomEvent,RpcError,ScreenSharePresets,SignalReconnectError,SignalRequestError,SimulatedError,SubscriptionError,TokenSource,TokenSourceConfigurable,TokenSourceFixed,Track,TrackEvent,TrackInvalidError,TrackPublication,TrackType,UnexpectedConnectionState,UnsupportedServer,VideoPreset,VideoPresets,VideoPresets43,VideoQuality,areTokenSourceFetchOptionsEqual,asEncryptablePacket,attachToElement,attributeTypings as attributes,audioCodecs,compareVersions,createAudioAnalyser,createE2EEKey,createKeyMaterialFromBuffer,createKeyMaterialFromString,createLocalAudioTrack,createLocalScreenTracks,createLocalTracks,createLocalVideoTrack,decodeTokenPayload,deriveKeys,detachTrack,facingModeFromDeviceLabel,facingModeFromLocalTrack,getBrowser,getEmptyAudioStreamTrack,getEmptyVideoStreamTrack,getLogger,importKey,isAudioCodec,isAudioTrack,isBackupCodec,isBackupVideoCodec,isBrowserSupported,isE2EESupported,isInsertableStreamSupported,isLocalParticipant,isLocalTrack,isRemoteParticipant,isRemoteTrack,isScriptTransformSupported,isSerializer,isVideoCodec,isVideoFrame,isVideoTrack,needsRbspUnescaping,parseRbsp,protocolVersion,ratchet,serializers,setLogExtension,setLogLevel,supportsAV1,supportsAdaptiveStream,supportsAudioOutputSelection,supportsDynacast,supportsVP9,version,videoCodecs,writeRbsp};//# sourceMappingURL=livekit-client.esm.mjs.map
