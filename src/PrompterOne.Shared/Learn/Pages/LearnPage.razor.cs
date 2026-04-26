@@ -57,6 +57,7 @@ public partial class LearnPage : IAsyncDisposable
     private bool _isPlaying;
     private bool _isLoopEnabled;
     private bool _loadState = true;
+    private bool _arePrepNotesExpanded = true;
     private bool _focusScreenAfterRender = true;
     private bool _syncFocusLayoutAfterRender;
     private bool _startPlaybackAfterLayoutSync;

@@ -525,6 +525,23 @@ public partial class TeleprompterPage
 
     private string BuildReaderSpeedLabel() => $"{_readerPlaybackSpeedWpm} {ReaderWordsPerMinuteSuffix}";
 
+    private int BuildReaderSpeedDialValue()
+    {
+        var speedRange = ReaderMaximumPlaybackSpeedWpm - ReaderMinimumPlaybackSpeedWpm;
+        if (speedRange <= 0)
+        {
+            return ReaderSpeedDialMinimum;
+        }
+
+        var dialRange = ReaderSpeedDialMaximum - ReaderSpeedDialMinimum;
+        var normalizedSpeed = Math.Clamp(_readerPlaybackSpeedWpm, ReaderMinimumPlaybackSpeedWpm, ReaderMaximumPlaybackSpeedWpm);
+        var speedOffset = normalizedSpeed - ReaderMinimumPlaybackSpeedWpm;
+        return ReaderSpeedDialMinimum + (int)Math.Round(speedOffset * dialRange / (double)speedRange, MidpointRounding.AwayFromZero);
+    }
+
+    private string BuildReaderSpeedDialValueLabel() =>
+        $"{BuildReaderSpeedDialValue()}/{ReaderSpeedDialMaximum}";
+
     private string? BuildReaderWordSpeedCueLabel(ReaderWordViewModel word, int targetWpm)
     {
         if (!ShouldShowReaderSpeedCueLabel(word) || word.EffectiveWpm is not int effectiveWpm)

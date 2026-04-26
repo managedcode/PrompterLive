@@ -208,3 +208,35 @@
         right: 6px;
     }
 }
+
+@media (max-width: 430px) {
+    .rd-sliders {
+        top: 12px;
+        bottom: 64px;
+        transform: none;
+        max-height: none;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+    }
+
+    .rd-sliders::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-height: 430px) {
+    .rd-sliders {
+        top: 8px;
+        bottom: 8px;
+        transform: none;
+        max-height: none;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+    }
+
+    .rd-sliders::-webkit-scrollbar {
+        display: none;
+    }
+}

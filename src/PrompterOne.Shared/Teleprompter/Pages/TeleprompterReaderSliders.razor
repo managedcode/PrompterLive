@@ -86,6 +86,45 @@
               data-test="@BuildTooltipTestId(UiTestIds.Teleprompter.AlignmentTooltipWidthKey)">@WidthTitle</span>
     </div>
     <div class="rd-rail-tip-anchor"
+         @onmouseenter="@(() => HandleTooltipPointerEnter(UiTestIds.Teleprompter.SpeedDialTooltipKey))"
+         @onmouseleave="@(() => HandleTooltipPointerLeave(UiTestIds.Teleprompter.SpeedDialTooltipKey))"
+         @onfocusin="@(() => HandleTooltipFocusIn(UiTestIds.Teleprompter.SpeedDialTooltipKey))"
+         @onfocusout="@(() => HandleTooltipFocusOut(UiTestIds.Teleprompter.SpeedDialTooltipKey))"
+         @onpointerdown="@(() => HandleTooltipPointerDown(UiTestIds.Teleprompter.SpeedDialTooltipKey))"
+        @onkeydown="@((KeyboardEventArgs args) => HandleTooltipKeyDown(UiTestIds.Teleprompter.SpeedDialTooltipKey, args))">
+        <div class="rd-slider-group rd-speed-dial-group">
+            <svg class="rd-slider-icon"
+                 aria-hidden="true"
+                 width="14"
+                 height="14"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path d="M12 15l3-3" />
+                <path d="M4 14a8 8 0 1 1 16 0" />
+                <path d="M5 19h14" />
+            </svg>
+            <input type="range"
+                   class="rd-vslider rd-speed-dial"
+                   id="@UiDomIds.Teleprompter.SpeedDial"
+                   min="@SpeedDialMin"
+                   max="@SpeedDialMax"
+                   value="@SpeedDialValue"
+                   @oninput="OnSpeedDialInput"
+                   @onkeydown:stopPropagation="true"
+                   aria-label="@SpeedDialTitle"
+                   data-test="@UiTestIds.Teleprompter.SpeedDial">
+            <span class="rd-slider-val"
+                  id="@UiDomIds.Teleprompter.SpeedDialValue"
+                  data-test="@UiTestIds.Teleprompter.SpeedDialValue">@SpeedDialValueLabel</span>
+        </div>
+        <span id="@BuildTooltipDomId(UiTestIds.Teleprompter.SpeedDialTooltipKey)"
+              class="@BuildTooltipCssClass(UiTestIds.Teleprompter.SpeedDialTooltipKey, false)"
+              role="tooltip"
+              data-test="@BuildTooltipTestId(UiTestIds.Teleprompter.SpeedDialTooltipKey)">@SpeedDialTitle</span>
+    </div>
+    <div class="rd-rail-tip-anchor"
          @onmouseenter="@(() => HandleTooltipPointerEnter(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
          @onmouseleave="@(() => HandleTooltipPointerLeave(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
          @onfocusin="@(() => HandleTooltipFocusIn(UiTestIds.Teleprompter.SpeedCueDisplayTooltipKey))"
@@ -135,11 +174,17 @@
     [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnFocalInput { get; set; }
     [Parameter, EditorRequired] public EventCallback OnSetSpeedCueDisplayMultiplier { get; set; }
     [Parameter, EditorRequired] public EventCallback OnSetSpeedCueDisplayWpm { get; set; }
+    [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnSpeedDialInput { get; set; }
     [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnWidthInput { get; set; }
     [Parameter] public ReaderSpeedCueDisplayMode SpeedCueDisplayMode { get; set; } = ReaderSettingsDefaults.SpeedCueDisplayMode;
     [Parameter, EditorRequired] public string SpeedCueDisplayMultiplierTitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedCueDisplayTitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedCueDisplayWpmTitle { get; set; } = string.Empty;
+    [Parameter] public int SpeedDialMax { get; set; }
+    [Parameter] public int SpeedDialMin { get; set; }
+    [Parameter] public int SpeedDialValue { get; set; }
+    [Parameter, EditorRequired] public string SpeedDialTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SpeedDialValueLabel { get; set; } = string.Empty;
     [Parameter] public Action<string>? TooltipFocusIn { get; set; }
     [Parameter] public Action<string>? TooltipFocusOut { get; set; }
     [Parameter] public Action<string, KeyboardEventArgs>? TooltipKeyDown { get; set; }

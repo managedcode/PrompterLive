@@ -7,6 +7,9 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
+    private const string ReaderSpeedDialUpdatedLabel = "8/10";
+    private const string ReaderSpeedDialUpdatedValue = "8";
+    private const int ReaderSpeedDialUpdatedWpm = 402;
     private const int ReaderSpeedStepWpm = 10;
     private const string WordsPerMinuteSuffix = "WPM";
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
@@ -59,6 +62,11 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
         await Expect(speedValue).ToHaveTextAsync($"{baselineSpeedWpm + ReaderSpeedStepWpm} {WordsPerMinuteSuffix}");
+
+        await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.SpeedDial), ReaderSpeedDialUpdatedValue);
+        await Expect(speedValue).ToHaveTextAsync($"{ReaderSpeedDialUpdatedWpm} {WordsPerMinuteSuffix}");
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDial)).ToHaveValueAsync(ReaderSpeedDialUpdatedValue);
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDialValue)).ToHaveTextAsync(ReaderSpeedDialUpdatedLabel);
 
         var cameraToggle = page.GetByTestId(UiTestIds.Teleprompter.CameraToggle);
         var cameraWasActive = await HasActiveStateAsync(cameraToggle);
@@ -281,6 +289,17 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
     private static Task<double> GetOpacityAsync(Microsoft.Playwright.ILocator locator) =>
         locator.EvaluateAsync<double>(
             "element => Number.parseFloat(window.getComputedStyle(element).opacity)");
+
+    private static Task SetRangeValueAsync(Microsoft.Playwright.ILocator locator, string value) =>
+        locator.EvaluateAsync(
+            """
+            (element, nextValue) => {
+                element.value = nextValue;
+                element.dispatchEvent(new Event("input", { bubbles: true }));
+                element.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            """,
+            value);
 
     private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(Microsoft.Playwright.ILocator locator) =>
         await locator.EvaluateAsync<LayoutBounds>(

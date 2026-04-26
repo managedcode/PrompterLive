@@ -18,6 +18,7 @@ public static partial class UiTestIds
         public const string NotesSave = "learn-notes-save";
         public const string NotesSection = "learn-notes-section";
         public const string NotesTextarea = "learn-notes-textarea";
+        public const string NotesToggle = "learn-notes-toggle";
         public const string OrpLine = "learn-orp-line";
         public const string Page = "learn-page";
         public const string PauseIcon = "learn-pause-icon";

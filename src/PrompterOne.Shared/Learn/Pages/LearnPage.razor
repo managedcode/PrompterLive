@@ -27,7 +27,7 @@
              @ref="_displayRoot"
              data-rsvp-layout-ready="@BuildLayoutReadyAttributeValue()"
              data-test="@UiTestIds.Learn.Display">
-            <div style="@BuildPendingLayoutHiddenStyle()">
+            <div class="rsvp-focus-stage" style="@BuildPendingLayoutHiddenStyle()">
                 <div class="rsvp-crosshair">
                     <UiCrosshairGuide TestId="@UiTestIds.Learn.Crosshair" />
                 </div>
@@ -80,43 +80,57 @@
                 <div id="@UiDomIds.Learn.PauseFill" class="rsvp-pause-fill"></div>
             </div>
 
-            <aside class="rsvp-notes"
+            <aside class="@PrepNotesPanelCssClass"
                    data-test="@UiTestIds.Learn.NotesPanel"
+                   data-expanded="@_arePrepNotesExpanded.ToString().ToLowerInvariant()"
                    @onkeydown:stopPropagation="true">
                 <div class="rsvp-notes-head">
-                    <span class="rsvp-notes-title">@Text(UiTextKey.LearnNotesTitle)</span>
+                    <button class="rsvp-notes-toggle"
+                            type="button"
+                            aria-label="@Text(UiTextKey.LearnNotesTitle)"
+                            aria-controls="@UiDomIds.Learn.NotesBody"
+                            aria-expanded="@_arePrepNotesExpanded.ToString().ToLowerInvariant()"
+                            @onclick="TogglePrepNotesExpanded"
+                            data-test="@UiTestIds.Learn.NotesToggle">
+                        <span class="rsvp-notes-title">@Text(UiTextKey.LearnNotesTitle)</span>
+                        <UiIcon Kind="@PrepNotesToggleIcon" Size="16" StrokeWidth="2.4m" />
+                    </button>
                     <span class="rsvp-notes-section" data-test="@UiTestIds.Learn.NotesSection">@CurrentPrepNotesSectionLabel</span>
                 </div>
-                <textarea class="rsvp-notes-input"
-                          rows="3"
-                          value="@_prepNoteDraft"
-                          placeholder="@Text(UiTextKey.LearnNotesPlaceholder)"
-                          aria-label="@Text(UiTextKey.LearnNotesTitle)"
-                          @oninput="HandlePrepNoteDraftChanged"
-                          data-test="@UiTestIds.Learn.NotesTextarea"></textarea>
-                <button class="rsvp-notes-save"
-                        type="button"
-                        disabled="@(!CanAddPrepNote)"
-                        @onclick="AddPrepNoteAsync"
-                        data-test="@UiTestIds.Learn.NotesSave">@Text(UiTextKey.LearnNotesSave)</button>
-                <div class="rsvp-notes-list" data-test="@UiTestIds.Learn.NotesList">
-                    @{
-                        var currentNotes = CurrentSectionPrepNotes;
-                    }
-                    @if (currentNotes.Count == 0)
-                    {
-                        <p class="rsvp-notes-empty" data-test="@UiTestIds.Learn.NotesEmpty">@Text(UiTextKey.LearnNotesEmpty)</p>
-                    }
-                    else
-                    {
-                        @foreach (var note in currentNotes)
-                        {
-                            <article class="rsvp-note" data-test="@UiTestIds.Learn.NoteItem(note.Id)">
-                                <span class="rsvp-note-anchor">@note.AnchorWord</span>
-                                <p>@note.Text</p>
-                            </article>
+                <div class="rsvp-notes-body"
+                     id="@UiDomIds.Learn.NotesBody"
+                     hidden="@(!_arePrepNotesExpanded)">
+                    <textarea class="rsvp-notes-input"
+                              rows="3"
+                              value="@_prepNoteDraft"
+                              placeholder="@Text(UiTextKey.LearnNotesPlaceholder)"
+                              aria-label="@Text(UiTextKey.LearnNotesTitle)"
+                              @oninput="HandlePrepNoteDraftChanged"
+                              data-test="@UiTestIds.Learn.NotesTextarea"></textarea>
+                    <button class="rsvp-notes-save"
+                            type="button"
+                            disabled="@(!CanAddPrepNote)"
+                            @onclick="AddPrepNoteAsync"
+                            data-test="@UiTestIds.Learn.NotesSave">@Text(UiTextKey.LearnNotesSave)</button>
+                    <div class="rsvp-notes-list" data-test="@UiTestIds.Learn.NotesList">
+                        @{
+                            var currentNotes = CurrentSectionPrepNotes;
                         }
-                    }
+                        @if (currentNotes.Count == 0)
+                        {
+                            <p class="rsvp-notes-empty" data-test="@UiTestIds.Learn.NotesEmpty">@Text(UiTextKey.LearnNotesEmpty)</p>
+                        }
+                        else
+                        {
+                            @foreach (var note in currentNotes)
+                            {
+                                <article class="rsvp-note" data-test="@UiTestIds.Learn.NoteItem(note.Id)">
+                                    <span class="rsvp-note-anchor">@note.AnchorWord</span>
+                                    <p>@note.Text</p>
+                                </article>
+                            }
+                        }
+                    </div>
                 </div>
             </aside>
         </div>

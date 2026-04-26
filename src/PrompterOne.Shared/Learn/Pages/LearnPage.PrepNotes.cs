@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PrompterOne.Shared.Components;
 using PrompterOne.Shared.Learn.Services;
 using PrompterOne.Shared.Localization;
 
@@ -26,6 +27,16 @@ public partial class LearnPage
 
     private bool CanAddPrepNote => !string.IsNullOrWhiteSpace(_prepNoteDraft);
 
+    private string PrepNotesPanelCssClass =>
+        _arePrepNotesExpanded
+            ? "rsvp-notes"
+            : "rsvp-notes is-collapsed";
+
+    private UiIconKind PrepNotesToggleIcon =>
+        _arePrepNotesExpanded
+            ? UiIconKind.ChevronDown
+            : UiIconKind.ChevronRight;
+
     private async Task LoadPrepNotesAsync()
     {
         var scriptKey = ResolvePrepNotesScriptKey();
@@ -36,6 +47,9 @@ public partial class LearnPage
 
     private void HandlePrepNoteDraftChanged(ChangeEventArgs args) =>
         _prepNoteDraft = args.Value?.ToString() ?? string.Empty;
+
+    private void TogglePrepNotesExpanded() =>
+        _arePrepNotesExpanded = !_arePrepNotesExpanded;
 
     private async Task AddPrepNoteAsync()
     {

@@ -69,17 +69,38 @@
 /* RSVP Display — horizontal 3-word context layout */
 .rsvp-display {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows:
+        minmax(0, 1fr)
+        var(--rsvp-focus-stage-height, 184px)
+        var(--rsvp-phrase-height, 70px)
+        var(--rsvp-pause-height, 24px)
+        minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
+    justify-items: center;
+    row-gap: var(--rsvp-display-gap, 20px);
     padding: 40px;
     position: relative;
+    min-height: 0;
+}
+
+.rsvp-focus-stage {
+    position: relative;
+    display: grid;
+    grid-row: 2;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    height: var(--rsvp-focus-stage-height, 184px);
+    min-height: 0;
 }
 
 /* Crosshair above focus word */
 .rsvp-crosshair {
-    margin-bottom: 32px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     opacity: .5;
 }
 
@@ -91,11 +112,11 @@
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     width: min(100%, 1100px);
     max-width: 1100px;
-    min-height: 144px;
+    height: var(--rsvp-focus-row-height, 144px);
     min-width: 0;
     overflow: visible;
 }
@@ -103,7 +124,7 @@
 .rsvp-lane {
     min-width: 0;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     position: relative;
     z-index: 1;
 }
@@ -120,7 +141,7 @@
 
 .rsvp-ctx-left, .rsvp-ctx-right {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 14px;
     font-size: clamp(26px, 2vw, 30px);
     font-weight: 400;
@@ -145,7 +166,7 @@
 .rsvp-focus-shell {
     justify-self: center;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: flex-start;
     width: 0;
     min-width: 0;
@@ -156,18 +177,7 @@
 }
 
 .rsvp-active-phrase-highlight {
-    position: absolute;
-    left: clamp(34px, 9vw, 170px);
-    right: clamp(34px, 9vw, 170px);
-    bottom: 24px;
-    height: 48px;
-    border-radius: 999px;
-    border-bottom: 2px solid rgba(232, 213, 176, .24);
-    background:
-        linear-gradient(90deg, transparent 0%, rgba(232, 213, 176, .055) 18%, rgba(232, 213, 176, .085) 50%, rgba(232, 213, 176, .055) 82%, transparent 100%);
-    box-shadow: 0 12px 36px rgba(232, 213, 176, .045);
-    pointer-events: none;
-    z-index: 0;
+    display: none;
 }
 
 /* Focus word — large, centered, with ORP highlight */
@@ -197,8 +207,8 @@
 /* Vertical ORP line */
 .rsvp-orp-line {
     position: absolute;
-    top: 15%;
-    bottom: 40%;
+    top: 0;
+    bottom: 0;
     left: 50%;
     width: 1.5px;
     background: linear-gradient(to bottom, transparent, rgba(255,82,82,.25), transparent);
@@ -215,10 +225,15 @@
 
 /* Phrase preview below */
 .rsvp-phrase {
-    margin-top: 40px;
+    grid-row: 3;
     text-align: center;
     max-width: min(640px, 78vw);
+    height: var(--rsvp-phrase-height, 70px);
+    display: grid;
+    grid-template-rows: 18px minmax(0, 1fr);
+    align-items: start;
     opacity: .4;
+    overflow: hidden;
 }
 .rsvp-phrase-label {
     font-size: 9px;
@@ -230,19 +245,26 @@
     display: block;
 }
 .rsvp-phrase p {
+    margin: 0;
     font-size: 16px;
     line-height: 1.5;
     color: var(--t3);
+    min-height: 48px;
+    max-height: 48px;
+    overflow: hidden;
     text-wrap: balance;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 /* Pause bar */
 .rsvp-pause-track {
+    grid-row: 4;
     width: 200px;
     height: 4px;
     background: var(--gold-07);
     border-radius: 2px;
-    margin-top: 20px;
     overflow: hidden;
 }
 .rsvp-pause-fill {
@@ -270,9 +292,32 @@
     color: var(--t2);
 }
 
+.rsvp-notes.is-collapsed {
+    max-height: 86px;
+}
+
 .rsvp-notes-head {
     display: grid;
     gap: 4px;
+}
+
+.rsvp-notes-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+}
+
+.rsvp-notes-toggle:hover,
+.rsvp-notes-toggle:focus-visible {
+    color: var(--t1);
 }
 
 .rsvp-notes-title {
@@ -290,6 +335,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.rsvp-notes-body {
+    display: contents;
+}
+
+.rsvp-notes-body[hidden] {
+    display: none;
 }
 
 .rsvp-notes-input {

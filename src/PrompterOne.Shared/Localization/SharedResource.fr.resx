@@ -561,6 +561,9 @@
   <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
     <value>Afficher les repères de vitesse en multiplicateurs</value>
   </data>
+  <data name="TooltipReaderSpeedDial" xml:space="preserve">
+    <value>Régler le cadran de vitesse en direct du lecteur</value>
+  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Texte plus petit</value>
   </data>

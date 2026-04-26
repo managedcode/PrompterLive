@@ -14,6 +14,10 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 {
     private static readonly TimeSpan PersistenceAssertionTimeout = TimeSpan.FromSeconds(10);
     private const int MinimumReaderSpeedWpm = 60;
+    private const int ReaderSpeedDialMaximum = 10;
+    private const int ReaderSpeedDialUpdatedValue = 8;
+    private const int ReaderSpeedDialUpdatedWpm = 402;
+    private const string ReaderSpeedDialUpdatedLabel = "8/10";
     private const int ReaderSpeedStepWpm = 10;
     private const string WordsPerMinuteSuffix = "WPM";
     private const int PersistedFocalPointPercent = 42;
@@ -258,6 +262,34 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Equal(BuildWordsPerMinuteLabel(MinimumReaderSpeedWpm), cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal(MinimumReaderSpeedWpm, savedSettings.ScrollSpeed, 2);
             Assert.Equal(MinimumReaderSpeedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
+        }, PersistenceAssertionTimeout);
+    }
+
+    [Test]
+    public async Task TeleprompterPage_SpeedDialPersistsMappedReaderSpeed()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterDemo);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(UiTestIds.Teleprompter.SpeedDial, cut.Markup, StringComparison.Ordinal);
+            Assert.Equal(ReaderSpeedDialMaximum.ToString(CultureInfo.InvariantCulture), cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial).GetAttribute("max"));
+        });
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial).InputAsync(ReaderSpeedDialUpdatedValue);
+
+        cut.WaitForAssertion(() =>
+        {
+            var savedSettings = harness.JsRuntime.GetSavedValue<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings);
+
+            Assert.Equal(ReaderSpeedDialUpdatedValue.ToString(CultureInfo.InvariantCulture), cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial).GetAttribute("value"));
+            Assert.Equal(ReaderSpeedDialUpdatedLabel, cut.FindByTestId(UiTestIds.Teleprompter.SpeedDialValue).TextContent.Trim());
+            Assert.Equal(BuildWordsPerMinuteLabel(ReaderSpeedDialUpdatedWpm), cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
+            Assert.Equal(ReaderSpeedDialUpdatedWpm, savedSettings.ScrollSpeed, 2);
+            Assert.Equal(ReaderSpeedDialUpdatedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
         }, PersistenceAssertionTimeout);
     }
 

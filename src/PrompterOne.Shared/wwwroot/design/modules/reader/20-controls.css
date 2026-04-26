@@ -377,6 +377,10 @@
     letter-spacing: 0.5px;
     white-space: nowrap;
 }
+.rd-speed-dial-group .rd-slider-val {
+    min-width: 24px;
+    text-align: center;
+}
 .rd-speed-cue-display {
     display: grid;
     grid-template-columns: minmax(38px, 1fr);

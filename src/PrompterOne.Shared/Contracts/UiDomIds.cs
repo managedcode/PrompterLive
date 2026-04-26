@@ -69,6 +69,7 @@ public static class UiDomIds
         public const string ContextLeft = "rsvp-ctx-l";
         public const string ContextRight = "rsvp-ctx-r";
         public const string NextPhrase = "rsvp-next-phrase";
+        public const string NotesBody = "rsvp-notes-body";
         public const string PauseFill = "rsvp-pause-fill";
         public const string ProgressLabel = "rsvp-progress-label";
         public const string ProgressFill = "rsvp-progress-fill";
@@ -91,6 +92,8 @@ public static class UiDomIds
         public const string FocalGuide = "rd-guide-h";
         public const string HeaderSegment = "rd-header-segment";
         public const string ProgressFill = "rd-progress-fill";
+        public const string SpeedDial = "rd-speed-dial";
+        public const string SpeedDialValue = "rd-speed-dial-val";
         public const string SpeedValue = "rd-speed-val";
         public const string Stage = "rd-stage";
         public const string Time = "rd-time";

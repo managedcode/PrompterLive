@@ -12,14 +12,15 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     private readonly record struct ContextGapMeasurement(double LeftGapPx, double RightGapPx);
     private readonly record struct ContextRailClipMeasurement(double LeftClipPx, double RightClipPx);
     private readonly record struct FocusWordSlackMeasurement(double SlackPx);
-    private readonly record struct ActivePhraseHighlightMeasurement(
-        double HighlightWidthPx,
-        double RowWidthPx,
-        double WordWidthPx,
-        string BorderBottomStyle,
-        string BackgroundImage);
     private readonly record struct OrpDeltaMeasurement(double DeltaPx);
+    private readonly record struct RsvpVerticalStabilityMeasurement(
+        double FocusRowTopPx,
+        double FocusRowHeightPx,
+        double OrpCenterYPx,
+        double PhraseTopPx,
+        double PhraseHeightPx);
     private readonly record struct VisibleContextWordGapMeasurement(double LeftWordGapPx, double RightWordGapPx);
+    private const double MaxRsvpVerticalDriftPx = 1.5d;
 
     [Test]
     public async Task LearnScreen_KeepsOrpLetterCenteredOnReferenceGuide()
@@ -83,30 +84,63 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
     }
 
     [Test]
-    public async Task LearnScreen_ActivePhraseHighlightMarksMoreThanTheCurrentWord()
+    public async Task LearnScreen_FocusRowAndNextPhraseKeepFixedVerticalSlots()
     {
-        const string scenario = "learn-active-phrase-highlight";
-        const string step = "active-phrase-highlight";
         var page = await fixture.NewPageAsync(additionalContext: true);
 
         try
         {
-            UiScenarioArtifacts.ResetScenario(scenario);
-
+            await page.SetViewportSizeAsync(
+                BrowserTestConstants.Learn.DemoViewportWidth,
+                BrowserTestConstants.Learn.DemoViewportHeight);
             await ReaderRouteDriver.OpenLearnAsync(page, BrowserTestConstants.Routes.LearnDemo);
             await Expect(page.GetByTestId(UiTestIds.Learn.Page))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
-            await Expect(page.GetByTestId(UiTestIds.Learn.ActivePhraseHighlight)).ToBeVisibleAsync();
             await WaitForLearnLayoutReadyAsync(page);
 
-            var measurement = await MeasureActivePhraseHighlightAsync(page);
+            var initial = await MeasureRsvpVerticalStabilityAsync(page);
+            for (var stepIndex = 0; stepIndex < 8; stepIndex++)
+            {
+                await UiInteractionDriver.ClickAndContinueAsync(page.GetByTestId(UiTestIds.Learn.StepForward));
+                await WaitForLearnLayoutReadyAsync(page);
+                var current = await MeasureRsvpVerticalStabilityAsync(page);
 
-            await Assert.That(measurement.HighlightWidthPx > measurement.WordWidthPx * 1.45).IsTrue().Because($"Expected the RSVP active phrase highlight to span beyond only the current word, but highlight={measurement.HighlightWidthPx:0.##}px and word={measurement.WordWidthPx:0.##}px.");
-            await Assert.That(measurement.HighlightWidthPx <= measurement.RowWidthPx).IsTrue().Because($"Expected the RSVP active phrase highlight to stay inside the focus row, but highlight={measurement.HighlightWidthPx:0.##}px and row={measurement.RowWidthPx:0.##}px.");
-            await Assert.That(measurement.BorderBottomStyle).IsEqualTo("solid");
-            await Assert.That(measurement.BackgroundImage).IsNotEqualTo("none");
+                await Assert.That(Math.Abs(current.FocusRowTopPx - initial.FocusRowTopPx) <= MaxRsvpVerticalDriftPx)
+                    .IsTrue()
+                    .Because($"Expected the Learn focus row top to stay fixed while words and the next phrase change, but it drifted from {initial.FocusRowTopPx:0.##}px to {current.FocusRowTopPx:0.##}px.");
+                await Assert.That(Math.Abs(current.FocusRowHeightPx - initial.FocusRowHeightPx) <= MaxRsvpVerticalDriftPx)
+                    .IsTrue()
+                    .Because($"Expected the Learn focus row height to stay reserved, but it changed from {initial.FocusRowHeightPx:0.##}px to {current.FocusRowHeightPx:0.##}px.");
+                await Assert.That(Math.Abs(current.OrpCenterYPx - initial.OrpCenterYPx) <= MaxRsvpVerticalDriftPx)
+                    .IsTrue()
+                    .Because($"Expected the Learn ORP letter to stay on the same vertical screen position, but it drifted from {initial.OrpCenterYPx:0.##}px to {current.OrpCenterYPx:0.##}px.");
+                await Assert.That(Math.Abs(current.PhraseTopPx - initial.PhraseTopPx) <= MaxRsvpVerticalDriftPx)
+                    .IsTrue()
+                    .Because($"Expected the Learn next phrase area to stay fixed, but it moved from {initial.PhraseTopPx:0.##}px to {current.PhraseTopPx:0.##}px.");
+                await Assert.That(Math.Abs(current.PhraseHeightPx - initial.PhraseHeightPx) <= MaxRsvpVerticalDriftPx)
+                    .IsTrue()
+                    .Because($"Expected the Learn next phrase area to keep a fixed reserved height, but it changed from {initial.PhraseHeightPx:0.##}px to {current.PhraseHeightPx:0.##}px.");
+            }
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
 
-            await UiScenarioArtifacts.CapturePageAsync(page, scenario, step);
+    [Test]
+    public async Task LearnScreen_DoesNotPaintDecorativeHighlightUnderFocusWord()
+    {
+        var page = await fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await ReaderRouteDriver.OpenLearnAsync(page, BrowserTestConstants.Routes.LearnDemo);
+            await Expect(page.GetByTestId(UiTestIds.Learn.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await WaitForLearnLayoutReadyAsync(page);
+
+            await Expect(page.GetByTestId(UiTestIds.Learn.ActivePhraseHighlight)).ToBeHiddenAsync();
         }
         finally
         {
@@ -500,42 +534,41 @@ public sealed class LearnFidelityTests(StandaloneAppFixture fixture)
                 right = UiTestIds.Learn.ContextRight
             });
 
-    private static Task<ActivePhraseHighlightMeasurement> MeasureActivePhraseHighlightAsync(Microsoft.Playwright.IPage page) =>
-        page.EvaluateAsync<ActivePhraseHighlightMeasurement>(
+    private static Task<RsvpVerticalStabilityMeasurement> MeasureRsvpVerticalStabilityAsync(Microsoft.Playwright.IPage page) =>
+        page.EvaluateAsync<RsvpVerticalStabilityMeasurement>(
             """
             ids => {
-                const highlight = document.querySelector(`[data-test="${ids.highlight}"]`);
                 const row = document.querySelector(`[data-test="${ids.row}"]`);
-                const word = document.querySelector(`[data-test="${ids.word}"]`);
-                if (!highlight || !row || !word) {
+                const orp = document.querySelector(`[data-test="${ids.orp}"]`);
+                const phrase = document.querySelector(`[data-test="${ids.phrase}"]`)?.closest('.rsvp-phrase');
+                if (!row || !orp || !phrase) {
                     return {
-                        highlightWidthPx: 0,
-                        rowWidthPx: 0,
-                        wordWidthPx: 0,
-                        borderBottomStyle: '',
-                        backgroundImage: 'none'
+                        focusRowTopPx: -999,
+                        focusRowHeightPx: -999,
+                        orpCenterYPx: -999,
+                        phraseTopPx: -999,
+                        phraseHeightPx: -999
                     };
                 }
 
-                const highlightRect = highlight.getBoundingClientRect();
                 const rowRect = row.getBoundingClientRect();
-                const wordRect = word.getBoundingClientRect();
-                const style = getComputedStyle(highlight);
+                const orpRect = orp.getBoundingClientRect();
+                const phraseRect = phrase.getBoundingClientRect();
 
                 return {
-                    highlightWidthPx: highlightRect.width,
-                    rowWidthPx: rowRect.width,
-                    wordWidthPx: wordRect.width,
-                    borderBottomStyle: style.borderBottomStyle,
-                    backgroundImage: style.backgroundImage
+                    focusRowTopPx: rowRect.top,
+                    focusRowHeightPx: rowRect.height,
+                    orpCenterYPx: orpRect.top + (orpRect.height / 2),
+                    phraseTopPx: phraseRect.top,
+                    phraseHeightPx: phraseRect.height
                 };
             }
             """,
             new
             {
-                highlight = UiTestIds.Learn.ActivePhraseHighlight,
-                row = UiTestIds.Learn.FocusRow,
-                word = UiTestIds.Learn.Word
+                orp = UiTestIds.Learn.WordOrp,
+                phrase = UiTestIds.Learn.NextPhrase,
+                row = UiTestIds.Learn.FocusRow
             });
 
     private static Task<VisibleContextWordGapMeasurement> MeasureVisibleContextWordGapsAsync(Microsoft.Playwright.IPage page) =>
