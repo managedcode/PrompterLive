@@ -132,12 +132,12 @@
     </div>
 
     <div class="rd-recording-panel"
-         data-active="@BuildBooleanDataAttribute(IsRecordingActive)"
+         data-active="@BuildStateDataAttribute(IsRecordingActive)"
          data-test="@UiTestIds.Teleprompter.RecordingPanel">
         <button class="rd-record-btn"
                 type="button"
                 aria-label="@RecordingToggleTooltip"
-                data-active="@BuildBooleanDataAttribute(IsRecordingActive)"
+                data-active="@BuildStateDataAttribute(IsRecordingActive)"
                 data-test="@UiTestIds.Teleprompter.RecordingToggle"
                 @onclick="OnRecordingToggle">
             <span class="rd-record-dot" aria-hidden="true"></span>
@@ -225,6 +225,8 @@
     [Parameter, EditorRequired] public IReadOnlyDictionary<string, object> TimeDataAttributes { get; set; } = new Dictionary<string, object>();
 
     private static string BuildBooleanDataAttribute(bool value) => value ? "true" : "false";
+
+    private static string BuildStateDataAttribute(bool value) => value ? "active" : "inactive";
 
     private bool ShowsRecordingCameraSelect =>
         string.Equals(RecordingMode, VideoAndAudioMode, StringComparison.Ordinal);

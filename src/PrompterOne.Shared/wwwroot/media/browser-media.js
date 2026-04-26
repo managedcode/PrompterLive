@@ -7,7 +7,7 @@
     const microphoneMonitorLevelMultiplier = 2800;
     const monitorMap = new Map();
     const pendingCameraCaptureMap = new Map();
-    const readerRecordingTimesliceMs = 500;
+    const readerRecordingTimesliceMs = 100;
     const recordingDefaultExtension = "webm";
     const readerRecordingMimeCandidates = Object.freeze({
         audio: [
@@ -723,16 +723,18 @@
         }
 
         readerRecordingSession = null;
-        const stopped = new Promise((resolve, reject) => {
-            session.recorder.addEventListener("stop", resolve, { once: true });
-            session.recorder.addEventListener("error", event => reject(event?.error ?? new Error("MediaRecorder failed.")), { once: true });
-        });
-
         if (session.recorder.state !== "inactive") {
+            const stopped = new Promise((resolve, reject) => {
+                session.recorder.addEventListener("stop", resolve, { once: true });
+                session.recorder.addEventListener("error", event => reject(event?.error ?? new Error("MediaRecorder failed.")), { once: true });
+            });
+            try {
+                session.recorder.requestData();
+            } catch {
+            }
             session.recorder.stop();
+            await stopped;
         }
-
-        await stopped;
         const blob = new Blob(session.chunks, { type: session.mimeType });
         await saveReaderRecordingBlob(blob, session.fileName, session.mimeType);
 

@@ -150,22 +150,28 @@ public partial class TeleprompterPage
 
     private async Task StopReaderRecordingAsync(bool updateUi)
     {
-        await StopReaderRecordingLevelMonitorAsync();
-
         if (!_isReaderRecording)
         {
+            await StopReaderRecordingLevelMonitorAsync();
             return;
         }
 
-        var snapshot = await ReaderRecordingInterop.StopAsync();
-        _isReaderRecording = false;
-        _readerRecordingAudioLevelPercent = 0;
-        _readerRecordingStatus = string.IsNullOrWhiteSpace(snapshot.FileName)
-            ? Text(UiTextKey.TeleprompterRecordingReadyStatus)
-            : string.Format(
-                CultureInfo.CurrentCulture,
-                Text(UiTextKey.TeleprompterRecordingSavedStatusFormat),
-                snapshot.FileName);
+        try
+        {
+            var snapshot = await ReaderRecordingInterop.StopAsync();
+            _isReaderRecording = false;
+            _readerRecordingAudioLevelPercent = 0;
+            _readerRecordingStatus = string.IsNullOrWhiteSpace(snapshot.FileName)
+                ? Text(UiTextKey.TeleprompterRecordingReadyStatus)
+                : string.Format(
+                    CultureInfo.CurrentCulture,
+                    Text(UiTextKey.TeleprompterRecordingSavedStatusFormat),
+                    snapshot.FileName);
+        }
+        finally
+        {
+            await StopReaderRecordingLevelMonitorAsync();
+        }
 
         if (updateUi)
         {

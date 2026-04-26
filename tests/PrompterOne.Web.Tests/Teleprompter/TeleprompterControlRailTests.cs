@@ -97,14 +97,15 @@ public sealed class TeleprompterControlRailTests : BunitContext
             var microphoneSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingMicrophoneSelect);
             var backgroundCameraToggle = cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle);
 
-            Assert.Equal("false", recordingPanel.GetAttribute("data-active"));
-            Assert.Equal("false", recordingToggle.GetAttribute("data-active"));
+            Assert.Equal("inactive", recordingPanel.GetAttribute("data-active"));
+            Assert.Equal("inactive", recordingToggle.GetAttribute("data-active"));
             Assert.Equal("video-audio", recordingMode.GetAttribute("value"));
             Assert.False(string.IsNullOrWhiteSpace(cameraSelect.GetAttribute("value")));
             Assert.False(string.IsNullOrWhiteSpace(microphoneSelect.GetAttribute("value")));
-            Assert.NotEqual(
+            Assert.False(string.Equals(
                 backgroundCameraToggle.GetAttribute("data-test"),
-                recordingToggle.GetAttribute("data-test"));
+                recordingToggle.GetAttribute("data-test"),
+                StringComparison.Ordinal));
         });
     }
 

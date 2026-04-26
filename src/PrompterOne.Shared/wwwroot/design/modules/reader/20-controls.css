@@ -470,7 +470,11 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    max-width: calc(100vw - 24px);
     padding: 6px 12px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
     background: rgba(20,18,12,.84);
     backdrop-filter: blur(18px);
     border: 1px solid var(--gold-14);
@@ -604,7 +608,7 @@
     color: #E8D5B0;
 }
 
-.rd-record-btn[data-active="true"] {
+.rd-record-btn[data-active="active"] {
     border-color: rgba(235,95,76,.42);
     color: #ffd8cf;
 }

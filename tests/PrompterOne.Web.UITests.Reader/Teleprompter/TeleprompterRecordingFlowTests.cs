@@ -29,6 +29,7 @@ public sealed class TeleprompterRecordingFlowTests(StandaloneAppFixture fixture)
                 "([testId, minimumLevel]) => Number(document.querySelector(`[data-test=\"${testId}\"]`)?.dataset.level ?? '0') >= minimumLevel",
                 new object[] { UiTestIds.Teleprompter.RecordingLevel, BrowserTestConstants.Media.LiveLevelThreshold },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+            await page.WaitForTimeoutAsync(900);
 
             await page.GetByTestId(UiTestIds.Teleprompter.RecordingToggle).ClickAsync();
             await page.WaitForFunctionAsync(
@@ -63,6 +64,7 @@ public sealed class TeleprompterRecordingFlowTests(StandaloneAppFixture fixture)
                 new object[] { BrowserTestConstants.Media.PrimaryMicrophoneId },
                 new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
             await Assert.That(await page.EvaluateAsync<int>(BrowserTestConstants.Media.GetActiveVideoTrackCountScript)).IsEqualTo(0);
+            await page.WaitForTimeoutAsync(1500);
 
             await page.GetByTestId(UiTestIds.Teleprompter.RecordingToggle).ClickAsync();
             await page.WaitForFunctionAsync(
