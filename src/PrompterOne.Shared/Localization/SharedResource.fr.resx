@@ -175,7 +175,7 @@
     <value>Impossible d'enregistrer le brouillon actuel.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Impossible d'enregistrer ce script sur le disque.</value>
+    <value>Impossible d’exporter ce script sur le disque.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Impossible de fractionner le brouillon actuel pour le moment.</value>
@@ -1688,6 +1688,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Exporter</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Exporter .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Exporter .txt</value>
   </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Raccourcis</value>

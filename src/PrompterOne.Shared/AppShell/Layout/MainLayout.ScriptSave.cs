@@ -8,5 +8,11 @@ public partial class MainLayout
     [Inject] private EditorDocumentSaveCoordinator EditorDocumentSaveCoordinator { get; set; } = null!;
 
     private Task HandleSaveFileClickAsync() =>
-        EditorDocumentSaveCoordinator.RequestSaveAsync();
+        EditorDocumentSaveCoordinator.RequestExportAsync(EditorDocumentExportFormat.Native);
+
+    private Task HandleExportMarkdownClickAsync() =>
+        EditorDocumentSaveCoordinator.RequestExportAsync(EditorDocumentExportFormat.Markdown);
+
+    private Task HandleExportPlainTextClickAsync() =>
+        EditorDocumentSaveCoordinator.RequestExportAsync(EditorDocumentExportFormat.PlainText);
 }

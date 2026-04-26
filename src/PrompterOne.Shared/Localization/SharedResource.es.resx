@@ -175,7 +175,7 @@
     <value>No se pudo guardar el borrador actual.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>No se pudo guardar este guion en el disco.</value>
+    <value>No se pudo exportar este guion al disco.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>No se pudo dividir el borrador actual en este momento.</value>
@@ -1688,6 +1688,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Exportar</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Exportar .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Exportar .txt</value>
   </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Atajos</value>

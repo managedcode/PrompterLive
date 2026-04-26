@@ -21,6 +21,8 @@ public static partial class UiTestIds
         public const string ImportProgressStep = "header-import-progress-step";
         public const string EditorLearn = "header-editor-learn";
         public const string EditorRead = "header-editor-read";
+        public const string EditorExportMarkdown = "header-editor-export-markdown";
+        public const string EditorExportPlainText = "header-editor-export-plain-text";
         public const string EditorSaveFile = "header-editor-save-file";
         public const string GoLive = "header-go-live";
         public const string GoLiveDot = "header-go-live-dot";

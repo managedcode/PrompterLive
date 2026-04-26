@@ -178,7 +178,7 @@
     <value>Unable to save the current draft.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Unable to save this script to disk.</value>
+    <value>Unable to export this script to disk.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Unable to split the current draft right now.</value>
@@ -191,6 +191,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Export</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Export .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Export .txt</value>
   </data>
   <data name="HeaderLearn" xml:space="preserve">
     <value>Learn</value>

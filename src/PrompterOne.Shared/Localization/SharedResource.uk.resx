@@ -178,7 +178,7 @@
     <value>Не вдалося зберегти поточну чернетку.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Не вдалося зберегти цей сценарій на диск.</value>
+    <value>Не вдалося експортувати цей сценарій на диск.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Зараз не вдалося розділити поточну чернетку.</value>
@@ -191,6 +191,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Експорт</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Експорт .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Експорт .txt</value>
   </data>
   <data name="HeaderLearn" xml:space="preserve">
     <value>Вивчати</value>

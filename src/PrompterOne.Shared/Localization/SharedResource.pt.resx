@@ -175,7 +175,7 @@
     <value>Não foi possível salvar o rascunho atual.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Não foi possível salvar este roteiro no disco.</value>
+    <value>Não foi possível exportar este roteiro para o disco.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Não foi possível dividir o rascunho atual agora.</value>
@@ -1466,6 +1466,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Exportar</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Exportar .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Exportar .txt</value>
   </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Atalhos</value>

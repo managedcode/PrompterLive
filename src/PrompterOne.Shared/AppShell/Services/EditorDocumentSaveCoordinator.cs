@@ -1,16 +1,23 @@
 namespace PrompterOne.Shared.Services;
 
+public enum EditorDocumentExportFormat
+{
+    Native,
+    Markdown,
+    PlainText
+}
+
 public sealed class EditorDocumentSaveCoordinator
 {
-    private Func<CancellationToken, Task>? _saveHandler;
+    private Func<EditorDocumentExportFormat, CancellationToken, Task>? _saveHandler;
 
-    public void Register(Func<CancellationToken, Task> saveHandler)
+    public void Register(Func<EditorDocumentExportFormat, CancellationToken, Task> saveHandler)
     {
         ArgumentNullException.ThrowIfNull(saveHandler);
         _saveHandler = saveHandler;
     }
 
-    public void Unregister(Func<CancellationToken, Task> saveHandler)
+    public void Unregister(Func<EditorDocumentExportFormat, CancellationToken, Task> saveHandler)
     {
         ArgumentNullException.ThrowIfNull(saveHandler);
 
@@ -21,7 +28,12 @@ public sealed class EditorDocumentSaveCoordinator
     }
 
     public Task RequestSaveAsync(CancellationToken cancellationToken = default) =>
+        RequestExportAsync(EditorDocumentExportFormat.Native, cancellationToken);
+
+    public Task RequestExportAsync(
+        EditorDocumentExportFormat format,
+        CancellationToken cancellationToken = default) =>
         _saveHandler is null
             ? Task.CompletedTask
-            : _saveHandler(cancellationToken);
+            : _saveHandler(format, cancellationToken);
 }

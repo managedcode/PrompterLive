@@ -175,7 +175,7 @@
     <value>Der aktuelle Entwurf konnte nicht gespeichert werden.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Dieses Skript konnte nicht auf dem Datenträger gespeichert werden.</value>
+    <value>Dieses Skript konnte nicht auf den Datenträger exportiert werden.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Der aktuelle Entwurf konnte gerade nicht aufgeteilt werden.</value>
@@ -1688,6 +1688,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Export</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Export .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Export .txt</value>
   </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Verknüpfungen</value>

@@ -123,6 +123,8 @@ public enum UiTextKey
     EditorSplitNoMatchesMessage,
     EditorSyntaxMessage,
     HeaderSaveFile,
+    HeaderExportMarkdown,
+    HeaderExportPlainText,
     HeaderLearn,
     HeaderRead,
     HeaderGoLive,

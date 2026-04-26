@@ -85,6 +85,19 @@
         height: 32px;
     }
 
+    .app-header-editor-learn {
+        order: -3;
+    }
+
+    .app-header-editor-read {
+        order: -2;
+    }
+
+    .app-header-native-export,
+    .app-header-format-export {
+        order: 2;
+    }
+
     .top-bar-title {
         font-size: 13px;
     }

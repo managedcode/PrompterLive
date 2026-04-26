@@ -707,9 +707,11 @@ public sealed class MainLayoutActionTests : BunitContext
         var navigation = Services.GetRequiredService<NavigationManager>();
         var saveCoordinator = Services.GetRequiredService<EditorDocumentSaveCoordinator>();
         var saveRequestCount = 0;
+        var requestedFormat = EditorDocumentExportFormat.Markdown;
 
-        saveCoordinator.Register(_ =>
+        saveCoordinator.Register((format, _) =>
         {
+            requestedFormat = format;
             saveRequestCount += 1;
             return Task.CompletedTask;
         });
@@ -732,13 +734,19 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Equal(EnglishImportLabel, importInput.GetAttribute("aria-label"));
             Assert.NotNull(exportAction);
             Assert.Contains(EnglishExportLabel, exportAction.TextContent, StringComparison.Ordinal);
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorExportMarkdown));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorExportPlainText));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorLearn));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorRead));
         });
 
         cut.FindByTestId(UiTestIds.Header.EditorSaveFile).Click();
 
-        cut.WaitForAssertion(() => Assert.Equal(1, saveRequestCount));
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(1, saveRequestCount);
+            Assert.Equal(EditorDocumentExportFormat.Native, requestedFormat);
+        });
     }
 
     [Test]
@@ -754,7 +762,11 @@ public sealed class MainLayoutActionTests : BunitContext
             .Add(layout => layout.Body, (RenderFragment)(builder => builder.AddMarkupContent(0, "<div>Body</div>"))));
 
         cut.WaitForAssertion(() =>
-            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorSaveFile))));
+        {
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorSaveFile)));
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportMarkdown)));
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportPlainText)));
+        });
     }
 
     [Test]

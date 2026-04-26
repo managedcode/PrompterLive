@@ -175,7 +175,7 @@
     <value>Impossibile salvare la bozza corrente.</value>
   </data>
   <data name="EditorSaveFileMessage" xml:space="preserve">
-    <value>Impossibile salvare questo script sul disco.</value>
+    <value>Impossibile esportare questo script sul disco.</value>
   </data>
   <data name="EditorSplitDraftMessage" xml:space="preserve">
     <value>Impossibile dividere la bozza corrente in questo momento.</value>
@@ -1688,6 +1688,12 @@
   </data>
   <data name="HeaderSaveFile" xml:space="preserve">
     <value>Esportare</value>
+  </data>
+  <data name="HeaderExportMarkdown" xml:space="preserve">
+    <value>Esporta .md</value>
+  </data>
+  <data name="HeaderExportPlainText" xml:space="preserve">
+    <value>Esporta .txt</value>
   </data>
   <data name="SettingsNavShortcuts" xml:space="preserve">
     <value>Scorciatoie</value>

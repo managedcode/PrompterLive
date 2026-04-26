@@ -7,7 +7,16 @@ namespace PrompterOne.Shared.Pages;
 
 public partial class EditorPage
 {
-    private async Task HandleSaveFileRequestedAsync(CancellationToken cancellationToken)
+    private const string MarkdownExportDescription = "Markdown script";
+    private const string MarkdownMimeType = "text/markdown";
+    private const string PlainTextExportDescription = "Plain text script";
+
+    private static readonly IReadOnlyList<string> MarkdownExportFileNameSuffixes = [".md"];
+    private static readonly IReadOnlyList<string> PlainTextExportFileNameSuffixes = [".txt"];
+
+    private async Task HandleSaveFileRequestedAsync(
+        EditorDocumentExportFormat format,
+        CancellationToken cancellationToken)
     {
         CancelDraftAnalysis();
         CancelAutosave();
@@ -20,19 +29,49 @@ public partial class EditorPage
             {
                 await PersistDraftStateCoreAsync(persistDocument: true, cancellationToken, revision);
                 await FilePickerInterop.SaveTextAsync(
-                    ResolveExportDocumentName(),
-                    BuildPersistedDocument(_sourceText),
-                    ScriptDocumentFileTypes.TextMimeType,
-                    ScriptDocumentFileTypes.SavePickerDescription,
-                    ScriptDocumentFileTypes.SaveSupportedFileNameSuffixes);
+                    ResolveExportDocumentName(format),
+                    BuildExportDocument(format),
+                    ResolveExportMimeType(format),
+                    ResolveExportPickerDescription(format),
+                    ResolveExportFileNameSuffixes(format));
             },
             clearRecoverableOnSuccess: string.IsNullOrWhiteSpace(SessionService.State.ErrorMessage));
     }
 
-    private string ResolveExportDocumentName()
+    private string BuildExportDocument(EditorDocumentExportFormat format) =>
+        format == EditorDocumentExportFormat.Native
+            ? BuildPersistedDocument(_sourceText)
+            : _sourceText;
+
+    private static IReadOnlyList<string> ResolveExportFileNameSuffixes(EditorDocumentExportFormat format) =>
+        format switch
+        {
+            EditorDocumentExportFormat.Markdown => MarkdownExportFileNameSuffixes,
+            EditorDocumentExportFormat.PlainText => PlainTextExportFileNameSuffixes,
+            _ => ScriptDocumentFileTypes.SaveSupportedFileNameSuffixes
+        };
+
+    private static string ResolveExportMimeType(EditorDocumentExportFormat format) =>
+        format switch
+        {
+            EditorDocumentExportFormat.Markdown => MarkdownMimeType,
+            _ => ScriptDocumentFileTypes.TextMimeType
+        };
+
+    private static string ResolveExportPickerDescription(EditorDocumentExportFormat format) =>
+        format switch
+        {
+            EditorDocumentExportFormat.Markdown => MarkdownExportDescription,
+            EditorDocumentExportFormat.PlainText => PlainTextExportDescription,
+            _ => ScriptDocumentFileTypes.SavePickerDescription
+        };
+
+    private string ResolveExportDocumentName(EditorDocumentExportFormat format)
     {
         var normalizedDocumentName = ScriptDocumentFileTypes.NormalizeFileName(SessionService.State.DocumentName);
-        var supportedSuffix = ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(normalizedDocumentName) ?? ScriptDocumentFileTypes.DefaultExtension;
+        var supportedSuffix = format == EditorDocumentExportFormat.Native
+            ? ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(normalizedDocumentName) ?? ScriptDocumentFileTypes.DefaultExtension
+            : ResolveExportFileNameSuffix(format);
 
         if (!string.IsNullOrWhiteSpace(normalizedDocumentName)
             && !string.Equals(
@@ -40,9 +79,32 @@ public partial class EditorPage
                 ScriptWorkspaceState.UntitledScriptDocumentName,
                 StringComparison.OrdinalIgnoreCase))
         {
-            return normalizedDocumentName;
+            return format == EditorDocumentExportFormat.Native
+                ? normalizedDocumentName
+                : ResolveExportFileName(normalizedDocumentName, supportedSuffix);
         }
 
         return string.Concat(BrowserStorageSlugifier.Slugify(_screenTitle), supportedSuffix);
     }
+
+    private static string ResolveExportFileName(string normalizedDocumentName, string suffix)
+    {
+        var currentSuffix = ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(normalizedDocumentName);
+        if (string.IsNullOrWhiteSpace(currentSuffix))
+        {
+            return string.Concat(normalizedDocumentName, suffix);
+        }
+
+        var stem = normalizedDocumentName[..^currentSuffix.Length].Trim();
+        return string.Concat(stem, suffix);
+    }
+
+    private static string ResolveExportFileNameSuffix(EditorDocumentExportFormat format) =>
+        format switch
+        {
+            EditorDocumentExportFormat.Markdown => ".md",
+            EditorDocumentExportFormat.PlainText => ".txt",
+            _ => ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(ScriptWorkspaceState.UntitledScriptDocumentName)
+                ?? ScriptDocumentFileTypes.DefaultExtension
+        };
 }

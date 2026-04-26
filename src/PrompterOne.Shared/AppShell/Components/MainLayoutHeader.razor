@@ -191,18 +191,32 @@
         @if (ShowSaveFileAction)
         {
             <button type="button"
-                    class="btn-ghost"
+                    class="btn-ghost app-header-native-export"
                     @onclick="HandleSaveFileClickAsync"
                     data-test="@UiTestIds.Header.EditorSaveFile">
-                <UiIcon Kind="UiIconKind.SaveFile" Size="15" />
+                <UiIcon Kind="UiIconKind.ExportArrow" Size="15" />
                 <span class="app-header-action-label">@SaveFileLabel</span>
+            </button>
+            <button type="button"
+                    class="btn-ghost app-header-format-export"
+                    @onclick="HandleExportMarkdownClickAsync"
+                    data-test="@UiTestIds.Header.EditorExportMarkdown">
+                <UiIcon Kind="UiIconKind.DocumentLines" Size="15" />
+                <span class="app-header-action-label">@ExportMarkdownLabel</span>
+            </button>
+            <button type="button"
+                    class="btn-ghost app-header-format-export"
+                    @onclick="HandleExportPlainTextClickAsync"
+                    data-test="@UiTestIds.Header.EditorExportPlainText">
+                <UiIcon Kind="UiIconKind.TextLines" Size="15" />
+                <span class="app-header-action-label">@ExportPlainTextLabel</span>
             </button>
         }
 
         @if (ShowLearnAction)
         {
             <button type="button"
-                    class="btn-ghost"
+                    class="btn-ghost app-header-editor-learn"
                     @onclick="HandleOpenLearnClickAsync"
                     data-test="@UiTestIds.Header.EditorLearn">
                 <UiIcon Kind="UiIconKind.BookOpen" Size="15" />
@@ -220,7 +234,7 @@
         @if (ShowReadAction)
         {
             <button type="button"
-                    class="btn-gold"
+                    class="btn-gold app-header-editor-read"
                     @onclick="HandleOpenReadClickAsync"
                     data-test="@UiTestIds.Header.EditorRead">
                 <UiIcon Kind="UiIconKind.Play" Size="15" />
@@ -272,6 +286,8 @@
     [Parameter, EditorRequired] public string NewScriptLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ReadLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string RestartTourLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ExportMarkdownLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ExportPlainTextLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SaveFileLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SearchPlaceholder { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SearchText { get; set; } = string.Empty;
@@ -286,6 +302,8 @@
     [Parameter] public EventCallback OnOpenLearnClick { get; set; }
     [Parameter] public EventCallback OnOpenOnboarding { get; set; }
     [Parameter] public EventCallback OnOpenReadClick { get; set; }
+    [Parameter] public EventCallback OnExportMarkdownClick { get; set; }
+    [Parameter] public EventCallback OnExportPlainTextClick { get; set; }
     [Parameter] public EventCallback OnSaveFileClick { get; set; }
     [Parameter] public EventCallback<InputFileChangeEventArgs> OnImport { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnLibrarySearchInput { get; set; }
@@ -309,6 +327,10 @@
     private Task HandleOpenOnboardingAsync() => OnOpenOnboarding.InvokeAsync();
 
     private Task HandleOpenReadClickAsync() => OnOpenReadClick.InvokeAsync();
+
+    private Task HandleExportMarkdownClickAsync() => OnExportMarkdownClick.InvokeAsync();
+
+    private Task HandleExportPlainTextClickAsync() => OnExportPlainTextClick.InvokeAsync();
 
     private Task HandleSaveFileClickAsync() => OnSaveFileClick.InvokeAsync();
 }
