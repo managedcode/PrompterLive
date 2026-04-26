@@ -60,6 +60,23 @@ public sealed class ScriptKnowledgeGraphServiceTests
             node.Kind == "Character" &&
             node.Attributes is not null &&
             node.Attributes.ContainsKey("centrality"));
+        Assert.Contains(result.Nodes, static node =>
+            node.Kind == "Character" &&
+            node.Label == "Alex" &&
+            node.Attributes?.TryGetValue("source", out var source) == true &&
+            source == "markdown-ld-kb" &&
+            node.Attributes.TryGetValue("entityType", out var entityType) &&
+            entityType == "schema:Person");
+        Assert.Contains(result.Nodes, static node =>
+            node.Kind == "Term" &&
+            node.Label == "focused" &&
+            node.Attributes?.TryGetValue("source", out var source) == true &&
+            source == "markdown-ld-kb" &&
+            node.Attributes.TryGetValue("entityType", out var entityType) &&
+            entityType == "schema:DefinedTerm");
+        Assert.Contains(result.Edges, static edge =>
+            edge.Label == "kb:memberOf" ||
+            edge.Label == "memberOf");
         Assert.Contains("Product Launch", result.JsonLd, StringComparison.Ordinal);
         Assert.Contains("Product Launch", result.Turtle, StringComparison.Ordinal);
     }

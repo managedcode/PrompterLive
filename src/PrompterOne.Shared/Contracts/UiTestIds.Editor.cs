@@ -84,6 +84,7 @@ public static partial class UiTestIds
         public const string GraphFit = "editor-graph-fit";
         public const string GraphCompactLayoutMode = "editor-graph-compact-layout-mode";
         public const string GraphLayoutMode = "editor-graph-layout-mode";
+        public const string GraphMetadata = "editor-graph-metadata";
         public const string GraphNode = "editor-graph-node";
         public const string GraphNodeList = "editor-graph-node-list";
         public const string GraphPanel = "editor-graph-panel";

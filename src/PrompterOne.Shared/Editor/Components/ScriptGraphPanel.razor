@@ -22,6 +22,7 @@
     else
     {
         var graphStats = CreateGraphStats(Artifact);
+        var graphMetadata = CreateGraphMetadata(Artifact);
         <header class="script-graph-summary" data-test="@UiTestIds.Editor.GraphSummary">
             <div class="script-graph-metrics">
                 <strong>@Format(UiTextKey.EditorGraphNodesFormat, graphStats.NodeCount)</strong>
@@ -109,36 +110,73 @@
                 </select>
             </div>
         </header>
-        @if (_renderFailed)
-        {
-            <div class="script-graph-semantic-status"
-                 data-test="@UiTestIds.Editor.GraphSemanticStatus"
-                 data-status="@RendererFailedStatus">
-                <div>
-                    <strong>@Text(UiTextKey.EditorGraphSemanticFailedTitle)</strong>
-                    <span>@Text(UiTextKey.EditorGraphSemanticFailedDetail)</span>
+        <div class="script-graph-info">
+            @if (_renderFailed)
+            {
+                <div class="script-graph-semantic-status"
+                     data-test="@UiTestIds.Editor.GraphSemanticStatus"
+                     data-status="@RendererFailedStatus">
+                    <div>
+                        <strong>@Text(UiTextKey.EditorGraphSemanticFailedTitle)</strong>
+                        <span>@Text(UiTextKey.EditorGraphSemanticFailedDetail)</span>
+                    </div>
                 </div>
-            </div>
-        }
-        else if (TryReadSemanticStatus(out var statusTitle, out var statusDetail, out var canRunTokenizer))
-        {
-            <div class="script-graph-semantic-status"
-                 data-test="@UiTestIds.Editor.GraphSemanticStatus"
-                 data-status="@Artifact.SemanticStatus.ToString()">
-                <div>
-                    <strong>@statusTitle</strong>
-                    <span>@statusDetail</span>
+            }
+            else if (TryReadSemanticStatus(out var statusTitle, out var statusDetail, out var canRunTokenizer))
+            {
+                <div class="script-graph-semantic-status"
+                     data-test="@UiTestIds.Editor.GraphSemanticStatus"
+                     data-status="@Artifact.SemanticStatus.ToString()">
+                    <div>
+                        <strong>@statusTitle</strong>
+                        <span>@statusDetail</span>
+                    </div>
+                    @if (canRunTokenizer)
+                    {
+                        <button type="button"
+                                data-test="@UiTestIds.Editor.GraphTokenizerAnalyze"
+                                @onclick="() => TokenizerAnalysisRequested.InvokeAsync()">
+                            @Text(UiTextKey.EditorGraphTokenizerAnalyze)
+                        </button>
+                    }
                 </div>
-                @if (canRunTokenizer)
+            }
+            <aside class="script-graph-metadata"
+                   data-test="@UiTestIds.Editor.GraphMetadata"
+                   data-kb-nodes="@graphMetadata.KnowledgeNodeCount">
+                <div class="script-graph-metadata-title">
+                    <strong>@Text(UiTextKey.EditorMetadataSection)</strong>
+                    <span>Markdown-LD</span>
+                </div>
+                <dl class="script-graph-metadata-grid">
+                    <div>
+                        <dt>@Text(UiTextKey.EditorGraphLanePeople)</dt>
+                        <dd>@graphMetadata.PeopleCount</dd>
+                    </div>
+                    <div>
+                        <dt>@Text(UiTextKey.EditorGraphLaneThemes)</dt>
+                        <dd>@graphMetadata.TopicCount</dd>
+                    </div>
+                    <div>
+                        <dt>@Text(UiTextKey.EditorGraphLaneKnowledge)</dt>
+                        <dd>@graphMetadata.KnowledgeNodeCount</dd>
+                    </div>
+                    <div>
+                        <dt>@Format(UiTextKey.EditorGraphLinksFormat, graphMetadata.KnowledgeLinkCount)</dt>
+                        <dd>@Format(UiTextKey.EditorGraphSourceRangesFormat, graphMetadata.SourceRangeCount)</dd>
+                    </div>
+                </dl>
+                @if (graphMetadata.TopLabels.Count > 0)
                 {
-                    <button type="button"
-                            data-test="@UiTestIds.Editor.GraphTokenizerAnalyze"
-                            @onclick="() => TokenizerAnalysisRequested.InvokeAsync()">
-                        @Text(UiTextKey.EditorGraphTokenizerAnalyze)
-                    </button>
+                    <div class="script-graph-metadata-tags" aria-label="@Text(UiTextKey.EditorGraphLaneThemes)">
+                        @foreach (var label in graphMetadata.TopLabels)
+                        {
+                            <span>@label</span>
+                        }
+                    </div>
                 }
-            </div>
-        }
+            </aside>
+        </div>
         <div class="script-graph-canvas"
              @ref="_graphElement"
              tabindex="0"
@@ -429,6 +467,41 @@
         return new GraphStats(visibleNodeIds.Count, edgeCount, sourceRangeCount);
     }
 
+    private static GraphMetadata CreateGraphMetadata(ScriptKnowledgeGraphArtifact artifact)
+    {
+        var markdownNodeIds = artifact.Nodes
+            .Where(static node => node.Attributes?.TryGetValue("source", out var source) == true &&
+                                  string.Equals(source, "markdown-ld-kb", StringComparison.Ordinal))
+            .Select(static node => node.Id)
+            .ToHashSet(StringComparer.Ordinal);
+        var markdownNodes = artifact.Nodes
+            .Where(node => markdownNodeIds.Contains(node.Id))
+            .ToArray();
+        var peopleCount = markdownNodes
+            .Where(static node => node.Kind == "Character")
+            .Select(static node => node.Label)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+        var topicCount = markdownNodes
+            .Where(static node => node.Kind is "Term" or "Theme" or "Entity" or "Story" or "Reference")
+            .Select(static node => node.Label)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+        var knowledgeLinkCount = artifact.Edges.Count(edge =>
+            markdownNodeIds.Contains(edge.SourceId) || markdownNodeIds.Contains(edge.TargetId));
+        var sourceRangeCount = artifact.SourceRanges.Count(range => markdownNodeIds.Contains(range.NodeId));
+        var topLabels = markdownNodes
+            .Where(static node => node.Kind is "Character" or "Term" or "Entity" or "Story")
+            .Select(static node => node.Label)
+            .Where(static label => !string.IsNullOrWhiteSpace(label))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(static label => label, StringComparer.OrdinalIgnoreCase)
+            .Take(5)
+            .ToArray();
+
+        return new GraphMetadata(markdownNodes.Length, peopleCount, topicCount, knowledgeLinkCount, sourceRangeCount, topLabels);
+    }
+
     private (string? Source, string? Target, string Label) ReadVisibleEdge(
         ScriptKnowledgeGraphEdge edge,
         IReadOnlySet<string> visibleNodeIds,
@@ -552,6 +625,14 @@
     };
 
     private readonly record struct GraphStats(int NodeCount, int EdgeCount, int SourceRangeCount);
+
+    private sealed record GraphMetadata(
+        int KnowledgeNodeCount,
+        int PeopleCount,
+        int TopicCount,
+        int KnowledgeLinkCount,
+        int SourceRangeCount,
+        IReadOnlyList<string> TopLabels);
 
     private sealed record GraphKindStyle(
         string Fill,

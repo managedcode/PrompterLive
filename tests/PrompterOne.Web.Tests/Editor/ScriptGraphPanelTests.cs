@@ -137,6 +137,52 @@ public sealed class ScriptGraphPanelTests : BunitContext
     }
 
     [Test]
+    public void ScriptGraphPanel_RendersMarkdownLdMetadataSummary()
+    {
+        var artifact = new ScriptKnowledgeGraphArtifact(
+            "test",
+            "Graph Test",
+            ScriptDocumentRevision.Create(Source),
+            [
+                new ScriptKnowledgeGraphNode(
+                    "kb:alex",
+                    "Alex",
+                    "Character",
+                    "knowledge",
+                    null,
+                    new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        ["source"] = "markdown-ld-kb",
+                        ["entityType"] = "schema:Person",
+                    }),
+                new ScriptKnowledgeGraphNode(
+                    "kb:focus",
+                    "focused",
+                    "Term",
+                    "knowledge",
+                    null,
+                    new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        ["source"] = "markdown-ld-kb",
+                        ["entityType"] = "schema:DefinedTerm",
+                    })
+            ],
+            [new ScriptKnowledgeGraphEdge("kb:alex|mentions|kb:focus", "kb:alex", "kb:focus", "mentions")],
+            [],
+            "{}",
+            string.Empty);
+
+        var cut = Render<ScriptGraphPanel>(parameters => parameters
+            .Add(component => component.Artifact, artifact));
+        var metadata = cut.Find($"[data-test='{UiTestIds.Editor.GraphMetadata}']");
+
+        Assert.Equal("2", metadata.GetAttribute("data-kb-nodes"));
+        Assert.Contains("Markdown-LD", metadata.TextContent, StringComparison.Ordinal);
+        Assert.Contains("Alex", metadata.TextContent, StringComparison.Ordinal);
+        Assert.Contains("focused", metadata.TextContent, StringComparison.Ordinal);
+    }
+
+    [Test]
     public void ScriptGraphPanel_DynamicImportFailureShowsFallbackInsteadOfThrowing()
     {
         _harness.JsRuntime.ImportFailures[GraphModulePath] = new JSException(

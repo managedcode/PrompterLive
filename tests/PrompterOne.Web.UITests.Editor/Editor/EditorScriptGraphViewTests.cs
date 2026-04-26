@@ -155,11 +155,11 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphCanvas))
                 .ToHaveAttributeAsync(
                     BrowserTestConstants.Editor.GraphNodeStyleAttributeName,
-                    BrowserTestConstants.Editor.GraphNodeStyleCompactValue,
+                    BrowserTestConstants.Editor.GraphNodeStyleDotsValue,
                     new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
-            var compactNodeTypes = await ReadNonLaneGraphNodeTypesAsync(page);
-            await Assert.That(compactNodeTypes)
-                .IsEquivalentTo([BrowserTestConstants.Editor.GraphNodeTypeEllipseValue]);
+            var dotNodeTypes = await ReadNonLaneGraphNodeTypesAsync(page);
+            await Assert.That(dotNodeTypes)
+                .IsEquivalentTo([BrowserTestConstants.Editor.GraphNodeTypeCircleValue]);
             await page.GetByTestId(UiTestIds.Editor.GraphRailNodeStyleMode)
                 .SelectOptionAsync([ScriptGraphNodeStyleModes.Cards]);
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphCanvas))
@@ -192,9 +192,16 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
                     BrowserTestConstants.Editor.GraphSemanticStatusAttributeName,
                     BrowserTestConstants.Editor.GraphSemanticStatusModelUnavailableValue,
                     new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.GraphMetadata))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            var markdownLdNodeCount = await page.GetByTestId(UiTestIds.Editor.GraphMetadata)
+                .EvaluateAsync<int>("element => Number(element.dataset.kbNodes || 0)");
+            await Assert.That(markdownLdNodeCount)
+                .IsGreaterThan(0)
+                .Because("The baseline graph should surface deterministic Markdown-LD metadata before tokenizer similarity is requested.");
             await Assert.That(graphKinds.Contains("Idea")).IsFalse();
             await Assert.That(graphKinds.Contains("Claim")).IsFalse();
-            await Assert.That(graphKinds.Contains("Term")).IsFalse();
+            await Assert.That(graphKinds.Contains("Term")).IsTrue();
             await Assert.That(graphKinds.Contains("Line")).IsFalse();
             await Assert.That(graphKinds.Contains("Pace")).IsFalse();
             await Assert.That(graphKinds.Contains("Timing")).IsFalse();

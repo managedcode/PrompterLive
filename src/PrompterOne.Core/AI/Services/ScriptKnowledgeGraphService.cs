@@ -1,3 +1,4 @@
+using System.Globalization;
 using ManagedCode.MarkdownLd.Kb.Pipeline;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -13,6 +14,7 @@ public sealed class ScriptKnowledgeGraphService(
 {
     private const string DocumentNodeId = "prompterone:document";
     private const string ContainsEdgeLabel = "contains";
+    private const string MarkdownKnowledgeSource = "markdown-ld-kb";
     private readonly IScriptKnowledgeGraphSemanticExtractor? _semanticExtractor = semanticExtractor;
     private readonly ScriptKnowledgeGraphTokenizerSimilarityExtractor _tokenizerSimilarityExtractor = tokenizerSimilarityExtractor ?? new();
     private readonly ILogger<ScriptKnowledgeGraphService> _logger = logger ?? NullLogger<ScriptKnowledgeGraphService>.Instance;
@@ -28,7 +30,7 @@ public sealed class ScriptKnowledgeGraphService(
         var pipeline = new MarkdownKnowledgePipeline();
         var kbResult = await pipeline
             .BuildFromMarkdownAsync(
-                compiledDocument.DisplayMarkdown,
+                compiledDocument.KnowledgeMarkdown,
                 CreateSourcePath(request.DocumentId),
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -57,7 +59,7 @@ public sealed class ScriptKnowledgeGraphService(
             nodes,
             edges,
             ranges);
-        AddKnowledgeBankGraph(kbResult.Graph.ToSnapshot(), content, nodes, edges, ranges);
+        AddKnowledgeBankGraph(kbResult, content, nodes, edges, ranges);
         var semanticStatus = request.SemanticMode == ScriptKnowledgeGraphSemanticMode.StructuralOnly
             ? ScriptKnowledgeGraphSemanticStatus.StructuralOnly
             : await TryAddModelSemanticGraphAsync(
@@ -74,7 +76,7 @@ public sealed class ScriptKnowledgeGraphService(
             await _tokenizerSimilarityExtractor
                 .AddTokenizerSimilarityAsync(
                     content,
-                    compiledDocument.DisplayMarkdown,
+                    compiledDocument.KnowledgeMarkdown,
                     nodes,
                     edges,
                     ranges,
@@ -145,12 +147,17 @@ public sealed class ScriptKnowledgeGraphService(
     }
 
     private static void AddKnowledgeBankGraph(
-        KnowledgeGraphSnapshot snapshot,
+        MarkdownKnowledgeBuildResult result,
         string content,
         IDictionary<string, ScriptKnowledgeGraphNode> nodes,
         IDictionary<string, ScriptKnowledgeGraphEdge> edges,
         IDictionary<string, ScriptKnowledgeGraphSourceRange> ranges)
     {
+        var snapshot = result.Graph.ToSnapshot();
+        var factsById = result.Facts.Entities
+            .Where(static entity => !string.IsNullOrWhiteSpace(entity.Id))
+            .GroupBy(static entity => entity.Id!, StringComparer.Ordinal)
+            .ToDictionary(static group => group.Key, static group => group.First(), StringComparer.Ordinal);
         foreach (var node in snapshot.Nodes)
         {
             if (IsVisualKnowledgeNoise(node))
@@ -158,8 +165,19 @@ public sealed class ScriptKnowledgeGraphService(
                 continue;
             }
 
-            nodes.TryAdd(node.Id, new ScriptKnowledgeGraphNode(node.Id, node.Label, node.Kind.ToString(), "knowledge"));
-            ScriptKnowledgeGraphSourceRanges.AddRangeIfFound(content, node.Id, node.Label, ranges);
+            factsById.TryGetValue(node.Id, out var fact);
+            var kind = ResolveKnowledgeKind(node, fact);
+            var label = string.IsNullOrWhiteSpace(fact?.Label) ? node.Label : fact!.Label;
+            nodes.TryAdd(
+                node.Id,
+                new ScriptKnowledgeGraphNode(
+                    node.Id,
+                    label,
+                    kind,
+                    "knowledge",
+                    CreateKnowledgeDetail(node, fact),
+                    CreateKnowledgeAttributes(node, fact)));
+            ScriptKnowledgeGraphSourceRanges.AddRangeIfFound(content, node.Id, label, ranges);
         }
 
         foreach (var edge in snapshot.Edges)
@@ -171,6 +189,97 @@ public sealed class ScriptKnowledgeGraphService(
 
             var id = $"{edge.SubjectId}|{edge.PredicateId}|{edge.ObjectId}";
             edges.TryAdd(id, new ScriptKnowledgeGraphEdge(id, edge.SubjectId, edge.ObjectId, edge.PredicateLabel));
+        }
+    }
+
+    private static string ResolveKnowledgeKind(KnowledgeGraphNode node, KnowledgeEntityFact? fact)
+    {
+        var type = fact?.Type ?? string.Empty;
+        if (ContainsType(type, "Person"))
+        {
+            return "Character";
+        }
+
+        if (ContainsType(type, "DefinedTerm"))
+        {
+            return "Term";
+        }
+
+        if (ContainsType(type, "Claim"))
+        {
+            return "Claim";
+        }
+
+        if (ContainsType(type, "CreativeWork") ||
+            ContainsType(type, "Article") ||
+            ContainsType(type, "TextDigitalDocument"))
+        {
+            return "Story";
+        }
+
+        return node.Kind switch
+        {
+            KnowledgeGraphNodeKind.Literal => "Literal",
+            KnowledgeGraphNodeKind.Blank => "Custom",
+            _ => "Entity",
+        };
+    }
+
+    private static bool ContainsType(string type, string value) =>
+        type.Contains(value, StringComparison.OrdinalIgnoreCase);
+
+    private static string? CreateKnowledgeDetail(KnowledgeGraphNode node, KnowledgeEntityFact? fact)
+    {
+        var detailParts = new List<string>();
+        AddDetail(detailParts, "type", fact?.Type);
+        AddDetail(detailParts, "source", fact?.Source);
+        if (node.Kind != KnowledgeGraphNodeKind.Uri)
+        {
+            AddDetail(detailParts, "rdf", node.Kind.ToString());
+        }
+
+        return detailParts.Count == 0 ? null : string.Join(" | ", detailParts);
+    }
+
+    private static IReadOnlyDictionary<string, string> CreateKnowledgeAttributes(
+        KnowledgeGraphNode node,
+        KnowledgeEntityFact? fact)
+    {
+        var attributes = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["source"] = MarkdownKnowledgeSource,
+            ["rdfKind"] = node.Kind.ToString(),
+        };
+        AddAttribute(attributes, "entityType", fact?.Type);
+        AddAttribute(attributes, "sourceDocument", fact?.Source);
+        if (fact is not null)
+        {
+            AddAttribute(
+                attributes,
+                "confidence",
+                fact.Confidence.ToString("0.###", CultureInfo.InvariantCulture));
+            if (fact.SameAs.Count > 0)
+            {
+                AddAttribute(attributes, "sameAs", string.Join(", ", fact.SameAs));
+            }
+        }
+
+        return attributes;
+    }
+
+    private static void AddDetail(ICollection<string> details, string label, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            details.Add($"{label}: {value.Trim()}");
+        }
+    }
+
+    private static void AddAttribute(IDictionary<string, string> attributes, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            attributes[key] = value.Trim();
         }
     }
 

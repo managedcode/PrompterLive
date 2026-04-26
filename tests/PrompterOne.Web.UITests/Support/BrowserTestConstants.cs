@@ -344,6 +344,7 @@ internal static partial class BrowserTestConstants
         public const double GraphCanvasMinimumVisibleHeightPx = 320;
         public const string GraphRawTpsMarkupRegex = @"\[[^\]\r\n]+\]";
         public const string GraphLaneNodePrefix = "prompterone:graph:lane:";
+        public const string GraphNodeTypeCircleValue = "circle";
         public const string GraphNodeTypeEllipseValue = "ellipse";
         public const string GraphNodeTypeRectValue = "rect";
         public const string GraphNodeKindSimilarityChunkValue = "SimilarityChunk";
