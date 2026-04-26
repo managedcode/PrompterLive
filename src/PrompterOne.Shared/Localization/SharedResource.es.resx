@@ -511,7 +511,7 @@
     <value>Reflejar el lector verticalmente</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Girar el lector entre horizontal y vertical</value>
+    <value>Girar la orientación del lector</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Alternar pantalla completa del navegador</value>

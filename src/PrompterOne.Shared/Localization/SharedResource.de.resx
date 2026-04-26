@@ -511,7 +511,7 @@
     <value>Leser vertikal spiegeln</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Leser zwischen Hoch- und Querformat drehen</value>
+    <value>Ausrichtung des Lesers drehen</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Browser-Vollbild umschalten</value>

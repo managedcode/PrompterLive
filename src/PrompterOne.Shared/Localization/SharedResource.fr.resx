@@ -511,7 +511,7 @@
     <value>Inverser le lecteur verticalement</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Faire pivoter le lecteur entre paysage et portrait</value>
+    <value>Faire pivoter l’orientation du lecteur</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Basculer le plein écran du navigateur</value>

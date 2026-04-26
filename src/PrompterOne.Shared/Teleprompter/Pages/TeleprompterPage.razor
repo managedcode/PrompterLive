@@ -26,7 +26,7 @@
             <div class="rd-left-rail">
                 <TeleprompterReaderMirrorToggles FullscreenButtonCssClass="@BuildReaderFullscreenButtonCssClass()" FullscreenTitle="@ReaderFullscreenTitle"
                                                  IsFullscreenActive="@_isReaderFullscreenActive" IsMirrorHorizontal="@_isReaderMirrorHorizontal"
-                                                 IsMirrorVertical="@_isReaderMirrorVertical" IsPortraitOrientation="@(_readerTextOrientation == ReaderTextOrientation.Portrait)"
+                                                 IsMirrorVertical="@_isReaderMirrorVertical" IsRotatedOrientation="@(_readerTextOrientation != ReaderTextOrientation.Landscape)"
                                                  MirrorHorizontalButtonCssClass="@BuildReaderMirrorButtonCssClass(_isReaderMirrorHorizontal)" MirrorHorizontalLabel="@ReaderMirrorHorizontalLabel"
                                                  MirrorHorizontalTitle="@ReaderMirrorHorizontalTitle" MirrorVerticalButtonCssClass="@BuildReaderMirrorButtonCssClass(_isReaderMirrorVertical)"
                                                  MirrorVerticalLabel="@ReaderMirrorVerticalLabel" MirrorVerticalTitle="@ReaderMirrorVerticalTitle"

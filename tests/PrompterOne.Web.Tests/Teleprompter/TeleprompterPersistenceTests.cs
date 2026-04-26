@@ -34,6 +34,11 @@ public sealed class TeleprompterPersistenceTests : BunitContext
     private const double UpdatedTextWidthRatio = UpdatedTextWidthPercent / 100d;
     private const string DisabledCameraAttribute = "false";
     private const string JustifyAlignmentValue = "justify";
+    private const string InvertedOrientationTransform = "rotate(180deg)";
+    private const string InvertedOrientationValue = "inverted";
+    private const string LandscapeOrientationValue = "landscape";
+    private const string PortraitCounterClockwiseOrientationTransform = "rotate(270deg)";
+    private const string PortraitCounterClockwiseOrientationValue = "portrait-270";
     private const string PortraitOrientationTransform = "rotate(90deg)";
     private const string PortraitOrientationValue = "portrait";
     private const string RightAlignmentValue = "right";
@@ -173,6 +178,63 @@ public sealed class TeleprompterPersistenceTests : BunitContext
     }
 
     [Test]
+    public async Task TeleprompterPage_CyclesAndPersistsAllReaderOrientations()
+    {
+        var harness = TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterDemo);
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+            Assert.Equal(
+                LandscapeOrientationValue,
+                cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("data-reader-orientation")));
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        cut.WaitForAssertion(() =>
+            AssertReaderOrientation(
+                cut,
+                harness,
+                ReaderTextOrientation.Portrait,
+                PortraitOrientationValue,
+                PortraitOrientationTransform));
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        cut.WaitForAssertion(() =>
+            AssertReaderOrientation(
+                cut,
+                harness,
+                ReaderTextOrientation.Inverted,
+                InvertedOrientationValue,
+                InvertedOrientationTransform));
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        cut.WaitForAssertion(() =>
+            AssertReaderOrientation(
+                cut,
+                harness,
+                ReaderTextOrientation.PortraitCounterClockwise,
+                PortraitCounterClockwiseOrientationValue,
+                PortraitCounterClockwiseOrientationTransform));
+
+        await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
+        cut.WaitForAssertion(() =>
+        {
+            var savedSettings = harness.JsRuntime.GetSavedValue<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings);
+            var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
+
+            Assert.Equal(
+                LandscapeOrientationValue,
+                cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("data-reader-orientation"));
+            Assert.DoesNotContain(PortraitOrientationTransform, clusterWrapStyle, StringComparison.Ordinal);
+            Assert.DoesNotContain(InvertedOrientationTransform, clusterWrapStyle, StringComparison.Ordinal);
+            Assert.DoesNotContain(PortraitCounterClockwiseOrientationTransform, clusterWrapStyle, StringComparison.Ordinal);
+            Assert.Equal(ReaderTextOrientation.Landscape, savedSettings.TextOrientation);
+            Assert.Equal(ReaderTextOrientation.Landscape, harness.Session.State.ReaderSettings.TextOrientation);
+        }, PersistenceAssertionTimeout);
+    }
+
+    [Test]
     public void TeleprompterPage_SpeedDown_ClampsAtSixtyWordsPerMinute()
     {
         var harness = TestHarnessFactory.Create(this);
@@ -212,5 +274,25 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         }
 
         return parsedWpm;
+    }
+
+    private static void AssertReaderOrientation(
+        IRenderedComponent<TeleprompterPage> cut,
+        AppHarness harness,
+        ReaderTextOrientation expectedOrientation,
+        string expectedDataAttribute,
+        string expectedTransform)
+    {
+        var savedSettings = harness.JsRuntime.GetSavedValue<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings);
+        var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
+        var cameraStyle = cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground).GetAttribute("style") ?? string.Empty;
+
+        Assert.Equal(
+            expectedDataAttribute,
+            cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("data-reader-orientation"));
+        Assert.Contains(expectedTransform, clusterWrapStyle, StringComparison.Ordinal);
+        Assert.Contains(expectedTransform, cameraStyle, StringComparison.Ordinal);
+        Assert.Equal(expectedOrientation, savedSettings.TextOrientation);
+        Assert.Equal(expectedOrientation, harness.Session.State.ReaderSettings.TextOrientation);
     }
 }

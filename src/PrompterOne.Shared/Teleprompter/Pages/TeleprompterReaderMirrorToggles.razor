@@ -51,7 +51,7 @@
         <button class="@OrientationButtonCssClass"
                 @onclick="OnToggleOrientation"
                 aria-label="@OrientationTitle"
-                data-active="@BuildBooleanDataAttribute(IsPortraitOrientation)"
+                data-active="@BuildBooleanDataAttribute(IsRotatedOrientation)"
                 data-test="@UiTestIds.Teleprompter.OrientationToggle">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M7 3H3v4"></path>
@@ -96,7 +96,7 @@
     [Parameter] public bool IsFullscreenActive { get; set; }
     [Parameter] public bool IsMirrorHorizontal { get; set; }
     [Parameter] public bool IsMirrorVertical { get; set; }
-    [Parameter] public bool IsPortraitOrientation { get; set; }
+    [Parameter] public bool IsRotatedOrientation { get; set; }
     [Parameter, EditorRequired] public string FullscreenButtonCssClass { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string FullscreenTitle { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string MirrorHorizontalButtonCssClass { get; set; } = string.Empty;

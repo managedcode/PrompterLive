@@ -18,7 +18,7 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
         RegexOptions.Compiled);
 
     [Test]
-    public Task TeleprompterScreen_ExposesOrientationToggle_AndSwitchesReaderOrientation() =>
+    public Task TeleprompterScreen_ExposesOrientationToggle_AndCyclesReaderOrientation() =>
         RunPageAsync(async page =>
         {
             await ReaderRouteDriver.OpenTeleprompterAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
@@ -40,6 +40,33 @@ public sealed class TeleprompterChromeFlowTests(StandaloneAppFixture fixture)
             await Expect(clusterWrap).ToHaveAttributeAsync(
                 BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
                 BrowserTestConstants.TeleprompterFlow.OrientationPortraitValue);
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationPortraitTransform), RegexOptions.Compiled));
+
+            await orientationToggle.ClickAsync();
+
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
+                BrowserTestConstants.TeleprompterFlow.OrientationInvertedValue);
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationInvertedTransform), RegexOptions.Compiled));
+
+            await orientationToggle.ClickAsync();
+
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
+                BrowserTestConstants.TeleprompterFlow.OrientationPortraitCounterClockwiseValue);
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationPortraitCounterClockwiseTransform), RegexOptions.Compiled));
+
+            await orientationToggle.ClickAsync();
+
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
+                BrowserTestConstants.TeleprompterFlow.OrientationLandscapeValue);
         });
 
     [Test]

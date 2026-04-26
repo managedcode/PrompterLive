@@ -241,7 +241,7 @@ internal static partial class BrowserTestConstants
         public const double MinimumLeftRailStageGapPx = 24;
         public const string MirrorHorizontalTooltipText = "Mirror the reader horizontally";
         public const string MirrorVerticalTooltipText = "Mirror the reader vertically";
-        public const string OrientationTooltipText = "Rotate the reader between landscape and portrait";
+        public const string OrientationTooltipText = "Rotate the reader orientation";
         public const string FullscreenTooltipText = "Toggle browser fullscreen";
         public const string AlignmentLeftTooltipText = "Align text to the left edge";
         public const string AlignmentCenterTooltipText = "Center text on the reading lane";
@@ -261,6 +261,8 @@ internal static partial class BrowserTestConstants
         public const string MirrorStep = "01-mirror-controls";
         public const string OrientationPortraitValue = "portrait";
         public const string OrientationLandscapeValue = "landscape";
+        public const string OrientationInvertedValue = "inverted";
+        public const string OrientationPortraitCounterClockwiseValue = "portrait-270";
         public const string FullscreenScenarioName = "teleprompter-fullscreen";
         public const string FullscreenStep = "01-fullscreen-active";
         public const string FullscreenStateScript = "() => Boolean(document.fullscreenElement)";
@@ -276,6 +278,7 @@ internal static partial class BrowserTestConstants
         public const string ProgressEmptyStylePattern = @"width:\s*0%";
         public const string ProgressFilledStylePattern = @"width:\s*100%";
         public const double MaxProgressShellOverflowPx = 0.5;
+        public const double MaxReaderContentOverflowPx = 1.5;
         public const double MinimumChromeBackgroundAlphaReduction = 0.08;
         public const double MinimumEdgeInfoOpacityReduction = 0.08;
         public const int SecurityIncidentViewportWidth = 1797;
@@ -288,6 +291,8 @@ internal static partial class BrowserTestConstants
         public const int MinimumBalancedTextLineCount = 2;
         public const string ReaderOrientationAttribute = "data-reader-orientation";
         public const string OrientationPortraitTransform = "rotate(90deg)";
+        public const string OrientationInvertedTransform = "rotate(180deg)";
+        public const string OrientationPortraitCounterClockwiseTransform = "rotate(270deg)";
         public const string MirrorHorizontalTransform = "scaleX(-1)";
         public const string MirrorVerticalTransform = "scaleY(-1)";
         public const string OpeningBlock = "Opening Block";

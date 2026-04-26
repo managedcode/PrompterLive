@@ -193,7 +193,8 @@
     height: 100%;
     --rd-font-size: 36px;
 }
-.rd-cluster-wrap[data-reader-orientation='portrait'] {
+.rd-cluster-wrap[data-reader-orientation='portrait'],
+.rd-cluster-wrap[data-reader-orientation='portrait-270'] {
     max-width: min(70vh, 780px, var(--rd-stage-shell-width));
 }
 

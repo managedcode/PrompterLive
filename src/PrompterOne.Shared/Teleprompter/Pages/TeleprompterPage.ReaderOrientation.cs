@@ -5,10 +5,7 @@ namespace PrompterOne.Shared.Pages;
 public partial class TeleprompterPage
 {
     private Task ToggleReaderOrientationAsync() =>
-        SetReaderOrientationAsync(
-            _readerTextOrientation == ReaderTextOrientation.Landscape
-                ? ReaderTextOrientation.Portrait
-                : ReaderTextOrientation.Landscape);
+        SetReaderOrientationAsync(BuildNextReaderOrientation());
 
     private async Task SetReaderOrientationAsync(ReaderTextOrientation textOrientation)
     {
@@ -21,4 +18,13 @@ public partial class TeleprompterPage
         RequestReaderAlignment(instant: true);
         await PersistCurrentReaderLayoutAsync();
     }
+
+    private ReaderTextOrientation BuildNextReaderOrientation() =>
+        _readerTextOrientation switch
+        {
+            ReaderTextOrientation.Landscape => ReaderTextOrientation.Portrait,
+            ReaderTextOrientation.Portrait => ReaderTextOrientation.Inverted,
+            ReaderTextOrientation.Inverted => ReaderTextOrientation.PortraitCounterClockwise,
+            _ => ReaderTextOrientation.Landscape
+        };
 }

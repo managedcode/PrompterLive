@@ -553,7 +553,7 @@
     <value>Віддзеркалити суфлер вертикально</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Повернути суфлер між альбомним і портретним режимами</value>
+    <value>Повернути орієнтацію суфлера</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Перемкнути повноекранний режим браузера</value>

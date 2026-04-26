@@ -532,7 +532,7 @@
     <value>Mirror the reader vertically</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Rotate the reader between landscape and portrait</value>
+    <value>Rotate the reader orientation</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Toggle browser fullscreen</value>

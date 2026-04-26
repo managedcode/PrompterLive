@@ -30,7 +30,11 @@ public partial class TeleprompterPage
     private const string ReaderHorizontalGuideCssClass = "rd-guide-h";
     private const string ReaderMirrorButtonCssClass = "rd-mirror-btn";
     private const string ReaderMirrorHorizontalTransform = "scaleX(-1)";
+    private const string ReaderOrientationInvertedTransform = "rotate(180deg)";
+    private const string ReaderOrientationInvertedValue = "inverted";
     private const string ReaderOrientationLandscapeValue = "landscape";
+    private const string ReaderOrientationPortraitCounterClockwiseTransform = "rotate(270deg)";
+    private const string ReaderOrientationPortraitCounterClockwiseValue = "portrait-270";
     private const string ReaderOrientationPortraitTransform = "rotate(90deg)";
     private const string ReaderOrientationPortraitValue = "portrait";
     private const string ReaderPercentSuffix = "%";
@@ -140,7 +144,7 @@ public partial class TeleprompterPage
         BuildReaderMirrorButtonCssClass(_isReaderFullscreenActive);
 
     private string BuildReaderOrientationButtonCssClass() =>
-        BuildReaderMirrorButtonCssClass(_readerTextOrientation == ReaderTextOrientation.Portrait);
+        BuildReaderMirrorButtonCssClass(_readerTextOrientation != ReaderTextOrientation.Landscape);
 
     private string BuildReaderAlignmentButtonCssClass(ReaderTextAlignment textAlignment) =>
         BuildClassList(
@@ -208,9 +212,10 @@ public partial class TeleprompterPage
     {
         var transforms = new List<string>();
 
-        if (_readerTextOrientation == ReaderTextOrientation.Portrait)
+        var orientationTransform = BuildReaderOrientationTransform();
+        if (!string.IsNullOrWhiteSpace(orientationTransform))
         {
-            transforms.Add(ReaderOrientationPortraitTransform);
+            transforms.Add(orientationTransform);
         }
 
         if (_isReaderMirrorHorizontal)
@@ -227,9 +232,22 @@ public partial class TeleprompterPage
     }
 
     private string BuildReaderOrientationDataAttribute() =>
-        _readerTextOrientation == ReaderTextOrientation.Portrait
-            ? ReaderOrientationPortraitValue
-            : ReaderOrientationLandscapeValue;
+        _readerTextOrientation switch
+        {
+            ReaderTextOrientation.Portrait => ReaderOrientationPortraitValue,
+            ReaderTextOrientation.Inverted => ReaderOrientationInvertedValue,
+            ReaderTextOrientation.PortraitCounterClockwise => ReaderOrientationPortraitCounterClockwiseValue,
+            _ => ReaderOrientationLandscapeValue
+        };
+
+    private string BuildReaderOrientationTransform() =>
+        _readerTextOrientation switch
+        {
+            ReaderTextOrientation.Portrait => ReaderOrientationPortraitTransform,
+            ReaderTextOrientation.Inverted => ReaderOrientationInvertedTransform,
+            ReaderTextOrientation.PortraitCounterClockwise => ReaderOrientationPortraitCounterClockwiseTransform,
+            _ => string.Empty
+        };
 
     private string BuildReaderTextAlignmentDataAttribute() =>
         _readerTextAlignment switch

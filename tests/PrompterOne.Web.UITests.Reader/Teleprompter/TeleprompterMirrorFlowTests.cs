@@ -8,6 +8,16 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
+    private readonly record struct ReaderContentFitProbe(
+        double StageBottom,
+        double StageLeft,
+        double StageRight,
+        double StageTop,
+        double TextBottom,
+        double TextLeft,
+        double TextRight,
+        double TextTop);
+
     private readonly record struct LeftRailLayoutProbe(
         double AlignmentLeft,
         double AlignmentRight,
@@ -80,6 +90,42 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
                 BrowserTestConstants.TeleprompterFlow.StyleAttribute,
                 new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationPortraitTransform), RegexOptions.Compiled));
 
+            await orientationToggle.ClickAsync();
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
+                BrowserTestConstants.TeleprompterFlow.OrientationInvertedValue);
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationInvertedTransform), RegexOptions.Compiled));
+            await Expect(cameraBackground).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationInvertedTransform), RegexOptions.Compiled));
+
+            await orientationToggle.ClickAsync();
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.ReaderOrientationAttribute,
+                BrowserTestConstants.TeleprompterFlow.OrientationPortraitCounterClockwiseValue);
+            await Expect(clusterWrap).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationPortraitCounterClockwiseTransform), RegexOptions.Compiled));
+            await Expect(cameraBackground).ToHaveAttributeAsync(
+                BrowserTestConstants.TeleprompterFlow.StyleAttribute,
+                new Regex(Regex.Escape(BrowserTestConstants.TeleprompterFlow.OrientationPortraitCounterClockwiseTransform), RegexOptions.Compiled));
+
+            var fit = await MeasureReaderContentFitAsync(page);
+            await Assert.That(fit.TextLeft >= fit.StageLeft - BrowserTestConstants.TeleprompterFlow.MaxReaderContentOverflowPx)
+                .IsTrue()
+                .Because($"Expected rotated reader text left edge {fit.TextLeft:0.##} to stay inside stage left edge {fit.StageLeft:0.##}.");
+            await Assert.That(fit.TextRight <= fit.StageRight + BrowserTestConstants.TeleprompterFlow.MaxReaderContentOverflowPx)
+                .IsTrue()
+                .Because($"Expected rotated reader text right edge {fit.TextRight:0.##} to stay inside stage right edge {fit.StageRight:0.##}.");
+            await Assert.That(fit.TextTop >= fit.StageTop - BrowserTestConstants.TeleprompterFlow.MaxReaderContentOverflowPx)
+                .IsTrue()
+                .Because($"Expected rotated reader text top edge {fit.TextTop:0.##} to stay inside stage top edge {fit.StageTop:0.##}.");
+            await Assert.That(fit.TextBottom <= fit.StageBottom + BrowserTestConstants.TeleprompterFlow.MaxReaderContentOverflowPx)
+                .IsTrue()
+                .Because($"Expected rotated reader text bottom edge {fit.TextBottom:0.##} to stay inside stage bottom edge {fit.StageBottom:0.##}.");
+
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
                 BrowserTestConstants.TeleprompterFlow.MirrorScenarioName,
@@ -146,4 +192,32 @@ public sealed class TeleprompterMirrorFlowTests(StandaloneAppFixture fixture) : 
         locator.EvaluateAsync<string>(
             "(element, propertyName) => getComputedStyle(element)[propertyName]",
             propertyName);
+
+    private static Task<ReaderContentFitProbe> MeasureReaderContentFitAsync(IPage page) =>
+        page.EvaluateAsync<ReaderContentFitProbe>(
+            """
+            args => {
+                const byTestId = testId => document.querySelector(`[data-test="${testId}"]`);
+                const stage = byTestId(args.stage);
+                const text = byTestId(args.text);
+                const stageRect = stage?.getBoundingClientRect();
+                const textRect = text?.getBoundingClientRect();
+
+                return {
+                    stageBottom: stageRect?.bottom ?? 0,
+                    stageLeft: stageRect?.left ?? 0,
+                    stageRight: stageRect?.right ?? 0,
+                    stageTop: stageRect?.top ?? 0,
+                    textBottom: textRect?.bottom ?? 0,
+                    textLeft: textRect?.left ?? 0,
+                    textRight: textRect?.right ?? 0,
+                    textTop: textRect?.top ?? 0
+                };
+            }
+            """,
+            new
+            {
+                stage = UiTestIds.Teleprompter.Stage,
+                text = UiTestIds.Teleprompter.CardText(0)
+            });
 }

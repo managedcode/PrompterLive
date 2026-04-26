@@ -511,7 +511,7 @@
     <value>Espelhar o leitor verticalmente</value>
   </data>
   <data name="TooltipRotateReaderOrientation" xml:space="preserve">
-    <value>Girar o leitor entre paisagem e retrato</value>
+    <value>Girar a orientação do leitor</value>
   </data>
   <data name="TooltipToggleBrowserFullscreen" xml:space="preserve">
     <value>Alternar tela cheia do navegador</value>

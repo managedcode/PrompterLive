@@ -18,7 +18,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     private const string FullscreenTooltipText = "Toggle browser fullscreen";
     private const string MirrorHorizontalTooltipText = "Mirror the reader horizontally";
     private const string MirrorVerticalTooltipText = "Mirror the reader vertically";
-    private const string OrientationTooltipText = "Rotate the reader between landscape and portrait";
+    private const string OrientationTooltipText = "Rotate the reader orientation";
     private const string SpeedCueDisplayMultiplierTooltipText = "Show speed cues as multipliers";
     private const string SpeedCueDisplayTooltipText = "Choose how speed cue labels appear";
     private const string SpeedCueDisplayWpmTooltipText = "Show speed cues as WPM";
