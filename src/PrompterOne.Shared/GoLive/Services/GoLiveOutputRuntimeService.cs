@@ -34,17 +34,18 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
         await RefreshStateAsync();
     }
 
-    public async Task RotateRecordingTakeAsync(GoLiveOutputRuntimeRequest request)
+    public async Task<GoLiveRecordingTakeExportSnapshot?> RotateRecordingTakeAsync(GoLiveOutputRuntimeRequest request)
     {
         if (!State.RecordingActive || !request.CanStartRecording)
         {
-            return;
+            return null;
         }
 
-        await _interop.RotateLocalRecordingTakeAsync(
+        var exportedTake = await _interop.RotateLocalRecordingTakeAsync(
             GoLiveOutputRuntimeContract.SessionId,
             request);
         await RefreshStateAsync();
+        return exportedTake;
     }
 
     public async Task UpdateProgramSourceAsync(GoLiveOutputRuntimeRequest request)
@@ -81,15 +82,16 @@ public sealed class GoLiveOutputRuntimeService(GoLiveOutputInterop interop)
         await RefreshStateAsync();
     }
 
-    public async Task StopRecordingAsync()
+    public async Task<GoLiveRecordingTakeExportSnapshot?> StopRecordingAsync()
     {
         if (!State.RecordingActive)
         {
-            return;
+            return null;
         }
 
-        await _interop.StopLocalRecordingAsync(GoLiveOutputRuntimeContract.SessionId);
+        var exportedTake = await _interop.StopLocalRecordingAsync(GoLiveOutputRuntimeContract.SessionId);
         await RefreshStateAsync();
+        return exportedTake;
     }
 
     private async Task SyncLiveOutputsAsync(GoLiveOutputRuntimeRequest request)

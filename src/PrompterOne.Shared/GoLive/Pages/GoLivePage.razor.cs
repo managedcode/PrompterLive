@@ -21,6 +21,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     [Inject] private GoLiveSessionService GoLiveSession { get; set; } = null!;
     [Inject] private GoLiveOutputRuntimeService GoLiveOutputRuntime { get; set; } = null!;
     [Inject] private GoLiveRemoteSourceRuntimeService GoLiveRemoteSourceRuntime { get; set; } = null!;
+    [Inject] private GoLiveBlockTakeStore BlockTakeStore { get; set; } = null!;
     [Inject] private BrowserMediaCaptureCapabilitiesService BrowserMediaCaptureCapabilityService { get; set; } = null!;
     [Inject] private MicrophoneLevelInterop MicrophoneLevelInterop { get; set; } = null!;
     [Inject] private StreamingPublishDescriptorResolver StreamingDescriptorResolver { get; set; } = null!;
@@ -44,6 +45,7 @@ public partial class GoLivePage : ComponentBase, IDisposable, IAsyncDisposable
     private bool _focusScreenAfterRender = true;
     private bool _loadState = true;
     private SettingsPagePreferences _recordingPreferences = SettingsPagePreferences.Default;
+    private IReadOnlyList<GoLiveBlockTakeRecord> _recordingBlockTakes = [];
     private ElementReference _screenRoot;
     private string _sessionSubtitle = string.Empty;
     private string _sessionTitle = ScriptWorkspaceState.UntitledScriptTitle;

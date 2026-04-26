@@ -1,4 +1,5 @@
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -67,13 +68,15 @@ public partial class GoLivePage
             }
 
             var previousIndex = _recordingBlockIndex;
+            var previousTakeTarget = BuildRecordingTakeTarget(blocks, previousIndex);
             _recordingBlockIndex = Math.Clamp(_recordingBlockIndex + direction, 0, blocks.Count - 1);
             if (_recordingBlockIndex == previousIndex || !GoLiveSession.State.IsRecordingActive)
             {
                 return;
             }
 
-            await GoLiveOutputRuntime.RotateRecordingTakeAsync(BuildRuntimeRequest(SelectedCamera));
+            var exportedTake = await GoLiveOutputRuntime.RotateRecordingTakeAsync(BuildRuntimeRequest(SelectedCamera));
+            await SaveRecordingBlockTakeAsync(previousTakeTarget, exportedTake);
         });
     }
 
@@ -90,4 +93,63 @@ public partial class GoLivePage
         _recordingBlockIndex = Math.Clamp(_recordingBlockIndex, 0, blockCount - 1);
         return _recordingBlockIndex;
     }
+
+    private GoLiveRecordingTakeTarget? BuildCurrentRecordingTakeTarget()
+    {
+        var blocks = RecordingBlocks;
+        return blocks.Count == 0
+            ? null
+            : BuildRecordingTakeTarget(blocks, NormalizeRecordingBlockIndex(blocks.Count));
+    }
+
+    private GoLiveRecordingTakeTarget? BuildRecordingTakeTarget(
+        IReadOnlyList<PrompterOne.Core.Services.Preview.BlockPreviewModel> blocks,
+        int blockIndex)
+    {
+        if (blockIndex < 0 || blockIndex >= blocks.Count || string.IsNullOrWhiteSpace(SessionService.State.ScriptId))
+        {
+            return null;
+        }
+
+        var block = blocks[blockIndex];
+        return new GoLiveRecordingTakeTarget(
+            BuildRecordingBlockKey(block, blockIndex),
+            string.IsNullOrWhiteSpace(block.Title) ? $"Block {blockIndex + 1}" : block.Title.Trim());
+    }
+
+    private async Task SaveRecordingBlockTakeAsync(
+        GoLiveRecordingTakeTarget? target,
+        GoLiveRecordingTakeExportSnapshot? exportedTake)
+    {
+        if (target is null
+            || exportedTake is null
+            || exportedTake.SizeBytes <= 0
+            || string.IsNullOrWhiteSpace(exportedTake.FileName))
+        {
+            return;
+        }
+
+        var nextTakeNumber = _recordingBlockTakes.Count(take => string.Equals(take.BlockKey, target.BlockKey, StringComparison.Ordinal)) + 1;
+        var record = new GoLiveBlockTakeRecord(
+            Id: Guid.NewGuid().ToString("N", System.Globalization.CultureInfo.InvariantCulture),
+            BlockKey: target.BlockKey,
+            BlockTitle: target.BlockTitle,
+            TakeNumber: nextTakeNumber,
+            FileName: exportedTake.FileName,
+            MimeType: exportedTake.MimeType,
+            SaveMode: exportedTake.SaveMode,
+            SizeBytes: exportedTake.SizeBytes,
+            RecordedAt: DateTimeOffset.UtcNow);
+
+        _recordingBlockTakes = _recordingBlockTakes
+            .Concat([record])
+            .OrderBy(take => take.BlockTitle, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(take => take.TakeNumber)
+            .ToList();
+
+        await BlockTakeStore.SaveAsync(SessionService.State.ScriptId, _recordingBlockTakes);
+        StateHasChanged();
+    }
+
+    private sealed record GoLiveRecordingTakeTarget(string BlockKey, string BlockTitle);
 }

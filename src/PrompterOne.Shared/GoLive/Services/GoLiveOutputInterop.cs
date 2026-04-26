@@ -23,11 +23,11 @@ public sealed class GoLiveOutputInterop(IJSRuntime jsRuntime)
             request).AsTask();
     }
 
-    public Task RotateLocalRecordingTakeAsync(
+    public Task<GoLiveRecordingTakeExportSnapshot?> RotateLocalRecordingTakeAsync(
         string sessionId,
         GoLiveOutputRuntimeRequest request)
     {
-        return _jsRuntime.InvokeVoidAsync(
+        return _jsRuntime.InvokeAsync<GoLiveRecordingTakeExportSnapshot?>(
             GoLiveOutputInteropMethodNames.RotateLocalRecordingTake,
             sessionId,
             request).AsTask();
@@ -67,9 +67,9 @@ public sealed class GoLiveOutputInterop(IJSRuntime jsRuntime)
             sessionId).AsTask();
     }
 
-    public Task StopLocalRecordingAsync(string sessionId)
+    public Task<GoLiveRecordingTakeExportSnapshot?> StopLocalRecordingAsync(string sessionId)
     {
-        return _jsRuntime.InvokeVoidAsync(
+        return _jsRuntime.InvokeAsync<GoLiveRecordingTakeExportSnapshot?>(
             GoLiveOutputInteropMethodNames.StopLocalRecording,
             sessionId).AsTask();
     }

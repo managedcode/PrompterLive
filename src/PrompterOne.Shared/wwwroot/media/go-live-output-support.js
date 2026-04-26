@@ -482,18 +482,30 @@
     }
 
     async function finalizeRecording(session) {
+        const exportSnapshot = {
+            fileName: session.recordingFileName || "",
+            mimeType: session.recordingMimeType || mimeTypeWebm,
+            saveMode: session.recordingSaveMode || "download",
+            sizeBytes: session.recordingBytes || 0
+        };
+
         if (session.recordingWritable) {
             await session.recordingWritePromise.catch(() => {});
             await session.recordingWritable.close().catch(() => {});
-            return;
+            return exportSnapshot.sizeBytes > 0 ? exportSnapshot : null;
         }
 
         if (session.recordingChunks.length === 0) {
-            return;
+            return null;
         }
 
         const blob = new Blob(session.recordingChunks, { type: session.recordingMimeType || mimeTypeWebm });
         triggerRecordingDownload(blob, session.recordingFileName || buildRecordingFileName(recordingFileStemFallback, blob.type));
+        return {
+            ...exportSnapshot,
+            mimeType: blob.type || exportSnapshot.mimeType,
+            sizeBytes: blob.size
+        };
     }
 
     window[getMediaRuntimeString("goLiveOutputSupportNamespace")] = {

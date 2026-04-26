@@ -2,6 +2,7 @@ using System.Text.Json;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
@@ -345,6 +346,34 @@ public sealed class GoLiveSessionInteractionTests : BunitContext
         Assert.Contains("take 02", rotateRequest.Recording.FileStem, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(secondBlockTitle, rotateRequest.Recording.FileStem, StringComparison.Ordinal);
         Assert.DoesNotContain(firstBlockTitle, rotateRequest.Recording.FileStem, StringComparison.Ordinal);
+    }
+
+    [Test]
+    public async Task GoLivePage_StopRecording_PersistsBlockTakeWithoutChangingScriptSource()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+        SeedStudioSettings(StudioSettings.Default with
+        {
+            Streaming = StudioSettings.Default.Streaming with
+            {
+                Recording = new RecordingProfile(IsEnabled: true)
+            }
+        });
+
+        Services.GetRequiredService<NavigationManager>().NavigateTo(AppTestData.Routes.GoLiveLeadership);
+        var cut = Render<GoLivePage>();
+
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+        var session = Services.GetRequiredService<IScriptSessionService>().State;
+        var sourceBeforeRecording = session.Text;
+
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.RecordingBlockContextToggle).Click());
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.StartRecording).Click());
+        await cut.InvokeAsync(() => cut.FindByTestId(UiTestIds.GoLive.StartRecording).Click());
+
+        var takes = await Services.GetRequiredService<GoLiveBlockTakeStore>().LoadAsync(session.ScriptId);
+        Assert.Single(takes);
+        Assert.Equal(sourceBeforeRecording, Services.GetRequiredService<IScriptSessionService>().State.Text);
     }
 
     [Test]

@@ -452,6 +452,51 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
     }
 
     [Test]
+    public async Task GoLivePage_RecordingBlockTakes_PersistAndCompareSameBlockSideBySide()
+    {
+        var page = await _fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await page.AddInitScriptAsync(scriptPath: GetRecordingFileHarnessScriptPath());
+            await GoLiveFlowTests.SeedGoLiveSceneForReuseAsync(page);
+            await GoLiveFlowTests.SeedRecordingPreferencesAsync(
+                page,
+                SettingsPagePreferences.Default with
+                {
+                    HasSeenOnboarding = true,
+                    RecordingFolder = RecordingPreferenceCatalog.LocationLabels.LocalFile
+                });
+            await StudioRouteDriver.OpenGoLiveRouteAsync(page, BrowserTestConstants.Routes.GoLiveLeadership);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockContextToggle),
+                noWaitAfter: true);
+
+            await RecordOneTakeAsync(page, expectedSavedRecordingCount: 1);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake)).ToHaveCountAsync(1);
+
+            await RecordOneTakeAsync(page, expectedSavedRecordingCount: 2);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTakeCompare)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake)).ToHaveCountAsync(2);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake).Nth(0)).ToContainTextAsync("Take 1");
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake).Nth(1)).ToContainTextAsync("Take 2");
+
+            await page.ReloadAsync();
+            await StudioRouteDriver.WaitForGoLiveReadyAsync(page, BrowserTestConstants.Routes.GoLiveLeadership);
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockContextToggle),
+                noWaitAfter: true);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake)).ToHaveCountAsync(2);
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
+    [Test]
     public async Task GoLivePage_AudioTab_ShowsLiveMicrophoneProgramAndRecordingLevels()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
@@ -555,6 +600,28 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
         await page.WaitForFunctionAsync(
             BrowserTestConstants.Media.ElementHasVisibleVideoScript,
             new object[] { UiTestIds.GoLive.ProgramVideo, BrowserTestConstants.Media.MinimumVisiblePixelCount },
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+    }
+
+    private static async Task RecordOneTakeAsync(IPage page, int expectedSavedRecordingCount)
+    {
+        await UiInteractionDriver.ClickAndContinueAsync(
+            page.GetByTestId(UiTestIds.GoLive.StartRecording),
+            noWaitAfter: true);
+        await page.WaitForFunctionAsync(
+            BrowserTestConstants.GoLive.RecordingRuntimeMetadataReadyScript,
+            BrowserTestConstants.GoLive.RuntimeSessionId,
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+        await UiInteractionDriver.ClickAndContinueAsync(
+            page.GetByTestId(UiTestIds.GoLive.StartRecording),
+            noWaitAfter: true);
+        await page.WaitForFunctionAsync(
+            BrowserTestConstants.GoLive.RecordingRuntimeInactiveScript,
+            BrowserTestConstants.GoLive.RuntimeSessionId,
+            new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+        await page.WaitForFunctionAsync(
+            BrowserTestConstants.Media.SavedRecordingCountReadyScript,
+            expectedSavedRecordingCount,
             new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
     }
 

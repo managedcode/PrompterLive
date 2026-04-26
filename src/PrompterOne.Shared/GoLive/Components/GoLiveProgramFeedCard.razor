@@ -55,6 +55,22 @@
                                     <span class="gl-recording-block-role">@cue.RoleLabel</span>
                                     <strong>@cue.Title</strong>
                                     <p>@cue.Text</p>
+                                    @if (cue.IsActive && cue.Takes.Count > 0)
+                                    {
+                                        <div class="gl-recording-take-compare"
+                                             data-test="@UiTestIds.GoLive.RecordingBlockTakeCompare">
+                                            @foreach (var take in cue.Takes)
+                                            {
+                                                <article class="gl-recording-take-card"
+                                                         data-test="@UiTestIds.GoLive.RecordingBlockTake"
+                                                         data-take-id="@take.Id">
+                                                    <span>@take.Label</span>
+                                                    <strong>@take.FileName</strong>
+                                                    <small>@take.Detail</small>
+                                                </article>
+                                            }
+                                        </div>
+                                    }
                                 </article>
                             }
                         </div>

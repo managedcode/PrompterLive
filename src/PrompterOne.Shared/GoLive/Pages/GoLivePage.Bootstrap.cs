@@ -40,6 +40,7 @@ public partial class GoLivePage
                 await EnsureSessionLoadedAsync();
                 await EnsureSceneDefaultsAsync();
                 await LoadRecordingPreferencesAsync();
+                await LoadRecordingBlockTakesAsync();
                 await LoadStudioSettingsAsync();
                 await SyncRemoteSourcesAsync();
                 UpdateScreenMetadata();
@@ -93,6 +94,11 @@ public partial class GoLivePage
     {
         _recordingPreferences = await SettingsStore.LoadAsync<SettingsPagePreferences>(SettingsPagePreferences.StorageKey)
             ?? SettingsPagePreferences.Default;
+    }
+
+    private async Task LoadRecordingBlockTakesAsync()
+    {
+        _recordingBlockTakes = await BlockTakeStore.LoadAsync(SessionService.State.ScriptId);
     }
 
     private async Task EnsureSceneDefaultsAsync()

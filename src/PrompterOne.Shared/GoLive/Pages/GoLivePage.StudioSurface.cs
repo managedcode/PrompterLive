@@ -8,6 +8,7 @@ using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
+using PrompterOne.Shared.Services.Editor;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -110,8 +111,8 @@ public partial class GoLivePage
 
     private bool ShowRecordingBlockContext =>
         _showRecordingBlockContext
-        && GoLiveSession.State.IsRecordingActive
-        && RecordingBlocks.Count > 0;
+        && RecordingBlocks.Count > 0
+        && (GoLiveSession.State.IsRecordingActive || _recordingBlockTakes.Count > 0);
 
     private bool ShowRightRail => _showRightRail && !_fullProgramView;
 
@@ -263,7 +264,7 @@ public partial class GoLivePage
             blockTitle.Trim());
     }
 
-    private static void AddRecordingBlockCue(
+    private void AddRecordingBlockCue(
         List<GoLiveRecordingBlockCueViewModel> cues,
         IReadOnlyList<BlockPreviewModel> blocks,
         int index,
@@ -282,8 +283,33 @@ public partial class GoLivePage
             roleLabel,
             block.Title,
             block.Text,
-            isActive));
+            isActive,
+            isActive ? BuildRecordingTakeViewModels(BuildRecordingBlockKey(block, index)) : []));
     }
+
+    private IReadOnlyList<GoLiveRecordingTakeViewModel> BuildRecordingTakeViewModels(string blockKey)
+    {
+        return _recordingBlockTakes
+            .Where(take => string.Equals(take.BlockKey, blockKey, StringComparison.Ordinal))
+            .OrderBy(take => take.TakeNumber)
+            .ThenBy(take => take.RecordedAt)
+            .Select(take => new GoLiveRecordingTakeViewModel(
+                take.Id,
+                string.Concat("Take ", take.TakeNumber.ToString(CultureInfo.InvariantCulture)),
+                take.FileName,
+                string.Concat(FormatFileSize(take.SizeBytes), MetricSeparator, FormatTakeTimestamp(take.RecordedAt))))
+            .ToList();
+    }
+
+    private string BuildRecordingBlockKey(BlockPreviewModel block, int blockIndex) =>
+        EditorBlockAttachmentKeyBuilder.BuildFromBlockName(
+            SessionService.State.Text,
+            block.Title,
+            segmentIndex: 0,
+            blockIndex);
+
+    private static string FormatTakeTimestamp(DateTimeOffset recordedAt) =>
+        recordedAt.LocalDateTime.ToString("MMM d, HH:mm", CultureInfo.InvariantCulture);
 
     private string BuildRoomCode()
     {

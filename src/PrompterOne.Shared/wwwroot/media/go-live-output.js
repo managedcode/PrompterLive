@@ -385,7 +385,7 @@
             const request = await ensureProgramSession(session, rawRequest);
 
             await support.stopRecordingSegment(session);
-            await support.finalizeRecording(session);
+            const exportedTake = await support.finalizeRecording(session);
             support.resetRecordingSink(session, false);
 
             session.recordingRequestedContainer = request.recording.containerLabel;
@@ -394,6 +394,7 @@
             await support.prepareRecordingSink(session, request, session.recordingMimeType);
             await support.startRecordingSegment(session);
             session.recordingActive = true;
+            return exportedTake;
         },
 
         async startVdoNinjaSession(sessionId, rawRequest) {
@@ -427,11 +428,12 @@
             }
 
             await getSupport().stopRecordingSegment(session);
-            await getSupport().finalizeRecording(session);
+            const exportedTake = await getSupport().finalizeRecording(session);
             session.recordingActive = false;
 
             getSupport().resetRecordingSink(session, true);
             await cleanupSessionIfIdle(sessionId, session);
+            return exportedTake;
         },
 
         async updateSessionDevices(sessionId, rawRequest) {

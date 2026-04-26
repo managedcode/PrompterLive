@@ -175,7 +175,9 @@ public partial class GoLivePage
                         Text(GoLiveText.Session.StopRecordingMessage),
                         async () =>
                     {
-                        await GoLiveOutputRuntime.StopRecordingAsync();
+                        var takeTarget = BuildCurrentRecordingTakeTarget();
+                        var exportedTake = await GoLiveOutputRuntime.StopRecordingAsync();
+                        await SaveRecordingBlockTakeAsync(takeTarget, exportedTake);
                         GoLiveSession.StopRecording();
                     });
                 return;

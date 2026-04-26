@@ -82,7 +82,14 @@ public sealed record GoLiveRecordingBlockCueViewModel(
     string RoleLabel,
     string Title,
     string Text,
-    bool IsActive);
+    bool IsActive,
+    IReadOnlyList<GoLiveRecordingTakeViewModel> Takes);
+
+public sealed record GoLiveRecordingTakeViewModel(
+    string Id,
+    string Label,
+    string FileName,
+    string Detail);
 
 public sealed record GoLiveRoomParticipantViewModel(
     string Id,

@@ -134,6 +134,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<EditorDocumentSaveCoordinator>();
         context.Services.AddSingleton<EditorLocalRevisionStore>();
         context.Services.AddSingleton<EditorBlockAttachmentStore>();
+        context.Services.AddSingleton<GoLiveBlockTakeStore>();
         context.Services.AddSingleton<IMediaSceneService>(sceneService);
         context.Services.AddSingleton<IMediaPermissionService>(permissionService);
         context.Services.AddSingleton<IMediaDeviceService>(deviceService);
@@ -480,6 +481,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
                 liveKitActive: existingSnapshot?.LiveKit?.Active == true,
                 recordingActive: true,
                 vdoNinjaActive: existingSnapshot?.VdoNinja?.Active == true);
+            result = BuildTypedResult<TValue>(BuildRecordingTakeExportSnapshot());
             return true;
         }
 
@@ -555,6 +557,7 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
                     SizeBytes = 0
                 }
             });
+            result = BuildTypedResult<TValue>(BuildRecordingTakeExportSnapshot());
             return true;
         }
 
@@ -640,6 +643,16 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             PublishUrl: string.Empty,
             RoomName: string.Empty,
             StreamId: string.Empty);
+
+    private static GoLiveRecordingTakeExportSnapshot BuildRecordingTakeExportSnapshot() =>
+        new(
+            FileName: RecordingFileName,
+            MimeType: RecordingMimeType,
+            SaveMode: RecordingSaveMode,
+            SizeBytes: RecordingSizeBytes);
+
+    private static TValue BuildTypedResult<TValue>(object value) =>
+        value is TValue typed ? typed : default!;
 
     private static GoLiveOutputRuntimeSnapshot BuildGoLiveSnapshot(
         IReadOnlyList<object?>? args,

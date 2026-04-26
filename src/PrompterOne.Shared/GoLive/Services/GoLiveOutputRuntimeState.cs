@@ -24,6 +24,12 @@ internal sealed record GoLiveOutputRecordingSnapshot(
     long SizeBytes,
     int VideoBitrateKbps);
 
+public sealed record GoLiveRecordingTakeExportSnapshot(
+    string FileName,
+    string MimeType,
+    string SaveMode,
+    long SizeBytes);
+
 internal sealed record GoLiveOutputRuntimeSnapshot(
     string AudioDeviceId,
     GoLiveOutputAudioSnapshot? Audio,

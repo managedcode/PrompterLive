@@ -39,6 +39,8 @@ public static partial class UiTestIds
         public const string RecordingBlockNextControl = "go-live-recording-block-next-control";
         public const string RecordingBlockPrevious = "go-live-recording-block-previous";
         public const string RecordingBlockPreviousControl = "go-live-recording-block-previous-control";
+        public const string RecordingBlockTake = "go-live-recording-block-take";
+        public const string RecordingBlockTakeCompare = "go-live-recording-block-take-compare";
         public const string ProgramVideo = "go-live-program-video";
         public const string PreviewRail = "go-live-preview-rail";
         public const string PreviewCard = "go-live-preview-card";
