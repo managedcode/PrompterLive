@@ -16,6 +16,7 @@
                            OnDeleteScript="@(() => HandleDeleteScriptAsync(card.Id))"
                            OnDuplicateScript="@(() => HandleDuplicateScriptAsync(card.Id))"
                            OnLearnScript="@(() => OnLearnScript.InvokeAsync(card.Id))"
+                           OnPrepScript="@(() => OnPrepScript.InvokeAsync(card.Id))"
                            OnMoveScript="@(folderId => HandleMoveScriptAsync(card.Id, folderId))"
                            OnOpenScript="@(() => HandleOpenScriptAsync(card.Id))"
                            OnReadScript="@(() => OnReadScript.InvokeAsync(card.Id))"
@@ -76,6 +77,8 @@
     [Parameter, EditorRequired] public EventCallback<string> OnDeleteScript { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<string> OnLearnScript { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback<string> OnPrepScript { get; set; }
 
     [Parameter, EditorRequired] public EventCallback<string> OnReadScript { get; set; }
 

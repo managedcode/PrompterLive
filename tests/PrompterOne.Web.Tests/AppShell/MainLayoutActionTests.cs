@@ -35,6 +35,7 @@ public sealed class MainLayoutActionTests : BunitContext
 
     [Test]
     [Arguments(AppRoutes.Learn, AppTestData.Scripts.QuantumId)]
+    [Arguments(AppRoutes.Prep, AppTestData.Scripts.QuantumId)]
     [Arguments(AppRoutes.Teleprompter, AppTestData.Scripts.QuantumId)]
     public void MainLayout_HeaderBack_UsesScopedEditorRoute_ForPlaybackScreens(string route, string scriptId)
     {

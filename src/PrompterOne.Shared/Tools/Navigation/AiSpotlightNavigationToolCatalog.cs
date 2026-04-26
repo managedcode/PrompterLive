@@ -26,6 +26,12 @@ internal static class AiSpotlightNavigationToolCatalog
             AiSpotlightToolText.OpenLearn,
             DocumentRoute(AppRoutes.Learn, documentId)));
         tools.Add(AiSpotlightToolFactory.NavigationTool(
+            AiSpotlightToolNames.NavPrep,
+            UiTextKey.HeaderPrep,
+            UiTextKey.OnboardingLearnBody,
+            AiSpotlightToolText.OpenPrep,
+            DocumentRoute(AppRoutes.Prep, documentId)));
+        tools.Add(AiSpotlightToolFactory.NavigationTool(
             AiSpotlightToolNames.NavTeleprompter,
             UiTextKey.OnboardingOpenTeleprompter,
             UiTextKey.OnboardingTeleprompterBody,
@@ -56,6 +62,7 @@ internal static class AiSpotlightNavigationToolCatalog
         {
             AppRoutes.Editor when !string.IsNullOrWhiteSpace(documentId) => AppRoutes.EditorWithId(documentId),
             AppRoutes.Learn when !string.IsNullOrWhiteSpace(documentId) => AppRoutes.LearnWithId(documentId),
+            AppRoutes.Prep when !string.IsNullOrWhiteSpace(documentId) => AppRoutes.PrepWithId(documentId),
             AppRoutes.Teleprompter when !string.IsNullOrWhiteSpace(documentId) => AppRoutes.TeleprompterWithId(documentId),
             AppRoutes.GoLive when !string.IsNullOrWhiteSpace(documentId) => AppRoutes.GoLiveWithId(documentId),
             _ => route

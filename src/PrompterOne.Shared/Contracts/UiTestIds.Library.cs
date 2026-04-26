@@ -46,6 +46,8 @@ public static partial class UiTestIds
 
         public static string CardLearn(string scriptId) => $"library-card-learn-{scriptId}";
 
+        public static string CardPrep(string scriptId) => $"library-card-prep-{scriptId}";
+
         public static string CardFavorite(string scriptId) => $"library-card-favorite-{scriptId}";
 
         public static string CardMenu(string scriptId) => $"library-card-menu-{scriptId}";

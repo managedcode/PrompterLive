@@ -275,6 +275,7 @@ public sealed class AppShellService
         AppRoutes.Library => true,
         AppRoutes.Editor => true,
         AppRoutes.Learn => true,
+        AppRoutes.Prep => true,
         AppRoutes.Teleprompter => true,
         AppRoutes.GoLive => true,
         AppRoutes.Settings => true,

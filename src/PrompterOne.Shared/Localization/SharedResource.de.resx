@@ -192,6 +192,9 @@
   <data name="HeaderLearn" xml:space="preserve">
     <value>Lernen</value>
   </data>
+  <data name="HeaderPrep" xml:space="preserve">
+    <value>Vorbereitung</value>
+  </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Lesen</value>
   </data>
@@ -1715,6 +1718,9 @@
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
     <value>Üben</value>
+  </data>
+  <data name="LibraryCardPrep" xml:space="preserve">
+    <value>Vorbereiten</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Teleprompter</value>

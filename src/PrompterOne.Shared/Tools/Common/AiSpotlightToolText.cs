@@ -20,6 +20,7 @@ internal static class AiSpotlightToolText
     public const string OpenLibrary = "open library";
     public const string OpenEditor = "open editor";
     public const string OpenLearn = "open learn mode";
+    public const string OpenPrep = "open prep mode";
     public const string OpenTeleprompter = "open teleprompter";
     public const string OpenGoLive = "open go live";
     public const string OpenSettings = "open settings";

@@ -215,6 +215,7 @@ internal static partial class BrowserTestConstants
         public const string ShowPlaceholder = "Morning show";
         public const string DemoToneLabel = "Warm";
         public const string PracticeActionLabel = "Practice";
+        public const string PrepActionLabel = "Prep";
         public const string TeleprompterActionLabel = "Teleprompter";
     }
 
@@ -1030,6 +1031,8 @@ internal static partial class BrowserTestConstants
         public static string LearnWpmBoundary => AppRoutes.LearnWithId(Scripts.LearnWpmBoundaryId);
         public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
         public static string LearnSecurityIncident => AppRoutes.LearnWithId(Scripts.SecurityIncidentId);
+        public static string PrepDemo => AppRoutes.PrepWithId(Scripts.DemoId);
+        public static string PrepQuantum => AppRoutes.PrepWithId(Scripts.QuantumId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
         public static string GoLiveLeadership => AppRoutes.GoLiveWithId(Scripts.LeadershipId);
         public static string GoLiveQuantum => AppRoutes.GoLiveWithId(Scripts.QuantumId);

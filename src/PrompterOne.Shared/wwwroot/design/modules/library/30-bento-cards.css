@@ -223,12 +223,13 @@
 }
 
 .dcard-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     padding: 8px 16px 16px;
 }
 .dcard-act {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     display: flex;
     align-items: center;
@@ -247,7 +248,18 @@
 }
 .dcard-act:hover { background: var(--gold-09); color: var(--t1); border-color: var(--gold-14); }
 
+.dcard-act-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dcard-act-prep {
+    color: #D8C5A4;
+}
+
 .dcard-act-go {
+    grid-column: 1 / -1;
     background: var(--gold-05);
     color: var(--emo);
     border-color: color-mix(in srgb, var(--emo) 20%, transparent);

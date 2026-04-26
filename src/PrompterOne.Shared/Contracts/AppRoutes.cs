@@ -9,6 +9,7 @@ public static class AppRoutes
     public const string Library = "/library";
     public const string Editor = "/editor";
     public const string Learn = "/learn";
+    public const string Prep = "/prep";
     public const string Teleprompter = "/teleprompter";
     public const string GoLive = "/go-live";
     public const string Settings = "/settings";
@@ -19,6 +20,8 @@ public static class AppRoutes
     public static string EditorWithId(string scriptId) => BuildScoped(Editor, scriptId);
 
     public static string LearnWithId(string scriptId) => BuildScoped(Learn, scriptId);
+
+    public static string PrepWithId(string scriptId) => BuildScoped(Prep, scriptId);
 
     public static string TeleprompterWithId(string scriptId) => BuildScoped(Teleprompter, scriptId);
 

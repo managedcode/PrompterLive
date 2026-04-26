@@ -204,6 +204,9 @@
   <data name="HeaderLearn" xml:space="preserve">
     <value>Вивчати</value>
   </data>
+  <data name="HeaderPrep" xml:space="preserve">
+    <value>Підготовка</value>
+  </data>
   <data name="HeaderRead" xml:space="preserve">
     <value>Читати</value>
   </data>
@@ -1715,6 +1718,9 @@
   </data>
   <data name="LibraryCardLearn" xml:space="preserve">
     <value>Практика</value>
+  </data>
+  <data name="LibraryCardPrep" xml:space="preserve">
+    <value>Підготовка</value>
   </data>
   <data name="LibraryCardRead" xml:space="preserve">
     <value>Телесуфлер</value>

@@ -286,6 +286,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable, IAsyncDispos
                 Shell.ShowEditor(ShellState.Title, currentScriptId);
                 break;
             case AppRoutes.Learn:
+            case AppRoutes.Prep:
                 Shell.ShowLearn(ShellState.Title, ShellState.Subtitle, ShellState.WpmLabel, currentScriptId);
                 break;
             case AppRoutes.Teleprompter:
