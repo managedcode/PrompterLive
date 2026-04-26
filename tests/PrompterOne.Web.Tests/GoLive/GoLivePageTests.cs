@@ -464,6 +464,51 @@ public sealed class GoLivePageTests : BunitContext
         });
     }
 
+    [Test]
+    public void GoLivePage_RecordingBlockContextToggle_ShowsAdjacentScriptBlocksOnlyWhileRecording()
+    {
+        SeedSceneState(CreateTwoCameraScene());
+
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.GoLiveLeadership);
+
+        var cut = Render<GoLivePage>();
+        cut.WaitForAssertion(() => Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.Page)));
+
+        cut.FindByTestId(UiTestIds.GoLive.RecordingBlockContextToggle).Click();
+        Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.RecordingBlockContext}']"));
+
+        var sessionService = Services.GetRequiredService<GoLiveSessionService>();
+        var current = sessionService.State;
+        sessionService.SetState(current with
+        {
+            IsRecordingActive = true,
+            RecordingStartedAt = DateTimeOffset.UtcNow
+        });
+
+        string firstActiveBlockTitle = string.Empty;
+        string firstNextBlockTitle = string.Empty;
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockContext));
+            firstActiveBlockTitle = GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockActive));
+            firstNextBlockTitle = GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNext));
+            Assert.False(string.IsNullOrWhiteSpace(firstActiveBlockTitle));
+            Assert.False(string.IsNullOrWhiteSpace(firstNextBlockTitle));
+            Assert.False(string.Equals(firstActiveBlockTitle, firstNextBlockTitle, StringComparison.Ordinal));
+            Assert.Empty(cut.FindAll($"[data-test='{UiTestIds.GoLive.RecordingBlockPrevious}']"));
+        });
+
+        cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNextControl).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(firstActiveBlockTitle, GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockPrevious)));
+            Assert.Equal(firstNextBlockTitle, GetCueTitle(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockActive)));
+            Assert.False(string.IsNullOrWhiteSpace(cut.FindByTestId(UiTestIds.GoLive.RecordingBlockNext).TextContent));
+        });
+    }
+
     private static MediaSceneState CreateTwoCameraScene() =>
         new(
             [
@@ -496,4 +541,7 @@ public sealed class GoLivePageTests : BunitContext
 
     private string Text(string key) =>
         Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key];
+
+    private static string GetCueTitle(AngleSharp.Dom.IElement element) =>
+        element.QuerySelector("strong")?.TextContent.Trim() ?? string.Empty;
 }

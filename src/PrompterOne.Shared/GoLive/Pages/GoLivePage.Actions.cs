@@ -47,4 +47,38 @@ public partial class GoLivePage
         MediaSceneService.SetIncludeInOutput(sourceId, !camera.Transform.IncludeInOutput);
         await PersistSceneAsync();
     }
+
+    private Task ToggleRecordingBlockContextAsync()
+    {
+        _showRecordingBlockContext = !_showRecordingBlockContext;
+        NormalizeRecordingBlockIndex();
+        return Task.CompletedTask;
+    }
+
+    private Task MoveRecordingBlockContextAsync(int direction)
+    {
+        var blocks = RecordingBlocks;
+        if (blocks.Count == 0)
+        {
+            _recordingBlockIndex = 0;
+            return Task.CompletedTask;
+        }
+
+        _recordingBlockIndex = Math.Clamp(_recordingBlockIndex + direction, 0, blocks.Count - 1);
+        return Task.CompletedTask;
+    }
+
+    private int NormalizeRecordingBlockIndex() => NormalizeRecordingBlockIndex(RecordingBlocks.Count);
+
+    private int NormalizeRecordingBlockIndex(int blockCount)
+    {
+        if (blockCount == 0)
+        {
+            _recordingBlockIndex = 0;
+            return _recordingBlockIndex;
+        }
+
+        _recordingBlockIndex = Math.Clamp(_recordingBlockIndex, 0, blockCount - 1);
+        return _recordingBlockIndex;
+    }
 }

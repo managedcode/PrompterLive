@@ -77,6 +77,13 @@ public sealed record GoLiveAudioChannelViewModel(
     string DetailLabel,
     int LevelPercent);
 
+public sealed record GoLiveRecordingBlockCueViewModel(
+    string TestId,
+    string RoleLabel,
+    string Title,
+    string Text,
+    bool IsActive);
+
 public sealed record GoLiveRoomParticipantViewModel(
     string Id,
     string Initial,

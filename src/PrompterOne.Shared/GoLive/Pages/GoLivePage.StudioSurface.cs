@@ -2,9 +2,11 @@ using System.Globalization;
 using PrompterOne.Core.Models.Media;
 using PrompterOne.Core.Models.Streaming;
 using PrompterOne.Core.Models.Workspace;
+using PrompterOne.Core.Services.Preview;
 using PrompterOne.Shared.Components.GoLive;
 using PrompterOne.Shared.Contracts;
 using PrompterOne.Shared.GoLive.Models;
+using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 
 namespace PrompterOne.Shared.Pages;
@@ -33,8 +35,10 @@ public partial class GoLivePage
     private int _customSceneCount;
     private bool _fullProgramView;
     private bool _muteAllGuests;
+    private int _recordingBlockIndex;
     private bool _roomCreated;
     private bool _showLeftRail = true;
+    private bool _showRecordingBlockContext;
     private bool _showRightRail = true;
     private bool _talkbackEnabled;
 
@@ -50,6 +54,10 @@ public partial class GoLivePage
         || ResolvePrimaryRoomDestination() is not null;
 
     private IReadOnlyList<GoLiveRoomParticipantViewModel> Participants => BuildParticipants();
+
+    private IReadOnlyList<GoLiveRecordingBlockCueViewModel> RecordingBlockCues => BuildRecordingBlockCues();
+
+    private IReadOnlyList<BlockPreviewModel> RecordingBlocks => BuildRecordingBlocks();
 
     private string RoomCode => BuildRoomCode();
 
@@ -97,7 +105,16 @@ public partial class GoLivePage
 
     private bool ShowLeftRail => _showLeftRail && !_fullProgramView;
 
+    private bool ShowRecordingBlockContext =>
+        _showRecordingBlockContext
+        && GoLiveSession.State.IsRecordingActive
+        && RecordingBlocks.Count > 0;
+
     private bool ShowRightRail => _showRightRail && !_fullProgramView;
+
+    private bool CanMoveRecordingBlockBackward => NormalizeRecordingBlockIndex() > 0;
+
+    private bool CanMoveRecordingBlockForward => NormalizeRecordingBlockIndex() < RecordingBlocks.Count - 1;
 
     private bool CanAddSceneCamera =>
         _mediaDevices.Any(device =>
@@ -170,6 +187,73 @@ public partial class GoLivePage
             false)));
 
         return participants;
+    }
+
+    private IReadOnlyList<BlockPreviewModel> BuildRecordingBlocks()
+    {
+        var blocks = new List<BlockPreviewModel>();
+        foreach (var segment in SessionService.State.PreviewSegments)
+        {
+            if (segment.Blocks.Count > 0)
+            {
+                blocks.AddRange(segment.Blocks);
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(segment.Content))
+            {
+                continue;
+            }
+
+            blocks.Add(new BlockPreviewModel
+            {
+                Title = segment.Title,
+                TargetWpm = segment.TargetWpm,
+                Emotion = segment.Emotion,
+                EmotionKey = segment.EmotionKey,
+                Text = segment.Content
+            });
+        }
+
+        return blocks;
+    }
+
+    private IReadOnlyList<GoLiveRecordingBlockCueViewModel> BuildRecordingBlockCues()
+    {
+        var blocks = RecordingBlocks;
+        if (blocks.Count == 0)
+        {
+            return [];
+        }
+
+        var activeIndex = NormalizeRecordingBlockIndex(blocks.Count);
+        var cues = new List<GoLiveRecordingBlockCueViewModel>(3);
+        AddRecordingBlockCue(cues, blocks, activeIndex - 1, Text(UiTextKey.EditorFindPrevious.ToString()), UiTestIds.GoLive.RecordingBlockPrevious, isActive: false);
+        AddRecordingBlockCue(cues, blocks, activeIndex, Text(UiTextKey.EditorStructureActiveBlock.ToString()), UiTestIds.GoLive.RecordingBlockActive, isActive: true);
+        AddRecordingBlockCue(cues, blocks, activeIndex + 1, Text(UiTextKey.EditorFindNext.ToString()), UiTestIds.GoLive.RecordingBlockNext, isActive: false);
+        return cues;
+    }
+
+    private static void AddRecordingBlockCue(
+        List<GoLiveRecordingBlockCueViewModel> cues,
+        IReadOnlyList<BlockPreviewModel> blocks,
+        int index,
+        string roleLabel,
+        string testId,
+        bool isActive)
+    {
+        if (index < 0 || index >= blocks.Count)
+        {
+            return;
+        }
+
+        var block = blocks[index];
+        cues.Add(new GoLiveRecordingBlockCueViewModel(
+            testId,
+            roleLabel,
+            block.Title,
+            block.Text,
+            isActive));
     }
 
     private string BuildRoomCode()

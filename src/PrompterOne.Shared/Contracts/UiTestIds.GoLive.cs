@@ -32,6 +32,13 @@ public static partial class UiTestIds
         public const string Page = "go-live-page";
         public const string ProgramEmpty = "go-live-program-empty";
         public const string ProgramCard = "go-live-program-card";
+        public const string RecordingBlockActive = "go-live-recording-block-active";
+        public const string RecordingBlockContext = "go-live-recording-block-context";
+        public const string RecordingBlockContextToggle = "go-live-recording-block-context-toggle";
+        public const string RecordingBlockNext = "go-live-recording-block-next";
+        public const string RecordingBlockNextControl = "go-live-recording-block-next-control";
+        public const string RecordingBlockPrevious = "go-live-recording-block-previous";
+        public const string RecordingBlockPreviousControl = "go-live-recording-block-previous-control";
         public const string ProgramVideo = "go-live-program-video";
         public const string PreviewRail = "go-live-preview-rail";
         public const string PreviewCard = "go-live-preview-card";

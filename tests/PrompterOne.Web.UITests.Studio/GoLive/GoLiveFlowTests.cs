@@ -267,6 +267,53 @@ public sealed class GoLiveFlowTests(StandaloneAppFixture fixture)
         }
     }
 
+    [Test]
+    public async Task GoLivePage_RecordingBlockContext_ShowsAdjacentBlocksWithoutCoveringControls()
+    {
+        var page = await _fixture.NewPageAsync(additionalContext: true);
+
+        try
+        {
+            await SeedGoLiveSceneForReuseAsync(page);
+            await GoLiveTestSeedHelper.SeedBrowserLocalRecordingPreferencesAsync(page);
+            await StudioRouteDriver.OpenGoLiveRouteAsync(page, BrowserTestConstants.Routes.GoLiveLeadership);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.Page)).ToBeVisibleAsync();
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockContextToggle),
+                noWaitAfter: true);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockContext)).ToHaveCountAsync(0);
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.StartRecording),
+                noWaitAfter: true);
+            await page.WaitForFunctionAsync(
+                BrowserTestConstants.GoLive.RecordingRuntimeActiveScript,
+                BrowserTestConstants.GoLive.RuntimeSessionId,
+                new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockContext)).ToBeVisibleAsync();
+            var firstActiveBlockTitle = (await page.GetByTestId(UiTestIds.GoLive.RecordingBlockActive).Locator("strong").TextContentAsync())?.Trim() ?? string.Empty;
+            var firstNextBlockTitle = (await page.GetByTestId(UiTestIds.GoLive.RecordingBlockNext).Locator("strong").TextContentAsync())?.Trim() ?? string.Empty;
+            await Assert.That(string.IsNullOrWhiteSpace(firstActiveBlockTitle)).IsFalse();
+            await Assert.That(string.IsNullOrWhiteSpace(firstNextBlockTitle)).IsFalse();
+            await Assert.That(firstActiveBlockTitle).IsNotEqualTo(firstNextBlockTitle);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.StartRecording)).ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.GoLive.StartStream)).ToBeVisibleAsync();
+
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.GoLive.RecordingBlockNextControl),
+                noWaitAfter: true);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockPrevious).Locator("strong")).ToHaveTextAsync(firstActiveBlockTitle);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockActive).Locator("strong")).ToHaveTextAsync(firstNextBlockTitle);
+            await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockNext)).ToBeVisibleAsync();
+        }
+        finally
+        {
+            await page.Context.CloseAsync();
+        }
+    }
+
     private static async Task<LayoutBounds> GetRequiredBoxAsync(Microsoft.Playwright.ILocator locator)
     {
         await Expect(locator).ToBeVisibleAsync(new()

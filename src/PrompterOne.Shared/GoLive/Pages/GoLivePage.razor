@@ -55,6 +55,16 @@
                     <UiIcon Kind="UiIconKind.PanelRight" Size="14" />
                 </button>
                 <div class="gl-topbar-sep"></div>
+                <button type="button"
+                        class="gl-panel-toggle @(_showRecordingBlockContext ? "active" : null)"
+                        disabled="@(RecordingBlocks.Count == 0)"
+                        aria-label="@Text(GoLiveText.Sidebar.CueLabel)"
+                        aria-pressed="@(_showRecordingBlockContext ? "true" : "false")"
+                        data-active="@(_showRecordingBlockContext ? ActiveStateValue : InactiveStateValue)"
+                        data-test="@UiTestIds.GoLive.RecordingBlockContextToggle"
+                        @onclick="ToggleRecordingBlockContextAsync">
+                    <UiIcon Kind="UiIconKind.TextLines" Size="14" />
+                </button>
                 <div class="gl-mode-switch">
                     <button type="button"
                             class="gl-mode-btn gl-mode-director @(_activeStudioMode == GoLiveStudioMode.Director ? "active" : null)"
@@ -129,8 +139,14 @@
                                        Camera="@LiveProgramCamera"
                                        IsRecordingActive="@GoLiveSession.State.IsRecordingActive"
                                        IsStreamActive="@GoLiveSession.State.IsStreamActive"
+                                       CanMoveRecordingBlockBackward="@CanMoveRecordingBlockBackward"
+                                       CanMoveRecordingBlockForward="@CanMoveRecordingBlockForward"
+                                       OnNextRecordingBlock="@(() => MoveRecordingBlockContextAsync(1))"
+                                       OnPreviousRecordingBlock="@(() => MoveRecordingBlockContextAsync(-1))"
                                        ProgramResolutionLabel="@ProgramResolutionLabel"
+                                       RecordingBlockCues="@RecordingBlockCues"
                                        SelectedSourceLabel="@SelectedSourceLabel"
+                                       ShowRecordingBlockContext="@ShowRecordingBlockContext"
                                        StageFrameRateLabel="@StageFrameRateLabel" />
                 <GoLiveSceneControls Scenes="@SceneChips"
                                      ActiveSceneId="@_activeSceneId"

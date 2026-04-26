@@ -22,6 +22,43 @@
             <OverlayContent>
                 <div class="gl-program-overlay">
                     <span class="gl-program-reader-tag">@Text(SettingsStreamingText.SourcePickerSelectedLabel)</span>
+                    @if (ShowRecordingBlockContext && RecordingBlockCues.Count > 0)
+                    {
+                        <div class="gl-recording-block-context"
+                             data-test="@UiTestIds.GoLive.RecordingBlockContext">
+                            <div class="gl-recording-block-context-head">
+                                <span>@Text(GoLiveText.Sidebar.CueLabel) @Text(UiTextKey.CommonBlocks.ToString())</span>
+                                <div class="gl-recording-block-context-controls">
+                                    <button type="button"
+                                            class="gl-recording-block-nav"
+                                            disabled="@(!CanMoveRecordingBlockBackward)"
+                                            aria-label="@Text(UiTextKey.TooltipPreviousBlock.ToString())"
+                                            data-test="@UiTestIds.GoLive.RecordingBlockPreviousControl"
+                                            @onclick="OnPreviousRecordingBlock">
+                                        <UiIcon Kind="UiIconKind.ChevronLeft" Size="12" />
+                                    </button>
+                                    <button type="button"
+                                            class="gl-recording-block-nav"
+                                            disabled="@(!CanMoveRecordingBlockForward)"
+                                            aria-label="@Text(UiTextKey.TooltipNextBlock.ToString())"
+                                            data-test="@UiTestIds.GoLive.RecordingBlockNextControl"
+                                            @onclick="OnNextRecordingBlock">
+                                        <UiIcon Kind="UiIconKind.ChevronRight" Size="12" />
+                                    </button>
+                                </div>
+                            </div>
+                            @foreach (var cue in RecordingBlockCues)
+                            {
+                                <article class="gl-recording-block-cue @(cue.IsActive ? "active" : null)"
+                                         data-active="@(cue.IsActive ? "true" : "false")"
+                                         data-test="@cue.TestId">
+                                    <span class="gl-recording-block-role">@cue.RoleLabel</span>
+                                    <strong>@cue.Title</strong>
+                                    <p>@cue.Text</p>
+                                </article>
+                            }
+                        </div>
+                    }
                 </div>
             </OverlayContent>
             <EmptyContent>
@@ -54,11 +91,17 @@
 
     [Parameter] public string ActiveSessionLabel { get; set; } = string.Empty;
     [Parameter] public string ActiveSourceLabel { get; set; } = string.Empty;
+    [Parameter] public bool CanMoveRecordingBlockBackward { get; set; }
+    [Parameter] public bool CanMoveRecordingBlockForward { get; set; }
     [Parameter] public SceneCameraSource? Camera { get; set; }
     [Parameter] public bool IsRecordingActive { get; set; }
     [Parameter] public bool IsStreamActive { get; set; }
+    [Parameter] public EventCallback OnNextRecordingBlock { get; set; }
+    [Parameter] public EventCallback OnPreviousRecordingBlock { get; set; }
     [Parameter] public string ProgramResolutionLabel { get; set; } = string.Empty;
+    [Parameter] public IReadOnlyList<GoLiveRecordingBlockCueViewModel> RecordingBlockCues { get; set; } = [];
     [Parameter] public string SelectedSourceLabel { get; set; } = string.Empty;
+    [Parameter] public bool ShowRecordingBlockContext { get; set; }
     [Parameter] public string StageFrameRateLabel { get; set; } = string.Empty;
     [Parameter] public string Title { get; set; } = string.Empty;
 

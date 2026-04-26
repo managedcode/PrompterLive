@@ -67,7 +67,8 @@
     inset: 0;
     display: flex;
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: space-between;
+    gap: 16px;
     padding: 12px;
     pointer-events: none;
 }
@@ -85,6 +86,101 @@
     font-weight: 700;
     letter-spacing: .12em;
     text-transform: uppercase;
+}
+
+.gl-recording-block-context {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: min(360px, 42%);
+    max-height: calc(100% - 12px);
+    padding: 10px;
+    overflow: hidden;
+    pointer-events: auto;
+    border: 1px solid rgba(255, 107, 107, .24);
+    border-radius: 12px;
+    background: rgba(5, 5, 8, .74);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+}
+
+.gl-recording-block-context-head,
+.gl-recording-block-context-controls {
+    display: flex;
+    align-items: center;
+}
+
+.gl-recording-block-context-head {
+    justify-content: space-between;
+    gap: 8px;
+    color: rgba(255, 245, 224, .72);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.gl-recording-block-context-controls {
+    gap: 4px;
+}
+
+.gl-recording-block-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .06);
+    color: rgba(255, 245, 224, .78);
+}
+
+.gl-recording-block-nav:disabled {
+    opacity: .35;
+}
+
+.gl-recording-block-cue {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .045);
+    color: rgba(248, 241, 226, .56);
+}
+
+.gl-recording-block-cue.active {
+    border-color: rgba(255, 107, 107, .34);
+    background: rgba(255, 107, 107, .12);
+    color: rgba(255, 245, 224, .92);
+}
+
+.gl-recording-block-role {
+    color: rgba(255, 245, 224, .44);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.gl-recording-block-cue strong {
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.gl-recording-block-cue p {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: inherit;
+    font-size: 11px;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .gl-preview-empty {
@@ -160,4 +256,24 @@
 
 .gl-program-monitor-shell[data-live-state="streaming"] .gl-monitor-program {
     border-color: rgba(16, 185, 129, .26);
+}
+
+@media (max-width: 760px) {
+    .gl-program-overlay {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .gl-recording-block-context {
+        width: min(280px, 58%);
+        padding: 8px;
+    }
+
+    .gl-recording-block-cue {
+        padding: 6px;
+    }
+
+    .gl-recording-block-cue p {
+        -webkit-line-clamp: 1;
+    }
 }

@@ -1017,6 +1017,7 @@ internal static partial class BrowserTestConstants
         public static string LearnReaderTiming => AppRoutes.LearnWithId(Scripts.ReaderTimingId);
         public static string LearnSecurityIncident => AppRoutes.LearnWithId(Scripts.SecurityIncidentId);
         public static string GoLiveDemo => AppRoutes.GoLiveWithId(Scripts.DemoId);
+        public static string GoLiveLeadership => AppRoutes.GoLiveWithId(Scripts.LeadershipId);
         public static string GoLiveQuantum => AppRoutes.GoLiveWithId(Scripts.QuantumId);
         public static string LibraryWithOnboarding => AppRoutes.LibraryWithOnboarding();
         public static string TeleprompterDemo => AppRoutes.TeleprompterWithId(Scripts.DemoId);
