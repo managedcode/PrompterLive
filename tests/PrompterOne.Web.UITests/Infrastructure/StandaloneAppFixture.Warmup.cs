@@ -21,11 +21,31 @@ public sealed partial class StandaloneAppFixture
         await context.AddInitScriptAsync(
             UiTestHostConstants.BuildCrossTabScopeInitializationScript(Guid.NewGuid().ToString("N")));
         await context.AddInitScriptAsync(UiTestHostConstants.RuntimeTelemetryHarnessInitializationScript);
+        await ConfigureDeterministicExternalAssetsAsync(context);
         await context.GrantPermissionsAsync(UiTestHostConstants.GrantedPermissions, new BrowserContextGrantPermissionsOptions
         {
             Origin = baseAddress
         });
         await ConfigureMediaHarnessAsync(context);
+    }
+
+    private static async Task ConfigureDeterministicExternalAssetsAsync(IBrowserContext context)
+    {
+        await context.RouteAsync(
+            "https://fonts.googleapis.com/**",
+            route => route.FulfillAsync(new()
+            {
+                Status = 200,
+                ContentType = "text/css; charset=utf-8",
+                Body = string.Empty
+            }));
+        await context.RouteAsync(
+            "https://fonts.gstatic.com/**",
+            route => route.FulfillAsync(new()
+            {
+                Status = 204,
+                Body = string.Empty
+            }));
     }
 
     private static Task<IBrowserContext> CreateBrowserContextAsync(IBrowser browser, string baseAddress) =>

@@ -8,7 +8,7 @@ public partial class TeleprompterPage
 {
     [Inject] private IStringLocalizer<SharedResource> Localizer { get; set; } = null!;
 
-    private string ReaderCameraTooltip => Text(UiTextKey.TooltipToggleCameraPreview);
+    private string ReaderCameraTooltip => Text(UiTextKey.TeleprompterBackgroundMediaTooltip);
 
     private string ReaderAutoLoopTooltip => _isReaderAutoLoopEnabled
         ? Text(UiTextKey.TooltipLoopPlaybackOn)

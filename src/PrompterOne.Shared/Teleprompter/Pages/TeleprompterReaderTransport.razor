@@ -126,7 +126,7 @@
                     aria-label="@CameraTooltip"
                     data-active="@BuildBooleanDataAttribute(IsCameraActive)"
                     data-test="@UiTestIds.Teleprompter.CameraToggle">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+                <UiIcon Kind="UiIconKind.PictureInPicture" Size="16" StrokeWidth="1.7m" />
             </button>
         </TooltipAnchor>
     </div>
@@ -141,30 +141,56 @@
                 data-test="@UiTestIds.Teleprompter.RecordingToggle"
                 @onclick="OnRecordingToggle">
             <span class="rd-record-dot" aria-hidden="true"></span>
-            <span>@(IsRecordingActive ? RecordingStopLabel : RecordingStartLabel)</span>
+            <span class="rd-record-btn-label">@(IsRecordingActive ? RecordingStopLabel : RecordingStartLabel)</span>
         </button>
-        <SettingsSelect Value="@RecordingMode"
-                        TestId="@UiTestIds.Teleprompter.RecordingModeSelect"
-                        Options="@RecordingModeOptions"
-                        OnChange="OnRecordingModeChange" />
+        <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.RecordingModeSelect" Text="@RecordingModeTooltip">
+            <div class="rd-record-select rd-record-select-mode" title="@RecordingModeSelectedLabel">
+                <span class="rd-record-select-icon" aria-hidden="true">
+                    <UiIcon Kind="@RecordingModeIcon" Size="15" StrokeWidth="1.8m" />
+                </span>
+                <SettingsSelect Value="@RecordingMode"
+                                TestId="@UiTestIds.Teleprompter.RecordingModeSelect"
+                                Options="@RecordingModeOptions"
+                                OnChange="OnRecordingModeChange" />
+            </div>
+        </TooltipAnchor>
         @if (ShowsRecordingCameraSelect)
         {
-            <SettingsSelect Value="@SelectedRecordingCameraId"
-                            TestId="@UiTestIds.Teleprompter.RecordingCameraSelect"
-                            Options="@RecordingCameraOptions"
-                            OnChange="OnRecordingCameraChange" />
+            <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.RecordingCameraSelect" Text="@RecordingCameraTooltip">
+                <div class="rd-record-select rd-record-select-camera" title="@RecordingCameraSelectedLabel">
+                    <span class="rd-record-select-icon" aria-hidden="true">
+                        <UiIcon Kind="UiIconKind.Camera" Size="15" StrokeWidth="1.8m" />
+                    </span>
+                    <SettingsSelect Value="@SelectedRecordingCameraId"
+                                    TestId="@UiTestIds.Teleprompter.RecordingCameraSelect"
+                                    Options="@RecordingCameraOptions"
+                                    OnChange="OnRecordingCameraChange" />
+                </div>
+            </TooltipAnchor>
         }
-        <SettingsSelect Value="@SelectedRecordingMicrophoneId"
-                        TestId="@UiTestIds.Teleprompter.RecordingMicrophoneSelect"
-                        Options="@RecordingMicrophoneOptions"
-                        OnChange="OnRecordingMicrophoneChange" />
+        <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.RecordingMicrophoneSelect" Text="@RecordingMicrophoneTooltip">
+            <div class="rd-record-select rd-record-select-mic" title="@RecordingMicrophoneSelectedLabel">
+                <span class="rd-record-select-icon" aria-hidden="true">
+                    <UiIcon Kind="UiIconKind.Microphone" Size="15" StrokeWidth="1.8m" />
+                </span>
+                <SettingsSelect Value="@SelectedRecordingMicrophoneId"
+                                TestId="@UiTestIds.Teleprompter.RecordingMicrophoneSelect"
+                                Options="@RecordingMicrophoneOptions"
+                                OnChange="OnRecordingMicrophoneChange" />
+            </div>
+        </TooltipAnchor>
         <div class="rd-record-level"
              aria-label="@RecordingLevelLabel"
              data-level="@RecordingLevelPercent"
              data-test="@UiTestIds.Teleprompter.RecordingLevel">
             <span style="@BuildRecordingLevelStyle()"></span>
         </div>
-        <span class="rd-record-status" data-test="@UiTestIds.Teleprompter.RecordingStatus">@RecordingStatusLabel</span>
+        <span class="rd-record-status"
+              data-active="@BuildStateDataAttribute(IsRecordingActive)"
+              data-test="@UiTestIds.Teleprompter.RecordingStatus">
+            <span class="rd-record-live-dot" aria-hidden="true"></span>
+            <span class="rd-record-status-text">@RecordingStatusLabel</span>
+        </span>
     </div>
 </div>
 
@@ -208,11 +234,14 @@
     [Parameter, EditorRequired] public string ProgressLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public IReadOnlyList<TeleprompterProgressSegmentViewModel> ProgressSegments { get; set; } = [];
     [Parameter, EditorRequired] public string ProgressShellCssClass { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string RecordingCameraTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public IReadOnlyList<MediaDeviceInfo> RecordingCameras { get; set; } = [];
     [Parameter, EditorRequired] public string RecordingLevelLabel { get; set; } = string.Empty;
     [Parameter] public int RecordingLevelPercent { get; set; }
+    [Parameter, EditorRequired] public string RecordingMicrophoneTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public IReadOnlyList<MediaDeviceInfo> RecordingMicrophones { get; set; } = [];
     [Parameter, EditorRequired] public string RecordingMode { get; set; } = VideoAndAudioMode;
+    [Parameter, EditorRequired] public string RecordingModeTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string RecordingStartLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string RecordingStatusLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string RecordingStopLabel { get; set; } = string.Empty;
@@ -231,6 +260,12 @@
     private bool ShowsRecordingCameraSelect =>
         string.Equals(RecordingMode, VideoAndAudioMode, StringComparison.Ordinal);
 
+    private bool IsAudioOnlyRecordingMode =>
+        string.Equals(RecordingMode, AudioOnlyMode, StringComparison.Ordinal);
+
+    private UiIconKind RecordingModeIcon =>
+        IsAudioOnlyRecordingMode ? UiIconKind.Microphone : UiIconKind.Video;
+
     private IReadOnlyList<SettingsSelectOption> RecordingModeOptions =>
     [
         new(VideoAndAudioMode, "Video + audio"),
@@ -246,6 +281,15 @@
         RecordingMicrophones.Count == 0
             ? [new(string.Empty, "No microphone")]
             : RecordingMicrophones.Select(device => new SettingsSelectOption(device.DeviceId, device.Label)).ToList();
+
+    private string RecordingModeSelectedLabel => GetSelectedOptionLabel(RecordingModeOptions, RecordingMode);
+
+    private string RecordingCameraSelectedLabel => GetSelectedOptionLabel(RecordingCameraOptions, SelectedRecordingCameraId);
+
+    private string RecordingMicrophoneSelectedLabel => GetSelectedOptionLabel(RecordingMicrophoneOptions, SelectedRecordingMicrophoneId);
+
+    private static string GetSelectedOptionLabel(IReadOnlyList<SettingsSelectOption> options, string value) =>
+        options.FirstOrDefault(option => string.Equals(option.Value, value, StringComparison.Ordinal))?.Label ?? string.Empty;
 
     private string BuildRecordingLevelStyle() =>
         $"width:{Math.Clamp(RecordingLevelPercent, 0, 100)}%;";

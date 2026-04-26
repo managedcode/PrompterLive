@@ -42,6 +42,7 @@ public partial class TeleprompterPage
         _preparedReaderCardIndex = nextCardIndex;
         _readerCardsWithoutMotionTransition.Add(nextCardIndex);
         await InvokeAsync(StateHasChanged);
+        await Task.Yield();
         //  Force the browser to actually PAINT the snap-to-starting-
         //  position state before re-enabling the transition. Without
         //  this commit, wrap-around playback (last → card 0) saw the

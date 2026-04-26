@@ -33,6 +33,12 @@ public partial class TeleprompterPage
 
     private string ReaderRecordingLevelLabel => Text(UiTextKey.TeleprompterRecordingLevelLabel);
 
+    private string ReaderRecordingCameraTooltip => Text(UiTextKey.TeleprompterRecordingCameraTooltip);
+
+    private string ReaderRecordingMicrophoneTooltip => Text(UiTextKey.TeleprompterRecordingMicrophoneTooltip);
+
+    private string ReaderRecordingModeTooltip => Text(UiTextKey.TeleprompterRecordingModeTooltip);
+
     private string ReaderRecordingStatusLabel =>
         string.IsNullOrWhiteSpace(_readerRecordingStatus)
             ? Text(UiTextKey.TeleprompterRecordingReadyStatus)

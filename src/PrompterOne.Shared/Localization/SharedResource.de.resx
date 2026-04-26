@@ -3201,6 +3201,9 @@
   <data name="TeleprompterAttachCameraMessage" xml:space="preserve">
     <value>Die Teleprompter-Kamera kann nicht aktiviert werden.</value>
   </data>
+  <data name="TeleprompterBackgroundMediaTooltip" xml:space="preserve">
+    <value>Hintergrund-Medienebene</value>
+  </data>
   <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
     <value>Die Reader-Aufnahme kann nicht gestartet werden.</value>
   </data>
@@ -3213,8 +3216,17 @@
   <data name="TeleprompterRecordingActiveStatus" xml:space="preserve">
     <value>Aufnahme läuft</value>
   </data>
+  <data name="TeleprompterRecordingCameraTooltip" xml:space="preserve">
+    <value>Aufnahmekamera</value>
+  </data>
   <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
     <value>Mikrofonpegel der Aufnahme</value>
+  </data>
+  <data name="TeleprompterRecordingMicrophoneTooltip" xml:space="preserve">
+    <value>Aufnahmemikrofon</value>
+  </data>
+  <data name="TeleprompterRecordingModeTooltip" xml:space="preserve">
+    <value>Aufnahmemodus</value>
   </data>
   <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
     <value>Wähle eine Kamera für die Videoaufnahme.</value>

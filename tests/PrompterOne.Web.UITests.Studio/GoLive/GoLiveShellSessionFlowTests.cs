@@ -532,8 +532,11 @@ public sealed class GoLiveShellSessionFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake).Nth(0)).ToContainTextAsync("Take 1");
             await Expect(page.GetByTestId(UiTestIds.GoLive.RecordingBlockTake).Nth(1)).ToContainTextAsync("Take 2");
 
-            await page.ReloadAsync();
-            await StudioRouteDriver.WaitForGoLiveReadyAsync(page, BrowserTestConstants.Routes.GoLiveLeadership);
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.GoLiveLeadership,
+                UiTestIds.GoLive.Page,
+                "go-live-recording-takes-reload");
             await UiInteractionDriver.ClickAndContinueAsync(
                 page.GetByTestId(UiTestIds.GoLive.RecordingBlockContextToggle),
                 noWaitAfter: true);

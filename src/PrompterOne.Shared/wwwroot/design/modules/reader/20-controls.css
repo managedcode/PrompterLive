@@ -473,8 +473,7 @@
     max-width: calc(100vw - 24px);
     padding: 6px 12px;
     box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: visible;
     background: rgba(20,18,12,.84);
     backdrop-filter: blur(18px);
     border: 1px solid var(--gold-14);
@@ -582,25 +581,25 @@
 .rd-recording-panel {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     margin-left: 6px;
-    padding-left: 10px;
+    padding: 3px 0 3px 10px;
     border-left: 1px solid var(--gold-06);
 }
 
 .rd-record-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    width: 34px;
     height: 34px;
-    padding: 0 10px;
+    flex: 0 0 34px;
+    padding: 0;
     border: 1px solid rgba(232,213,176,.16);
-    border-radius: 10px;
+    border-radius: 999px;
     background: rgba(255,255,255,.03);
     color: rgba(232,213,176,.76);
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 650;
 }
 
 .rd-record-btn:hover {
@@ -611,32 +610,83 @@
 .rd-record-btn[data-active="active"] {
     border-color: rgba(235,95,76,.42);
     color: #ffd8cf;
+    background: rgba(235,95,76,.12);
 }
 
 .rd-record-dot {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #e35d4f;
     box-shadow: 0 0 0 3px rgba(227,93,79,.16);
 }
 
+.rd-record-btn[data-active="active"] .rd-record-dot {
+    animation: rd-record-pulse 1.1s ease-in-out infinite;
+}
+
+.rd-record-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.rd-record-select {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+}
+
+.rd-record-select-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    display: grid;
+    width: 18px;
+    height: 18px;
+    place-items: center;
+    color: rgba(232,213,176,.78);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
 .rd-recording-panel .ss-wrap {
-    width: 112px;
+    width: 34px;
+    height: 34px;
 }
 
 .rd-recording-panel .ss-trigger {
+    width: 34px;
     min-height: 34px;
-    padding: 0 8px;
-    border-radius: 10px;
+    padding: 0;
+    border-radius: 999px;
     background: rgba(255,255,255,.03);
-    color: rgba(232,213,176,.72);
-    font-size: 11px;
+    color: transparent;
+}
+
+.rd-recording-panel .ss-label,
+.rd-recording-panel .ss-chevron {
+    opacity: 0;
+}
+
+.rd-recording-panel .ss-panel {
+    right: auto;
+    min-width: 176px;
+}
+
+.rd-record-select-camera .ss-panel,
+.rd-record-select-mic .ss-panel {
+    min-width: 220px;
 }
 
 .rd-record-level {
-    width: 42px;
-    height: 6px;
+    width: 30px;
+    height: 4px;
     overflow: hidden;
     border-radius: 999px;
     background: rgba(232,213,176,.12);
@@ -652,12 +702,62 @@
 }
 
 .rd-record-status {
-    max-width: 96px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 16px;
+    max-width: 66px;
     overflow: hidden;
     color: rgba(232,213,176,.56);
-    font-size: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.rd-record-live-dot {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+    border-radius: 50%;
+    background: rgba(232,213,176,.35);
+}
+
+.rd-record-status[data-active="active"] {
+    color: #ffd8cf;
+}
+
+.rd-record-status[data-active="inactive"] {
+    max-width: 5px;
+}
+
+.rd-record-status[data-active="inactive"] .rd-record-status-text {
+    display: none;
+}
+
+.rd-record-status[data-active="active"] .rd-record-live-dot {
+    background: #eb5f4c;
+    box-shadow: 0 0 0 3px rgba(235,95,76,.16);
+    animation: rd-record-pulse 1.1s ease-in-out infinite;
+}
+
+.rd-record-status-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes rd-record-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: .82;
+    }
+
+    50% {
+        transform: scale(1.22);
+        opacity: 1;
+    }
 }
 
 /* Subtle noise texture on body */

@@ -7,6 +7,8 @@
         right: 12px;
         transform: none;
         justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
 
     .rd-recording-panel {
@@ -84,11 +86,15 @@
     }
 
     .rd-recording-panel .ss-wrap {
-        flex: 0 0 94px;
-        width: 94px;
+        flex: 0 0 32px;
+        width: 32px;
     }
 
     .rd-record-status {
+        max-width: 18px;
+    }
+
+    .rd-record-status-text {
         display: none;
     }
 }

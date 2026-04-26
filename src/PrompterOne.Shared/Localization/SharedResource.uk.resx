@@ -3201,6 +3201,9 @@
   <data name="TeleprompterAttachCameraMessage" xml:space="preserve">
     <value>Не вдається ввімкнути камеру телесуфлера.</value>
   </data>
+  <data name="TeleprompterBackgroundMediaTooltip" xml:space="preserve">
+    <value>Фоновий медіашар</value>
+  </data>
   <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
     <value>Не вдається почати запис у рідері.</value>
   </data>
@@ -3213,8 +3216,17 @@
   <data name="TeleprompterRecordingActiveStatus" xml:space="preserve">
     <value>Записується</value>
   </data>
+  <data name="TeleprompterRecordingCameraTooltip" xml:space="preserve">
+    <value>Камера для запису</value>
+  </data>
   <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
     <value>Рівень мікрофона запису</value>
+  </data>
+  <data name="TeleprompterRecordingMicrophoneTooltip" xml:space="preserve">
+    <value>Мікрофон для запису</value>
+  </data>
+  <data name="TeleprompterRecordingModeTooltip" xml:space="preserve">
+    <value>Режим запису</value>
   </data>
   <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
     <value>Оберіть камеру для запису відео.</value>
