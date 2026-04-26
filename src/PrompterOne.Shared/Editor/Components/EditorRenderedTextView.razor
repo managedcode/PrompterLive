@@ -1,10 +1,15 @@
 @namespace PrompterOne.Shared.Components.Editor
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 @using PrompterOne.Shared.Localization
+@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IJSRuntime JSRuntime
 
-<div class="editor-rendered-view" data-test="@UiTestIds.Editor.RenderedView">
+<div class="editor-rendered-view"
+     @ref="_rootElement"
+     data-test="@UiTestIds.Editor.RenderedView">
     <div class="editor-rendered-strip" data-test="@UiTestIds.Editor.RenderedStrip">
         @if (Segments.Count == 0)
         {
@@ -37,19 +42,15 @@
 
                     @foreach (var block in segment.Blocks)
                     {
-                        <article class="@GetBlockCssClass(block)"
-                                 draggable="true"
-                                 @ondragstart="() => OnBlockDragStart(block)"
-                                 @ondragend="OnBlockDragEnd"
-                                 @ondragenter="() => OnBlockDragEnter(block)"
-                                 @ondragleave="() => OnBlockDragLeave(block)"
-                                 @ondragover:preventDefault="true"
-                                 @ondrop="() => OnBlockDropAsync(block)"
-                                 @ondrop:preventDefault="true"
+                        <article class="editor-rendered-block"
+                                 draggable="false"
+                                 data-rendered-segment-index="@block.SegmentIndex"
+                                 data-rendered-block-index="@block.BlockIndex"
                                  data-test="@UiTestIds.Editor.RenderedBlock(block.SegmentIndex, block.BlockIndex)">
                             <div class="editor-rendered-block-head">
                                 <span class="editor-rendered-block-drag-handle"
-                                      aria-hidden="true">⋮⋮</span>
+                                      aria-hidden="true"
+                                      data-test="@UiTestIds.Editor.RenderedBlockDragHandle(block.SegmentIndex, block.BlockIndex)">⋮⋮</span>
                                 <span class="editor-rendered-block-number">@block.Number</span>
                                 <span class="editor-rendered-block-title">@block.Name</span>
                                 <span class="editor-rendered-block-actions">
@@ -133,9 +134,44 @@
 
     [Parameter] public EventCallback<EditorRenderedBlockAttachmentRequest> AttachmentRequested { get; set; }
 
-    private EditorRenderedBlockViewModel? _draggedBlock;
+    private const string RenderedCardsModulePath = "./_content/PrompterOne.Shared/app/editor-rendered-cards.js";
 
-    private EditorRenderedBlockViewModel? _dragOverBlock;
+    private ElementReference _rootElement;
+
+    private IJSObjectReference? _renderedCardsModule;
+
+    private IJSObjectReference? _renderedCardsHandle;
+
+    private DotNetObjectReference<EditorRenderedTextView>? _dotNetReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            _dotNetReference = DotNetObjectReference.Create(this);
+            _renderedCardsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", RenderedCardsModulePath);
+            if (_renderedCardsModule is null)
+            {
+                return;
+            }
+
+            _renderedCardsHandle = await _renderedCardsModule.InvokeAsync<IJSObjectReference>(
+                "attach",
+                _rootElement,
+                _dotNetReference);
+        }
+        catch (InvalidOperationException)
+        {
+        }
+        catch (JSException)
+        {
+        }
+    }
 
     private Task OnBlockInputAsync(EditorRenderedBlockViewModel block, ChangeEventArgs args) =>
         TextChanged.InvokeAsync(new EditorRenderedBlockTextChange(
@@ -158,50 +194,26 @@
             file));
     }
 
-    private void OnBlockDragStart(EditorRenderedBlockViewModel block)
+    [JSInvokable]
+    public async Task HandleRenderedCardDropAsync(
+        int sourceSegmentIndex,
+        int sourceBlockIndex,
+        int targetSegmentIndex,
+        int targetBlockIndex)
     {
-        _draggedBlock = block;
-        _dragOverBlock = null;
-    }
-
-    private void OnBlockDragEnter(EditorRenderedBlockViewModel block)
-    {
-        if (_draggedBlock is not null && !IsSameBlock(_draggedBlock, block))
-        {
-            _dragOverBlock = block;
-        }
-    }
-
-    private void OnBlockDragLeave(EditorRenderedBlockViewModel block)
-    {
-        if (_dragOverBlock is not null && IsSameBlock(_dragOverBlock, block))
-        {
-            _dragOverBlock = null;
-        }
-    }
-
-    private async Task OnBlockDropAsync(EditorRenderedBlockViewModel target)
-    {
-        var dragged = _draggedBlock;
-        _draggedBlock = null;
-        _dragOverBlock = null;
-        if (dragged is null || IsSameBlock(dragged, target))
+        var blocks = FlattenBlocks();
+        var dragged = blocks.FirstOrDefault(block =>
+            block.SegmentIndex == sourceSegmentIndex &&
+            block.BlockIndex == sourceBlockIndex);
+        var target = blocks.FirstOrDefault(block =>
+            block.SegmentIndex == targetSegmentIndex &&
+            block.BlockIndex == targetBlockIndex);
+        if (dragged is null || target is null || IsSameBlock(dragged, target))
         {
             return;
         }
 
-        await BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
-            dragged.SegmentIndex,
-            dragged.BlockIndex,
-            target.SegmentIndex,
-            target.BlockIndex,
-            IsBefore(dragged, target)));
-    }
-
-    private void OnBlockDragEnd()
-    {
-        _draggedBlock = null;
-        _dragOverBlock = null;
+        await RequestBlockReorderAsync(dragged, target);
     }
 
     private async Task MoveBlockByOffsetAsync(EditorRenderedBlockViewModel block, int offset)
@@ -231,22 +243,6 @@
         return index >= 0 && targetIndex >= 0 && targetIndex < blocks.Count;
     }
 
-    private string GetBlockCssClass(EditorRenderedBlockViewModel block)
-    {
-        var tokens = new List<string> { "editor-rendered-block" };
-        if (_draggedBlock is not null && IsSameBlock(_draggedBlock, block))
-        {
-            tokens.Add("editor-rendered-block--dragging");
-        }
-
-        if (_dragOverBlock is not null && IsSameBlock(_dragOverBlock, block))
-        {
-            tokens.Add("editor-rendered-block--drop-target");
-        }
-
-        return string.Join(' ', tokens);
-    }
-
     private List<EditorRenderedBlockViewModel> FlattenBlocks() =>
         Segments.SelectMany(segment => segment.Blocks).ToList();
 
@@ -256,6 +252,30 @@
     private static bool IsBefore(EditorRenderedBlockViewModel source, EditorRenderedBlockViewModel target) =>
         source.SegmentIndex < target.SegmentIndex ||
         (source.SegmentIndex == target.SegmentIndex && source.BlockIndex < target.BlockIndex);
+
+    private Task RequestBlockReorderAsync(EditorRenderedBlockViewModel dragged, EditorRenderedBlockViewModel target) =>
+        BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
+            dragged.SegmentIndex,
+            dragged.BlockIndex,
+            target.SegmentIndex,
+            target.BlockIndex,
+            IsBefore(dragged, target)));
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_renderedCardsHandle is not null)
+        {
+            await _renderedCardsHandle.InvokeVoidAsync("dispose");
+            await _renderedCardsHandle.DisposeAsync();
+        }
+
+        if (_renderedCardsModule is not null)
+        {
+            await _renderedCardsModule.DisposeAsync();
+        }
+
+        _dotNetReference?.Dispose();
+    }
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

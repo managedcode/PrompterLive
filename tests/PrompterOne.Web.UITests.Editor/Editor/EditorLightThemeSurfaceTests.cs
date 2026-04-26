@@ -12,8 +12,10 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
     private const string ScenarioName = "editor-light-theme-surface";
     private const string FullEditorStep = "01-full-editor-surface";
     private const string SourceStageStep = "02-source-stage-surface";
+    private const string CardsViewStep = "03-cards-view-surface";
     private const double MinimumToolbarSurfaceChannel = 220;
     private const double MinimumMetadataSurfaceChannel = 210;
+    private const double MinimumCardsSurfaceChannel = 200;
     private const double MaximumReadableTextChannel = 160;
 
     private readonly record struct CssColor(double R, double G, double B, double A);
@@ -59,6 +61,13 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
 
             await UiScenarioArtifacts.CapturePageAsync(page, ScenarioName, FullEditorStep);
             await UiScenarioArtifacts.CaptureLocatorAsync(stage, ScenarioName, SourceStageStep);
+
+            await page.GetByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+            var renderedView = page.GetByTestId(UiTestIds.Editor.RenderedView);
+            await Expect(renderedView).ToBeVisibleAsync();
+            var cardsBackground = await ReadCssColorAsync(renderedView, BackgroundColorProperty);
+            await Assert.That(HasMinimumChannels(cardsBackground, MinimumCardsSurfaceChannel)).IsTrue().Because($"Expected the light-theme cards view to use a light theme-aware surface, but got rgba({cardsBackground.R:0.##}, {cardsBackground.G:0.##}, {cardsBackground.B:0.##}, {cardsBackground.A:0.##}).");
+            await UiScenarioArtifacts.CaptureLocatorAsync(renderedView, ScenarioName, CardsViewStep);
         });
 
     private static async Task SwitchThemeAsync(IPage page)
@@ -84,18 +93,28 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
             """
             (element, propertyName) => {
                 const value = getComputedStyle(element)[propertyName];
-                const match = value.match(/rgba?\(([^)]+)\)/);
-                if (!match) {
-                    return { r: 0, g: 0, b: 0, a: 0 };
+                const rgbMatch = value.match(/rgba?\(([^)]+)\)/);
+                if (rgbMatch) {
+                    const parts = rgbMatch[1].split(',').map(part => Number.parseFloat(part.trim()));
+                    return {
+                        r: parts[0] ?? 0,
+                        g: parts[1] ?? 0,
+                        b: parts[2] ?? 0,
+                        a: parts[3] ?? 1
+                    };
                 }
 
-                const parts = match[1].split(',').map(part => Number.parseFloat(part.trim()));
-                return {
-                    r: parts[0] ?? 0,
-                    g: parts[1] ?? 0,
-                    b: parts[2] ?? 0,
-                    a: parts[3] ?? 1
-                };
+                const srgbMatch = value.match(/color\(srgb\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)(?:\s*\/\s*([0-9.]+))?\)/);
+                if (srgbMatch) {
+                    return {
+                        r: Number.parseFloat(srgbMatch[1]) * 255,
+                        g: Number.parseFloat(srgbMatch[2]) * 255,
+                        b: Number.parseFloat(srgbMatch[3]) * 255,
+                        a: srgbMatch[4] ? Number.parseFloat(srgbMatch[4]) : 1
+                    };
+                }
+
+                return { r: 0, g: 0, b: 0, a: 0 };
             }
             """,
             propertyName);

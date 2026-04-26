@@ -1,24 +1,34 @@
 .editor-rendered-view {
+    --editor-rendered-board: color-mix(in srgb, var(--bg-2) 88%, var(--bg-deep));
+    --editor-rendered-card: color-mix(in srgb, var(--bg-3) 82%, transparent);
+    --editor-rendered-card-border: color-mix(in srgb, var(--gold-08) 78%, transparent);
+    --editor-rendered-card-shadow: 0 16px 34px color-mix(in srgb, var(--bg-deep) 34%, transparent);
+    --editor-rendered-control: color-mix(in srgb, var(--bg-4) 76%, transparent);
+    --editor-rendered-control-hover: color-mix(in srgb, var(--gold-09) 70%, var(--bg-4));
+    --editor-rendered-drop: color-mix(in srgb, var(--gold-10) 22%, transparent);
+    --editor-rendered-drop-line: color-mix(in srgb, var(--gold) 72%, transparent);
     display: flex;
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid rgba(210, 218, 232, .72);
+    border: var(--glass-border-light);
     border-radius: 8px;
-    background: #f6f8fb;
-    color: #1f2937;
+    background: var(--editor-rendered-board);
+    color: var(--text-1);
 }
 
 .editor-rendered-strip {
     display: grid;
     grid-auto-columns: minmax(280px, 360px);
     grid-auto-flow: column;
+    gap: 12px;
     min-width: 0;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-color: rgba(72, 82, 104, .32) transparent;
+    padding: 12px;
+    scrollbar-color: color-mix(in srgb, var(--text-4) 42%, transparent) transparent;
 }
 
 .editor-rendered-card {
@@ -27,9 +37,11 @@
     min-width: 0;
     min-height: 100%;
     gap: 18px;
-    padding: 48px 28px 32px;
-    border-right: 1px solid rgba(210, 218, 232, .84);
-    background: rgba(255, 255, 255, .92);
+    padding: 34px 24px 28px;
+    border: 1px solid var(--editor-rendered-card-border);
+    border-radius: 8px;
+    background: var(--editor-rendered-card);
+    box-shadow: var(--editor-rendered-card-shadow), var(--glass-inset);
 }
 
 .editor-rendered-card--empty {
@@ -45,7 +57,7 @@
 
 .editor-rendered-number,
 .editor-rendered-empty-mark {
-    color: #2f3645;
+    color: var(--text-1);
     font-size: 42px;
     font-weight: 760;
     line-height: .9;
@@ -54,7 +66,7 @@
 .editor-rendered-meta,
 .editor-rendered-block-number,
 .editor-rendered-block-meta {
-    color: #7b8494;
+    color: var(--text-4);
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
@@ -62,7 +74,7 @@
 }
 
 .editor-rendered-segment-title {
-    color: #222a37;
+    color: var(--text-1);
     font-size: 25px;
     font-weight: 760;
     line-height: 1.16;
@@ -74,7 +86,7 @@
     flex-wrap: wrap;
     gap: 8px;
     min-height: 18px;
-    color: #9aa3b2;
+    color: var(--text-4);
     font-size: 11px;
     font-weight: 700;
     line-height: 1.35;
@@ -86,21 +98,34 @@
     flex-direction: column;
     gap: 10px;
     min-width: 0;
-    padding-block: 6px;
-    border-radius: 6px;
+    padding: 9px 10px 10px;
+    border: 1px solid color-mix(in srgb, var(--text-4) 13%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--bg-2) 52%, transparent);
+    cursor: grab;
     transition:
         background-color .16s ease,
+        border-color .16s ease,
         box-shadow .16s ease,
-        opacity .16s ease;
+        opacity .16s ease,
+        transform .16s ease;
+}
+
+.editor-rendered-block:hover {
+    border-color: color-mix(in srgb, var(--gold-10) 42%, transparent);
+    background: color-mix(in srgb, var(--bg-4) 50%, transparent);
 }
 
 .editor-rendered-block--dragging {
     opacity: .62;
+    transform: rotate(.25deg) scale(.99);
+    cursor: grabbing;
 }
 
 .editor-rendered-block--drop-target {
-    background: rgba(56, 112, 214, .08);
-    box-shadow: inset 3px 0 0 rgba(56, 112, 214, .42);
+    background: var(--editor-rendered-drop);
+    border-color: var(--editor-rendered-drop-line);
+    box-shadow: inset 3px 0 0 var(--editor-rendered-drop-line);
 }
 
 .editor-rendered-block-head {
@@ -111,14 +136,25 @@
 }
 
 .editor-rendered-block-drag-handle {
+    display: inline-grid;
     flex: 0 0 auto;
-    color: #a1aaba;
+    width: 18px;
+    height: 24px;
+    place-items: center;
+    border-radius: 5px;
+    color: var(--text-4);
     cursor: grab;
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0;
     line-height: 1;
+    touch-action: none;
     user-select: none;
+}
+
+.editor-rendered-block-drag-handle:hover {
+    background: color-mix(in srgb, var(--gold-09) 58%, transparent);
+    color: var(--text-1);
 }
 
 .editor-rendered-block-actions {
@@ -128,15 +164,16 @@
     margin-inline-start: auto;
 }
 
-.editor-rendered-block-move {
+.editor-rendered-block-move,
+.editor-rendered-attach {
     display: inline-grid;
     width: 24px;
     height: 24px;
     place-items: center;
-    border: 1px solid rgba(137, 148, 169, .34);
+    border: 1px solid color-mix(in srgb, var(--text-4) 24%, transparent);
     border-radius: 6px;
-    background: rgba(255, 255, 255, .78);
-    color: #4c5a70;
+    background: var(--editor-rendered-control);
+    color: var(--text-2);
     cursor: pointer;
     font-size: 13px;
     font-weight: 800;
@@ -149,33 +186,19 @@
 }
 
 .editor-rendered-block-move:not(:disabled):hover,
-.editor-rendered-block-move:not(:disabled):focus-visible {
-    border-color: rgba(56, 112, 214, .48);
-    color: #244f9f;
+.editor-rendered-block-move:not(:disabled):focus-visible,
+.editor-rendered-attach:hover,
+.editor-rendered-attach:focus-within {
+    border-color: color-mix(in srgb, var(--gold) 42%, transparent);
+    background: var(--editor-rendered-control-hover);
+    color: var(--text-1);
     outline: none;
 }
 
 .editor-rendered-attach {
     position: relative;
-    display: inline-grid;
-    width: 24px;
-    height: 24px;
-    place-items: center;
     overflow: hidden;
-    border: 1px solid rgba(137, 148, 169, .34);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, .78);
-    color: #4c5a70;
-    cursor: pointer;
     font-size: 15px;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.editor-rendered-attach:hover,
-.editor-rendered-attach:focus-within {
-    border-color: rgba(56, 112, 214, .48);
-    color: #244f9f;
 }
 
 .editor-rendered-attach-input {
@@ -189,7 +212,7 @@
 .editor-rendered-block-title {
     min-width: 0;
     overflow: hidden;
-    color: #2f3645;
+    color: var(--text-1);
     font-size: 13px;
     font-weight: 760;
     line-height: 1.25;
@@ -205,12 +228,12 @@
     border: 0;
     outline: none;
     background: transparent;
-    color: #3b4352;
+    color: var(--text-2);
     font: 500 14px/1.55 var(--font-sans);
 }
 
 .editor-rendered-text:focus {
-    box-shadow: inset 3px 0 0 rgba(56, 112, 214, .42);
+    box-shadow: inset 3px 0 0 var(--editor-rendered-drop-line);
 }
 
 .editor-rendered-text--empty {
@@ -235,9 +258,9 @@
     align-items: center;
     min-width: 0;
     padding: 7px 8px;
-    border: 1px solid rgba(218, 224, 234, .92);
+    border: 1px solid color-mix(in srgb, var(--text-4) 16%, transparent);
     border-radius: 7px;
-    background: rgba(248, 250, 252, .84);
+    background: color-mix(in srgb, var(--bg-1) 62%, transparent);
 }
 
 .editor-rendered-attachment-thumb,
@@ -255,15 +278,15 @@
 .editor-rendered-attachment-icon {
     display: inline-grid;
     place-items: center;
-    background: rgba(226, 232, 240, .82);
-    color: #64748b;
+    background: color-mix(in srgb, var(--bg-4) 72%, transparent);
+    color: var(--text-3);
     font-size: 14px;
 }
 
 .editor-rendered-attachment-name {
     min-width: 0;
     overflow: hidden;
-    color: #2f3645;
+    color: var(--text-1);
     font-size: 12px;
     font-weight: 760;
     line-height: 1.25;
@@ -272,11 +295,22 @@
 }
 
 .editor-rendered-attachment-meta {
-    color: #8a94a5;
+    color: var(--text-4);
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.25;
+}
+
+html[data-theme="light"] .editor-rendered-view,
+html.theme-light .editor-rendered-view,
+body.theme-light .editor-rendered-view {
+    --editor-rendered-board: color-mix(in srgb, var(--bg-2) 78%, var(--bg-1));
+    --editor-rendered-card: color-mix(in srgb, var(--bg-1) 88%, transparent);
+    --editor-rendered-card-border: color-mix(in srgb, var(--text-4) 22%, transparent);
+    --editor-rendered-card-shadow: 0 14px 28px color-mix(in srgb, var(--bg-deep) 15%, transparent);
+    --editor-rendered-control: color-mix(in srgb, var(--bg-1) 86%, transparent);
+    --editor-rendered-control-hover: color-mix(in srgb, var(--gold-09) 48%, var(--bg-1));
 }
 
 @media (max-width: 760px) {
@@ -285,6 +319,6 @@
     }
 
     .editor-rendered-card {
-        padding: 34px 22px 26px;
+        padding: 28px 18px 22px;
     }
 }

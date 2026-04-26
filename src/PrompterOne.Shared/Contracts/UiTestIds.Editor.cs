@@ -191,6 +191,8 @@ public static partial class UiTestIds
 
         public static string RenderedBlock(int segmentIndex, int blockIndex) => $"editor-rendered-block-{segmentIndex}-{blockIndex}";
 
+        public static string RenderedBlockDragHandle(int segmentIndex, int blockIndex) => $"editor-rendered-block-drag-handle-{segmentIndex}-{blockIndex}";
+
         public static string RenderedBlockAttachment(int segmentIndex, int blockIndex, int attachmentIndex) =>
             $"editor-rendered-block-attachment-{segmentIndex}-{blockIndex}-{attachmentIndex}";
 

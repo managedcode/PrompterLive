@@ -90,6 +90,14 @@ public sealed class EditorVisualSourceTests : BunitContext
                 .GetAttribute("value") ?? string.Empty;
 
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedView));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedBlockDragHandle(
+                EditorVisualTestSource.IntroSegmentIndex,
+                EditorVisualTestSource.OpeningBlockIndex)));
+            Assert.Equal(
+                "false",
+                cut.FindByTestId(UiTestIds.Editor.RenderedBlock(
+                    EditorVisualTestSource.IntroSegmentIndex,
+                    EditorVisualTestSource.OpeningBlockIndex)).GetAttribute("draggable"));
             Assert.Contains(EditorVisualTestSource.RenderedOpeningProbe, renderedText, StringComparison.Ordinal);
             Assert.DoesNotContain(EditorVisualTestSource.RawSegmentPrefix, renderedText, StringComparison.Ordinal);
             Assert.DoesNotContain(EditorVisualTestSource.RawTagOpen, renderedText, StringComparison.Ordinal);
