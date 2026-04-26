@@ -99,6 +99,41 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
         Math.Round(value, StoredReaderSettingPrecisionDigits);
 
     [Test]
+    public Task Teleprompter_CenterAlignmentPersistsAcrossReload() =>
+        RunPageAsync(async page =>
+        {
+            await ReaderRouteDriver.OpenTeleprompterAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.Page))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ExtendedVisibleTimeoutMs });
+
+            await page.GetByTestId(UiTestIds.Teleprompter.AlignmentCenter).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute,
+                    BrowserTestConstants.TeleprompterFlow.AlignmentCenterValue);
+
+            var storedJson = await page.EvaluateAsync<string>(
+                "(storageKey) => localStorage.getItem(storageKey) ?? ''",
+                StoredReaderSettingsKey);
+            var storedSettings = JsonSerializer.Deserialize<ReaderSettings>(storedJson);
+
+            await Assert.That(storedSettings).IsNotNull();
+            await Assert.That(storedSettings.TextAlignment).IsEqualTo(ReaderTextAlignment.Center);
+
+            await BrowserRouteDriver.ReloadPageAsync(
+                page,
+                BrowserTestConstants.Routes.TeleprompterDemo,
+                UiTestIds.Teleprompter.Page,
+                $"{nameof(Teleprompter_CenterAlignmentPersistsAcrossReload)}-reload");
+            await PlaybackRouteDriver.WaitForTeleprompterReadyAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
+
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
+                .ToHaveAttributeAsync(
+                    BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute,
+                    BrowserTestConstants.TeleprompterFlow.AlignmentCenterValue);
+        });
+
+    [Test]
     public Task Teleprompter_BackwardBlockJump_ReversesOutgoingCardDirection() =>
         RunPageAsync(async page =>
         {
