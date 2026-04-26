@@ -158,8 +158,6 @@ public sealed class NavigationFlowTests(StandaloneAppFixture fixture)
                     UiTestIds.Header.AiSpotlight,
                     UiTestIds.Header.EditorImportScriptButton,
                     UiTestIds.Header.EditorSaveFile,
-                    UiTestIds.Header.EditorExportMarkdown,
-                    UiTestIds.Header.EditorExportPlainText,
                     UiTestIds.Header.EditorLearn,
                     UiTestIds.Header.EditorRead);
 

@@ -49,6 +49,13 @@ public static partial class UiTestIds
         public const string ProgressFill = "teleprompter-progress-fill";
         public const string ProgressLabel = "teleprompter-progress-label";
         public const string ProgressSegments = "teleprompter-progress-segments";
+        public const string RecordingCameraSelect = "teleprompter-recording-camera-select";
+        public const string RecordingMicrophoneSelect = "teleprompter-recording-microphone-select";
+        public const string RecordingModeSelect = "teleprompter-recording-mode-select";
+        public const string RecordingPanel = "teleprompter-recording-panel";
+        public const string RecordingStatus = "teleprompter-recording-status";
+        public const string RecordingToggle = "teleprompter-recording-toggle";
+        public const string RecordingLevel = "teleprompter-recording-level";
         public const string SpeedDown = "teleprompter-speed-down";
         public const string SpeedCueDisplayMode = "teleprompter-speed-cue-display-mode";
         public const string SpeedCueDisplayMultiplier = "teleprompter-speed-cue-display-multiplier";

@@ -7,6 +7,20 @@
     const microphoneMonitorLevelMultiplier = 2800;
     const monitorMap = new Map();
     const pendingCameraCaptureMap = new Map();
+    const readerRecordingTimesliceMs = 500;
+    const recordingDefaultExtension = "webm";
+    const readerRecordingMimeCandidates = Object.freeze({
+        audio: [
+            "audio/webm;codecs=opus",
+            "audio/webm"
+        ],
+        video: [
+            "video/webm;codecs=vp9,opus",
+            "video/webm;codecs=vp8,opus",
+            "video/webm"
+        ]
+    });
+    let readerRecordingSession = null;
     const remoteCaptureMap = new Map();
     const remoteStreamMap = new Map();
     const appleVendorFragment = "Apple";
@@ -287,6 +301,131 @@
 
     function getTrackCaptureOptions(deviceId) {
         return deviceId ? { deviceId } : true;
+    }
+
+    function readRequestValue(request, camelName, pascalName, fallback = null) {
+        if (request && Object.prototype.hasOwnProperty.call(request, camelName)) {
+            return request[camelName];
+        }
+
+        if (request && Object.prototype.hasOwnProperty.call(request, pascalName)) {
+            return request[pascalName];
+        }
+
+        return fallback;
+    }
+
+    function normalizeBooleanOption(value, fallback = false) {
+        return typeof value === "boolean" ? value : fallback;
+    }
+
+    function normalizePositiveNumberOption(value) {
+        const number = Number(value);
+        return Number.isFinite(number) && number > 0 ? number : null;
+    }
+
+    function buildAudioCaptureOptions(request) {
+        const options = {};
+        const deviceId = readRequestValue(request, "microphoneDeviceId", "MicrophoneDeviceId", "");
+        if (typeof deviceId === "string" && deviceId.length > 0) {
+            options.deviceId = deviceId;
+        }
+
+        options.echoCancellation = normalizeBooleanOption(readRequestValue(request, "echoCancellation", "EchoCancellation"), true);
+        options.noiseSuppression = normalizeBooleanOption(readRequestValue(request, "noiseSuppression", "NoiseSuppression"), true);
+        options.autoGainControl = normalizeBooleanOption(readRequestValue(request, "autoGainControl", "AutoGainControl"), true);
+
+        if (normalizeBooleanOption(readRequestValue(request, "voiceIsolation", "VoiceIsolation"), false)) {
+            options.voiceIsolation = true;
+        }
+
+        const channelCount = normalizePositiveNumberOption(readRequestValue(request, "channelCount", "ChannelCount"));
+        const sampleRate = normalizePositiveNumberOption(readRequestValue(request, "sampleRate", "SampleRate"));
+        const sampleSize = normalizePositiveNumberOption(readRequestValue(request, "sampleSize", "SampleSize"));
+        if (channelCount !== null) {
+            options.channelCount = channelCount;
+        }
+
+        if (sampleRate !== null) {
+            options.sampleRate = sampleRate;
+        }
+
+        if (sampleSize !== null) {
+            options.sampleSize = sampleSize;
+        }
+
+        return options;
+    }
+
+    function resolveSupportedRecordingMimeType(includeVideo) {
+        if (typeof MediaRecorder === "undefined") {
+            throw new Error("MediaRecorder is not available in this browser.");
+        }
+
+        const candidates = includeVideo
+            ? readerRecordingMimeCandidates.video
+            : readerRecordingMimeCandidates.audio;
+        for (const candidate of candidates) {
+            if (MediaRecorder.isTypeSupported(candidate)) {
+                return candidate;
+            }
+        }
+
+        return includeVideo ? "video/webm" : "audio/webm";
+    }
+
+    function getRecordingFileExtension(mimeType) {
+        const baseType = String(mimeType || "").split(";")[0].toLowerCase();
+        if (baseType.includes("/ogg")) {
+            return "ogg";
+        }
+
+        if (baseType.includes("/mp4")) {
+            return "mp4";
+        }
+
+        return recordingDefaultExtension;
+    }
+
+    function sanitizeRecordingFileStem(fileStem) {
+        const stem = String(fileStem || "").trim().toLowerCase();
+        const safe = stem.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        return safe || "reader-rehearsal";
+    }
+
+    function buildReaderRecordingFileName(fileStem, mimeType) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        return `${sanitizeRecordingFileStem(fileStem)}-${timestamp}.${getRecordingFileExtension(mimeType)}`;
+    }
+
+    async function saveReaderRecordingBlob(blob, fileName, mimeType) {
+        if (typeof window.showSaveFilePicker === "function") {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: fileName,
+                types: [
+                    {
+                        accept: {
+                            [String(mimeType || "video/webm").split(";")[0]]: [`.${getRecordingFileExtension(mimeType)}`]
+                        },
+                        description: "PrompterOne reader recording"
+                    }
+                ]
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = fileName;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     }
 
     function getCaptureKey(deviceId) {
@@ -571,6 +710,43 @@
         await notifyMonitorLevel(monitor, 0);
     }
 
+    async function stopActiveReaderRecording() {
+        const session = readerRecordingSession;
+        if (!session) {
+            return {
+                active: false,
+                fileName: "",
+                mimeType: "",
+                mode: "",
+                sizeBytes: 0
+            };
+        }
+
+        readerRecordingSession = null;
+        const stopped = new Promise((resolve, reject) => {
+            session.recorder.addEventListener("stop", resolve, { once: true });
+            session.recorder.addEventListener("error", event => reject(event?.error ?? new Error("MediaRecorder failed.")), { once: true });
+        });
+
+        if (session.recorder.state !== "inactive") {
+            session.recorder.stop();
+        }
+
+        await stopped;
+        const blob = new Blob(session.chunks, { type: session.mimeType });
+        await saveReaderRecordingBlob(blob, session.fileName, session.mimeType);
+
+        session.releaseTracks();
+
+        return {
+            active: false,
+            fileName: session.fileName,
+            mimeType: session.mimeType,
+            mode: session.mode,
+            sizeBytes: blob.size
+        };
+    }
+
     async function requestMediaPermissions() {
         const liveKitClient = getLiveKitClient();
         let tracks = [];
@@ -616,6 +792,74 @@
         async requestPermissions() {
             await requestMediaPermissions();
             return await window[getMediaRuntimeString("browserMediaInteropNamespace")].queryPermissions();
+        },
+
+        async startReaderRecording(request) {
+            if (readerRecordingSession) {
+                await stopActiveReaderRecording();
+            }
+
+            const liveKitClient = getLiveKitClient();
+            const mode = readRequestValue(request, "mode", "Mode", "video-audio");
+            const includeVideo = mode !== "audio";
+            const fileStem = readRequestValue(request, "fileStem", "FileStem", "reader-rehearsal");
+            const cameraDeviceId = readRequestValue(request, "cameraDeviceId", "CameraDeviceId", "");
+            const mimeType = resolveSupportedRecordingMimeType(includeVideo);
+            const tracks = [];
+            let videoCapture = null;
+            let audioTrack = null;
+
+            try {
+                audioTrack = await liveKitClient.createLocalAudioTrack(buildAudioCaptureOptions(request));
+                tracks.push(audioTrack.mediaStreamTrack);
+
+                if (includeVideo) {
+                    videoCapture = await acquireSharedVideoCapture(cameraDeviceId);
+                    tracks.push(videoCapture.track.mediaStreamTrack);
+                }
+
+                const stream = new MediaStream(tracks);
+                const chunks = [];
+                const recorder = new MediaRecorder(stream, {
+                    mimeType
+                });
+                recorder.addEventListener("dataavailable", event => {
+                    if (event.data?.size > 0) {
+                        chunks.push(event.data);
+                    }
+                });
+                recorder.start(readerRecordingTimesliceMs);
+
+                const fileName = buildReaderRecordingFileName(fileStem, mimeType);
+                readerRecordingSession = {
+                    chunks,
+                    fileName,
+                    mimeType,
+                    mode,
+                    recorder,
+                    releaseTracks() {
+                        releaseLocalTrack(audioTrack);
+                        if (videoCapture) {
+                            void releaseSharedVideoCapture(videoCapture.captureKey);
+                        }
+                    }
+                };
+
+                return {
+                    active: true,
+                    fileName,
+                    mimeType,
+                    mode,
+                    sizeBytes: 0
+                };
+            } catch (error) {
+                releaseLocalTrack(audioTrack);
+                if (videoCapture) {
+                    await releaseSharedVideoCapture(videoCapture.captureKey);
+                }
+
+                throw error;
+            }
         },
 
         async listDevices() {
@@ -731,6 +975,10 @@
 
         async stopMicrophoneLevelMonitor(elementId) {
             await releaseMonitor(elementId);
+        },
+
+        async stopReaderRecording() {
+            return await stopActiveReaderRecording();
         }
     };
 })();

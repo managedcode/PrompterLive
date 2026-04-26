@@ -1,6 +1,8 @@
 @namespace PrompterOne.Shared.Pages
 @using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
+@using PrompterOne.Core.Models.Media
+@using PrompterOne.Shared.Settings.Components
 
 <div class="@EdgeProgressCssClass">
     <div class="rd-edge-fill" id="@UiDomIds.Teleprompter.ProgressFill" data-test="@UiTestIds.Teleprompter.ProgressFill" style="@ProgressFillStyle"></div>
@@ -128,12 +130,52 @@
             </button>
         </TooltipAnchor>
     </div>
+
+    <div class="rd-recording-panel"
+         data-active="@BuildBooleanDataAttribute(IsRecordingActive)"
+         data-test="@UiTestIds.Teleprompter.RecordingPanel">
+        <button class="rd-record-btn"
+                type="button"
+                aria-label="@RecordingToggleTooltip"
+                data-active="@BuildBooleanDataAttribute(IsRecordingActive)"
+                data-test="@UiTestIds.Teleprompter.RecordingToggle"
+                @onclick="OnRecordingToggle">
+            <span class="rd-record-dot" aria-hidden="true"></span>
+            <span>@(IsRecordingActive ? RecordingStopLabel : RecordingStartLabel)</span>
+        </button>
+        <SettingsSelect Value="@RecordingMode"
+                        TestId="@UiTestIds.Teleprompter.RecordingModeSelect"
+                        Options="@RecordingModeOptions"
+                        OnChange="OnRecordingModeChange" />
+        @if (ShowsRecordingCameraSelect)
+        {
+            <SettingsSelect Value="@SelectedRecordingCameraId"
+                            TestId="@UiTestIds.Teleprompter.RecordingCameraSelect"
+                            Options="@RecordingCameraOptions"
+                            OnChange="OnRecordingCameraChange" />
+        }
+        <SettingsSelect Value="@SelectedRecordingMicrophoneId"
+                        TestId="@UiTestIds.Teleprompter.RecordingMicrophoneSelect"
+                        Options="@RecordingMicrophoneOptions"
+                        OnChange="OnRecordingMicrophoneChange" />
+        <div class="rd-record-level"
+             aria-label="@RecordingLevelLabel"
+             data-level="@RecordingLevelPercent"
+             data-test="@UiTestIds.Teleprompter.RecordingLevel">
+            <span style="@BuildRecordingLevelStyle()"></span>
+        </div>
+        <span class="rd-record-status" data-test="@UiTestIds.Teleprompter.RecordingStatus">@RecordingStatusLabel</span>
+    </div>
 </div>
 
 @code {
+    private const string AudioOnlyMode = "audio";
+    private const string VideoAndAudioMode = "video-audio";
+
     [Parameter] public bool IsAutoLoopEnabled { get; set; }
     [Parameter] public bool IsCameraActive { get; set; }
     [Parameter] public bool IsReaderPlaying { get; set; }
+    [Parameter] public bool IsRecordingActive { get; set; }
     [Parameter, EditorRequired] public string AutoLoopTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string BlockIndicatorLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string CameraButtonCssClass { get; set; } = string.Empty;
@@ -151,6 +193,10 @@
     [Parameter] public EventCallback OnPlayToggle { get; set; }
     [Parameter] public EventCallback OnPreviousBlock { get; set; }
     [Parameter] public EventCallback OnPreviousWord { get; set; }
+    [Parameter] public EventCallback OnRecordingToggle { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnRecordingCameraChange { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnRecordingMicrophoneChange { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnRecordingModeChange { get; set; }
     [Parameter] public EventCallback OnSpeedDown { get; set; }
     [Parameter] public EventCallback OnSpeedUp { get; set; }
     [Parameter, EditorRequired] public string NextBlockTooltip { get; set; } = string.Empty;
@@ -162,10 +208,43 @@
     [Parameter, EditorRequired] public string ProgressLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public IReadOnlyList<TeleprompterProgressSegmentViewModel> ProgressSegments { get; set; } = [];
     [Parameter, EditorRequired] public string ProgressShellCssClass { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public IReadOnlyList<MediaDeviceInfo> RecordingCameras { get; set; } = [];
+    [Parameter, EditorRequired] public string RecordingLevelLabel { get; set; } = string.Empty;
+    [Parameter] public int RecordingLevelPercent { get; set; }
+    [Parameter, EditorRequired] public IReadOnlyList<MediaDeviceInfo> RecordingMicrophones { get; set; } = [];
+    [Parameter, EditorRequired] public string RecordingMode { get; set; } = VideoAndAudioMode;
+    [Parameter, EditorRequired] public string RecordingStartLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string RecordingStatusLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string RecordingStopLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string RecordingToggleTooltip { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SelectedRecordingCameraId { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SelectedRecordingMicrophoneId { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedDownTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedUpTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedValueLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public IReadOnlyDictionary<string, object> TimeDataAttributes { get; set; } = new Dictionary<string, object>();
 
     private static string BuildBooleanDataAttribute(bool value) => value ? "true" : "false";
+
+    private bool ShowsRecordingCameraSelect =>
+        string.Equals(RecordingMode, VideoAndAudioMode, StringComparison.Ordinal);
+
+    private IReadOnlyList<SettingsSelectOption> RecordingModeOptions =>
+    [
+        new(VideoAndAudioMode, "Video + audio"),
+        new(AudioOnlyMode, "Audio only"),
+    ];
+
+    private IReadOnlyList<SettingsSelectOption> RecordingCameraOptions =>
+        RecordingCameras.Count == 0
+            ? [new(string.Empty, "No camera")]
+            : RecordingCameras.Select(device => new SettingsSelectOption(device.DeviceId, device.Label)).ToList();
+
+    private IReadOnlyList<SettingsSelectOption> RecordingMicrophoneOptions =>
+        RecordingMicrophones.Count == 0
+            ? [new(string.Empty, "No microphone")]
+            : RecordingMicrophones.Select(device => new SettingsSelectOption(device.DeviceId, device.Label)).ToList();
+
+    private string BuildRecordingLevelStyle() =>
+        $"width:{Math.Clamp(RecordingLevelPercent, 0, 100)}%;";
 }

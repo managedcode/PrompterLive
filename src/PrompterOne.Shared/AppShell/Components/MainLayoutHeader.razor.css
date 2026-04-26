@@ -4,6 +4,59 @@
     flex: 0 0 auto;
 }
 
+.app-header-export {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+}
+
+.app-header-export-trigger {
+    min-width: 112px;
+    justify-content: center;
+}
+
+.app-header-export-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 20;
+    display: grid;
+    gap: 3px;
+    min-width: 176px;
+    padding: 6px;
+    border: 1px solid color-mix(in srgb, var(--gold-20) 72%, var(--border-subtle));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--bg-1) 96%, var(--gold-04));
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, .34),
+        0 0 0 1px rgba(255, 255, 255, .03);
+}
+
+.app-header-export-option {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 0;
+    border-radius: 8px;
+    color: var(--text-2);
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.app-header-export-option:hover,
+.app-header-export-option:focus-visible {
+    color: var(--text-1);
+    background: var(--gold-09);
+    outline: none;
+}
+
 .app-header-title {
     max-width: 100%;
     min-width: 0;

@@ -5,6 +5,7 @@
 @using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
 @using PrompterOne.Shared.Localization
+@using PrompterOne.Shared.Settings.Components
 @inject IStringLocalizer<SharedResource> Localizer
 
 <section class="set-section set-panel"
@@ -99,6 +100,45 @@
                                          @onclick="ToggleEchoCancellation"
                                          data-test="@UiTestIds.Settings.EchoCancellation">
                                         <div class="set-toggle-thumb"></div>
+                                    </div>
+                                </div>
+                                <div class="set-field set-field-toggle">
+                                    <label>@Text(UiTextKey.SettingsMicrophonesAutoGainControl)</label>
+                                    <div class="@BuildToggleCssClass(MicrophoneSettings.AutoGainControl)"
+                                         @onclick="ToggleAutoGainControl"
+                                         data-test="@UiTestIds.Settings.AutoGainControl">
+                                        <div class="set-toggle-thumb"></div>
+                                    </div>
+                                </div>
+                                <div class="set-field set-field-toggle">
+                                    <label>@Text(UiTextKey.SettingsMicrophonesVoiceIsolation)</label>
+                                    <div class="@BuildToggleCssClass(MicrophoneSettings.VoiceIsolation)"
+                                         @onclick="ToggleVoiceIsolation"
+                                         data-test="@UiTestIds.Settings.VoiceIsolation">
+                                        <div class="set-toggle-thumb"></div>
+                                    </div>
+                                </div>
+                                <div class="set-rec-grid">
+                                    <div class="set-field">
+                                        <label>@Text(UiTextKey.CommonChannels)</label>
+                                        <SettingsSelect Value="@BuildOptionalNumberValue(MicrophoneSettings.ChannelCount)"
+                                                       TestId="@UiTestIds.Settings.MicChannelCount"
+                                                       Options="@ChannelCountOptions"
+                                                       OnChange="OnChannelCountChanged" />
+                                    </div>
+                                    <div class="set-field">
+                                        <label>@Text(UiTextKey.CommonSampleRate)</label>
+                                        <SettingsSelect Value="@BuildOptionalNumberValue(MicrophoneSettings.SampleRate)"
+                                                       TestId="@UiTestIds.Settings.MicSampleRate"
+                                                       Options="@SampleRateOptions"
+                                                       OnChange="OnSampleRateChanged" />
+                                    </div>
+                                    <div class="set-field">
+                                        <label>@Text(UiTextKey.SettingsMicrophonesSampleSize)</label>
+                                        <SettingsSelect Value="@BuildOptionalNumberValue(MicrophoneSettings.SampleSize)"
+                                                       TestId="@UiTestIds.Settings.MicSampleSize"
+                                                       Options="@SampleSizeOptions"
+                                                       OnChange="OnSampleSizeChanged" />
                                     </div>
                                 </div>
                             </div>
@@ -242,11 +282,21 @@
 
     [Parameter] public EventCallback ToggleEchoCancellation { get; set; }
 
+    [Parameter] public EventCallback ToggleAutoGainControl { get; set; }
+
     [Parameter] public EventCallback ToggleMuteAllMicrophones { get; set; }
 
     [Parameter] public EventCallback<MediaDeviceInfo> ToggleMicrophoneSelection { get; set; }
 
     [Parameter] public EventCallback ToggleNoiseSuppression { get; set; }
+
+    [Parameter] public EventCallback ToggleVoiceIsolation { get; set; }
+
+    [Parameter] public EventCallback<string> UpdateChannelCount { get; set; }
+
+    [Parameter] public EventCallback<string> UpdateSampleRate { get; set; }
+
+    [Parameter] public EventCallback<string> UpdateSampleSize { get; set; }
 
     [Parameter] public Func<MediaDeviceInfo, ChangeEventArgs, Task>? UpdateAudioDelay { get; set; }
 
@@ -260,5 +310,37 @@
     private Task UpdateAudioGainAsync(MediaDeviceInfo microphone, ChangeEventArgs args) =>
         UpdateAudioGain?.Invoke(microphone, args) ?? Task.CompletedTask;
 
+    private static string BuildOptionalNumberValue(int? value) =>
+        value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
+
+    private Task OnChannelCountChanged(ChangeEventArgs args) => UpdateChannelCount.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task OnSampleRateChanged(ChangeEventArgs args) => UpdateSampleRate.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
+    private Task OnSampleSizeChanged(ChangeEventArgs args) => UpdateSampleSize.InvokeAsync(args.Value?.ToString() ?? string.Empty);
+
     private string Text(UiTextKey key) => Localizer[key.ToString()];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> ChannelCountOptions =
+    [
+        new(string.Empty, "Browser default"),
+        new("1", "Mono"),
+        new("2", "Stereo"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> SampleRateOptions =
+    [
+        new(string.Empty, "Browser default"),
+        new("44100", "44.1 kHz"),
+        new("48000", "48 kHz"),
+        new("96000", "96 kHz"),
+    ];
+
+    private static readonly IReadOnlyList<SettingsSelectOption> SampleSizeOptions =
+    [
+        new(string.Empty, "Browser default"),
+        new("16", "16-bit"),
+        new("24", "24-bit"),
+        new("32", "32-bit"),
+    ];
 }

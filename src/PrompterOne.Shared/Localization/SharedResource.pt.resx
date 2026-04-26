@@ -1638,6 +1638,9 @@
   <data name="CommonScripts" xml:space="preserve">
     <value>Roteiros</value>
   </data>
+  <data name="CommonRecord" xml:space="preserve">
+    <value>Gravar</value>
+  </data>
   <data name="CommonRecordings" xml:space="preserve">
     <value>Gravações</value>
   </data>
@@ -2232,6 +2235,15 @@
   <data name="SettingsMicrophonesEchoCancellation" xml:space="preserve">
     <value>Cancelamento de eco</value>
   </data>
+  <data name="SettingsMicrophonesAutoGainControl" xml:space="preserve">
+    <value>Controle automático de ganho</value>
+  </data>
+  <data name="SettingsMicrophonesVoiceIsolation" xml:space="preserve">
+    <value>Isolamento de voz</value>
+  </data>
+  <data name="SettingsMicrophonesSampleSize" xml:space="preserve">
+    <value>Tamanho da amostra</value>
+  </data>
   <data name="SettingsMicrophonesGeneralTitle" xml:space="preserve">
     <value>Em geral</value>
   </data>
@@ -2660,6 +2672,9 @@
   </data>
   <data name="CommonGeneral" xml:space="preserve">
     <value>Em geral</value>
+  </data>
+  <data name="CommonStop" xml:space="preserve">
+    <value>Parar</value>
   </data>
   <data name="CommonVideo" xml:space="preserve">
     <value>Vídeo</value>
@@ -3185,6 +3200,33 @@
   </data>
   <data name="TeleprompterAttachCameraMessage" xml:space="preserve">
     <value>Não é possível ativar a câmera do teleprompter.</value>
+  </data>
+  <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
+    <value>Não é possível iniciar a gravação do leitor.</value>
+  </data>
+  <data name="TeleprompterStartRecordingTooltip" xml:space="preserve">
+    <value>Iniciar gravação de ensaio</value>
+  </data>
+  <data name="TeleprompterStopRecordingTooltip" xml:space="preserve">
+    <value>Parar gravação de ensaio</value>
+  </data>
+  <data name="TeleprompterRecordingActiveStatus" xml:space="preserve">
+    <value>Gravando</value>
+  </data>
+  <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
+    <value>Nível do microfone de gravação</value>
+  </data>
+  <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
+    <value>Selecione uma câmera para gravar vídeo.</value>
+  </data>
+  <data name="TeleprompterRecordingNoMicrophoneStatus" xml:space="preserve">
+    <value>Selecione um microfone para gravar.</value>
+  </data>
+  <data name="TeleprompterRecordingReadyStatus" xml:space="preserve">
+    <value>Pronto</value>
+  </data>
+  <data name="TeleprompterRecordingSavedStatusFormat" xml:space="preserve">
+    <value>Salvo {0}</value>
   </data>
   <data name="SettingsLoadMessage" xml:space="preserve">
     <value>Não é possível carregar as configurações no momento.</value>

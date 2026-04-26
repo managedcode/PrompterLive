@@ -13,6 +13,8 @@ internal static class BrowserMediaInteropMethodNames
     public const string ListDevices = NamespacePrefix + ".listDevices";
     public const string QueryPermissions = NamespacePrefix + ".queryPermissions";
     public const string RequestPermissions = NamespacePrefix + ".requestPermissions";
+    public const string StartReaderRecording = NamespacePrefix + ".startReaderRecording";
     public const string StartMicrophoneLevelMonitor = NamespacePrefix + ".startMicrophoneLevelMonitor";
+    public const string StopReaderRecording = NamespacePrefix + ".stopReaderRecording";
     public const string StopMicrophoneLevelMonitor = NamespacePrefix + ".stopMicrophoneLevelMonitor";
 }

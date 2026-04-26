@@ -44,6 +44,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
 
             await Expect(page.GetByTestId(UiTestIds.Header.EditorSaveFile)).ToBeVisibleAsync();
             await page.GetByTestId(UiTestIds.Header.EditorSaveFile).ClickAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorExportNative).ClickAsync();
             var savedFile = await WaitForSavedFileAsync(page, FilePickerMode);
             var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
 
@@ -77,6 +78,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
             await EditorMonacoDriver.SetTextAsync(page, EditedScript);
 
             await page.GetByTestId(UiTestIds.Header.EditorSaveFile).ClickAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorExportNative).ClickAsync();
             var savedFile = await WaitForSavedFileAsync(page, DownloadMode);
             var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
 
@@ -93,7 +95,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
     }
 
     [Test]
-    public async Task EditorScreen_ExportButtons_WriteMarkdownAndPlainTextFiles()
+    public async Task EditorScreen_ExportMenu_WritesNativeMarkdownAndPlainTextFiles()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
 
@@ -104,16 +106,29 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
             await EditorMonacoDriver.SetTextAsync(page, EditedScript);
 
-            await Expect(page.GetByTestId(UiTestIds.Header.EditorSaveFile)).ToContainTextAsync("Export");
-            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportMarkdown)).ToContainTextAsync("Export .md");
-            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportPlainText)).ToContainTextAsync("Export .txt");
+            var exportTrigger = page.GetByTestId(UiTestIds.Header.EditorSaveFile);
+            await Expect(exportTrigger).ToContainTextAsync("Export");
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportMarkdown)).ToBeHiddenAsync();
 
+            await exportTrigger.ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportNative)).ToContainTextAsync("TPS");
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportMarkdown)).ToContainTextAsync("Markdown");
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportPlainText)).ToContainTextAsync("Plain Text");
+
+            await page.GetByTestId(UiTestIds.Header.EditorExportNative).ClickAsync();
+            var nativeFile = await WaitForSavedFileAsync(page, FilePickerMode);
+            await AssertExportedSourceFileAsync(nativeFile, ExpectedDocumentName);
+
+            await page.EvaluateAsync(HarnessResetScript);
+
+            await exportTrigger.ClickAsync();
             await page.GetByTestId(UiTestIds.Header.EditorExportMarkdown).ClickAsync();
             var markdownFile = await WaitForSavedFileAsync(page, FilePickerMode);
             await AssertExportedSourceFileAsync(markdownFile, ExpectedMarkdownDocumentName);
 
             await page.EvaluateAsync(HarnessResetScript);
 
+            await exportTrigger.ClickAsync();
             await page.GetByTestId(UiTestIds.Header.EditorExportPlainText).ClickAsync();
             var textFile = await WaitForSavedFileAsync(page, FilePickerMode);
             await AssertExportedSourceFileAsync(textFile, ExpectedTextDocumentName);

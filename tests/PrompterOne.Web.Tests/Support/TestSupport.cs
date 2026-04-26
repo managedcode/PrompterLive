@@ -165,6 +165,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<CameraPreviewInterop>();
         context.Services.AddSingleton<LearnRsvpLayoutInterop>();
         context.Services.AddSingleton<MicrophoneLevelInterop>();
+        context.Services.AddSingleton<ReaderRecordingInterop>();
         context.Services.AddSingleton<TeleprompterReaderInterop>();
         context.Services.AddSingleton<KineticReaderInterop>();
         context.Services.AddSingleton<GoLiveOutputInterop>();

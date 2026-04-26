@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using PrompterOne.Core.Models.Media;
+using PrompterOne.Core.Models.Workspace;
 
 namespace PrompterOne.Shared.Pages;
 
@@ -184,6 +185,60 @@ public partial class SettingsPage
             }
         };
 
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleAutoGainControlAsync()
+    {
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with
+            {
+                AutoGainControl = !_studioSettings.Microphone.AutoGainControl
+            }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private async Task ToggleVoiceIsolationAsync()
+    {
+        _studioSettings = _studioSettings with
+        {
+            Microphone = _studioSettings.Microphone with
+            {
+                VoiceIsolation = !_studioSettings.Microphone.VoiceIsolation
+            }
+        };
+
+        await PersistStudioSettingsAsync();
+    }
+
+    private Task UpdateMicrophoneChannelCountAsync(string value) =>
+        UpdateMicrophoneOptionalNumberAsync(value, count => _studioSettings.Microphone with { ChannelCount = count });
+
+    private Task UpdateMicrophoneSampleRateAsync(string value) =>
+        UpdateMicrophoneOptionalNumberAsync(value, sampleRate => _studioSettings.Microphone with { SampleRate = sampleRate });
+
+    private Task UpdateMicrophoneSampleSizeAsync(string value) =>
+        UpdateMicrophoneOptionalNumberAsync(value, sampleSize => _studioSettings.Microphone with { SampleSize = sampleSize });
+
+    private async Task UpdateMicrophoneOptionalNumberAsync(
+        string value,
+        Func<int?, MicrophoneStudioSettings> update)
+    {
+        int? parsedValue = null;
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            if (!int.TryParse(value, out var number) || number <= 0)
+            {
+                return;
+            }
+
+            parsedValue = number;
+        }
+
+        _studioSettings = _studioSettings with { Microphone = update(parsedValue) };
         await PersistStudioSettingsAsync();
     }
 

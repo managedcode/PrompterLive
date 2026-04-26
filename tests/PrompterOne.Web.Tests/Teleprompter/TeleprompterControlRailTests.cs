@@ -79,6 +79,35 @@ public sealed class TeleprompterControlRailTests : BunitContext
         });
     }
 
+    [Test]
+    public void TeleprompterPage_RendersSeparateBackgroundCameraAndRecordingControls()
+    {
+        TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterDemo);
+
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var recordingPanel = cut.FindByTestId(UiTestIds.Teleprompter.RecordingPanel);
+            var recordingToggle = cut.FindByTestId(UiTestIds.Teleprompter.RecordingToggle);
+            var recordingMode = cut.FindByTestId(UiTestIds.Teleprompter.RecordingModeSelect);
+            var cameraSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingCameraSelect);
+            var microphoneSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingMicrophoneSelect);
+            var backgroundCameraToggle = cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle);
+
+            Assert.Equal("false", recordingPanel.GetAttribute("data-active"));
+            Assert.Equal("false", recordingToggle.GetAttribute("data-active"));
+            Assert.Equal("video-audio", recordingMode.GetAttribute("value"));
+            Assert.False(string.IsNullOrWhiteSpace(cameraSelect.GetAttribute("value")));
+            Assert.False(string.IsNullOrWhiteSpace(microphoneSelect.GetAttribute("value")));
+            Assert.NotEqual(
+                backgroundCameraToggle.GetAttribute("data-test"),
+                recordingToggle.GetAttribute("data-test"));
+        });
+    }
+
     private static void AssertIconButton(AngleSharp.Dom.IElement button, string expectedAriaLabel)
     {
         Assert.Equal(expectedAriaLabel, button.GetAttribute("aria-label"));

@@ -93,8 +93,7 @@
         order: -2;
     }
 
-    .app-header-native-export,
-    .app-header-format-export {
+    .app-header-export {
         order: 2;
     }
 

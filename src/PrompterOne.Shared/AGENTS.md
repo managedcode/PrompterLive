@@ -58,6 +58,7 @@
 - Dropdown item content across `PrompterOne.Shared` must align from the left edge as one readable cluster; do not push tags, shortcuts, or meta copy to a fake right column inside menu rows.
 - Editor Cards view must behave like a real card board: script cards should support drag-and-drop reordering, expose clear drag handles, and persist the resulting source order instead of relying only on up/down buttons.
 - Editor Cards view must be theme-aware across light and dark themes; do not hardcode white card/page backgrounds or dark-only text that bypasses shared app color tokens.
+- Editor header export actions must use one clear `Export` entry point with format choices inside it; do not render separate top-level buttons for each export format because they read as duplicated actions and crowd the shell chrome.
 - Tooltip surfaces across the app must feel intentional and premium: compact, aligned, clearly separated from the background, and positioned so they do not clip, overlap, or awkwardly fight the control that owns them.
 - Editor header toolbar tooltips must reveal more slowly than dropdown intent so quick menu interactions open the dropdown without competing hover tooltip paint.
 - Repeated menus, dropdowns, tooltips, badges, icon rows, image wrappers, and similar visual chrome must be standardized as reusable Blazor components with owning styles; routed pages and catalog files must compose those components instead of embedding bespoke markup or inline visual logic.

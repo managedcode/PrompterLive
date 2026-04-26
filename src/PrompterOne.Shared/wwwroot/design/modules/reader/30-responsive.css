@@ -60,6 +60,21 @@
         min-width: 28px;
         font-size: 9px;
     }
+
+    .rd-recording-panel {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-left: 6px;
+    }
+
+    .rd-recording-panel .ss-wrap {
+        flex: 0 0 94px;
+        width: 94px;
+    }
+
+    .rd-record-status {
+        display: none;
+    }
 }
 
 @media (max-height: 430px) {

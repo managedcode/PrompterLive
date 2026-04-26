@@ -52,6 +52,8 @@ public partial class TeleprompterPage : IAsyncDisposable
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private TpsFrontMatterDocumentService FrontMatterService { get; set; } = null!;
     [Inject] private StudioSettingsStore StudioSettingsStore { get; set; } = null!;
+    [Inject] private MicrophoneLevelInterop MicrophoneLevelInterop { get; set; } = null!;
+    [Inject] private ReaderRecordingInterop ReaderRecordingInterop { get; set; } = null!;
     [Inject] private TeleprompterReaderInterop ReaderInterop { get; set; } = null!;
     [Inject] private KineticReaderInterop KineticInterop { get; set; } = null!;
     [Inject] private IUserSettingsStore UserSettingsStore { get; set; } = null!;
@@ -66,6 +68,8 @@ public partial class TeleprompterPage : IAsyncDisposable
     private ReaderCameraLayerViewModel _cameraLayer = ReaderCameraLayerViewModel.Placeholder;
     private IReadOnlyList<ReaderCardViewModel> _cards = [];
     private IReadOnlyList<EditorBlockAttachment> _blockAttachments = [];
+    private IReadOnlyList<MediaDeviceInfo> _readerRecordingCameras = [];
+    private IReadOnlyList<MediaDeviceInfo> _readerRecordingMicrophones = [];
     private StudioSettings _studioSettings = StudioSettings.Default;
     private bool _activateReaderCameraAfterRender;
     private bool _areWidthGuidesActive;
@@ -213,6 +217,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         var autoStart = SessionService.State.ReaderSettings.ShowCameraScene;
         var devices = await MediaDeviceService.GetDevicesAsync();
         var availableCameras = devices.Where(device => device.Kind == MediaDeviceKind.Camera).ToList();
+        UpdateReaderRecordingDeviceDefaults(devices);
         var hasResolvedCameraIdentity = availableCameras.Any(device => !string.IsNullOrWhiteSpace(device.DeviceId));
         var preferredCameraId = _studioSettings.Camera.DefaultCameraId;
         var visibleSceneCameras = MediaSceneService.State.Cameras

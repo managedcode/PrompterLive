@@ -66,6 +66,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         StopReaderPlaybackLoop();
+        await StopReaderRecordingAsync(updateUi: false);
         await DetachReaderCameraAsync();
     }
 }

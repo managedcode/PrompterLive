@@ -193,27 +193,50 @@
 
         @if (ShowSaveFileAction)
         {
-            <button type="button"
-                    class="btn-ghost app-header-native-export"
-                    @onclick="HandleSaveFileClickAsync"
-                    data-test="@UiTestIds.Header.EditorSaveFile">
-                <UiIcon Kind="UiIconKind.ExportArrow" Size="15" />
-                <span class="app-header-action-label">@SaveFileLabel</span>
-            </button>
-            <button type="button"
-                    class="btn-ghost app-header-format-export"
-                    @onclick="HandleExportMarkdownClickAsync"
-                    data-test="@UiTestIds.Header.EditorExportMarkdown">
-                <UiIcon Kind="UiIconKind.DocumentLines" Size="15" />
-                <span class="app-header-action-label">@ExportMarkdownLabel</span>
-            </button>
-            <button type="button"
-                    class="btn-ghost app-header-format-export"
-                    @onclick="HandleExportPlainTextClickAsync"
-                    data-test="@UiTestIds.Header.EditorExportPlainText">
-                <UiIcon Kind="UiIconKind.TextLines" Size="15" />
-                <span class="app-header-action-label">@ExportPlainTextLabel</span>
-            </button>
+            <div class="app-header-export"
+                 data-test="@UiTestIds.Header.EditorExportMenu">
+                <button type="button"
+                        class="btn-ghost app-header-export-trigger"
+                        aria-haspopup="menu"
+                        aria-expanded="@(_isExportMenuOpen ? EnabledStateValue : DisabledStateValue)"
+                        @onclick="ToggleExportMenu"
+                        data-test="@UiTestIds.Header.EditorSaveFile">
+                    <UiIcon Kind="UiIconKind.ExportArrow" Size="15" />
+                    <span class="app-header-action-label">@SaveFileLabel</span>
+                    <UiIcon Kind="UiIconKind.ChevronDown" Size="13" StrokeWidth="2.2m" />
+                </button>
+
+                @if (_isExportMenuOpen)
+                {
+                    <div class="app-header-export-menu"
+                         role="menu">
+                        <button type="button"
+                                class="app-header-export-option"
+                                role="menuitem"
+                                @onclick="HandleSaveFileClickAsync"
+                                data-test="@UiTestIds.Header.EditorExportNative">
+                            <UiIcon Kind="UiIconKind.ExportArrow" Size="15" />
+                            <span>@ExportNativeLabel</span>
+                        </button>
+                        <button type="button"
+                                class="app-header-export-option"
+                                role="menuitem"
+                                @onclick="HandleExportMarkdownClickAsync"
+                                data-test="@UiTestIds.Header.EditorExportMarkdown">
+                            <UiIcon Kind="UiIconKind.DocumentLines" Size="15" />
+                            <span>@ExportMarkdownLabel</span>
+                        </button>
+                        <button type="button"
+                                class="app-header-export-option"
+                                role="menuitem"
+                                @onclick="HandleExportPlainTextClickAsync"
+                                data-test="@UiTestIds.Header.EditorExportPlainText">
+                            <UiIcon Kind="UiIconKind.TextLines" Size="15" />
+                            <span>@ExportPlainTextLabel</span>
+                        </button>
+                    </div>
+                }
+            </div>
         }
 
         @if (ShowLearnAction)
@@ -251,6 +274,7 @@
     private const string DisabledStateValue = "false";
     private const string EnabledStateValue = "true";
     private const decimal HomeIconStrokeWidth = 1.9m;
+    private bool _isExportMenuOpen;
 
     [Parameter, EditorRequired] public string CssClass { get; set; } = string.Empty;
     [Parameter] public bool IsReaderMuted { get; set; }
@@ -292,6 +316,7 @@
     [Parameter, EditorRequired] public string ReadLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string RestartTourLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ExportMarkdownLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ExportNativeLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ExportPlainTextLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SaveFileLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SearchPlaceholder { get; set; } = string.Empty;
@@ -333,9 +358,23 @@
 
     private Task HandleOpenReadClickAsync() => OnOpenReadClick.InvokeAsync();
 
-    private Task HandleExportMarkdownClickAsync() => OnExportMarkdownClick.InvokeAsync();
+    private void ToggleExportMenu() => _isExportMenuOpen = !_isExportMenuOpen;
 
-    private Task HandleExportPlainTextClickAsync() => OnExportPlainTextClick.InvokeAsync();
+    private async Task HandleExportMarkdownClickAsync()
+    {
+        _isExportMenuOpen = false;
+        await OnExportMarkdownClick.InvokeAsync();
+    }
 
-    private Task HandleSaveFileClickAsync() => OnSaveFileClick.InvokeAsync();
+    private async Task HandleExportPlainTextClickAsync()
+    {
+        _isExportMenuOpen = false;
+        await OnExportPlainTextClick.InvokeAsync();
+    }
+
+    private async Task HandleSaveFileClickAsync()
+    {
+        _isExportMenuOpen = false;
+        await OnSaveFileClick.InvokeAsync();
+    }
 }

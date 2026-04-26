@@ -15,6 +15,8 @@ internal static class AiSpotlightTeleprompterToolCatalog
         AddMutation(tools, AiSpotlightToolNames.TeleprompterTextSizeSet, UiTextKey.TooltipAdjustReaderTextSize, AiSpotlightToolText.TeleprompterTextSizeSet, AiSpotlightToolParameterSets.Percent);
         AddMutation(tools, AiSpotlightToolNames.TeleprompterReadWidthSet, UiTextKey.TooltipAdjustReaderTextWidth, AiSpotlightToolText.TeleprompterReadWidthSet, AiSpotlightToolParameterSets.Percent);
         AddMutation(tools, AiSpotlightToolNames.TeleprompterCameraToggle, UiTextKey.TooltipToggleCameraPreview, AiSpotlightToolText.TeleprompterCameraToggle, idempotent: false);
+        AddMutation(tools, AiSpotlightToolNames.TeleprompterRecordingStart, UiTextKey.TeleprompterStartRecordingTooltip, AiSpotlightToolText.TeleprompterRecordingStart);
+        AddMutation(tools, AiSpotlightToolNames.TeleprompterRecordingStop, UiTextKey.TeleprompterStopRecordingTooltip, AiSpotlightToolText.TeleprompterRecordingStop);
         AddMutation(tools, AiSpotlightToolNames.TeleprompterMirrorHorizontalToggle, UiTextKey.TooltipMirrorReaderHorizontally, AiSpotlightToolText.TeleprompterMirrorHorizontalToggle, idempotent: false);
         AddMutation(tools, AiSpotlightToolNames.TeleprompterMirrorVerticalToggle, UiTextKey.TooltipMirrorReaderVertically, AiSpotlightToolText.TeleprompterMirrorVerticalToggle, idempotent: false);
         AddMutation(tools, AiSpotlightToolNames.TeleprompterFullscreenToggle, UiTextKey.TooltipToggleBrowserFullscreen, AiSpotlightToolText.TeleprompterFullscreenToggle, idempotent: false);

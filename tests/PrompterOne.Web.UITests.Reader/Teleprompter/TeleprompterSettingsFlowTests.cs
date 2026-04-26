@@ -180,6 +180,11 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(page.GetByTestId(UiTestIds.Settings.MicPreviewMeter)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.NoiseSuppression)).ToBeVisibleAsync();
         await Expect(page.GetByTestId(UiTestIds.Settings.EchoCancellation)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.AutoGainControl)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.VoiceIsolation)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.MicChannelCount)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.MicSampleRate)).ToBeVisibleAsync();
+        await Expect(page.GetByTestId(UiTestIds.Settings.MicSampleSize)).ToBeVisibleAsync();
         await page.GetByTestId(UiTestIds.Settings.MicLevel).EvaluateAsync(BrowserTestConstants.SettingsFlow.MicLevelInputScript);
         await Expect(page.GetByTestId(UiTestIds.Settings.MicLevel)).ToHaveValueAsync(BrowserTestConstants.SettingsFlow.MicLevelValue);
         await page.GetByTestId(UiTestIds.Settings.NoiseSuppression).ClickAsync();

@@ -36,7 +36,12 @@ public sealed record MicrophoneStudioSettings(
     string? DefaultMicrophoneId = null,
     int InputLevelPercent = 65,
     bool NoiseSuppression = true,
-    bool EchoCancellation = true);
+    bool EchoCancellation = true,
+    bool AutoGainControl = true,
+    bool VoiceIsolation = false,
+    int? ChannelCount = null,
+    int? SampleRate = null,
+    int? SampleSize = null);
 
 public sealed record StreamStudioSettings(
     ProgramCaptureProfile? ProgramCapture = null,

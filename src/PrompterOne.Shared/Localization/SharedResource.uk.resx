@@ -1860,6 +1860,9 @@
   <data name="CommonScripts" xml:space="preserve">
     <value>Сценарії</value>
   </data>
+  <data name="CommonRecord" xml:space="preserve">
+    <value>Запис</value>
+  </data>
   <data name="CommonRecordings" xml:space="preserve">
     <value>Записи</value>
   </data>
@@ -2454,6 +2457,15 @@
   <data name="SettingsMicrophonesEchoCancellation" xml:space="preserve">
     <value>Ехоподавлення</value>
   </data>
+  <data name="SettingsMicrophonesAutoGainControl" xml:space="preserve">
+    <value>Автоматичне підсилення</value>
+  </data>
+  <data name="SettingsMicrophonesVoiceIsolation" xml:space="preserve">
+    <value>Ізоляція голосу</value>
+  </data>
+  <data name="SettingsMicrophonesSampleSize" xml:space="preserve">
+    <value>Розмір семпла</value>
+  </data>
   <data name="SettingsMicrophonesGeneralTitle" xml:space="preserve">
     <value>Загальний</value>
   </data>
@@ -2883,6 +2895,9 @@
   <data name="CommonGeneral" xml:space="preserve">
     <value>Загальний</value>
   </data>
+  <data name="CommonStop" xml:space="preserve">
+    <value>Стоп</value>
+  </data>
   <data name="CommonVideo" xml:space="preserve">
     <value>відео</value>
   </data>
@@ -3185,6 +3200,33 @@
   </data>
   <data name="TeleprompterAttachCameraMessage" xml:space="preserve">
     <value>Не вдається ввімкнути камеру телесуфлера.</value>
+  </data>
+  <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
+    <value>Не вдається почати запис у рідері.</value>
+  </data>
+  <data name="TeleprompterStartRecordingTooltip" xml:space="preserve">
+    <value>Почати репетиційний запис</value>
+  </data>
+  <data name="TeleprompterStopRecordingTooltip" xml:space="preserve">
+    <value>Зупинити репетиційний запис</value>
+  </data>
+  <data name="TeleprompterRecordingActiveStatus" xml:space="preserve">
+    <value>Записується</value>
+  </data>
+  <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
+    <value>Рівень мікрофона запису</value>
+  </data>
+  <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
+    <value>Оберіть камеру для запису відео.</value>
+  </data>
+  <data name="TeleprompterRecordingNoMicrophoneStatus" xml:space="preserve">
+    <value>Оберіть мікрофон для запису.</value>
+  </data>
+  <data name="TeleprompterRecordingReadyStatus" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="TeleprompterRecordingSavedStatusFormat" xml:space="preserve">
+    <value>Збережено {0}</value>
   </data>
   <data name="SettingsLoadMessage" xml:space="preserve">
     <value>Зараз неможливо завантажити налаштування.</value>

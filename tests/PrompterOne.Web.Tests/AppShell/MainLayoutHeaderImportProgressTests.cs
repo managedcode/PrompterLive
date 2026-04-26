@@ -116,6 +116,9 @@ public sealed class MainLayoutHeaderImportProgressTests : BunitContext
             parameters.Add(component => component.NewScriptLabel, "New Script");
             parameters.Add(component => component.ReadLabel, "Read");
             parameters.Add(component => component.RestartTourLabel, "Restart tour");
+            parameters.Add(component => component.ExportMarkdownLabel, "Markdown");
+            parameters.Add(component => component.ExportNativeLabel, "TPS (Native)");
+            parameters.Add(component => component.ExportPlainTextLabel, "Plain Text");
             parameters.Add(component => component.SaveFileLabel, "Export");
             parameters.Add(component => component.SearchPlaceholder, "Search");
             parameters.Add(component => component.SearchText, string.Empty);

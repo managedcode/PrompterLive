@@ -143,6 +143,8 @@ internal static class AiSpotlightToolText
     public const string TeleprompterTextSizeSet = "set teleprompter text size";
     public const string TeleprompterReadWidthSet = "set teleprompter read width";
     public const string TeleprompterCameraToggle = "toggle teleprompter camera preview";
+    public const string TeleprompterRecordingStart = "start local reader rehearsal recording";
+    public const string TeleprompterRecordingStop = "stop local reader rehearsal recording";
     public const string TeleprompterMirrorHorizontalToggle = "toggle horizontal mirror";
     public const string TeleprompterMirrorVerticalToggle = "toggle vertical mirror";
     public const string TeleprompterFullscreenToggle = "toggle browser fullscreen";

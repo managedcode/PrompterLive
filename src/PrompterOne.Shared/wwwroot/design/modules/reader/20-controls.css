@@ -575,6 +575,87 @@
     min-width: 36px;
 }
 
+.rd-recording-panel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
+    padding-left: 10px;
+    border-left: 1px solid var(--gold-06);
+}
+
+.rd-record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid rgba(232,213,176,.16);
+    border-radius: 10px;
+    background: rgba(255,255,255,.03);
+    color: rgba(232,213,176,.76);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.rd-record-btn:hover {
+    background: rgba(255,255,255,.07);
+    color: #E8D5B0;
+}
+
+.rd-record-btn[data-active="true"] {
+    border-color: rgba(235,95,76,.42);
+    color: #ffd8cf;
+}
+
+.rd-record-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #e35d4f;
+    box-shadow: 0 0 0 3px rgba(227,93,79,.16);
+}
+
+.rd-recording-panel .ss-wrap {
+    width: 112px;
+}
+
+.rd-recording-panel .ss-trigger {
+    min-height: 34px;
+    padding: 0 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.03);
+    color: rgba(232,213,176,.72);
+    font-size: 11px;
+}
+
+.rd-record-level {
+    width: 42px;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(232,213,176,.12);
+}
+
+.rd-record-level span {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #7dd3a8, #e8d5b0);
+    transition: width .12s linear;
+}
+
+.rd-record-status {
+    max-width: 96px;
+    overflow: hidden;
+    color: rgba(232,213,176,.56);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Subtle noise texture on body */
 body::before {
     content: '';
