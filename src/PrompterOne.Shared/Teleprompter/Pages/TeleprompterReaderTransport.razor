@@ -107,6 +107,16 @@
 
     <div class="rd-ctrl-group">
         <span class="rd-ctrl-label rd-block-indicator" id="@UiDomIds.Teleprompter.BlockIndicator" data-test="@UiTestIds.Teleprompter.BlockIndicator">@BlockIndicatorLabel</span>
+        <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.AutoLoopToggle" Text="@AutoLoopTooltip">
+            <button class="rd-ctrl-btn"
+                    @onclick="OnAutoLoopToggle"
+                    aria-label="@AutoLoopTooltip"
+                    aria-pressed="@BuildBooleanDataAttribute(IsAutoLoopEnabled)"
+                    data-active="@BuildBooleanDataAttribute(IsAutoLoopEnabled)"
+                    data-test="@UiTestIds.Teleprompter.AutoLoopToggle">
+                <UiIcon Kind="UiIconKind.Loop" Size="16" />
+            </button>
+        </TooltipAnchor>
         <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.CameraToggle" Text="@CameraTooltip">
             <button class="@CameraButtonCssClass"
                     id="@UiDomIds.Teleprompter.CameraButton"
@@ -121,8 +131,10 @@
 </div>
 
 @code {
+    [Parameter] public bool IsAutoLoopEnabled { get; set; }
     [Parameter] public bool IsCameraActive { get; set; }
     [Parameter] public bool IsReaderPlaying { get; set; }
+    [Parameter, EditorRequired] public string AutoLoopTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string BlockIndicatorLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string CameraButtonCssClass { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string CameraTooltip { get; set; } = string.Empty;
@@ -133,6 +145,7 @@
     [Parameter, EditorRequired] public string EdgeSectionLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ElapsedLabel { get; set; } = string.Empty;
     [Parameter] public EventCallback OnCameraToggle { get; set; }
+    [Parameter] public EventCallback OnAutoLoopToggle { get; set; }
     [Parameter] public EventCallback OnNextBlock { get; set; }
     [Parameter] public EventCallback OnNextWord { get; set; }
     [Parameter] public EventCallback OnPlayToggle { get; set; }

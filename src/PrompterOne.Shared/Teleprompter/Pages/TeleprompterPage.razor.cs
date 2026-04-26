@@ -75,6 +75,7 @@ public partial class TeleprompterPage : IAsyncDisposable
     private bool _isFocalGuideActive;
     private bool _isReaderCameraActive;
     private bool _isReaderCountdownActive;
+    private bool _isReaderAutoLoopEnabled = ReaderSettingsDefaults.AutoLoop;
     private bool _isReaderPlaying;
     private bool _loadState = true;
     private int _activeReaderCardIndex;
@@ -191,6 +192,7 @@ public partial class TeleprompterPage : IAsyncDisposable
         _readerSpeedCueDisplayMode = NormalizeReaderSpeedCueDisplayMode(SessionService.State.ReaderSettings.SpeedCueDisplayMode);
         _readerTextAlignment = NormalizeReaderTextAlignment(SessionService.State.ReaderSettings.TextAlignment);
         _readerTextOrientation = SessionService.State.ReaderSettings.TextOrientation;
+        _isReaderAutoLoopEnabled = SessionService.State.ReaderSettings.AutoLoop;
         _activeReaderCardIndex = 0;
         _activeReaderWordIndex = -1;
         _activeReaderPauseChunkIndex = null;

@@ -12,5 +12,6 @@ public sealed record ReaderSettings(
     bool ShowFocusLine = ReaderSettingsDefaults.ShowFocusLine,
     bool ShowProgress = ReaderSettingsDefaults.ShowProgress,
     bool ShowCameraScene = ReaderSettingsDefaults.ShowCameraScene,
+    bool AutoLoop = ReaderSettingsDefaults.AutoLoop,
     int FocalPointPercent = ReaderSettingsDefaults.FocalPointPercent,
     ReaderSpeedCueDisplayMode SpeedCueDisplayMode = ReaderSettingsDefaults.SpeedCueDisplayMode);

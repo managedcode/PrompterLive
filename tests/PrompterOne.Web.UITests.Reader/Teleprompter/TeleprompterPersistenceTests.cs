@@ -40,6 +40,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider), PersistedTextWidthValue);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), PersistedFocalPointValue);
             await page.GetByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
+            await page.GetByTestId(UiTestIds.Teleprompter.AutoLoopToggle).ClickAsync();
             var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
             var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
             var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
@@ -70,6 +71,7 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
             await Assert.That(RoundStoredReaderSetting((decimal)storedSettings.TextWidth)).IsEqualTo(expectedTextWidth);
             await Assert.That(storedSettings.ScrollSpeed).IsEqualTo(expectedSpeedWpm);
             await Assert.That(storedSettings.TextAlignment).IsEqualTo(ReaderTextAlignment.Justify);
+            await Assert.That(storedSettings.AutoLoop).IsFalse();
 
             await BrowserRouteDriver.ReloadPageAsync(
                 page,
@@ -89,6 +91,8 @@ public sealed class TeleprompterPersistenceTests(StandaloneAppFixture fixture)
                 .ToHaveAttributeAsync("style", new Regex(Regex.Escape(PersistedFontStyleFragment), RegexOptions.Compiled));
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.ClusterWrap))
                 .ToHaveAttributeAsync(BrowserTestConstants.TeleprompterFlow.ReaderTextAlignmentAttribute, PersistedTextAlignmentValue);
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.AutoLoopToggle))
+                .ToHaveAttributeAsync("aria-pressed", "false");
         });
 
     private static decimal RoundStoredReaderSetting(decimal value) =>

@@ -9,6 +9,8 @@ namespace PrompterOne.Web.UITests;
 public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fixture)
     : AppUiTestBase(fixture)
 {
+    private const int MaximumReaderSpeedWpm = 500;
+    private const int SpeedStepWpm = 10;
     private readonly record struct ReaderTransitionSample(double OutgoingTop, double IncomingTop);
 
     [Test]
@@ -42,6 +44,48 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
                     new() { Timeout = BrowserTestConstants.Timing.ReaderAutomaticTransitionTimeoutMs });
 
             await AssertReaderTimeContinuesAdvancingAsync(page);
+        });
+
+    [Test]
+    public Task Teleprompter_PlaybackStopsAtFinalWordWhenAutoLoopIsOff() =>
+        RunPageAsync(async page =>
+        {
+            await OpenLeadershipTeleprompterAsync(page);
+            await SetPlaybackToMaximumSpeedAsync(page);
+            await page.GetByTestId(UiTestIds.Teleprompter.AutoLoopToggle).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.AutoLoopToggle))
+                .ToHaveAttributeAsync("aria-pressed", "false");
+
+            var initialBlockIndicator = await page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator).TextContentAsync()
+                ?? string.Empty;
+            var totalBlocks = ParseTotalBlocks(initialBlockIndicator);
+            var finalCardIndex = totalBlocks - 1;
+            var finalWordCount = await page.Locator($"[data-test^='{UiTestIds.Teleprompter.CardWordPrefix(finalCardIndex)}']").CountAsync();
+            await Assert.That(finalWordCount).IsGreaterThan(0);
+
+            for (var blockIndex = 1; blockIndex < totalBlocks; blockIndex++)
+            {
+                await UiInteractionDriver.ClickAndContinueAsync(
+                    page.GetByTestId(UiTestIds.Teleprompter.NextBlock),
+                    noWaitAfter: true);
+                await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
+                    .ToHaveTextAsync($"{blockIndex + 1} / {totalBlocks}");
+            }
+
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.ActiveWord))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ReaderPlaybackReadyTimeoutMs });
+
+            for (var wordIndex = 1; wordIndex < finalWordCount; wordIndex++)
+            {
+                await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+            }
+
+            await StartPlaybackAsync(page);
+
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.PlayIcon))
+                .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ReaderPlaybackAdvanceTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
+                .ToHaveTextAsync($"{totalBlocks} / {totalBlocks}");
         });
 
     [Test]
@@ -133,6 +177,43 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
         await playToggle.ClickAsync();
         await Expect(playToggle.Locator(BrowserTestConstants.Teleprompter.PauseToggleIconSelector))
             .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.ReaderPlaybackReadyTimeoutMs });
+    }
+
+    private static async Task SetPlaybackToMaximumSpeedAsync(IPage page)
+    {
+        var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
+        var speedText = await speedValue.TextContentAsync() ?? string.Empty;
+        var currentSpeed = ParseWordsPerMinuteValue(speedText);
+        var requiredClicks = Math.Max(0, (MaximumReaderSpeedWpm - currentSpeed) / SpeedStepWpm);
+
+        for (var clickIndex = 0; clickIndex < requiredClicks; clickIndex++)
+        {
+            await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
+        }
+
+        await Expect(speedValue).ToHaveTextAsync($"{MaximumReaderSpeedWpm} WPM");
+    }
+
+    private static int ParseTotalBlocks(string blockIndicator)
+    {
+        var parts = blockIndicator.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2 || !int.TryParse(parts[1], CultureInfo.InvariantCulture, out var totalBlocks))
+        {
+            throw new InvalidOperationException($"Unable to parse teleprompter block total from '{blockIndicator}'.");
+        }
+
+        return totalBlocks;
+    }
+
+    private static int ParseWordsPerMinuteValue(string speedText)
+    {
+        var tokens = speedText.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (tokens.Length == 0 || !int.TryParse(tokens[0], CultureInfo.InvariantCulture, out var parsedWpm))
+        {
+            throw new InvalidOperationException($"Unable to parse teleprompter speed value from '{speedText}'.");
+        }
+
+        return parsedWpm;
     }
 
     private static async Task AssertReaderTimeContinuesAdvancingAsync(IPage page)

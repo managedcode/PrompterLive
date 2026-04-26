@@ -10,6 +10,10 @@ public partial class TeleprompterPage
 
     private string ReaderCameraTooltip => Text(UiTextKey.TooltipToggleCameraPreview);
 
+    private string ReaderAutoLoopTooltip => _isReaderAutoLoopEnabled
+        ? Text(UiTextKey.TooltipLoopPlaybackOn)
+        : Text(UiTextKey.TooltipLoopPlaybackOff);
+
     private string ReaderNextBlockTooltip => Text(UiTextKey.TooltipNextBlock);
 
     private string ReaderNextWordTooltip => Text(UiTextKey.TooltipNextWord);

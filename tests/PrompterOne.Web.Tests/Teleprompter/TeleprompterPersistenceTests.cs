@@ -118,6 +118,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         await cut.FindByTestId(UiTestIds.Teleprompter.AlignmentJustify).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.OrientationToggle).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Teleprompter.AutoLoopToggle).ClickAsync();
         await cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle).ClickAsync();
 
         cut.WaitForAssertion(() =>
@@ -156,13 +157,16 @@ public sealed class TeleprompterPersistenceTests : BunitContext
             Assert.Equal(ReaderTextAlignment.Justify, savedSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, savedSettings.TextOrientation);
             Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, savedSettings.SpeedCueDisplayMode);
+            Assert.False(savedSettings.AutoLoop);
             Assert.Equal(expectedShowCameraScene, savedSettings.ShowCameraScene);
+            Assert.Equal("false", cut.FindByTestId(UiTestIds.Teleprompter.AutoLoopToggle).GetAttribute("aria-pressed"));
             Assert.Equal(expectedCameraAttribute, cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground).GetAttribute("data-camera-autostart"));
             Assert.True(harness.Session.State.ReaderSettings.MirrorText);
             Assert.True(harness.Session.State.ReaderSettings.MirrorVertical);
             Assert.Equal(ReaderTextAlignment.Justify, harness.Session.State.ReaderSettings.TextAlignment);
             Assert.Equal(ReaderTextOrientation.Portrait, harness.Session.State.ReaderSettings.TextOrientation);
             Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, harness.Session.State.ReaderSettings.SpeedCueDisplayMode);
+            Assert.False(harness.Session.State.ReaderSettings.AutoLoop);
             Assert.Equal(expectedUpdatedSpeedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
             Assert.Equal(expectedShowCameraScene, harness.Session.State.ReaderSettings.ShowCameraScene);
         }, PersistenceAssertionTimeout);

@@ -411,6 +411,14 @@ public partial class TeleprompterPage
             return GetCurrentWordDelayMilliseconds();
         }
 
+        if (!_isReaderAutoLoopEnabled && _activeReaderCardIndex == _cards.Count - 1)
+        {
+            StopReaderPlaybackLoop();
+            UpdateReaderDisplayState(requestAlignment: false);
+            await InvokeAsync(StateHasChanged);
+            return MinimumReaderLoopDelayMilliseconds;
+        }
+
         //  Playback loop always advances upward — even when wrapping
         //  from the last card back to index 0. Without an explicit
         //  direction, the wrap would compare 0 < lastIndex and fire

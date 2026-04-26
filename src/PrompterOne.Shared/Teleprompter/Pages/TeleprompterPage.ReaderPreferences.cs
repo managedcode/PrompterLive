@@ -26,6 +26,15 @@ public partial class TeleprompterPage
             ShowCameraScene = _isReaderCameraActive
         });
 
+    private async Task ToggleReaderAutoLoopAsync()
+    {
+        _isReaderAutoLoopEnabled = !_isReaderAutoLoopEnabled;
+        await PersistReaderSettingsAsync(currentSettings => currentSettings with
+        {
+            AutoLoop = _isReaderAutoLoopEnabled
+        });
+    }
+
     private async Task SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode displayMode)
     {
         var normalizedDisplayMode = NormalizeReaderSpeedCueDisplayMode(displayMode);

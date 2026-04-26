@@ -5,6 +5,7 @@ public static partial class UiTestIds
     public static class Teleprompter
     {
         public const string ActiveWord = "teleprompter-active-word";
+        public const string AutoLoopToggle = "teleprompter-auto-loop-toggle";
         public const string Back = "teleprompter-back";
         public const string AlignmentCenter = "teleprompter-alignment-center";
         public const string AlignmentControls = "teleprompter-alignment-controls";

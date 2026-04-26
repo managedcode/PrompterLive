@@ -30,6 +30,7 @@ public sealed class ReaderSettingsSerializationTests
         Assert.Equal(ReaderSettingsDefaults.MirrorVertical, settings.MirrorVertical);
         Assert.Equal(ReaderSettingsDefaults.TextOrientation, settings.TextOrientation);
         Assert.Equal(ReaderSettingsDefaults.SpeedCueDisplayMode, settings.SpeedCueDisplayMode);
+        Assert.Equal(ReaderSettingsDefaults.AutoLoop, settings.AutoLoop);
         Assert.Equal(1.11d, settings.FontScale);
         Assert.Equal(0.8182d, settings.TextWidth);
     }

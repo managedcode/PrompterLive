@@ -13,6 +13,7 @@ public static class ReaderSettingsDefaults
     public const bool ShowFocusLine = true;
     public const bool ShowProgress = true;
     public const bool ShowCameraScene = false;
+    public const bool AutoLoop = true;
     public const int FocalPointPercent = 30;
     public const ReaderSpeedCueDisplayMode SpeedCueDisplayMode = ReaderSpeedCueDisplayMode.WordsPerMinute;
 }
