@@ -107,6 +107,11 @@ internal static class AiSpotlightToolParameterSets
             AiSpotlightToolParameterNames.WordsPerMinute,
             AiSpotlightToolParameterDescriptions.RsvpWordsPerMinute));
 
+    public static readonly IReadOnlyList<ScriptAgentAppToolParameter> PrepNote =
+        AiSpotlightToolParameters.Of(String(
+            AiSpotlightToolParameterNames.Text,
+            AiSpotlightToolParameterDescriptions.PrepNoteText));
+
     public static readonly IReadOnlyList<ScriptAgentAppToolParameter> Percent =
         AiSpotlightToolParameters.Of(Integer(
             AiSpotlightToolParameterNames.Percent,

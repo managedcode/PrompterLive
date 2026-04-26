@@ -1521,6 +1521,21 @@
   <data name="LearnProgressFormat" xml:space="preserve">
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
+  <data name="LearnNotesTitle" xml:space="preserve">
+    <value>Notas de preparação</value>
+  </data>
+  <data name="LearnNotesSectionFormat" xml:space="preserve">
+    <value>Seção: {0}</value>
+  </data>
+  <data name="LearnNotesPlaceholder" xml:space="preserve">
+    <value>Adicione uma nota para esta seção...</value>
+  </data>
+  <data name="LearnNotesSave" xml:space="preserve">
+    <value>Adicionar nota</value>
+  </data>
+  <data name="LearnNotesEmpty" xml:space="preserve">
+    <value>Ainda não há notas de preparação.</value>
+  </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Tela não encontrada</value>
   </data>

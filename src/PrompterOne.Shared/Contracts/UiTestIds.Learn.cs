@@ -11,6 +11,12 @@ public static partial class UiTestIds
         public const string FocusRow = "learn-focus-row";
         public const string LoopToggle = "learn-loop-toggle";
         public const string NextPhrase = "learn-next-phrase";
+        public const string NotesEmpty = "learn-notes-empty";
+        public const string NotesList = "learn-notes-list";
+        public const string NotesPanel = "learn-notes-panel";
+        public const string NotesSave = "learn-notes-save";
+        public const string NotesSection = "learn-notes-section";
+        public const string NotesTextarea = "learn-notes-textarea";
         public const string OrpLine = "learn-orp-line";
         public const string Page = "learn-page";
         public const string PauseIcon = "learn-pause-icon";
@@ -30,5 +36,7 @@ public static partial class UiTestIds
         public const string WordOrp = "learn-word-orp";
         public const string WordShell = "learn-word-shell";
         public const string WordTrailing = "learn-word-trailing";
+
+        public static string NoteItem(string id) => $"learn-note-{id}";
     }
 }

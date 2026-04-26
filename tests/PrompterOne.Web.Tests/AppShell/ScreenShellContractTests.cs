@@ -66,6 +66,8 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.Word));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.WordShell));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.OrpLine));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.NotesPanel));
+            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.NotesTextarea));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextLeft));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ContextRight));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.ProgressLabel));

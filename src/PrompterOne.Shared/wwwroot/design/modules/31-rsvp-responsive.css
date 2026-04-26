@@ -69,6 +69,38 @@
         width: 56px;
         height: 56px;
     }
+
+    .rsvp-notes {
+        top: 18px;
+        right: 18px;
+        width: min(300px, 32vw);
+        max-height: calc(100% - 36px);
+        padding: 12px;
+    }
+}
+
+@media (max-width: 980px) {
+    .rsvp-notes {
+        top: 14px;
+        right: 14px;
+        left: 14px;
+        width: auto;
+        max-height: 162px;
+        padding: 10px;
+    }
+
+    .rsvp-notes-head {
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: baseline;
+    }
+
+    .rsvp-notes-input {
+        min-height: 46px;
+    }
+
+    .rsvp-notes-list {
+        display: none;
+    }
 }
 
 @media (max-height: 430px) and (orientation: landscape) {
@@ -184,5 +216,9 @@
 
     .rsvp-pos {
         font-size: 11px;
+    }
+
+    .rsvp-notes {
+        display: none;
     }
 }

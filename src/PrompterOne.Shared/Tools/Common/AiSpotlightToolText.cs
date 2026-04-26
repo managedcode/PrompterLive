@@ -131,6 +131,8 @@ internal static class AiSpotlightToolText
     public const string LearnStepForward = "step Learn playback forward";
     public const string LearnSpeedSet = "set Learn RSVP speed";
     public const string LearnLoopToggle = "toggle Learn loop mode";
+    public const string LearnNotesList = "list Learn prep notes for the current section";
+    public const string LearnNoteAdd = "add a Learn prep note for the current section";
 
     public const string TeleprompterStateRead = "read teleprompter playback state and progress";
     public const string TeleprompterPlay = "start teleprompter playback";

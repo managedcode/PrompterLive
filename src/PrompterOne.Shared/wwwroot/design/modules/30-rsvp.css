@@ -235,6 +235,119 @@
     width: 0%;
 }
 
+.rsvp-notes {
+    position: absolute;
+    top: 56px;
+    right: 32px;
+    width: min(320px, 28vw);
+    max-height: min(420px, calc(100% - 112px));
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid rgba(245, 230, 208, .16);
+    border-radius: 8px;
+    background: rgba(10, 28, 21, .72);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .24);
+    backdrop-filter: blur(18px);
+    color: var(--t2);
+}
+
+.rsvp-notes-head {
+    display: grid;
+    gap: 4px;
+}
+
+.rsvp-notes-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--accent);
+}
+
+.rsvp-notes-section {
+    font-size: 12px;
+    line-height: 1.35;
+    color: rgba(232, 213, 176, .58);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rsvp-notes-input {
+    width: 100%;
+    min-height: 78px;
+    resize: vertical;
+    border: 1px solid rgba(245, 230, 208, .16);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .06);
+    color: var(--t1);
+    padding: 10px 11px;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+    outline: none;
+}
+
+.rsvp-notes-input:focus {
+    border-color: rgba(196, 168, 130, .78);
+    box-shadow: 0 0 0 3px rgba(196, 168, 130, .16);
+}
+
+.rsvp-notes-input::placeholder {
+    color: rgba(232, 213, 176, .38);
+}
+
+.rsvp-notes-save {
+    align-self: flex-end;
+    min-height: 32px;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: rgba(196, 168, 130, .22);
+    color: var(--t1);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.rsvp-notes-save:disabled {
+    cursor: not-allowed;
+    opacity: .42;
+}
+
+.rsvp-notes-list {
+    display: grid;
+    gap: 8px;
+    overflow: auto;
+}
+
+.rsvp-notes-empty,
+.rsvp-note p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.rsvp-notes-empty {
+    color: rgba(232, 213, 176, .46);
+}
+
+.rsvp-note {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .07);
+}
+
+.rsvp-note-anchor {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(196, 168, 130, .82);
+}
+
 .rsvp-bottom {
     display: flex;
     flex-direction: column;

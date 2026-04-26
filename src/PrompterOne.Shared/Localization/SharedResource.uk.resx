@@ -1743,6 +1743,21 @@
   <data name="LearnProgressFormat" xml:space="preserve">
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
+  <data name="LearnNotesTitle" xml:space="preserve">
+    <value>Нотатки підготовки</value>
+  </data>
+  <data name="LearnNotesSectionFormat" xml:space="preserve">
+    <value>Розділ: {0}</value>
+  </data>
+  <data name="LearnNotesPlaceholder" xml:space="preserve">
+    <value>Додайте нотатку для цього розділу...</value>
+  </data>
+  <data name="LearnNotesSave" xml:space="preserve">
+    <value>Додати нотатку</value>
+  </data>
+  <data name="LearnNotesEmpty" xml:space="preserve">
+    <value>Нотаток підготовки ще немає.</value>
+  </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Екран не знайдено</value>
   </data>

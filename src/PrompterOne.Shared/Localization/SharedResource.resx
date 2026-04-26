@@ -684,6 +684,21 @@
   <data name="LearnProgressFormat" xml:space="preserve">
     <value>{0}/{1} · {2}:{3:00}</value>
   </data>
+  <data name="LearnNotesTitle" xml:space="preserve">
+    <value>Prep notes</value>
+  </data>
+  <data name="LearnNotesSectionFormat" xml:space="preserve">
+    <value>Section: {0}</value>
+  </data>
+  <data name="LearnNotesPlaceholder" xml:space="preserve">
+    <value>Add a note for this section...</value>
+  </data>
+  <data name="LearnNotesSave" xml:space="preserve">
+    <value>Add note</value>
+  </data>
+  <data name="LearnNotesEmpty" xml:space="preserve">
+    <value>No prep notes yet.</value>
+  </data>
   <data name="RoutesNotFoundTitle" xml:space="preserve">
     <value>Screen not found</value>
   </data>

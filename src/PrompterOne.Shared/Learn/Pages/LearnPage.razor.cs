@@ -3,6 +3,7 @@ using PrompterOne.Core.Abstractions;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Shared.Contracts;
+using PrompterOne.Shared.Learn.Services;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
@@ -33,6 +34,7 @@ public partial class LearnPage : IAsyncDisposable
     [Inject] private IScriptSessionService SessionService { get; set; } = null!;
     [Inject] private AppShellService Shell { get; set; } = null!;
     [Inject] private LearnRsvpLayoutInterop LearnRsvpLayoutInterop { get; set; } = null!;
+    [Inject] private LearnPrepNotesStore PrepNotesStore { get; set; } = null!;
     [Inject] private RsvpTextProcessor TextProcessor { get; set; } = null!;
 
     [Parameter]
@@ -62,7 +64,9 @@ public partial class LearnPage : IAsyncDisposable
     private string _currentWordLeading = string.Empty;
     private string _currentWordOrp = string.Empty;
     private string _currentWordTrailing = string.Empty;
+    private string _prepNoteDraft = string.Empty;
     private IReadOnlyList<string> _leftContextWords = [];
+    private IReadOnlyList<LearnPrepNote> _prepNotes = [];
     private IReadOnlyList<string> _rightContextWords = [];
     private IReadOnlyList<RsvpTimelineEntry> _timeline = [];
 
@@ -88,6 +92,7 @@ public partial class LearnPage : IAsyncDisposable
                     await Bootstrapper.EnsureReadyAsync();
                     await EnsureSessionLoadedAsync();
                     PopulateLearnState();
+                    await LoadPrepNotesAsync();
                     StateHasChanged();
                 });
             return;

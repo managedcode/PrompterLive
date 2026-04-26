@@ -20,6 +20,7 @@ using PrompterOne.Core.Services.Preview;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Core.Services.Streaming;
 using PrompterOne.Core.Services.Workspace;
+using PrompterOne.Shared.Learn.Services;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services;
 using PrompterOne.Shared.Services.Diagnostics;
@@ -134,6 +135,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton<EditorDocumentSaveCoordinator>();
         context.Services.AddSingleton<EditorLocalRevisionStore>();
         context.Services.AddSingleton<EditorBlockAttachmentStore>();
+        context.Services.AddSingleton<LearnPrepNotesStore>();
         context.Services.AddSingleton<GoLiveBlockTakeStore>();
         context.Services.AddSingleton<IMediaSceneService>(sceneService);
         context.Services.AddSingleton<IMediaPermissionService>(permissionService);

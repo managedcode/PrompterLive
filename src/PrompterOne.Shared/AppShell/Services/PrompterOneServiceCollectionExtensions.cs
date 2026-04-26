@@ -15,6 +15,7 @@ using PrompterOne.Core.Services.Preview;
 using PrompterOne.Core.Services.Rsvp;
 using PrompterOne.Core.Services.Streaming;
 using PrompterOne.Core.Services.Workspace;
+using PrompterOne.Shared.Learn.Services;
 using PrompterOne.Shared.Localization;
 using PrompterOne.Shared.Services.Diagnostics;
 using PrompterOne.Shared.Services.Editor;
@@ -108,6 +109,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<BrowserMediaCaptureCapabilitiesService>();
         services.AddScoped<CameraPreviewInterop>();
         services.AddScoped<LearnRsvpLayoutInterop>();
+        services.AddScoped<LearnPrepNotesStore>();
         services.AddScoped<MicrophoneLevelInterop>();
         services.AddScoped<TeleprompterReaderInterop>();
         services.AddScoped<KineticReaderInterop>();

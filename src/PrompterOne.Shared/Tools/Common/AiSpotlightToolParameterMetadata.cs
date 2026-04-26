@@ -56,6 +56,7 @@ internal static class AiSpotlightToolParameterDescriptions
     public const string MediaSourceId = "Camera, microphone, stream, or recording source identifier.";
     public const string MicrophoneDeviceId = "Browser microphone device identifier.";
     public const string Percent = "Target percentage value.";
+    public const string PrepNoteText = "Prep note text for the current Learn section.";
     public const string ProgramLayout = "Program layout preset.";
     public const string ReplacementText = "Replacement script text.";
     public const string RsvpWordsPerMinute = "Target RSVP words per minute.";

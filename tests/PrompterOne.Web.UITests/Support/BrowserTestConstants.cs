@@ -142,6 +142,9 @@ internal static partial class BrowserTestConstants
         public const string ShortcutNavigationScenarioName = "learn-keyboard-navigation-shortcuts";
         public const string ShortcutNavigationStep = "01-word-navigation";
         public const string LoopPressedValue = "true";
+        public const string PrepNoteScenarioName = "learn-prep-notes";
+        public const string PrepNoteStep = "01-section-note";
+        public const string PrepNoteText = "Hold eye contact before the launch metric.";
         public const string SpeedAfterDecreaseText = "250";
         public const string SpeedAfterIncreaseText = "260";
     }

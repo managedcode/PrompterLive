@@ -131,6 +131,8 @@ internal static class AiSpotlightToolNames
     public const string LearnStepForward = "learn_step_forward";
     public const string LearnSpeedSet = "learn_speed_set";
     public const string LearnLoopToggle = "learn_loop_toggle";
+    public const string LearnNotesList = "learn_notes_list";
+    public const string LearnNoteAdd = "learn_note_add";
 
     public const string TeleprompterStateRead = "teleprompter_state_read";
     public const string TeleprompterPlay = "teleprompter_play";

@@ -75,6 +75,46 @@
             <div class="rsvp-pause-track">
                 <div id="@UiDomIds.Learn.PauseFill" class="rsvp-pause-fill"></div>
             </div>
+
+            <aside class="rsvp-notes"
+                   data-test="@UiTestIds.Learn.NotesPanel"
+                   @onkeydown:stopPropagation="true">
+                <div class="rsvp-notes-head">
+                    <span class="rsvp-notes-title">@Text(UiTextKey.LearnNotesTitle)</span>
+                    <span class="rsvp-notes-section" data-test="@UiTestIds.Learn.NotesSection">@CurrentPrepNotesSectionLabel</span>
+                </div>
+                <textarea class="rsvp-notes-input"
+                          rows="3"
+                          value="@_prepNoteDraft"
+                          placeholder="@Text(UiTextKey.LearnNotesPlaceholder)"
+                          aria-label="@Text(UiTextKey.LearnNotesTitle)"
+                          @oninput="HandlePrepNoteDraftChanged"
+                          data-test="@UiTestIds.Learn.NotesTextarea"></textarea>
+                <button class="rsvp-notes-save"
+                        type="button"
+                        disabled="@(!CanAddPrepNote)"
+                        @onclick="AddPrepNoteAsync"
+                        data-test="@UiTestIds.Learn.NotesSave">@Text(UiTextKey.LearnNotesSave)</button>
+                <div class="rsvp-notes-list" data-test="@UiTestIds.Learn.NotesList">
+                    @{
+                        var currentNotes = CurrentSectionPrepNotes;
+                    }
+                    @if (currentNotes.Count == 0)
+                    {
+                        <p class="rsvp-notes-empty" data-test="@UiTestIds.Learn.NotesEmpty">@Text(UiTextKey.LearnNotesEmpty)</p>
+                    }
+                    else
+                    {
+                        @foreach (var note in currentNotes)
+                        {
+                            <article class="rsvp-note" data-test="@UiTestIds.Learn.NoteItem(note.Id)">
+                                <span class="rsvp-note-anchor">@note.AnchorWord</span>
+                                <p>@note.Text</p>
+                            </article>
+                        }
+                    }
+                </div>
+            </aside>
         </div>
 
         <div class="rsvp-bottom">

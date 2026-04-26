@@ -14,6 +14,8 @@ internal static class AiSpotlightLearnToolCatalog
         AddMutation(tools, AiSpotlightToolNames.LearnStepForward, UiTextKey.TooltipForwardOneWord, AiSpotlightToolText.LearnStepForward);
         AddMutation(tools, AiSpotlightToolNames.LearnSpeedSet, UiTextKey.LearnWpm, AiSpotlightToolText.LearnSpeedSet, AiSpotlightToolParameterSets.RsvpSpeed);
         AddMutation(tools, AiSpotlightToolNames.LearnLoopToggle, UiTextKey.TooltipLoopPlaybackOn, AiSpotlightToolText.LearnLoopToggle, idempotent: false);
+        AddReadOnly(tools, AiSpotlightToolNames.LearnNotesList, UiTextKey.LearnNotesTitle, AiSpotlightToolText.LearnNotesList);
+        AddMutation(tools, AiSpotlightToolNames.LearnNoteAdd, UiTextKey.LearnNotesSave, AiSpotlightToolText.LearnNoteAdd, AiSpotlightToolParameterSets.PrepNote);
     }
 
     private static void AddReadOnly(List<AiSpotlightTool> tools, string name, UiTextKey label, string prompt) =>
