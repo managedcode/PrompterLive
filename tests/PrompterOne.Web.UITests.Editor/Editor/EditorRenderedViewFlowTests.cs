@@ -55,6 +55,10 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
 
             await Expect(page.GetByTestId(UiTestIds.Editor.RenderedView))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            await Expect(page.GetByTestId(UiTestIds.Editor.SourceTab)).ToHaveTextAsync("Raw");
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedTab)).ToHaveTextAsync("Rendered");
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedView))
+                .ToHaveAttributeAsync("data-rendered-authoring-mode", "visual");
             var renderedViewColor = await ReadCssColorAsync(page.GetByTestId(UiTestIds.Editor.RenderedView), BackgroundColorProperty);
             await Assert.That(HasMaximumChannels(renderedViewColor, MaximumDarkCardsSurfaceChannel)).IsTrue().Because($"Expected dark-theme cards view to avoid a white paper surface, but got rgba({renderedViewColor.R:0.##}, {renderedViewColor.G:0.##}, {renderedViewColor.B:0.##}, {renderedViewColor.A:0.##}).");
             var renderedBlock = page.GetByTestId(UiTestIds.Editor.RenderedBlockText(IntroSegmentIndex, OpeningBlockIndex));
@@ -67,6 +71,12 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
             await Assert.That(renderedValue).DoesNotContain(RawHeadingMarker);
             await Assert.That(renderedValue).DoesNotContain(RawTagOpen);
             await Assert.That(renderedValue).DoesNotContain(RawTagClose);
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedSegmentCues(IntroSegmentIndex)))
+                .ToContainTextAsync("WPM");
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedBlockCues(IntroSegmentIndex, OpeningBlockIndex)))
+                .ToContainTextAsync("WPM");
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedBlockCues(IntroSegmentIndex, OpeningBlockIndex)).Locator("[data-cue-kind='pace']"))
+                .ToBeVisibleAsync();
 
             await renderedBlock.FillAsync(BrowserTestConstants.Editor.RenderedOpeningRewrite);
             await Expect(renderedBlock).ToHaveValueAsync(BrowserTestConstants.Editor.RenderedOpeningRewrite);
@@ -101,14 +111,29 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
 
             await EditorMonacoDriver.SetTextAsync(page, ReorderScript);
             await page.GetByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedBlockCues(IntroSegmentIndex, OpeningBlockIndex)))
+                .ToContainTextAsync("Warm");
+            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedBlockCues(IntroSegmentIndex, OpeningBlockIndex)).Locator("[data-cue-kind='emotion']").First)
+                .ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Editor.RenderedView))
                 .ToHaveAttributeAsync("data-rendered-cards-drag-ready", "true");
+            var boardMetrics = await ReadRenderedBoardMetricsAsync(page);
+            await Assert.That(boardMetrics.ColumnCount)
+                .IsGreaterThanOrEqualTo(BrowserTestConstants.Editor.RenderedCardsMinimumBoardColumns)
+                .Because("Cards view should use the available workspace as a multi-column board, not one narrow vertical list.");
+            await Assert.That(boardMetrics.OverflowRightPx)
+                .IsLessThanOrEqualTo(BrowserTestConstants.Editor.RenderedCardsColumnTolerancePx)
+                .Because("The multi-column cards board should fit inside the visible segment lane.");
             var dragHandle = page.GetByTestId(UiTestIds.Editor.RenderedBlockDragHandle(IntroSegmentIndex, ClosingBlockIndex));
-            await Expect(page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, ClosingBlockIndex)))
+            var draggedBlock = page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, ClosingBlockIndex));
+            var targetBlock = page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, OpeningBlockIndex));
+            await Expect(draggedBlock)
                 .ToHaveAttributeAsync("draggable", "false");
             await DragHandleToAsync(
+                page,
                 dragHandle,
-                page.GetByTestId(UiTestIds.Editor.RenderedBlock(IntroSegmentIndex, OpeningBlockIndex)));
+                targetBlock,
+                draggedBlock);
             await page.GetByTestId(UiTestIds.Editor.SourceTab).ClickAsync();
             await Expect(sourceInput)
                 .ToHaveValueAsync(
@@ -121,7 +146,7 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
             await Assert.That(sourceValue).Contains("Charlie closing block.");
         });
 
-    private static async Task DragHandleToAsync(ILocator handle, ILocator target)
+    private static async Task DragHandleToAsync(IPage page, ILocator handle, ILocator target, ILocator dragged)
     {
         var handleBox = await handle.BoundingBoxAsync();
         var targetBox = await target.BoundingBoxAsync();
@@ -140,6 +165,10 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
 
         await handle.DispatchEventAsync("mousedown", mouseDown);
         await target.DispatchEventAsync("mousemove", mouseMove);
+        await Expect(page.GetByTestId(UiTestIds.Editor.RenderedView))
+            .ToHaveAttributeAsync("data-rendered-cards-dragging", "true");
+        await Expect(dragged).ToHaveClassAsync(new Regex("editor-rendered-block--dragging"));
+        await Expect(target).ToHaveClassAsync(new Regex("editor-rendered-block--drop-target"));
         await target.DispatchEventAsync("mouseup", mouseUp);
     }
 
@@ -227,6 +256,34 @@ public sealed class EditorRenderedViewFlowTests(StandaloneAppFixture fixture) : 
             }
             """,
             propertyName);
+
+    private static Task<RenderedBoardMetrics> ReadRenderedBoardMetricsAsync(IPage page) =>
+        page.GetByTestId(UiTestIds.Editor.RenderedSegment(IntroSegmentIndex))
+            .EvaluateAsync<RenderedBoardMetrics>(
+                """
+                segment => {
+                    const segmentRect = segment.getBoundingClientRect();
+                    const blocks = Array.from(segment.querySelectorAll(".editor-rendered-block"));
+                    const lefts = [];
+                    for (const block of blocks) {
+                        const rect = block.getBoundingClientRect();
+                        if (!lefts.some(left => Math.abs(left - rect.left) <= 4)) {
+                            lefts.push(rect.left);
+                        }
+                    }
+
+                    const overflowRightPx = blocks.reduce((overflow, block) => {
+                        const rect = block.getBoundingClientRect();
+                        return Math.max(overflow, rect.right - segmentRect.right);
+                    }, 0);
+                    return {
+                        columnCount: lefts.length,
+                        overflowRightPx
+                    };
+                }
+                """);
+
+    private readonly record struct RenderedBoardMetrics(int ColumnCount, double OverflowRightPx);
 
     private readonly record struct CssColor(double R, double G, double B, double A);
 }

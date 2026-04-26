@@ -349,7 +349,7 @@
     <value>From script library to live delivery</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Start in Library, write or import a script in Editor, switch to Cards when you want visual editing without TPS syntax, rehearse in Practice, read in Teleprompter, and use Go Live when you are ready to record or stream.</value>
+    <value>Start in Library, write or import a script in Editor, switch to Rendered when you want visual editing without TPS syntax, rehearse in Practice, read in Teleprompter, and use Go Live when you are ready to record or stream.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>TPS standard basics</value>
@@ -367,7 +367,7 @@
     <value>Choose the surface that matches the job</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source is for raw TPS editing, Cards is for rendered block editing, Graph shows the script structure, Practice uses RSVP for word-by-word practice, Teleprompter is the live reader, and Go Live combines reading with camera, recording, and streaming controls.</value>
+    <value>Raw is for direct TPS source editing, Rendered is for visual block editing without raw syntax, Graph shows the script structure, Practice uses RSVP for word-by-word practice, Teleprompter is the live reader, and Go Live combines reading with camera, recording, and streaming controls.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Local files and history</value>
@@ -2911,10 +2911,10 @@
     <value>Group the script by knowledge, structure, and delivery cues.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
-    <value>Source</value>
+    <value>Raw</value>
   </data>
   <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
-    <value>Cards</value>
+    <value>Rendered</value>
   </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Graph</value>

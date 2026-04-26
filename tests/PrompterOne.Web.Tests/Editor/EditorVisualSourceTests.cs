@@ -90,6 +90,18 @@ public sealed class EditorVisualSourceTests : BunitContext
                 .GetAttribute("value") ?? string.Empty;
 
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedView));
+            Assert.Equal("visual", cut.FindByTestId(UiTestIds.Editor.RenderedView).GetAttribute("data-rendered-authoring-mode"));
+            Assert.Contains(
+                "Warm",
+                cut.FindByTestId(UiTestIds.Editor.RenderedSegmentCues(EditorVisualTestSource.IntroSegmentIndex)).TextContent,
+                StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(
+                "140WPM",
+                cut.FindByTestId(UiTestIds.Editor.RenderedBlockCues(
+                        EditorVisualTestSource.IntroSegmentIndex,
+                        EditorVisualTestSource.OpeningBlockIndex))
+                    .TextContent,
+                StringComparison.OrdinalIgnoreCase);
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedBlockDragHandle(
                 EditorVisualTestSource.IntroSegmentIndex,
                 EditorVisualTestSource.OpeningBlockIndex)));

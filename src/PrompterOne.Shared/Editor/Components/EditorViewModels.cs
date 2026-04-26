@@ -53,6 +53,7 @@ public sealed record EditorRenderedSegmentViewModel(
     string EmotionLabel,
     string TargetWpmLabel,
     string DurationLabel,
+    IReadOnlyList<EditorRenderedCueViewModel> Cues,
     IReadOnlyList<EditorRenderedBlockViewModel> Blocks);
 
 public sealed record EditorRenderedBlockViewModel(
@@ -64,7 +65,14 @@ public sealed record EditorRenderedBlockViewModel(
     string EmotionLabel,
     string TargetWpmLabel,
     string Text,
+    IReadOnlyList<EditorRenderedCueViewModel> Cues,
     IReadOnlyList<EditorBlockAttachmentViewModel> Attachments);
+
+public sealed record EditorRenderedCueViewModel(
+    string Kind,
+    string Icon,
+    string Label,
+    string Tone);
 
 public sealed record EditorBlockAttachmentViewModel(
     string Id,

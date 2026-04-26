@@ -337,7 +337,7 @@
     <value>Von der Skriptbibliothek bis zur Live-Ausgabe</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Beginnen Sie in Library, schreiben oder importieren Sie ein Skript in Editor, wechseln Sie zu Cards, wenn Sie visuell ohne TPS-Syntax bearbeiten möchten, proben Sie in Practice, lesen Sie in Teleprompter und verwenden Sie Go Live, wenn Sie aufnehmen oder streamen möchten.</value>
+    <value>Beginnen Sie in Library, schreiben oder importieren Sie ein Skript in Editor, wechseln Sie zu Rendered, wenn Sie visuell ohne TPS-Syntax bearbeiten möchten, proben Sie in Practice, lesen Sie in Teleprompter und verwenden Sie Go Live, wenn Sie aufnehmen oder streamen möchten.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>TPS-Standardgrundlagen</value>
@@ -355,7 +355,7 @@
     <value>Wählen Sie die Oberfläche für die jeweilige Aufgabe</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source dient der direkten TPS-Bearbeitung, Cards der Bearbeitung gerenderter Blöcke, Graph zeigt die Skriptstruktur, Practice nutzt RSVP für Wort-für-Wort-Übung, Teleprompter ist der Live-Reader, und Go Live kombiniert Lesen mit Kamera-, Aufnahme- und Streaming-Steuerung.</value>
+    <value>Raw dient der direkten TPS-Quellbearbeitung, Rendered der visuellen Blockbearbeitung ohne rohen Syntax, Graph zeigt die Skriptstruktur, Practice nutzt RSVP für Wort-für-Wort-Übung, Teleprompter ist der Live-Reader, und Go Live kombiniert Lesen mit Kamera-, Aufnahme- und Streaming-Steuerung.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Lokale Dateien und Verlauf</value>
@@ -1681,10 +1681,10 @@
     <value>Gruppiert das Skript nach Wissen, Struktur und Vortragshinweisen.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
-    <value>Quelle</value>
+    <value>Raw</value>
   </data>
   <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
-    <value>Karten</value>
+    <value>Rendered</value>
   </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Graph</value>

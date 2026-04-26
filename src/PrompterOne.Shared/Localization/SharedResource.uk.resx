@@ -349,7 +349,7 @@
     <value>Від бібліотеки сценаріїв до живої подачі</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Почніть у Library, напишіть або імпортуйте сценарій в Editor, перейдіть у Cards, коли потрібне візуальне редагування без синтаксису TPS, репетируйте в Practice, читайте в Teleprompter і використовуйте Go Live, коли готові записувати або транслювати.</value>
+    <value>Почніть у Library, напишіть або імпортуйте сценарій в Editor, перейдіть у Rendered, коли потрібне візуальне редагування без синтаксису TPS, репетируйте в Practice, читайте в Teleprompter і використовуйте Go Live, коли готові записувати або транслювати.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Основи стандарту TPS</value>
@@ -367,7 +367,7 @@
     <value>Виберіть поверхню під конкретну задачу</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source призначений для сирого редагування TPS, Cards — для редагування відрендерених блоків, Graph показує структуру сценарію, Practice використовує RSVP для практики слово за словом, Teleprompter є живим рідером, а Go Live поєднує читання з камерою, записом і керуванням трансляцією.</value>
+    <value>Raw призначений для прямого редагування TPS-джерела, Rendered — для візуального редагування блоків без сирого синтаксису, Graph показує структуру сценарію, Practice використовує RSVP для практики слово за словом, Teleprompter є живим рідером, а Go Live поєднує читання з камерою, записом і керуванням трансляцією.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Локальні файли та історія</value>
@@ -1702,10 +1702,10 @@
     <value>Групує скрипт за знаннями, структурою та підказками подачі.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
-    <value>Джерело</value>
+    <value>Raw</value>
   </data>
   <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
-    <value>Картки</value>
+    <value>Rendered</value>
   </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Граф</value>

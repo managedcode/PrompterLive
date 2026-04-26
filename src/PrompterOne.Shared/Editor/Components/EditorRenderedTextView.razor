@@ -9,6 +9,7 @@
 
 <div class="editor-rendered-view"
      @ref="_rootElement"
+     data-rendered-authoring-mode="visual"
      data-test="@UiTestIds.Editor.RenderedView">
     <div class="editor-rendered-strip" data-test="@UiTestIds.Editor.RenderedStrip">
         @if (Segments.Count == 0)
@@ -39,6 +40,22 @@
                             <span>@segment.DurationLabel</span>
                         }
                     </div>
+                    @if (segment.Cues.Count > 0)
+                    {
+                        <div class="editor-rendered-cue-row editor-rendered-cue-row--segment"
+                             aria-label="@segment.Name"
+                             data-test="@UiTestIds.Editor.RenderedSegmentCues(segment.Index)">
+                            @foreach (var cue in segment.Cues)
+                            {
+                                <span class="editor-rendered-cue-chip"
+                                      data-cue-kind="@cue.Kind"
+                                      data-cue-tone="@cue.Tone">
+                                    <span class="editor-rendered-cue-icon" aria-hidden="true">@cue.Icon</span>
+                                    <span class="editor-rendered-cue-label">@cue.Label</span>
+                                </span>
+                            }
+                        </div>
+                    }
 
                     @foreach (var block in segment.Blocks)
                     {
@@ -76,6 +93,22 @@
                                     </label>
                                 </span>
                             </div>
+                            @if (block.Cues.Count > 0)
+                            {
+                                <div class="editor-rendered-cue-row"
+                                     aria-label="@block.Name"
+                                     data-test="@UiTestIds.Editor.RenderedBlockCues(block.SegmentIndex, block.BlockIndex)">
+                                    @foreach (var cue in block.Cues)
+                                    {
+                                        <span class="editor-rendered-cue-chip"
+                                              data-cue-kind="@cue.Kind"
+                                              data-cue-tone="@cue.Tone">
+                                            <span class="editor-rendered-cue-icon" aria-hidden="true">@cue.Icon</span>
+                                            <span class="editor-rendered-cue-label">@cue.Label</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
                             <textarea class="editor-rendered-text"
                                       aria-label="@block.Name"
                                       data-test="@UiTestIds.Editor.RenderedBlockText(block.SegmentIndex, block.BlockIndex)"

@@ -59,6 +59,28 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
                     BrowserTestConstants.Editor.GraphReadyAttributeName,
                     BrowserTestConstants.Editor.GraphReadyAttributeValue,
                     new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+            var graphCanvasFit = await ReadGraphCanvasFitProbeAsync(page);
+            await Assert.That(graphCanvasFit.HostWidth)
+                .IsGreaterThanOrEqualTo(graphCanvasFit.PanelWidth - BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The graph host should span the full graph panel width.");
+            await Assert.That(graphCanvasFit.HostHeight)
+                .IsGreaterThanOrEqualTo(BrowserTestConstants.Editor.GraphCanvasMinimumVisibleHeightPx)
+                .Because("The graph host should use the available editor workspace instead of collapsing to a clipped viewport.");
+            await Assert.That(graphCanvasFit.HostBottomDelta)
+                .IsBetween(0, BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The graph host should fill the panel's remaining vertical space to the bottom edge.");
+            await Assert.That(graphCanvasFit.SurfaceWidthDelta)
+                .IsBetween(0, BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The rendered G6 canvas should match the graph host width.");
+            await Assert.That(graphCanvasFit.SurfaceHeightDelta)
+                .IsBetween(0, BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The rendered G6 canvas should match the graph host height.");
+            await Assert.That(graphCanvasFit.ViewportWidthDelta)
+                .IsBetween(0, BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The G6 viewport width should be synchronized from the graph host.");
+            await Assert.That(graphCanvasFit.ViewportHeightDelta)
+                .IsBetween(0, BrowserTestConstants.Editor.GraphCanvasFitTolerancePx)
+                .Because("The G6 viewport height should be synchronized from the graph host.");
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphLayoutMode))
                 .ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
             await Expect(page.GetByTestId(UiTestIds.Editor.GraphOnlyToggle))
@@ -519,6 +541,25 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
         public string NodeStyle { get; set; } = string.Empty;
     }
 
+    private sealed class GraphCanvasFitProbe
+    {
+        public double PanelWidth { get; set; }
+
+        public double HostWidth { get; set; }
+
+        public double HostHeight { get; set; }
+
+        public double HostBottomDelta { get; set; }
+
+        public double SurfaceWidthDelta { get; set; }
+
+        public double SurfaceHeightDelta { get; set; }
+
+        public double ViewportWidthDelta { get; set; }
+
+        public double ViewportHeightDelta { get; set; }
+    }
+
     private sealed class GraphTooltipAnchorProbe
     {
         public bool Visible { get; set; }
@@ -544,4 +585,29 @@ public sealed class EditorScriptGraphViewTests(StandaloneAppFixture fixture)
                         .map(node => node.type)))
                 """,
                 BrowserTestConstants.Editor.GraphLaneNodePrefix);
+
+    private static Task<GraphCanvasFitProbe> ReadGraphCanvasFitProbeAsync(IPage page) =>
+        page.GetByTestId(UiTestIds.Editor.GraphCanvas)
+            .EvaluateAsync<GraphCanvasFitProbe>(
+                """
+                element => {
+                    const panel = element.closest('[data-test="editor-graph-panel"]');
+                    const surface = element.querySelector("canvas");
+                    const panelRect = panel?.getBoundingClientRect() ?? new DOMRect();
+                    const hostRect = element.getBoundingClientRect();
+                    const surfaceRect = surface?.getBoundingClientRect() ?? new DOMRect();
+                    const viewportWidth = Number(element.dataset.graphViewportWidth || 0);
+                    const viewportHeight = Number(element.dataset.graphViewportHeight || 0);
+                    return {
+                        panelWidth: panelRect.width,
+                        hostWidth: hostRect.width,
+                        hostHeight: hostRect.height,
+                        hostBottomDelta: Math.abs(panelRect.bottom - hostRect.bottom),
+                        surfaceWidthDelta: Math.abs(surfaceRect.width - hostRect.width),
+                        surfaceHeightDelta: Math.abs(surfaceRect.height - hostRect.height),
+                        viewportWidthDelta: Math.abs(viewportWidth - hostRect.width),
+                        viewportHeightDelta: Math.abs(viewportHeight - hostRect.height)
+                    };
+                }
+                """);
 }

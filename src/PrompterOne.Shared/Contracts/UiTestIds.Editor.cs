@@ -193,6 +193,8 @@ public static partial class UiTestIds
 
         public static string RenderedBlockDragHandle(int segmentIndex, int blockIndex) => $"editor-rendered-block-drag-handle-{segmentIndex}-{blockIndex}";
 
+        public static string RenderedBlockCues(int segmentIndex, int blockIndex) => $"editor-rendered-block-cues-{segmentIndex}-{blockIndex}";
+
         public static string RenderedBlockAttachment(int segmentIndex, int blockIndex, int attachmentIndex) =>
             $"editor-rendered-block-attachment-{segmentIndex}-{blockIndex}-{attachmentIndex}";
 
@@ -207,6 +209,8 @@ public static partial class UiTestIds
         public static string RenderedBlockMoveUp(int segmentIndex, int blockIndex) => $"editor-rendered-block-move-up-{segmentIndex}-{blockIndex}";
 
         public static string RenderedBlockText(int segmentIndex, int blockIndex) => $"editor-rendered-block-text-{segmentIndex}-{blockIndex}";
+
+        public static string RenderedSegmentCues(int segmentIndex) => $"editor-rendered-segment-cues-{segmentIndex}";
 
         public static string RenderedSegment(int segmentIndex) => $"editor-rendered-segment-{segmentIndex}";
 

@@ -7,6 +7,8 @@
     --editor-rendered-control-hover: color-mix(in srgb, var(--gold-09) 70%, var(--bg-4));
     --editor-rendered-drop: color-mix(in srgb, var(--gold-10) 22%, transparent);
     --editor-rendered-drop-line: color-mix(in srgb, var(--gold) 72%, transparent);
+    --editor-rendered-lane: color-mix(in srgb, var(--bg-3) 54%, transparent);
+    --editor-rendered-lift-shadow: 0 22px 48px color-mix(in srgb, var(--bg-deep) 46%, transparent);
     display: flex;
     flex: 1 1 auto;
     min-width: 0;
@@ -20,27 +22,30 @@
 
 .editor-rendered-strip {
     display: grid;
-    grid-auto-columns: minmax(280px, 360px);
-    grid-auto-flow: column;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
     gap: 12px;
     min-width: 0;
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     padding: 12px;
     scrollbar-color: color-mix(in srgb, var(--text-4) 42%, transparent) transparent;
 }
 
 .editor-rendered-card {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    align-content: start;
     min-width: 0;
-    min-height: 100%;
-    gap: 18px;
-    padding: 34px 24px 28px;
+    min-height: 0;
+    gap: 12px;
+    padding: 18px;
     border: 1px solid var(--editor-rendered-card-border);
     border-radius: 8px;
-    background: var(--editor-rendered-card);
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--editor-rendered-lane) 86%, transparent), transparent 190px),
+        var(--editor-rendered-card);
     box-shadow: var(--editor-rendered-card-shadow), var(--glass-inset);
 }
 
@@ -50,6 +55,7 @@
 
 .editor-rendered-card-header {
     display: flex;
+    grid-column: 1 / -1;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
@@ -74,6 +80,7 @@
 }
 
 .editor-rendered-segment-title {
+    grid-column: 1 / -1;
     color: var(--text-1);
     font-size: 25px;
     font-weight: 760;
@@ -83,6 +90,7 @@
 
 .editor-rendered-segment-detail {
     display: flex;
+    grid-column: 1 / -1;
     flex-wrap: wrap;
     gap: 8px;
     min-height: 18px;
@@ -93,11 +101,99 @@
     text-transform: uppercase;
 }
 
+.editor-rendered-cue-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.editor-rendered-cue-row--segment {
+    grid-column: 1 / -1;
+}
+
+.editor-rendered-cue-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 24px;
+    gap: 5px;
+    padding: 3px 7px;
+    border: 1px solid color-mix(in srgb, var(--text-4) 19%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--bg-1) 42%, transparent);
+    color: var(--text-3);
+    font-size: 11px;
+    font-weight: 740;
+    line-height: 1.15;
+}
+
+.editor-rendered-cue-icon {
+    display: inline-grid;
+    min-width: 13px;
+    place-items: center;
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.editor-rendered-cue-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.editor-rendered-cue-chip[data-cue-kind="emotion"] {
+    border-color: color-mix(in srgb, #d8ab65 38%, transparent);
+    background: color-mix(in srgb, #d8ab65 12%, var(--bg-1));
+}
+
+.editor-rendered-cue-chip[data-cue-tone="warm"],
+.editor-rendered-cue-chip[data-cue-tone="happy"] {
+    border-color: color-mix(in srgb, #f1b85f 45%, transparent);
+    color: color-mix(in srgb, #f5d7a5 74%, var(--text-1));
+}
+
+.editor-rendered-cue-chip[data-cue-tone="urgent"] {
+    border-color: color-mix(in srgb, #ff756f 46%, transparent);
+    color: color-mix(in srgb, #ffc0b9 70%, var(--text-1));
+}
+
+.editor-rendered-cue-chip[data-cue-tone="calm"],
+.editor-rendered-cue-chip[data-cue-tone="focused"] {
+    border-color: color-mix(in srgb, #7db7ff 40%, transparent);
+    color: color-mix(in srgb, #b9d8ff 68%, var(--text-1));
+}
+
+.editor-rendered-cue-chip[data-cue-kind="pace"],
+.editor-rendered-cue-chip[data-cue-kind="timing"],
+.editor-rendered-cue-chip[data-cue-kind="pause"] {
+    border-color: color-mix(in srgb, var(--gold) 34%, transparent);
+    background: color-mix(in srgb, var(--gold-09) 32%, transparent);
+}
+
+.editor-rendered-cue-chip[data-cue-kind="energy"],
+.editor-rendered-cue-chip[data-cue-kind="delivery"] {
+    border-color: color-mix(in srgb, #8cd68f 34%, transparent);
+    color: color-mix(in srgb, #bfe9c1 68%, var(--text-1));
+}
+
+.editor-rendered-cue-chip[data-cue-kind="pronunciation"],
+.editor-rendered-cue-chip[data-cue-kind="phonetic"],
+.editor-rendered-cue-chip[data-cue-kind="stress"] {
+    border-color: color-mix(in srgb, #a89cff 38%, transparent);
+    color: color-mix(in srgb, #d5d0ff 68%, var(--text-1));
+}
+
 .editor-rendered-block {
     display: flex;
     flex-direction: column;
     gap: 10px;
     min-width: 0;
+    min-height: 244px;
     padding: 9px 10px 10px;
     border: 1px solid color-mix(in srgb, var(--text-4) 13%, transparent);
     border-radius: 8px;
@@ -108,7 +204,9 @@
         border-color .16s ease,
         box-shadow .16s ease,
         opacity .16s ease,
-        transform .16s ease;
+        transform .16s ease,
+        filter .16s ease;
+    will-change: transform;
 }
 
 .editor-rendered-block:hover {
@@ -117,15 +215,55 @@
 }
 
 .editor-rendered-block--dragging {
-    opacity: .62;
-    transform: rotate(.25deg) scale(.99);
+    opacity: .48;
+    transform: scale(.985);
     cursor: grabbing;
+    filter: saturate(.84);
 }
 
 .editor-rendered-block--drop-target {
     background: var(--editor-rendered-drop);
     border-color: var(--editor-rendered-drop-line);
-    box-shadow: inset 3px 0 0 var(--editor-rendered-drop-line);
+    box-shadow:
+        inset 0 0 0 1px var(--editor-rendered-drop-line),
+        var(--editor-rendered-card-shadow);
+    transform: translateY(-2px);
+}
+
+.editor-rendered-block--drop-before,
+.editor-rendered-block--drop-after {
+    position: relative;
+}
+
+.editor-rendered-block--drop-before::before,
+.editor-rendered-block--drop-after::after {
+    position: absolute;
+    z-index: 2;
+    right: 12px;
+    left: 12px;
+    height: 3px;
+    content: "";
+    border-radius: 999px;
+    background: var(--editor-rendered-drop-line);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 38%, transparent);
+}
+
+.editor-rendered-block--drop-before::before {
+    top: -7px;
+}
+
+.editor-rendered-block--drop-after::after {
+    bottom: -7px;
+}
+
+.editor-rendered-drag-ghost {
+    position: fixed;
+    z-index: 1000;
+    width: min(330px, calc(100vw - 32px));
+    pointer-events: none;
+    opacity: .92;
+    transform: translate3d(-50%, -18px, 0) rotate(.45deg);
+    box-shadow: var(--editor-rendered-lift-shadow);
 }
 
 .editor-rendered-block-head {
@@ -222,7 +360,7 @@
 
 .editor-rendered-text {
     width: 100%;
-    min-height: 150px;
+    min-height: 126px;
     padding: 0;
     resize: vertical;
     border: 0;
@@ -311,14 +449,17 @@ body.theme-light .editor-rendered-view {
     --editor-rendered-card-shadow: 0 14px 28px color-mix(in srgb, var(--bg-deep) 15%, transparent);
     --editor-rendered-control: color-mix(in srgb, var(--bg-1) 86%, transparent);
     --editor-rendered-control-hover: color-mix(in srgb, var(--gold-09) 48%, var(--bg-1));
+    --editor-rendered-lane: color-mix(in srgb, var(--bg-2) 70%, transparent);
+    --editor-rendered-lift-shadow: 0 22px 44px color-mix(in srgb, var(--bg-deep) 22%, transparent);
 }
 
 @media (max-width: 760px) {
     .editor-rendered-strip {
-        grid-auto-columns: minmax(240px, 82vw);
+        padding: 10px;
     }
 
     .editor-rendered-card {
-        padding: 28px 18px 22px;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 14px;
     }
 }

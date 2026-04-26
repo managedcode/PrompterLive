@@ -337,7 +337,7 @@
     <value>Da biblioteca de roteiros à entrega ao vivo</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Comece em Library, escreva ou importe um roteiro no Editor, mude para Cards quando quiser edição visual sem sintaxe TPS, ensaie em Practice, leia no Teleprompter e use Go Live quando estiver pronto para gravar ou transmitir.</value>
+    <value>Comece em Library, escreva ou importe um roteiro no Editor, mude para Rendered quando quiser edição visual sem sintaxe TPS, ensaie em Practice, leia no Teleprompter e use Go Live quando estiver pronto para gravar ou transmitir.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Conceitos básicos do padrão TPS</value>
@@ -355,7 +355,7 @@
     <value>Escolha a superfície adequada para o trabalho</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Source é para editar TPS bruto, Cards para editar blocos renderizados, Graph mostra a estrutura do roteiro, Practice usa RSVP para praticar palavra por palavra, Teleprompter é o leitor ao vivo e Go Live combina leitura com câmera, gravação e controles de streaming.</value>
+    <value>Raw é para editar diretamente a fonte TPS, Rendered para editar blocos visualmente sem sintaxe bruta, Graph mostra a estrutura do roteiro, Practice usa RSVP para praticar palavra por palavra, Teleprompter é o leitor ao vivo e Go Live combina leitura com câmera, gravação e controles de streaming.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Arquivos locais e histórico</value>
@@ -1459,10 +1459,10 @@
     <value>Agrupa o script por conhecimento, estrutura e dicas de entrega.</value>
   </data>
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
-    <value>Fonte</value>
+    <value>Raw</value>
   </data>
   <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
-    <value>Cartões</value>
+    <value>Rendered</value>
   </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Grafo</value>

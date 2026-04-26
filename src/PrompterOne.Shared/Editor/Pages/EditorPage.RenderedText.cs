@@ -41,6 +41,7 @@ public partial class EditorPage
                     segment.EmotionLabel,
                     segment.TargetWpmLabel,
                     segment.DurationLabel,
+                    BuildRenderedSegmentCues(segment),
                     segment.Blocks
                         .Select(block =>
                         {
@@ -61,6 +62,7 @@ public partial class EditorPage
                                 block.EmotionLabel,
                                 block.TargetWpmLabel,
                                 BuildBlockDisplayText(block, compiledBlock),
+                                BuildRenderedBlockCues(block, compiledBlock),
                                 attachmentsByBlock.GetValueOrDefault(blockKey) ?? []);
                         })
                         .ToList());
@@ -90,6 +92,127 @@ public partial class EditorPage
             _sourceText.AsSpan(range.End));
         var caret = Math.Clamp(range.Start + insertion.Length, 0, nextText.Length);
         await ApplyMutationAsync(nextText, new EditorSelectionRange(caret, caret));
+    }
+
+    private static IReadOnlyList<EditorRenderedCueViewModel> BuildRenderedSegmentCues(EditorOutlineSegmentViewModel segment)
+    {
+        var cues = new List<EditorRenderedCueViewModel>();
+        AddCue(cues, "emotion", "●", segment.EmotionLabel, ResolveCueTone(segment.EmotionLabel));
+        AddCue(cues, "pace", "×", segment.TargetWpmLabel, "pace");
+        AddCue(cues, "timing", "⌁", segment.DurationLabel, "timing");
+        return cues;
+    }
+
+    private static IReadOnlyList<EditorRenderedCueViewModel> BuildRenderedBlockCues(
+        EditorOutlineBlockViewModel block,
+        CompiledBlock? compiledBlock)
+    {
+        var cues = new List<EditorRenderedCueViewModel>();
+        AddCue(cues, "emotion", "●", block.EmotionLabel, ResolveCueTone(block.EmotionLabel));
+        AddCue(cues, "pace", "×", block.TargetWpmLabel, "pace");
+
+        if (compiledBlock?.Words is not { Count: > 0 } words)
+        {
+            return cues;
+        }
+
+        foreach (var metadata in words.Select(static word => word.Metadata))
+        {
+            if (metadata.IsBreath)
+            {
+                AddCue(cues, "pause", "⏸", "Breath", "pause");
+            }
+
+            if (metadata.IsPause)
+            {
+                AddCue(cues, "pause", "⏸", FormatDurationCue(metadata.PauseDuration), "pause");
+            }
+
+            if (metadata.SpeedMultiplier is { } multiplier)
+            {
+                AddCue(cues, "pace", "×", FormattableString.Invariant($"x{multiplier:0.##}"), "pace");
+            }
+
+            if (metadata.SpeedOverride is { } speedOverride)
+            {
+                AddCue(cues, "pace", "×", FormattableString.Invariant($"{speedOverride}WPM"), "pace");
+            }
+
+            AddCue(cues, "emotion", "●", metadata.InlineEmotionHint ?? metadata.EmotionHint, ResolveCueTone(metadata.InlineEmotionHint ?? metadata.EmotionHint));
+            AddCue(cues, "volume", "◖", metadata.VolumeLevel, "volume");
+            AddCue(cues, "delivery", "↗", metadata.DeliveryMode, "delivery");
+            AddCue(cues, "articulation", "·", metadata.ArticulationStyle, "articulation");
+            AddCue(cues, "emphasis", "!", metadata.IsHighlight ? "Highlight" : null, "emphasis");
+            AddCue(cues, "emphasis", "!", metadata.IsEmphasis ? FormatEmphasisCue(metadata) : null, "emphasis");
+            AddCue(cues, "energy", "⚡", metadata.EnergyLevel is { } energy ? FormattableString.Invariant($"Energy {energy:+0;-0;0}") : null, "energy");
+            AddCue(cues, "melody", "♪", metadata.MelodyLevel is { } melody ? FormattableString.Invariant($"Melody {melody:+0;-0;0}") : null, "melody");
+            AddCue(cues, "pronunciation", "◌", metadata.PronunciationGuide, "speech");
+            AddCue(cues, "phonetic", "IPA", metadata.PhoneticGuide, "speech");
+            AddCue(cues, "stress", "ˈ", metadata.StressGuide ?? metadata.StressText, "speech");
+            AddCue(cues, "edit", "✦", metadata.IsEditPoint ? FormatDisplayCue(metadata.EditPointPriority, "Edit") : null, "edit");
+            AddCue(cues, "head", "◇", metadata.HeadCue, "delivery");
+        }
+
+        return cues;
+    }
+
+    private static void AddCue(
+        List<EditorRenderedCueViewModel> cues,
+        string kind,
+        string icon,
+        string? label,
+        string tone)
+    {
+        var displayLabel = FormatDisplayCue(label, string.Empty);
+        if (string.IsNullOrWhiteSpace(displayLabel) ||
+            cues.Any(candidate =>
+                string.Equals(candidate.Kind, kind, StringComparison.Ordinal) &&
+                string.Equals(candidate.Label, displayLabel, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        cues.Add(new EditorRenderedCueViewModel(kind, icon, displayLabel, tone));
+    }
+
+    private static string FormatDurationCue(int? durationMs) =>
+        durationMs is > 0
+            ? FormattableString.Invariant($"{durationMs.Value}ms")
+            : "Pause";
+
+    private static string FormatEmphasisCue(WordMetadata metadata) =>
+        !string.IsNullOrWhiteSpace(metadata.EmphasisStyle)
+            ? FormatDisplayCue(metadata.EmphasisStyle, "Emphasis")
+            : metadata.EmphasisLevel > 0
+                ? FormattableString.Invariant($"Emphasis {metadata.EmphasisLevel}")
+                : "Emphasis";
+
+    private static string FormatDisplayCue(string? value, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return fallback;
+        }
+
+        var normalized = value.Trim().Replace('-', ' ').Replace('_', ' ');
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(normalized);
+    }
+
+    private static string ResolveCueTone(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "neutral";
+        }
+
+        var normalized = value.Trim().ToLowerInvariant();
+        return normalized switch
+        {
+            "warm" or "happy" or "excited" or "motivational" => "warm",
+            "urgent" or "energetic" or "concerned" => "urgent",
+            "sad" or "calm" or "focused" or "neutral" => normalized,
+            _ => "emotion"
+        };
     }
 
     private async Task OnRenderedBlockReorderRequestedAsync(EditorRenderedBlockReorderRequest request)

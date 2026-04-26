@@ -35,6 +35,7 @@
 .editor-workspace-body {
     display: flex;
     flex: 1 1 auto;
+    height: 100%;
     min-width: 0;
     min-height: 0;
     gap: 10px;
@@ -51,6 +52,7 @@
         minmax(220px, var(--editor-graph-source-pane, 34%))
         12px
         minmax(0, 1fr);
+    height: 100%;
     min-width: 0;
     min-height: 0;
     gap: 0;
@@ -63,6 +65,7 @@
 
 .editor-graph-source-pane {
     display: flex;
+    height: 100%;
     min-width: 0;
     min-height: 0;
 }

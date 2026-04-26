@@ -805,10 +805,10 @@ function resolveVisibleAncestor(nodeId, visibleNodeIds, parentByNode) {
 }
 
 function readLayoutBounds(element) {
-    const rect = element.getBoundingClientRect?.() ?? { width: 1024, height: 640 };
+    const rect = element.getBoundingClientRect?.() ?? {};
     return {
-        width: Math.max(760, rect.width || 1024),
-        height: Math.max(520, rect.height || 640)
+        width: Math.max(1, Math.round(rect.width || element.clientWidth || 1024)),
+        height: Math.max(1, Math.round(rect.height || element.clientHeight || 640))
     };
 }
 
@@ -1012,6 +1012,55 @@ async function fitGraphView(graph, mode, duration = 120) {
     if (Number.isFinite(currentZoom) && currentZoom < minimumZoom) {
         await graph.zoomTo?.(minimumZoom, { duration: 0 });
     }
+}
+
+function syncGraphViewportSize(element) {
+    const graph = element.prompterOneGraph;
+    if (!graph) {
+        return false;
+    }
+
+    const bounds = readLayoutBounds(element);
+    graph.resize?.(bounds.width, bounds.height);
+    element.dataset.graphViewportWidth = `${bounds.width}`;
+    element.dataset.graphViewportHeight = `${bounds.height}`;
+    return true;
+}
+
+async function syncAndFitGraphView(element, mode, duration = 120) {
+    if (!syncGraphViewportSize(element)) {
+        return;
+    }
+
+    await fitGraphView(element.prompterOneGraph, mode, duration);
+}
+
+function bindGraphResize(element) {
+    element.prompterOneGraphResizeObserver?.disconnect();
+    if (element.prompterOneGraphResizeFrame) {
+        cancelAnimationFrame(element.prompterOneGraphResizeFrame);
+        element.prompterOneGraphResizeFrame = 0;
+    }
+
+    if (!window.ResizeObserver) {
+        return;
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+        if (element.prompterOneGraphResizeFrame) {
+            cancelAnimationFrame(element.prompterOneGraphResizeFrame);
+        }
+
+        element.prompterOneGraphResizeFrame = requestAnimationFrame(() => {
+            element.prompterOneGraphResizeFrame = 0;
+            const mode = element.dataset.graphLayout ?? defaultLayoutMode;
+            syncAndFitGraphView(element, mode, 80).catch(error => {
+                console.warn("PrompterOne graph resize failed", error);
+            });
+        });
+    });
+    resizeObserver.observe(element);
+    element.prompterOneGraphResizeObserver = resizeObserver;
 }
 
 function readMinimumZoom(mode) {
@@ -1300,7 +1349,8 @@ async function renderGraphInstance(element, artifact, config, mode, fitDuration 
     syncRenderedGraphData(element, graphData);
     bindGraphTooltips(element.prompterOneGraph, element, graphData);
     bindGraphNavigation(element.prompterOneGraph, element, graphData, config);
-    await fitGraphView(element.prompterOneGraph, mode, fitDuration);
+    bindGraphResize(element);
+    await syncAndFitGraphView(element, mode, fitDuration);
     element.dataset.graphReady = "true";
     element.dataset.graphState = "ready";
 }
@@ -1325,7 +1375,7 @@ function bindControls(element) {
                 await graph.zoomBy?.(0.84, { duration: 120 });
             }
             else if (action === "fit") {
-                await graph.fitView?.({ padding: fitViewPadding }, { duration: 120 });
+                await syncAndFitGraphView(element, element.dataset.graphLayout ?? defaultLayoutMode, 120);
             }
             else if (action === "auto-layout") {
                 await autoLayoutGraph(element);
@@ -1422,6 +1472,12 @@ function destroyExistingGraph(element) {
     element.prompterOneGraphNavigationAbort?.abort();
     element.prompterOneGraphTooltipAbort?.abort();
     element.prompterOneGraphSpaceGrabAbort?.abort();
+    element.prompterOneGraphResizeObserver?.disconnect();
+    element.prompterOneGraphResizeObserver = null;
+    if (element.prompterOneGraphResizeFrame) {
+        cancelAnimationFrame(element.prompterOneGraphResizeFrame);
+        element.prompterOneGraphResizeFrame = 0;
+    }
     element.prompterOneGraphTooltip?.remove();
     element.prompterOneGraphTooltip = null;
 

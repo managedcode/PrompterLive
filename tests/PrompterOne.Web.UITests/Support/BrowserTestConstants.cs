@@ -340,6 +340,8 @@ internal static partial class BrowserTestConstants
         public const int GraphRenderedNodePositionMinimumCount = 2;
         public const double GraphMinimumReadableEdgeOpacity = .64;
         public const double GraphTooltipAnchorTolerancePx = 2;
+        public const double GraphCanvasFitTolerancePx = 2;
+        public const double GraphCanvasMinimumVisibleHeightPx = 320;
         public const string GraphRawTpsMarkupRegex = @"\[[^\]\r\n]+\]";
         public const string GraphLaneNodePrefix = "prompterone:graph:lane:";
         public const string GraphNodeTypeEllipseValue = "ellipse";
@@ -352,6 +354,8 @@ internal static partial class BrowserTestConstants
         public const string GraphAutoLayoutFirstRunValue = "1";
         public const string GraphAutoLayoutSecondRunValue = "2";
         public const string GraphLayoutStoryValue = "story";
+        public const int RenderedCardsMinimumBoardColumns = 2;
+        public const double RenderedCardsColumnTolerancePx = 4;
         public const string TypingResponsivenessProbeText = "local typing must stay instant";
         public const int ClickCaretThreshold = 64;
         public const int ClickNearStartOffsetX = 140;
