@@ -46,6 +46,7 @@ public enum UiIconKind
     Play,
     Plus,
     RecordTarget,
+    Restart,
     SaveFile,
     Search,
     SkipBackward,

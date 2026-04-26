@@ -79,7 +79,9 @@ public sealed class ScreenShellContractTests : BunitContext
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackwardLarge));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepBackward));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.PlayToggle));
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.RestartPhrase));
+            var restartPhrase = cut.FindByTestId(UiTestIds.Learn.RestartPhrase);
+            Assert.Contains("M3 12a9 9 0 1 0 3-6.7", restartPhrase.InnerHtml, StringComparison.Ordinal);
+            Assert.DoesNotContain("cx=\"12\" cy=\"12\" r=\"10\"", restartPhrase.InnerHtml, StringComparison.Ordinal);
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForward));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.StepForwardLarge));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Learn.LoopToggle));
