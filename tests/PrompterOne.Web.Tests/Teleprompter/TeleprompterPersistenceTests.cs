@@ -75,7 +75,7 @@ public sealed class TeleprompterPersistenceTests : BunitContext
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
                 cut.FindByTestId(UiTestIds.Teleprompter.FontValue).TextContent.Trim());
             Assert.Equal(
-                BuildWordsPerMinuteLabel(expectedBaseSpeedWpm),
+                BuildSpeedMultiplierLabel(expectedBaseSpeedWpm, expectedBaseSpeedWpm),
                 cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal(
                 PersistedFontSize.ToString(CultureInfo.InvariantCulture),
@@ -140,7 +140,11 @@ public sealed class TeleprompterPersistenceTests : BunitContext
 
             Assert.Equal(UpdatedFontSize, int.Parse(cut.FindByTestId(UiTestIds.Teleprompter.FontValue).TextContent.Trim(), CultureInfo.InvariantCulture));
             Assert.Equal(UpdatedTextWidthLabel, cut.FindByTestId(UiTestIds.Teleprompter.WidthValue).TextContent.Trim());
-            Assert.Equal(BuildWordsPerMinuteLabel(expectedUpdatedSpeedWpm), cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
+            Assert.Equal(
+                BuildSpeedMultiplierLabel(
+                    harness.Session.State.ScriptData?.TargetWpm ?? expectedUpdatedSpeedWpm,
+                    expectedUpdatedSpeedWpm),
+                cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal($"top:{UpdatedFocalPointPercent}%;", cut.FindByTestId(UiTestIds.Teleprompter.FocalGuide).GetAttribute("style"));
             var clusterWrapStyle = cut.FindByTestId(UiTestIds.Teleprompter.ClusterWrap).GetAttribute("style") ?? string.Empty;
             var cameraStyle = cut.FindByTestId(UiTestIds.Teleprompter.CameraBackground).GetAttribute("style") ?? string.Empty;
@@ -280,21 +284,34 @@ public sealed class TeleprompterPersistenceTests : BunitContext
         });
 
         await cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial).InputAsync(ReaderSpeedDialUpdatedValue);
+        await cut.FindByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
             var savedSettings = harness.JsRuntime.GetSavedValue<ReaderSettings>(BrowserAppSettingsKeys.ReaderSettings);
+            var expectedBaseSpeedWpm = harness.Session.State.ScriptData?.TargetWpm ?? ReaderSpeedDialUpdatedWpm;
 
             Assert.Equal(ReaderSpeedDialUpdatedValue.ToString(CultureInfo.InvariantCulture), cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial).GetAttribute("value"));
             Assert.Equal(ReaderSpeedDialUpdatedLabel, cut.FindByTestId(UiTestIds.Teleprompter.SpeedDialValue).TextContent.Trim());
-            Assert.Equal(BuildWordsPerMinuteLabel(ReaderSpeedDialUpdatedWpm), cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
+            Assert.Equal(
+                BuildSpeedMultiplierLabel(expectedBaseSpeedWpm, ReaderSpeedDialUpdatedWpm),
+                cut.FindByTestId(UiTestIds.Teleprompter.SpeedValue).TextContent.Trim());
             Assert.Equal(ReaderSpeedDialUpdatedWpm, savedSettings.ScrollSpeed, 2);
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, savedSettings.SpeedCueDisplayMode);
             Assert.Equal(ReaderSpeedDialUpdatedWpm, harness.Session.State.ReaderSettings.ScrollSpeed, 2);
+            Assert.Equal(ReaderSpeedCueDisplayMode.Multiplier, harness.Session.State.ReaderSettings.SpeedCueDisplayMode);
         }, PersistenceAssertionTimeout);
     }
 
     private static string BuildWordsPerMinuteLabel(int speedWpm) =>
         $"{speedWpm} {WordsPerMinuteSuffix}";
+
+    private static string BuildSpeedMultiplierLabel(int baseWpm, int speedWpm) =>
+        string.Concat(
+            "x",
+            (speedWpm / (double)Math.Max(MinimumReaderSpeedWpm, baseWpm)).ToString(
+                "0.##",
+                CultureInfo.InvariantCulture));
 
     private static int ParseWordsPerMinuteValue(string speedText)
     {

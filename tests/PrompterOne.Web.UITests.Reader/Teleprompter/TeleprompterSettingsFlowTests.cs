@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using PrompterOne.Shared.Contracts;
 using static Microsoft.Playwright.Assertions;
@@ -11,6 +12,7 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
     private const string ReaderSpeedDialUpdatedValue = "8";
     private const int ReaderSpeedDialUpdatedWpm = 402;
     private const int ReaderSpeedStepWpm = 10;
+    private const int TeleprompterDemoBaseWpm = 140;
     private const string WordsPerMinuteSuffix = "WPM";
     private readonly record struct LayoutBounds(double X, double Y, double Width, double Height);
 
@@ -67,6 +69,12 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await Expect(speedValue).ToHaveTextAsync($"{ReaderSpeedDialUpdatedWpm} {WordsPerMinuteSuffix}");
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDial)).ToHaveValueAsync(ReaderSpeedDialUpdatedValue);
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDialValue)).ToHaveTextAsync(ReaderSpeedDialUpdatedLabel);
+
+        await page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
+        await Expect(speedValue)
+            .ToHaveTextAsync(BuildSpeedMultiplierLabel(TeleprompterDemoBaseWpm, ReaderSpeedDialUpdatedWpm));
+        await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier))
+            .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.Teleprompter.ActiveStateValue);
 
         var cameraToggle = page.GetByTestId(UiTestIds.Teleprompter.CameraToggle);
         var cameraWasActive = await HasActiveStateAsync(cameraToggle);
@@ -383,6 +391,11 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
 
         return parsedWpm;
     }
+
+    private static string BuildSpeedMultiplierLabel(int baseWpm, int speedWpm) =>
+        string.Concat(
+            "x",
+            (speedWpm / (double)baseWpm).ToString("0.##", CultureInfo.InvariantCulture));
 
     private static async Task<bool> HasEnabledStateAsync(Microsoft.Playwright.ILocator locator)
     {

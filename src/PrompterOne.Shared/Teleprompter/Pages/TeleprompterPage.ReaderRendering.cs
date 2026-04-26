@@ -523,7 +523,10 @@ public partial class TeleprompterPage
             ? "0%"
             : $"{BuildProgressPercent():0}% · {_activeReaderCardIndex + 1} / {_cards.Count}";
 
-    private string BuildReaderSpeedLabel() => $"{_readerPlaybackSpeedWpm} {ReaderWordsPerMinuteSuffix}";
+    private string BuildReaderSpeedLabel() =>
+        _readerSpeedCueDisplayMode == ReaderSpeedCueDisplayMode.Multiplier
+            ? BuildReaderSpeedMultiplierLabel(_readerBaseTpsWpm, _readerPlaybackSpeedWpm)
+            : $"{_readerPlaybackSpeedWpm} {ReaderWordsPerMinuteSuffix}";
 
     private int BuildReaderSpeedDialValue()
     {

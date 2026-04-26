@@ -68,6 +68,7 @@
 - Teleprompter routed surfaces in `PrompterOne.Shared` must expose a direct in-reader text-size control, owned by the reader UI itself, so operators can tune readability during playback without leaving the route.
 - Teleprompter width controls in `PrompterOne.Shared` must scale relative to the active viewport or screen size and persist that adaptive ratio; do not clamp the readable lane around a fixed pixel-only desktop maximum.
 - Teleprompter width controls in `PrompterOne.Shared` must map to the real visible text lane; when the user drives `Read Width` to `100%`, the reader must not keep extra inner shell padding or centered shrink-wrap gaps inside that lane.
+- Teleprompter speed display mode must apply consistently to every reader speed readout: when the user switches between `WPM` and multiplier display, inline cue labels and the bottom transport speed label must change together.
 - Editor gutter line numbers must read as editor chrome, not as part of the script content; their color and emphasis must stay clearly separated from source text.
 - Editor wrap/format commands must not partially capture TPS tag syntax or create accidental nested wrappers by spanning across existing tag boundaries; if the selection touches tag markup, normalize or reject it instead of producing broken mixed-tag output.
 - File-creating editor actions such as document split must show explicit in-app feedback about what was created and where to find it; silent success states behind generic buttons are not user-friendly enough.
