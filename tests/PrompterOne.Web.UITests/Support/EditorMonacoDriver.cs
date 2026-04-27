@@ -308,26 +308,13 @@ internal static class EditorMonacoDriver
 
     internal static async Task SetTextAsync(IPage page, string text)
     {
-        _ = await InvokeHarnessAsync<EditorMonacoState>(page, "setText", new { text });
+        var state = await InvokeHarnessAsync<EditorMonacoState?>(page, "setText", new { text });
+        await Assert.That(state).IsNotNull();
+        await Assert.That(state!.Text).IsEqualTo(text);
         await Expect(SourceInput(page)).ToHaveValueAsync(text, new()
         {
             Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs
         });
-
-        await page.WaitForFunctionAsync(
-            """
-            (args) => {
-                const harness = window[args.harnessGlobalName];
-                return harness?.getState(args.testId)?.text === args.expectedText;
-            }
-            """,
-            new
-            {
-                expectedText = text,
-                harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
-                testId = UiTestIds.Editor.SourceStage
-            },
-            new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
     }
 
     internal static Task DropFilesAsync(IPage page, params DroppedFileDescriptor[] files) =>
