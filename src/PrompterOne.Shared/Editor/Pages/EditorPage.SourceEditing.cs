@@ -56,12 +56,38 @@ public partial class EditorPage
 
     private Task OnSelectionChangedAsync(EditorSelectionViewModel selection)
     {
+        var previousSelection = _selection;
+        var previousSegmentIndex = _activeSegmentIndex;
+        var previousBlockIndex = _activeBlockIndex;
+
         _selection = selection;
         _history.UpdateSelection(selection.Range);
         RefreshSelectionState();
         PublishEditorAiContext();
-        StateHasChanged();
+        if (ShouldRenderSelectionChange(previousSelection, previousSegmentIndex, previousBlockIndex))
+        {
+            StateHasChanged();
+        }
+
         return Task.CompletedTask;
+    }
+
+    private bool ShouldRenderSelectionChange(
+        EditorSelectionViewModel previousSelection,
+        int previousSegmentIndex,
+        int? previousBlockIndex)
+    {
+        if (previousSelection.HasSelection || _selection.HasSelection)
+        {
+            return true;
+        }
+
+        if (previousSegmentIndex != _activeSegmentIndex || previousBlockIndex != _activeBlockIndex)
+        {
+            return true;
+        }
+
+        return previousSelection.Line != _selection.Line;
     }
 
     private Task OnSourceChangedAsync(string text)
