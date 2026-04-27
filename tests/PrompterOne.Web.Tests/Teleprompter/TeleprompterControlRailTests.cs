@@ -13,12 +13,14 @@ public sealed class TeleprompterControlRailTests : BunitContext
     private const string AlignJustifyTooltipText = "Stretch text across the full readable width";
     private const string AlignLeftTooltipText = "Align text to the left edge";
     private const string AlignRightTooltipText = "Align text to the right edge";
+    private const string BackgroundMediaTooltipText = "Background source: camera, video file, or URL";
     private const string FocalSliderTooltipText = "Move the focal reading guide";
     private const string FontSliderTooltipText = "Adjust the reader text size";
     private const string FullscreenTooltipText = "Toggle browser fullscreen";
     private const string MirrorHorizontalTooltipText = "Mirror the reader horizontally";
     private const string MirrorVerticalTooltipText = "Mirror the reader vertically";
     private const string OrientationTooltipText = "Rotate the reader orientation";
+    private const string RecordingCameraTooltipText = "Camera captured in the recording";
     private const string SpeedCueDisplayMultiplierTooltipText = "Show speed cues as multipliers";
     private const string SpeedCueDisplayTooltipText = "Choose how speed cue labels appear";
     private const string SpeedCueDisplayWpmTooltipText = "Show speed cues as WPM";
@@ -117,6 +119,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
             var cameraSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingCameraSelect);
             var microphoneSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingMicrophoneSelect);
             var backgroundCameraToggle = cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle);
+            var recordingModeShell = recordingMode.Closest(".rd-record-select-mode");
             var recordingCameraShell = cameraSelect.Closest(".rd-record-select-camera");
 
             Assert.Equal("inactive", recordingPanel.GetAttribute("data-active"));
@@ -124,7 +127,13 @@ public sealed class TeleprompterControlRailTests : BunitContext
             Assert.Equal("video-audio", recordingMode.GetAttribute("value"));
             Assert.False(string.IsNullOrWhiteSpace(cameraSelect.GetAttribute("value")));
             Assert.False(string.IsNullOrWhiteSpace(microphoneSelect.GetAttribute("value")));
+            Assert.Equal(BackgroundMediaTooltipText, backgroundCameraToggle.GetAttribute("aria-label"));
+            Assert.Equal(BackgroundMediaTooltipText, cut.FindByTestId(UiTestIds.Tooltip.Surface(UiTestIds.Teleprompter.CameraToggle)).TextContent.Trim());
+            Assert.Equal(RecordingCameraTooltipText, cut.FindByTestId(UiTestIds.Tooltip.Surface(UiTestIds.Teleprompter.RecordingCameraSelect)).TextContent.Trim());
             Assert.Contains("rd-background-media-icon", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains("M4 8.5 12 4l8 4.5-8 4.5L4 8.5Z", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains("rd-record-mode-icon", recordingModeShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
+            Assert.DoesNotContain("points=\"23,7 16,12 23,17\"", recordingModeShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
             Assert.Contains("rd-record-camera-icon", recordingCameraShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
             Assert.DoesNotContain("rd-record-camera-icon", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
             Assert.DoesNotContain("rd-background-media-icon", recordingCameraShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);

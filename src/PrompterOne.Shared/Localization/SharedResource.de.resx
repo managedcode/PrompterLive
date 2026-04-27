@@ -3205,7 +3205,7 @@
     <value>Die Teleprompter-Kamera kann nicht aktiviert werden.</value>
   </data>
   <data name="TeleprompterBackgroundMediaTooltip" xml:space="preserve">
-    <value>Hintergrund-Medienebene</value>
+    <value>Hintergrundquelle: Kamera, Videodatei oder URL</value>
   </data>
   <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
     <value>Die Reader-Aufnahme kann nicht gestartet werden.</value>
@@ -3220,7 +3220,7 @@
     <value>Aufnahme läuft</value>
   </data>
   <data name="TeleprompterRecordingCameraTooltip" xml:space="preserve">
-    <value>Aufnahmekamera</value>
+    <value>Kamera, die in der Aufnahme erfasst wird</value>
   </data>
   <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
     <value>Mikrofonpegel der Aufnahme</value>

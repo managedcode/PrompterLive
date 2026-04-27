@@ -170,7 +170,7 @@
         <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.RecordingModeSelect" Text="@RecordingModeTooltip">
             <div class="rd-record-select rd-record-select-mode" title="@RecordingModeSelectedLabel">
                 <span class="rd-record-select-icon" aria-hidden="true">
-                    <UiIcon Kind="@RecordingModeIcon" Size="15" StrokeWidth="1.8m" />
+                    <UiIcon Kind="@RecordingModeIcon" CssClass="rd-record-mode-icon" Size="15" StrokeWidth="1.8m" />
                 </span>
                 <SettingsSelect Value="@RecordingMode"
                                 TestId="@UiTestIds.Teleprompter.RecordingModeSelect"
@@ -294,7 +294,7 @@
         string.Equals(RecordingMode, AudioOnlyMode, StringComparison.Ordinal);
 
     private UiIconKind RecordingModeIcon =>
-        IsAudioOnlyRecordingMode ? UiIconKind.Microphone : UiIconKind.Video;
+        IsAudioOnlyRecordingMode ? UiIconKind.Microphone : UiIconKind.Monitor;
 
     private IReadOnlyList<SettingsSelectOption> RecordingModeOptions =>
     [

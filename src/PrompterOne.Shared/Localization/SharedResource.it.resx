@@ -3205,7 +3205,7 @@
     <value>Impossibile abilitare la fotocamera del teleprompter.</value>
   </data>
   <data name="TeleprompterBackgroundMediaTooltip" xml:space="preserve">
-    <value>Livello multimediale di sfondo</value>
+    <value>Sorgente di sfondo: videocamera, file video o URL</value>
   </data>
   <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
     <value>Impossibile avviare la registrazione del reader.</value>
@@ -3220,7 +3220,7 @@
     <value>Registrazione</value>
   </data>
   <data name="TeleprompterRecordingCameraTooltip" xml:space="preserve">
-    <value>Videocamera di registrazione</value>
+    <value>Videocamera acquisita nella registrazione</value>
   </data>
   <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
     <value>Livello microfono registrazione</value>

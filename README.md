@@ -49,9 +49,9 @@ No PrompterOne backend. No desktop install. No account wall. Open the app, start
 ## What Works Today
 
 - **Library**: browse scripts, create folders, move documents, search by title, file name, and script content, then jump straight into edit, Learn, or Teleprompter flows from the same card.
-- **Editor**: author real TPS with Monaco-native syntax support, metadata hydration, structure-aware navigation, floating formatting controls, in-document find, syntax-aware rendering, browser-local autosave/history, a script knowledge-graph view, and responsive large-draft typing.
+- **Editor**: author real TPS with Monaco-native syntax support, metadata hydration, structure-aware navigation, floating formatting controls, in-document find, rendered visual editing, DOCX/TPS/Markdown/plain-text import and export, browser-local autosave/history, a script knowledge-graph view, and responsive large-draft typing.
 - **Learn**: rehearse with ORP-aligned RSVP, context rails, phrase-aware timing, WPM controls, stepping, looping, and punctuation-safe word progression.
-- **Teleprompter**: read with persisted font and width controls, focal-line positioning, horizontal and vertical mirror toggles, orientation switching, browser fullscreen, segmented progress, and optional camera background.
+- **Teleprompter**: read with persisted font and width controls, focal-line positioning, horizontal and vertical mirror toggles, orientation switching, browser fullscreen, segmented progress, a live speed dial, a distinct background-media source control, and compact rehearsal recording controls for video+audio or audio-only capture.
 - **Onboarding**: walk the first-run flow with a localized tour that explains TPS, RSVP, the editor, Learn, Teleprompter, and Go Live, then reopen that tour later from Settings.
 - **Settings**: manage appearance, browser language, media permissions, camera and microphone setup, sync offsets, recording defaults, minimal active AI provider setup, cloud snapshot targets, transport credentials, and onboarding restart from one routed screen.
 - **AI Spotlight**: when an AI provider is configured, run the global assistant as a real Microsoft Agent Framework agent with route context, editor text, selected ranges, graph summary, PrompterOne MCP-style tools, and structured output that separates chat replies from exact document edits.
@@ -71,7 +71,7 @@ The operating desk for the rest of the app. The library keeps starter scripts an
 
 This is not a plain textarea. The editor understands **TPS** (Teleprompter Script), so you can write in segments, blocks, pacing markers, emphasis, emotion tags, pronunciation guides, pause cues, and speed modifiers directly in the source. Front matter is parsed into the metadata rail and kept out of the visible body instead of lingering inline.
 
-The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, in-document find, import and export actions, browser-local autosave with revision history, syntax-aware highlighting over the live source, and a first-class script graph tab. The graph view can run beside or over the source, lets writers inspect the script's high-level knowledge map, and keeps jump-back-to-source context attached to graph nodes. Its **Build AI graph** action uses the configured LLM extractor; tokenizer similarity stays an explicit lower-fidelity fallback instead of silently pretending to be semantic analysis. Recent UI work moved TPS authoring fully onto the Monaco editor surface, tightened dropdown and tooltip behavior, cleaned up gutter spacing, and kept large-draft responsiveness intact on both polished demo scripts and very large seeded drafts.
+The authoring surface includes structure navigation on the left, a full formatting and insert toolbar, floating selection controls, a metadata rail for front matter and speed offsets, in-document find, raw and rendered editing views, import and export actions for TPS, Markdown, plain text, and DOCX, browser-local autosave with revision history, syntax-aware highlighting over the live source, and a first-class script graph tab. The graph view can run beside or over the source, lets writers inspect the script's high-level knowledge map, and keeps jump-back-to-source context attached to graph nodes. Its **Build AI graph** action uses the configured LLM extractor; tokenizer similarity stays an explicit lower-fidelity fallback instead of silently pretending to be semantic analysis. Recent UI work moved TPS authoring fully onto the Monaco editor surface, tightened dropdown and tooltip behavior, cleaned up gutter spacing, and kept large-draft responsiveness intact on both polished demo scripts and very large seeded drafts.
 
 ![Editor](docs/screenshots/readme/editor.png)
 
@@ -178,9 +178,9 @@ Context rails show nearby words without clipping into the focal lane, phrase-awa
 
 The delivery surface. Large readable text, phrase-aware emphasis, adjustable font size, adjustable reader width, and a focal guide you can reposition without leaving the route. TPS formatting carries through here too: speed modifiers affect timing while preserving readable word gaps, inline emphasis stays intact, punctuation is attached correctly, and emphasis groups stay continuous instead of breaking word by word.
 
-A live camera feed can run behind the reader as a background layer, and the operator controls stay on-screen: horizontal mirror, vertical mirror, reader orientation toggle, browser fullscreen, font controls, width controls, focal positioning, segmented block progress, and transport-style playback controls all live inside the same reader shell. Smooth block-to-block transitions keep the reading flow readable in both forward and backward navigation.
+A background media layer can run behind the reader, separate from what gets recorded. That background control is for stage scenery such as a camera preview, local video file, or video URL; the recording controls are a separate compact cluster for choosing video+audio or audio-only capture, the recording camera, the microphone, and a live microphone-level indicator. The operator controls stay on-screen: horizontal mirror, vertical mirror, reader orientation toggle, browser fullscreen, font controls, width controls, focal positioning, live speed dial, segmented block progress, and transport-style playback controls all live inside the same reader shell. Smooth block-to-block transitions keep the reading flow readable in both forward and backward navigation.
 
-Reader preferences persist between sessions, so your chosen layout, focal position, mirrors, and camera background do not have to be rebuilt every time.
+Reader preferences persist between sessions, so your chosen layout, focal position, mirrors, speed display, and background source do not have to be rebuilt every time.
 
 ![Teleprompter](docs/screenshots/readme/teleprompter.png)
 
@@ -202,7 +202,7 @@ Distribution targets such as YouTube, Twitch, and custom RTMP are capability-gat
 
 ### Settings
 
-Settings holds the operational state for the rest of the app: appearance, browser language, cloud snapshot targets, camera selection with preview, microphone setup with live meters, delay and sync offsets, output quality profiles, recording defaults, minimal AI provider preferences, transport credentials, and onboarding restart. AI provider setup stays intentionally small: choose one active provider, enter only the endpoint or base URL when needed, the API key when needed, and the model or deployment names you actually use. Theme changes and layout preferences persist, and appearance changes propagate across tabs instead of drifting out of sync.
+Settings holds the operational state for the rest of the app: appearance, browser language, cloud snapshot targets, camera selection with preview, microphone setup with live meters and browser-supported processing options, delay and sync offsets, output quality profiles, reader and Go Live recording defaults, minimal AI provider preferences, transport credentials, and onboarding restart. AI provider setup stays intentionally small: choose one active provider, enter only the endpoint or base URL when needed, the API key when needed, and the model or deployment names you actually use. Theme changes and layout preferences persist, and appearance changes propagate across tabs instead of drifting out of sync.
 
 ---
 
@@ -229,12 +229,12 @@ PrompterOne is in **active alpha**: the core authoring, rehearsal, reader, and l
 | Area | Status | Current reality |
 | --- | :---: | --- |
 | **Library** | ✅ | Script browsing, folder organization, create and move flows, workflow launchers, persisted browser storage |
-| **Editor** | ✅ | Monaco-native TPS authoring, front-matter hydration, metadata rail, floating formatting controls, in-document find, script graph tab, local autosave/history, syntax-aware cue rendering, responsive large-draft typing |
+| **Editor** | ✅ | Monaco-native TPS authoring, raw and rendered editing views, front-matter hydration, metadata rail, floating formatting controls, in-document find, script graph tab, DOCX/TPS/Markdown/plain-text import and export, local autosave/history, syntax-aware cue rendering, responsive large-draft typing |
 | **Learn** | ✅ | ORP-aligned RSVP, phrase-aware timing, context rails, WPM controls, stepping, looping, punctuation-safe progression |
-| **Teleprompter** | ✅ | Reader width and font controls, focal positioning, TPS cue contour rendering, horizontal and vertical mirror toggles, orientation toggle, browser fullscreen, segmented progress, persisted layout |
+| **Teleprompter** | ✅ | Reader width and font controls, focal positioning, TPS cue contour rendering, horizontal and vertical mirror toggles, orientation toggle, browser fullscreen, live speed dial, separate background-media source control, compact reader recording controls, segmented progress, persisted layout |
 | **Onboarding** | ✅ | Localized first-run walkthrough plus Settings-driven tour restart |
 | **Settings** | ✅ | Appearance sync, browser language, media permissions, camera and mic setup, delay offsets, recording defaults, AI provider preferences, cloud snapshot forms, transport configuration |
-| **Local recording** | ✅ | Browser-side recording of the composed program feed with decodable video and audio |
+| **Local recording** | ✅ | Browser-side recording for reader rehearsal capture and Go Live composed program output with decodable video and audio |
 | **Localization** | ✅ | Browser-negotiated language, persisted manual override, shared resource parity across supported languages, localized onboarding, diagnostics, settings, library actions, editor command surfaces, AI Spotlight shell, and reader controls |
 | **Go Live studio shell** | ✅ | Source rails, scene switching, preview/program layout, runtime telemetry, session chrome, browser-owned operator workflow |
 | **VDO.Ninja transport** | 🟡 | Real transport-aware browser integration, with operational polish still expanding |

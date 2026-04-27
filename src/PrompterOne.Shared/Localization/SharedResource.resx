@@ -3205,7 +3205,7 @@
     <value>Unable to enable the teleprompter camera.</value>
   </data>
   <data name="TeleprompterBackgroundMediaTooltip" xml:space="preserve">
-    <value>Background media layer</value>
+    <value>Background source: camera, video file, or URL</value>
   </data>
   <data name="TeleprompterStartRecordingMessage" xml:space="preserve">
     <value>Unable to start reader recording.</value>
@@ -3220,7 +3220,7 @@
     <value>Recording</value>
   </data>
   <data name="TeleprompterRecordingCameraTooltip" xml:space="preserve">
-    <value>Recording camera</value>
+    <value>Camera captured in the recording</value>
   </data>
   <data name="TeleprompterRecordingLevelLabel" xml:space="preserve">
     <value>Recording microphone level</value>
