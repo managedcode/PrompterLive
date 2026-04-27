@@ -56,8 +56,9 @@ internal static class TestHarnessFactory
         var compiler = new ScriptCompiler();
         var frontMatter = new TpsFrontMatterDocumentService();
         var documentSplitService = new TpsDocumentSplitService();
+        var docxDocumentService = new ScriptDocxDocumentService();
         var scriptImportDescriptorService = new ScriptImportDescriptorService();
-        var scriptDocumentImportService = new ScriptDocumentImportService(scriptImportDescriptorService);
+        var scriptDocumentImportService = new ScriptDocumentImportService(scriptImportDescriptorService, docxDocumentService);
         var droppedScriptMergeService = new EditorDroppedScriptMergeService();
         var textEditor = new TpsTextEditor();
         var structureEditor = new TpsStructureEditor();
@@ -115,6 +116,7 @@ internal static class TestHarnessFactory
         context.Services.AddSingleton(compiler);
         context.Services.AddSingleton(frontMatter);
         context.Services.AddSingleton(documentSplitService);
+        context.Services.AddSingleton(docxDocumentService);
         context.Services.AddSingleton(scriptDocumentImportService);
         context.Services.AddSingleton(scriptImportDescriptorService);
         context.Services.AddSingleton(droppedScriptMergeService);
@@ -422,7 +424,8 @@ internal sealed class TestJsRuntime(TimeSpan? invocationDelay = null) : IJSRunti
             throw exception;
         }
 
-        return string.Equals(modulePath, RuntimeTelemetryModulePath, StringComparison.Ordinal)
+        return string.Equals(modulePath, RuntimeTelemetryModulePath, StringComparison.Ordinal) ||
+               string.Equals(modulePath, AppShellFilePickerInteropMethodNames.ModulePath, StringComparison.Ordinal)
             ? new TestJsModule(this)
             : null;
     }

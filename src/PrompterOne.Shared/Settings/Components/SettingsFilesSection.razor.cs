@@ -33,6 +33,7 @@ public partial class SettingsFilesSection : ComponentBase
         new(Text(UiTextKey.SettingsFilesExportFormatTpsNative), "TPS (Native)"),
         new(Text(UiTextKey.SettingsFilesExportFormatMarkdown), "Markdown"),
         new(Text(UiTextKey.SettingsFilesExportFormatPlainText), "Plain Text"),
+        new(Text(UiTextKey.SettingsFilesExportFormatDocx), "DOCX"),
         new(Text(UiTextKey.SettingsFilesExportFormatPdf), "PDF"),
     ];
 

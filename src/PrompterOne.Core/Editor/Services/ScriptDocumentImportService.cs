@@ -4,11 +4,14 @@ using PrompterOne.Core.Models.Editor;
 
 namespace PrompterOne.Core.Services.Editor;
 
-public sealed class ScriptDocumentImportService(ScriptImportDescriptorService descriptorService)
+public sealed class ScriptDocumentImportService(
+    ScriptImportDescriptorService descriptorService,
+    ScriptDocxDocumentService? docxDocumentService = null)
 {
     private const string UnsupportedFileNameMessage = "Only supported script and document files can be imported.";
 
     private readonly ScriptImportDescriptorService _descriptorService = descriptorService;
+    private readonly ScriptDocxDocumentService _docxDocumentService = docxDocumentService ?? new ScriptDocxDocumentService();
 
     public bool CanImport(string? fileName) =>
         ScriptDocumentFileTypes.CanImportFromPicker(fileName);
@@ -27,10 +30,13 @@ public sealed class ScriptDocumentImportService(ScriptImportDescriptorService de
             throw new ArgumentException(UnsupportedFileNameMessage, nameof(fileName));
         }
 
-        var isTextImport = ScriptDocumentFileTypes.CanReadAsText(normalizedFileName);
+        var isDocxImport = ScriptDocumentFileTypes.IsDocx(normalizedFileName);
+        var isTextImport = !isDocxImport && ScriptDocumentFileTypes.CanReadAsText(normalizedFileName);
         var text = isTextImport
             ? await ReadTextAsync(stream, cancellationToken)
-            : await ConvertToMarkdownAsync(stream, normalizedFileName, mimeType, cancellationToken);
+            : isDocxImport
+                ? await ReadDocxAsync(stream, _docxDocumentService, cancellationToken)
+                : await ConvertToMarkdownAsync(stream, normalizedFileName, mimeType, cancellationToken);
         var importedDocumentName = ScriptDocumentFileTypes.BuildImportedDocumentName(normalizedFileName);
         var descriptor = _descriptorService.Build(importedDocumentName, text);
 
@@ -68,5 +74,16 @@ public sealed class ScriptDocumentImportService(ScriptImportDescriptorService de
     {
         using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
         return await reader.ReadToEndAsync(cancellationToken);
+    }
+
+    private static async Task<string> ReadDocxAsync(
+        Stream stream,
+        ScriptDocxDocumentService docxDocumentService,
+        CancellationToken cancellationToken)
+    {
+        await using var memory = new MemoryStream();
+        await stream.CopyToAsync(memory, cancellationToken);
+        memory.Position = 0;
+        return docxDocumentService.ImportMarkdown(memory);
     }
 }

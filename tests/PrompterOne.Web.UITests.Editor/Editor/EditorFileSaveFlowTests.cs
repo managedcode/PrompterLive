@@ -15,6 +15,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
         This saved draft proves the file export path. / [highlight]Keep the styling[/highlight] //
         """;
     private const string ExpectedDocumentName = "test-quantum-computing.tps";
+    private const string ExpectedDocxDocumentName = "test-quantum-computing.docx";
     private const string ExpectedMarkdownDocumentName = "test-quantum-computing.md";
     private const string ExpectedTextDocumentName = "test-quantum-computing.txt";
     private const string FilePickerMode = "file-system";
@@ -95,7 +96,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
     }
 
     [Test]
-    public async Task EditorScreen_ExportMenu_WritesNativeMarkdownAndPlainTextFiles()
+    public async Task EditorScreen_ExportMenu_WritesNativeMarkdownPlainTextAndDocxFiles()
     {
         var page = await _fixture.NewPageAsync(additionalContext: true);
 
@@ -114,6 +115,7 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
             await Expect(page.GetByTestId(UiTestIds.Header.EditorExportNative)).ToContainTextAsync("TPS");
             await Expect(page.GetByTestId(UiTestIds.Header.EditorExportMarkdown)).ToContainTextAsync("Markdown");
             await Expect(page.GetByTestId(UiTestIds.Header.EditorExportPlainText)).ToContainTextAsync("Plain Text");
+            await Expect(page.GetByTestId(UiTestIds.Header.EditorExportDocx)).ToContainTextAsync("DOCX");
 
             await page.GetByTestId(UiTestIds.Header.EditorExportNative).ClickAsync();
             var nativeFile = await WaitForSavedFileAsync(page, FilePickerMode);
@@ -131,7 +133,14 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
             await exportTrigger.ClickAsync();
             await page.GetByTestId(UiTestIds.Header.EditorExportPlainText).ClickAsync();
             var textFile = await WaitForSavedFileAsync(page, FilePickerMode);
-            await AssertExportedSourceFileAsync(textFile, ExpectedTextDocumentName);
+            await AssertExportedPlainTextFileAsync(textFile, ExpectedTextDocumentName);
+
+            await page.EvaluateAsync(HarnessResetScript);
+
+            await exportTrigger.ClickAsync();
+            await page.GetByTestId(UiTestIds.Header.EditorExportDocx).ClickAsync();
+            var docxFile = await WaitForSavedFileAsync(page, FilePickerMode);
+            await AssertExportedDocxFileAsync(docxFile, ExpectedDocxDocumentName);
         }
         finally
         {
@@ -168,6 +177,29 @@ public sealed class EditorFileSaveFlowTests(StandaloneAppFixture fixture)
         await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
         await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
         await Assert.That(savedFile.GetProperty("text").GetString()).IsEqualTo(EditedScript);
+    }
+
+    private static async Task AssertExportedPlainTextFileAsync(JsonElement savedFile, string expectedFileName)
+    {
+        var savedText = savedFile.GetProperty("text").GetString() ?? string.Empty;
+
+        await Assert.That(savedFile.GetProperty("mode").GetString()).IsEqualTo(FilePickerMode);
+        await Assert.That(savedFile.GetProperty("fileName").GetString()).IsEqualTo(expectedFileName);
+        await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
+        await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
+        await Assert.That(savedText).Contains("This saved draft proves the file export path.");
+        await Assert.That(savedText).DoesNotContain("[highlight]");
+    }
+
+    private static async Task AssertExportedDocxFileAsync(JsonElement savedFile, string expectedFileName)
+    {
+        await Assert.That(savedFile.GetProperty("mode").GetString()).IsEqualTo(FilePickerMode);
+        await Assert.That(savedFile.GetProperty("fileName").GetString()).IsEqualTo(expectedFileName);
+        await Assert.That(savedFile.GetProperty("pickerCallCount").GetInt32()).IsEqualTo(1);
+        await Assert.That(savedFile.GetProperty("hasBlob").GetBoolean()).IsTrue();
+        await Assert.That(savedFile.GetProperty("contentType").GetString())
+            .IsEqualTo("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        await Assert.That(savedFile.GetProperty("byteLength").GetInt32()).IsGreaterThan(0);
     }
 
     private static async Task AssertNativeExportedFileAsync(JsonElement savedFile, string expectedFileName)

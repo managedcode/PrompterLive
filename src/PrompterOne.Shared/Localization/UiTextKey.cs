@@ -645,6 +645,7 @@ public enum UiTextKey
     SettingsFilesExportFormatTpsNative,
     SettingsFilesExportFormatMarkdown,
     SettingsFilesExportFormatPlainText,
+    SettingsFilesExportFormatDocx,
     SettingsFilesExportFormatPdf,
     SettingsFilesSingularScript,
     SettingsFilesPluralScript,

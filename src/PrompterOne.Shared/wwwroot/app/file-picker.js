@@ -68,6 +68,24 @@ export async function saveTextFile(suggestedFileName, text, mimeType, descriptio
         type: typeof mimeType === "string" && mimeType.length > 0 ? mimeType : defaultMimeType
     });
 
+    return saveBlob(fileName, blob, mimeType, description, extensions, preferSavePicker);
+}
+
+export async function saveBinaryFile(suggestedFileName, content, mimeType, description, extensions, preferSavePicker) {
+    const fileName = normalizeSuggestedFileName(suggestedFileName);
+    const bytes = content instanceof Uint8Array
+        ? content
+        : Array.isArray(content)
+            ? new Uint8Array(content)
+            : new Uint8Array();
+    const blob = new Blob([bytes], {
+        type: typeof mimeType === "string" && mimeType.length > 0 ? mimeType : "application/octet-stream"
+    });
+
+    return saveBlob(fileName, blob, mimeType, description, extensions, preferSavePicker);
+}
+
+async function saveBlob(fileName, blob, mimeType, description, extensions, preferSavePicker) {
     if (preferSavePicker !== false && typeof window.showSaveFilePicker === "function") {
         try {
             const fileType = buildFileType(description, mimeType, extensions);

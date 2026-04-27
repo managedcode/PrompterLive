@@ -103,6 +103,7 @@ public partial class EditorPage
     [Inject] private EditorOutlineBuilder OutlineBuilder { get; set; } = null!;
     [Inject] private ScriptKnowledgeGraphService ScriptKnowledgeGraphService { get; set; } = null!;
     [Inject] private ScriptDocumentEditService ScriptDocumentEditService { get; set; } = null!;
+    [Inject] private ScriptDocxDocumentService ScriptDocxDocumentService { get; set; } = null!;
     [Inject] private ScriptImportDescriptorService ScriptImportDescriptorService { get; set; } = null!;
     [Inject] private TpsDocumentSplitService DocumentSplitService { get; set; } = null!;
     [Inject] private IScriptRepository ScriptRepository { get; set; } = null!;

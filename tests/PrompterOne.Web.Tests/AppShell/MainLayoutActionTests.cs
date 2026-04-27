@@ -738,6 +738,7 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportNative)));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportMarkdown)));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportPlainText)));
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportDocx)));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorLearn));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Header.EditorRead));
         });
@@ -750,14 +751,15 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Contains("TPS", cut.FindByTestId(UiTestIds.Header.EditorExportNative).TextContent, StringComparison.Ordinal);
             Assert.Contains("Markdown", cut.FindByTestId(UiTestIds.Header.EditorExportMarkdown).TextContent, StringComparison.Ordinal);
             Assert.Contains("Plain Text", cut.FindByTestId(UiTestIds.Header.EditorExportPlainText).TextContent, StringComparison.Ordinal);
+            Assert.Contains("DOCX", cut.FindByTestId(UiTestIds.Header.EditorExportDocx).TextContent, StringComparison.Ordinal);
         });
 
-        cut.FindByTestId(UiTestIds.Header.EditorExportNative).Click();
+        cut.FindByTestId(UiTestIds.Header.EditorExportDocx).Click();
 
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(1, saveRequestCount);
-            Assert.Equal(EditorDocumentExportFormat.Native, requestedFormat);
+            Assert.Equal(EditorDocumentExportFormat.Docx, requestedFormat);
         });
     }
 
@@ -779,6 +781,7 @@ public sealed class MainLayoutActionTests : BunitContext
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportNative)));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportMarkdown)));
             Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportPlainText)));
+            Assert.Empty(cut.FindAll(BunitTestSelectors.BuildTestIdSelector(UiTestIds.Header.EditorExportDocx)));
         });
     }
 

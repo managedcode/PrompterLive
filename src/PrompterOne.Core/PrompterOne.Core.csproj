@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" />
     <PackageReference Include="LLamaSharp" />
     <PackageReference Include="ManagedCode.MarkdownLd.Kb" />
     <PackageReference Include="ManagedCode.MarkItDown" />

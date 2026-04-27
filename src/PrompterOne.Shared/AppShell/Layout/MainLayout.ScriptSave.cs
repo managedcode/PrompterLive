@@ -15,4 +15,7 @@ public partial class MainLayout
 
     private Task HandleExportPlainTextClickAsync() =>
         EditorDocumentSaveCoordinator.RequestExportAsync(EditorDocumentExportFormat.PlainText);
+
+    private Task HandleExportDocxClickAsync() =>
+        EditorDocumentSaveCoordinator.RequestExportAsync(EditorDocumentExportFormat.Docx);
 }

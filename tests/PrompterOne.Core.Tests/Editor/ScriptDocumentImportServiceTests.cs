@@ -9,6 +9,14 @@ namespace PrompterOne.Core.Tests;
 public sealed class ScriptDocumentImportServiceTests
 {
     private const string DocxContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    private const string DocxExportBody =
+        """
+        ## Opening
+
+        ### First beat
+
+        The exported DOCX should be readable in Word.
+        """;
     private const string ImportedDocxFileName = "Imported Design Review From File Name.docx";
     private const string ImportedDocxTitle = "Imported Design Review From File Name";
     private const string ImportedHeading = "Converted heading should stay in the editor body";
@@ -109,7 +117,7 @@ public sealed class ScriptDocumentImportServiceTests
     [Test]
     public async Task ImportAsync_DocxConvertsToMarkdown_AndUsesFileStemTitle()
     {
-        var service = new ScriptDocumentImportService(new ScriptImportDescriptorService());
+        var service = new ScriptDocumentImportService(new ScriptImportDescriptorService(), new ScriptDocxDocumentService());
         await using var stream = CreateDocxStream();
 
         var descriptor = await service.ImportAsync(stream, ImportedDocxFileName, DocxContentType);
@@ -118,6 +126,22 @@ public sealed class ScriptDocumentImportServiceTests
         Assert.Equal("Imported Design Review From File Name.tps.md", descriptor.DocumentName);
         Assert.Contains(ImportedHeading, descriptor.Text, StringComparison.Ordinal);
         Assert.Contains(ImportedParagraph, descriptor.Text, StringComparison.Ordinal);
+    }
+
+    [Test]
+    public void DocxDocumentService_ExportsReadableWordDocument_AndImportsMarkdownBack()
+    {
+        var service = new ScriptDocxDocumentService();
+
+        var bytes = service.Export("Board Review", DocxExportBody);
+        using var stream = new MemoryStream(bytes);
+
+        var markdown = service.ImportMarkdown(stream);
+
+        Assert.Contains("# Board Review", markdown, StringComparison.Ordinal);
+        Assert.Contains("# Opening", markdown, StringComparison.Ordinal);
+        Assert.Contains("## First beat", markdown, StringComparison.Ordinal);
+        Assert.Contains("The exported DOCX should be readable in Word.", markdown, StringComparison.Ordinal);
     }
 
     private static MemoryStream CreateDocxStream()

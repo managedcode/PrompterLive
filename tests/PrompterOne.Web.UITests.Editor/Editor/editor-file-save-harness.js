@@ -44,7 +44,8 @@
                     chunks.push(data instanceof Blob ? data : new Blob([data]));
                 },
                 close: async () => {
-                    recordSavedFile(fileSystemMode, suggestedName, new Blob(chunks));
+                    const contentType = chunks.find(chunk => typeof chunk?.type === "string" && chunk.type.length > 0)?.type ?? "";
+                    recordSavedFile(fileSystemMode, suggestedName, new Blob(chunks, { type: contentType }));
                 }
             })
         };
@@ -101,6 +102,8 @@
                 hasBlob: savedBlob instanceof Blob,
                 mode: savedMode,
                 pickerCallCount,
+                byteLength: savedBlob instanceof Blob ? savedBlob.size : 0,
+                contentType: savedBlob instanceof Blob ? savedBlob.type : "",
                 text: savedBlob instanceof Blob ? await savedBlob.text() : ""
             };
         },

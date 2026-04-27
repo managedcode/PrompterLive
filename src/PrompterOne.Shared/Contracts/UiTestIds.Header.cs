@@ -25,6 +25,7 @@ public static partial class UiTestIds
         public const string EditorExportMarkdown = "header-editor-export-markdown";
         public const string EditorExportNative = "header-editor-export-native";
         public const string EditorExportPlainText = "header-editor-export-plain-text";
+        public const string EditorExportDocx = "header-editor-export-docx";
         public const string EditorSaveFile = "header-editor-save-file";
         public const string GoLive = "header-go-live";
         public const string GoLiveDot = "header-go-live-dot";

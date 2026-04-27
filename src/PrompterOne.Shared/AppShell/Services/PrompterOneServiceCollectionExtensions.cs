@@ -52,6 +52,7 @@ public static class PrompterOneServiceCollectionExtensions
         services.AddScoped<TpsDocumentSplitService>();
         services.AddScoped<ScriptDocumentImportService>();
         services.AddScoped<ScriptImportDescriptorService>();
+        services.AddScoped<ScriptDocxDocumentService>();
         services.AddScoped<EditorDroppedScriptMergeService>();
         services.AddScoped<TpsTextEditor>();
         services.AddScoped<TpsStructureEditor>();

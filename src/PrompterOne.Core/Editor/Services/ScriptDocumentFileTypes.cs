@@ -6,6 +6,8 @@ public static class ScriptDocumentFileTypes
 {
     public const string CanonicalImportedExtension = ".tps.md";
     public const string DefaultExtension = ".tps";
+    public const string DocxExtension = ".docx";
+    public const string DocxMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     public const string SavePickerDescription = "PrompterOne script";
     public const string TextMimeType = "text/plain";
 
@@ -28,7 +30,7 @@ public static class ScriptDocumentFileTypes
         ".tps.md",
         ".md.tps",
         ".markdown",
-        ".docx",
+        DocxExtension,
         ".html",
         ".jsonl",
         ".ndjson",
@@ -66,6 +68,9 @@ public static class ScriptDocumentFileTypes
 
     public static bool CanReadAsText(string? fileName) =>
         ResolveEditorDropSupportedSuffix(fileName) is not null;
+
+    public static bool IsDocx(string? fileName) =>
+        string.Equals(ResolvePickerSupportedSuffix(fileName), DocxExtension, StringComparison.OrdinalIgnoreCase);
 
     public static bool PreservesNativeDocumentName(string? fileName)
     {

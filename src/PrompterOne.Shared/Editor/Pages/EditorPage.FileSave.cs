@@ -9,8 +9,10 @@ public partial class EditorPage
 {
     private const string MarkdownExportDescription = "Markdown script";
     private const string MarkdownMimeType = "text/markdown";
+    private const string DocxExportDescription = "Word document";
     private const string PlainTextExportDescription = "Plain text script";
 
+    private static readonly IReadOnlyList<string> DocxExportFileNameSuffixes = [ScriptDocumentFileTypes.DocxExtension];
     private static readonly IReadOnlyList<string> MarkdownExportFileNameSuffixes = [".md"];
     private static readonly IReadOnlyList<string> PlainTextExportFileNameSuffixes = [".txt"];
 
@@ -28,6 +30,17 @@ public partial class EditorPage
             async () =>
             {
                 await PersistDraftStateCoreAsync(persistDocument: true, cancellationToken, revision);
+                if (format == EditorDocumentExportFormat.Docx)
+                {
+                    await FilePickerInterop.SaveBytesAsync(
+                        ResolveExportDocumentName(format),
+                        BuildDocxExportDocument(),
+                        ScriptDocumentFileTypes.DocxMimeType,
+                        DocxExportDescription,
+                        DocxExportFileNameSuffixes);
+                    return;
+                }
+
                 await FilePickerInterop.SaveTextAsync(
                     ResolveExportDocumentName(format),
                     BuildExportDocument(format),
@@ -39,13 +52,72 @@ public partial class EditorPage
     }
 
     private string BuildExportDocument(EditorDocumentExportFormat format) =>
-        format == EditorDocumentExportFormat.Native
-            ? BuildPersistedDocument(_sourceText)
-            : _sourceText;
+        format switch
+        {
+            EditorDocumentExportFormat.Native => BuildPersistedDocument(_sourceText),
+            EditorDocumentExportFormat.PlainText => BuildPlainTextExportDocument(),
+            _ => _sourceText
+        };
+
+    private byte[] BuildDocxExportDocument() =>
+        ScriptDocxDocumentService.Export(_screenTitle, BuildPlainTextExportDocument(includeHeadings: true));
+
+    private string BuildPlainTextExportDocument(bool includeHeadings = false)
+    {
+        var compiledSegments = SessionService.State.CompiledScript?.Segments;
+        if (compiledSegments is { Count: > 0 })
+        {
+            return BuildCompiledPlainText(compiledSegments, includeHeadings);
+        }
+
+        return BuildSourceDisplayText(_sourceText);
+    }
+
+    private static string BuildCompiledPlainText(
+        IReadOnlyList<PrompterOne.Core.Models.CompiledScript.CompiledSegment> segments,
+        bool includeHeadings)
+    {
+        var builder = new System.Text.StringBuilder();
+        foreach (var segment in segments)
+        {
+            if (includeHeadings && !string.IsNullOrWhiteSpace(segment.Name))
+            {
+                AppendParagraph(builder, string.Concat("## ", segment.Name.Trim()));
+            }
+
+            foreach (var block in segment.Blocks)
+            {
+                if (includeHeadings && !string.IsNullOrWhiteSpace(block.Name))
+                {
+                    AppendParagraph(builder, string.Concat("### ", block.Name.Trim()));
+                }
+
+                var blockText = BuildCompiledBlockText(block);
+                if (!string.IsNullOrWhiteSpace(blockText))
+                {
+                    AppendParagraph(builder, blockText);
+                }
+            }
+        }
+
+        return builder.ToString().Trim();
+    }
+
+    private static void AppendParagraph(System.Text.StringBuilder builder, string text)
+    {
+        if (builder.Length > 0)
+        {
+            builder.AppendLine();
+            builder.AppendLine();
+        }
+
+        builder.Append(text.Trim());
+    }
 
     private static IReadOnlyList<string> ResolveExportFileNameSuffixes(EditorDocumentExportFormat format) =>
         format switch
         {
+            EditorDocumentExportFormat.Docx => DocxExportFileNameSuffixes,
             EditorDocumentExportFormat.Markdown => MarkdownExportFileNameSuffixes,
             EditorDocumentExportFormat.PlainText => PlainTextExportFileNameSuffixes,
             _ => ScriptDocumentFileTypes.SaveSupportedFileNameSuffixes
@@ -54,6 +126,7 @@ public partial class EditorPage
     private static string ResolveExportMimeType(EditorDocumentExportFormat format) =>
         format switch
         {
+            EditorDocumentExportFormat.Docx => ScriptDocumentFileTypes.DocxMimeType,
             EditorDocumentExportFormat.Markdown => MarkdownMimeType,
             _ => ScriptDocumentFileTypes.TextMimeType
         };
@@ -61,6 +134,7 @@ public partial class EditorPage
     private static string ResolveExportPickerDescription(EditorDocumentExportFormat format) =>
         format switch
         {
+            EditorDocumentExportFormat.Docx => DocxExportDescription,
             EditorDocumentExportFormat.Markdown => MarkdownExportDescription,
             EditorDocumentExportFormat.PlainText => PlainTextExportDescription,
             _ => ScriptDocumentFileTypes.SavePickerDescription
@@ -70,7 +144,7 @@ public partial class EditorPage
     {
         var normalizedDocumentName = ScriptDocumentFileTypes.NormalizeFileName(SessionService.State.DocumentName);
         var supportedSuffix = format == EditorDocumentExportFormat.Native
-            ? ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(normalizedDocumentName) ?? ScriptDocumentFileTypes.DefaultExtension
+            ? ResolveNativeExportSuffix(normalizedDocumentName)
             : ResolveExportFileNameSuffix(format);
 
         if (!string.IsNullOrWhiteSpace(normalizedDocumentName)
@@ -104,7 +178,16 @@ public partial class EditorPage
         {
             EditorDocumentExportFormat.Markdown => ".md",
             EditorDocumentExportFormat.PlainText => ".txt",
+            EditorDocumentExportFormat.Docx => ScriptDocumentFileTypes.DocxExtension,
             _ => ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(ScriptWorkspaceState.UntitledScriptDocumentName)
                 ?? ScriptDocumentFileTypes.DefaultExtension
         };
+
+    private static string ResolveNativeExportSuffix(string normalizedDocumentName)
+    {
+        var suffix = ScriptDocumentFileTypes.ResolveSaveSupportedSuffix(normalizedDocumentName);
+        return suffix is null
+            ? ScriptDocumentFileTypes.DefaultExtension
+            : suffix;
+    }
 }

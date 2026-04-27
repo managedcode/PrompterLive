@@ -4,7 +4,8 @@ public enum EditorDocumentExportFormat
 {
     Native,
     Markdown,
-    PlainText
+    PlainText,
+    Docx
 }
 
 public sealed class EditorDocumentSaveCoordinator

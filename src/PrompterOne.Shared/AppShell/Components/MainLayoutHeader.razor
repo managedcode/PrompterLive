@@ -234,6 +234,14 @@
                             <UiIcon Kind="UiIconKind.TextLines" Size="15" />
                             <span>@ExportPlainTextLabel</span>
                         </button>
+                        <button type="button"
+                                class="app-header-export-option"
+                                role="menuitem"
+                                @onclick="HandleExportDocxClickAsync"
+                                data-test="@UiTestIds.Header.EditorExportDocx">
+                            <UiIcon Kind="UiIconKind.DocumentLines" Size="15" />
+                            <span>@ExportDocxLabel</span>
+                        </button>
                     </div>
                 }
             </div>
@@ -318,6 +326,7 @@
     [Parameter, EditorRequired] public string ExportMarkdownLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ExportNativeLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string ExportPlainTextLabel { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string ExportDocxLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SaveFileLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SearchPlaceholder { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SearchText { get; set; } = string.Empty;
@@ -334,6 +343,7 @@
     [Parameter] public EventCallback OnOpenReadClick { get; set; }
     [Parameter] public EventCallback OnExportMarkdownClick { get; set; }
     [Parameter] public EventCallback OnExportPlainTextClick { get; set; }
+    [Parameter] public EventCallback OnExportDocxClick { get; set; }
     [Parameter] public EventCallback OnSaveFileClick { get; set; }
     [Parameter] public EventCallback<InputFileChangeEventArgs> OnImport { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnLibrarySearchInput { get; set; }
@@ -370,6 +380,12 @@
     {
         _isExportMenuOpen = false;
         await OnExportPlainTextClick.InvokeAsync();
+    }
+
+    private async Task HandleExportDocxClickAsync()
+    {
+        _isExportMenuOpen = false;
+        await OnExportDocxClick.InvokeAsync();
     }
 
     private async Task HandleSaveFileClickAsync()

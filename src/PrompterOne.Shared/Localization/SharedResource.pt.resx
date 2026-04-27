@@ -2094,6 +2094,9 @@
   <data name="SettingsFilesExportFormatPlainText" xml:space="preserve">
     <value>Texto Simples</value>
   </data>
+  <data name="SettingsFilesExportFormatDocx" xml:space="preserve">
+    <value>DOCX</value>
+  </data>
   <data name="SettingsFilesExportFormatPdf" xml:space="preserve">
     <value>PDF</value>
   </data>

@@ -54,6 +54,38 @@ public sealed class AppShellFilePickerInterop(IJSRuntime jsRuntime) : IDisposabl
         };
     }
 
+    public async Task<AppShellFileSaveMode> SaveBytesAsync(
+        string suggestedFileName,
+        byte[] content,
+        string mimeType,
+        string description,
+        IReadOnlyList<string> extensions,
+        bool preferSavePicker = true)
+    {
+        var module = await GetModuleAsync() ?? throw new InvalidOperationException(FileSaveUnavailableMessage);
+
+        var normalizedExtensions = extensions
+            .Where(extension => !string.IsNullOrWhiteSpace(extension))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var result = await module.InvokeAsync<string>(
+            AppShellFilePickerInteropMethodNames.SaveBinaryFile,
+            suggestedFileName ?? string.Empty,
+            content ?? [],
+            mimeType ?? string.Empty,
+            description ?? string.Empty,
+            normalizedExtensions,
+            preferSavePicker);
+
+        return result switch
+        {
+            AppShellFilePickerInteropMethodNames.FileSaveModeFileSystem => AppShellFileSaveMode.FileSystem,
+            AppShellFilePickerInteropMethodNames.FileSaveModeDownload => AppShellFileSaveMode.Download,
+            _ => AppShellFileSaveMode.Cancelled
+        };
+    }
+
     public void Dispose()
     {
     }
