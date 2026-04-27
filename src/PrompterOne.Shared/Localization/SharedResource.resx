@@ -3223,10 +3223,10 @@
     <value>Recording microphone level</value>
   </data>
   <data name="TeleprompterRecordingMicrophoneTooltip" xml:space="preserve">
-    <value>Recording microphone</value>
+    <value>Microphone captured in the recording</value>
   </data>
   <data name="TeleprompterRecordingModeTooltip" xml:space="preserve">
-    <value>Recording mode</value>
+    <value>Choose whether to record video + audio or audio only</value>
   </data>
   <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
     <value>Select a camera to record video.</value>

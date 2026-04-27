@@ -86,8 +86,19 @@
     }
 
     .rd-recording-panel .ss-wrap {
-        flex: 0 0 32px;
-        width: 32px;
+        width: 100%;
+    }
+
+    .rd-record-select-mode {
+        min-width: 100px;
+    }
+
+    .rd-record-select-camera {
+        min-width: 84px;
+    }
+
+    .rd-record-select-mic {
+        min-width: 64px;
     }
 
     .rd-record-status {

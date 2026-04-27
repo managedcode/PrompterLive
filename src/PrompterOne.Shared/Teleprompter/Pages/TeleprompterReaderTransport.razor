@@ -150,6 +150,8 @@
                 </span>
                 <SettingsSelect Value="@RecordingMode"
                                 TestId="@UiTestIds.Teleprompter.RecordingModeSelect"
+                                AriaLabel="@BuildRecordingSelectAriaLabel(RecordingModeTooltip, RecordingModeSelectedLabel)"
+                                DisplayLabel="@RecordingModeCompactLabel"
                                 Options="@RecordingModeOptions"
                                 OnChange="OnRecordingModeChange" />
             </div>
@@ -163,6 +165,8 @@
                     </span>
                     <SettingsSelect Value="@SelectedRecordingCameraId"
                                     TestId="@UiTestIds.Teleprompter.RecordingCameraSelect"
+                                    AriaLabel="@BuildRecordingSelectAriaLabel(RecordingCameraTooltip, RecordingCameraSelectedLabel)"
+                                    DisplayLabel="@RecordingCameraCompactLabel"
                                     Options="@RecordingCameraOptions"
                                     OnChange="OnRecordingCameraChange" />
                 </div>
@@ -175,6 +179,8 @@
                 </span>
                 <SettingsSelect Value="@SelectedRecordingMicrophoneId"
                                 TestId="@UiTestIds.Teleprompter.RecordingMicrophoneSelect"
+                                AriaLabel="@BuildRecordingSelectAriaLabel(RecordingMicrophoneTooltip, RecordingMicrophoneSelectedLabel)"
+                                DisplayLabel="@RecordingMicrophoneCompactLabel"
                                 Options="@RecordingMicrophoneOptions"
                                 OnChange="OnRecordingMicrophoneChange" />
             </div>
@@ -263,8 +269,14 @@
     private bool IsAudioOnlyRecordingMode =>
         string.Equals(RecordingMode, AudioOnlyMode, StringComparison.Ordinal);
 
-    private UiIconKind RecordingModeIcon =>
-        IsAudioOnlyRecordingMode ? UiIconKind.Microphone : UiIconKind.Monitor;
+    private UiIconKind RecordingModeIcon => UiIconKind.RecordTarget;
+
+    private string RecordingModeCompactLabel =>
+        IsAudioOnlyRecordingMode ? "Audio" : "Video + audio";
+
+    private string RecordingCameraCompactLabel => "Camera";
+
+    private string RecordingMicrophoneCompactLabel => "Mic";
 
     private IReadOnlyList<SettingsSelectOption> RecordingModeOptions =>
     [
@@ -290,6 +302,11 @@
 
     private static string GetSelectedOptionLabel(IReadOnlyList<SettingsSelectOption> options, string value) =>
         options.FirstOrDefault(option => string.Equals(option.Value, value, StringComparison.Ordinal))?.Label ?? string.Empty;
+
+    private static string BuildRecordingSelectAriaLabel(string label, string selected) =>
+        string.IsNullOrWhiteSpace(selected)
+            ? label
+            : $"{label}: {selected}";
 
     private string BuildRecordingLevelStyle() =>
         $"width:{Math.Clamp(RecordingLevelPercent, 0, 100)}%;";

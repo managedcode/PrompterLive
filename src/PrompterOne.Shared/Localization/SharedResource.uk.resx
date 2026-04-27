@@ -3223,10 +3223,10 @@
     <value>Рівень мікрофона запису</value>
   </data>
   <data name="TeleprompterRecordingMicrophoneTooltip" xml:space="preserve">
-    <value>Мікрофон для запису</value>
+    <value>Мікрофон, який потрапляє в запис</value>
   </data>
   <data name="TeleprompterRecordingModeTooltip" xml:space="preserve">
-    <value>Режим запису</value>
+    <value>Обрати запис відео + аудіо або лише аудіо</value>
   </data>
   <data name="TeleprompterRecordingNoCameraStatus" xml:space="preserve">
     <value>Оберіть камеру для запису відео.</value>

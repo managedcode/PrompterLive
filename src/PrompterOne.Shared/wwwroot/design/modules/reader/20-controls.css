@@ -578,7 +578,7 @@
 .rd-recording-panel {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     margin-left: 6px;
     padding: 3px 0 3px 10px;
     border-left: 1px solid var(--gold-06);
@@ -633,15 +633,27 @@
 
 .rd-record-select {
     position: relative;
-    width: 34px;
+    width: auto;
     height: 34px;
-    flex: 0 0 34px;
+    flex: 0 0 auto;
+}
+
+.rd-record-select-mode {
+    min-width: 112px;
+}
+
+.rd-record-select-camera {
+    min-width: 92px;
+}
+
+.rd-record-select-mic {
+    min-width: 72px;
 }
 
 .rd-record-select-icon {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 13px;
     z-index: 2;
     display: grid;
     width: 18px;
@@ -653,22 +665,48 @@
 }
 
 .rd-recording-panel .ss-wrap {
-    width: 34px;
+    position: relative;
+    width: 100%;
     height: 34px;
 }
 
 .rd-recording-panel .ss-trigger {
-    width: 34px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
     min-height: 34px;
-    padding: 0;
+    padding: 0 23px 0 30px;
     border-radius: 999px;
     background: rgba(255,255,255,.03);
-    color: transparent;
+    color: rgba(232,213,176,.72);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
 }
 
-.rd-recording-panel .ss-label,
+.rd-recording-panel .ss-trigger:hover,
+.rd-recording-panel .ss-trigger:focus {
+    border-color: rgba(232,213,176,.24);
+    background: rgba(255,255,255,.07);
+    color: rgba(244,232,204,.92);
+}
+
+.rd-recording-panel .ss-label {
+    min-width: 0;
+    overflow: hidden;
+    opacity: 1;
+    text-overflow: ellipsis;
+}
+
 .rd-recording-panel .ss-chevron {
-    opacity: 0;
+    position: absolute;
+    right: 8px;
+    opacity: .62;
 }
 
 .rd-recording-panel .ss-panel {
