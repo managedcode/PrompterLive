@@ -93,6 +93,8 @@ internal static partial class BrowserTestConstants
         public static Regex BlankTextRegex { get; } = new(@"^\s*$", RegexOptions.Compiled);
         public static string ResetSavedRecordingScript =>
             $$"""() => window["{{RecordingFileHarnessGlobal}}"].reset()""";
+        public static string EnableSyntheticRecordingEncoderScript =>
+            $$"""() => window["{{RecordingFileHarnessGlobal}}"].enableSyntheticMediaRecorder()""";
         public static string SavedRecordingReadyScript =>
             $$"""() => Boolean(window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()?.hasBlob && (window["{{RecordingFileHarnessGlobal}}"].getSavedRecordingState()?.sizeBytes ?? 0) > 0)""";
         public static string SavedRecordingCountReadyScript =>

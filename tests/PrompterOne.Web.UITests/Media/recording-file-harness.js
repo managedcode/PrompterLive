@@ -37,6 +37,7 @@
     let savedBlob = null;
     let savedFileName = "";
     const savedRecordings = [];
+    const nativeMediaRecorder = window.MediaRecorder;
 
     function normalizePart(part) {
         if (part instanceof Blob) {
@@ -350,8 +351,82 @@
         };
     };
 
+    class SyntheticMediaRecorder extends EventTarget {
+        static isTypeSupported(type) {
+            if (nativeMediaRecorder && typeof nativeMediaRecorder.isTypeSupported === "function") {
+                return nativeMediaRecorder.isTypeSupported(type);
+            }
+
+            return typeof type === "string" && type.length > 0;
+        }
+
+        constructor(stream, options) {
+            super();
+            this.stream = stream;
+            this.mimeType = options?.mimeType || blobMimeFallback;
+            this.state = "inactive";
+            this._intervalId = 0;
+        }
+
+        start(timeslice) {
+            if (this.state !== "inactive") {
+                throw new DOMException("Synthetic MediaRecorder is already active.", "InvalidStateError");
+            }
+
+            this.state = "recording";
+            const intervalMs = Number.isFinite(timeslice) && timeslice > 0 ? timeslice : 100;
+            this._intervalId = window.setInterval(() => this._emitChunk(), intervalMs);
+            window.setTimeout(() => this._emitChunk(), 0);
+        }
+
+        requestData() {
+            if (this.state === "inactive") {
+                return;
+            }
+
+            this._emitChunk();
+        }
+
+        stop() {
+            if (this.state === "inactive") {
+                return;
+            }
+
+            this.state = "inactive";
+            if (this._intervalId) {
+                window.clearInterval(this._intervalId);
+                this._intervalId = 0;
+            }
+
+            window.setTimeout(() => {
+                this._emitChunk();
+                this.dispatchEvent(new Event("stop"));
+                if (typeof this.onstop === "function") {
+                    this.onstop(new Event("stop"));
+                }
+            }, 0);
+        }
+
+        _emitChunk() {
+            const blob = new Blob([new Uint8Array([80, 49, 82, 69, 67])], { type: this.mimeType || blobMimeFallback });
+            const event = new BlobEvent("dataavailable", { data: blob });
+            this.dispatchEvent(event);
+            if (typeof this.ondataavailable === "function") {
+                this.ondataavailable(event);
+            }
+        }
+    }
+
     window[harnessGlobalName] = Object.freeze({
         analyzeSavedRecording,
+        disableSyntheticMediaRecorder() {
+            if (nativeMediaRecorder) {
+                window.MediaRecorder = nativeMediaRecorder;
+            }
+        },
+        enableSyntheticMediaRecorder() {
+            window.MediaRecorder = SyntheticMediaRecorder;
+        },
         getSavedRecordingState,
         getSavedRecordingsState,
         reset() {

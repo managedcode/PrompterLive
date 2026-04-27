@@ -13,6 +13,7 @@ public sealed class TeleprompterRecordingFlowTests(StandaloneAppFixture fixture)
         {
             await page.AddInitScriptAsync(scriptPath: UiTestAssetPaths.GetRecordingFileHarnessScriptPath());
             await ReaderRouteDriver.OpenTeleprompterAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
+            await page.EvaluateAsync(BrowserTestConstants.Media.EnableSyntheticRecordingEncoderScript);
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.RecordingPanel)).ToBeVisibleAsync();
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.CameraToggle)).ToBeVisibleAsync();
@@ -49,6 +50,7 @@ public sealed class TeleprompterRecordingFlowTests(StandaloneAppFixture fixture)
         {
             await page.AddInitScriptAsync(scriptPath: UiTestAssetPaths.GetRecordingFileHarnessScriptPath());
             await ReaderRouteDriver.OpenTeleprompterAsync(page, BrowserTestConstants.Routes.TeleprompterDemo);
+            await page.EvaluateAsync(BrowserTestConstants.Media.EnableSyntheticRecordingEncoderScript);
             await TeleprompterCameraDriver.EnsureDisabledAsync(page);
             await page.EvaluateAsync(BrowserTestConstants.Media.ClearRequestLogScript);
 
