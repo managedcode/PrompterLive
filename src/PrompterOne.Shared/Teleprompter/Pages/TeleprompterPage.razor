@@ -58,14 +58,10 @@
                                        FontValue="@_readerFontSize" FocalMax="@ReaderMaxFocalPointPercent" FocalMin="@ReaderMinFocalPointPercent"
                                        FocalTitle="@ReaderFocalSliderTitle" FocalValue="@_readerFocalPointPercent" OnFontInput="HandleReaderFontSizeInputAsync"
                                        OnFocalInput="HandleReaderFocalPointInputAsync" OnWidthInput="HandleReaderTextWidthInputAsync"
-                                       OnSpeedDialInput="HandleReaderSpeedDialInputAsync"
                                        OnSetSpeedCueDisplayMultiplier="@(() => SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode.Multiplier))"
                                        OnSetSpeedCueDisplayWpm="@(() => SetReaderSpeedCueDisplayModeAsync(ReaderSpeedCueDisplayMode.WordsPerMinute))"
                                        SpeedCueDisplayMode="@_readerSpeedCueDisplayMode" SpeedCueDisplayMultiplierTitle="@ReaderSpeedCueDisplayMultiplierTitle"
                                        SpeedCueDisplayTitle="@ReaderSpeedCueDisplayTitle" SpeedCueDisplayWpmTitle="@ReaderSpeedCueDisplayWpmTitle"
-                                       SpeedDialMax="@ReaderSpeedDialMaximum" SpeedDialMin="@ReaderSpeedDialMinimum"
-                                       SpeedDialTitle="@ReaderSpeedDialTitle" SpeedDialValue="@BuildReaderSpeedDialValue()"
-                                       SpeedDialValueLabel="@BuildReaderSpeedDialValueLabel()"
                                        TooltipCssClassFactory="BuildRailTooltipCssClass" TooltipDomIdFactory="BuildRailTooltipDomId"
                                        TooltipFocusIn="HandleRailTooltipFocusIn" TooltipFocusOut="HandleRailTooltipFocusOut"
                                        TooltipKeyDown="HandleRailTooltipKeyDown" TooltipPointerDown="HandleRailTooltipPointerDown"
@@ -232,7 +228,10 @@
                                          RecordingStatusLabel="@ReaderRecordingStatusLabel" RecordingStopLabel="@ReaderRecordingStopLabel"
                                          RecordingToggleTooltip="@ReaderRecordingToggleTooltip" SelectedRecordingCameraId="@_readerRecordingCameraId"
                                          SelectedRecordingMicrophoneId="@_readerRecordingMicrophoneId"
-                                         SpeedUpTooltip="@ReaderSpeedUpTooltip" SpeedValueLabel="@BuildReaderSpeedLabel()"
+                                         SpeedDialMax="@ReaderSpeedDialMaximum" SpeedDialMin="@ReaderSpeedDialMinimum"
+                                         SpeedDialTitle="@ReaderSpeedDialTitle" SpeedDialValue="@BuildReaderSpeedDialValue()"
+                                         SpeedDialValueLabel="@BuildReaderSpeedDialValueLabel()" SpeedUpTooltip="@ReaderSpeedUpTooltip"
+                                         SpeedValueLabel="@BuildReaderSpeedLabel()" OnSpeedDialInput="HandleReaderSpeedDialInputAsync"
                                          TimeDataAttributes="@BuildReaderTimeDataAttributes()" />
         </div>
     </div>

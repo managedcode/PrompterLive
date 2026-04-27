@@ -109,7 +109,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
             var rail = cut.FindByTestId(UiTestIds.Editor.MetadataRail);
 
             Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
-            Assert.Equal(EditorMetadataTestSource.RightChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
+            Assert.Equal(EditorMetadataTestSource.RightSidebarIcon, toggle.GetAttribute(EditorMetadataTestSource.SidebarIconAttribute));
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.CreatedIcon));
             Assert.Equal(EditorMetadataTestSource.FalseText, rail.GetAttribute("data-collapsed"));
         });
@@ -122,7 +122,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
             var rail = cut.FindByTestId(UiTestIds.Editor.MetadataRail);
 
             Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
-            Assert.Equal(EditorMetadataTestSource.LeftChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
+            Assert.Equal(EditorMetadataTestSource.RightSidebarIcon, toggle.GetAttribute(EditorMetadataTestSource.SidebarIconAttribute));
             Assert.Equal(EditorMetadataTestSource.TrueText, rail.GetAttribute("data-collapsed"));
             Assert.True(cut.FindByTestId(UiTestIds.Editor.MetadataRailBody).HasAttribute("hidden"));
         });
@@ -135,7 +135,7 @@ public sealed class EditorMetadataInteractionTests : BunitContext
             var rail = cut.FindByTestId(UiTestIds.Editor.MetadataRail);
 
             Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
-            Assert.Equal(EditorMetadataTestSource.RightChevronDirection, toggle.GetAttribute(EditorMetadataTestSource.ChevronDirectionAttribute));
+            Assert.Equal(EditorMetadataTestSource.RightSidebarIcon, toggle.GetAttribute(EditorMetadataTestSource.SidebarIconAttribute));
             Assert.Equal(EditorMetadataTestSource.FalseText, rail.GetAttribute("data-collapsed"));
             Assert.False(cut.FindByTestId(UiTestIds.Editor.MetadataRailBody).HasAttribute("hidden"));
         });
@@ -173,14 +173,13 @@ public sealed class EditorMetadataInteractionTests : BunitContext
         public const string AuthorPersistenceLine = "author: \"Test Speaker\"";
         public const string BaseWpm210 = "210";
         public const string BlankTitle = "   ";
-        public const string ChevronDirectionAttribute = "data-chevron-direction";
         public const string DurationField = "duration:";
         public const string DurationPersistenceLine = "duration: \"12:34\"";
         public const string FalseText = "false";
-        public const string LeftChevronDirection = "left";
         public const string ProfileRsvp = "RSVP";
         public const string RetitledScript = "Renamed Product Launch";
-        public const string RightChevronDirection = "right";
+        public const string RightSidebarIcon = "right";
+        public const string SidebarIconAttribute = "data-sidebar-icon";
         public const string ImportedDocumentName = "Imported Design Review From File Name With A Long Header Title That Should Clamp Cleanly In Editor.tps.md";
         public const string ImportedFileStemTitle = "Imported Design Review From File Name With A Long Header Title That Should Clamp Cleanly In Editor";
         public const string ImportedHeading = "Converted heading should stay inside the editor body instead of becoming the shell title";

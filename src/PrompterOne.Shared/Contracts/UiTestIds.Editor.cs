@@ -161,6 +161,8 @@ public static partial class UiTestIds
         public const string StatusSegments = "editor-status-segments";
         public const string StatusVersion = "editor-status-version";
         public const string StatusWords = "editor-status-words";
+        public const string StructureSidebar = "editor-structure-sidebar";
+        public const string StructureSidebarToggle = "editor-structure-sidebar-toggle";
         public const string SourceTab = "editor-source-tab";
         public const string SplitSegment = "editor-split-segment";
         public const string SplitHint = "editor-split-hint";

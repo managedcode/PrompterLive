@@ -55,6 +55,30 @@
             </button>
         </TooltipAnchor>
         <span class="rd-ctrl-label" id="@UiDomIds.Teleprompter.SpeedValue" data-test="@UiTestIds.Teleprompter.SpeedValue">@SpeedValueLabel</span>
+        <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.SpeedDial" Text="@SpeedDialTitle">
+            <label class="rd-speed-dial-inline" aria-label="@SpeedDialTitle">
+                <span class="rd-speed-dial-icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 15l3-3" />
+                        <path d="M4 14a8 8 0 1 1 16 0" />
+                        <path d="M5 19h14" />
+                    </svg>
+                </span>
+                <input type="range"
+                       class="rd-speed-dial"
+                       id="@UiDomIds.Teleprompter.SpeedDial"
+                       min="@SpeedDialMin"
+                       max="@SpeedDialMax"
+                       value="@SpeedDialValue"
+                       @oninput="OnSpeedDialInput"
+                       @onkeydown:stopPropagation="true"
+                       aria-label="@SpeedDialTitle"
+                       data-test="@UiTestIds.Teleprompter.SpeedDial">
+                <span class="rd-speed-dial-value"
+                      id="@UiDomIds.Teleprompter.SpeedDialValue"
+                      data-test="@UiTestIds.Teleprompter.SpeedDialValue">@SpeedDialValueLabel</span>
+            </label>
+        </TooltipAnchor>
         <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.SpeedUp" Text="@SpeedUpTooltip">
             <button class="rd-ctrl-btn"
                     @onclick="OnSpeedUp"
@@ -126,7 +150,7 @@
                     aria-label="@CameraTooltip"
                     data-active="@BuildBooleanDataAttribute(IsCameraActive)"
                     data-test="@UiTestIds.Teleprompter.CameraToggle">
-                <UiIcon Kind="UiIconKind.PictureInPicture" Size="16" StrokeWidth="1.7m" />
+                <UiIcon Kind="UiIconKind.BackgroundMedia" CssClass="rd-background-media-icon" Size="16" StrokeWidth="1.7m" />
             </button>
         </TooltipAnchor>
     </div>
@@ -159,7 +183,7 @@
             <TooltipAnchor OwnerTestId="@UiTestIds.Teleprompter.RecordingCameraSelect" Text="@RecordingCameraTooltip">
                 <div class="rd-record-select rd-record-select-camera" title="@RecordingCameraSelectedLabel">
                     <span class="rd-record-select-icon" aria-hidden="true">
-                        <UiIcon Kind="UiIconKind.Camera" Size="15" StrokeWidth="1.8m" />
+                        <UiIcon Kind="UiIconKind.Camera" CssClass="rd-record-camera-icon" Size="15" StrokeWidth="1.8m" />
                     </span>
                     <SettingsSelect Value="@SelectedRecordingCameraId"
                                     TestId="@UiTestIds.Teleprompter.RecordingCameraSelect"
@@ -223,6 +247,7 @@
     [Parameter] public EventCallback<ChangeEventArgs> OnRecordingCameraChange { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnRecordingMicrophoneChange { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnRecordingModeChange { get; set; }
+    [Parameter, EditorRequired] public EventCallback<ChangeEventArgs> OnSpeedDialInput { get; set; }
     [Parameter] public EventCallback OnSpeedDown { get; set; }
     [Parameter] public EventCallback OnSpeedUp { get; set; }
     [Parameter, EditorRequired] public string NextBlockTooltip { get; set; } = string.Empty;
@@ -248,6 +273,11 @@
     [Parameter, EditorRequired] public string RecordingToggleTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SelectedRecordingCameraId { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SelectedRecordingMicrophoneId { get; set; } = string.Empty;
+    [Parameter] public int SpeedDialMax { get; set; }
+    [Parameter] public int SpeedDialMin { get; set; }
+    [Parameter] public int SpeedDialValue { get; set; }
+    [Parameter, EditorRequired] public string SpeedDialTitle { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string SpeedDialValueLabel { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedDownTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedUpTooltip { get; set; } = string.Empty;
     [Parameter, EditorRequired] public string SpeedValueLabel { get; set; } = string.Empty;

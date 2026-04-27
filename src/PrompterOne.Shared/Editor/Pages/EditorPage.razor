@@ -19,6 +19,9 @@
                 <EditorStructureSidebar Segments="@_segments"
                                         ActiveSegmentIndex="@_activeSegmentIndex"
                                         ActiveBlockIndex="@_activeBlockIndex"
+                                        IsCollapsed="@_isStructureSidebarCollapsed"
+                                        ToggleLabel="@GetStructureSidebarToggleLabel()"
+                                        ToggleRequested="OnStructureSidebarToggleAsync"
                                         OnNavigate="OnNavigateAsync" />
             }
 

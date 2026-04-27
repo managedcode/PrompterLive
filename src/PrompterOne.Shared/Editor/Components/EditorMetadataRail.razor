@@ -57,12 +57,13 @@
                 aria-controls="@UiDomIds.Editor.MetadataRailBody"
                 aria-expanded="@GetExpandedAttributeValue()"
                 aria-label="@ToggleLabel"
-                data-chevron-direction="@GetToggleChevronDirection()"
+                title="@ToggleLabel"
+                data-sidebar-icon="right"
                 @onclick="() => ToggleRequested.InvokeAsync()"
                 data-test="@UiTestIds.Editor.MetadataRailToggle">
-            <UiIcon Kind="@(IsCollapsed ? UiIconKind.ChevronLeft : UiIconKind.ChevronRight)"
-                    Size="14"
-                    StrokeWidth="2.2m" />
+            <UiIcon Kind="UiIconKind.PanelRight"
+                    Size="16"
+                    StrokeWidth="2.1m" />
         </button>
     </div>
 
@@ -198,8 +199,6 @@
 
     [Parameter] public EventCallback<int> XslowOffsetChanged { get; set; }
 
-    private const string LeftChevronDirection = "left";
-    private const string RightChevronDirection = "right";
     private EditorMetadataRailTab _selectedTab = EditorMetadataRailTab.Metadata;
 
     protected override void OnParametersSet()
@@ -214,8 +213,6 @@
     private string GetCollapsedAttributeValue() => IsCollapsed ? "true" : "false";
 
     private string GetExpandedAttributeValue() => IsCollapsed ? "false" : "true";
-
-    private string GetToggleChevronDirection() => IsCollapsed ? LeftChevronDirection : RightChevronDirection;
 
     private async Task SelectTabAsync(EditorMetadataRailTab tab)
     {

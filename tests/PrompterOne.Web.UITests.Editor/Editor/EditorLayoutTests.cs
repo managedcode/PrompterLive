@@ -234,7 +234,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
 
             await Assert.That(expandedMetrics.LayoutViewportRightGap).IsBetween(0, BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
             await Assert.That(expandedMetrics.MetadataRailCollapsed).IsFalse();
-            await Assert.That(expandedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailExpandedChevronDirection);
+            await Assert.That(expandedMetrics.MetadataToggleSidebarIcon).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailSidebarIcon);
 
             await metadataToggle.ClickAsync();
             await Expect(metadataToggle).ToHaveAttributeAsync("aria-expanded", "false");
@@ -248,7 +248,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
 
             await Assert.That(collapsedMetrics.LayoutViewportRightGap).IsBetween(0, BrowserTestConstants.Editor.MaximumLayoutViewportRightGapPx);
             await Assert.That(collapsedMetrics.MetadataRailCollapsed).IsTrue();
-            await Assert.That(collapsedMetrics.MetadataToggleChevronDirection).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailCollapsedChevronDirection);
+            await Assert.That(collapsedMetrics.MetadataToggleSidebarIcon).IsEqualTo(BrowserTestConstants.EditorFlow.MetadataRailSidebarIcon);
             await Assert.That(collapsedMetrics.MetadataRailWidth).IsBetween(0, BrowserTestConstants.Editor.MaximumCollapsedMetadataRailWidthPx);
 
             var reclaimedMainWidth = collapsedMetrics.MainWidth - expandedMetrics.MainWidth;
@@ -322,7 +322,7 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
                     mainWidth: mainRect.width,
                     metadataRailWidth: railRect.width,
                     metadataRailCollapsed: rail.getAttribute('data-collapsed') === 'true',
-                    metadataToggleChevronDirection: toggle.getAttribute('data-chevron-direction') ?? ''
+                    metadataToggleSidebarIcon: toggle.getAttribute('data-sidebar-icon') ?? ''
                 };
             }
             """,
@@ -385,5 +385,5 @@ public sealed class EditorLayoutTests(StandaloneAppFixture fixture)
         double MainWidth,
         double MetadataRailWidth,
         bool MetadataRailCollapsed,
-        string MetadataToggleChevronDirection);
+        string MetadataToggleSidebarIcon);
 }

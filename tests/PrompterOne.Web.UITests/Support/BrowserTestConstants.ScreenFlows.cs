@@ -33,8 +33,7 @@ internal static partial class BrowserTestConstants
         public const int BenefitsBlockIndex = 1;
         public const string LightThemeScenario = "editor-light-theme-emotion-menu";
         public const string LightThemeStep = "01-readable-menu-and-tooltip";
-        public const string MetadataRailCollapsedChevronDirection = "left";
-        public const string MetadataRailExpandedChevronDirection = "right";
+        public const string MetadataRailSidebarIcon = "right";
         public const int MetadataRailToggleSettleDelayMs = 250;
         public const string ToolbarTooltipScenario = "editor-toolbar-tooltips";
         public const string ToolbarTooltipDelayStep = "01-delayed-toolbar-tooltip";

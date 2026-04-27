@@ -59,15 +59,17 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await AssertTeleprompterChromeVisibilityAsync(page);
 
         var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
+        var speedDial = page.GetByTestId(UiTestIds.Teleprompter.SpeedDial);
         var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
         var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
+        await Expect(speedDial).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
 
         await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
         await Expect(speedValue).ToHaveTextAsync($"{baselineSpeedWpm + ReaderSpeedStepWpm} {WordsPerMinuteSuffix}");
 
-        await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.SpeedDial), ReaderSpeedDialUpdatedValue);
+        await SetRangeValueAsync(speedDial, ReaderSpeedDialUpdatedValue);
         await Expect(speedValue).ToHaveTextAsync($"{ReaderSpeedDialUpdatedWpm} {WordsPerMinuteSuffix}");
-        await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDial)).ToHaveValueAsync(ReaderSpeedDialUpdatedValue);
+        await Expect(speedDial).ToHaveValueAsync(ReaderSpeedDialUpdatedValue);
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDialValue)).ToHaveTextAsync(ReaderSpeedDialUpdatedLabel);
 
         await page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();

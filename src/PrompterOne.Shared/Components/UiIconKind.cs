@@ -6,6 +6,7 @@ public enum UiIconKind
     ArrowLeft,
     ArrowRight,
     AudioNotes,
+    BackgroundMedia,
     BookOpen,
     Broadcast,
     Camera,

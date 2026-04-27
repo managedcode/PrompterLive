@@ -80,6 +80,27 @@ public sealed class TeleprompterControlRailTests : BunitContext
     }
 
     [Test]
+    public void TeleprompterPage_RendersSpeedDialInBottomTransportControls()
+    {
+        TestHarnessFactory.Create(this);
+        Services.GetRequiredService<NavigationManager>()
+            .NavigateTo(AppTestData.Routes.TeleprompterDemo);
+
+        var cut = Render<TeleprompterPage>();
+
+        cut.WaitForAssertion(() =>
+        {
+            var controls = cut.FindByTestId(UiTestIds.Teleprompter.Controls);
+            var speedDial = cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial);
+            var speedDialShell = speedDial.ParentElement;
+
+            Assert.Contains(UiTestIds.Teleprompter.SpeedDial, controls.InnerHtml, StringComparison.Ordinal);
+            Assert.NotNull(speedDialShell);
+            Assert.Contains("rd-speed-dial-inline", speedDialShell!.ClassName, StringComparison.Ordinal);
+        });
+    }
+
+    [Test]
     public void TeleprompterPage_RendersSeparateBackgroundCameraAndRecordingControls()
     {
         TestHarnessFactory.Create(this);
@@ -96,12 +117,17 @@ public sealed class TeleprompterControlRailTests : BunitContext
             var cameraSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingCameraSelect);
             var microphoneSelect = cut.FindByTestId(UiTestIds.Teleprompter.RecordingMicrophoneSelect);
             var backgroundCameraToggle = cut.FindByTestId(UiTestIds.Teleprompter.CameraToggle);
+            var recordingCameraShell = cameraSelect.Closest(".rd-record-select-camera");
 
             Assert.Equal("inactive", recordingPanel.GetAttribute("data-active"));
             Assert.Equal("inactive", recordingToggle.GetAttribute("data-active"));
             Assert.Equal("video-audio", recordingMode.GetAttribute("value"));
             Assert.False(string.IsNullOrWhiteSpace(cameraSelect.GetAttribute("value")));
             Assert.False(string.IsNullOrWhiteSpace(microphoneSelect.GetAttribute("value")));
+            Assert.Contains("rd-background-media-icon", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains("rd-record-camera-icon", recordingCameraShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
+            Assert.DoesNotContain("rd-record-camera-icon", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.DoesNotContain("rd-background-media-icon", recordingCameraShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
             Assert.False(string.Equals(
                 backgroundCameraToggle.GetAttribute("data-test"),
                 recordingToggle.GetAttribute("data-test"),

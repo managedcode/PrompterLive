@@ -57,6 +57,23 @@ public sealed class EditorStructureSidebarTests : BunitContext
         Assert.Equal(LongBlockTitle, blockName.GetAttribute("title"));
     }
 
+    [Test]
+    public void EditorStructureSidebar_CollapsedStateKeepsPanelToggleVisible()
+    {
+        var cut = Render<EditorStructureSidebar>(parameters => parameters
+            .Add(component => component.IsCollapsed, true)
+            .Add(component => component.ToggleLabel, "Open sidebar")
+            .Add(component => component.Segments, BuildSegments()));
+
+        var sidebar = cut.FindByTestId(UiTestIds.Editor.StructureSidebar);
+        var toggle = cut.FindByTestId(UiTestIds.Editor.StructureSidebarToggle);
+
+        Assert.Equal("active", sidebar.GetAttribute("data-collapsed"));
+        Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
+        Assert.Equal("left", toggle.GetAttribute("data-sidebar-icon"));
+        Assert.DoesNotContain(UiTestIds.Editor.SegmentNavigation(0), cut.Markup, StringComparison.Ordinal);
+    }
+
     private static IReadOnlyList<EditorOutlineSegmentViewModel> BuildSegments(
         string segmentTitle = EpisodeTitle,
         string blockTitle = BlockTitle) =>
