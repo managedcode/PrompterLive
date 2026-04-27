@@ -62,7 +62,7 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
             await UiScenarioArtifacts.CapturePageAsync(page, ScenarioName, FullEditorStep);
             await UiScenarioArtifacts.CaptureLocatorAsync(stage, ScenarioName, SourceStageStep);
 
-            await page.GetByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+            await page.GetByTestId(UiTestIds.Editor.WorkspaceEditorTab).ClickAsync();
             var renderedView = page.GetByTestId(UiTestIds.Editor.RenderedView);
             await Expect(renderedView).ToBeVisibleAsync();
             var cardsBackground = await ReadCssColorAsync(renderedView, BackgroundColorProperty);

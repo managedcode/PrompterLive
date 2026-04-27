@@ -153,12 +153,12 @@ public partial class EditorPage
         }
 
         await InvokeAsync(StateHasChanged);
-        if (_workspaceTab != EditorWorkspaceTab.Rendered && _sourcePanel is not null)
+        if (_workspaceTab != EditorWorkspaceTab.Editor && _sourcePanel is not null)
         {
             await _sourcePanel.SyncExternalTextAsync(_sourceText, selection);
         }
 
-        if (_workspaceTab != EditorWorkspaceTab.Rendered)
+        if (_workspaceTab != EditorWorkspaceTab.Editor)
         {
             await FocusSourceRangeAsync(selection.Start, selection.End, revealSelection: false);
         }

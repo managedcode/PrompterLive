@@ -36,10 +36,10 @@
                             @Text(UiTextKey.EditorWorkspaceSourceTab)
                         </button>
                         <button type="button"
-                                class="@GetWorkspaceTabCss(EditorWorkspaceTab.Rendered)"
-                                @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Rendered)"
-                                data-test="@UiTestIds.Editor.RenderedTab">
-                            @Text(UiTextKey.EditorWorkspaceRenderedTab)
+                                class="@GetWorkspaceTabCss(EditorWorkspaceTab.Editor)"
+                                @onclick="() => OnWorkspaceTabChangedAsync(EditorWorkspaceTab.Editor)"
+                                data-test="@UiTestIds.Editor.WorkspaceEditorTab">
+                            @Text(UiTextKey.EditorWorkspaceEditorTab)
                         </button>
                         <button type="button"
                                 class="@GetWorkspaceTabCss(EditorWorkspaceTab.Graph)"
@@ -69,11 +69,11 @@
                                            OnHistoryRequested="OnHistoryRequestedAsync"
                                            OnCommandRequested="OnCommandRequestedAsync" />
                     }
-                    else if (_workspaceTab == EditorWorkspaceTab.Rendered)
+                    else if (_workspaceTab == EditorWorkspaceTab.Editor)
                     {
                         <EditorRenderedTextView Segments="@BuildRenderedSegments()"
                                                 FallbackText="@BuildRenderedFallbackText()"
-                                                FallbackLabel="@Text(UiTextKey.EditorWorkspaceRenderedTab)"
+                                                FallbackLabel="@Text(UiTextKey.EditorWorkspaceEditorTab)"
                                                 AttachmentRequested="OnRenderedBlockAttachmentRequestedAsync"
                                                 BlockReorderRequested="OnRenderedBlockReorderRequestedAsync"
                                                 TextChanged="OnRenderedTextChangedAsync" />

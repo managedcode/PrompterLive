@@ -107,7 +107,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     [Test]
     public void TeleprompterPage_RendersSeparateBackgroundCameraAndRecordingControls()
     {
-        TestHarnessFactory.Create(this);
+        var harness = TestHarnessFactory.Create(this);
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.TeleprompterDemo);
 
@@ -141,7 +141,9 @@ public sealed class TeleprompterControlRailTests : BunitContext
             Assert.Equal(RecordingCameraTooltipText, cut.FindByTestId(UiTestIds.Tooltip.Surface(UiTestIds.Teleprompter.RecordingCameraSelect)).TextContent.Trim());
             Assert.Equal(RecordingMicrophoneTooltipText, cut.FindByTestId(UiTestIds.Tooltip.Surface(UiTestIds.Teleprompter.RecordingMicrophoneSelect)).TextContent.Trim());
             Assert.Contains("rd-background-media-icon", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
-            Assert.Contains("M4 8.5 12 4l8 4.5-8 4.5L4 8.5Z", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains("rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains("M4.5 17 9 12.5l3 3 2-2L19.5 19", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
+            Assert.DoesNotContain("M4 8.5 12 4l8 4.5-8 4.5L4 8.5Z", backgroundCameraToggle.InnerHtml, StringComparison.Ordinal);
             Assert.Contains("rd-record-mode-icon", recordingModeShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
             Assert.Contains("circle", recordingModeShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
             Assert.DoesNotContain("points=\"23,7 16,12 23,17\"", recordingModeShell?.InnerHtml ?? string.Empty, StringComparison.Ordinal);
@@ -152,6 +154,17 @@ public sealed class TeleprompterControlRailTests : BunitContext
                 backgroundCameraToggle.GetAttribute("data-test"),
                 recordingToggle.GetAttribute("data-test"),
                 StringComparison.Ordinal));
+        });
+
+        cut.FindByTestId(UiTestIds.Teleprompter.RecordingCameraSelect).Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains(
+                UiTestIds.Settings.SelectPanel(UiTestIds.Teleprompter.RecordingCameraSelect),
+                cut.Markup,
+                StringComparison.Ordinal);
+            Assert.Contains("PrompterOneSettingsSelect.position", harness.JsRuntime.Invocations);
         });
     }
 

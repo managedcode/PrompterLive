@@ -554,7 +554,7 @@ public enum UiTextKey
     EditorMetadataToggleExpand,
     EditorMetadataToggleCollapse,
     EditorWorkspaceSourceTab,
-    EditorWorkspaceRenderedTab,
+    EditorWorkspaceEditorTab,
     EditorWorkspaceGraphTab,
     EditorRenderedMoveBlockUp,
     EditorRenderedMoveBlockDown,

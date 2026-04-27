@@ -1,12 +1,15 @@
 @namespace PrompterOne.Shared.Settings.Components
+@using Microsoft.JSInterop
 @using PrompterOne.Shared.Components
 @using PrompterOne.Shared.Contracts
+@inject IJSRuntime JSRuntime
 
 <div class="ss-wrap"
      tabindex="-1"
      @onfocusout="OnFocusOut"
      @onclick:stopPropagation="true">
     <button type="button"
+            @ref="_triggerElement"
             class="ss-trigger set-select"
             data-test="@TestId"
             value="@Value"
@@ -22,6 +25,7 @@
     @if (_open)
     {
         <div class="ss-panel"
+             @ref="_panelElement"
              data-test="@GetPanelTestId()">
             @foreach (var option in Options)
             {
@@ -51,10 +55,14 @@
 
 @code {
     private const string OpenChevronClass = "ss-chevron-open";
+    private const string PositionInteropIdentifier = "PrompterOneSettingsSelect.position";
     private const string SelectedOptionClass = "ss-option-selected";
     private const string FallbackLabel = "—";
 
     private bool _open;
+    private bool _needsPanelPositioning;
+    private ElementReference _panelElement;
+    private ElementReference _triggerElement;
 
     [Parameter] public string Value { get; set; } = string.Empty;
     [Parameter] public string AriaLabel { get; set; } = string.Empty;
@@ -95,19 +103,33 @@
     private void Toggle()
     {
         _open = !_open;
+        _needsPanelPositioning = _open;
     }
 
     private async Task SelectOption(string value)
     {
         _open = false;
+        _needsPanelPositioning = false;
         if (!string.Equals(value, Value, StringComparison.Ordinal))
         {
             await OnChange.InvokeAsync(new ChangeEventArgs { Value = value });
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_open || !_needsPanelPositioning)
+        {
+            return;
+        }
+
+        _needsPanelPositioning = false;
+        await JSRuntime.InvokeVoidAsync(PositionInteropIdentifier, _triggerElement, _panelElement);
+    }
+
     private void OnFocusOut()
     {
         _open = false;
+        _needsPanelPositioning = false;
     }
 }

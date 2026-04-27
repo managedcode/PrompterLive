@@ -26,7 +26,7 @@ public partial class EditorPage
             _metadataRailSelectedTab = EditorMetadataRailTab.Metadata;
         }
 
-        if (tab == EditorWorkspaceTab.Rendered)
+        if (tab == EditorWorkspaceTab.Editor)
         {
             _sourcePanel = null;
         }

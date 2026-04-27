@@ -1,21 +1,15 @@
 @namespace PrompterOne.Shared.Components.Editor
-@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Localization
-@using Microsoft.JSInterop
 @using PrompterOne.Shared.Localization
-@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
-@inject IJSRuntime JSRuntime
 
 <div class="editor-rendered-view"
-     @ref="_rootElement"
-     data-rendered-authoring-mode="visual"
+     data-rendered-authoring-mode="styled-text"
      data-test="@UiTestIds.Editor.RenderedView">
-    <div class="editor-rendered-strip" data-test="@UiTestIds.Editor.RenderedStrip">
+    <div class="editor-rendered-document" data-test="@UiTestIds.Editor.RenderedStrip">
         @if (Segments.Count == 0)
         {
-            <section class="editor-rendered-card editor-rendered-card--empty" data-test="@UiTestIds.Editor.RenderedEmpty">
-                <span class="editor-rendered-empty-mark">1</span>
+            <section class="editor-rendered-section editor-rendered-section--empty" data-test="@UiTestIds.Editor.RenderedEmpty">
                 <textarea class="editor-rendered-text editor-rendered-text--empty"
                           aria-label="@FallbackLabel"
                           data-test="@UiTestIds.Editor.RenderedFallbackText"
@@ -27,35 +21,26 @@
         {
             @foreach (var segment in Segments)
             {
-                <section class="editor-rendered-card" data-test="@UiTestIds.Editor.RenderedSegment(segment.Index)">
-                    <header class="editor-rendered-card-header">
+                <section class="editor-rendered-section" data-test="@UiTestIds.Editor.RenderedSegment(segment.Index)">
+                    <header class="editor-rendered-section-header">
                         <span class="editor-rendered-number">@segment.Number</span>
-                        <span class="editor-rendered-meta">@segment.TargetWpmLabel</span>
-                    </header>
-                    <div class="editor-rendered-segment-title">@segment.Name</div>
-                    <div class="editor-rendered-segment-detail">
-                        <span>@segment.EmotionLabel</span>
-                        @if (!string.IsNullOrWhiteSpace(segment.DurationLabel))
-                        {
-                            <span>@segment.DurationLabel</span>
-                        }
-                    </div>
-                    @if (segment.Cues.Count > 0)
-                    {
-                        <div class="editor-rendered-cue-row editor-rendered-cue-row--segment"
-                             aria-label="@segment.Name"
-                             data-test="@UiTestIds.Editor.RenderedSegmentCues(segment.Index)">
-                            @foreach (var cue in segment.Cues)
-                            {
-                                <span class="editor-rendered-cue-chip"
-                                      data-cue-kind="@cue.Kind"
-                                      data-cue-tone="@cue.Tone">
-                                    <span class="editor-rendered-cue-icon" aria-hidden="true">@cue.Icon</span>
-                                    <span class="editor-rendered-cue-label">@cue.Label</span>
-                                </span>
-                            }
+                        <div class="editor-rendered-section-title-group">
+                            <h2 class="editor-rendered-segment-title">@segment.Name</h2>
+                            <div class="editor-rendered-cue-row editor-rendered-cue-row--segment"
+                                 aria-label="@segment.Name"
+                                 data-test="@UiTestIds.Editor.RenderedSegmentCues(segment.Index)">
+                                @foreach (var cue in segment.Cues)
+                                {
+                                    <span class="editor-rendered-cue-chip"
+                                          data-cue-kind="@cue.Kind"
+                                          data-cue-tone="@cue.Tone">
+                                        <span class="editor-rendered-cue-icon" aria-hidden="true">@cue.Icon</span>
+                                        <span class="editor-rendered-cue-label">@cue.Label</span>
+                                    </span>
+                                }
+                            </div>
                         </div>
-                    }
+                    </header>
 
                     @foreach (var block in segment.Blocks)
                     {
@@ -65,39 +50,10 @@
                                  data-rendered-block-index="@block.BlockIndex"
                                  data-test="@UiTestIds.Editor.RenderedBlock(block.SegmentIndex, block.BlockIndex)">
                             <div class="editor-rendered-block-head">
-                                <span class="editor-rendered-block-drag-handle"
-                                      aria-hidden="true"
-                                      data-test="@UiTestIds.Editor.RenderedBlockDragHandle(block.SegmentIndex, block.BlockIndex)">⋮⋮</span>
                                 <span class="editor-rendered-block-number">@block.Number</span>
                                 <span class="editor-rendered-block-title">@block.Name</span>
-                                <span class="editor-rendered-block-actions">
-                                    <button type="button"
-                                            class="editor-rendered-block-move"
-                                            aria-label="@Text(UiTextKey.EditorRenderedMoveBlockUp)"
-                                            disabled="@(!CanMoveBlock(block, -1))"
-                                            @onclick="() => MoveBlockByOffsetAsync(block, -1)"
-                                            data-test="@UiTestIds.Editor.RenderedBlockMoveUp(block.SegmentIndex, block.BlockIndex)">↑</button>
-                                    <button type="button"
-                                            class="editor-rendered-block-move"
-                                            aria-label="@Text(UiTextKey.EditorRenderedMoveBlockDown)"
-                                            disabled="@(!CanMoveBlock(block, 1))"
-                                            @onclick="() => MoveBlockByOffsetAsync(block, 1)"
-                                            data-test="@UiTestIds.Editor.RenderedBlockMoveDown(block.SegmentIndex, block.BlockIndex)">↓</button>
-                                    <label class="editor-rendered-attach"
-                                           title="@Text(UiTextKey.EditorRenderedAttachMedia)">
-                                        <span aria-hidden="true">＋</span>
-                                        <InputFile class="editor-rendered-attach-input"
-                                                   aria-label="@Text(UiTextKey.EditorRenderedAttachMedia)"
-                                                   OnChange="@((InputFileChangeEventArgs args) => OnAttachmentInputAsync(block, args))"
-                                                   data-test="@UiTestIds.Editor.RenderedBlockAttachmentInput(block.SegmentIndex, block.BlockIndex)" />
-                                    </label>
-                                </span>
-                            </div>
-                            @if (block.Cues.Count > 0)
-                            {
-                                <div class="editor-rendered-cue-row"
-                                     aria-label="@block.Name"
-                                     data-test="@UiTestIds.Editor.RenderedBlockCues(block.SegmentIndex, block.BlockIndex)">
+                                <span class="editor-rendered-block-cue-line"
+                                      data-test="@UiTestIds.Editor.RenderedBlockCues(block.SegmentIndex, block.BlockIndex)">
                                     @foreach (var cue in block.Cues)
                                     {
                                         <span class="editor-rendered-cue-chip"
@@ -107,45 +63,13 @@
                                             <span class="editor-rendered-cue-label">@cue.Label</span>
                                         </span>
                                     }
-                                </div>
-                            }
+                                </span>
+                            </div>
                             <textarea class="editor-rendered-text"
                                       aria-label="@block.Name"
                                       data-test="@UiTestIds.Editor.RenderedBlockText(block.SegmentIndex, block.BlockIndex)"
                                       value="@block.Text"
                                       @oninput="@((ChangeEventArgs args) => OnBlockInputAsync(block, args))"></textarea>
-                            <div class="editor-rendered-block-meta">
-                                @if (!string.IsNullOrWhiteSpace(block.EmotionLabel))
-                                {
-                                    <span>@block.EmotionLabel</span>
-                                }
-                                <span>@block.TargetWpmLabel</span>
-                            </div>
-                            @if (block.Attachments.Count > 0)
-                            {
-                                <div class="editor-rendered-attachments"
-                                     aria-label="@Text(UiTextKey.EditorRenderedAttachmentsLabel)"
-                                     data-test="@UiTestIds.Editor.RenderedBlockAttachments(block.SegmentIndex, block.BlockIndex)">
-                                    @foreach (var attachment in block.Attachments.Select((value, index) => (value, index)))
-                                    {
-                                        <div class="editor-rendered-attachment"
-                                             data-test="@UiTestIds.Editor.RenderedBlockAttachment(block.SegmentIndex, block.BlockIndex, attachment.index)">
-                                            @if (!string.IsNullOrWhiteSpace(attachment.value.PreviewDataUrl))
-                                            {
-                                                <img class="editor-rendered-attachment-thumb"
-                                                     src="@attachment.value.PreviewDataUrl"
-                                                     alt="" />
-                                            }
-                                            else
-                                            {
-                                                <span class="editor-rendered-attachment-icon" aria-hidden="true">▣</span>
-                                            }
-                                            <span class="editor-rendered-attachment-name">@attachment.value.FileName</span>
-                                            <span class="editor-rendered-attachment-meta">@attachment.value.KindLabel · @attachment.value.SizeLabel</span>
-                                        </div>
-                                    }
-                                </div>
-                            }
                         </article>
                     }
                 </section>
@@ -167,45 +91,6 @@
 
     [Parameter] public EventCallback<EditorRenderedBlockAttachmentRequest> AttachmentRequested { get; set; }
 
-    private const string RenderedCardsModulePath = "./_content/PrompterOne.Shared/app/editor-rendered-cards.js";
-
-    private ElementReference _rootElement;
-
-    private IJSObjectReference? _renderedCardsModule;
-
-    private IJSObjectReference? _renderedCardsHandle;
-
-    private DotNetObjectReference<EditorRenderedTextView>? _dotNetReference;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        try
-        {
-            _dotNetReference = DotNetObjectReference.Create(this);
-            _renderedCardsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", RenderedCardsModulePath);
-            if (_renderedCardsModule is null)
-            {
-                return;
-            }
-
-            _renderedCardsHandle = await _renderedCardsModule.InvokeAsync<IJSObjectReference>(
-                "attach",
-                _rootElement,
-                _dotNetReference);
-        }
-        catch (InvalidOperationException)
-        {
-        }
-        catch (JSException)
-        {
-        }
-    }
-
     private Task OnBlockInputAsync(EditorRenderedBlockViewModel block, ChangeEventArgs args) =>
         TextChanged.InvokeAsync(new EditorRenderedBlockTextChange(
             block.SegmentIndex,
@@ -217,98 +102,6 @@
             0,
             0,
             args.Value?.ToString() ?? string.Empty));
-
-    private Task OnAttachmentInputAsync(EditorRenderedBlockViewModel block, InputFileChangeEventArgs args)
-    {
-        var file = args.File;
-        return AttachmentRequested.InvokeAsync(new EditorRenderedBlockAttachmentRequest(
-            block.BlockKey,
-            block.Name,
-            file));
-    }
-
-    [JSInvokable]
-    public async Task HandleRenderedCardDropAsync(
-        int sourceSegmentIndex,
-        int sourceBlockIndex,
-        int targetSegmentIndex,
-        int targetBlockIndex)
-    {
-        var blocks = FlattenBlocks();
-        var dragged = blocks.FirstOrDefault(block =>
-            block.SegmentIndex == sourceSegmentIndex &&
-            block.BlockIndex == sourceBlockIndex);
-        var target = blocks.FirstOrDefault(block =>
-            block.SegmentIndex == targetSegmentIndex &&
-            block.BlockIndex == targetBlockIndex);
-        if (dragged is null || target is null || IsSameBlock(dragged, target))
-        {
-            return;
-        }
-
-        await RequestBlockReorderAsync(dragged, target);
-    }
-
-    private async Task MoveBlockByOffsetAsync(EditorRenderedBlockViewModel block, int offset)
-    {
-        var blocks = FlattenBlocks();
-        var index = blocks.FindIndex(candidate => IsSameBlock(candidate, block));
-        var targetIndex = index + offset;
-        if (index < 0 || targetIndex < 0 || targetIndex >= blocks.Count)
-        {
-            return;
-        }
-
-        var target = blocks[targetIndex];
-        await BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
-            block.SegmentIndex,
-            block.BlockIndex,
-            target.SegmentIndex,
-            target.BlockIndex,
-            offset > 0));
-    }
-
-    private bool CanMoveBlock(EditorRenderedBlockViewModel block, int offset)
-    {
-        var blocks = FlattenBlocks();
-        var index = blocks.FindIndex(candidate => IsSameBlock(candidate, block));
-        var targetIndex = index + offset;
-        return index >= 0 && targetIndex >= 0 && targetIndex < blocks.Count;
-    }
-
-    private List<EditorRenderedBlockViewModel> FlattenBlocks() =>
-        Segments.SelectMany(segment => segment.Blocks).ToList();
-
-    private static bool IsSameBlock(EditorRenderedBlockViewModel left, EditorRenderedBlockViewModel right) =>
-        left.SegmentIndex == right.SegmentIndex && left.BlockIndex == right.BlockIndex;
-
-    private static bool IsBefore(EditorRenderedBlockViewModel source, EditorRenderedBlockViewModel target) =>
-        source.SegmentIndex < target.SegmentIndex ||
-        (source.SegmentIndex == target.SegmentIndex && source.BlockIndex < target.BlockIndex);
-
-    private Task RequestBlockReorderAsync(EditorRenderedBlockViewModel dragged, EditorRenderedBlockViewModel target) =>
-        BlockReorderRequested.InvokeAsync(new EditorRenderedBlockReorderRequest(
-            dragged.SegmentIndex,
-            dragged.BlockIndex,
-            target.SegmentIndex,
-            target.BlockIndex,
-            IsBefore(dragged, target)));
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_renderedCardsHandle is not null)
-        {
-            await _renderedCardsHandle.InvokeVoidAsync("dispose");
-            await _renderedCardsHandle.DisposeAsync();
-        }
-
-        if (_renderedCardsModule is not null)
-        {
-            await _renderedCardsModule.DisposeAsync();
-        }
-
-        _dotNetReference?.Dispose();
-    }
 
     private string Text(UiTextKey key) => Localizer[key.ToString()];
 }

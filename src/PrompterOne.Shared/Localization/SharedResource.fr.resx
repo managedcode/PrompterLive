@@ -337,7 +337,7 @@
     <value>De la bibliothèque de scripts à la lecture en direct</value>
   </data>
   <data name="SettingsHelpAppFlowCopy" xml:space="preserve">
-    <value>Commencez dans Library, écrivez ou importez un script dans Editor, passez à Rendered lorsque vous voulez une édition visuelle sans syntaxe TPS, répétez dans Practice, lisez dans Teleprompter et utilisez Go Live quand vous êtes prêt à enregistrer ou diffuser.</value>
+    <value>Commencez dans Library, écrivez ou importez la source dans Raw lorsque vous avez besoin des balises TPS, utilisez Editor pour une édition visuelle sans syntaxe TPS, répétez dans Practice, lisez dans Teleprompter et utilisez Go Live quand vous êtes prêt à enregistrer ou diffuser.</value>
   </data>
   <data name="SettingsHelpTpsBasicsTitle" xml:space="preserve">
     <value>Bases du standard TPS</value>
@@ -355,7 +355,7 @@
     <value>Choisissez la surface adaptée à la tâche</value>
   </data>
   <data name="SettingsHelpModesCopy" xml:space="preserve">
-    <value>Raw sert à modifier directement la source TPS, Rendered à modifier visuellement les blocs sans syntaxe brute, Graph affiche la structure du script, Practice utilise RSVP pour s’entraîner mot par mot, Teleprompter est le lecteur en direct, et Go Live combine lecture, caméra, enregistrement et contrôles de streaming.</value>
+    <value>Raw sert à modifier directement la source TPS, Editor est l’éditeur de script de type WYSIWYG sans syntaxe brute, Graph affiche la structure du script, Practice utilise RSVP pour s’entraîner mot par mot, Teleprompter est le lecteur en direct, et Go Live combine lecture, caméra, enregistrement et contrôles de streaming.</value>
   </data>
   <data name="SettingsHelpLocalFilesTitle" xml:space="preserve">
     <value>Fichiers locaux et historique</value>
@@ -1680,8 +1680,8 @@
   <data name="EditorWorkspaceSourceTab" xml:space="preserve">
     <value>Raw</value>
   </data>
-  <data name="EditorWorkspaceRenderedTab" xml:space="preserve">
-    <value>Rendered</value>
+  <data name="EditorWorkspaceEditorTab" xml:space="preserve">
+    <value>Editor</value>
   </data>
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Graphe</value>

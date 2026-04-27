@@ -67,7 +67,7 @@ public sealed class EditorVisualSourceTests : BunitContext
     }
 
     [Test]
-    public async Task EditorPage_RenderedCardsViewHidesTpsSyntaxAndEditsBlockText()
+    public async Task EditorPage_RenderedStyledTextViewHidesTpsSyntaxAndEditsBlockText()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -79,7 +79,7 @@ public sealed class EditorVisualSourceTests : BunitContext
             Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
         });
 
-        await cut.FindByTestId(UiTestIds.Editor.RenderedTab).ClickAsync();
+        await cut.FindByTestId(UiTestIds.Editor.WorkspaceEditorTab).ClickAsync();
 
         cut.WaitForAssertion(() =>
         {
@@ -90,7 +90,9 @@ public sealed class EditorVisualSourceTests : BunitContext
                 .GetAttribute("value") ?? string.Empty;
 
             Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedView));
-            Assert.Equal("visual", cut.FindByTestId(UiTestIds.Editor.RenderedView).GetAttribute("data-rendered-authoring-mode"));
+            Assert.Equal("styled-text", cut.FindByTestId(UiTestIds.Editor.RenderedView).GetAttribute("data-rendered-authoring-mode"));
+            Assert.DoesNotContain("editor-rendered-card", cut.Markup, StringComparison.Ordinal);
+            Assert.DoesNotContain("data-rendered-cards-drag-ready", cut.Markup, StringComparison.Ordinal);
             Assert.Contains(
                 "Warm",
                 cut.FindByTestId(UiTestIds.Editor.RenderedSegmentCues(EditorVisualTestSource.IntroSegmentIndex)).TextContent,
@@ -102,9 +104,6 @@ public sealed class EditorVisualSourceTests : BunitContext
                         EditorVisualTestSource.OpeningBlockIndex))
                     .TextContent,
                 StringComparison.OrdinalIgnoreCase);
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedBlockDragHandle(
-                EditorVisualTestSource.IntroSegmentIndex,
-                EditorVisualTestSource.OpeningBlockIndex)));
             Assert.Equal(
                 "false",
                 cut.FindByTestId(UiTestIds.Editor.RenderedBlock(
@@ -163,7 +162,7 @@ public sealed class EditorVisualSourceTests : BunitContext
         public const string RawTagClose = "]";
         public const string RawTagOpen = "[";
         public const string RenderedOpeningProbe = "Good morning everyone";
-        public const string RenderedOpeningRewrite = "Good morning everyone, welcome from cards mode.";
+        public const string RenderedOpeningRewrite = "Good morning everyone, welcome from Editor mode.";
         public const int IntroSegmentIndex = 0;
         public const int OpeningBlockIndex = 0;
         public const int AutosaveAssertionTimeout = 5_000;

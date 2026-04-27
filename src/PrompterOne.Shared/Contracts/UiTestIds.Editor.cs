@@ -136,7 +136,7 @@ public static partial class UiTestIds
         public const string RenderedEmpty = "editor-rendered-empty";
         public const string RenderedFallbackText = "editor-rendered-fallback-text";
         public const string RenderedStrip = "editor-rendered-strip";
-        public const string RenderedTab = "editor-rendered-tab";
+        public const string WorkspaceEditorTab = "editor-workspace-editor-tab";
         public const string RenderedView = "editor-rendered-view";
         public const string SourceHighlight = "editor-source-highlight";
         public const string SourceInput = "editor-source-input";

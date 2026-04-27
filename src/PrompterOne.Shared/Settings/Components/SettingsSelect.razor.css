@@ -49,6 +49,24 @@
     overflow-y: auto;
 }
 
+.ss-panel.ss-panel-positioned {
+    position: fixed;
+    top: var(--ss-panel-top);
+    left: var(--ss-panel-left);
+    right: auto;
+    width: var(--ss-panel-width);
+    max-width: calc(100vw - 16px);
+    max-height: var(--ss-panel-max-height, 280px);
+}
+
+.ss-panel.ss-panel-positioned[data-placement="top"] {
+    transform-origin: bottom center;
+}
+
+.ss-panel.ss-panel-positioned[data-placement="bottom"] {
+    transform-origin: top center;
+}
+
 .ss-option {
     display: flex;
     align-items: center;
