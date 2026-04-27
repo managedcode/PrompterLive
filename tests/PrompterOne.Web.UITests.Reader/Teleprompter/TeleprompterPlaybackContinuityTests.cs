@@ -36,6 +36,7 @@ public sealed class TeleprompterPlaybackContinuityTests(StandaloneAppFixture fix
             await OpenLeadershipTeleprompterAsync(page);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.WidthSlider), BrowserTestConstants.ReaderWorkflow.TeleprompterWidth);
             await SetRangeValueAsync(page.GetByTestId(UiTestIds.Teleprompter.FocalSlider), BrowserTestConstants.ReaderWorkflow.TeleprompterFocal);
+            await SetPlaybackToMaximumSpeedAsync(page);
             await StartPlaybackAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Teleprompter.BlockIndicator))
