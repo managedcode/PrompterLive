@@ -82,7 +82,7 @@ public sealed class TeleprompterControlRailTests : BunitContext
     }
 
     [Test]
-    public void TeleprompterPage_RendersSpeedDialInBottomTransportControls()
+    public void TeleprompterPage_RendersSimpleSpeedControlsWithoutInlineDial()
     {
         TestHarnessFactory.Create(this);
         Services.GetRequiredService<NavigationManager>()
@@ -93,12 +93,12 @@ public sealed class TeleprompterControlRailTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             var controls = cut.FindByTestId(UiTestIds.Teleprompter.Controls);
-            var speedDial = cut.FindByTestId(UiTestIds.Teleprompter.SpeedDial);
-            var speedDialShell = speedDial.ParentElement;
 
-            Assert.Contains(UiTestIds.Teleprompter.SpeedDial, controls.InnerHtml, StringComparison.Ordinal);
-            Assert.NotNull(speedDialShell);
-            Assert.Contains("rd-speed-dial-inline", speedDialShell!.ClassName, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Teleprompter.SpeedDown, controls.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Teleprompter.SpeedValue, controls.InnerHtml, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Teleprompter.SpeedUp, controls.InnerHtml, StringComparison.Ordinal);
+            Assert.DoesNotContain("rd-speed-dial", controls.InnerHtml, StringComparison.Ordinal);
+            Assert.DoesNotContain("teleprompter-speed-dial", controls.InnerHtml, StringComparison.Ordinal);
         });
     }
 

@@ -18,17 +18,6 @@ public partial class TeleprompterPage
 
     private Task IncreaseReaderPlaybackSpeedAsync() => ChangeReaderPlaybackSpeedAsync(ReaderPlaybackSpeedStepWpm);
 
-    private Task HandleReaderSpeedDialInputAsync(ChangeEventArgs args)
-    {
-        var nextDialValue = ParseReaderControlValue(
-            args.Value,
-            ReaderSpeedDialMinimum,
-            ReaderSpeedDialMaximum,
-            BuildReaderSpeedDialValue());
-
-        return SetReaderPlaybackSpeedAsync(MapReaderSpeedDialToWpm(nextDialValue));
-    }
-
     private Task StepReaderBackwardAsync() => StepReaderWordAsync(ReaderBackwardStep);
 
     private Task StepReaderForwardAsync() => StepReaderWordAsync(ReaderForwardStep);
@@ -70,20 +59,6 @@ public partial class TeleprompterPage
         {
             RestartReaderPlaybackLoop(GetCurrentWordDelayMilliseconds());
         }
-    }
-
-    private static int MapReaderSpeedDialToWpm(int dialValue)
-    {
-        var normalizedDial = Math.Clamp(dialValue, ReaderSpeedDialMinimum, ReaderSpeedDialMaximum);
-        var dialRange = ReaderSpeedDialMaximum - ReaderSpeedDialMinimum;
-        if (dialRange <= 0)
-        {
-            return ReaderMinimumPlaybackSpeedWpm;
-        }
-
-        var speedRange = ReaderMaximumPlaybackSpeedWpm - ReaderMinimumPlaybackSpeedWpm;
-        var dialOffset = normalizedDial - ReaderSpeedDialMinimum;
-        return ReaderMinimumPlaybackSpeedWpm + (int)Math.Round(speedRange * dialOffset / (double)dialRange, MidpointRounding.AwayFromZero);
     }
 
     private async Task HandleReaderFontSizeInputAsync(ChangeEventArgs args)

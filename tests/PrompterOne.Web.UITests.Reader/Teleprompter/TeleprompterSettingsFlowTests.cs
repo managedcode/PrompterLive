@@ -8,9 +8,6 @@ namespace PrompterOne.Web.UITests;
 [ClassDataSource<StandaloneAppFixture>(Shared = SharedType.PerClass)]
 public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) : AppUiTestBase(fixture)
 {
-    private const string ReaderSpeedDialUpdatedLabel = "8/10";
-    private const string ReaderSpeedDialUpdatedValue = "8";
-    private const int ReaderSpeedDialUpdatedWpm = 402;
     private const int ReaderSpeedStepWpm = 10;
     private const int TeleprompterDemoBaseWpm = 140;
     private const string WordsPerMinuteSuffix = "WPM";
@@ -59,22 +56,16 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
         await AssertTeleprompterChromeVisibilityAsync(page);
 
         var speedValue = page.GetByTestId(UiTestIds.Teleprompter.SpeedValue);
-        var speedDial = page.GetByTestId(UiTestIds.Teleprompter.SpeedDial);
         var baselineSpeedText = await speedValue.TextContentAsync() ?? string.Empty;
         var baselineSpeedWpm = ParseWordsPerMinuteValue(baselineSpeedText);
-        await Expect(speedDial).ToBeVisibleAsync(new() { Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs });
+        var updatedSpeedWpm = baselineSpeedWpm + ReaderSpeedStepWpm;
 
         await page.GetByTestId(UiTestIds.Teleprompter.SpeedUp).ClickAsync();
-        await Expect(speedValue).ToHaveTextAsync($"{baselineSpeedWpm + ReaderSpeedStepWpm} {WordsPerMinuteSuffix}");
-
-        await SetRangeValueAsync(speedDial, ReaderSpeedDialUpdatedValue);
-        await Expect(speedValue).ToHaveTextAsync($"{ReaderSpeedDialUpdatedWpm} {WordsPerMinuteSuffix}");
-        await Expect(speedDial).ToHaveValueAsync(ReaderSpeedDialUpdatedValue);
-        await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedDialValue)).ToHaveTextAsync(ReaderSpeedDialUpdatedLabel);
+        await Expect(speedValue).ToHaveTextAsync($"{updatedSpeedWpm} {WordsPerMinuteSuffix}");
 
         await page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier).ClickAsync();
         await Expect(speedValue)
-            .ToHaveTextAsync(BuildSpeedMultiplierLabel(TeleprompterDemoBaseWpm, ReaderSpeedDialUpdatedWpm));
+            .ToHaveTextAsync(BuildSpeedMultiplierLabel(TeleprompterDemoBaseWpm, updatedSpeedWpm));
         await Expect(page.GetByTestId(UiTestIds.Teleprompter.SpeedCueDisplayMultiplier))
             .ToHaveAttributeAsync(BrowserTestConstants.State.ActiveAttribute, BrowserTestConstants.Teleprompter.ActiveStateValue);
 
@@ -304,17 +295,6 @@ public sealed class TeleprompterSettingsFlowTests(StandaloneAppFixture fixture) 
     private static Task<double> GetOpacityAsync(Microsoft.Playwright.ILocator locator) =>
         locator.EvaluateAsync<double>(
             "element => Number.parseFloat(window.getComputedStyle(element).opacity)");
-
-    private static Task SetRangeValueAsync(Microsoft.Playwright.ILocator locator, string value) =>
-        locator.EvaluateAsync(
-            """
-            (element, nextValue) => {
-                element.value = nextValue;
-                element.dispatchEvent(new Event("input", { bubbles: true }));
-                element.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-            """,
-            value);
 
     private static async Task<LayoutBounds> GetRequiredBoundingBoxAsync(Microsoft.Playwright.ILocator locator) =>
         await locator.EvaluateAsync<LayoutBounds>(

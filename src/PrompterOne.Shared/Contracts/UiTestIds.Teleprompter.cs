@@ -61,9 +61,6 @@ public static partial class UiTestIds
         public const string SpeedCueDisplayMultiplier = "teleprompter-speed-cue-display-multiplier";
         public const string SpeedCueDisplayTooltipKey = "speed-cue-display";
         public const string SpeedCueDisplayWpm = "teleprompter-speed-cue-display-wpm";
-        public const string SpeedDial = "teleprompter-speed-dial";
-        public const string SpeedDialTooltipKey = "speed-dial";
-        public const string SpeedDialValue = "teleprompter-speed-dial-value";
         public const string SpeedUp = "teleprompter-speed-up";
         public const string SpeedValue = "teleprompter-speed-value";
         public const string Sliders = "teleprompter-sliders";

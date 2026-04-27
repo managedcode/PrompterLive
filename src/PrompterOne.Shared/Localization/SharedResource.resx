@@ -582,9 +582,6 @@
   <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
     <value>Show speed cues as multipliers</value>
   </data>
-  <data name="TooltipReaderSpeedDial" xml:space="preserve">
-    <value>Adjust the live reader speed dial</value>
-  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Smaller text</value>
   </data>

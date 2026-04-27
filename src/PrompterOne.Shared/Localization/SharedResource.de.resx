@@ -561,9 +561,6 @@
   <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
     <value>Geschwindigkeitsmarken als Multiplikatoren anzeigen</value>
   </data>
-  <data name="TooltipReaderSpeedDial" xml:space="preserve">
-    <value>Live-Geschwindigkeitsregler für den Reader anpassen</value>
-  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Kleinerer Text</value>
   </data>

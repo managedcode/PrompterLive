@@ -603,9 +603,6 @@
   <data name="TooltipReaderSpeedCueDisplayMultiplier" xml:space="preserve">
     <value>Показувати позначки швидкості як множники</value>
   </data>
-  <data name="TooltipReaderSpeedDial" xml:space="preserve">
-    <value>Налаштувати живий регулятор швидкості читання</value>
-  </data>
   <data name="TooltipSmallerText" xml:space="preserve">
     <value>Менший текст</value>
   </data>

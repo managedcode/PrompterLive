@@ -300,7 +300,6 @@ public enum UiTextKey
     TooltipReaderSpeedCueDisplay,
     TooltipReaderSpeedCueDisplayWpm,
     TooltipReaderSpeedCueDisplayMultiplier,
-    TooltipReaderSpeedDial,
     TooltipSmallerText,
     TooltipLargerText,
     TooltipPreviousBlock,

@@ -92,8 +92,6 @@ public static class UiDomIds
         public const string FocalGuide = "rd-guide-h";
         public const string HeaderSegment = "rd-header-segment";
         public const string ProgressFill = "rd-progress-fill";
-        public const string SpeedDial = "rd-speed-dial";
-        public const string SpeedDialValue = "rd-speed-dial-val";
         public const string SpeedValue = "rd-speed-val";
         public const string Stage = "rd-stage";
         public const string Time = "rd-time";
