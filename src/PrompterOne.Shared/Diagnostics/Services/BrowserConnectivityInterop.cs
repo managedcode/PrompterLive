@@ -53,8 +53,28 @@ public sealed class BrowserConnectivityInterop(IJSRuntime jsRuntime) : IDisposab
         }
     }
 
-    private Task<IJSObjectReference?> GetModuleAsync() =>
-        _moduleTask ??= ImportModuleAsync();
+    private async Task<IJSObjectReference?> GetModuleAsync()
+    {
+        if (_moduleTask is not null)
+        {
+            var existingModule = await _moduleTask;
+            if (existingModule is not null)
+            {
+                return existingModule;
+            }
+
+            _moduleTask = null;
+        }
+
+        _moduleTask = ImportModuleAsync();
+        var module = await _moduleTask;
+        if (module is null)
+        {
+            _moduleTask = null;
+        }
+
+        return module;
+    }
 
     private async Task<IJSObjectReference?> ImportModuleAsync()
     {

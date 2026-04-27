@@ -203,6 +203,20 @@ public sealed class DiagnosticsTests : BunitContext
         Assert.True(RuntimeTelemetrySuppressionPolicy.ShouldSuppressOutboundSentry(sentryEvent));
     }
 
+    [Test]
+    public async Task BrowserConnectivityInterop_RetriesModuleImportAfterTransientFailure()
+    {
+        var jsRuntime = new TransientConnectivityJsRuntime();
+        await using var interop = new BrowserConnectivityInterop(jsRuntime);
+
+        var firstProbe = await interop.GetOnlineStatusAsync();
+        var secondProbe = await interop.GetOnlineStatusAsync();
+
+        Assert.Null(firstProbe);
+        Assert.True(secondProbe is true);
+        Assert.Equal(2, jsRuntime.ImportAttempts);
+    }
+
     private string Text(UiTextKey key) =>
         Services.GetRequiredService<IStringLocalizer<SharedResource>>()[key.ToString()];
 
@@ -225,6 +239,48 @@ public sealed class DiagnosticsTests : BunitContext
             ClarityProjectId: "clarity-test-project",
             SentryDsn: "https://public@example.ingest.sentry.io/1",
             HostEnabled: true);
+
+    private sealed class TransientConnectivityJsRuntime : IJSRuntime
+    {
+        public int ImportAttempts { get; private set; }
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
+            InvokeAsync<TValue>(identifier, CancellationToken.None, args);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+        {
+            if (!string.Equals(identifier, BrowserConnectivityInteropMethodNames.JSImportMethodName, StringComparison.Ordinal))
+            {
+                return ValueTask.FromResult(default(TValue)!);
+            }
+
+            ImportAttempts++;
+            if (ImportAttempts == 1)
+            {
+                throw new JSException("Transient connectivity module import failure.");
+            }
+
+            return ValueTask.FromResult((TValue)(object)new ConnectivityJsModule());
+        }
+    }
+
+    private sealed class ConnectivityJsModule : IJSObjectReference
+    {
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
+            InvokeAsync<TValue>(identifier, CancellationToken.None, args);
+
+        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+        {
+            if (string.Equals(identifier, BrowserConnectivityInteropMethodNames.GetOnlineStatus, StringComparison.Ordinal))
+            {
+                return ValueTask.FromResult((TValue)(object)true);
+            }
+
+            return ValueTask.FromResult(default(TValue)!);
+        }
+    }
 
     private sealed class ThrowingDiagnosticsComponent : ComponentBase
     {
