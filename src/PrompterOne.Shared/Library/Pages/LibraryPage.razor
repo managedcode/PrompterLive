@@ -16,8 +16,6 @@
                     IsOpen="_isSidebarOpen"
                     FavoriteScriptCount="_allCards.Count(card => card.IsFavorite)"
                     OrganizationTerminology="OrganizationTerminology"
-                    SelectedOrganizationMode="_organizationMode"
-                    OnOrganizationModeChanged="SetOrganizationMode"
                     OnSelectFolder="SelectFolder"
                     OnClose="CloseSidebar"
                     OnStartCreateFolder="StartCreateFolder" />
@@ -47,23 +45,22 @@
                         @onclick:stopPropagation="true">
                     <UiIcon Kind="UiIconKind.PanelLeft" Size="16" />
                 </button>
-                <span class="sort-label" data-test="@UiTestIds.Library.SortLabel">@Text(UiTextKey.LibrarySortBy)</span>
-                <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
-                        @onclick="() => SetSortMode(LibrarySortMode.Name)"
-                        data-active="@(GetSortModeState(LibrarySortMode.Name))"
-                        data-test="@UiTestIds.Library.SortName">@Text(UiTextKey.LibrarySortName)</button>
-                <button class="sort-btn @GetSortClass(LibrarySortMode.Date)"
-                        @onclick="() => SetSortMode(LibrarySortMode.Date)"
-                        data-active="@(GetSortModeState(LibrarySortMode.Date))"
-                        data-test="@UiTestIds.Library.SortDate">@Text(UiTextKey.LibrarySortDate)</button>
-                <button class="sort-btn @GetSortClass(LibrarySortMode.Duration)"
-                        @onclick="() => SetSortMode(LibrarySortMode.Duration)"
-                        data-active="@(GetSortModeState(LibrarySortMode.Duration))"
-                        data-test="@UiTestIds.Library.SortDuration">@Text(UiTextKey.LibrarySortDuration)</button>
-                <button class="sort-btn @GetSortClass(LibrarySortMode.Wpm)"
-                        @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
-                        data-active="@(GetSortModeState(LibrarySortMode.Wpm))"
-                        data-test="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
+                <span class="sort-label" data-test="@UiTestIds.Library.SortLabel">@Text(UiTextKey.LibraryOrganizationModeLabel)</span>
+                <div class="lib-organization-switcher" data-test="@UiTestIds.Library.OrganizationModeGroup">
+                    <div class="lib-organization-options">
+                        @foreach (var option in LibraryOrganizationTerminologyCatalog.All)
+                        {
+                            <button class="@GetOrganizationModeClass(option.Mode)"
+                                    type="button"
+                                    data-active="@(option.Mode == _organizationMode ? ActiveStateValue : InactiveStateValue)"
+                                    data-test="@UiTestIds.Library.OrganizationModeOption(option.Value)"
+                                    @onclick="() => SetOrganizationMode(option.Mode)">
+                                @Text(option.OptionLabelKey)
+                            </button>
+                        }
+                    </div>
+                </div>
+                <span class="lib-arrange-divider" aria-hidden="true"></span>
                 <button class="sort-btn @GetSortClass(LibrarySortMode.Author)"
                         @onclick="() => SetSortMode(LibrarySortMode.Author)"
                         data-active="@(GetSortModeState(LibrarySortMode.Author))"
@@ -72,6 +69,22 @@
                         @onclick="() => SetSortMode(LibrarySortMode.Project)"
                         data-active="@(GetSortModeState(LibrarySortMode.Project))"
                         data-test="@UiTestIds.Library.SortProject">@Text(UiTextKey.LibrarySortProject)</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Name)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Name)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Name))"
+                        data-test="@UiTestIds.Library.SortName">@Text(UiTextKey.LibrarySortName)</button>
+                <button class="sort-btn @GetSortClass(LibrarySortMode.Date)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Date)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Date))"
+                        data-test="@UiTestIds.Library.SortDate">@Text(UiTextKey.LibrarySortDate)</button>
+                <button class="sort-btn sort-btn-secondary @GetSortClass(LibrarySortMode.Duration)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Duration)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Duration))"
+                        data-test="@UiTestIds.Library.SortDuration">@Text(UiTextKey.LibrarySortDuration)</button>
+                <button class="sort-btn sort-btn-secondary @GetSortClass(LibrarySortMode.Wpm)"
+                        @onclick="() => SetSortMode(LibrarySortMode.Wpm)"
+                        data-active="@(GetSortModeState(LibrarySortMode.Wpm))"
+                        data-test="@UiTestIds.Library.SortWpm">@Text(UiTextKey.LibrarySortWpm)</button>
                 <button class="sort-btn tone-toggle @(_showToneMetadata ? "active" : null)"
                         type="button"
                         aria-pressed="@(_showToneMetadata ? "true" : "false")"

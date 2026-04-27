@@ -106,7 +106,7 @@
     overflow-y: auto;
 }
 .lib-organization-switcher {
-    padding: 0 10px 14px;
+    padding: 0;
 }
 .lib-organization-label {
     display: block;
@@ -118,8 +118,8 @@
     color: var(--t4);
 }
 .lib-organization-options {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 4px;
 }
 .lib-organization-option {

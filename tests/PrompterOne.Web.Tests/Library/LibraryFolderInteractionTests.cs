@@ -59,6 +59,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal("Folders", cut.FindByTestId(UiTestIds.Library.SectionFoldersTitle).TextContent.Trim());
+            Assert.Equal("Organize as", cut.FindByTestId(UiTestIds.Library.SortLabel).TextContent.Trim());
             Assert.Contains("Product Launch", cut.Markup);
         });
 
@@ -66,6 +67,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
+            Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.OrganizationModeOption("shows")).GetAttribute("data-active"));
             Assert.Equal("Shows", cut.FindByTestId(UiTestIds.Library.SectionFoldersTitle).TextContent.Trim());
             Assert.Contains("New show", cut.FindByTestId(UiTestIds.Library.FolderCreateTile).TextContent);
         });
@@ -179,6 +181,7 @@ public sealed class LibraryFolderInteractionTests : BunitContext
         cut.WaitForAssertion(() =>
         {
             Assert.Equal(ActiveStateValue, cut.FindByTestId(UiTestIds.Library.SortProject).GetAttribute("data-active"));
+            Assert.Contains(UiTestIds.Library.OrganizationModeGroup, cut.Markup, StringComparison.Ordinal);
             Assert.Equal(AppTestData.Scripts.LearnWpmBoundaryTitle, ResolveFirstCardTitle(cut));
         });
 

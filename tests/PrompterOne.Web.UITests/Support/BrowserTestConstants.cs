@@ -916,14 +916,14 @@ internal static partial class BrowserTestConstants
     public static class Localization
     {
         public const string CultureStorageKey = BrowserStorageKeys.CultureSetting;
-        public const string EnglishSortByLabel = "Sort by";
+        public const string EnglishSortByLabel = "Organize as";
         public const string FrenchCultureName = "fr";
         public const string FrenchCreateFolderTitle = "Créer un dossier";
         public const string FrenchLanguageLabel = "Français";
         public const string FrenchFoldersLabel = "Dossiers";
-        public const string FrenchSortByLabel = "Trier par";
+        public const string FrenchSortByLabel = "Organiser comme";
         public const string GermanCultureName = "de";
-        public const string GermanSortByLabel = "Sortieren nach";
+        public const string GermanSortByLabel = "Organisieren als";
         public const string RussianCultureName = "ru";
         public const string SetLocalStorageScript = "([key, value]) => window.localStorage.setItem(key, value)";
 

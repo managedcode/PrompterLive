@@ -108,6 +108,11 @@ public partial class LibraryPage
 
     private string? GetSortClass(LibrarySortMode sortMode) => _sortMode == sortMode ? "active" : null;
 
+    private string GetOrganizationModeClass(LibraryOrganizationMode mode) =>
+        mode == _organizationMode
+            ? "lib-organization-option active"
+            : "lib-organization-option";
+
     private string ResolveSelectedFolderLabel()
     {
         if (IsAllSelected)

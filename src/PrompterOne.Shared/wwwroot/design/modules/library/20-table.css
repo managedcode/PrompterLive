@@ -109,8 +109,28 @@
     gap: 6px;
     margin-bottom: 20px;
     min-width: 0;
+    flex-wrap: wrap;
 }
 .sort-label { font-size: 12px; color: var(--t4); margin-right: 4px; }
+.lib-sort-bar .lib-organization-switcher {
+    padding: 0;
+    min-width: 0;
+}
+
+.lib-sort-bar .lib-organization-options {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.lib-arrange-divider {
+    width: 1px;
+    height: 20px;
+    margin: 0 3px;
+    background: var(--gold-07);
+}
+
 .sort-btn {
     padding: 5px 12px;
     font-size: 12px;
@@ -118,6 +138,9 @@
     color: var(--t4);
     background: transparent;
     border-radius: 8px;
+}
+.sort-btn-secondary {
+    color: color-mix(in srgb, var(--t4) 78%, transparent);
 }
 .sort-btn:hover { color: var(--t2); background: var(--gold-05); }
 .sort-btn.active {
