@@ -2,8 +2,15 @@ namespace PrompterOne.Shared.Services;
 
 internal sealed partial class GoLiveSessionService
 {
+    private static readonly TimeSpan[] StateRequestCatchUpDelays =
+    [
+        TimeSpan.FromMilliseconds(250),
+        TimeSpan.FromMilliseconds(750)
+    ];
+
     private readonly SemaphoreSlim _crossTabStartGate = new(1, 1);
 
+    private CancellationTokenSource? _stateRequestCatchUpCancellationTokenSource;
     private bool _crossTabReady;
     private bool _disposed;
     private bool _stateRequestPublished;
@@ -23,6 +30,21 @@ internal sealed partial class GoLiveSessionService
 
     public async Task RequestCrossTabStateAsync(CancellationToken cancellationToken = default)
     {
+        await PublishCrossTabStateRequestAsync(cancellationToken);
+        ScheduleCrossTabStateCatchUpRequests();
+    }
+
+    public async Task RequestCrossTabStateCatchUpAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var delay in StateRequestCatchUpDelays)
+        {
+            await Task.Delay(delay, cancellationToken);
+            await PublishCrossTabStateRequestAsync(cancellationToken);
+        }
+    }
+
+    private async Task PublishCrossTabStateRequestAsync(CancellationToken cancellationToken = default)
+    {
         await EnsureCrossTabReadyAsync(cancellationToken);
         await _crossTabMessageBus.PublishAsync(
             CrossTabMessageTypes.GoLiveSessionRequested,
@@ -38,8 +60,36 @@ internal sealed partial class GoLiveSessionService
         }
 
         _disposed = true;
+        _stateRequestCatchUpCancellationTokenSource?.Cancel();
+        _stateRequestCatchUpCancellationTokenSource?.Dispose();
+        _stateRequestCatchUpCancellationTokenSource = null;
         _crossTabMessageBus.MessageReceived -= HandleCrossTabMessageAsync;
         _crossTabStartGate.Dispose();
+    }
+
+    private void ScheduleCrossTabStateCatchUpRequests()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _stateRequestCatchUpCancellationTokenSource?.Cancel();
+        _stateRequestCatchUpCancellationTokenSource?.Dispose();
+        _stateRequestCatchUpCancellationTokenSource = new CancellationTokenSource();
+
+        _ = RequestCrossTabStateCatchUpInBackgroundAsync(_stateRequestCatchUpCancellationTokenSource.Token);
+    }
+
+    private async Task RequestCrossTabStateCatchUpInBackgroundAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await RequestCrossTabStateCatchUpAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+        }
     }
 
     private async Task EnsureCrossTabReadyAsync(CancellationToken cancellationToken)
