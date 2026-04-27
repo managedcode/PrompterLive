@@ -44,7 +44,18 @@ public sealed record EditorLocalRevisionViewModel(
     string Id,
     string SavedAtLabel,
     string Title,
-    string DocumentName);
+    string DocumentName,
+    int DiffAddedCount,
+    int DiffRemovedCount,
+    IReadOnlyList<EditorLocalRevisionDiffLineViewModel> DiffLines)
+{
+    public string DiffSummary => $"+{DiffAddedCount} / -{DiffRemovedCount}";
+}
+
+public sealed record EditorLocalRevisionDiffLineViewModel(
+    string Kind,
+    string Marker,
+    string Text);
 
 public sealed record EditorRenderedSegmentViewModel(
     int Index,

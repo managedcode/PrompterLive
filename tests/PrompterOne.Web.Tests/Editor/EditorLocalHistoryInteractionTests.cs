@@ -103,7 +103,15 @@ public sealed class EditorLocalHistoryInteractionTests : BunitContext
         {
             Assert.Equal(2, LoadLocalHistoryEntries().Count);
             Assert.Contains(UiTestIds.Editor.LocalHistoryPanel, cut.Markup, StringComparison.Ordinal);
+            Assert.Contains(UiTestIds.Editor.LocalHistoryDiff(1), cut.Markup, StringComparison.Ordinal);
             Assert.Contains(UiTestIds.Editor.LocalHistoryRestore(1), cut.Markup, StringComparison.Ordinal);
+            Assert.Equal(
+                "+0 / -1",
+                cut.FindByTestId(UiTestIds.Editor.LocalHistoryDiffSummary(1)).TextContent.Trim());
+            Assert.Contains(
+                EditorLocalHistoryInteractionTestSource.SecondRevisionLine,
+                cut.FindByTestId(UiTestIds.Editor.LocalHistoryDiff(1)).TextContent,
+                StringComparison.Ordinal);
             Assert.Contains(
                 EditorLocalHistoryInteractionTestSource.SecondRevisionLine,
                 _harness.Session.State.Text,

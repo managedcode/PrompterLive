@@ -188,6 +188,10 @@ public static partial class UiTestIds
 
         public static string LocalHistoryItem(int index) => $"editor-local-history-item-{index}";
 
+        public static string LocalHistoryDiff(int index) => $"editor-local-history-diff-{index}";
+
+        public static string LocalHistoryDiffSummary(int index) => $"editor-local-history-diff-summary-{index}";
+
         public static string LocalHistoryRestore(int index) => $"editor-local-history-restore-{index}";
 
         public static string RenderedBlock(int segmentIndex, int blockIndex) => $"editor-rendered-block-{segmentIndex}-{blockIndex}";

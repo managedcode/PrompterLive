@@ -353,13 +353,20 @@ body.theme-light .ed-meta-toggle:hover {
 
 .ed-local-history-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
     padding: 8px 10px;
     border-radius: 10px;
     border: 1px solid var(--gold-10);
     background: var(--gold-03);
+}
+
+.ed-local-history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .ed-local-history-copy {
@@ -388,6 +395,25 @@ body.theme-light .ed-meta-toggle:hover {
     color: #8A9E98;
 }
 
+.ed-local-history-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.ed-local-history-diff-summary {
+    min-width: 46px;
+    padding: 4px 6px;
+    border-radius: 7px;
+    border: 1px solid var(--gold-07);
+    color: var(--t3);
+    background: rgba(255,255,255,.025);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-align: center;
+}
+
 .ed-local-history-restore {
     flex-shrink: 0;
     padding: 6px 10px;
@@ -406,6 +432,46 @@ body.theme-light .ed-meta-toggle:hover {
     background: var(--gold-09);
     border-color: var(--gold-18);
     color: var(--t1);
+}
+
+.ed-local-history-diff {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px;
+    border-radius: 8px;
+    background: rgba(0,0,0,.12);
+    border: 1px solid rgba(245,200,80,.06);
+}
+
+.ed-local-history-diff-line {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
+    align-items: start;
+    gap: 4px;
+    min-width: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.ed-local-history-diff-line[data-kind="added"] {
+    color: #A9DDB6;
+}
+
+.ed-local-history-diff-line[data-kind="removed"] {
+    color: #E0A1A1;
+}
+
+.ed-local-history-diff-marker {
+    font-weight: 800;
+    text-align: center;
+}
+
+.ed-local-history-diff-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .ed-tool-group { display: flex; gap: 3px; }

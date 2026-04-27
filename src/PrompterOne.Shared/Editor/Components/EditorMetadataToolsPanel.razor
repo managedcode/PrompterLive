@@ -58,16 +58,35 @@
                 {
                     var revision = LocalHistory[index];
                     <div class="ed-local-history-item" data-test="@UiTestIds.Editor.LocalHistoryItem(index)">
-                        <div class="ed-local-history-copy">
-                            <span class="ed-local-history-time">@revision.SavedAtLabel</span>
-                            <span class="ed-local-history-file">@revision.DocumentName</span>
+                        <div class="ed-local-history-head">
+                            <div class="ed-local-history-copy">
+                                <span class="ed-local-history-time">@revision.SavedAtLabel</span>
+                                <span class="ed-local-history-file">@revision.DocumentName</span>
+                            </div>
+                            <div class="ed-local-history-actions">
+                                <span class="ed-local-history-diff-summary"
+                                      data-test="@UiTestIds.Editor.LocalHistoryDiffSummary(index)">@revision.DiffSummary</span>
+                                <button type="button"
+                                        class="ed-local-history-restore"
+                                        data-test="@UiTestIds.Editor.LocalHistoryRestore(index)"
+                                        @onclick="() => LocalHistoryRestoreRequested.InvokeAsync(revision.Id)">
+                                    @Text(UiTextKey.CommonRestore)
+                                </button>
+                            </div>
                         </div>
-                        <button type="button"
-                                class="ed-local-history-restore"
-                                data-test="@UiTestIds.Editor.LocalHistoryRestore(index)"
-                                @onclick="() => LocalHistoryRestoreRequested.InvokeAsync(revision.Id)">
-                            @Text(UiTextKey.CommonRestore)
-                        </button>
+                        @if (revision.DiffLines.Count > 0)
+                        {
+                            <div class="ed-local-history-diff" data-test="@UiTestIds.Editor.LocalHistoryDiff(index)">
+                                @foreach (var line in revision.DiffLines)
+                                {
+                                    <div class="ed-local-history-diff-line"
+                                         data-kind="@line.Kind">
+                                        <span class="ed-local-history-diff-marker">@line.Marker</span>
+                                        <span class="ed-local-history-diff-text">@line.Text</span>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 }
             </div>

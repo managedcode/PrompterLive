@@ -33,6 +33,10 @@ public sealed class EditorLocalHistoryFlowTests(StandaloneAppFixture fixture)
             await EditorMonacoDriver.SetTextAsync(page, secondRevisionText);
             await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryItem(BrowserTestConstants.Editor.LocalHistoryOriginalRevisionIndex)))
                 .ToBeVisibleAsync();
+            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryDiff(BrowserTestConstants.Editor.LocalHistoryPreviousRevisionIndex)))
+                .ToContainTextAsync(BrowserTestConstants.Editor.LocalHistorySecondLine);
+            await Expect(page.GetByTestId(UiTestIds.Editor.LocalHistoryDiffSummary(BrowserTestConstants.Editor.LocalHistoryPreviousRevisionIndex)))
+                .ToHaveTextAsync("+0 / -1");
             await UiScenarioArtifacts.CapturePageAsync(
                 page,
                 BrowserTestConstants.EditorFlow.LocalHistoryScenario,
