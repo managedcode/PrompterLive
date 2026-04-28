@@ -86,7 +86,7 @@ function createHoverProvider(monaco, spec) {
     return {
         provideHover(model, position) {
             const line = model.getLineContent(position.lineNumber);
-            return findWrappedGuideHover(monaco, line, position, spec) ??
+            return findWrappedCueContentHover(monaco, line, position, spec) ??
                 findMarkdownHover(monaco, line, position, spec) ??
                 findTagHover(monaco, line, position, spec) ??
                 findPauseHover(monaco, line, position) ??
@@ -147,30 +147,6 @@ function resolveCompletionKind(monaco, group) {
     return monaco.languages.CompletionItemKind.Keyword;
 }
 
-function findWrappedGuideHover(monaco, line, position, spec) {
-    const wrappedGuidePattern = /\[(phonetic|pronunciation|stress|energy|melody):([^\]]+)\]([^[]+?)\[\/\1(?::[^\]]+)?\]/ig;
-    for (const match of line.matchAll(wrappedGuidePattern)) {
-        const openTag = match[0].slice(0, match[0].indexOf(match[3], 0));
-        const startColumn = (match.index ?? 0) + openTag.length + 1;
-        const endColumn = startColumn + match[3].length;
-        if (position.column < startColumn || position.column > endColumn) {
-            continue;
-        }
-
-        const normalizedName = match[1].toLowerCase();
-        const candidate = spec.parameterizedWrapperLookup.get(normalizedName);
-        return createHover(
-            monaco,
-            position.lineNumber,
-            startColumn,
-            endColumn,
-            resolveParameterizedTitle(normalizedName),
-            `${candidate?.documentation ?? spec.emptyValue}\n\nGuide: \`${match[2]}\``.trim());
-    }
-
-    return null;
-}
-
 function findMarkdownHover(monaco, line, position, spec) {
     for (const match of line.matchAll(spec.markdownBoldPattern)) {
         const startColumn = (match.index ?? 0) + 1;
@@ -205,6 +181,100 @@ function findMarkdownHover(monaco, line, position, spec) {
     }
 
     return null;
+}
+
+function findWrappedCueContentHover(monaco, line, position, spec) {
+    const scopes = [];
+    let bestHover = null;
+    for (const match of line.matchAll(spec.inlineTagPattern)) {
+        const rawTag = match[0];
+        const startColumn = (match.index ?? 0) + 1;
+        const tag = parseInlineTag(rawTag, spec);
+        if (!tag || !isKnownWrapperTag(tag.name, spec)) {
+            continue;
+        }
+
+        if (!tag.closing) {
+            scopes.push({
+                argument: tag.argument,
+                contentStartColumn: startColumn + rawTag.length,
+                name: tag.name
+            });
+            continue;
+        }
+
+        const openScopeIndex = findOpenScopeIndex(scopes, tag.name);
+        if (openScopeIndex < 0) {
+            continue;
+        }
+
+        const scope = scopes.splice(openScopeIndex, 1)[0];
+        const contentEndColumn = startColumn;
+        if (position.column >= scope.contentStartColumn && position.column < contentEndColumn) {
+            const hover = createCueContentHover(monaco, position.lineNumber, scope, contentEndColumn, spec);
+            bestHover = chooseNarrowerHover(bestHover, hover);
+        }
+    }
+
+    return bestHover;
+}
+
+function parseInlineTag(rawTag, spec) {
+    const inner = rawTag.slice(1, -1).trim();
+    if (!inner) {
+        return null;
+    }
+
+    const closing = inner.startsWith("/");
+    const content = closing ? inner.slice(1).trim() : inner;
+    const separatorIndex = content.indexOf(":");
+    const name = (separatorIndex >= 0 ? content.slice(0, separatorIndex) : content).trim().toLowerCase();
+    if (!name) {
+        return null;
+    }
+
+    return {
+        argument: separatorIndex >= 0 ? content.slice(separatorIndex + 1).trim() : spec.emptyValue,
+        closing,
+        name
+    };
+}
+
+function isKnownWrapperTag(name, spec) {
+    return spec.plainWrapperLookup.has(name) || spec.parameterizedWrapperLookup.has(name);
+}
+
+function findOpenScopeIndex(scopes, name) {
+    for (let index = scopes.length - 1; index >= 0; index -= 1) {
+        if (scopes[index].name === name) {
+            return index;
+        }
+    }
+
+    return -1;
+}
+
+function createCueContentHover(monaco, lineNumber, scope, contentEndColumn, spec) {
+    const parameterizedSpec = spec.parameterizedWrapperLookup.get(scope.name);
+    const plainSpec = spec.plainWrapperLookup.get(scope.name);
+    const title = parameterizedSpec && scope.argument
+        ? resolveParameterizedTitle(scope.name)
+        : plainSpec?.detail ?? parameterizedSpec?.detail ?? "TPS cue";
+    const documentation = parameterizedSpec && scope.argument
+        ? `${parameterizedSpec.documentation}\n\nGuide: \`${scope.argument}\``
+        : plainSpec?.documentation ?? parameterizedSpec?.documentation ?? "This wrapped text carries TPS delivery metadata.";
+
+    return createHover(monaco, lineNumber, scope.contentStartColumn, contentEndColumn, title, documentation);
+}
+
+function chooseNarrowerHover(currentHover, candidateHover) {
+    if (!currentHover) {
+        return candidateHover;
+    }
+
+    const currentWidth = currentHover.range.endColumn - currentHover.range.startColumn;
+    const candidateWidth = candidateHover.range.endColumn - candidateHover.range.startColumn;
+    return candidateWidth <= currentWidth ? candidateHover : currentHover;
 }
 
 function findTagHover(monaco, line, position, spec) {

@@ -15,9 +15,15 @@ public sealed class EditorStylesheetContractTests
     private static readonly string EditorSupportScriptPath = Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory,
         "../../../../../src/PrompterOne.Shared/wwwroot/editor/editor-source-panel.js"));
+    private static readonly string EditorMonacoScriptPath = Path.GetFullPath(Path.Combine(
+        AppContext.BaseDirectory,
+        "../../../../../src/PrompterOne.Shared/wwwroot/editor/editor-monaco.js"));
     private static readonly string MediaScriptPath = Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory,
         "../../../../../src/PrompterOne.Shared/wwwroot/media/browser-media.js"));
+    private static readonly string ReaderStatesStylesheetPath = Path.GetFullPath(Path.Combine(
+        AppContext.BaseDirectory,
+        "../../../../../src/PrompterOne.Shared/wwwroot/design/modules/reader/10-reading-states.css"));
     private static readonly string HostIndexPath = Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory,
         "../../../../../src/PrompterOne.Web/wwwroot/index.html"));
@@ -85,6 +91,101 @@ public sealed class EditorStylesheetContractTests
         var rule = GetRuleBlock(selector);
 
         Assert.DoesNotContain(forbiddenDeclaration, rule, StringComparison.Ordinal);
+    }
+
+    [Test]
+    public void MonacoDecorationPipeline_UsesViewportRangesWithoutDelayingSmallTextNotifications()
+    {
+        var editorMonacoScript = File.ReadAllText(EditorMonacoScriptPath);
+
+        Assert.Contains(
+            "const visibleRangeDecorationCharacterThreshold = 0;",
+            editorMonacoScript,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "const largeDraftTextNotificationCharacterThreshold = 16000;",
+            editorMonacoScript,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "currentText.length < largeDraftTextNotificationCharacterThreshold",
+            editorMonacoScript,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "model?.getValueLength() ?? 0) >= visibleRangeDecorationCharacterThreshold",
+            editorMonacoScript,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "largeDraftDecorationCharacterThreshold",
+            editorMonacoScript,
+            StringComparison.Ordinal);
+    }
+
+    [Test]
+    public void MonacoCueDecorations_CarrySharedReaderCueClasses()
+    {
+        var editorMonacoScript = File.ReadAllText(EditorMonacoScriptPath);
+
+        Assert.Contains("function createInlineCueClassName(localName, tpsName)", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("beforeContentClassName", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("createTagObjectClassName", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("createPauseObjectClassName", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-${tpsName}", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-normal", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-emphasis", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-highlight", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-stress", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-${name}", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("buildContourCueClassName(\"energy\", argument)", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("buildContourCueClassName(\"melody\", argument)", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-pronunciation", editorMonacoScript, StringComparison.Ordinal);
+        Assert.Contains("tps-phonetic", editorMonacoScript, StringComparison.Ordinal);
+    }
+
+    [Test]
+    public void EditorCueStyles_ReuseReaderCueClassContract()
+    {
+        var componentStylesheet = File.ReadAllText(ComponentStylesheetPath);
+        var readerStylesheet = File.ReadAllText(ReaderStatesStylesheetPath);
+
+        foreach (var cueClass in new[]
+        {
+            "tps-loud",
+            "tps-soft",
+            "tps-whisper",
+            "tps-building",
+            "tps-highlight",
+            "tps-emphasis",
+            "tps-legato",
+            "tps-staccato",
+            "tps-stress",
+            "tps-energy",
+            "tps-melody",
+            "tps-pronunciation",
+            "tps-phonetic"
+        })
+        {
+            Assert.Contains(cueClass, componentStylesheet, StringComparison.Ordinal);
+            Assert.Contains(cueClass, readerStylesheet, StringComparison.Ordinal);
+        }
+
+        Assert.Contains(".po-inline-articulation-legato.tps-legato::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".po-inline-articulation-staccato.tps-staccato::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".po-inline-stress.tps-stress::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".po-inline-melody.tps-melody::after", componentStylesheet, StringComparison.Ordinal);
+    }
+
+    [Test]
+    public void StyledEditorTechnicalObjects_RenderObjectChipsInsteadOfRawSyntax()
+    {
+        var componentStylesheet = File.ReadAllText(ComponentStylesheetPath);
+
+        Assert.Contains(".ed-main--styled-text ::deep .po-object-chip::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".ed-main--styled-text ::deep .po-object-pause::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".ed-main--styled-text ::deep .po-object-cut::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".ed-main--styled-text ::deep .po-object-highlight::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".ed-main--styled-text ::deep .po-object-chip.po-object-tag-close::before", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains(".ed-main--styled-text ::deep .po-pause-short", componentStylesheet, StringComparison.Ordinal);
+        Assert.Contains("font-size:0 !important;", GetRuleBlock(".ed-main--styled-text ::deep .po-pause-short,\n.ed-main--styled-text ::deep .po-pause-long,\n.ed-main--styled-text ::deep .po-pause-timed"), StringComparison.Ordinal);
     }
 
     [Test]

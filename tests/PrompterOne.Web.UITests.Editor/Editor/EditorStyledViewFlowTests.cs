@@ -14,11 +14,11 @@ public sealed class EditorStyledViewFlowTests(StandaloneAppFixture fixture) : Ap
         {
             await EditorIsolatedDraftDriver.CreateSeededDraftAsync(page, BrowserTestConstants.Scripts.DemoId);
 
-            await page.GetByTestId(UiTestIds.Editor.WorkspaceEditorTab).ClickAsync();
             await EditorMonacoDriver.WaitUntilReadyAsync(page);
 
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceTab)).ToHaveTextAsync("Raw");
             await Expect(page.GetByTestId(UiTestIds.Editor.WorkspaceEditorTab)).ToHaveTextAsync("Editor");
+            await Expect(page.GetByTestId(UiTestIds.Editor.WorkspaceEditorTab)).ToHaveClassAsync(new Regex("active"));
             await Expect(page.GetByTestId(UiTestIds.Editor.MainPanel))
                 .ToHaveAttributeAsync("data-authoring-mode", UiTestIds.Editor.StyledAuthoringMode);
             await Expect(page.GetByTestId(UiTestIds.Editor.SourceStage))
@@ -31,16 +31,21 @@ public sealed class EditorStyledViewFlowTests(StandaloneAppFixture fixture) : Ap
             await Assert.That(styledState.Engine).IsEqualTo(EditorMonacoRuntimeContract.EditorEngineAttributeValue);
             await Assert.That(styledState.Text).Contains(BrowserTestConstants.Editor.RenderedOpeningProbe);
             await Assert.That(styledState.DecorationClasses.Any(item => item.Contains("po-tag", StringComparison.Ordinal))).IsTrue();
+            await Assert.That(styledState.DecorationClasses.Any(item => item.Contains("po-object-chip", StringComparison.Ordinal))).IsTrue();
             var tagFontSize = await page.Locator(".po-tag").First.EvaluateAsync<string>("element => getComputedStyle(element).fontSize");
             await Assert.That(tagFontSize).IsEqualTo("0px");
+            await Expect(page.Locator(".po-object-chip").First).ToBeVisibleAsync();
             await EditorMonacoDriver.SetTextAsync(
                 page,
                 $"""
                 ## [Demo Segment|Speaker:Alex|140WPM|neutral]
                 ### [Demo Block|140WPM|neutral]
-                {BrowserTestConstants.Editor.RenderedOpeningProbe}
+                [edit_point:high] {BrowserTestConstants.Editor.RenderedOpeningProbe} / [highlight]important[/highlight] //
                 """);
             styledState = await EditorMonacoDriver.GetStateAsync(page);
+            await Assert.That(styledState.DecorationClasses.Any(item => item.Contains("po-object-cut", StringComparison.Ordinal))).IsTrue();
+            await Assert.That(styledState.DecorationClasses.Any(item => item.Contains("po-object-pause-short", StringComparison.Ordinal))).IsTrue();
+            await Assert.That(styledState.DecorationClasses.Any(item => item.Contains("po-object-highlight", StringComparison.Ordinal))).IsTrue();
             var headerLines = styledState.Text.Split('\n');
             var speakerHeaderLineIndex = Array.FindIndex(
                 headerLines,

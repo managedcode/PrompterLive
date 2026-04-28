@@ -1,8 +1,9 @@
 import { ensureTpsLanguage, getTpsLanguageSupport } from "./editor-monaco-tps-language.js";
 
 const cssClassPrefix = "po";
-const largeDraftDecorationCharacterThreshold = 16000;
 const largeDraftDecorationViewportLinePadding = 24;
+const visibleRangeDecorationCharacterThreshold = 0;
+const largeDraftTextNotificationCharacterThreshold = 16000;
 const largeDraftTextNotificationDelayMs = 750;
 const sourceMirrorLineRenderCharacterThreshold = 8000;
 const frontMatterDelimiter = "---";
@@ -77,6 +78,12 @@ const monacoDefaults = Object.freeze({
     overviewRulerBorder: false,
     overviewRulerLanes: 0,
     padding: { top: 40, bottom: 40 },
+    hover: {
+        above: true,
+        delay: 180,
+        enabled: true,
+        sticky: true
+    },
     quickSuggestions: true,
     renderLineHighlight: "none",
     roundedSelection: true,
@@ -114,18 +121,22 @@ function createDecorationCatalog(options) {
     const articulationNames = normalizeCatalogNames(runtimeCatalog.articulationStyles);
     const speedNames = normalizeCatalogNames(runtimeCatalog.relativeSpeedTags);
     return {
-        articulationClasses: new Map(articulationNames.map(name => [name, `${cssClassPrefix}-inline-articulation-${name}`])),
+        articulationClasses: new Map(articulationNames.map(name => [name, createInlineCueClassName(`articulation-${name}`, name)])),
         articulationTagClasses: createSemanticTagClassMap(articulationNames, "articulation"),
-        deliveryClasses: new Map(deliveryNames.map(name => [name, `${cssClassPrefix}-inline-delivery-${name}`])),
+        deliveryClasses: new Map(deliveryNames.map(name => [name, createInlineCueClassName(`delivery-${name}`, name)])),
         deliveryTagClasses: createSemanticTagClassMap(deliveryNames, "delivery"),
-        emotionClasses: new Map(emotionNames.map(name => [name, `${cssClassPrefix}-inline-emotion-${name}`])),
+        emotionClasses: new Map(emotionNames.map(name => [name, createInlineCueClassName(`emotion-${name}`, name)])),
         emotionTagClasses: createSemanticTagClassMap(emotionNames, "emotion"),
         headerEmotionTags: new Set(emotionNames),
-        speedClasses: new Map(speedNames.map(name => [name, name === "normal" ? null : `${cssClassPrefix}-inline-speed-${name}`])),
+        speedClasses: new Map(speedNames.map(name => [name, name === "normal" ? "tps-normal" : createInlineCueClassName(`speed-${name}`, name)])),
         speedTagClasses: createSemanticTagClassMap(speedNames.filter(name => name !== "normal"), "speed"),
-        volumeClasses: new Map(volumeNames.map(name => [name, `${cssClassPrefix}-inline-${name}`])),
+        volumeClasses: new Map(volumeNames.map(name => [name, createInlineCueClassName(name, name)])),
         volumeTagClasses: createSemanticTagClassMap(volumeNames, "volume")
     };
+}
+
+function createInlineCueClassName(localName, tpsName) {
+    return `${cssClassPrefix}-inline-${localName} tps-${tpsName}`;
 }
 
 function normalizeCatalogNames(values) {
@@ -148,10 +159,16 @@ function normalizeTagName(value) {
         .toLowerCase();
 }
 
-function createTagClassName(semanticTagClassName) {
+function createTagClassName(semanticTagClassName, role, normalizedName) {
+    const roleClassName = role ? ` ${cssClassPrefix}-tag-${role}` : emptyValue;
+    const nameClassName = normalizedName ? ` ${cssClassPrefix}-tag-name-${sanitizeCssName(normalizedName)}` : emptyValue;
     return semanticTagClassName
-        ? `${cssClassPrefix}-tag ${semanticTagClassName}`
-        : `${cssClassPrefix}-tag`;
+        ? `${cssClassPrefix}-tag ${semanticTagClassName}${roleClassName}${nameClassName}`
+        : `${cssClassPrefix}-tag${roleClassName}${nameClassName}`;
+}
+
+function sanitizeCssName(value) {
+    return String(value ?? emptyValue).trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
 }
 
 function resolveSemanticTagClassName(normalizedName, tpsCatalog) {
@@ -523,6 +540,23 @@ function ensureHarness(options) {
                 }
                 : null;
         },
+        getPositionCoordinates: (testId, lineNumber, column) => {
+            const state = getRequiredHarnessState(testId);
+            const position = new state.monaco.Position(lineNumber ?? 1, column ?? 1);
+            state.editor.revealPositionInCenterIfOutsideViewport(position);
+            state.editor.render(true);
+            const visiblePosition = state.editor.getScrolledVisiblePosition(position);
+            const editorBounds = state.editor.getDomNode()?.getBoundingClientRect();
+            if (!visiblePosition || !editorBounds) {
+                return null;
+            }
+
+            return {
+                height: visiblePosition.height,
+                x: editorBounds.left + visiblePosition.left + 2,
+                y: editorBounds.top + visiblePosition.top + (visiblePosition.height / 2)
+            };
+        },
         setSelection: async (testId, start, end, revealSelection = true, selectionDirection = undefined) => {
             const state = getRequiredHarnessState(testId);
             applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, selectionDirection);
@@ -601,8 +635,11 @@ function createHarnessState(state, options) {
     return {
         decorationClasses: state.lastDecorationClasses?.length
             ? state.lastDecorationClasses
-            : (model?.getAllDecorations().map(decoration =>
-                decoration.options.inlineClassName || decoration.options.lineClassName || "").filter(Boolean) ?? []),
+            : (model?.getAllDecorations().flatMap(getDecorationClassNames).filter(Boolean) ?? []),
+        decorationHoverMessages: state.lastDecorationHoverMessages?.length
+            ? state.lastDecorationHoverMessages
+            : (model?.getAllDecorations().flatMap(decoration =>
+                normalizeHoverMessages(decoration.options.hoverMessage)).filter(Boolean) ?? []),
         engine: state.host.getAttribute(options.editorEngineAttributeName) ?? emptyValue,
         authoringMode: normalizeAuthoringMode(state.options.authoringMode),
         layout: {
@@ -673,6 +710,10 @@ function resolveThemeName(options) {
 
 function normalizeAuthoringMode(authoringMode) {
     return authoringMode === styledTextAuthoringMode ? styledTextAuthoringMode : "raw";
+}
+
+function isStyledTextAuthoringMode(state) {
+    return normalizeAuthoringMode(state?.options?.authoringMode) === styledTextAuthoringMode;
 }
 
 function isLightThemeActive() {
@@ -794,7 +835,7 @@ function queueTextChangedNotification(state) {
     }
 
     const currentText = state.editor.getValue();
-    if (currentText.length < largeDraftDecorationCharacterThreshold) {
+    if (currentText.length < largeDraftTextNotificationCharacterThreshold) {
         cancelPendingTextNotification(state);
         void notifyTextChangedAsync(state, currentText);
         return;
@@ -995,11 +1036,39 @@ function scheduleDecorations(state) {
     state.decorationFrameId = requestAnimationFrame(() => {
         const decorations = buildDecorations(state);
         state.lastDecorationClasses = decorations
-            .map(decoration => decoration?.options?.inlineClassName || decoration?.options?.lineClassName || emptyValue)
+            .flatMap(getDecorationClassNames)
+            .filter(Boolean);
+        state.lastDecorationHoverMessages = decorations
+            .flatMap(decoration => normalizeHoverMessages(decoration?.options?.hoverMessage))
             .filter(Boolean);
         state.decorationCollection.set(decorations);
         state.decorationFrameId = 0;
     });
+}
+
+function getDecorationClassNames(decoration) {
+    const options = decoration?.options;
+    if (!options) {
+        return [];
+    }
+
+    return [
+        options.inlineClassName,
+        options.lineClassName,
+        options.beforeContentClassName,
+        options.afterContentClassName
+    ].filter(Boolean);
+}
+
+function normalizeHoverMessages(hoverMessage) {
+    if (!hoverMessage) {
+        return [];
+    }
+
+    const messages = Array.isArray(hoverMessage) ? hoverMessage : [hoverMessage];
+    return messages
+        .map(message => normalizeMarkdownValue(message))
+        .filter(Boolean);
 }
 
 function buildDecorations(state) {
@@ -1012,6 +1081,7 @@ function buildDecorations(state) {
     const decorations = [];
     const frontMatterEndLine = resolveFrontMatterEndLine(model);
     const lineRanges = getDecorationLineRanges(state, model);
+    const styledTextMode = isStyledTextAuthoringMode(state);
 
     for (const lineRange of lineRanges) {
         for (let lineNumber = lineRange.startLineNumber; lineNumber <= lineRange.endLineNumber; lineNumber++) {
@@ -1029,7 +1099,7 @@ function buildDecorations(state) {
                 continue;
             }
 
-            decorateBodyLine(monaco, decorations, lineNumber, line, state.tpsCatalog);
+            decorateBodyLine(monaco, decorations, lineNumber, line, state.tpsCatalog, styledTextMode);
         }
     }
 
@@ -1145,7 +1215,7 @@ function resolveFrontMatterEndLine(model) {
 
 function shouldUseVisibleRangeDecorations(state) {
     const model = state.editor.getModel();
-    return (model?.getValueLength() ?? 0) >= largeDraftDecorationCharacterThreshold;
+    return (model?.getValueLength() ?? 0) >= visibleRangeDecorationCharacterThreshold;
 }
 
 function decorateFrontMatterLine(monaco, decorations, lineNumber, line) {
@@ -1207,30 +1277,30 @@ function decorateHeaderLine(monaco, decorations, lineNumber, line, prefix, lineC
     return true;
 }
 
-function decorateBodyLine(monaco, decorations, lineNumber, line, tpsCatalog) {
+function decorateBodyLine(monaco, decorations, lineNumber, line, tpsCatalog, styledTextMode) {
     const scopes = [createInlineScopeFrame("root", scopeKindRoot, createInlineRenderState())];
     let index = 0;
 
     for (const match of line.matchAll(new RegExp(tagPattern.source, "g"))) {
         const tagIndex = match.index ?? 0;
         if (tagIndex > index) {
-            decorateInlineTextSegment(monaco, decorations, lineNumber, line.slice(index, tagIndex), index, scopes);
+            decorateInlineTextSegment(monaco, decorations, lineNumber, line.slice(index, tagIndex), index, scopes, styledTextMode);
         }
 
-        decorateInlineTag(monaco, decorations, lineNumber, match[0], tagIndex, scopes, tpsCatalog);
+        decorateInlineTag(monaco, decorations, lineNumber, match[0], tagIndex, scopes, tpsCatalog, styledTextMode);
         index = tagIndex + match[0].length;
     }
 
     if (index < line.length) {
-        decorateInlineTextSegment(monaco, decorations, lineNumber, line.slice(index), index, scopes);
+        decorateInlineTextSegment(monaco, decorations, lineNumber, line.slice(index), index, scopes, styledTextMode);
     }
 }
 
-function decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, className) {
-    decorations.push(createInlineDecoration(monaco, lineNumber, startColumn, endColumn, className));
+function decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, className, hoverMessage, beforeContentClassName) {
+    decorations.push(createInlineDecoration(monaco, lineNumber, startColumn, endColumn, className, null, hoverMessage, beforeContentClassName));
 }
 
-function decorateInlineTextSegment(monaco, decorations, lineNumber, text, lineOffset, scopes) {
+function decorateInlineTextSegment(monaco, decorations, lineNumber, text, lineOffset, scopes, styledTextMode) {
     if (!text) {
         return;
     }
@@ -1268,7 +1338,9 @@ function decorateInlineTextSegment(monaco, decorations, lineNumber, text, lineOf
             lineNumber,
             lineOffset + index + 1,
             lineOffset + index + pauseLength + 1,
-            pauseClassName);
+            pauseClassName,
+            createPauseHoverMessage(pauseLength),
+            styledTextMode ? createPauseObjectClassName(pauseLength) : null);
 
         index += pauseLength - 1;
         chunkStart = index + 1;
@@ -1293,10 +1365,10 @@ function decorateStyledTextSegment(monaco, decorations, lineNumber, startColumn,
         return;
     }
 
-    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, className);
+    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, className, buildInlineStateHoverMessage(state, extraClasses));
 }
 
-function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, scopes, tpsCatalog) {
+function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, scopes, tpsCatalog, styledTextMode) {
     const inner = rawTag.slice(1, -1).trim();
     if (!inner) {
         return;
@@ -1311,13 +1383,16 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
             decoratePronunciationBuffer(monaco, decorations, lineNumber, matchedScope, scopes[scopes.length - 1].state);
         }
 
+        const semanticTagClassName = matchedScope?.tagClassName ?? resolveSemanticTagClassName(normalizedClosingName, tpsCatalog);
         decorateRawRange(
             monaco,
             decorations,
             lineNumber,
             startColumn,
             endColumn,
-            createTagClassName(matchedScope?.tagClassName ?? resolveSemanticTagClassName(normalizedClosingName, tpsCatalog)));
+            createTagClassName(semanticTagClassName, "close", normalizedClosingName),
+            createTagHoverMessage(normalizedClosingName, null, "close"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedClosingName, null, "close") : null);
         return;
     }
 
@@ -1331,34 +1406,74 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
         : resolveSemanticTagClassName(normalizedName, tpsCatalog);
 
     if (numericWpmRegex.test(name)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(semanticTagClassName, "open", normalizedName),
+            createTagHoverMessage(normalizedName, null, "open"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, null, "standalone") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindWpm, currentState, null, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "pause") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(semanticTagClassName, "standalone", normalizedName),
+            createTagHoverMessage(normalizedName, argument, "standalone"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "standalone") : null);
         return;
     }
 
     if (normalizedName === "breath") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(semanticTagClassName, "standalone", normalizedName),
+            createTagHoverMessage(normalizedName, argument, "standalone"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "standalone") : null);
         return;
     }
 
     if (normalizedName === "edit_point" || normalizedName === "editpoint") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(semanticTagClassName, "standalone", normalizedName),
+            createTagHoverMessage(normalizedName, argument, "standalone"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "standalone") : null);
         return;
     }
 
     if (normalizedName === "phonetic" || normalizedName === "pronunciation") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(
+            monaco,
+            decorations,
+            lineNumber,
+            startColumn,
+            endColumn,
+            createTagClassName(semanticTagClassName, "open", normalizedName),
+            createTagHoverMessage(normalizedName, argument, "open"),
+            styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindPronunciation, currentState, argument, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "highlight") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isHighlighted: true
@@ -1367,7 +1482,7 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (normalizedName === "emphasis" || normalizedName === "strong" || normalizedName === "bold") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isEmphasis: true
@@ -1376,7 +1491,7 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (normalizedName === "stress") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             isStress: true
@@ -1385,27 +1500,27 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (normalizedName === "energy") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
-            energyClass: `${cssClassPrefix}-inline-energy`,
+            energyClass: buildContourCueClassName("energy", argument),
             energyValue: argument ?? null
         }, null, semanticTagClassName));
         return;
     }
 
     if (normalizedName === "melody") {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
-            melodyClass: `${cssClassPrefix}-inline-melody`,
+            melodyClass: buildContourCueClassName("melody", argument),
             melodyValue: argument ?? null
         }, null, semanticTagClassName));
         return;
     }
 
     if (tpsCatalog.speedClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             speedClass: tpsCatalog.speedClasses.get(normalizedName),
@@ -1415,7 +1530,7 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (tpsCatalog.volumeClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             volumeClass: tpsCatalog.volumeClasses.get(normalizedName),
@@ -1425,7 +1540,7 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (tpsCatalog.deliveryClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             deliveryClass: tpsCatalog.deliveryClasses.get(normalizedName),
@@ -1435,7 +1550,7 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (tpsCatalog.articulationClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
             articulationClass: tpsCatalog.articulationClasses.get(normalizedName),
@@ -1445,19 +1560,21 @@ function decorateInlineTag(monaco, decorations, lineNumber, rawTag, tagIndex, sc
     }
 
     if (tpsCatalog.emotionClasses.has(normalizedName)) {
-        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+        decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
         scopes.push(createInlineScopeFrame(normalizedName, scopeKindStyle, {
             ...currentState,
-            emotionClass: tpsCatalog.emotionClasses.get(normalizedName)
+            emotionClass: tpsCatalog.emotionClasses.get(normalizedName),
+            emotionValue: normalizedName
         }, null, semanticTagClassName));
         return;
     }
 
-    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName));
+    decorateRawRange(monaco, decorations, lineNumber, startColumn, endColumn, createTagClassName(semanticTagClassName, "open", normalizedName), createTagHoverMessage(normalizedName, argument, "open"), styledTextMode ? createTagObjectClassName(semanticTagClassName, normalizedName, argument, "open") : null);
     scopes.push(createInlineScopeFrame(normalizedName, scopeKindNeutral, currentState, null, semanticTagClassName));
 }
 
 function decoratePronunciationBuffer(monaco, decorations, lineNumber, scope, parentState) {
+    const guideClassName = scope.name === "phonetic" ? "tps-phonetic" : "tps-pronunciation";
     for (const chunk of scope.buffer) {
         decorateStyledTextSegment(
             monaco,
@@ -1466,8 +1583,23 @@ function decoratePronunciationBuffer(monaco, decorations, lineNumber, scope, par
             chunk.startColumn,
             chunk.endColumn,
             parentState,
-            [`${cssClassPrefix}-inline-pronunciation-word`]);
+            [`${cssClassPrefix}-inline-pronunciation-word`, guideClassName]);
     }
+}
+
+function buildContourCueClassName(name, argument) {
+    const level = normalizeContourLevel(argument);
+    const levelClassName = level > 0 ? ` ${cssClassPrefix}-${name}-level-${level}` : emptyValue;
+    return `${cssClassPrefix}-inline-${name} tps-${name}${levelClassName}`;
+}
+
+function normalizeContourLevel(argument) {
+    const parsedLevel = Number.parseInt(String(argument ?? emptyValue).trim(), 10);
+    if (!Number.isFinite(parsedLevel)) {
+        return 0;
+    }
+
+    return Math.max(1, Math.min(10, parsedLevel));
 }
 
 function createInlineScopeFrame(name, kind, state, argument, tagClassName) {
@@ -1490,6 +1622,7 @@ function createInlineRenderState() {
         energyClass: null,
         energyValue: null,
         emotionClass: null,
+        emotionValue: null,
         isEmphasis: false,
         isHighlighted: false,
         isStress: false,
@@ -1530,13 +1663,13 @@ function popInlineScope(scopes, closingName) {
 function buildInlineStateClassName(state, extraClasses) {
     const classes = [];
     if (state.isEmphasis) {
-        classes.push(`${cssClassPrefix}-inline-emphasis`);
+        classes.push(`${cssClassPrefix}-inline-emphasis tps-emphasis`);
     }
     if (state.isHighlighted) {
-        classes.push(`${cssClassPrefix}-inline-highlight`);
+        classes.push(`${cssClassPrefix}-inline-highlight tps-highlight`);
     }
     if (state.isStress) {
-        classes.push(`${cssClassPrefix}-inline-stress`);
+        classes.push(`${cssClassPrefix}-inline-stress tps-stress`);
     }
     if (state.emotionClass) {
         classes.push(state.emotionClass);
@@ -1568,6 +1701,117 @@ function buildInlineStateClassName(state, extraClasses) {
     return classes.join(" ");
 }
 
+function buildInlineStateHoverMessage(state, extraClasses) {
+    const lines = [];
+    if (state.isHighlighted) {
+        lines.push("Highlight: mark this word or phrase as visually important.");
+    }
+    if (state.isEmphasis) {
+        lines.push("Emphasis: land this word or phrase harder than surrounding text.");
+    }
+    if (state.isStress) {
+        lines.push("Stress: focus articulation or syllable pressure here.");
+    }
+    if (state.volumeValue) {
+        lines.push(`Volume: deliver this as ${state.volumeValue}.`);
+    }
+    if (state.deliveryValue) {
+        lines.push(`Delivery: read this with ${state.deliveryValue} intent.`);
+    }
+    if (state.articulationValue) {
+        lines.push(`Articulation: apply ${state.articulationValue} phrasing.`);
+    }
+    if (state.emotionValue) {
+        lines.push(`Emotion: color this text with ${state.emotionValue}.`);
+    }
+    if (state.energyClass) {
+        lines.push(state.energyValue
+            ? `Energy contour: use delivery energy level ${state.energyValue}.`
+            : "Energy contour: shape the phrase with stronger delivery drive.");
+    }
+    if (state.melodyClass) {
+        lines.push(state.melodyValue
+            ? `Melody contour: use pitch variation level ${state.melodyValue}.`
+            : "Melody contour: shape the phrase with pitch movement.");
+    }
+    if (state.speedValue) {
+        lines.push(`Pace: deliver this at ${state.speedValue} speed.`);
+    }
+
+    for (const extraClass of extraClasses ?? []) {
+        if (String(extraClass).includes("tps-pronunciation")) {
+            lines.push("Pronunciation guide: show how this word should be spoken.");
+        } else if (String(extraClass).includes("tps-phonetic")) {
+            lines.push("Phonetic guide: show the IPA-style pronunciation for this word.");
+        }
+    }
+
+    return lines.length
+        ? { value: `**TPS cue**\n\n${lines.map(line => `- ${line}`).join("\n")}` }
+        : null;
+}
+
+function createPauseHoverMessage(pauseLength) {
+    return {
+        value: pauseLength === 2
+            ? "**TPS object**\n\n- Medium pause: insert a clear beat between phrases."
+            : "**TPS object**\n\n- Short pause: add a small spoken break without changing the surrounding words."
+    };
+}
+
+function createPauseObjectClassName(pauseLength) {
+    return `${cssClassPrefix}-object-chip ${cssClassPrefix}-object-pause ${pauseLength === 2 ? `${cssClassPrefix}-object-pause-long` : `${cssClassPrefix}-object-pause-short`}`;
+}
+
+function createTagHoverMessage(normalizedName, argument, role) {
+    const objectKind = resolveTagObjectKind(normalizedName, argument);
+    const roleText = role === "close"
+        ? "End marker"
+        : role === "standalone"
+            ? "Inline object"
+            : "Start marker";
+    const argumentText = argument ? ` Value: \`${argument}\`.` : emptyValue;
+    return {
+        value: `**TPS object**\n\n- ${roleText}: ${objectKind.description}${argumentText}`
+    };
+}
+
+function createTagObjectClassName(semanticTagClassName, normalizedName, argument, role) {
+    const objectKind = resolveTagObjectKind(normalizedName, argument);
+    const semanticClass = semanticTagClassName ? ` ${semanticTagClassName.replace(/\bpo-tag\b/g, emptyValue).trim()}` : emptyValue;
+    return `${cssClassPrefix}-object-chip ${cssClassPrefix}-object-tag ${cssClassPrefix}-object-tag-${role} ${cssClassPrefix}-object-${objectKind.name}${semanticClass}`;
+}
+
+function resolveTagObjectKind(normalizedName, argument) {
+    switch (normalizedName) {
+        case "pause":
+            return { name: "pause", description: argument ? "timed pause" : "pause" };
+        case "breath":
+            return { name: "breath", description: "breath mark" };
+        case "edit_point":
+        case "editpoint":
+            return { name: "cut", description: "edit or cut point" };
+        case "phonetic":
+            return { name: "phonetic", description: "phonetic pronunciation guide" };
+        case "pronunciation":
+            return { name: "pronunciation", description: "readable pronunciation guide" };
+        case "energy":
+            return { name: "energy", description: "energy contour" };
+        case "melody":
+            return { name: "melody", description: "melody contour" };
+        case "stress":
+            return { name: "stress", description: "stress cue" };
+        case "highlight":
+            return { name: "highlight", description: "highlight cue" };
+        case "emphasis":
+        case "strong":
+        case "bold":
+            return { name: "emphasis", description: "emphasis cue" };
+        default:
+            return { name: "cue", description: `${normalizedName || "TPS"} cue` };
+    }
+}
+
 function getPauseLength(text, index) {
     if (text[index] !== "/" || (index > 0 && text[index - 1] === "\\")) {
         return 0;
@@ -1585,12 +1829,18 @@ function getPauseLength(text, index) {
     return length;
 }
 
-function createInlineDecoration(monaco, lineNumber, startColumn, endColumn, inlineClassName, lineClassName) {
+function createInlineDecoration(monaco, lineNumber, startColumn, endColumn, inlineClassName, lineClassName, hoverMessage, beforeContentClassName) {
+    const options = {
+        beforeContentClassName,
+        inlineClassName,
+        lineClassName
+    };
+    if (hoverMessage) {
+        options.hoverMessage = hoverMessage;
+    }
+
     return {
-        options: {
-            inlineClassName,
-            lineClassName
-        },
+        options,
         range: new monaco.Range(lineNumber, startColumn, lineNumber, endColumn)
     };
 }

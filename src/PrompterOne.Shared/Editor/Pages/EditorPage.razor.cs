@@ -67,7 +67,7 @@ public partial class EditorPage
     private IReadOnlyList<EditorLocalRevisionViewModel> _localHistory = [];
     private DateTimeOffset? _lastLocalSaveAt;
     private EditorMetadataRailTab _metadataRailSelectedTab = EditorMetadataRailTab.Metadata;
-    private EditorWorkspaceTab _workspaceTab = EditorWorkspaceTab.Source;
+    private EditorWorkspaceTab _workspaceTab = EditorWorkspaceTab.Editor;
     private IDisposable? _aiSpotlightEditRegistration;
     private string _profile = DefaultProfileActor;
     private bool _preserveHistoryOnNextLoad;

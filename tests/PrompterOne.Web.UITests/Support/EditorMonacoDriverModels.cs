@@ -4,6 +4,8 @@ internal sealed class EditorMonacoState
 {
     public List<string> DecorationClasses { get; set; } = [];
 
+    public List<string> DecorationHoverMessages { get; set; } = [];
+
     public string AuthoringMode { get; set; } = string.Empty;
 
     public string Engine { get; set; } = string.Empty;
@@ -83,6 +85,15 @@ internal sealed class EditorMonacoHoverResult
     public List<string> Contents { get; set; } = [];
 
     public EditorMonacoHoverRange? Range { get; set; }
+}
+
+internal sealed class EditorMonacoPositionCoordinates
+{
+    public double Height { get; set; }
+
+    public double X { get; set; }
+
+    public double Y { get; set; }
 }
 
 internal sealed class EditorMonacoHoverRange

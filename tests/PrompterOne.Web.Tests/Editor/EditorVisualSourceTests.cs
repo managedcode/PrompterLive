@@ -79,14 +79,13 @@ public sealed class EditorVisualSourceTests : BunitContext
             Assert.Contains(AppTestData.Editor.BodyHeading, source.GetAttribute("value"));
         });
 
-        await cut.FindByTestId(UiTestIds.Editor.WorkspaceEditorTab).ClickAsync();
-
         cut.WaitForAssertion(() =>
         {
             var mainPanel = cut.FindByTestId(UiTestIds.Editor.MainPanel);
             var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
 
             Assert.Equal(UiTestIds.Editor.StyledAuthoringMode, mainPanel.GetAttribute("data-authoring-mode"));
+            Assert.Contains("active", cut.FindByTestId(UiTestIds.Editor.WorkspaceEditorTab).GetAttribute("class"), StringComparison.Ordinal);
             Assert.DoesNotContain(UiTestIds.Editor.LegacyRenderedView, cut.Markup, StringComparison.Ordinal);
             Assert.DoesNotContain("editor-rendered-card", cut.Markup, StringComparison.Ordinal);
             Assert.Contains(EditorVisualTestSource.RenderedOpeningProbe, source.GetAttribute("value"), StringComparison.Ordinal);

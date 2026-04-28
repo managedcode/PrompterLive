@@ -153,6 +153,18 @@ internal static class EditorMonacoDriver
             column
         });
 
+    internal static async Task<EditorMonacoPositionCoordinates> GetPositionCoordinatesAsync(IPage page, int lineNumber, int column)
+    {
+        var coordinates = await InvokeHarnessAsync<EditorMonacoPositionCoordinates?>(page, "getPositionCoordinates", new
+        {
+            lineNumber,
+            column
+        });
+
+        await Assert.That(coordinates).IsNotNull();
+        return coordinates!;
+    }
+
     internal static async Task<EditorMonacoTokenizedLine> TokenizeLineAsync(IPage page, int lineNumber)
     {
         var tokenizedLine = await InvokeHarnessAsync<EditorMonacoTokenizedLine?>(page, "tokenizeLine", new
