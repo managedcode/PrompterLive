@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components.Forms;
 using PrompterOne.Core.Models.Editor;
 
 namespace PrompterOne.Shared.Components.Editor;
@@ -40,6 +39,12 @@ public sealed record EditorStatusViewModel(
     string Duration,
     string Version);
 
+public enum EditorSourceAuthoringMode
+{
+    Raw,
+    StyledText
+}
+
 public sealed record EditorLocalRevisionViewModel(
     string Id,
     string SavedAtLabel,
@@ -57,57 +62,12 @@ public sealed record EditorLocalRevisionDiffLineViewModel(
     string Marker,
     string Text);
 
-public sealed record EditorRenderedSegmentViewModel(
-    int Index,
-    string Number,
-    string Name,
-    string EmotionLabel,
-    string TargetWpmLabel,
-    string DurationLabel,
-    IReadOnlyList<EditorRenderedCueViewModel> Cues,
-    IReadOnlyList<EditorRenderedBlockViewModel> Blocks);
-
-public sealed record EditorRenderedBlockViewModel(
-    int SegmentIndex,
-    int BlockIndex,
-    string BlockKey,
-    string Number,
-    string Name,
-    string EmotionLabel,
-    string TargetWpmLabel,
-    string Text,
-    IReadOnlyList<EditorRenderedCueViewModel> Cues,
-    IReadOnlyList<EditorBlockAttachmentViewModel> Attachments);
-
-public sealed record EditorRenderedCueViewModel(
-    string Kind,
-    string Icon,
-    string Label,
-    string Tone);
-
 public sealed record EditorBlockAttachmentViewModel(
     string Id,
     string FileName,
     string KindLabel,
     string SizeLabel,
     string? PreviewDataUrl);
-
-public sealed record EditorRenderedBlockTextChange(
-    int SegmentIndex,
-    int BlockIndex,
-    string Text);
-
-public sealed record EditorRenderedBlockAttachmentRequest(
-    string BlockKey,
-    string BlockName,
-    IBrowserFile File);
-
-public sealed record EditorRenderedBlockReorderRequest(
-    int SourceSegmentIndex,
-    int SourceBlockIndex,
-    int TargetSegmentIndex,
-    int TargetBlockIndex,
-    bool InsertAfterTarget);
 
 public sealed record EditorNavigationTarget(
     int SegmentIndex,

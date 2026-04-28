@@ -242,16 +242,25 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var titleHover = await EditorMonacoDriver.GetHoverAsync(page, TitleLineNumber, FindColumn(TitleLine, "#"));
             var wpmHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "140WPM"));
             var emotionHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "Professional"));
+            var speakerHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "Speaker:Alex"));
             var timingHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(SegmentLine, "0:00-0:30"));
 
             await Assert.That(titleHover).IsNotNull();
             await Assert.That(wpmHover).IsNotNull();
             await Assert.That(emotionHover).IsNotNull();
+            await Assert.That(speakerHover).IsNotNull();
             await Assert.That(timingHover).IsNotNull();
             await Assert.That(titleHover!.Contents).Contains(content => content.Contains("Document title", StringComparison.Ordinal));
-            await Assert.That(wpmHover!.Contents).Contains(content => content.Contains("WPM override", StringComparison.Ordinal));
-            await Assert.That(emotionHover!.Contents).Contains(content => content.Contains("Emotion override", StringComparison.Ordinal));
-            await Assert.That(timingHover!.Contents).Contains(content => content.Contains("Optional timing window", StringComparison.Ordinal));
+            await Assert.That(wpmHover!.Contents).Contains(content => content.Contains("Pace", StringComparison.Ordinal) &&
+                content.Contains("target speaking pace", StringComparison.Ordinal));
+            await Assert.That(emotionHover!.Contents).Contains(content => content.Contains("Emotion", StringComparison.Ordinal) &&
+                content.Contains("delivery mood", StringComparison.Ordinal));
+            await Assert.That(speakerHover!.Contents).Contains(content => content.Contains("Speaker assignment", StringComparison.Ordinal) &&
+                content.Contains("Speaker:Name", StringComparison.Ordinal));
+            await Assert.That(speakerHover.Contents).DoesNotContain(content => content.Contains("Header metadata", StringComparison.Ordinal));
+            await Assert.That(string.Join("\n", speakerHover.Contents).Length).IsLessThanOrEqualTo(180);
+            await Assert.That(timingHover!.Contents).Contains(content => content.Contains("Timing", StringComparison.Ordinal) &&
+                content.Contains("planned time window", StringComparison.Ordinal));
         }
         finally
         {
@@ -296,9 +305,10 @@ public sealed class EditorMonacoAssistanceRegressionTests(StandaloneAppFixture f
             var archetypeHover = await EditorMonacoDriver.GetHoverAsync(page, SegmentLineNumber, FindColumn(ArchetypeLine, "Archetype:Storyteller"));
 
             await Assert.That(archetypeHover).IsNotNull();
-            await Assert.That(archetypeHover!.Contents).Contains(content => content.Contains("Storyteller recommends 125 WPM", StringComparison.Ordinal));
-            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("energy 4-7", StringComparison.Ordinal));
-            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("melody 8-10", StringComparison.Ordinal));
+            await Assert.That(archetypeHover!.Contents).Contains(content => content.Contains("Archetype", StringComparison.Ordinal));
+            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("Storyteller performance preset", StringComparison.Ordinal));
+            await Assert.That(archetypeHover.Contents).Contains(content => content.Contains("pace, energy, melody", StringComparison.Ordinal));
+            await Assert.That(string.Join("\n", archetypeHover.Contents).Length).IsLessThanOrEqualTo(180);
         }
         finally
         {

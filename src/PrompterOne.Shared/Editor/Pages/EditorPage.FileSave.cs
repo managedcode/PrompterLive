@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using PrompterOne.Core.Models.CompiledScript;
 using PrompterOne.Core.Models.Workspace;
 using PrompterOne.Core.Services.Editor;
 using PrompterOne.Shared.Localization;
@@ -15,6 +17,11 @@ public partial class EditorPage
     private static readonly IReadOnlyList<string> DocxExportFileNameSuffixes = [ScriptDocumentFileTypes.DocxExtension];
     private static readonly IReadOnlyList<string> MarkdownExportFileNameSuffixes = [".md"];
     private static readonly IReadOnlyList<string> PlainTextExportFileNameSuffixes = [".txt"];
+    private static readonly Regex ExportCarriageReturnRegex = new(@"\r\n?", RegexOptions.Compiled);
+    private static readonly Regex ExportExcessBlankLineRegex = new(@"\n{3,}", RegexOptions.Compiled);
+    private static readonly Regex ExportSourceHeadingRegex = new(@"^\s{0,3}#{1,6}\s*\[[^\r\n]+\]\s*$", RegexOptions.Multiline | RegexOptions.Compiled);
+    private static readonly Regex ExportSourceInlineTagRegex = new(@"\[[^\]\r\n]+\]", RegexOptions.Compiled);
+    private static readonly Regex ExportWhitespaceBeforePunctuationRegex = new(@"\s+([,.!?;:])", RegexOptions.Compiled);
 
     private async Task HandleSaveFileRequestedAsync(
         EditorDocumentExportFormat format,
@@ -112,6 +119,51 @@ public partial class EditorPage
         }
 
         builder.Append(text.Trim());
+    }
+
+    private static string BuildCompiledBlockText(CompiledBlock? block)
+    {
+        if (block?.Words is not { Count: > 0 } words)
+        {
+            return string.Empty;
+        }
+
+        var text = string.Join(
+            ' ',
+            words
+                .Where(static word =>
+                    word.Metadata is not { IsPause: true } &&
+                    word.Metadata is not { IsEditPoint: true } &&
+                    !string.IsNullOrWhiteSpace(word.CleanText))
+                .Select(static word => word.CleanText.Trim()));
+
+        return CleanExportText(text);
+    }
+
+    private static string BuildSourceDisplayText(string source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return string.Empty;
+        }
+
+        var normalized = ExportCarriageReturnRegex.Replace(source, "\n");
+        var withoutHeadings = ExportSourceHeadingRegex.Replace(normalized, string.Empty);
+        var withoutInlineTags = ExportSourceInlineTagRegex.Replace(withoutHeadings, string.Empty);
+        return CleanExportText(withoutInlineTags);
+    }
+
+    private static string CleanExportText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        var normalized = ExportCarriageReturnRegex.Replace(text, "\n");
+        normalized = ExportWhitespaceBeforePunctuationRegex.Replace(normalized, "$1");
+        normalized = ExportExcessBlankLineRegex.Replace(normalized, "\n\n");
+        return normalized.Trim();
     }
 
     private static IReadOnlyList<string> ResolveExportFileNameSuffixes(EditorDocumentExportFormat format) =>

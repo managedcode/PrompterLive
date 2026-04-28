@@ -329,6 +329,39 @@ body.theme-light .ed-main ::deep .efb-menu-item:hover {
 .ed-main ::deep .monaco-editor .scroll-decoration{box-shadow:none !important;}
 .ed-main ::deep .monaco-editor .view-line{font-family:var(--mono) !important;}
 .ed-main ::deep .monaco-editor .cursor{box-shadow:none !important;}
+.ed-main ::deep .monaco-editor .monaco-hover,
+.ed-main ::deep .monaco-editor .monaco-hover .monaco-hover-content{
+    max-width:min(420px, calc(100vw - 32px)) !important;
+}
+.ed-main ::deep .monaco-editor .monaco-hover{
+    z-index:500 !important;
+    max-height:min(220px, calc(100vh - 32px)) !important;
+    overflow:hidden !important;
+    border:1px solid rgba(223,187,124,.32) !important;
+    border-radius:10px !important;
+    background:linear-gradient(180deg, rgba(9,13,22,.985), rgba(10,15,24,.995)) !important;
+    box-shadow:0 16px 36px rgba(0,0,0,.52),0 0 0 1px rgba(255,223,153,.1),inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.ed-main ::deep .monaco-editor .monaco-hover .hover-row,
+.ed-main ::deep .monaco-editor .monaco-hover .markdown-hover,
+.ed-main ::deep .monaco-editor .monaco-hover .hover-contents,
+.ed-main ::deep .monaco-editor .monaco-hover .monaco-hover-content{
+    color:var(--text-1) !important;
+    font:500 12px/1.45 var(--font-sans) !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+}
+.ed-main ::deep .monaco-editor .monaco-hover .hover-contents:not(.html-hover-contents) p,
+.ed-main ::deep .monaco-editor .monaco-hover .markdown-hover p{
+    margin:0 0 6px !important;
+}
+.ed-main ::deep .monaco-editor .monaco-hover code{
+    font:600 11px/1.45 var(--mono) !important;
+    color:#FFE7A8 !important;
+    background:rgba(212,176,112,.12) !important;
+    border-radius:4px !important;
+    padding:1px 4px !important;
+}
 .ed-main ::deep .mk-wpm-badge{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:600;color:#FFE066;background:rgba(255,224,102,.1);padding:2px 10px;border-radius:6px;border:1px solid rgba(255,224,102,.2);vertical-align:middle;margin:0 3px;}
 .ed-main ::deep .ed-src-line{margin:0;min-height:calc(2em);color:var(--t1);font-size:inherit;line-height:inherit;letter-spacing:inherit;}
 .ed-main ::deep .ed-src-line-empty{margin:0;min-height:calc(2em);}
@@ -351,6 +384,7 @@ body.theme-light .ed-main ::deep .efb-menu-item:hover {
 .ed-main ::deep .h-name,
 .ed-main ::deep .po-header-name{color:var(--t1);}
 .ed-main ::deep .h-sep{color:#7A8E88;}
+.ed-main ::deep .po-header-separator{color:#7A8E88;}
 .ed-main ::deep .h-wpm,
 .ed-main ::deep .po-header-wpm,
 .ed-main ::deep .po-inline-wpm{color:#FFE066;}
@@ -400,6 +434,37 @@ body.theme-light .ed-main ::deep .efb-menu-item:hover {
 .ed-main ::deep .po-inline-highlight{background-image:linear-gradient(180deg, transparent 58%, rgba(255,232,122,.15) 58%);box-shadow:inset 0 -2px 0 rgba(255,232,122,.35);color:#FFE87A;}
 .ed-main ::deep .po-find-match{background-image:linear-gradient(180deg, transparent 56%, rgba(212,176,112,.18) 56%);box-shadow:inset 0 -2px 0 rgba(212,176,112,.34);border-radius:4px;}
 .ed-main ::deep .po-find-match-active{background-image:linear-gradient(180deg, transparent 52%, rgba(255,224,102,.26) 52%);box-shadow:inset 0 -3px 0 rgba(255,224,102,.52);color:#FFF0C2;}
+.ed-main--styled-text ::deep .monaco-editor .view-line{font-family:var(--font-sans, var(--mono)) !important;}
+.ed-main--styled-text ::deep .po-header-mark,
+.ed-main--styled-text ::deep .po-header-bracket,
+.ed-main--styled-text ::deep .po-header-separator,
+.ed-main--styled-text ::deep .po-tag{
+    color:transparent !important;
+    font-size:0 !important;
+    opacity:0 !important;
+    text-shadow:none !important;
+}
+.ed-main--styled-text ::deep .po-line-segment,
+.ed-main--styled-text ::deep .po-line-block{
+    background:transparent;
+    box-shadow:none;
+}
+.ed-main--styled-text ::deep .po-header-name{
+    color:var(--t1);
+    font-weight:700;
+}
+.ed-main--styled-text ::deep .po-header-speaker,
+.ed-main--styled-text ::deep .po-header-wpm,
+.ed-main--styled-text ::deep .po-header-emotion,
+.ed-main--styled-text ::deep .po-header-meta{
+    border-radius:4px;
+    background:rgba(212,176,112,.045);
+    box-shadow:inset 0 0 0 1px rgba(212,176,112,.07);
+    color:color-mix(in srgb, currentColor 82%, var(--text-3));
+    font-weight:500;
+    opacity:.82;
+    padding:0 3px;
+}
 .ed-main ::deep .monaco-editor .line-numbers.active-line-number{
     color:#90A39C !important;
     font-size:14px !important;
@@ -417,6 +482,36 @@ html.theme-light .ed-main ::deep .monaco-editor .line-numbers,
 body.theme-light .ed-main ::deep .monaco-editor .line-numbers{
     color:#9F917D !important;
     opacity:.72;
+}
+
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover{
+    background:rgba(255,255,255,.98) !important;
+    border-color:rgba(139,115,85,.24) !important;
+    box-shadow:0 12px 30px rgba(92,77,61,.16),0 0 0 1px rgba(139,115,85,.08) !important;
+}
+
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover .hover-row,
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover .markdown-hover,
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover .hover-contents,
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover .monaco-hover-content,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover .hover-row,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover .markdown-hover,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover .hover-contents,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover .monaco-hover-content,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover .hover-row,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover .markdown-hover,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover .hover-contents,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover .monaco-hover-content{
+    color:#2C2418 !important;
+}
+
+html[data-theme="light"] .ed-main ::deep .monaco-editor .monaco-hover code,
+html.theme-light .ed-main ::deep .monaco-editor .monaco-hover code,
+body.theme-light .ed-main ::deep .monaco-editor .monaco-hover code{
+    color:#6F5424 !important;
+    background:rgba(139,115,85,.1) !important;
 }
 
 html[data-theme="light"] .ed-main ::deep .monaco-editor .line-numbers.active-line-number,

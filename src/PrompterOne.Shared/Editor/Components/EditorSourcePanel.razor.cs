@@ -37,7 +37,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
     private string _lastTypedText = string.Empty;
     private bool _skipNextRender;
     private bool _syncFindHighlightsAfterRender;
-    private bool _syncOverlayAfterRender = true;
     private bool _syncSurfaceAfterRender = true;
     private bool _surfaceInteropReady;
     private bool _visibleCanRedo;
@@ -67,6 +66,8 @@ public partial class EditorSourcePanel : IAsyncDisposable
 
     [Parameter] public bool CanRenderFloatingToolbar { get; set; } = true;
 
+    [Parameter] public EditorSourceAuthoringMode AuthoringMode { get; set; }
+
     [Parameter] public string? ErrorMessage { get; set; }
 
     [Parameter] public EventCallback<EditorCommandRequest> OnCommandRequested { get; set; }
@@ -88,6 +89,14 @@ public partial class EditorSourcePanel : IAsyncDisposable
     [Inject] private ILogger<EditorSourcePanel> Logger { get; set; } = NullLogger<EditorSourcePanel>.Instance;
     [Inject] private EditorToolbarInterop ToolbarInterop { get; set; } = default!;
 
+    private string AuthoringModeAttribute =>
+        AuthoringMode == EditorSourceAuthoringMode.StyledText ? "styled-text" : "raw";
+
+    private string MainPanelCss =>
+        AuthoringMode == EditorSourceAuthoringMode.StyledText
+            ? "ed-main ed-main--styled-text"
+            : "ed-main";
+
     protected override void OnParametersSet()
     {
         EnsureToolbarCatalogs();
@@ -101,7 +110,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
         var requiresSurfaceSyncForText = textChanged && !isLocalTextEcho;
 
         _skipNextRender = _surfaceInteropReady && isLocalTextEcho && !selectionNeedsRender;
-        _syncOverlayAfterRender |= textChanged;
         _syncSurfaceAfterRender |= requiresSurfaceSyncForText || (selectionChanged && selectionNeedsRender && !isLocalSelectionEcho);
 
         if (!isLocalTextEcho)
@@ -126,7 +134,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
         var surfaceBecameReady = await EnsureSurfaceInteropReadyAsync();
         if (surfaceBecameReady)
         {
-            _syncOverlayAfterRender = true;
             _syncSurfaceAfterRender = true;
             StateHasChanged();
             return;
@@ -136,12 +143,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
         {
             _syncSurfaceAfterRender = false;
             await SafeSyncSurfaceAsync();
-        }
-
-        if (_surfaceInteropReady && (firstRender || _syncOverlayAfterRender))
-        {
-            _syncOverlayAfterRender = false;
-            await SafeRenderOverlayAsync();
         }
 
         if (_surfaceInteropReady && (firstRender || _syncFindHighlightsAfterRender))
@@ -206,7 +207,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
             () => MonacoInterop.SyncEditorStateAsync(_editorHostRef, text, Selection with { Range = selection }),
             SurfaceSyncFailureMessage);
         _syncSurfaceAfterRender = false;
-        _syncOverlayAfterRender = false;
     }
 
     protected Task RequestInsertAsync(string token, int? caretOffset = null) =>
@@ -348,13 +348,6 @@ public partial class EditorSourcePanel : IAsyncDisposable
         return true;
     }
 
-    private async Task SafeRenderOverlayAsync()
-    {
-        _ = await RunInteropAsync(
-            () => SemanticInterop.RenderOverlayAsync(_semanticSnapshotRef, Text, SourceCueContracts),
-            InitializeSurfaceFailureMessage);
-    }
-
     private async Task SafeSyncSurfaceAsync()
     {
         _ = await RunInteropAsync(
@@ -385,6 +378,7 @@ public partial class EditorSourcePanel : IAsyncDisposable
         monacoLoaderPath = EditorMonacoRuntimeContract.MonacoLoaderPath,
         monacoStylesheetPath = EditorMonacoRuntimeContract.MonacoStylesheetPath,
         monacoVsPath = EditorMonacoRuntimeContract.MonacoVsPath,
+        authoringMode = AuthoringModeAttribute,
         placeholder = PlaceholderText,
         selectionChangedCallbackName = EditorMonacoInteropMethodNames.NotifySelectionChanged,
         sourceGutterTestId = UiTestIds.Editor.SourceGutter,

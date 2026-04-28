@@ -7,7 +7,9 @@
 @inject EditorInterop SemanticInterop
 @inject EditorMonacoInterop MonacoInterop
 
-<div class="ed-main" data-test="@UiTestIds.Editor.MainPanel">
+<div class="@MainPanelCss"
+     data-authoring-mode="@AuthoringModeAttribute"
+     data-test="@UiTestIds.Editor.MainPanel">
     <div class="ed-toolbar"
          @ref="_toolbarRef"
          data-test="@UiTestIds.Editor.Toolbar">

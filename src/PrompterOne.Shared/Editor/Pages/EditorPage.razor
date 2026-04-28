@@ -60,6 +60,7 @@
                                            Status="@_status"
                                            CanUndo="@_history.CanUndo"
                                            CanRedo="@_history.CanRedo"
+                                           AuthoringMode="@EditorSourceAuthoringMode.Raw"
                                            CanApplyWrapCommands="@CanApplyWrapCommands"
                                            CanRenderFloatingToolbar="@CanRenderFloatingToolbar"
                                            ErrorMessage="@_errorMessage"
@@ -71,12 +72,22 @@
                     }
                     else if (_workspaceTab == EditorWorkspaceTab.Editor)
                     {
-                        <EditorRenderedTextView Segments="@BuildRenderedSegments()"
-                                                FallbackText="@BuildRenderedFallbackText()"
-                                                FallbackLabel="@Text(UiTextKey.EditorWorkspaceEditorTab)"
-                                                AttachmentRequested="OnRenderedBlockAttachmentRequestedAsync"
-                                                BlockReorderRequested="OnRenderedBlockReorderRequestedAsync"
-                                                TextChanged="OnRenderedTextChangedAsync" />
+                        <EditorSourcePanel @key="EditorWorkspaceTab.Editor"
+                                           @ref="_sourcePanel"
+                                           Text="@_sourceText"
+                                           Selection="@_selection"
+                                           Status="@_status"
+                                           CanUndo="@_history.CanUndo"
+                                           CanRedo="@_history.CanRedo"
+                                           AuthoringMode="@EditorSourceAuthoringMode.StyledText"
+                                           CanApplyWrapCommands="@CanApplyWrapCommands"
+                                           CanRenderFloatingToolbar="@CanRenderFloatingToolbar"
+                                           ErrorMessage="@_errorMessage"
+                                           OnFilesDropped="OnFilesDroppedAsync"
+                                           OnTextChanged="OnSourceChangedAsync"
+                                           OnSelectionChanged="OnSelectionChangedAsync"
+                                           OnHistoryRequested="OnHistoryRequestedAsync"
+                                           OnCommandRequested="OnCommandRequestedAsync" />
                     }
                     else
                     {
@@ -98,6 +109,7 @@
                                                        Status="@_status"
                                                        CanUndo="@_history.CanUndo"
                                                        CanRedo="@_history.CanRedo"
+                                                       AuthoringMode="@EditorSourceAuthoringMode.Raw"
                                                        CanApplyWrapCommands="@CanApplyWrapCommands"
                                                        CanRenderFloatingToolbar="@CanRenderFloatingToolbar"
                                                        ErrorMessage="@_errorMessage"

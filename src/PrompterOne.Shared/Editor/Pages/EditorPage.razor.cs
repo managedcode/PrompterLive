@@ -30,7 +30,6 @@ public partial class EditorPage
     private const int LargeDraftDebounceThreshold = 16_000;
     private const int UntitledDraftAutosaveDelayMilliseconds = 1_500;
     private const int UntitledDraftAutosaveCharacterThreshold = 2;
-    private const long MaxBlockAttachmentBytes = 5 * 1024 * 1024;
     private const double GraphSourcePaneDefaultPercent = 34;
     private const double GraphSourcePaneMinimumPercent = 22;
     private const double GraphSourcePaneMaximumPercent = 64;
@@ -66,7 +65,6 @@ public partial class EditorPage
     private string? _errorMessage;
     private BrowserFileStorageSettings _fileStorageSettings = BrowserFileStorageSettings.Default;
     private IReadOnlyList<EditorLocalRevisionViewModel> _localHistory = [];
-    private IReadOnlyList<EditorBlockAttachment> _blockAttachments = [];
     private DateTimeOffset? _lastLocalSaveAt;
     private EditorMetadataRailTab _metadataRailSelectedTab = EditorMetadataRailTab.Metadata;
     private EditorWorkspaceTab _workspaceTab = EditorWorkspaceTab.Source;
@@ -98,7 +96,6 @@ public partial class EditorPage
     [Inject] private ScriptGraphViewerInterop GraphViewerInterop { get; set; } = null!;
     [Inject] private EditorLocalRevisionStore EditorLocalRevisionStore { get; set; } = null!;
     [Inject] private EditorDocumentSaveCoordinator EditorDocumentSaveCoordinator { get; set; } = null!;
-    [Inject] private EditorBlockAttachmentStore EditorBlockAttachmentStore { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private EditorOutlineBuilder OutlineBuilder { get; set; } = null!;
     [Inject] private ScriptKnowledgeGraphService ScriptKnowledgeGraphService { get; set; } = null!;

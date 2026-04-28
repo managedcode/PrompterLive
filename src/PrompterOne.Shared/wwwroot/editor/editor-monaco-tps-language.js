@@ -270,7 +270,8 @@ function findHeaderHover(monaco, line, position, spec) {
         for (const [index, part] of body.slice(1, -1).split("|").entries()) {
             const partEndColumn = partStartColumn + part.length;
             if (position.column >= partStartColumn && position.column <= partEndColumn) {
-                return createHover(monaco, position.lineNumber, partStartColumn, partEndColumn, resolveHeaderPartTitle(marker, index, spec), resolveHeaderPartDescription(marker, index, part.trim(), spec));
+                const value = part.trim();
+                return createHover(monaco, position.lineNumber, partStartColumn, partEndColumn, resolveHeaderPartTitle(marker, index, value, spec), resolveHeaderPartDescription(marker, index, value, spec));
             }
 
             partStartColumn = partEndColumn + 1;
@@ -338,12 +339,25 @@ function resolveHeaderTitle(marker, spec) {
             : "Block header";
 }
 
-function resolveHeaderPartTitle(marker, index, spec) {
+function resolveHeaderPartTitle(marker, index, value, spec) {
     if (index === 0) {
         return marker === spec.segmentHeaderMarker ? "Segment name" : "Block name";
     }
 
-    return "Header metadata";
+    switch (resolveHeaderPartKind(value, spec)) {
+        case "speaker":
+            return "Speaker assignment";
+        case "archetype":
+            return "Archetype";
+        case "pace":
+            return "Pace";
+        case "emotion":
+            return "Emotion";
+        case "timing":
+            return "Timing";
+        default:
+            return "Header option";
+    }
 }
 
 function resolveHeaderPartDescription(marker, index, value, spec) {
@@ -353,33 +367,51 @@ function resolveHeaderPartDescription(marker, index, value, spec) {
             : "Name of the TPS block inside the current segment.";
     }
 
+    const kind = resolveHeaderPartKind(value, spec);
+
+    switch (kind) {
+        case "speaker":
+            return "Assigns this segment or block to a named speaker. Use `Speaker:Name` for multi-speaker scripts.";
+        case "archetype": {
+            const descriptor = resolveArchetypeDescriptor(value, spec);
+            return descriptor
+                ? `Applies the ${descriptor.label} performance preset. It guides pace, energy, melody, and ${normalizeArchetypeArticulation(descriptor.articulation)} articulation.`
+                : "Applies a performance preset that can guide pace, energy, melody, and articulation.";
+        }
+        case "pace":
+            return "Sets the target speaking pace for this scope, for example `140WPM`.";
+        case "emotion":
+            return `Sets the inherited delivery mood for this scope. \`${value}\` affects reader and editor cue styling.`;
+        case "timing":
+            return "Marks an optional planned time window for this segment or block.";
+        default:
+            return "Extra structured header option inherited by content inside this scope.";
+    }
+}
+
+function resolveHeaderPartKind(value, spec) {
     const lowerValue = value.toLowerCase();
-    const speakerPrefixLower = spec.speakerPrefix.toLowerCase();
-    const archetypePrefixLower = spec.archetypePrefix.toLowerCase();
-    if (lowerValue.startsWith(speakerPrefixLower)) {
-        return "Talent assignment for multi-speaker scripts. Prefix the speaker name with `Speaker:`.";
+    if (lowerValue.startsWith(spec.speakerPrefix.toLowerCase())) {
+        return "speaker";
     }
 
-    if (lowerValue.startsWith(archetypePrefixLower)) {
-        const descriptor = resolveArchetypeDescriptor(value, spec);
-        return descriptor
-            ? `Archetype preset for this header scope. ${descriptor.label} recommends ${descriptor.recommendedWpm} WPM, energy ${descriptor.energyMin}-${descriptor.energyMax}, melody ${descriptor.melodyMin}-${descriptor.melodyMax}, speed ${descriptor.speedMin}-${descriptor.speedMax} WPM, and ${normalizeArchetypeArticulation(descriptor.articulation)} articulation.`
-            : "Archetype preset for this header scope. It can supply recommended pacing, articulation, and delivery defaults.";
+    if (lowerValue.startsWith(spec.archetypePrefix.toLowerCase())) {
+        return "archetype";
     }
 
     if (spec.numericWpmPattern.test(value)) {
-        return "WPM override for this header scope. Omit it when the inherited pace is already correct.";
+        return "pace";
     }
 
     if (spec.emotionTagNames.includes(lowerValue)) {
-        return `Emotion override for this scope. \`${value}\` affects the delivery styling and inherited mood.`;
+        return "emotion";
     }
 
     if (spec.headerTimingPattern.test(value)) {
-        return "Optional timing window for the header scope.";
+        return "timing";
     }
 
-    return "Additional header metadata for the current scope.";
+    return "metadata";
 }
 
 function resolveArchetypeDescriptor(value, spec) {

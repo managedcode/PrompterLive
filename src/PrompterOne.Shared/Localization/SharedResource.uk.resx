@@ -1707,18 +1707,6 @@
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Граф</value>
   </data>
-  <data name="EditorRenderedMoveBlockUp" xml:space="preserve">
-    <value>Перемістити блок вгору</value>
-  </data>
-  <data name="EditorRenderedMoveBlockDown" xml:space="preserve">
-    <value>Перемістити блок вниз</value>
-  </data>
-  <data name="EditorRenderedAttachMedia" xml:space="preserve">
-    <value>Додати медіа</value>
-  </data>
-  <data name="EditorRenderedAttachmentsLabel" xml:space="preserve">
-    <value>Вкладення блоку</value>
-  </data>
   <data name="LibraryCardBadgeTps" xml:space="preserve">
     <value>TPS</value>
   </data>

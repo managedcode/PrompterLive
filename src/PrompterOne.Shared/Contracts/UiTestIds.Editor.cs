@@ -133,17 +133,15 @@ public static partial class UiTestIds
         public const string PauseTwoSeconds = "editor-pause-two-seconds";
         public const string Profile = "editor-profile";
         public const string Redo = "editor-redo";
-        public const string RenderedEmpty = "editor-rendered-empty";
-        public const string RenderedFallbackText = "editor-rendered-fallback-text";
-        public const string RenderedStrip = "editor-rendered-strip";
         public const string WorkspaceEditorTab = "editor-workspace-editor-tab";
-        public const string RenderedView = "editor-rendered-view";
         public const string SourceHighlight = "editor-source-highlight";
         public const string SourceInput = "editor-source-input";
         public const string SourceGutter = "editor-source-gutter";
         public const string SourceMinimap = "editor-source-minimap";
         public const string SourceScrollHost = "editor-source-scroll-host";
         public const string SourceStage = "editor-source-stage";
+        public const string StyledAuthoringMode = "styled-text";
+        public const string LegacyRenderedView = "editor-rendered-view";
         public const string Toolbar = "editor-toolbar";
         public const string ToolbarScrollNext = "editor-toolbar-scroll-next";
         public const string ToolbarScrollPrevious = "editor-toolbar-scroll-previous";
@@ -195,31 +193,6 @@ public static partial class UiTestIds
         public static string LocalHistoryDiffSummary(int index) => $"editor-local-history-diff-summary-{index}";
 
         public static string LocalHistoryRestore(int index) => $"editor-local-history-restore-{index}";
-
-        public static string RenderedBlock(int segmentIndex, int blockIndex) => $"editor-rendered-block-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockDragHandle(int segmentIndex, int blockIndex) => $"editor-rendered-block-drag-handle-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockCues(int segmentIndex, int blockIndex) => $"editor-rendered-block-cues-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockAttachment(int segmentIndex, int blockIndex, int attachmentIndex) =>
-            $"editor-rendered-block-attachment-{segmentIndex}-{blockIndex}-{attachmentIndex}";
-
-        public static string RenderedBlockAttachmentInput(int segmentIndex, int blockIndex) =>
-            $"editor-rendered-block-attachment-input-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockAttachments(int segmentIndex, int blockIndex) =>
-            $"editor-rendered-block-attachments-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockMoveDown(int segmentIndex, int blockIndex) => $"editor-rendered-block-move-down-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockMoveUp(int segmentIndex, int blockIndex) => $"editor-rendered-block-move-up-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedBlockText(int segmentIndex, int blockIndex) => $"editor-rendered-block-text-{segmentIndex}-{blockIndex}";
-
-        public static string RenderedSegmentCues(int segmentIndex) => $"editor-rendered-segment-cues-{segmentIndex}";
-
-        public static string RenderedSegment(int segmentIndex) => $"editor-rendered-segment-{segmentIndex}";
 
         public static string SplitResultItem(int index) => $"editor-split-result-item-{index}";
 

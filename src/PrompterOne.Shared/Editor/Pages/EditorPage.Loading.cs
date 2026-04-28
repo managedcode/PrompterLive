@@ -35,7 +35,6 @@ public partial class EditorPage
                 PopulateEditorState(
                     resetHistory: !preserveHistoryOnLoad,
                     clearSplitFeedback: !ConsumePreserveSplitFeedbackOnNextLoad());
-                await LoadRenderedBlockAttachmentsAsync(SessionService.State.ScriptId);
                 StateHasChanged();
             });
 

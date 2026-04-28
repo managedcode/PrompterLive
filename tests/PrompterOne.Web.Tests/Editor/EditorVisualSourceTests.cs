@@ -67,7 +67,7 @@ public sealed class EditorVisualSourceTests : BunitContext
     }
 
     [Test]
-    public async Task EditorPage_RenderedStyledTextViewHidesTpsSyntaxAndEditsBlockText()
+    public async Task EditorPage_StyledEditorViewUsesMonacoBackedSourceSurface()
     {
         Services.GetRequiredService<NavigationManager>()
             .NavigateTo(AppTestData.Routes.EditorDemo);
@@ -83,43 +83,21 @@ public sealed class EditorVisualSourceTests : BunitContext
 
         cut.WaitForAssertion(() =>
         {
-            var renderedText = cut.FindByTestId(
-                    UiTestIds.Editor.RenderedBlockText(
-                        EditorVisualTestSource.IntroSegmentIndex,
-                        EditorVisualTestSource.OpeningBlockIndex))
-                .GetAttribute("value") ?? string.Empty;
+            var mainPanel = cut.FindByTestId(UiTestIds.Editor.MainPanel);
+            var source = cut.FindByTestId(UiTestIds.Editor.SourceInput);
 
-            Assert.NotNull(cut.FindByTestId(UiTestIds.Editor.RenderedView));
-            Assert.Equal("styled-text", cut.FindByTestId(UiTestIds.Editor.RenderedView).GetAttribute("data-rendered-authoring-mode"));
+            Assert.Equal(UiTestIds.Editor.StyledAuthoringMode, mainPanel.GetAttribute("data-authoring-mode"));
+            Assert.DoesNotContain(UiTestIds.Editor.LegacyRenderedView, cut.Markup, StringComparison.Ordinal);
             Assert.DoesNotContain("editor-rendered-card", cut.Markup, StringComparison.Ordinal);
-            Assert.DoesNotContain("data-rendered-cards-drag-ready", cut.Markup, StringComparison.Ordinal);
-            Assert.Contains(
-                "Warm",
-                cut.FindByTestId(UiTestIds.Editor.RenderedSegmentCues(EditorVisualTestSource.IntroSegmentIndex)).TextContent,
-                StringComparison.OrdinalIgnoreCase);
-            Assert.Contains(
-                "140WPM",
-                cut.FindByTestId(UiTestIds.Editor.RenderedBlockCues(
-                        EditorVisualTestSource.IntroSegmentIndex,
-                        EditorVisualTestSource.OpeningBlockIndex))
-                    .TextContent,
-                StringComparison.OrdinalIgnoreCase);
-            Assert.Equal(
-                "false",
-                cut.FindByTestId(UiTestIds.Editor.RenderedBlock(
-                    EditorVisualTestSource.IntroSegmentIndex,
-                    EditorVisualTestSource.OpeningBlockIndex)).GetAttribute("draggable"));
-            Assert.Contains(EditorVisualTestSource.RenderedOpeningProbe, renderedText, StringComparison.Ordinal);
-            Assert.DoesNotContain(EditorVisualTestSource.RawSegmentPrefix, renderedText, StringComparison.Ordinal);
-            Assert.DoesNotContain(EditorVisualTestSource.RawTagOpen, renderedText, StringComparison.Ordinal);
-            Assert.DoesNotContain(EditorVisualTestSource.RawTagClose, renderedText, StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.RenderedOpeningProbe, source.GetAttribute("value"), StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.RawSegmentPrefix, source.GetAttribute("value"), StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.RawTagOpen, source.GetAttribute("value"), StringComparison.Ordinal);
+            Assert.Contains(EditorVisualTestSource.RawTagClose, source.GetAttribute("value"), StringComparison.Ordinal);
         });
 
-        await cut.FindByTestId(
-                UiTestIds.Editor.RenderedBlockText(
-                    EditorVisualTestSource.IntroSegmentIndex,
-                    EditorVisualTestSource.OpeningBlockIndex))
-            .InputAsync(EditorVisualTestSource.RenderedOpeningRewrite);
+        var nextSource = (cut.FindByTestId(UiTestIds.Editor.SourceInput).GetAttribute("value") ?? string.Empty)
+            .Replace(EditorVisualTestSource.RenderedOpeningProbe, EditorVisualTestSource.RenderedOpeningRewrite, StringComparison.Ordinal);
+        await cut.FindByTestId(UiTestIds.Editor.SourceInput).InputAsync(nextSource);
         await cut.FindByTestId(UiTestIds.Editor.SourceTab).ClickAsync();
 
         cut.WaitForAssertion(() =>

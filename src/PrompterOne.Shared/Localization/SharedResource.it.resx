@@ -1686,18 +1686,6 @@
   <data name="EditorWorkspaceGraphTab" xml:space="preserve">
     <value>Grafo</value>
   </data>
-  <data name="EditorRenderedMoveBlockUp" xml:space="preserve">
-    <value>Sposta blocco su</value>
-  </data>
-  <data name="EditorRenderedMoveBlockDown" xml:space="preserve">
-    <value>Sposta blocco giù</value>
-  </data>
-  <data name="EditorRenderedAttachMedia" xml:space="preserve">
-    <value>Allega media</value>
-  </data>
-  <data name="EditorRenderedAttachmentsLabel" xml:space="preserve">
-    <value>Allegati del blocco</value>
-  </data>
   <data name="HeaderOpenScript" xml:space="preserve">
     <value>Importare</value>
   </data>

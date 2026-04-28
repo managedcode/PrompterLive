@@ -4,6 +4,7 @@ const cssClassPrefix = "po";
 const largeDraftDecorationCharacterThreshold = 16000;
 const largeDraftDecorationViewportLinePadding = 24;
 const largeDraftTextNotificationDelayMs = 750;
+const sourceMirrorLineRenderCharacterThreshold = 8000;
 const frontMatterDelimiter = "---";
 const emptyValue = "";
 const findMatchActiveClassName = `${cssClassPrefix}-find-match-active`;
@@ -21,6 +22,7 @@ const scopeKindNeutral = "neutral";
 const scopeKindStyle = "style";
 const scopeKindWpm = "wpm";
 const scopeKindPronunciation = "pronunciation";
+const styledTextAuthoringMode = "styled-text";
 const monacoMinimapDefaults = Object.freeze({
     autohide: "none",
     enabled: true,
@@ -221,6 +223,7 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
         existingState.findDecorationCollection ??= existingState.editor.createDecorationsCollection();
         existingState.findMatches ??= [];
         existingState.activeFindMatchIndex ??= -1;
+        existingState.host.dataset.authoringMode = normalizeAuthoringMode(options.authoringMode);
         await syncEditorState(host, proxy.value ?? emptyValue, proxy.selectionStart ?? 0, proxy.selectionEnd ?? 0);
         updateFindDecorations(existingState);
         return true;
@@ -295,11 +298,13 @@ export async function initializeEditor(host, proxy, semanticSnapshot, dotNetRef,
     state.hostDropHandler = hostDropHandler;
 
     hostStates.set(host, state);
+    host.dataset.authoringMode = normalizeAuthoringMode(options.authoringMode);
     host.setAttribute(options.editorEngineAttributeName, options.editorEngineAttributeValue);
     host.setAttribute(options.editorReadyAttributeName, "true");
 
     syncProxyFromEditor(state);
     syncEditorChromeContracts(state);
+    renderSemanticSnapshot(state, editor.getValue());
     scheduleDecorations(state);
     updateFindDecorations(state);
     ensureHarness(options);
@@ -599,6 +604,7 @@ function createHarnessState(state, options) {
             : (model?.getAllDecorations().map(decoration =>
                 decoration.options.inlineClassName || decoration.options.lineClassName || "").filter(Boolean) ?? []),
         engine: state.host.getAttribute(options.editorEngineAttributeName) ?? emptyValue,
+        authoringMode: normalizeAuthoringMode(state.options.authoringMode),
         layout: {
             contentLeft: layoutInfo.contentLeft ?? 0,
             contentWidth: layoutInfo.contentWidth ?? 0,
@@ -663,6 +669,10 @@ function applyResolvedTheme(monaco, options) {
 
 function resolveThemeName(options) {
     return isLightThemeActive() ? options.lightThemeName : options.darkThemeName;
+}
+
+function normalizeAuthoringMode(authoringMode) {
+    return authoringMode === styledTextAuthoringMode ? styledTextAuthoringMode : "raw";
 }
 
 function isLightThemeActive() {
@@ -945,10 +955,36 @@ function isSupportedFileName(fileName, supportedSuffixes) {
 }
 
 function renderSemanticSnapshot(state, text) {
-    const renderer = window.EditorSurfaceInterop;
-    if (renderer?.renderOverlay && state.semanticSnapshot) {
-        renderer.renderOverlay(state.semanticSnapshot, text ?? emptyValue, state.options.cueContracts);
+    const mirror = state.semanticSnapshot;
+    if (!(mirror instanceof HTMLElement)) {
+        return;
     }
+
+    const nextText = text ?? emptyValue;
+    mirror.dataset.renderedLength = String(nextText.length);
+    const renderLines = nextText.length <= sourceMirrorLineRenderCharacterThreshold;
+    if (state.lastMirrorText === nextText && state.lastMirrorRenderedLines === renderLines) {
+        return;
+    }
+
+    state.lastMirrorText = nextText;
+    state.lastMirrorRenderedLines = renderLines;
+
+    if (!renderLines) {
+        mirror.replaceChildren();
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    const lines = nextText.split(/\r\n|\n|\r/);
+    for (const line of lines) {
+        const element = document.createElement("div");
+        element.className = "ed-src-line";
+        element.textContent = line;
+        fragment.appendChild(element);
+    }
+
+    mirror.replaceChildren(fragment);
 }
 
 function scheduleDecorations(state) {
@@ -1144,8 +1180,9 @@ function decorateHeaderLine(monaco, decorations, lineNumber, line, prefix, lineC
 
     const contentStart = prefix.length + 3;
     const content = line.slice(contentStart - 1, -1);
+    const parts = content.split("|");
     let segmentStart = contentStart;
-    content.split("|").forEach((part, index) => {
+    parts.forEach((part, index) => {
         const className = index === 0
             ? `${cssClassPrefix}-header-name`
             : part.startsWith("Speaker:")
@@ -1156,6 +1193,14 @@ function decorateHeaderLine(monaco, decorations, lineNumber, line, prefix, lineC
                         ? `${cssClassPrefix}-header-emotion`
                         : `${cssClassPrefix}-header-meta`;
         decorations.push(createInlineDecoration(monaco, lineNumber, segmentStart, segmentStart + part.length, className));
+        if (index < parts.length - 1) {
+            decorations.push(createInlineDecoration(
+                monaco,
+                lineNumber,
+                segmentStart + part.length,
+                segmentStart + part.length + 1,
+                `${cssClassPrefix}-header-separator`));
+        }
         segmentStart += part.length + 1;
     });
 

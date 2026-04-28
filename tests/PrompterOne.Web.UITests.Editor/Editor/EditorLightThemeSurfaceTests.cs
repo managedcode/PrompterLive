@@ -12,10 +12,10 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
     private const string ScenarioName = "editor-light-theme-surface";
     private const string FullEditorStep = "01-full-editor-surface";
     private const string SourceStageStep = "02-source-stage-surface";
-    private const string CardsViewStep = "03-cards-view-surface";
+    private const string StyledEditorStep = "03-styled-editor-surface";
     private const double MinimumToolbarSurfaceChannel = 220;
     private const double MinimumMetadataSurfaceChannel = 210;
-    private const double MinimumCardsSurfaceChannel = 200;
+    private const double MinimumStyledEditorSurfaceChannel = 200;
     private const double MaximumReadableTextChannel = 160;
 
     private readonly record struct CssColor(double R, double G, double B, double A);
@@ -63,11 +63,12 @@ public sealed class EditorLightThemeSurfaceTests(StandaloneAppFixture fixture) :
             await UiScenarioArtifacts.CaptureLocatorAsync(stage, ScenarioName, SourceStageStep);
 
             await page.GetByTestId(UiTestIds.Editor.WorkspaceEditorTab).ClickAsync();
-            var renderedView = page.GetByTestId(UiTestIds.Editor.RenderedView);
-            await Expect(renderedView).ToBeVisibleAsync();
-            var cardsBackground = await ReadCssColorAsync(renderedView, BackgroundColorProperty);
-            await Assert.That(HasMinimumChannels(cardsBackground, MinimumCardsSurfaceChannel)).IsTrue().Because($"Expected the light-theme cards view to use a light theme-aware surface, but got rgba({cardsBackground.R:0.##}, {cardsBackground.G:0.##}, {cardsBackground.B:0.##}, {cardsBackground.A:0.##}).");
-            await UiScenarioArtifacts.CaptureLocatorAsync(renderedView, ScenarioName, CardsViewStep);
+            await EditorMonacoDriver.WaitUntilReadyAsync(page);
+            var styledEditor = page.GetByTestId(UiTestIds.Editor.MainPanel);
+            await Expect(styledEditor).ToHaveAttributeAsync("data-authoring-mode", UiTestIds.Editor.StyledAuthoringMode);
+            var styledBackground = await ReadCssColorAsync(styledEditor, BackgroundColorProperty);
+            await Assert.That(HasMinimumChannels(styledBackground, MinimumStyledEditorSurfaceChannel)).IsTrue().Because($"Expected the light-theme styled editor to use a light theme-aware surface, but got rgba({styledBackground.R:0.##}, {styledBackground.G:0.##}, {styledBackground.B:0.##}, {styledBackground.A:0.##}).");
+            await UiScenarioArtifacts.CaptureLocatorAsync(styledEditor, ScenarioName, StyledEditorStep);
         });
 
     private static async Task SwitchThemeAsync(IPage page)

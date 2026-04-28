@@ -126,7 +126,8 @@ public sealed class EditorMonacoAssistanceFlowTests(StandaloneAppFixture fixture
             await Assert.That(markdownHover).IsNotNull();
             await Assert.That(breathHover!.Contents).Contains(content => content.Contains("Breath mark", StringComparison.Ordinal) &&
                 content.Contains("natural breath point", StringComparison.OrdinalIgnoreCase));
-            await Assert.That(speakerHover!.Contents).Contains(content => content.Contains("Talent assignment", StringComparison.OrdinalIgnoreCase));
+            await Assert.That(speakerHover!.Contents).Contains(content => content.Contains("Speaker assignment", StringComparison.OrdinalIgnoreCase) &&
+                content.Contains("multi-speaker scripts", StringComparison.OrdinalIgnoreCase));
             await Assert.That(pauseHover!.Contents).Contains(content => content.Contains("Medium pause", StringComparison.Ordinal) &&
                 content.Contains("600ms", StringComparison.Ordinal));
             await Assert.That(guideHover!.Contents).Contains(content => content.Contains("Syllable guide", StringComparison.Ordinal) &&

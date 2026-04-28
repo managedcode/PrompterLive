@@ -4,6 +4,8 @@ internal sealed class EditorMonacoState
 {
     public List<string> DecorationClasses { get; set; } = [];
 
+    public string AuthoringMode { get; set; } = string.Empty;
+
     public string Engine { get; set; } = string.Empty;
 
     public EditorMonacoLayout Layout { get; set; } = new();

@@ -28,94 +28,49 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
                 [loud][building]Rise together[/building][/loud] and [soft]listen[stress]ing[/stress][/soft].
                 [breath] [legato][energy:8]steady[/energy][/legato] [staccato][melody:4]rhythm[/melody][/staccato].
                 """);
-            var probeHandle = await page.WaitForFunctionAsync(
+            await page.WaitForFunctionAsync(
                 """
                 (args) => {
-                    const host = document.querySelector(`[data-test="${args.overlayTestId}"]`);
-                    if (!(host instanceof HTMLElement)) {
+                    const harness = window[args.harnessGlobalName];
+                    const state = harness?.getState(args.stageTestId);
+                    const classes = state?.decorationClasses ?? [];
+                    if (!classes.length) {
                         return false;
                     }
 
-                    const nodes = [...host.querySelectorAll('*')];
-                    const loud = nodes.find(node =>
-                        node?.getAttribute(args.volumeAttributeName) === args.loudValue);
-                    const soft = nodes.find(node =>
-                        node?.getAttribute(args.volumeAttributeName) === args.softValue);
-                    const building = nodes.find(node =>
-                        node?.getAttribute(args.deliveryAttributeName) === args.buildingValue);
-                    const stress = nodes.find(node =>
-                        node?.getAttribute(args.stressAttributeName) === args.stressValue);
-                    const legato = nodes.find(node =>
-                        node?.getAttribute(args.articulationAttributeName) === args.legatoValue);
-                    const staccato = nodes.find(node =>
-                        node?.getAttribute(args.articulationAttributeName) === args.staccatoValue);
-                    const energy = nodes.find(node =>
-                        node?.getAttribute(args.energyAttributeName) === args.energyValue);
-                    const melody = nodes.find(node =>
-                        node?.getAttribute(args.melodyAttributeName) === args.melodyValue);
-                    const breath = nodes.find(node =>
-                        node?.getAttribute(args.breathAttributeName) === args.breathValue);
-                    const readScale = element =>
-                        element instanceof HTMLElement
-                            ? getComputedStyle(element).getPropertyValue(args.cueScaleVariableName).trim()
-                            : '';
-
-                    const loudScale = readScale(loud);
-                    const softScale = readScale(soft);
-                    if (!loud || !soft || !building || !stress || !legato || !staccato || !energy || !melody || !breath || !loudScale || !softScale) {
-                        return false;
-                    }
-
-                    return {
-                        loudVolume: loud.getAttribute(args.volumeAttributeName) ?? '',
-                        softVolume: soft.getAttribute(args.volumeAttributeName) ?? '',
-                        buildingDelivery: building.getAttribute(args.deliveryAttributeName) ?? '',
-                        stressValue: stress.getAttribute(args.stressAttributeName) ?? '',
-                        legatoArticulation: legato.getAttribute(args.articulationAttributeName) ?? '',
-                        staccatoArticulation: staccato.getAttribute(args.articulationAttributeName) ?? '',
-                        energyValue: energy.getAttribute(args.energyAttributeName) ?? '',
-                        melodyValue: melody.getAttribute(args.melodyAttributeName) ?? '',
-                        breathValue: breath.getAttribute(args.breathAttributeName) ?? '',
-                        loudScale,
-                        softScale
-                    };
+                    return args.requiredClasses.every(requiredClass =>
+                        classes.some(value => value.includes(requiredClass)));
                 }
                 """,
                 new
                 {
-                    articulationAttributeName = TpsVisualCueContracts.ArticulationAttributeName,
-                    breathAttributeName = TpsVisualCueContracts.BreathAttributeName,
-                    breathValue = TpsVisualCueContracts.BreathAttributeValue,
-                    cueScaleVariableName = TpsVisualCueContracts.CueScaleVariableName,
-                    deliveryAttributeName = TpsVisualCueContracts.DeliveryAttributeName,
-                    buildingValue = TpsVisualCueContracts.DeliveryModeBuilding,
-                    energyAttributeName = TpsVisualCueContracts.EnergyAttributeName,
-                    energyValue = "8",
-                    legatoValue = TpsVisualCueContracts.ArticulationLegato,
-                    melodyAttributeName = TpsVisualCueContracts.MelodyAttributeName,
-                    melodyValue = "4",
-                    loudValue = TpsVisualCueContracts.VolumeLoud,
-                    overlayTestId = UiTestIds.Editor.SourceHighlight,
-                    softValue = TpsVisualCueContracts.VolumeSoft,
-                    staccatoValue = TpsVisualCueContracts.ArticulationStaccato,
-                    stressAttributeName = TpsVisualCueContracts.StressAttributeName,
-                    stressValue = TpsVisualCueContracts.StressAttributeValue,
-                    volumeAttributeName = TpsVisualCueContracts.VolumeAttributeName
+                    harnessGlobalName = EditorMonacoRuntimeContract.BrowserHarnessGlobalName,
+                    requiredClasses = new[]
+                    {
+                        "po-inline-loud",
+                        "po-inline-soft",
+                        "po-inline-delivery-building",
+                        "po-inline-stress",
+                        "po-inline-articulation-legato",
+                        "po-inline-articulation-staccato",
+                        "po-inline-energy",
+                        "po-inline-melody",
+                        "po-tag-breath"
+                    },
+                    stageTestId = UiTestIds.Editor.SourceStage
                 },
                 new() { Timeout = BrowserTestConstants.Timing.EditorMutationTimeoutMs });
-            var probe = await probeHandle.JsonValueAsync<EditorCueProbe>();
 
-            await Assert.That(probe.LoudVolume).IsEqualTo(TpsVisualCueContracts.VolumeLoud);
-            await Assert.That(probe.SoftVolume).IsEqualTo(TpsVisualCueContracts.VolumeSoft);
-            await Assert.That(probe.BuildingDelivery).IsEqualTo(TpsVisualCueContracts.DeliveryModeBuilding);
-            await Assert.That(probe.StressValue).IsEqualTo(TpsVisualCueContracts.StressAttributeValue);
-            await Assert.That(probe.LegatoArticulation).IsEqualTo(TpsVisualCueContracts.ArticulationLegato);
-            await Assert.That(probe.StaccatoArticulation).IsEqualTo(TpsVisualCueContracts.ArticulationStaccato);
-            await Assert.That(probe.EnergyValue).IsEqualTo("8");
-            await Assert.That(probe.MelodyValue).IsEqualTo("4");
-            await Assert.That(probe.BreathValue).IsEqualTo(TpsVisualCueContracts.BreathAttributeValue);
-            await Assert.That(string.IsNullOrWhiteSpace(probe.LoudScale)).IsFalse();
-            await Assert.That(string.IsNullOrWhiteSpace(probe.SoftScale)).IsFalse();
+            var state = await EditorMonacoDriver.GetStateAsync(page);
+            await Assert.That(HasDecorationToken(state, "po-inline-loud")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-soft")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-delivery-building")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-stress")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-articulation-legato")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-articulation-staccato")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-energy")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-inline-melody")).IsTrue();
+            await Assert.That(HasDecorationToken(state, "po-tag-breath")).IsTrue();
 
             await UiScenarioArtifacts.CapturePageAsync(page, CueScenario, OverlayStepName);
         }
@@ -200,31 +155,6 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
         {
             await page.Context.CloseAsync();
         }
-    }
-
-    private sealed class EditorCueProbe
-    {
-        public string LoudVolume { get; init; } = string.Empty;
-
-        public string SoftVolume { get; init; } = string.Empty;
-
-        public string BuildingDelivery { get; init; } = string.Empty;
-
-        public string StressValue { get; init; } = string.Empty;
-
-        public string LegatoArticulation { get; init; } = string.Empty;
-
-        public string StaccatoArticulation { get; init; } = string.Empty;
-
-        public string EnergyValue { get; init; } = string.Empty;
-
-        public string MelodyValue { get; init; } = string.Empty;
-
-        public string BreathValue { get; init; } = string.Empty;
-
-        public string LoudScale { get; init; } = string.Empty;
-
-        public string SoftScale { get; init; } = string.Empty;
     }
 
     private static bool HasDecorationToken(EditorMonacoState state, string decorationToken) =>
