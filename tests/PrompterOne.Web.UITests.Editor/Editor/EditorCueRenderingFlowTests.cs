@@ -213,9 +213,9 @@ public sealed class EditorCueRenderingFlowTests(StandaloneAppFixture fixture)
             await Assert.That(energyHover!.Contents).Contains(content => content.Contains("Energy contour", StringComparison.Ordinal));
             await Assert.That(melodyHover!.Contents).Contains(content => content.Contains("Melody contour", StringComparison.Ordinal));
 
-            var energyPoint = await EditorMonacoDriver.GetPositionCoordinatesAsync(page, 5, FindColumn(contourLine, "steady"));
+            var energyPoint = await EditorMonacoDriver.GetRenderedDecorationCoordinatesAsync(page, "po-inline-energy", "steady");
             await page.Mouse.MoveAsync((float)energyPoint.X, (float)energyPoint.Y);
-            await Expect(page.Locator(".monaco-hover").First).ToContainTextAsync("Energy contour", new()
+            await Expect(page.Locator(".monaco-hover:not(.hidden)").First).ToContainTextAsync("Energy contour", new()
             {
                 Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
             });

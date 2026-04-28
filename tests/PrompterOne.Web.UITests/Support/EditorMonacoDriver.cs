@@ -165,6 +165,18 @@ internal static class EditorMonacoDriver
         return coordinates!;
     }
 
+    internal static async Task<EditorMonacoPositionCoordinates> GetRenderedDecorationCoordinatesAsync(IPage page, string className, string textContent)
+    {
+        var coordinates = await InvokeHarnessAsync<EditorMonacoPositionCoordinates?>(page, "getRenderedDecorationCoordinates", new
+        {
+            className,
+            textContent
+        });
+
+        await Assert.That(coordinates).IsNotNull();
+        return coordinates!;
+    }
+
     internal static async Task<EditorMonacoTokenizedLine> TokenizeLineAsync(IPage page, int lineNumber)
     {
         var tokenizedLine = await InvokeHarnessAsync<EditorMonacoTokenizedLine?>(page, "tokenizeLine", new

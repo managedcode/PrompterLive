@@ -557,6 +557,40 @@ function ensureHarness(options) {
                 y: editorBounds.top + visiblePosition.top + (visiblePosition.height / 2)
             };
         },
+        getRenderedDecorationCoordinates: (testId, className, textContent) => {
+            const state = getRequiredHarnessState(testId);
+            const token = String(className ?? emptyValue).trim().replace(/^\./, emptyValue);
+            if (!/^[a-zA-Z0-9_-]+$/.test(token)) {
+                return null;
+            }
+
+            state.editor.render(true);
+            const editorNode = state.editor.getDomNode();
+            if (!editorNode) {
+                return null;
+            }
+
+            const expectedText = String(textContent ?? emptyValue).trim();
+            const elements = Array.from(editorNode.querySelectorAll(`.${token}`));
+            const element = elements.find(candidate => {
+                const bounds = candidate.getBoundingClientRect();
+                if (bounds.width <= 0 || bounds.height <= 0) {
+                    return false;
+                }
+
+                return !expectedText || String(candidate.textContent ?? emptyValue).includes(expectedText);
+            });
+            if (!element) {
+                return null;
+            }
+
+            const bounds = element.getBoundingClientRect();
+            return {
+                height: bounds.height,
+                x: bounds.left + (bounds.width / 2),
+                y: bounds.top + (bounds.height / 2)
+            };
+        },
         setSelection: async (testId, start, end, revealSelection = true, selectionDirection = undefined) => {
             const state = getRequiredHarnessState(testId);
             applySelection(state, start ?? 0, end ?? 0, revealSelection !== false, selectionDirection);
