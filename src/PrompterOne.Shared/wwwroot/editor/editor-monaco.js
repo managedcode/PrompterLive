@@ -1,7 +1,7 @@
 import { ensureTpsLanguage, getTpsLanguageSupport } from "./editor-monaco-tps-language.js";
 
 const cssClassPrefix = "po";
-const largeDraftDecorationViewportLinePadding = 24;
+const largeDraftDecorationViewportLinePadding = 12;
 const visibleRangeDecorationCharacterThreshold = 0;
 const largeDraftTextNotificationCharacterThreshold = 16000;
 const largeDraftTextNotificationDelayMs = 750;
@@ -13,6 +13,7 @@ const findMatchClassName = `${cssClassPrefix}-find-match`;
 const floatingToolbarMinimumTop = 44;
 const floatingToolbarSelectionOffset = 5;
 const hostStates = new WeakMap();
+const frontMatterEndLineCache = new WeakMap();
 const gutterSelector = ".margin-view-overlays";
 const minimapSelector = ".minimap";
 const numericWpmRegex = /^(?<wpm>\d+)\s*WPM$/i;
@@ -1234,17 +1235,30 @@ function getDecorationLineRanges(state, model) {
 }
 
 function resolveFrontMatterEndLine(model) {
-    if (model.getLineCount() < 2 || model.getLineContent(1) !== frontMatterDelimiter) {
-        return 0;
+    const versionId = typeof model.getVersionId === "function"
+        ? model.getVersionId()
+        : -1;
+    const cached = frontMatterEndLineCache.get(model);
+    if (cached?.versionId === versionId) {
+        return cached.endLineNumber;
     }
 
+    let endLineNumber = 0;
+    if (model.getLineCount() < 2 || model.getLineContent(1) !== frontMatterDelimiter) {
+        frontMatterEndLineCache.set(model, { endLineNumber, versionId });
+        return endLineNumber;
+    }
+
+    endLineNumber = 1;
     for (let lineNumber = 2; lineNumber <= model.getLineCount(); lineNumber++) {
         if (model.getLineContent(lineNumber) === frontMatterDelimiter) {
-            return lineNumber;
+            endLineNumber = lineNumber;
+            break;
         }
     }
 
-    return 1;
+    frontMatterEndLineCache.set(model, { endLineNumber, versionId });
+    return endLineNumber;
 }
 
 function shouldUseVisibleRangeDecorations(state) {

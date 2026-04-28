@@ -285,7 +285,9 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 return activeWord;
             }
 
-            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Teleprompter.NextWord),
+                noWaitAfter: true);
             await Expect(activeWord).Not.ToHaveTextAsync(currentText, new()
             {
                 Timeout = BrowserTestConstants.Timing.DefaultVisibleTimeoutMs
@@ -311,7 +313,9 @@ public sealed class TeleprompterCueRenderingFlowTests(StandaloneAppFixture fixtu
                 return;
             }
 
-            await page.GetByTestId(UiTestIds.Teleprompter.NextWord).ClickAsync();
+            await UiInteractionDriver.ClickAndContinueAsync(
+                page.GetByTestId(UiTestIds.Teleprompter.NextWord),
+                noWaitAfter: true);
         }
 
         throw new InvalidOperationException(
